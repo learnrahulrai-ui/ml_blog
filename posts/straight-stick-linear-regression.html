@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Straight Stick (Linear Regression from 3 Points) :: Rahul's ML Blog</title>
+  <title>Linear Regression: OLS, the Normal Equations, and Numerics :: Rahul's ML Blog</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -16,8 +16,8 @@
 
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** guess = Σ feature×dial + nudge *** best dials = bottom of the bowl ***
-      3b + 6w = 10 ;  6b + 14w = 23 *** β = (XᵀX)⁻¹Xᵀy *** it's a projection ***
+      *** minimize ‖Xβ − y‖² *** XᵀX β = Xᵀy *** ŷ = Hy is a projection ***
+      O(nd² + d³) *** don't invert — factor *** singular XᵀX → ridge ***
     </span>
   </div>
 
@@ -33,207 +33,225 @@
 
       <div class="article-header">
         <span class="series-badge">LAB 1 &middot; PART 3 OF 3</span>
-        <div class="article-title">The Straight Stick: Linear Regression from Three Points</div>
+        <div class="article-title">Linear Regression: OLS, the Normal Equations, and Numerics</div>
         <div class="article-meta">
           Posted: 2026-06-01 &nbsp;|&nbsp;
           Author: Rahul Rai &nbsp;|&nbsp;
-          Tags: linear-regression, ols, least-squares, by-hand, math
+          Tags: linear-regression, ols, least-squares, numerical-stability
         </div>
       </div>
 
       <div class="article-body">
 
         <p>
-          The <a href="neighbor-machine-knn.html">neighbour machine</a> copies. This
-          one is a completely different philosophy. No neighbours, no scanning the pile.
-          Instead:
+          Linear regression models the target as a weighted sum of the features plus an
+          intercept. Unlike KNN it is parametric: fit once, discard the data, keep
+          <code>d+1</code> numbers. The weights have a closed-form least-squares solution.
         </p>
 
-        <blockquote>Give every measured thing a dial. Multiply and add up.</blockquote>
+        <h2>The Model</h2>
 
         <div class="math-box">
-          guess = rooms&times;dial&sub1; + income&times;dial&sub2; + age&times;dial&sub3; + &hellip; + nudge
+          &#375;<sub>i</sub> = &beta;<sub>0</sub> + &Sigma;<sub>j</sub> &beta;<sub>j</sub> x<sub>ij</sub>
+          &nbsp;&nbsp;&hArr;&nbsp;&nbsp; &#375; = X&beta;
         </div>
 
         <p>
-          Each <em>dial</em> is a multiplier that says how much that measurement
-          matters. The <code>nudge</code> is the baseline &mdash; the guess when every
-          measurement is zero. Once the dials are set, guessing is instant: no memory,
-          just arithmetic.
+          The intercept <code>&beta;<sub>0</sub></code> is absorbed by prepending a column of
+          ones to <code>X</code>. Each <code>&beta;<sub>j</sub></code> is the change in the
+          prediction per unit change in feature <code>j</code>, holding the others fixed. The
+          model is linear <em>in the parameters</em>; the features themselves may be transformed
+          (squares, logs, interactions) and it remains linear regression.
         </p>
 
-        <h2>The Bowl</h2>
+        <h2>The Objective: Least Squares</h2>
+
+        <p>Choose <code>&beta;</code> to minimise the residual sum of squares:</p>
+
+        <div class="math-box">
+          J(&beta;) = &#8214;X&beta; &minus; y&#8214;&sup2; = &Sigma;<sub>i</sub> (&#375;<sub>i</sub> &minus; y<sub>i</sub>)&sup2;
+        </div>
 
         <p>
-          The best dials are the ones that make the total mistake smallest. Picture a
-          bowl &mdash; the height is the mistake, and you want the bottom:
+          <code>J</code> is a convex quadratic &mdash; its Hessian <code>2X&#7488;X</code> is
+          positive semidefinite &mdash; so any stationary point is a global minimum. No local
+          minima, no iterative search required.
         </p>
 
 <pre><code>         ╲         ╱
-          ╲       ╱
-           ╲     ╱
-            ╲   ╱
-             ╲ ╱
-              •  ← best dials live here (bottom of the bowl)</code></pre>
+          ╲       ╱        height  = squared error J(β)
+           ╲     ╱         bottom  = the least-squares β
+            ╲ • ╱</code></pre>
 
-        <p>Two ways to find the bottom:</p>
+        <h2>Solving It: The Normal Equations</h2>
 
-        <ol>
-          <li><strong>Walk downhill</strong> &mdash; start anywhere, feel the slope,
-              take a small step down, repeat. (The textbook calls this
-              <em>gradient descent</em>.)</li>
-          <li><strong>Solve directly</strong> &mdash; the slope is zero at the bottom;
-              for a straight stick you can solve <em>where flat</em> in one shot.</li>
-        </ol>
+        <p>Set the gradient to zero:</p>
 
-        <p>
-          For a straight line there's an exact answer, so I wanted the real math. Here
-          it is &mdash; three points, done entirely by pencil.
-        </p>
-
-        <h2>The Pencil Solve</h2>
-
-<pre><code>   x = 1, 2, 3       y = 2, 3, 5
-
-   Build the sums:
-   Σ1  = 3    Σx  = 6     Σy  = 10    Σxy = 23    Σx² = 14
-
-   Normal equations (the "where flat" conditions):
-     3b +  6w = 10
-     6b + 14w = 23
-
-   Solve:
-     multiply top row by 2:   6b + 12w = 20
-     subtract from bottom:          2w = 3     →  w = 3/2
-     back-substitute:    3b + 9 = 10           →  b = 1/3
-
-   The line:  ŷ = 1/3 + 1.5x</code></pre>
-
-        <p>Now check the residuals &mdash; the leftover misses:</p>
-
-<pre><code>   x=1: ŷ=1.833, miss=+0.167
-   x=2: ŷ=3.333, miss=−0.333
-   x=3: ŷ=4.833, miss=+0.167
-
-   Sum of misses   = 0     ✓  (they cancel)
-   Sum of x·miss   = 0     ✓  (residuals ⟂ inputs)
-   RMSE ≈ 0.236</code></pre>
-
-        <div class="callout key">
-          <span class="callout-label">&#9733; THE SAME OPERATION, SCALED</span>
-          This three-point pencil solve <strong>is</strong> exactly what the machine
-          does &mdash; just with 16,000 rows and 8 dials instead of 3 rows and 1 dial.
-          The dials live in <code>m.coef_</code>, the nudge in <code>m.intercept_</code>.
+        <div class="math-box">
+          &nabla;J = 2X&#7488;(X&beta; &minus; y) = 0
+          &nbsp;&rArr;&nbsp; X&#7488;X&beta; = X&#7488;y
+          &nbsp;&rArr;&nbsp; &beta; = (X&#7488;X)<sup>&minus;1</sup>X&#7488;y
         </div>
 
-        <h2>The Geometry: It's a Projection</h2>
-
         <p>
-          Those two checks aren't a coincidence. The residuals sum to zero and they're
-          perpendicular to the inputs because fitting a straight line is a
-          <strong>projection</strong>. The best line is the <em>shadow</em> of the data
-          cast onto the space of all possible lines. You can't do better than the
-          shadow &mdash; any other line leaves a longer leftover.
+          The same system, solved by hand at <code>d = 1</code> (one feature, one intercept) on
+          three points &mdash; here <code>&Sigma;1</code>, <code>&Sigma;x</code> etc. are the
+          entries of <code>X&#7488;X</code> and <code>X&#7488;y</code>:
         </p>
 
-        <p>And here it is in symbols, for when you're ready to go deeper:</p>
+<pre><code>   x = 1, 2, 3     y = 2, 3, 5
+   Σ1 = 3   Σx = 6   Σy = 10   Σxy = 23   Σx² = 14
 
-<pre><code>   minimise  J(β) = ‖Xβ − y‖²          (total squared miss)
-   set slope to zero:  XᵀX β = Xᵀy      (the normal equations)
-   solve:  β = (XᵀX)⁻¹ Xᵀy             (the exact dials)
+   XᵀX β = Xᵀy   →    3b +  6w = 10
+                      6b + 14w = 23
 
-   geometry:  ŷ = Hy   →  it's a projection (H = "hat" matrix)
-   residual ⟂ inputs:   Xᵀe = 0
-   stats:  unbiased, best among all straight guessers (Gauss–Markov)</code></pre>
+   solve:  2w = 3  →  w = 3/2 ;   3b + 9 = 10  →  b = 1/3
+   line:   ŷ = 1/3 + (3/2)x</code></pre>
+
+        <h2>Why the Residuals Check Out</h2>
 
         <p>
-          I won't pretend I absorbed all of that in one sitting. But I <em>touched</em>
-          it &mdash; I held the pieces. That matters more than memorising the final
-          formula.
+          At the optimum, <code>X&#7488;(y &minus; X&beta;) = 0</code>, i.e.
+          <code>X&#7488;e = 0</code>: the residual vector is orthogonal to every feature column,
+          and (because one column is all ones) the residuals sum to zero. That's exactly what
+          the three-point fit shows:
         </p>
+
+<pre><code>   x=1: ŷ=1.833, r = y−ŷ = +0.167
+   x=2: ŷ=3.333, r       = −0.333
+   x=3: ŷ=4.833, r       = +0.167
+
+   Σ r      = 0     ✓   (orthogonal to the intercept column)
+   Σ x·r    = 0     ✓   (orthogonal to the x column)
+   RMSE = √(mean r²) ≈ 0.236</code></pre>
+
+        <p>
+          Geometrically, <code>&#375; = Hy</code> with the hat matrix
+          <code>H = X(X&#7488;X)<sup>&minus;1</sup>X&#7488;</code> &mdash; the orthogonal
+          projection of <code>y</code> onto the column space of <code>X</code>. <code>H</code> is
+          symmetric and idempotent (<code>H&sup2; = H</code>), and <code>trace(H)</code> equals
+          the number of fitted parameters. OLS <em>is</em> that projection; no vector in the span
+          of the features sits closer to <code>y</code>.
+        </p>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; SAME OPERATION, SCALED UP</span>
+          The three-point pencil solve is identical to what the library runs on 16,000 rows and
+          8 features &mdash; only the dimensions of <code>X&#7488;X</code> change. Fitted weights
+          land in <code>m.coef_</code>, the intercept in <code>m.intercept_</code>.
+        </div>
+
+        <h2>When OLS Is the Best Linear Estimator</h2>
+
+        <p>
+          The Gauss&ndash;Markov theorem: if the errors have zero conditional mean
+          (<code>E[&epsilon;|X] = 0</code>), constant variance, and are uncorrelated, and
+          <code>X</code> has full column rank, then OLS is <strong>BLUE</strong> &mdash; the
+          minimum-variance estimator among all linear unbiased estimators. Two things worth
+          stating precisely:
+        </p>
+
+        <ul>
+          <li><strong>Normality is not required</strong> for Gauss&ndash;Markov. You only need it
+              for exact confidence intervals and t-tests, not for OLS to be the best linear
+              unbiased fit.</li>
+          <li><strong>Full column rank</strong> means no feature is a linear combination of the
+              others. If one is, <code>X&#7488;X</code> is singular and
+              <code>(X&#7488;X)<sup>&minus;1</sup></code> does not exist.</li>
+        </ul>
+
+        <h2>Numerics: Don't Invert the Matrix</h2>
+
+        <p>
+          Forming <code>X&#7488;X</code> costs <code>O(nd&sup2;)</code> and solving costs
+          <code>O(d&sup3;)</code>, so the fit is <code>O(nd&sup2; + d&sup3;)</code>. But you
+          should not compute <code>(X&#7488;X)<sup>&minus;1</sup></code> explicitly: forming
+          <code>X&#7488;X</code> squares the condition number
+          (<code>&kappa;(X&#7488;X) = &kappa;(X)&sup2;</code>) and loses precision. Instead:
+        </p>
+
+        <ul>
+          <li>Solve the linear system directly (Cholesky on <code>X&#7488;X</code>), or better,</li>
+          <li>Factor <code>X</code> itself with <strong>QR</strong> or <strong>SVD</strong> and
+              solve the least-squares problem without ever forming <code>X&#7488;X</code>.
+              scikit-learn's <code>LinearRegression</code> uses an SVD-based solver.</li>
+          <li>For very large <code>n</code> or <code>d</code>, or streaming data, use gradient
+              descent: <code>O(nd)</code> per step instead of a full factorisation.</li>
+          <li>If <code>X&#7488;X</code> is singular or ill-conditioned (collinear features), add
+              an L2 penalty &mdash; ridge regression,
+              <code>&beta; = (X&#7488;X + &lambda;I)<sup>&minus;1</sup>X&#7488;y</code> &mdash;
+              which is invertible for any <code>&lambda; &gt; 0</code>.</li>
+        </ul>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; SCALING: THE CONTRAST WITH KNN</span>
+          Plain OLS is <strong>invariant</strong> to feature scaling: rescale a feature and its
+          weight rescales inversely, leaving predictions and RMSE unchanged. So &mdash; unlike
+          KNN &mdash; OLS needs no standardisation for correctness. You <em>do</em> need it for
+          gradient-descent convergence and for any regularised variant (ridge/lasso penalise
+          coefficient magnitude, which depends on scale).
+        </div>
 
         <h2>In Code</h2>
-
-        <p>
-          The tool hides the loop again. <code>fit</code> does the real work (solving
-          the normal equations); <code>predict</code> is just multiply-and-add:
-        </p>
 
 <pre><code>from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
-m = LinearRegression()           # the straight-stick machine, no neighbour knob
-m.fit(X_train, y_train)          # finds the dials (the real work)
-guesses = m.predict(X_test)
+m = LinearRegression()           # SVD-based least squares under the hood
+m.fit(X_train, y_train)          # solves XᵀX β = Xᵀy for β
+pred = m.predict(X_test)         # one dot product per row
 
-rmse = mean_squared_error(y_test, guesses) ** 0.5
-print(round(rmse, 3))
+rmse = mean_squared_error(y_test, pred) ** 0.5
+print(round(rmse, 3), m.coef_, m.intercept_)</code></pre>
 
-print("dials (coef_):", m.coef_)
-print("nudge (intercept_):", m.intercept_)</code></pre>
-
-        <div class="callout note">
-          <span class="callout-label">&#9656; No knob to tune</span>
-          Unlike KNN's <code>k</code>, plain linear regression has nothing to choose.
-          The dials are <em>solved</em>, not picked. There's no equivalent of "try k=1,
-          3, 5&hellip;" &mdash; the bottom of the bowl is wherever the math says it is.
-          (That changes once you add regularisation &mdash; a later chapter.)
-        </div>
-
-        <h2>KNN vs. The Straight Stick</h2>
+        <h2>KNN vs. OLS</h2>
 
         <table>
           <thead>
-            <tr><th>&nbsp;</th><th>Neighbour machine (KNN)</th><th>Straight stick (linear)</th></tr>
+            <tr><th>&nbsp;</th><th>KNN</th><th>Linear regression (OLS)</th></tr>
           </thead>
           <tbody>
-            <tr><td>How it guesses</td><td>copy nearest neighbours</td><td>one formula, dials + nudge</td></tr>
-            <tr><td>"Training"</td><td>none &mdash; just memorise</td><td>solve for the dials once</td></tr>
-            <tr><td>Guessing cost</td><td>re-scan whole pile</td><td>instant multiply-add</td></tr>
-            <tr><td>Knob to pick</td><td>k (cross-validate it)</td><td>none (it's solved)</td></tr>
-            <tr><td>Shape it fits</td><td>bumpy, local</td><td>one flat plane</td></tr>
+            <tr><td>Type</td><td>non-parametric, instance-based</td><td>parametric</td></tr>
+            <tr><td>Fit</td><td>store data, O(1)</td><td>solve normal equations, O(nd²+d³)</td></tr>
+            <tr><td>Predict</td><td>O(n·d) per row</td><td>O(d) per row</td></tr>
+            <tr><td>Hyperparameter</td><td>k (cross-validate)</td><td>none (λ if regularised)</td></tr>
+            <tr><td>Feature scaling</td><td>required</td><td>not for plain OLS</td></tr>
+            <tr><td>Hypothesis</td><td>local, piecewise-constant</td><td>one global hyperplane</td></tr>
           </tbody>
         </table>
 
         <p>
-          Same job, opposite strategies. One leans on memory, the other on a rule.
-          Both answer the same question: <em>given what I've seen, what's my best guess
-          for something I haven't?</em>
+          Opposite strategies, one question: given the rows seen, predict the target for a row
+          unseen. KNN leans on stored examples; OLS compresses them into a hyperplane.
         </p>
 
-        <h2>Where to Go Deeper</h2>
-
-        <p>
-          When you're ready, these are the search terms that open up the math under the
-          straight stick:
-        </p>
+        <h2>Going Deeper</h2>
 
         <ul>
-          <li><strong>dot product</strong>, <strong>matrix times vector</strong> &mdash; the language</li>
-          <li><strong>normal equations</strong>, <strong>least squares</strong> &mdash; the solve</li>
-          <li><strong>least squares projection</strong> &mdash; the geometry</li>
-          <li><strong>gradient descent</strong> &mdash; the walk-downhill alternative</li>
-          <li><strong>Gauss&ndash;Markov</strong> &mdash; why this line is provably the best straight guesser</li>
+          <li><strong>normal equations</strong>, <strong>ordinary least squares</strong> &mdash; the solve</li>
+          <li><strong>QR / SVD least squares</strong>, <strong>condition number</strong> &mdash; the numerics</li>
+          <li><strong>projection / hat matrix</strong> &mdash; the geometry</li>
+          <li><strong>Gauss&ndash;Markov</strong>, <strong>heteroscedasticity</strong> &mdash; the assumptions</li>
+          <li><strong>ridge</strong>, <strong>lasso</strong> &mdash; what to do when features are collinear</li>
         </ul>
 
         <ol class="takeaways">
-          <li>A straight rule = a dial per feature, plus one nudge.</li>
-          <li>Best dials = the bottom of the squared-mistake bowl.</li>
-          <li>For a line you can solve the bottom exactly (normal equations).</li>
-          <li>Residuals sum to zero and are perpendicular to the inputs &mdash; it's a projection.</li>
-          <li>Plain linear regression has no knob to tune; the dials are solved.</li>
+          <li>Model: <code>&#375; = X&beta;</code>; fit by minimising <code>&#8214;X&beta;&minus;y&#8214;&sup2;</code>.</li>
+          <li>Convex objective &rarr; closed form <code>&beta; = (X&#7488;X)<sup>&minus;1</sup>X&#7488;y</code>.</li>
+          <li>Residuals are orthogonal to the features; <code>&#375; = Hy</code> is a projection.</li>
+          <li>OLS is BLUE under Gauss&ndash;Markov; normality is needed only for inference.</li>
+          <li>Factor (QR/SVD), don't invert; regularise when <code>X&#7488;X</code> is singular.</li>
         </ol>
 
         <hr>
         <p style="font-size:13px;">
           <strong>Lab 1 series:</strong>
-          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; Overview</a> &middot;
-          <a href="neighbor-machine-knn.html">Part 2 &mdash; The Neighbor Machine</a> &middot;
+          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; Pipeline</a> &middot;
+          <a href="neighbor-machine-knn.html">Part 2 &mdash; k-Nearest Neighbours</a> &middot;
           Part 3 (this post)
         </p>
         <p style="font-size:12px; color:var(--dim);">
-          <em>Next: a yes-or-no guesser with an S-curve, and drawing the dividing line
-          between groups.</em>
+          <em>Next lab: binary classification &mdash; the logistic link and the decision boundary.</em>
         </p>
         <p style="font-size:12px; color:var(--dim);">
           &larr; <a href="../index.html">Back to all posts</a>
@@ -246,7 +264,7 @@ print("nudge (intercept_):", m.intercept_)</code></pre>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// LAB 1 SERIES</div>
         <ul>
-          <li><a href="chapter1-what-ml-actually-does.html">Part 1: Overview</a></li>
+          <li><a href="chapter1-what-ml-actually-does.html">Part 1: Pipeline</a></li>
           <li><a href="neighbor-machine-knn.html">Part 2: KNN</a></li>
           <li><strong>Part 3: Linear Reg.</strong></li>
         </ul>
@@ -254,21 +272,21 @@ print("nudge (intercept_):", m.intercept_)</code></pre>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// IN THIS POST</div>
         <ul>
-          <li>Dials + nudge</li>
-          <li>The bowl</li>
-          <li>Pencil solve (3 pts)</li>
+          <li>Model &amp; objective</li>
           <li>Normal equations</li>
-          <li>Projection geometry</li>
-          <li>KNN vs linear</li>
+          <li>Residual orthogonality</li>
+          <li>Gauss&ndash;Markov</li>
+          <li>Numerical stability</li>
+          <li>Scaling invariance</li>
         </ul>
       </div>
       <div class="sidebar-box">
-        <div class="sidebar-box-title">// DECODER</div>
+        <div class="sidebar-box-title">// KEY RESULTS</div>
         <ul>
-          <li>straight stick = linear reg / OLS</li>
-          <li>dials = coefficients</li>
-          <li>nudge = intercept</li>
-          <li>bowl bottom = least squares</li>
+          <li>β = (XᵀX)⁻¹Xᵀy</li>
+          <li>Xᵀe = 0</li>
+          <li>ŷ = Hy, H²=H</li>
+          <li>fit: O(nd²+d³)</li>
         </ul>
       </div>
     </aside>
