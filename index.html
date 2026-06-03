@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rahul's ML Blog :: Machine Learning Notes from the Trenches</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="wrapper">
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="ascii-art">
+ ____  __   _  _  __  ____  ____     __  __    ____  __     __   ___
+(  _ \/ _\ / )( \(  )(_  _)/ ___)   (  \/  )  (  _ \(  )   /  \ / __)
+ )   //    \) \/ ( )(   )(  \___ \   )    (    ) _ ( )(    (  O )( (_ \
+(__\_)\_/\_/\____/(__)  (__) (____/  (__/\__)  (____/(____)  \__/  \___/
+</div>
+    <div class="site-title">RAHUL'S ML BLOG<span class="blink">_</span></div>
+    <div class="site-subtitle">// Machine Learning Notes from the Trenches // Est. 2024 //</div>
+  </header>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      *** WELCOME TO MY ML BLOG *** gradient descent never stops ***
+      neural nets all the way down *** transformers ate the world ***
+      this site best viewed with an open mind *** no cookies, no trackers, just math ***
+      *** WELCOME TO MY ML BLOG *** gradient descent never stops ***
+    </span>
+  </div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="archive.html">Archive</a>
+    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
+  </nav>
+
+  <!-- MAIN CONTENT AREA -->
+  <div id="content-area">
+
+    <!-- POSTS -->
+    <main id="main">
+      <div class="section-header">// LATEST POSTS</div>
+
+      <!-- Post: Backprop -->
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/backpropagation.html">Backpropagation From Scratch: It's Just Chain Rule</a>
+        </div>
+        <div class="post-meta">
+          <span>2024-11-20</span> &nbsp;|&nbsp;
+          <span class="tag">deep-learning</span>
+          <span class="tag">math</span>
+          <span class="tag">beginner</span>
+        </div>
+        <div class="post-excerpt">
+          Everyone says backprop is hard. It's not — it's literally just the chain rule from calculus
+          applied repeatedly. In this post I derive it from scratch, implement it in pure Python,
+          and show you exactly what gradients mean geometrically. No magic, no black boxes.
+        </div>
+        <a class="read-more" href="posts/backpropagation.html">[ READ MORE &rarr; ]</a>
+      </article>
+
+      <!-- Post: Transformers -->
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/attention-mechanism.html">Attention Is All You Need (But Here's What That Actually Means)</a>
+        </div>
+        <div class="post-meta">
+          <span>2024-10-05</span> &nbsp;|&nbsp;
+          <span class="tag">transformers</span>
+          <span class="tag">nlp</span>
+          <span class="tag">attention</span>
+        </div>
+        <div class="post-excerpt">
+          The 2017 paper changed everything. But most explanations either wave their hands or dump
+          equations without intuition. I'll walk through self-attention step by step using actual
+          numbers so you can see what Q, K, and V really do, and why dot-product attention works.
+        </div>
+        <a class="read-more" href="posts/attention-mechanism.html">[ READ MORE &rarr; ]</a>
+      </article>
+
+      <!-- Post: Gradient Descent -->
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/gradient-descent.html">Gradient Descent: SGD, Adam, and Why Your Loss Explodes</a>
+        </div>
+        <div class="post-meta">
+          <span>2024-09-12</span> &nbsp;|&nbsp;
+          <span class="tag">optimization</span>
+          <span class="tag">training</span>
+        </div>
+        <div class="post-excerpt">
+          Plain gradient descent almost never ships in production. SGD with momentum, RMSProp, Adam —
+          what are they actually doing? I compare all the common optimizers, explain the adaptive
+          learning rate intuition, and show the hyperparameter traps that kill training runs.
+        </div>
+        <a class="read-more" href="posts/gradient-descent.html">[ READ MORE &rarr; ]</a>
+      </article>
+
+      <hr>
+      <div style="text-align:center; font-size:12px; color:var(--dim);">
+        &larr; more posts coming soon &rarr;
+      </div>
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+
+      <div class="sidebar-box counter-box">
+        <div class="sidebar-box-title">// VISITORS</div>
+        <span class="counter-num">004271</span>
+        <span class="counter-label">hits since launch</span>
+      </div>
+
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// TOPICS</div>
+        <ul>
+          <li><a href="#">Deep Learning</a></li>
+          <li><a href="#">NLP / LLMs</a></li>
+          <li><a href="#">Optimization</a></li>
+          <li><a href="#">Math &amp; Proofs</a></li>
+          <li><a href="#">Paper Reviews</a></li>
+          <li><a href="#">Python Code</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// LINKS</div>
+        <ul>
+          <li><a href="https://arxiv.org/list/cs.LG/recent" target="_blank">arXiv ML</a></li>
+          <li><a href="https://paperswithcode.com" target="_blank">Papers w/ Code</a></li>
+          <li><a href="https://distill.pub" target="_blank">Distill.pub</a></li>
+          <li><a href="https://github.com/learnrahulrai-ui" target="_blank">My GitHub</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// STACK</div>
+        <ul>
+          <li>Python 3.12</li>
+          <li>PyTorch 2.x</li>
+          <li>NumPy</li>
+          <li>Jupyter</li>
+          <li>Pure HTML/CSS</li>
+        </ul>
+      </div>
+
+    </aside>
+  </div><!-- /content-area -->
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div>&copy; 2024 Rahul Rai &mdash; All rights reserved</div>
+    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
+    <div class="footer-badges">
+      <span class="badge">HTML 5</span>
+      <span class="badge">CSS 3</span>
+      <span class="badge">No JS</span>
+      <span class="badge">Open Source</span>
+      <span class="badge">Best Viewed: Any Browser</span>
+    </div>
+  </footer>
+
+</div><!-- /wrapper -->
+</body>
+</html>

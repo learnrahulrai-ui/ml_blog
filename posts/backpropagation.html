@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backpropagation From Scratch :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="site-title"><a href="../index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
+    <div class="site-subtitle">// Machine Learning Notes from the Trenches //</div>
+  </header>
+
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      *** dL/dw = dL/da * da/dz * dz/dw *** chain rule forever ***
+      just keep multiplying those Jacobians *** it's not magic it's calculus ***
+    </span>
+  </div>
+
+  <nav id="nav">
+    <a href="../index.html">Home</a>
+    <a href="../about.html">About</a>
+    <a href="../archive.html">Archive</a>
+    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
+  </nav>
+
+  <div id="content-area">
+    <main id="main">
+
+      <!-- ARTICLE -->
+      <div class="article-header">
+        <div class="article-title">Backpropagation From Scratch: It's Just Chain Rule</div>
+        <div class="article-meta">
+          Posted: 2024-11-20 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: deep-learning, math, beginner
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          Every intro to neural networks gets to backprop and suddenly the
+          notation explodes — partial derivatives, superscripts, subscripts,
+          Jacobians. People treat it like black magic baked into PyTorch.
+          It's not. It's one rule applied over and over: the <strong>chain rule</strong>.
+        </p>
+
+        <h2>The Setup</h2>
+
+        <p>
+          A neural network maps inputs to outputs through a chain of functions.
+          If our network is just two layers:
+        </p>
+
+        <div class="math-box">
+          ŷ = f₂( f₁( x &middot; W₁ + b₁ ) &middot; W₂ + b₂ )
+        </div>
+
+        <p>
+          We want to minimize a loss <code>L(ŷ, y)</code> by adjusting the weights.
+          To do that we need <code>∂L/∂W₁</code>, <code>∂L/∂W₂</code>, etc.
+          That's it. That's what backprop computes.
+        </p>
+
+        <h2>Chain Rule in One Sentence</h2>
+
+        <p>
+          If <code>z = g(f(x))</code>, then:
+        </p>
+
+        <div class="math-box">
+          dz/dx = dz/df &middot; df/dx
+        </div>
+
+        <p>
+          You have a chain of functions? Multiply all the local derivatives together.
+          Backprop is just doing this for every parameter in the network, starting
+          from the loss and working backwards — hence <em>back</em>propagation.
+        </p>
+
+        <h2>A Minimal Working Example</h2>
+
+        <p>
+          Let's implement a 2-layer network in pure Python with no libraries.
+          Just NumPy for matrix math.
+        </p>
+
+<pre><code>import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_deriv(x):
+    s = sigmoid(x)
+    return s * (1 - s)
+
+def mse_loss(y_pred, y_true):
+    return ((y_pred - y_true) ** 2).mean()
+
+# --- forward pass ---
+def forward(X, W1, b1, W2, b2):
+    z1 = X @ W1 + b1       # pre-activation layer 1
+    a1 = sigmoid(z1)       # activation layer 1
+    z2 = a1 @ W2 + b2      # pre-activation layer 2
+    a2 = sigmoid(z2)       # output
+    cache = (X, z1, a1, z2, a2)
+    return a2, cache
+
+# --- backward pass ---
+def backward(y_true, cache, W2):
+    X, z1, a1, z2, a2 = cache
+    m = y_true.shape[0]
+
+    # dL/da2 — derivative of MSE loss
+    dL_da2 = 2 * (a2 - y_true) / m
+
+    # dL/dz2 — chain through sigmoid
+    dL_dz2 = dL_da2 * sigmoid_deriv(z2)
+
+    # dL/dW2 and dL/db2
+    dW2 = a1.T @ dL_dz2
+    db2 = dL_dz2.sum(axis=0)
+
+    # dL/da1 — propagate gradient back through W2
+    dL_da1 = dL_dz2 @ W2.T
+
+    # dL/dz1 — chain through sigmoid again
+    dL_dz1 = dL_da1 * sigmoid_deriv(z1)
+
+    # dL/dW1 and dL/db1
+    dW1 = X.T @ dL_dz1
+    db1 = dL_dz1.sum(axis=0)
+
+    return dW1, db1, dW2, db2
+</code></pre>
+
+        <h2>What's Actually Happening</h2>
+
+        <p>
+          Look at the backward pass line by line. We start with
+          <code>dL/da2</code> — how does the loss change as the output changes?
+          Then at each layer we do two things:
+        </p>
+
+        <ol>
+          <li>
+            <strong>Apply the local derivative</strong> of the activation function
+            (<code>sigmoid_deriv</code>) to get the gradient w.r.t. the pre-activation.
+          </li>
+          <li>
+            <strong>Propagate through the weight matrix</strong> (<code>@ W2.T</code>)
+            to get the gradient w.r.t. the previous layer's activation.
+          </li>
+        </ol>
+
+        <p>
+          Repeat until you reach the first layer. Every gradient is just a
+          product of gradients you already computed further down the chain.
+          No mystery.
+        </p>
+
+        <h2>The Vanishing Gradient Problem (Quick Note)</h2>
+
+        <p>
+          Notice <code>sigmoid_deriv(z)</code>? The sigmoid derivative peaks at 0.25
+          and quickly approaches 0 for large positive or negative inputs. Multiply
+          enough of those together as you go back through deep networks and the
+          gradients shrink to near-zero — weights in early layers barely update.
+          This is why ReLU (<code>max(0, x)</code>, derivative = 1 for positive inputs)
+          became the default activation: it keeps gradients alive.
+        </p>
+
+        <div class="math-box">
+          ReLU'(x) = 1 if x &gt; 0, else 0
+        </div>
+
+        <h2>Running It</h2>
+
+<pre><code># XOR dataset
+X = np.array([[0,0],[0,1],[1,0],[1,1]], dtype=float)
+y = np.array([[0],[1],[1],[0]], dtype=float)
+
+# random init
+np.random.seed(42)
+W1 = np.random.randn(2, 4) * 0.5
+b1 = np.zeros((1, 4))
+W2 = np.random.randn(4, 1) * 0.5
+b2 = np.zeros((1, 1))
+
+lr = 0.5
+for epoch in range(5000):
+    y_pred, cache = forward(X, W1, b1, W2, b2)
+    dW1, db1, dW2, db2 = backward(y, cache, W2)
+    W1 -= lr * dW1
+    b1 -= lr * db1
+    W2 -= lr * dW2
+    b2 -= lr * db2
+
+y_pred, _ = forward(X, W1, b1, W2, b2)
+print(np.round(y_pred, 2))
+# → [[0.04], [0.96], [0.96], [0.04]]  ✓
+</code></pre>
+
+        <p>
+          Works. XOR is classically not linearly separable — the hidden layer
+          learned to transform the input space so it becomes separable.
+          Backprop found those weights automatically.
+        </p>
+
+        <h2>Takeaway</h2>
+
+        <p>
+          Backpropagation = forward pass to compute outputs and cache intermediate
+          values + backward pass multiplying local gradients using the chain rule.
+          PyTorch's <code>autograd</code> does exactly this, just for arbitrary
+          computation graphs and much more efficiently. Understanding the manual
+          version means you'll never be confused by what <code>.backward()</code> does.
+        </p>
+
+        <blockquote>
+          "Backprop is just book-keeping for the chain rule." — probably someone smart
+        </blockquote>
+
+        <hr>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div><!-- /article-body -->
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>Chain Rule</li>
+          <li>Forward Pass</li>
+          <li>Backward Pass</li>
+          <li>Pure Python impl</li>
+          <li>Vanishing Gradient</li>
+          <li>XOR example</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// RELATED</div>
+        <ul>
+          <li><a href="gradient-descent.html">Gradient Descent</a></li>
+          <li><a href="attention-mechanism.html">Attention Mechanism</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <footer id="footer">
+    <div>&copy; 2024 Rahul Rai &mdash; All rights reserved</div>
+    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
+    <div class="footer-badges">
+      <span class="badge">HTML 5</span>
+      <span class="badge">CSS 3</span>
+      <span class="badge">No JS</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attention Is All You Need :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <header id="header">
+    <div class="site-title"><a href="../index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
+    <div class="site-subtitle">// Machine Learning Notes from the Trenches //</div>
+  </header>
+
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      *** Attention(Q,K,V) = softmax(QK^T / sqrt(d_k))V ***
+      Vaswani et al. 2017 changed everything *** Q K V forever ***
+      multi-head attention is just parallel attention ***
+    </span>
+  </div>
+
+  <nav id="nav">
+    <a href="../index.html">Home</a>
+    <a href="../about.html">About</a>
+    <a href="../archive.html">Archive</a>
+    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
+  </nav>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <div class="article-title">Attention Is All You Need (But Here's What That Actually Means)</div>
+        <div class="article-meta">
+          Posted: 2024-10-05 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: transformers, nlp, attention
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          In 2017, Vaswani et al. published "Attention Is All You Need" and
+          proceeded to make RNNs largely obsolete. But the paper is dense and
+          most blog posts either re-copy the abstract or drown you in matrices.
+          Let me show you what attention actually <em>does</em> with real numbers.
+        </p>
+
+        <h2>The Core Idea</h2>
+
+        <p>
+          Old sequence models (LSTMs, GRUs) processed tokens one at a time —
+          the hidden state had to carry information about the entire past.
+          Attention says: what if every token could directly look at every
+          other token and decide how much to "attend" to it?
+        </p>
+
+        <p>
+          The key insight: represent each token three ways —
+        </p>
+
+        <ul>
+          <li><strong>Query (Q)</strong>: what am I looking for?</li>
+          <li><strong>Key (K)</strong>: what do I offer?</li>
+          <li><strong>Value (V)</strong>: what is my actual content?</li>
+        </ul>
+
+        <p>
+          To compute the output for token <em>i</em>, you compare its query
+          against every token's key (dot product = similarity), normalize with
+          softmax to get weights, then take a weighted sum of all values.
+        </p>
+
+        <h2>The Formula</h2>
+
+        <div class="math-box">
+          Attention(Q, K, V) = softmax( QK&sup T; / &radic;d_k ) &middot; V
+        </div>
+
+        <p>
+          The <code>√d_k</code> scaling prevents the dot products from getting
+          too large as embedding dimension grows (which would push softmax into
+          tiny-gradient territory).
+        </p>
+
+        <h2>Step by Step with Numbers</h2>
+
+        <p>Let's do it manually. Say we have a 3-token sequence with d_model=4.</p>
+
+<pre><code>import numpy as np
+
+# 3 tokens, d_model = 4
+X = np.array([
+    [1.0, 0.0, 1.0, 0.0],   # token 0
+    [0.0, 1.0, 0.0, 1.0],   # token 1
+    [1.0, 1.0, 0.0, 0.0],   # token 2
+])
+
+# learned projection matrices (d_model=4 → d_k=4)
+np.random.seed(7)
+W_Q = np.random.randn(4, 4) * 0.5
+W_K = np.random.randn(4, 4) * 0.5
+W_V = np.random.randn(4, 4) * 0.5
+
+# project input to Q, K, V
+Q = X @ W_Q   # shape (3, 4)
+K = X @ W_K
+V = X @ W_V
+
+# compute raw attention scores
+d_k = Q.shape[-1]
+scores = Q @ K.T / np.sqrt(d_k)   # shape (3, 3)
+print("Raw scores:\n", np.round(scores, 3))
+
+# softmax over last axis
+def softmax(x):
+    e = np.exp(x - x.max(axis=-1, keepdims=True))
+    return e / e.sum(axis=-1, keepdims=True)
+
+attn_weights = softmax(scores)    # shape (3, 3)
+print("\nAttention weights:\n", np.round(attn_weights, 3))
+
+# weighted sum of values
+output = attn_weights @ V         # shape (3, 4)
+print("\nOutput:\n", np.round(output, 3))
+</code></pre>
+
+        <p>
+          Each row of <code>attn_weights</code> sums to 1.0 and tells you how
+          much each token attends to every other token. The output for token 0
+          is a blend of all three value vectors, weighted by how relevant
+          each token was to token 0's query.
+        </p>
+
+        <h2>Multi-Head Attention</h2>
+
+        <p>
+          A single attention head can only learn one "type" of relationship.
+          Multi-head attention runs <em>h</em> attention heads in parallel,
+          each with its own W_Q, W_K, W_V projections, then concatenates the results:
+        </p>
+
+        <div class="math-box">
+          MultiHead(Q,K,V) = Concat(head₁, ..., head_h) &middot; W_O
+        </div>
+
+        <p>
+          In GPT-style models, different heads learn different patterns —
+          some track syntactic dependencies, others track long-range
+          semantic relationships, some handle positional structure.
+        </p>
+
+<pre><code>def attention(Q, K, V):
+    d_k = Q.shape[-1]
+    scores = Q @ K.T / np.sqrt(d_k)
+    return softmax(scores) @ V
+
+def multi_head_attention(X, W_Qs, W_Ks, W_Vs, W_O):
+    heads = [attention(X @ Wq, X @ Wk, X @ Wv)
+             for Wq, Wk, Wv in zip(W_Qs, W_Ks, W_Vs)]
+    concat = np.concatenate(heads, axis=-1)
+    return concat @ W_O
+</code></pre>
+
+        <h2>Positional Encoding</h2>
+
+        <p>
+          Attention has no inherent sense of order — "cat sat mat" and
+          "mat sat cat" would produce the same attention scores without help.
+          Transformers add a <strong>positional encoding</strong> to each token
+          embedding before it enters the attention layers.
+        </p>
+
+        <p>
+          The original paper used sinusoids:
+        </p>
+
+        <div class="math-box">
+          PE(pos, 2i) = sin(pos / 10000^(2i/d)) &nbsp;&nbsp;&nbsp; PE(pos, 2i+1) = cos(pos / 10000^(2i/d))
+        </div>
+
+        <p>
+          Modern models (BERT, GPT) just learn the positional embeddings directly.
+        </p>
+
+        <h2>Why It Scales</h2>
+
+        <p>
+          The big win over RNNs: any two tokens interact in O(1) operations
+          regardless of distance. No vanishing gradients across long sequences.
+          The cost is O(n²) in sequence length — for a 4096-token context,
+          that's 16M attention scores per head per layer. Techniques like
+          Flash Attention, sliding-window attention, and sparse attention
+          are all about making that quadratic cost manageable.
+        </p>
+
+        <blockquote>
+          The architecture that became GPT, BERT, T5, and every LLM you use today
+          is just this mechanism, stacked 96 times with some FFN layers in between.
+        </blockquote>
+
+        <hr>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>Q, K, V intuition</li>
+          <li>Scaled dot-product</li>
+          <li>NumPy walkthrough</li>
+          <li>Multi-head attention</li>
+          <li>Positional encoding</li>
+          <li>Why it scales</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// RELATED</div>
+        <ul>
+          <li><a href="backpropagation.html">Backpropagation</a></li>
+          <li><a href="gradient-descent.html">Gradient Descent</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <footer id="footer">
+    <div>&copy; 2024 Rahul Rai &mdash; All rights reserved</div>
+    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
+    <div class="footer-badges">
+      <span class="badge">HTML 5</span>
+      <span class="badge">CSS 3</span>
+      <span class="badge">No JS</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
