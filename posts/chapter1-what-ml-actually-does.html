@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 1: What Machine Learning Actually Does :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <header id="header">
+    <div class="site-title"><a href="../index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
+    <div class="site-subtitle">// Machine Learning Notes from the Trenches //</div>
+  </header>
+
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      *** a table of numbers, one column is the answer *** hide 20%, stay honest ***
+      ask the neighbours OR fit a straight line *** miss → square → mean → root ***
+      learn the picture first, the words come free ***
+    </span>
+  </div>
+
+  <nav id="nav">
+    <a href="../index.html">Home</a>
+    <a href="../about.html">About</a>
+    <a href="../archive.html">Archive</a>
+    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
+  </nav>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <span class="series-badge">LAB 1 &middot; PART 1 OF 3</span>
+        <div class="article-title">What Machine Learning Actually Does (Before Anyone Tells You the Fancy Words)</div>
+        <div class="article-meta">
+          Posted: 2026-06-03 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: fundamentals, supervised-learning, knn, linear-regression
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p style="font-style:italic; color:var(--dim);">
+          I learned to predict California house prices two different ways. One was
+          invented in 1951. Neither required understanding a single buzzword first.
+        </p>
+
+        <p>
+          I started learning machine learning the way most people do &mdash; by
+          Googling it. Within five minutes I had seventeen tabs open, each one
+          drowning in words like <em>hyperparameter</em>, <em>cross-validated RMSE</em>,
+          and <em>gradient descent</em>. Every explanation assumed I already knew the
+          explanation.
+        </p>
+
+        <p>
+          So I closed the tabs and started over. From scratch. With a pencil.
+        </p>
+
+        <p>
+          What follows is what I actually learned &mdash; not the vocabulary, but the
+          <strong>machinery</strong>. The ideas underneath the labels. If you
+          understand this post, you understand the real thing. The fancy words are
+          just stickers you can paste on later.
+        </p>
+
+        <h2>The Setup: A Table and a Question</h2>
+
+        <p>
+          Someone hands you a table. Each row is a neighbourhood in California. The
+          columns record things you can measure &mdash; median income, average number
+          of rooms, how old the houses are, how close the ocean is, how many people
+          live there.
+        </p>
+
+        <p>One column sits on the far right: <strong style="color:var(--green)">the price</strong>.</p>
+
+<pre><code>   rooms  income  age  ocean  people  │  PRICE
+   ──────────────────────────────────────────
+    4.2    3.5    25    1.0    320    │   1.4
+    5.1    5.6    10    0.5    210    │   2.8
+    3.8    2.1    42    3.2    890    │   0.9
+    ...                              │   ...</code></pre>
+
+        <p>
+          <strong>The question:</strong> given a new neighbourhood where you know
+          everything <em>except</em> the price &mdash; can you guess it?
+        </p>
+
+        <p>
+          That's it. That is the entire premise of supervised learning. A table. A
+          missing answer column. A guess.
+        </p>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; GOTCHA &mdash; .shape is a PAIR</span>
+          When you measure the table with <code>.shape</code>, you get back
+          <code>(rows, cols)</code> &mdash; a sealed package of two counts in a fixed
+          order, <strong>not</strong> rows&times;cols. For this dataset:
+          <code>(20640, 9)</code>. That's 20,640 neighbourhoods, 9 things known about
+          each.
+        </div>
+
+        <h2>The One Rule You Can't Break</h2>
+
+        <p>Before you build anything, you hide part of the table.</p>
+
+        <p>
+          Take 20% of the rows, fold them face-down, and push them to the side. You
+          are not allowed to look at their prices. Not while building. Not while
+          tuning. Not until the very end, when you open them <em>once</em> to see how
+          you did.
+        </p>
+
+<pre><code>   ████████████████░░░░
+    80% you study     20% sealed — don't touch</code></pre>
+
+        <p>
+          Why? Because if you study the answers and then "predict" those same answers,
+          of course you'll look brilliant. You memorised the exam. That's not
+          learning. The sealed 20% is your honesty check &mdash; the only way to know
+          if your machine actually <em>generalises</em> to houses it has never seen.
+        </p>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; THE KEY IDEA</span>
+          This split is the single most important idea in the field. Everything else
+          is technique. <strong>This is discipline.</strong> Shuffle first &mdash; with
+          a fixed seed, so the shuffle is identical every run &mdash; then cut.
+        </div>
+
+        <h2>Method 1: Ask the Neighbours</h2>
+
+        <p>
+          The first approach is embarrassingly simple. No equations. No dials to tune.
+          Just one idea:
+        </p>
+
+        <blockquote>Things that are similar probably cost about the same.</blockquote>
+
+        <p>
+          To guess the price of an unknown neighbourhood, you measure how far it is
+          from every neighbourhood you <em>do</em> know. "Distance" here means the
+          combined gap across all the measurements &mdash; rooms, income, age,
+          everything &mdash; squashed into a single number.
+        </p>
+
+        <div class="math-box">
+          distance = &radic;( gap&sub1;&sup2; + gap&sub2;&sup2; + gap&sub3;&sup2; + &hellip; )
+        </div>
+
+        <p>Pick the 5 closest matches. Average their prices. That's your guess.</p>
+
+        <p>I did this on paper first, with a new neighbourhood at income 5.0:</p>
+
+<pre><code>   Known neighbours:
+     Income 5.6 → Price 3.4    (distance 0.6)  ← close
+     Income 4.0 → Price 2.7    (distance 1.0)  ← close
+     Income 3.8 → Price 2.4    (distance 1.2)  ← close
+     Income 2.5 → Price 1.5    (distance 2.5)
+     Income 7.3 → Price 3.5    (distance 2.3)
+
+   3 nearest: prices 3.4, 2.7, 2.4
+   Guess = average = 2.83  →  roughly $283,000</code></pre>
+
+        <p>
+          That's the whole method. The computer does this across 16,000 rows instead
+          of 5, but the logic is identical. This idea was first published in
+          <strong>1951</strong> by Evelyn Fix and Joseph Hodges. It's older than most
+          programming languages.
+        </p>
+
+        <p>
+          The number of neighbours you consult &mdash; <code>k</code> &mdash; is a dial
+          you set before running. <code>k=1</code> copies the single closest match
+          (fast, but fragile). <code>k=25</code> smooths out noise by averaging many
+          (stable, but blurry). The right k is somewhere in between.
+        </p>
+
+        <p style="font-size:13px;">
+          &rarr; Full pencil-first derivation of the neighbour machine:
+          <a href="neighbor-machine-knn.html">Part 2 &mdash; The Neighbor Machine</a>
+        </p>
+
+        <h2>Measuring Mistakes</h2>
+
+        <p>You need a number that says: <em>how wrong were my guesses, overall?</em></p>
+
+<pre><code>   For each guess:     miss = guess − truth
+   Kill the sign:      square it
+   Across all guesses: take the mean
+   Make it readable:   take the square root
+
+   miss → square → mean → √  =  RMSE</code></pre>
+
+        <p>
+          RMSE stands for <em>root mean squared error</em>. If your RMSE is 0.77, your
+          guesses are off by about $77,000 on average. Lower is better. Zero means
+          you're psychic.
+        </p>
+
+        <h2>Method 2: Fit a Straight Line</h2>
+
+        <p>
+          Completely different philosophy. Instead of copying neighbours, you build a
+          formula:
+        </p>
+
+        <div class="math-box">
+          guess = income&times;dial&sub1; + rooms&times;dial&sub2; + age&times;dial&sub3; + &hellip; + nudge
+        </div>
+
+        <p>
+          Every measurement gets a <em>dial</em> &mdash; a multiplier that says how
+          much that measurement matters. The <code>nudge</code> is a baseline, the
+          starting point when every measurement is zero.
+        </p>
+
+        <p>
+          The best set of dials is whichever makes the total mistake smallest. Imagine
+          a bowl &mdash; the mistake is the height, and you're looking for the bottom:
+        </p>
+
+<pre><code>         ╲         ╱
+          ╲       ╱
+           ╲     ╱
+            ╲   ╱
+             ╲ ╱
+              •  ← smallest mistake = best dials</code></pre>
+
+        <p>
+          For a straight-line formula, there's a direct solution. You don't need to
+          search &mdash; you can solve for the exact bottom using a system of equations.
+          I worked it through on three points to convince myself it's real (nudge = 1/3,
+          dial = 3/2). Fitting a straight line is geometrically a <em>projection</em>:
+          the best line is the shadow of the data onto the space of possible lines.
+        </p>
+
+        <p style="font-size:13px;">
+          &rarr; Full pencil solve, normal equations, and the projection geometry:
+          <a href="straight-stick-linear-regression.html">Part 3 &mdash; The Straight Stick</a>
+        </p>
+
+        <h2>Choosing Fairly: The Rotation Trick</h2>
+
+        <p>
+          You have a dial to pick (how many neighbours, or which formula complexity).
+          You can't use the sealed 20% to choose &mdash; that's the honesty check, and
+          you only open it once. So how do you pick the best setting? You rotate through
+          the <em>training</em> data itself.
+        </p>
+
+        <p>
+          Cut the 80% study pile into 5 equal slices. Hold one slice out, train on the
+          other four, score against the held-out slice. Rotate:
+        </p>
+
+<pre><code>            A    B    C    D    E
+   round 1  ⬛   ·    ·    ·    ·    → score₁
+   round 2  ·    ⬛   ·    ·    ·    → score₂
+   round 3  ·    ·    ⬛   ·    ·    → score₃
+   round 4  ·    ·    ·    ⬛   ·    → score₄
+   round 5  ·    ·    ·    ·    ⬛   → score₅
+                              average → honest practice score</code></pre>
+
+        <p>
+          Every row gets exactly one turn as the test. No row is always safe. The
+          average of the five scores is a trustworthy estimate of how well that setting
+          will perform on genuinely unseen data. Do this for every candidate setting.
+          Pick the winner. <em>Then</em> &mdash; and only then &mdash; open the sealed
+          test set. Run the winner once. Report the result.
+        </p>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; "Isn't scoring on the test set peeking?"</span>
+          No. The rule is: <em>never let the test pick a setting</em>. Using the test
+          to <strong>choose</strong> among machines is cheating. Using it
+          <strong>once</strong> to grade the locked winner is its entire job. If the
+          test score is slightly worse than the practice score, that's normal &mdash;
+          rehearsal always goes a little better than opening night. If it's <em>much</em>
+          worse, the machine memorised instead of learned.
+        </div>
+
+        <h2>The Punchline</h2>
+
+        <p>
+          Two methods. One copies neighbours. One fits a formula. Both are trying to
+          answer the same question: <em>given what I've seen, what's my best guess for
+          something I haven't?</em>
+        </p>
+
+        <ol class="takeaways">
+          <li>A table of numbers, one column is the answer.</li>
+          <li>Hide some rows to stay honest.</li>
+          <li>Guess the missing answers using the rows you kept.</li>
+          <li>Measure how wrong you are: miss &rarr; square &rarr; mean &rarr; root.</li>
+          <li>Choose your settings on a practice rotation, never on the real test.</li>
+          <li>Open the sealed set exactly once. Report the truth.</li>
+        </ol>
+
+        <p>That's supervised learning. Not the word &mdash; the thing.</p>
+
+        <h2>A Note on Vocabulary</h2>
+
+        <p>
+          I deliberately avoided jargon throughout this post. Here's the decoder ring,
+          if you want it:
+        </p>
+
+        <table>
+          <thead>
+            <tr><th>What I said</th><th>What the textbook says</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>table of numbers</td><td>dataset</td></tr>
+            <tr><td>one measured thing</td><td>feature</td></tr>
+            <tr><td>the right answer</td><td>label / target</td></tr>
+            <tr><td>ask the neighbours</td><td>k-nearest neighbours (KNN)</td></tr>
+            <tr><td>fit a straight line</td><td>linear regression (OLS)</td></tr>
+            <tr><td>dials</td><td>weights / coefficients</td></tr>
+            <tr><td>nudge</td><td>bias / intercept</td></tr>
+            <tr><td>miss &rarr; square &rarr; mean &rarr; root</td><td>RMSE</td></tr>
+            <tr><td>hide 20%</td><td>train-test split</td></tr>
+            <tr><td>rotation trick</td><td>k-fold cross-validation</td></tr>
+            <tr><td>memorised the exam</td><td>overfitting</td></tr>
+            <tr><td>the sealed 20%</td><td>held-out test set</td></tr>
+          </tbody>
+        </table>
+
+        <p>
+          The words aren't the knowledge. The knowledge is the picture underneath.
+          Learn the picture first. The words come free.
+        </p>
+
+        <hr>
+        <p style="font-size:13px;">
+          <strong>Lab 1 series:</strong>
+          Part 1 (this post) &middot;
+          <a href="neighbor-machine-knn.html">Part 2 &mdash; The Neighbor Machine</a> &middot;
+          <a href="straight-stick-linear-regression.html">Part 3 &mdash; The Straight Stick</a>
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          <em>Next up: what happens when the answer isn't a number but a yes-or-no
+          &mdash; and the line bends into an S-curve.</em>
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// LAB 1 SERIES</div>
+        <ul>
+          <li><strong>Part 1: Overview</strong></li>
+          <li><a href="neighbor-machine-knn.html">Part 2: KNN</a></li>
+          <li><a href="straight-stick-linear-regression.html">Part 3: Linear Reg.</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>The table &amp; question</li>
+          <li>Train-test split</li>
+          <li>KNN (neighbours)</li>
+          <li>RMSE</li>
+          <li>Linear regression</li>
+          <li>Cross-validation</li>
+          <li>Vocab decoder ring</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// HISTORY</div>
+        <ul>
+          <li>KNN: Fix &amp; Hodges, 1951</li>
+          <li>Sharpened: Cover &amp; Hart, 1967</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <footer id="footer">
+    <div>&copy; 2026 Rahul Rai &mdash; All rights reserved</div>
+    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
+    <div class="footer-badges">
+      <span class="badge">HTML 5</span>
+      <span class="badge">CSS 3</span>
+      <span class="badge">No JS</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

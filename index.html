@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rahul's ML Blog :: Machine Learning Notes from the Trenches</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="wrapper">
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="ascii-art">
+ ____  __   _  _  __  ____  ____     __  __    ____  __     __   ___
+(  _ \/ _\ / )( \(  )(_  _)/ ___)   (  \/  )  (  _ \(  )   /  \ / __)
+ )   //    \) \/ ( )(   )(  \___ \   )    (    ) _ ( )(    (  O )( (_ \
+(__\_)\_/\_/\____/(__)  (__) (____/  (__/\__)  (____/(____)  \__/  \___/
+</div>
+    <div class="site-title">RAHUL'S ML BLOG<span class="blink">_</span></div>
+    <div class="site-subtitle">// Machine Learning, Learned by Hand // Est. 2026 //</div>
+  </header>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      *** WELCOME *** I ban the jargon, learn with a pencil, then stick the labels on ***
+      a table of numbers, one column is the answer *** miss → square → mean → root ***
+      no cookies, no trackers, just math *** WELCOME ***
+    </span>
+  </div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="archive.html">Archive</a>
+    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
+  </nav>
+
+  <!-- MAIN CONTENT AREA -->
+  <div id="content-area">
+
+    <!-- POSTS -->
+    <main id="main">
+
+      <!-- FEATURED SERIES BANNER -->
+      <div class="callout note" style="margin-top:0;">
+        <span class="callout-label">&#9656; NOW SERVING &mdash; LAB 1: GUESS A HOUSE PRICE</span>
+        A three-part series where I learn supervised machine learning from scratch by
+        predicting California house prices &mdash; no buzzwords, pencil first, then the
+        real Python. Start with Part 1 below.
+      </div>
+
+      <div class="section-header">// LAB 1 SERIES</div>
+
+      <!-- Part 1 -->
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/chapter1-what-ml-actually-does.html">What Machine Learning Actually Does (Before Anyone Tells You the Fancy Words)</a>
+        </div>
+        <div class="post-meta">
+          <span>2026-06-03</span> &nbsp;|&nbsp;
+          <span class="tag">part 1</span>
+          <span class="tag">fundamentals</span>
+          <span class="tag">supervised-learning</span>
+        </div>
+        <div class="post-excerpt">
+          I closed seventeen confusing browser tabs and started over with a pencil. The
+          whole premise of supervised learning in plain words: a table, a missing answer
+          column, a guess. Train-test split, two ways to guess, RMSE, cross-validation,
+          and a jargon decoder ring at the end.
+        </div>
+        <a class="read-more" href="posts/chapter1-what-ml-actually-does.html">[ READ MORE &rarr; ]</a>
+      </article>
+
+      <!-- Part 2 -->
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/neighbor-machine-knn.html">The Neighbor Machine: k-Nearest Neighbours, By Hand</a>
+        </div>
+        <div class="post-meta">
+          <span>2026-06-02</span> &nbsp;|&nbsp;
+          <span class="tag">part 2</span>
+          <span class="tag">knn</span>
+          <span class="tag">distance</span>
+        </div>
+        <div class="post-excerpt">
+          Guess what you don't know by copying the things most like it that you do. The
+          distance formula (features only, never the price), the find&ndash;pick&ndash;average
+          loop, a full pencil example, and choosing k fairly &mdash; re-deriving a 1951
+          idea from Fix &amp; Hodges.
+        </div>
+        <a class="read-more" href="posts/neighbor-machine-knn.html">[ READ MORE &rarr; ]</a>
+      </article>
+
+      <!-- Part 3 -->
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/straight-stick-linear-regression.html">The Straight Stick: Linear Regression from Three Points</a>
+        </div>
+        <div class="post-meta">
+          <span>2026-06-01</span> &nbsp;|&nbsp;
+          <span class="tag">part 3</span>
+          <span class="tag">linear-regression</span>
+          <span class="tag">math</span>
+        </div>
+        <div class="post-excerpt">
+          A different philosophy: give every measurement a dial, multiply and add. The
+          best dials sit at the bottom of a bowl &mdash; and for a straight line you can
+          solve the exact bottom by hand. Three points, the normal equations, and why
+          fitting a line is really a projection.
+        </div>
+        <a class="read-more" href="posts/straight-stick-linear-regression.html">[ READ MORE &rarr; ]</a>
+      </article>
+
+      <hr>
+      <div style="text-align:center; font-size:12px; color:var(--dim);">
+        &larr; Lab 2 coming soon: a yes-or-no guesser and the S-curve &rarr;
+      </div>
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+
+      <div class="sidebar-box counter-box">
+        <div class="sidebar-box-title">// VISITORS</div>
+        <span class="counter-num">004271</span>
+        <span class="counter-label">hits since launch</span>
+      </div>
+
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// THE METHOD</div>
+        <ul>
+          <li>Ban the jargon</li>
+          <li>Draw it first</li>
+          <li>Solve by pencil</li>
+          <li>Then write the code</li>
+          <li>Stick labels on last</li>
+        </ul>
+      </div>
+
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// TOPICS</div>
+        <ul>
+          <li>Supervised Learning</li>
+          <li>KNN / Neighbours</li>
+          <li>Linear Regression</li>
+          <li>Cross-Validation</li>
+          <li>Math &amp; Proofs</li>
+          <li>Python / scikit-learn</li>
+        </ul>
+      </div>
+
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// LINKS</div>
+        <ul>
+          <li><a href="https://scikit-learn.org" target="_blank">scikit-learn</a></li>
+          <li><a href="https://arxiv.org/list/cs.LG/recent" target="_blank">arXiv ML</a></li>
+          <li><a href="https://paperswithcode.com" target="_blank">Papers w/ Code</a></li>
+          <li><a href="https://github.com/learnrahulrai-ui" target="_blank">My GitHub</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// STACK</div>
+        <ul>
+          <li>Python 3.12</li>
+          <li>scikit-learn</li>
+          <li>NumPy / pandas</li>
+          <li>A pencil</li>
+          <li>Pure HTML/CSS</li>
+        </ul>
+      </div>
+
+    </aside>
+  </div><!-- /content-area -->
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div>&copy; 2026 Rahul Rai &mdash; All rights reserved</div>
+    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
+    <div class="footer-badges">
+      <span class="badge">HTML 5</span>
+      <span class="badge">CSS 3</span>
+      <span class="badge">No JS</span>
+      <span class="badge">Pencil First</span>
+      <span class="badge">Best Viewed: Any Browser</span>
+    </div>
+  </footer>
+
+</div><!-- /wrapper -->
+</body>
+</html>
