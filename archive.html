@@ -40,7 +40,7 @@
 
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/chapter1-what-ml-actually-does.html">Part 1 &mdash; Supervised Regression, End to End</a>
+          <a href="posts/chapter1-what-ml-actually-does.html">Part 1 &mdash; Guessing House Prices, End to End</a>
         </div>
         <div class="post-meta">
           2026-06-03 &nbsp;|&nbsp;
@@ -48,15 +48,16 @@
           <span class="tag">supervised-learning</span>
         </div>
         <div class="post-excerpt">
-          The full pipeline on California housing: problem statement, test-set isolation, KNN
-          vs. OLS, RMSE against the std(y) baseline, and k-fold CV with leakage-safe preprocessing.
+          The whole picture on California housing: lock away the hidden pile first, introduce
+          the ask-closest rule and the straight-stick rule, measure mistake with RMSE against
+          the always-ȳ baseline, pick settings by rotating folds.
         </div>
         <a class="read-more" href="posts/chapter1-what-ml-actually-does.html">[ READ &rarr; ]</a>
       </article>
 
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/neighbor-machine-knn.html">Part 2 &mdash; k-Nearest Neighbours: Scaling &amp; Complexity</a>
+          <a href="posts/neighbor-machine-knn.html">Part 2 &mdash; Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a>
         </div>
         <div class="post-meta">
           2026-06-02 &nbsp;|&nbsp;
@@ -65,15 +66,16 @@
           <span class="tag">scaling</span>
         </div>
         <div class="post-excerpt">
-          The distance metric, why standardisation is mandatory, O(n&middot;d) query cost and
-          the curse of dimensionality, k as the bias&ndash;variance knob, and leakage-safe CV.
+          The gap formula, why putting columns on the same ruler is mandatory, O(n&middot;d) cost
+          per guess and why close stops meaning close as columns pile up, k as the stiff-vs-jumpy
+          dial, and a leak-safe rotating-fold picker.
         </div>
         <a class="read-more" href="posts/neighbor-machine-knn.html">[ READ &rarr; ]</a>
       </article>
 
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/straight-stick-linear-regression.html">Part 3 &mdash; Linear Regression: OLS &amp; Numerics</a>
+          <a href="posts/straight-stick-linear-regression.html">Part 3 &mdash; The Straight-Stick Rule: Dials, Right-Angle Leftovers, and Numerics</a>
         </div>
         <div class="post-meta">
           2026-06-01 &nbsp;|&nbsp;
@@ -82,8 +84,9 @@
           <span class="tag">numerics</span>
         </div>
         <div class="post-excerpt">
-          The least-squares objective, the normal equations solved by hand, residual
-          orthogonality and the hat matrix, Gauss&ndash;Markov, and QR/SVD vs. inverting.
+          The bowl-shaped squared leftover, the flat-point equations solved by hand, right-angle
+          leftovers and the flat-shadow thrower, Gauss&ndash;Markov, and why you cut the sheet
+          (QR/SVD) rather than flip it.
         </div>
         <a class="read-more" href="posts/straight-stick-linear-regression.html">[ READ &rarr; ]</a>
       </article>

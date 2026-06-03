@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Linear Regression: OLS, the Normal Equations, and Numerics :: Rahul's ML Blog</title>
+  <title>Part 3: The Straight-Stick Rule :: Rahul's ML Blog</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -16,8 +16,8 @@
 
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** minimize ‖Xβ − y‖² *** XᵀX β = Xᵀy *** ŷ = Hy is a projection ***
-      O(nd² + d³) *** don't invert — factor *** singular XᵀX → ridge ***
+      *** shrink ‖Xβ − y‖² *** XᵀX β = Xᵀy *** guess = Hy is a flat-sheet shadow ***
+      O(nd² + d³) *** cut the sheet, don't flip it *** flat XᵀX → add a bump ***
     </span>
   </div>
 
@@ -33,7 +33,7 @@
 
       <div class="article-header">
         <span class="series-badge">LAB 1 &middot; PART 3 OF 3</span>
-        <div class="article-title">Linear Regression: OLS, the Normal Equations, and Numerics</div>
+        <div class="article-title">The Straight-Stick Rule: Setting the Dials, Checking the Leftovers, Getting the Numbers Right</div>
         <div class="article-meta">
           Posted: 2026-06-01 &nbsp;|&nbsp;
           Author: Rahul Rai &nbsp;|&nbsp;
@@ -44,48 +44,56 @@
       <div class="article-body">
 
         <p>
-          Linear regression models the target as a weighted sum of the features plus an
-          intercept. Unlike KNN it is parametric: fit once, discard the data, keep
-          <code>d+1</code> numbers. The weights have a closed-form least-squares solution.
+          The straight-stick rule guesses using a weighted sum of the measured columns plus a
+          fixed nudge. Unlike the ask-closest rule it squeezes the whole working pile into
+          <code>d+1</code> dials, then discards the pile. The dials have an exact formula &mdash;
+          no searching required.
         </p>
 
-        <h2>The Model</h2>
+        <h2>The Rule</h2>
+
+<pre><code>   one row of measured things:  [rooms, income, age, …]
+         ×
+   one dial per column:         [β₁,    β₂,    β₃,  …]
+         +  fixed nudge β₀
+         =  guess ŷ
+
+   all rows at once:  ŷ = Xβ
+   (X has a column of 1s prepended to carry β₀)</code></pre>
 
         <div class="math-box">
           &#375;<sub>i</sub> = &beta;<sub>0</sub> + &Sigma;<sub>j</sub> &beta;<sub>j</sub> x<sub>ij</sub>
-          &nbsp;&nbsp;&hArr;&nbsp;&nbsp; &#375; = X&beta;
+          &nbsp;&hArr;&nbsp; &#375; = X&beta;
         </div>
 
         <p>
-          The intercept <code>&beta;<sub>0</sub></code> is absorbed by prepending a column of
-          ones to <code>X</code>. Each <code>&beta;<sub>j</sub></code> is the change in the
-          prediction per unit change in feature <code>j</code>, holding the others fixed. The
-          model is linear <em>in the parameters</em>; the features themselves may be transformed
-          (squares, logs, interactions) and it remains linear regression.
+          Each dial <code>&beta;<sub>j</sub></code> is the change in the guess per unit change in
+          column <code>j</code>, all other columns held fixed. The columns can be squares, logs,
+          or products of raw columns &mdash; the rule stays linear in the dials.
         </p>
 
-        <h2>The Objective: Least Squares</h2>
+        <h2>The Squared Leftover to Shrink</h2>
 
-        <p>Choose <code>&beta;</code> to minimise the residual sum of squares:</p>
+<pre><code>         ╲         ╱
+          ╲       ╱        height  = total squared leftover J(β)
+           ╲     ╱         bottom  = the best dials β
+            ╲ • ╱</code></pre>
+
+        <p>Pick the dials that shrink the squared leftover sum:</p>
 
         <div class="math-box">
           J(&beta;) = &#8214;X&beta; &minus; y&#8214;&sup2; = &Sigma;<sub>i</sub> (&#375;<sub>i</sub> &minus; y<sub>i</sub>)&sup2;
         </div>
 
         <p>
-          <code>J</code> is a convex quadratic &mdash; its Hessian <code>2X&#7488;X</code> is
-          positive semidefinite &mdash; so any stationary point is a global minimum. No local
-          minima, no iterative search required.
+          <code>J</code> is bowl-shaped &mdash; its Hessian <code>2X&#7488;X</code> is
+          never-negative &mdash; so any flat point is the global bottom. No local traps,
+          no searching.
         </p>
 
-<pre><code>         ╲         ╱
-          ╲       ╱        height  = squared error J(β)
-           ╲     ╱         bottom  = the least-squares β
-            ╲ • ╱</code></pre>
+        <h2>Finding the Dials: The Flat-Point Equations</h2>
 
-        <h2>Solving It: The Normal Equations</h2>
-
-        <p>Set the gradient to zero:</p>
+        <p>Set the slope of the bowl to zero:</p>
 
         <div class="math-box">
           &nabla;J = 2X&#7488;(X&beta; &minus; y) = 0
@@ -94,164 +102,164 @@
         </div>
 
         <p>
-          The same system, solved by hand at <code>d = 1</code> (one feature, one intercept) on
-          three points &mdash; here <code>&Sigma;1</code>, <code>&Sigma;x</code> etc. are the
-          entries of <code>X&#7488;X</code> and <code>X&#7488;y</code>:
+          Worked by hand at one column (<code>d = 1</code>) on three rows &mdash;
+          <code>&Sigma;1, &Sigma;x,</code> etc. are the entries of <code>X&#7488;X</code>
+          and <code>X&#7488;y</code>:
         </p>
 
 <pre><code>   x = 1, 2, 3     y = 2, 3, 5
    Σ1 = 3   Σx = 6   Σy = 10   Σxy = 23   Σx² = 14
 
    XᵀX β = Xᵀy   →    3b +  6w = 10
-                      6b + 14w = 23
+                       6b + 14w = 23
 
    solve:  2w = 3  →  w = 3/2 ;   3b + 9 = 10  →  b = 1/3
-   line:   ŷ = 1/3 + (3/2)x</code></pre>
+   stick:  ŷ = 1/3 + (3/2)x</code></pre>
 
-        <h2>Why the Residuals Check Out</h2>
+        <h2>Checking the Leftovers</h2>
 
         <p>
-          At the optimum, <code>X&#7488;(y &minus; X&beta;) = 0</code>, i.e.
-          <code>X&#7488;e = 0</code>: the residual vector is orthogonal to every feature column,
-          and (because one column is all ones) the residuals sum to zero. That's exactly what
-          the three-point fit shows:
+          At the best dials, <code>X&#7488;(y &minus; X&beta;) = 0</code>,
+          written <code>X&#7488;e = 0</code>:
+          the leftover column sits at right-angles to every measured column.
+          Because one column is all ones, the leftovers also sum to zero.
         </p>
 
-<pre><code>   x=1: ŷ=1.833, r = y−ŷ = +0.167
-   x=2: ŷ=3.333, r       = −0.333
-   x=3: ŷ=4.833, r       = +0.167
+<pre><code>   x=1: ŷ=1.833, leftover = +0.167
+   x=2: ŷ=3.333, leftover = −0.333
+   x=3: ŷ=4.833, leftover = +0.167
 
-   Σ r      = 0     ✓   (orthogonal to the intercept column)
-   Σ x·r    = 0     ✓   (orthogonal to the x column)
-   RMSE = √(mean r²) ≈ 0.236</code></pre>
+   Σ leftover        = 0  ✓   (right-angles to the ones column)
+   Σ x · leftover    = 0  ✓   (right-angles to x column)
+   RMSE = √(mean leftover²) ≈ 0.236</code></pre>
 
         <p>
-          Geometrically, <code>&#375; = Hy</code> with the hat matrix
-          <code>H = X(X&#7488;X)<sup>&minus;1</sup>X&#7488;</code> &mdash; the orthogonal
-          projection of <code>y</code> onto the column space of <code>X</code>. <code>H</code> is
-          symmetric and idempotent (<code>H&sup2; = H</code>), and <code>trace(H)</code> equals
-          the number of fitted parameters. OLS <em>is</em> that projection; no vector in the span
-          of the features sits closer to <code>y</code>.
+          Geometrically: <code>&#375; = Hy</code> where the flat-shadow thrower
+          <code>H = X(X&#7488;X)<sup>&minus;1</sup>X&#7488;</code> projects <code>y</code>
+          onto the flat sheet spanned by the measured columns. <code>H</code> is symmetric
+          and squaring it gives itself back (<code>H&sup2; = H</code>). <code>trace(H)</code>
+          equals the number of fitted dials. No point on the flat sheet sits closer to <code>y</code>.
         </p>
 
         <div class="callout key">
-          <span class="callout-label">&#9733; SAME OPERATION, SCALED UP</span>
-          The three-point pencil solve is identical to what the library runs on 16,000 rows and
-          8 features &mdash; only the dimensions of <code>X&#7488;X</code> change. Fitted weights
-          land in <code>m.coef_</code>, the intercept in <code>m.intercept_</code>.
+          <span class="callout-label">&#9733; SAME WORK, BIGGER SHEET</span>
+          The three-row pencil solve is identical to what the toolbox runs on 16,000 rows and
+          8 columns &mdash; only the size of <code>X&#7488;X</code> changes. Fitted dials land in
+          <code>m.coef_</code>, the fixed nudge in <code>m.intercept_</code>.
         </div>
 
-        <h2>When OLS Is the Best Linear Estimator</h2>
+        <h2>When the Straight-Stick Rule Is the Best Possible</h2>
 
         <p>
-          The Gauss&ndash;Markov theorem: if the errors have zero conditional mean
-          (<code>E[&epsilon;|X] = 0</code>), constant variance, and are uncorrelated, and
-          <code>X</code> has full column rank, then OLS is <strong>BLUE</strong> &mdash; the
-          minimum-variance estimator among all linear unbiased estimators. Two things worth
-          stating precisely:
+          The Gauss&ndash;Markov result: if the leftover has zero average given the rows
+          (<code>E[&epsilon;|X] = 0</code>), the same spread everywhere, leftovers do not echo
+          each other, and <code>X</code> has full column rank &mdash; then the straight-stick
+          rule is <strong>BLUE</strong>: the lowest-spread rule among all flat, honest rules.
         </p>
 
         <ul>
-          <li><strong>Normality is not required</strong> for Gauss&ndash;Markov. You only need it
-              for exact confidence intervals and t-tests, not for OLS to be the best linear
-              unbiased fit.</li>
-          <li><strong>Full column rank</strong> means no feature is a linear combination of the
-              others. If one is, <code>X&#7488;X</code> is singular and
+          <li><strong>Bell-curve shape of leftovers is not required</strong> for BLUE. You need it
+              only for exact confidence ranges and t-tests, not for the rule to be the best flat rule.</li>
+          <li><strong>Full column rank</strong> means no measured column is a recipe of the others.
+              If one is, <code>X&#7488;X</code> is flat (no single solution) and
               <code>(X&#7488;X)<sup>&minus;1</sup></code> does not exist.</li>
         </ul>
 
-        <h2>Numerics: Don't Invert the Matrix</h2>
+        <h2>Getting the Dials Right: Don't Flip the Sheet</h2>
+
+<pre><code>   build XᵀX: O(nd²)   ← n rows, each d² multiplications
+   solve for β: O(d³)
+   total: O(nd² + d³)</code></pre>
 
         <p>
-          Forming <code>X&#7488;X</code> costs <code>O(nd&sup2;)</code> and solving costs
-          <code>O(d&sup3;)</code>, so the fit is <code>O(nd&sup2; + d&sup3;)</code>. But you
-          should not compute <code>(X&#7488;X)<sup>&minus;1</sup></code> explicitly: forming
-          <code>X&#7488;X</code> squares the condition number
+          Do <em>not</em> compute <code>(X&#7488;X)<sup>&minus;1</sup></code> by flipping the sheet
+          directly. Forming <code>X&#7488;X</code> squares the shakiness number
           (<code>&kappa;(X&#7488;X) = &kappa;(X)&sup2;</code>) and loses precision. Instead:
         </p>
 
         <ul>
-          <li>Solve the linear system directly (Cholesky on <code>X&#7488;X</code>), or better,</li>
-          <li>Factor <code>X</code> itself with <strong>QR</strong> or <strong>SVD</strong> and
-              solve the least-squares problem without ever forming <code>X&#7488;X</code>.
-              scikit-learn's <code>LinearRegression</code> uses an SVD-based solver.</li>
-          <li>For very large <code>n</code> or <code>d</code>, or streaming data, use gradient
-              descent: <code>O(nd)</code> per step instead of a full factorisation.</li>
-          <li>If <code>X&#7488;X</code> is singular or ill-conditioned (collinear features), add
-              an L2 penalty &mdash; ridge regression,
+          <li>Solve the flat-point equations directly (Cholesky cut of <code>X&#7488;X</code>), or better,</li>
+          <li>Cut <code>X</code> itself with <strong>QR</strong> or <strong>SVD</strong> and
+              solve without ever forming <code>X&#7488;X</code>. The toolbox's
+              <code>LinearRegression</code> uses an SVD-based approach.</li>
+          <li>For very many rows or a stream, roll downhill a little at a time: <code>O(nd)</code>
+              per step instead of a full cut.</li>
+          <li>If <code>X&#7488;X</code> is flat or shaky (one column is a near-recipe of another),
+              add a small bump to the diagonal &mdash; the ridge rule:
               <code>&beta; = (X&#7488;X + &lambda;I)<sup>&minus;1</sup>X&#7488;y</code> &mdash;
-              which is invertible for any <code>&lambda; &gt; 0</code>.</li>
+              solvable for any <code>&lambda; &gt; 0</code>.</li>
         </ul>
 
         <div class="callout note">
-          <span class="callout-label">&#9656; SCALING: THE CONTRAST WITH KNN</span>
-          Plain OLS is <strong>invariant</strong> to feature scaling: rescale a feature and its
-          weight rescales inversely, leaving predictions and RMSE unchanged. So &mdash; unlike
-          KNN &mdash; OLS needs no standardisation for correctness. You <em>do</em> need it for
-          gradient-descent convergence and for any regularised variant (ridge/lasso penalise
-          coefficient magnitude, which depends on scale).
+          <span class="callout-label">&#9656; SAME-RULER CONTRAST WITH ASK-CLOSEST RULE</span>
+          The straight-stick rule does <em>not</em> care which ruler you used. Rescale a column
+          and its dial rescales inversely &mdash; guesses and RMSE stay the same.
+          (The ask-closest rule breaks without same-ruler treatment.)
+          You <em>do</em> need same-ruler when rolling downhill or when adding a bump,
+          because those care about the size of the dials, which depends on scale.
         </div>
 
-        <h2>In Code</h2>
+        <h2>In the Toolbox</h2>
 
 <pre><code>from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
-m = LinearRegression()           # SVD-based least squares under the hood
-m.fit(X_train, y_train)          # solves XᵀX β = Xᵀy for β
-pred = m.predict(X_test)         # one dot product per row
+m = LinearRegression()          # SVD-based flat-point solve under the hood
+m.fit(X_train, y_train)         # sets dials: XᵀX β = Xᵀy
+pred = m.predict(X_test)        # one dot-product per row
 
 rmse = mean_squared_error(y_test, pred) ** 0.5
 print(round(rmse, 3), m.coef_, m.intercept_)</code></pre>
 
-        <h2>KNN vs. OLS</h2>
+        <h2>Ask-Closest vs. Straight-Stick</h2>
 
         <table>
           <thead>
-            <tr><th>&nbsp;</th><th>KNN</th><th>Linear regression (OLS)</th></tr>
+            <tr><th>&nbsp;</th><th>Ask-Closest Rule (KNN)</th><th>Straight-Stick Rule (OLS)</th></tr>
           </thead>
           <tbody>
-            <tr><td>Type</td><td>non-parametric, instance-based</td><td>parametric</td></tr>
-            <tr><td>Fit</td><td>store data, O(1)</td><td>solve normal equations, O(nd²+d³)</td></tr>
-            <tr><td>Predict</td><td>O(n·d) per row</td><td>O(d) per row</td></tr>
-            <tr><td>Hyperparameter</td><td>k (cross-validate)</td><td>none (λ if regularised)</td></tr>
-            <tr><td>Feature scaling</td><td>required</td><td>not for plain OLS</td></tr>
-            <tr><td>Hypothesis</td><td>local, piecewise-constant</td><td>one global hyperplane</td></tr>
+            <tr><td>What it stores</td><td>whole pile</td><td>d+1 dials only</td></tr>
+            <tr><td>Build cost</td><td>O(1) (store only)</td><td>O(nd²+d³) (solve equations)</td></tr>
+            <tr><td>Guess cost</td><td>O(n·d) per row</td><td>O(d) per row</td></tr>
+            <tr><td>Setting to pick by hand</td><td>k (by rotating folds)</td><td>none (&lambda; if adding a bump)</td></tr>
+            <tr><td>Same-ruler needed?</td><td>yes &mdash; required</td><td>no &mdash; not for plain rule</td></tr>
+            <tr><td>Shape of guess surface</td><td>piecewise-flat, local</td><td>one flat sheet, global</td></tr>
           </tbody>
         </table>
 
         <p>
-          Opposite strategies, one question: given the rows seen, predict the target for a row
-          unseen. KNN leans on stored examples; OLS compresses them into a hyperplane.
+          Opposite approaches, one question: given the working rows, guess the right answer for
+          a new row. Ask-closest leans on stored rows; straight-stick compresses them into a
+          flat sheet.
         </p>
 
         <h2>Going Deeper</h2>
 
         <ul>
-          <li><strong>normal equations</strong>, <strong>ordinary least squares</strong> &mdash; the solve</li>
-          <li><strong>QR / SVD least squares</strong>, <strong>condition number</strong> &mdash; the numerics</li>
-          <li><strong>projection / hat matrix</strong> &mdash; the geometry</li>
-          <li><strong>Gauss&ndash;Markov</strong>, <strong>heteroscedasticity</strong> &mdash; the assumptions</li>
-          <li><strong>ridge</strong>, <strong>lasso</strong> &mdash; what to do when features are collinear</li>
+          <li><strong>flat-point equations, ordinary least squares</strong> &mdash; the solve</li>
+          <li><strong>QR / SVD least squares, shakiness number (condition number)</strong> &mdash; the numerics</li>
+          <li><strong>flat-shadow thrower (hat matrix), right-angle leftovers</strong> &mdash; the geometry</li>
+          <li><strong>Gauss&ndash;Markov, unequal leftover spread (heteroscedasticity)</strong> &mdash; the assumptions</li>
+          <li><strong>ridge, lasso</strong> &mdash; when columns are near-recipes of each other</li>
         </ul>
 
         <ol class="takeaways">
-          <li>Model: <code>&#375; = X&beta;</code>; fit by minimising <code>&#8214;X&beta;&minus;y&#8214;&sup2;</code>.</li>
-          <li>Convex objective &rarr; closed form <code>&beta; = (X&#7488;X)<sup>&minus;1</sup>X&#7488;y</code>.</li>
-          <li>Residuals are orthogonal to the features; <code>&#375; = Hy</code> is a projection.</li>
-          <li>OLS is BLUE under Gauss&ndash;Markov; normality is needed only for inference.</li>
-          <li>Factor (QR/SVD), don't invert; regularise when <code>X&#7488;X</code> is singular.</li>
+          <li>Rule: <code>&#375; = X&beta;</code>; set dials by shrinking <code>&#8214;X&beta;&minus;y&#8214;&sup2;</code>.</li>
+          <li>Bowl-shaped mistake &rarr; exact dials from <code>&beta; = (X&#7488;X)<sup>&minus;1</sup>X&#7488;y</code>.</li>
+          <li>Leftovers sit at right-angles to measured columns; <code>&#375; = Hy</code> is a flat-sheet shadow.</li>
+          <li>Straight-stick rule is BLUE under Gauss&ndash;Markov; bell-curve leftovers needed only for tests.</li>
+          <li>Cut the sheet (QR/SVD), don't flip it; add a bump when <code>X&#7488;X</code> is flat.</li>
         </ol>
 
         <hr>
         <p style="font-size:13px;">
           <strong>Lab 1 series:</strong>
-          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; Pipeline</a> &middot;
-          <a href="neighbor-machine-knn.html">Part 2 &mdash; k-Nearest Neighbours</a> &middot;
+          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; The Full Picture</a> &middot;
+          <a href="neighbor-machine-knn.html">Part 2 &mdash; Ask-Closest Rule</a> &middot;
           Part 3 (this post)
         </p>
         <p style="font-size:12px; color:var(--dim);">
-          <em>Next lab: binary classification &mdash; the logistic link and the decision boundary.</em>
+          <em>Next lab: sort into yes or no &mdash; the S-curve and where to draw the line.</em>
         </p>
         <p style="font-size:12px; color:var(--dim);">
           &larr; <a href="../index.html">Back to all posts</a>
@@ -264,29 +272,29 @@ print(round(rmse, 3), m.coef_, m.intercept_)</code></pre>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// LAB 1 SERIES</div>
         <ul>
-          <li><a href="chapter1-what-ml-actually-does.html">Part 1: Pipeline</a></li>
-          <li><a href="neighbor-machine-knn.html">Part 2: KNN</a></li>
-          <li><strong>Part 3: Linear Reg.</strong></li>
+          <li><a href="chapter1-what-ml-actually-does.html">Part 1: The Full Picture</a></li>
+          <li><a href="neighbor-machine-knn.html">Part 2: Ask-Closest Rule</a></li>
+          <li><strong>Part 3: Straight-Stick Rule</strong></li>
         </ul>
       </div>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// IN THIS POST</div>
         <ul>
-          <li>Model &amp; objective</li>
-          <li>Normal equations</li>
-          <li>Residual orthogonality</li>
+          <li>The rule &amp; dials</li>
+          <li>Squared leftover</li>
+          <li>Flat-point equations</li>
+          <li>Right-angle leftovers</li>
           <li>Gauss&ndash;Markov</li>
-          <li>Numerical stability</li>
-          <li>Scaling invariance</li>
+          <li>Don't flip the sheet</li>
         </ul>
       </div>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// KEY RESULTS</div>
         <ul>
-          <li>β = (XᵀX)⁻¹Xᵀy</li>
-          <li>Xᵀe = 0</li>
-          <li>ŷ = Hy, H²=H</li>
-          <li>fit: O(nd²+d³)</li>
+          <li>&beta; = (X&#7488;X)&#8315;&sup1;X&#7488;y</li>
+          <li>X&#7488;e = 0</li>
+          <li>&#375; = Hy, H&sup2;=H</li>
+          <li>build: O(nd&sup2;+d&sup3;)</li>
         </ul>
       </div>
     </aside>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chapter 1: Supervised Regression, End to End :: Rahul's ML Blog</title>
+  <title>Part 1: Guessing House Prices, End to End :: Rahul's ML Blog</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -16,8 +16,8 @@
 
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** learn f: X → y that generalizes *** measure on held-out data only ***
-      RMSE = √(mean(residual²)) *** beat the ȳ baseline *** tune by k-fold CV, test once ***
+      *** find a rule that guesses right on rows never seen *** hide 20% before touching anything ***
+      mistake = √(mean(r²)) *** beat the always-ȳ baseline *** rotate folds, peek at hidden pile once ***
     </span>
   </div>
 
@@ -33,7 +33,7 @@
 
       <div class="article-header">
         <span class="series-badge">LAB 1 &middot; PART 1 OF 3</span>
-        <div class="article-title">Supervised Regression, End to End (No Jargon Until It's Earned)</div>
+        <div class="article-title">Guessing House Prices, End to End (No Labels Until the End)</div>
         <div class="article-meta">
           Posted: 2026-06-03 &nbsp;|&nbsp;
           Author: Rahul Rai &nbsp;|&nbsp;
@@ -44,203 +44,188 @@
       <div class="article-body">
 
         <p>
-          Most ML explanations define jargon with more jargon. This series builds the
-          machinery first &mdash; by hand, on the California housing dataset &mdash; and
-          attaches the standard terms at the end. Part 1 is the whole supervised-regression
-          pipeline; Parts 2 and 3 derive the two estimators in detail.
+          Most explanations define labels with more labels. This series builds the
+          machinery first &mdash; by hand, on the California housing pile &mdash; and
+          sticks the standard labels on at the very end. Part 1 is the whole picture;
+          Parts 2 and 3 work out each rule in detail.
         </p>
 
-        <h2>The Problem: Learn a Function From a Table</h2>
+        <h2>The Job: Guess From a Sheet of Numbers</h2>
+
+<pre><code>  rooms  income  age  ocean  people  │  PRICE  ← right-answer column
+  ─────────────────────────────────────────────────
+   4.2    3.5    25    1.0    320    │   1.4
+   5.1    5.6    10    0.5    210    │   2.8
+   3.8    2.1    42    3.2    890    │   0.9
+  └───────── 8 measured columns ────┘</code></pre>
 
         <p>
-          You're given a table of <code>n</code> rows and <code>d</code> feature columns
-          &mdash; a matrix <code>X &isin; &#8477;<sup>n&times;d</sup></code> &mdash; plus a
-          target vector <code>y &isin; &#8477;<sup>n</sup></code> (here, median house value
-          per district). The goal: learn a function <code>f: &#8477;<sup>d</sup> &rarr;
-          &#8477;</code> that minimises prediction error on rows it has <em>never seen</em>,
-          not on the rows it was built from.
-        </p>
-
-<pre><code>   rooms  income  age  ocean  people  │  PRICE  (= target y)
-   ──────────────────────────────────────────────────────
-    4.2    3.5    25    1.0    320    │   1.4
-    5.1    5.6    10    0.5    210    │   2.8
-    3.8    2.1    42    3.2    890    │   0.9
-   └──────────── features X ─────────┘</code></pre>
-
-        <p>
-          California housing is shape <code>(20640, 9)</code> &mdash; 20,640 rows, 8 features
-          plus the target. The features sit on different numeric scales (median income
-          &asymp; 0&ndash;15, population &asymp; hundreds to thousands). That difference is
-          harmless for a linear model but breaks distance-based methods unless you rescale
-          &mdash; see Part 2.
+          20,640 rows. Each row is one California neighbourhood. 8 measured columns.
+          One right-answer column: median house price in $100,000s.
+          The job: build a rule that guesses the right answer for a row it has
+          <em>never seen</em>, not a row it learned from.
         </p>
 
         <div class="callout gotcha">
           <span class="callout-label">&#9888; .shape is a PAIR, not a product</span>
-          <code>df.shape</code> returns the tuple <code>(n_rows, n_cols)</code> in that fixed
-          order &mdash; <code>(20640, 9)</code> &mdash; not <code>n_rows&times;n_cols</code>.
+          <code>df.shape</code> returns <code>(n_rows, n_cols)</code> in that fixed
+          order &mdash; <code>(20640, 9)</code> &mdash; never their product.
         </div>
 
-        <h2>The One Rule: Isolate a Test Set</h2>
+        <h2>The One Rule: Hide Some Rows</h2>
+
+<pre><code>   ALL ROWS
+   ████████████████░░░░
+    working pile (80%)   hidden pile (20%)
+                         ↑ locked away — read once, at the very end</code></pre>
 
         <p>
-          Before fitting anything, hold out a random fraction of the rows (20% here). Their
-          targets must not influence <em>any</em> decision &mdash; not model choice, not
-          hyperparameters, not even the parameters of a preprocessing step. They exist to
-          produce <strong>one</strong> unbiased estimate of generalisation error, read once,
-          at the very end.
+          Before touching anything: set aside a random 20% of rows.
+          Their right answers must not touch any decision &mdash; not the rule,
+          not any setting, not even how the numbers are prepared.
+          They exist for one honest check at the end.
         </p>
 
-<pre><code>   ████████████████░░░░
-    80% train          20% test (read once)</code></pre>
-
         <p>
-          The reason is mechanical, not moral: any quantity fit on a set and then evaluated
-          on that same set is optimistically biased. Training error underestimates test error
-          by construction &mdash; at <code>k=1</code>, nearest-neighbours scores a perfect 0 on
-          its own training data and generalises poorly. The held-out set is the only honest
-          estimate of performance on the population the data was drawn from (assuming the rows
-          are roughly i.i.d.).
+          The reason is mechanical: any rule checked on the same rows it was built from
+          reports a false low mistake. The ask-closest rule at <code>k=1</code> makes
+          zero mistakes on its own working pile and does poorly on new rows.
+          The hidden pile is the only honest number.
         </p>
 
         <div class="callout key">
-          <span class="callout-label">&#9733; SPLIT DISCIPLINE</span>
-          Shuffle before splitting (datasets often arrive sorted) with a fixed random seed so
-          the partition is reproducible across runs. The seed controls reproducibility, not
-          fairness &mdash; the shuffle is what removes ordering bias.
+          <span class="callout-label">&#9733; SHUFFLE FIRST</span>
+          Rows often arrive sorted by district. Shuffle with a fixed starting point
+          so the split is reproducible and not ordered. The fixed point controls
+          reproducibility; the shuffle removes order bias.
         </div>
 
-        <h2>Estimator 1 &mdash; k-Nearest Neighbours (Instance-Based)</h2>
+        <h2>Rule 1 &mdash; Ask the Closest Rows</h2>
 
-        <p>
-          Non-parametric: nothing is fit; the training set <em>is</em> the model. To predict a
-          row, compute its distance to every training row, take the <code>k</code> closest, and
-          return the mean of their targets.
-        </p>
+<pre><code>   new row ?
+       ↓
+   measure gap to every working-pile row
+       ↓
+   pick the k closest
+       ↓
+   average their right-answers   →   guess</code></pre>
 
         <div class="math-box">
-          d(a, b) = &radic;( &Sigma;<sub>j</sub> (a<sub>j</sub> &minus; b<sub>j</sub>)&sup2; )
+          gap(a, b) = &radic;( &Sigma;<sub>j</sub> (a<sub>j</sub> &minus; b<sub>j</sub>)&sup2; )
         </div>
 
         <p>
-          Because the distance <em>sums over features</em>, any feature with a large numeric
-          range dominates it &mdash; so KNN requires feature scaling. The neighbour count
-          <code>k</code> is a hyperparameter trading bias against variance: small <code>k</code>
-          &rarr; low bias, high variance; large <code>k</code> &rarr; high bias, low variance.
-          Full derivation, scaling, and complexity in
+          Nothing is built ahead of time &mdash; the whole working pile is stored and
+          looked up each time. The one setting to pick by hand: <code>k</code>
+          (how many neighbours to ask). Small <code>k</code> &rarr; too jumpy;
+          large <code>k</code> &rarr; too stiff. Full derivation in
           <a href="neighbor-machine-knn.html">Part 2</a>.
         </p>
 
-        <h2>Scoring: RMSE</h2>
+        <h2>Measuring How Wrong: RMSE</h2>
 
-        <p>
-          Define the residual <code>r<sub>i</sub> = y<sub>i</sub> &minus; &#375;<sub>i</sub></code>
-          (truth minus prediction). The root-mean-squared error is:
-        </p>
+        <p>Leftover for one row: <code>r<sub>i</sub> = y<sub>i</sub> &minus; &#375;<sub>i</sub></code> (right answer minus guess).</p>
 
         <div class="math-box">
           RMSE = &radic;( (1/n) &Sigma;<sub>i</sub> r<sub>i</sub>&sup2; )
         </div>
 
         <p>
-          RMSE carries the target's units, so an RMSE of 0.5 here is a typical miss of about
-          $50,000 (the target is in $100,000s). The square makes it more sensitive to large
-          errors than the mean absolute error, <code>MAE = mean|r<sub>i</sub>|</code>. The
-          reference point: predicting the constant <code>&#563;</code> for every row gives
-          <code>RMSE = std(y)</code> &mdash; any useful model must beat that baseline.
+          RMSE stays in the same units as the right-answer column.
+          RMSE = 0.5 here means a typical miss of $50,000.
+          The bar to beat: always guessing the average price gives RMSE&nbsp;=&nbsp;std(y).
+          Any useful rule must beat that.
+          RMSE punishes large single misses more heavily than the plain average
+          of absolute leftovers, MAE&nbsp;=&nbsp;mean|r<sub>i</sub>|.
         </p>
 
-        <h2>Estimator 2 &mdash; Linear Regression (Parametric)</h2>
+        <h2>Rule 2 &mdash; The Straight-Stick Rule</h2>
+
+<pre><code>   d+1 dials:  [nudge β₀,  dial₁ β₁,  dial₂ β₂, …]
+
+   guess = β₀ + β₁·(rooms) + β₂·(income) + …
+         = Xβ   (one dot-product per row)</code></pre>
 
         <p>
-          A parametric model with <code>d+1</code> numbers (one weight per feature, plus an
-          intercept):
-        </p>
-
-        <div class="math-box">
-          &#375; = X&beta; &nbsp;&nbsp;(weights &beta;, intercept folded in as a constant column)
-        </div>
-
-        <p>
-          Fit by ordinary least squares: choose <code>&beta;</code> minimising the squared
-          residual norm <code>&#8214;X&beta; &minus; y&#8214;&sup2;</code>. For a linear model
-          this objective is convex with a <em>closed-form</em> solution &mdash; no iterative
-          search. Once fitted, prediction is a single dot product; the training data is
-          discarded. Derivation, assumptions, and numerics in
+          Squeeze the whole working pile into <code>d+1</code> dials.
+          Once set, the pile is discarded; each guess is one dot-product.
+          The dials are set by shrinking the squared leftover sum &mdash;
+          an exact formula, no searching. Full derivation in
           <a href="straight-stick-linear-regression.html">Part 3</a>.
         </p>
 
-        <h2>Model Selection: k-Fold Cross-Validation</h2>
+        <h2>Picking Settings Without Peeking at the Hidden Pile</h2>
+
+<pre><code>   working pile split into 5 chunks:  A  B  C  D  E
+
+   round 1  ⬛   ·    ·    ·    ·    → mistake₁
+   round 2  ·    ⬛   ·    ·    ·    → mistake₂
+   round 3  ·    ·    ⬛   ·    ·    → mistake₃
+   round 4  ·    ·    ·    ⬛   ·    → mistake₄
+   round 5  ·    ·    ·    ·    ⬛   → mistake₅
+                              average → honest estimate</code></pre>
 
         <p>
-          You can't tune <code>k</code> on the test set without contaminating it. Instead,
-          partition the <em>training</em> set into <code>K</code> folds; for each candidate
-          setting, train on <code>K&minus;1</code> folds, score on the held-out fold, rotate so
-          every fold is held out exactly once, and average the scores.
+          Each round, one chunk grades the rule built on the other four.
+          Rotate until every chunk has graded once. Average the five mistakes.
+          This gives an honest estimate without ever touching the hidden pile.
         </p>
 
-<pre><code>            A    B    C    D    E
-   round 1  ⬛   ·    ·    ·    ·    → RMSE₁
-   round 2  ·    ⬛   ·    ·    ·    → RMSE₂
-   round 3  ·    ·    ⬛   ·    ·    → RMSE₃
-   round 4  ·    ·    ·    ⬛   ·    → RMSE₄
-   round 5  ·    ·    ·    ·    ⬛   → RMSE₅
-                              mean → CV estimate of generalisation error</code></pre>
-
         <div class="callout gotcha">
-          <span class="callout-label">&#9888; PREPROCESSING GOES INSIDE THE FOLD</span>
-          Any step with learned parameters (a scaler's mean/variance, an imputer's fill value)
-          must be fit on each fold's training portion only. Fitting it on the full training set
-          before splitting leaks information across folds and biases the estimate optimistically.
-          A scikit-learn <code>Pipeline</code> enforces this automatically (Part 2).
+          <span class="callout-label">&#9888; PREPARE NUMBERS INSIDE EACH ROUND</span>
+          Any step that learns from the numbers (computing an average, a spread)
+          must be done on each round's building portion only. Doing it on the
+          whole working pile before splitting leaks grading-chunk numbers into
+          the build step. A bound pipeline enforces this automatically (Part 2).
         </div>
 
         <p>
-          Procedure: select hyperparameters by CV on the training set &rarr; refit the winner on
-          all of training &rarr; evaluate <strong>once</strong> on the test set &rarr; report.
+          Procedure: pick settings using rotating folds on the working pile &rarr;
+          refit the winner on all of the working pile &rarr; read the hidden pile
+          <strong>once</strong> &rarr; report that number.
         </p>
 
         <div class="callout note">
-          <span class="callout-label">&#9656; "Isn't scoring on the test set peeking?"</span>
-          No &mdash; the invariant is <em>never let the test set influence a choice</em>. Using
-          it to <strong>select</strong> among models is leakage; using it <strong>once</strong>
-          to estimate the chosen model's error is its defined purpose. A test RMSE modestly above
-          the CV RMSE is expected (CV slightly overfits the selection); a large gap signals
-          overfitting or distribution shift.
+          <span class="callout-label">&#9656; Isn't checking the hidden pile peeking?</span>
+          No &mdash; using it to pick among rules is peeking;
+          using it <strong>once</strong> to report the chosen rule's mistake is
+          exactly what it is for. A gap between the rotating-fold estimate and the
+          hidden-pile mistake means the rule memorised the working pile a little.
         </div>
 
-        <h2>The Pipeline in Six Lines</h2>
+        <h2>The Six Steps</h2>
 
         <ol class="takeaways">
-          <li>Learn <code>f: X &rarr; y</code> that generalises; measure on held-out data only.</li>
-          <li>KNN &mdash; non-parametric, distance-based; scale features, tune <code>k</code>.</li>
-          <li>Linear regression &mdash; parametric, OLS, closed-form weights.</li>
-          <li>Score with RMSE (target units); the bar to clear is <code>std(y)</code>.</li>
-          <li>Tune by k-fold CV with preprocessing fit inside each fold.</li>
-          <li>Refit the winner on all training data; read the test set exactly once.</li>
+          <li>Find a rule that guesses right on rows never seen; measure on the hidden pile only.</li>
+          <li>Ask-closest rule &mdash; store the pile, look it up; put columns on the same ruler; pick <code>k</code>.</li>
+          <li>Straight-stick rule &mdash; d+1 dials, exact formula, one dot-product per guess.</li>
+          <li>Measure mistake with RMSE (same units as price); the bar to beat is std(y).</li>
+          <li>Pick settings by rotating folds, preparing numbers inside each round.</li>
+          <li>Refit on all of working pile; read the hidden pile exactly once.</li>
         </ol>
 
-        <h2>The Vocabulary, Last</h2>
+        <h2>The Labels, Last</h2>
 
         <table>
           <thead>
-            <tr><th>Plain term used here</th><th>Standard term</th></tr>
+            <tr><th>Plain term used above</th><th>Standard label</th></tr>
           </thead>
           <tbody>
-            <tr><td>table of numbers</td><td>dataset / design matrix</td></tr>
+            <tr><td>sheet of written-down numbers</td><td>dataset / design matrix X &isin; &#8477;<sup>n&times;d</sup></td></tr>
             <tr><td>one measured column</td><td>feature</td></tr>
-            <tr><td>the answer column</td><td>target / label</td></tr>
-            <tr><td>nothing is fit, store the data</td><td>non-parametric / instance-based</td></tr>
-            <tr><td>ask the neighbours</td><td>k-nearest neighbours (KNN)</td></tr>
-            <tr><td>weighted sum + offset</td><td>linear regression (OLS)</td></tr>
-            <tr><td>multipliers / offset</td><td>coefficients / intercept</td></tr>
-            <tr><td>rescale features to comparable ranges</td><td>standardisation / normalisation</td></tr>
-            <tr><td>residual &rarr; square &rarr; mean &rarr; root</td><td>RMSE</td></tr>
-            <tr><td>hold out 20%</td><td>train&ndash;test split</td></tr>
-            <tr><td>rotate folds</td><td>k-fold cross-validation</td></tr>
-            <tr><td>fit the training noise</td><td>overfitting</td></tr>
-            <tr><td>error on unseen data</td><td>generalisation error</td></tr>
+            <tr><td>right-answer column</td><td>target / label y</td></tr>
+            <tr><td>working pile</td><td>training set</td></tr>
+            <tr><td>hidden pile</td><td>test set</td></tr>
+            <tr><td>store the pile, look it up</td><td>non-parametric / instance-based</td></tr>
+            <tr><td>ask-closest rule</td><td>k-nearest neighbours (KNN)</td></tr>
+            <tr><td>straight-stick rule</td><td>linear regression (OLS)</td></tr>
+            <tr><td>dials</td><td>weights / coefficients &beta;</td></tr>
+            <tr><td>fixed nudge</td><td>intercept / bias &beta;<sub>0</sub></td></tr>
+            <tr><td>put columns on the same ruler</td><td>standardisation / normalisation</td></tr>
+            <tr><td>leftover / mistake (RMSE)</td><td>residual / loss / error</td></tr>
+            <tr><td>rotating folds</td><td>k-fold cross-validation</td></tr>
+            <tr><td>memorising the working pile</td><td>overfitting</td></tr>
+            <tr><td>mistake on rows never seen</td><td>generalisation error</td></tr>
           </tbody>
         </table>
 
@@ -248,12 +233,11 @@
         <p style="font-size:13px;">
           <strong>Lab 1 series:</strong>
           Part 1 (this post) &middot;
-          <a href="neighbor-machine-knn.html">Part 2 &mdash; k-Nearest Neighbours</a> &middot;
-          <a href="straight-stick-linear-regression.html">Part 3 &mdash; Linear Regression</a>
+          <a href="neighbor-machine-knn.html">Part 2 &mdash; Ask-Closest Rule</a> &middot;
+          <a href="straight-stick-linear-regression.html">Part 3 &mdash; Straight-Stick Rule</a>
         </p>
         <p style="font-size:12px; color:var(--dim);">
-          <em>Next lab: binary classification &mdash; the logistic link, decision boundaries,
-          and why squared error is the wrong loss for a yes/no target.</em>
+          <em>Next lab: sort into yes or no &mdash; the S-curve and where to draw the line.</em>
         </p>
         <p style="font-size:12px; color:var(--dim);">
           &larr; <a href="../index.html">Back to all posts</a>
@@ -266,29 +250,29 @@
       <div class="sidebar-box">
         <div class="sidebar-box-title">// LAB 1 SERIES</div>
         <ul>
-          <li><strong>Part 1: Pipeline</strong></li>
-          <li><a href="neighbor-machine-knn.html">Part 2: KNN</a></li>
-          <li><a href="straight-stick-linear-regression.html">Part 3: Linear Reg.</a></li>
+          <li><strong>Part 1: The Full Picture</strong></li>
+          <li><a href="neighbor-machine-knn.html">Part 2: Ask-Closest Rule</a></li>
+          <li><a href="straight-stick-linear-regression.html">Part 3: Straight-Stick Rule</a></li>
         </ul>
       </div>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// IN THIS POST</div>
         <ul>
-          <li>Problem statement</li>
-          <li>Test-set isolation</li>
-          <li>KNN (instance-based)</li>
-          <li>RMSE &amp; baseline</li>
-          <li>OLS (parametric)</li>
-          <li>k-fold CV + leakage</li>
+          <li>The job</li>
+          <li>Hide some rows</li>
+          <li>Ask-closest rule</li>
+          <li>Measuring mistake</li>
+          <li>Straight-stick rule</li>
+          <li>Rotating folds</li>
         </ul>
       </div>
       <div class="sidebar-box">
-        <div class="sidebar-box-title">// DATASET</div>
+        <div class="sidebar-box-title">// THE PILE</div>
         <ul>
           <li>California housing</li>
           <li>shape (20640, 9)</li>
-          <li>8 features, 1 target</li>
-          <li>target in $100k units</li>
+          <li>8 measured columns</li>
+          <li>right answers in $100k</li>
         </ul>
       </div>
     </aside>
