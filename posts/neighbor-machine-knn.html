@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>k-Nearest Neighbours: Derivation, Scaling, Complexity :: Rahul's ML Blog</title>
+  <title>Part 2: Ask the Closest Rows :: Rahul's ML Blog</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -16,8 +16,8 @@
 
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** ŷ = mean of k nearest targets *** Euclidean distance is scale-sensitive → standardize ***
-      brute force O(n·d) per query *** k tunes bias vs variance *** curse of dimensionality ***
+      *** guess = average of k nearest right-answers *** gap is ruler-sensitive → put on the same ruler ***
+      brute: O(n·d) per row *** k tunes stiff vs jumpy *** too many columns → close stops meaning close ***
     </span>
   </div>
 
@@ -33,7 +33,7 @@
 
       <div class="article-header">
         <span class="series-badge">LAB 1 &middot; PART 2 OF 3</span>
-        <div class="article-title">k-Nearest Neighbours: Derivation, Scaling, and Complexity</div>
+        <div class="article-title">Ask the Closest Rows: Gap Formula, Same-Ruler Rule, and How Slow It Gets</div>
         <div class="article-meta">
           Posted: 2026-06-02 &nbsp;|&nbsp;
           Author: Rahul Rai &nbsp;|&nbsp;
@@ -44,57 +44,60 @@
       <div class="article-body">
 
         <p>
-          KNN predicts a target by averaging the <code>k</code> training targets closest in
-          feature space. It is non-parametric and instance-based: there is no fit step beyond
-          storing the data. The whole method is three operations &mdash; distance, select,
-          average &mdash; but two practical details decide whether it works at all: feature
-          scaling and the choice of <code>k</code>.
+          The ask-closest rule guesses by averaging the <code>k</code> closest working-pile
+          right-answers. Nothing is built ahead of time &mdash; the whole pile is stored and
+          looked up each time. Three steps &mdash; measure gap, pick closest, average &mdash; but
+          two details decide whether it works: put columns on the same ruler, and pick
+          <code>k</code> with care.
         </p>
 
-        <h2>Train and Test</h2>
+        <h2>Working Pile and Hidden Pile</h2>
 
-<pre><code>   TRAIN (n rows, labeled)             TEST (targets withheld)
-   rooms income age pop │ price        rooms income age pop │ price
-   ──────────────────────────────      ──────────────────────────────
-     4    3.2   6   320 │  3.4           3    3.0   5  410 │  ?
-     8    1.5   1   880 │  1.5           ...                │  ?</code></pre>
+<pre><code>   WORKING PILE (rows with right answers)   HIDDEN PILE (right answers withheld)
+   rooms income age pop │ price             rooms income age pop │ price
+   ─────────────────────────────            ─────────────────────────────
+     4    3.2   6   320 │  3.4               3    3.0   5  410 │  ?
+     8    1.5   1   880 │  1.5              ...                 │  ?</code></pre>
 
         <p>
-          Distances are computed from features only. The test targets are read once, at
-          scoring &mdash; never during prediction.
+          Gaps are measured from the measured columns only.
+          Hidden right-answers are read once, at scoring &mdash; never during guessing.
         </p>
 
-        <h2>Distance</h2>
+        <h2>Measuring the Gap</h2>
 
-        <p>Euclidean distance over all features:</p>
+        <p>Straight-line gap over all measured columns:</p>
 
         <div class="math-box">
-          d(a, b) = &radic;( &Sigma;<sub>j</sub> (a<sub>j</sub> &minus; b<sub>j</sub>)&sup2; )
+          gap(a, b) = &radic;( &Sigma;<sub>j</sub> (a<sub>j</sub> &minus; b<sub>j</sub>)&sup2; )
         </div>
 
         <p>
-          This is the <code>p = 2</code> case of the Minkowski metric
-          <code>(&Sigma;<sub>j</sub> |a<sub>j</sub> &minus; b<sub>j</sub>|<sup>p</sup>)<sup>1/p</sup></code>;
-          <code>p = 1</code> is Manhattan distance. A worked pair, test row
-          <code>(3, 2, 5, 4)</code>:
+          This is <code>p = 2</code> of the general rule
+          <code>(&Sigma;<sub>j</sub> |a<sub>j</sub> &minus; b<sub>j</sub>|<sup>p</sup>)<sup>1/p</sup></code>.
+          At <code>p = 1</code> it counts straight city-block steps.
+          Worked pair &mdash; new row <code>(3, 2, 5, 4)</code>:
         </p>
 
-<pre><code>   row A: (4, 2, 6, 3)  gaps (1,0,1,1)  d = √(1+0+1+1)   = √3   ≈ 1.73
-   row B: (8, 9, 1, 9)  gaps (5,7,4,5)  d = √(25+49+16+25) = √115 ≈ 10.72</code></pre>
+<pre><code>   row A: (4, 2, 6, 3)   gaps (1, 0, 1, 1)   gap = √(1+0+1+1)    = √3   ≈ 1.73
+   row B: (8, 9, 1, 9)   gaps (5, 7, 4, 5)   gap = √(25+49+16+25) = √115 ≈ 10.72</code></pre>
 
-        <h2>Scale First, or the Distance Lies</h2>
+        <h2>Put Columns on the Same Ruler First</h2>
 
         <p>
-          The distance sums squared per-feature gaps, so a feature measured in thousands
-          (population) swamps one measured in single digits (rooms). Whichever feature has the
-          largest numeric range dominates &mdash; usually an accident of units, not a statement
-          about importance. On the raw California features, KNN is effectively a 1-D model on
-          population.
+          The gap adds squared per-column differences. A column measured in thousands
+          (people) drowns one measured in single digits (rooms) &mdash; an accident of
+          units, not importance. On the raw California pile, the ask-closest rule is
+          effectively a 1-column rule on population.
         </p>
 
+<pre><code>   raw columns:
+     rooms  ≈   2 – 12     ← tiny gaps
+     people ≈ 100 – 35000  ← huge gaps  ← this column runs the whole show</code></pre>
+
         <p>
-          Fix it by standardising each feature to zero mean and unit variance, using statistics
-          computed on the <em>training set only</em>:
+          Fix: shift each column to zero average and stretch it to spread of 1,
+          using numbers from the working pile only:
         </p>
 
         <div class="math-box">
@@ -102,77 +105,79 @@
         </div>
 
         <p>
-          Fit <code>&mu;<sub>j</sub>, &sigma;<sub>j</sub></code> on train; apply the <em>same</em>
-          constants to test. (Min&ndash;max scaling to <code>[0,1]</code> is an alternative.)
-          After scaling, every feature contributes comparably to the distance.
+          Compute <code>&mu;<sub>j</sub>, &sigma;<sub>j</sub></code> on the working pile;
+          apply the same constants to the hidden pile. After this, every column
+          contributes equally to the gap. (Squeezing to [0,1] instead of unit spread
+          is an alternative that works the same way.)
         </p>
 
         <div class="callout gotcha">
-          <span class="callout-label">&#9888; FIT THE SCALER ON TRAIN ONLY</span>
-          Computing <code>&mu;, &sigma;</code> over the full dataset before splitting leaks test
-          statistics into training &mdash; the model has seen a summary of the test set.
-          Standardise after the split, fitting on train, transforming both. Inside
-          cross-validation, the scaler must be refit per fold (use a <code>Pipeline</code>).
+          <span class="callout-label">&#9888; LEARN THE RULER ON THE WORKING PILE ONLY</span>
+          Computing averages and spreads on the whole pile before splitting leaks
+          hidden-pile numbers into the build step. Learn on working, apply to both.
+          Inside rotating folds, relearn per round &mdash; the bound pipeline does this.
         </div>
 
-        <h2>Predicting One Row</h2>
+        <h2>Guessing One Row</h2>
 
-<pre><code>   1. distance to all n training rows        O(n·d)
-   2. select the k smallest                  O(n) with a partial sort / heap
-   3. average those k targets  →  ŷ</code></pre>
+<pre><code>   1. measure gap to every working-pile row          O(n·d)
+   2. pick the k smallest gaps                        O(n) with a heap
+   3. average those k right-answers  →  guess</code></pre>
 
         <p>
-          For regression the prediction is the mean of the <code>k</code> neighbour targets.
-          An optional refinement weights nearer neighbours more heavily &mdash; inverse-distance
-          weights <code>w<sub>i</sub> = 1/d<sub>i</sub></code>:
+          An optional refinement weights closer rows more &mdash;
+          inverse-gap weights <code>w<sub>i</sub> = 1/gap<sub>i</sub></code>:
         </p>
 
         <div class="math-box">
-          &#375; = ( &Sigma;<sub>i</sub> w<sub>i</sub> y<sub>i</sub> ) / ( &Sigma;<sub>i</sub> w<sub>i</sub> )
+          guess = ( &Sigma;<sub>i</sub> w<sub>i</sub> y<sub>i</sub> ) / ( &Sigma;<sub>i</sub> w<sub>i</sub> )
         </div>
 
-        <p>Uniform weights (<code>w<sub>i</sub> = 1</code>) recover the plain mean.</p>
+        <p>Equal weights (<code>w<sub>i</sub> = 1</code>) recover the plain average.</p>
 
-        <h2>Cost</h2>
-
-        <p>
-          Brute force computes <code>n_train</code> distances per query at <code>O(d)</code>
-          each &mdash; <code>O(n_train &middot; d)</code> per query, <code>O(n_train &middot;
-          n_query &middot; d)</code> total. There is no training phase to amortise this: KNN
-          trades a zero-cost fit for an expensive predict, and stores the entire dataset.
-        </p>
-
-<pre><code>   100 rows = 80 train + 20 query
-   work     = 20 × 80 × d  distance evaluations</code></pre>
+        <h2>How Slow Is It</h2>
 
         <p>
-          Spatial indexes (KD-tree, Ball-tree) cut average query time to roughly
-          <code>O(d&middot;log n)</code> in low dimensions, but degrade toward brute force as
-          <code>d</code> grows. This is the <strong>curse of dimensionality</strong>: in high
-          dimensions, distances concentrate &mdash; the nearest and farthest points sit at
-          almost the same distance &mdash; and "nearest neighbour" stops being meaningful.
+          No work done ahead of time: the pile is stored, not compressed.
+          Every guess recomputes all gaps from scratch.
         </p>
+
+<pre><code>   100 rows = 80 working + 20 hidden
+   work per hidden row  = 80 × d  gap computations
+   total work           = 20 × 80 × d</code></pre>
+
+        <p>
+          Sorting shelves (KD-tree, Ball-tree) cut average guess time to roughly
+          <code>O(d&middot;log n)</code> when columns are few, but degrade toward brute
+          force as columns pile up. Here is why:
+        </p>
+
+<pre><code>   few columns:   nearby rows are truly nearby  ← sorting shelf helps
+   many columns:  all rows sit about the same gap away
+                  "closest" stops meaning anything</code></pre>
 
         <h2>Worked by Hand</h2>
 
         <p>
-          One feature (income), so scaling is moot here; new row at income 5.0, <code>k = 3</code>:
+          One column (income) only, so same-ruler step is moot here.
+          New row at income 5.0, <code>k = 3</code>:
         </p>
 
-<pre><code>   train (income, price):
-     (5.6, 3.4) (4.0, 2.7) (3.8, 2.4) (2.5, 1.5) (7.3, 3.5)
+<pre><code>   working pile (income, price):
+     (5.6, 3.4)  (4.0, 2.7)  (3.8, 2.4)  (2.5, 1.5)  (7.3, 3.5)
 
-   |5.0 − 5.6| = 0.6   |5.0 − 4.0| = 1.0   |5.0 − 3.8| = 1.2
-   |5.0 − 2.5| = 2.5   |5.0 − 7.3| = 2.3
+   gaps from 5.0:
+     |5.0 − 5.6| = 0.6 ←   |5.0 − 4.0| = 1.0 ←   |5.0 − 3.8| = 1.2 ←
+     |5.0 − 2.5| = 2.5      |5.0 − 7.3| = 2.3
 
-   3 nearest prices: 3.4, 2.7, 2.4
-   ŷ = (3.4 + 2.7 + 2.4) / 3 = 2.83</code></pre>
+   3 closest right-answers: 3.4, 2.7, 2.4
+   guess = (3.4 + 2.7 + 2.4) / 3 = 2.83</code></pre>
 
-        <h2>In Code</h2>
+        <h2>In the Toolbox</h2>
 
         <p>
-          A <code>Pipeline</code> binds the scaler to the estimator so scaling is fit on train
-          and reapplied on predict &mdash; and, later, refit per CV fold:
+          Binding the ruler-learner to the ask-closest rule means the ruler is relearned
+          on each round's building portion &mdash; never on the grading chunk:
         </p>
 
 <pre><code>from sklearn.pipeline import make_pipeline
@@ -181,83 +186,77 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error
 
 knn = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=5))
-knn.fit(X_train, y_train)                 # store data; scaler learns μ, σ on train
-pred = knn.predict(X_test)                # scale → distance → select → average
+knn.fit(X_train, y_train)          # stores pile; learns μ, σ on working rows
+pred = knn.predict(X_test)         # same ruler → measure gaps → average
 
 rmse = mean_squared_error(y_test, pred) ** 0.5
 print(round(rmse, 3))</code></pre>
 
-        <h2>k Is the Bias&ndash;Variance Knob</h2>
+        <h2>k Is the Stiff-vs-Jumpy Dial</h2>
+
+<pre><code>   k = 1       asks 1 row     → copies its noise exactly
+               zero mistake on working pile
+               bad on new rows   (too jumpy)
+
+   k = large   asks many rows → smooths everything out
+               always a bit wrong, everywhere  (too stiff)
+               at k = n_working, every guess = average price
+
+   right k  →  somewhere in between — found by rotating folds</code></pre>
+
+        <h2>Picking k Without Touching the Hidden Pile</h2>
 
         <p>
-          <code>k</code> is the only real hyperparameter (alongside the metric and the weighting
-          scheme). It controls model complexity directly:
-        </p>
-
-        <ul>
-          <li><code>k = 1</code>: zero training error, the prediction surface fits every noisy
-              point &mdash; <strong>low bias, high variance</strong>.</li>
-          <li><code>k</code> large: each prediction averages many points and flattens toward the
-              global mean &mdash; <strong>high bias, low variance</strong>. At
-              <code>k = n_train</code>, every query returns <code>&#563;</code>.</li>
-        </ul>
-
-        <p>Pick <code>k</code> by cross-validation, not by eye.</p>
-
-        <h2>Choosing k Without Touching the Test Set</h2>
-
-        <p>
-          Cross-validate each candidate on the training set. Passing the whole
-          <code>Pipeline</code> to <code>cross_val_score</code> refits the scaler on each fold's
-          training portion &mdash; no leakage:
+          Try each candidate <code>k</code> by rotating folds on the working pile.
+          Passing the whole bound rule to the rotating-fold checker means the ruler
+          is relearned per round &mdash; no peeking:
         </p>
 
 <pre><code>from sklearn.model_selection import KFold, cross_val_score
 
-def cv_rmse(k, X_train, y_train):
-    model = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=k))
+def fold_mistake(k, X_train, y_train):
+    rule = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=k))
     kf = KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
-    scores = cross_val_score(model, X_train, y_train, cv=kf,
+    scores = cross_val_score(rule, X_train, y_train, cv=kf,
                              scoring='neg_root_mean_squared_error')
     return round(-scores.mean(), 3)
 
 candidates = [1, 3, 5, 7, 9, 15, 25]
-cv = {k: cv_rmse(k, X_train, y_train) for k in candidates}
-best_k = min(cv, key=cv.get)              # key with the smallest VALUE</code></pre>
+cv = {k: fold_mistake(k, X_train, y_train) for k in candidates}
+best_k = min(cv, key=cv.get)    # key with the smallest VALUE</code></pre>
 
         <div class="callout gotcha">
           <span class="callout-label">&#9888; THREE THINGS THAT TRIP PEOPLE UP</span>
-          <strong>(1)</strong> <code>k</code> (neighbours, sets the guess) and the fold count
-          (grading, sets the estimate) are unrelated &mdash; <code>k=25</code> with 5 folds is
-          fine.<br>
-          <strong>(2)</strong> scikit-learn maximises its score, so RMSE is negated; un-negate
-          with <code>-scores.mean()</code>.<br>
-          <strong>(3)</strong> <code>min(cv, key=cv.get)</code> returns the key with the smallest
-          value; plain <code>min(cv)</code> returns the smallest key &mdash; the wrong answer.
+          <strong>(1)</strong> <code>k</code> (how many neighbours) and the fold count
+          (how many grading rounds) are unrelated &mdash; <code>k=25</code> with 5 folds is fine.<br>
+          <strong>(2)</strong> The toolbox maximises its score, so it negates the mistake;
+          un-negate with <code>-scores.mean()</code>.<br>
+          <strong>(3)</strong> <code>min(cv, key=cv.get)</code> returns the key with the
+          smallest value; plain <code>min(cv)</code> returns the smallest key &mdash; wrong answer.
         </div>
 
         <h2>Origin</h2>
 
         <p>
-          The rule was formalised by Evelyn Fix and Joseph Hodges in 1951 and analysed by Thomas
-          Cover and Peter Hart in 1967, who proved the 1-NN error rate is asymptotically within a
-          factor of two of the optimal Bayes error.
+          Evelyn Fix and Joseph Hodges wrote down this rule in 1951. Thomas Cover and Peter
+          Hart proved in 1967 that the one-closest-row version's mistake rate is at most
+          twice the best possible mistake, as the pile grows without bound.
         </p>
 
         <ol class="takeaways">
-          <li>Prediction = mean of the <code>k</code> nearest training targets (optionally distance-weighted).</li>
-          <li>Euclidean distance is scale-sensitive &mdash; standardise features, fitting on train only.</li>
-          <li>No training; predict is <code>O(n_train&middot;d)</code> per query and stores all data.</li>
-          <li><code>k</code> sets the bias&ndash;variance trade-off; choose it by cross-validation.</li>
-          <li>High dimensions erode the method (distance concentration).</li>
+          <li>Guess = average of the <code>k</code> closest working right-answers (optionally weighted by closeness).</li>
+          <li>The gap adds squared per-column differences &mdash; put columns on the same ruler, learning it on the working pile only.</li>
+          <li>No building ahead; each guess costs <code>O(n&middot;d)</code> and stores the whole pile.</li>
+          <li><code>k</code> sets the stiff-vs-jumpy balance; pick it by rotating folds.</li>
+          <li>When columns pile up, close stops meaning close.</li>
         </ol>
 
         <hr>
         <p style="font-size:13px;">
           <strong>Lab 1 series:</strong>
-          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; Pipeline</a> &middot;
+          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; The Full Picture</a> &middot;
           Part 2 (this post) &middot;
-          <a href="straight-stick-linear-regression.html">Part 3 &mdash; Linear Regression</a>
+          <a href="straight-stick-linear-regression.html">Part 3 &mdash; Straight-Stick Rule</a>
         </p>
         <p style="font-size:12px; color:var(--dim);">
           &larr; <a href="../index.html">Back to all posts</a>
@@ -270,29 +269,29 @@ best_k = min(cv, key=cv.get)              # key with the smallest VALUE</code></
       <div class="sidebar-box">
         <div class="sidebar-box-title">// LAB 1 SERIES</div>
         <ul>
-          <li><a href="chapter1-what-ml-actually-does.html">Part 1: Pipeline</a></li>
-          <li><strong>Part 2: KNN</strong></li>
-          <li><a href="straight-stick-linear-regression.html">Part 3: Linear Reg.</a></li>
+          <li><a href="chapter1-what-ml-actually-does.html">Part 1: The Full Picture</a></li>
+          <li><strong>Part 2: Ask-Closest Rule</strong></li>
+          <li><a href="straight-stick-linear-regression.html">Part 3: Straight-Stick Rule</a></li>
         </ul>
       </div>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// IN THIS POST</div>
         <ul>
-          <li>Distance metric</li>
-          <li>Feature scaling</li>
-          <li>Predict / weighting</li>
-          <li>Complexity</li>
-          <li>Bias&ndash;variance of k</li>
-          <li>Leakage-safe CV</li>
+          <li>Gap formula</li>
+          <li>Same-ruler rule</li>
+          <li>Guess / weighting</li>
+          <li>How slow it gets</li>
+          <li>Stiff-vs-jumpy k</li>
+          <li>Rotating folds</li>
         </ul>
       </div>
       <div class="sidebar-box">
-        <div class="sidebar-box-title">// COMPLEXITY</div>
+        <div class="sidebar-box-title">// COST</div>
         <ul>
-          <li>fit: O(1) (store)</li>
-          <li>query: O(n·d) brute</li>
-          <li>KD/Ball-tree: ~O(d·log n)</li>
-          <li>fails as d grows</li>
+          <li>build: O(1) (store)</li>
+          <li>guess: O(n·d) brute</li>
+          <li>sorting shelf: ~O(d·log n)</li>
+          <li>fails as columns pile up</li>
         </ul>
       </div>
     </aside>

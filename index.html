@@ -25,8 +25,8 @@
   <!-- MARQUEE -->
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** supervised regression on California housing *** KNN + OLS, derived by hand ***
-      RMSE, bias–variance, k-fold cross-validation *** β = (XᵀX)⁻¹Xᵀy *** no cookies, no trackers ***
+      *** guess house prices from a pile of numbers *** two rules, derived by hand ***
+      RMSE, stiff-vs-jumpy, rotating folds *** β = (XᵀX)⁻¹Xᵀy *** no cookies, no trackers ***
     </span>
   </div>
 
@@ -46,10 +46,10 @@
 
       <!-- FEATURED SERIES BANNER -->
       <div class="callout note" style="margin-top:0;">
-        <span class="callout-label">&#9656; LAB 1 &mdash; SUPERVISED REGRESSION ON CALIFORNIA HOUSING</span>
-        A three-part series on supervised regression from first principles: the train/test
-        discipline, two estimators (KNN and OLS) derived by hand, and model selection by
-        cross-validation. Start with Part 1.
+        <span class="callout-label">&#9656; LAB 1 &mdash; GUESSING HOUSE PRICES FROM SCRATCH</span>
+        Three parts. A pile of numbers, two rules (ask-closest and straight-stick), and a way
+        to pick between them without peeking. Everything derived by hand before any toolbox
+        is opened. Start with Part 1.
       </div>
 
       <div class="section-header">// LAB 1 SERIES</div>
@@ -57,7 +57,7 @@
       <!-- Part 1 -->
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/chapter1-what-ml-actually-does.html">Supervised Regression, End to End (No Jargon Until It's Earned)</a>
+          <a href="posts/chapter1-what-ml-actually-does.html">Guessing House Prices, End to End (No Labels Until the End)</a>
         </div>
         <div class="post-meta">
           <span>2026-06-03</span> &nbsp;|&nbsp;
@@ -66,10 +66,10 @@
           <span class="tag">supervised-learning</span>
         </div>
         <div class="post-excerpt">
-          The full pipeline on the California housing dataset: the problem stated as learning
-          f: X&rarr;y, why the test set is isolated, KNN vs. OLS, RMSE against the std(y)
-          baseline, and k-fold cross-validation with leakage-safe preprocessing. Standard
-          terminology mapped at the end.
+          The whole picture on the California housing pile: why 20% of rows are locked away
+          before touching anything, the ask-closest rule and the straight-stick rule introduced
+          plainly, RMSE against the always-ȳ baseline, and picking settings by rotating folds
+          without peeking. Labels mapped at the end.
         </div>
         <a class="read-more" href="posts/chapter1-what-ml-actually-does.html">[ READ MORE &rarr; ]</a>
       </article>
@@ -77,7 +77,7 @@
       <!-- Part 2 -->
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/neighbor-machine-knn.html">k-Nearest Neighbours: Derivation, Scaling, and Complexity</a>
+          <a href="posts/neighbor-machine-knn.html">Ask the Closest Rows: Gap Formula, Same-Ruler Rule, and How Slow It Gets</a>
         </div>
         <div class="post-meta">
           <span>2026-06-02</span> &nbsp;|&nbsp;
@@ -86,9 +86,10 @@
           <span class="tag">complexity</span>
         </div>
         <div class="post-excerpt">
-          KNN from the distance metric up: why Euclidean distance demands feature
-          standardisation, the O(n&middot;d) query cost and the curse of dimensionality, k as
-          the bias&ndash;variance knob, and selecting it with a leakage-safe CV pipeline.
+          The ask-closest rule from the gap formula up: why any column measured in thousands
+          runs the whole show and must be put on the same ruler, the O(n&middot;d) cost per guess
+          and why close stops meaning close as columns pile up, k as the stiff-vs-jumpy dial,
+          and a leak-safe rotating-fold picker.
         </div>
         <a class="read-more" href="posts/neighbor-machine-knn.html">[ READ MORE &rarr; ]</a>
       </article>
@@ -96,7 +97,7 @@
       <!-- Part 3 -->
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/straight-stick-linear-regression.html">Linear Regression: OLS, the Normal Equations, and Numerics</a>
+          <a href="posts/straight-stick-linear-regression.html">The Straight-Stick Rule: Setting the Dials, Checking the Leftovers, Getting the Numbers Right</a>
         </div>
         <div class="post-meta">
           <span>2026-06-01</span> &nbsp;|&nbsp;
@@ -105,10 +106,10 @@
           <span class="tag">least-squares</span>
         </div>
         <div class="post-excerpt">
-          OLS from the convex objective to the closed form &beta; = (X&#7488;X)&#8315;&sup1;X&#7488;y:
-          a three-point pencil solve of the normal equations, residual orthogonality and the
-          projection/hat matrix, the Gauss&ndash;Markov conditions, and why you factor (QR/SVD)
-          rather than invert.
+          From the bowl-shaped squared leftover to the exact dials &beta;&nbsp;=&nbsp;(X&#7488;X)&#8315;&sup1;X&#7488;y:
+          a three-row pencil solve of the flat-point equations, right-angle leftovers and the
+          flat-shadow thrower, the Gauss&ndash;Markov conditions, and why you cut the sheet
+          (QR/SVD) rather than flip it.
         </div>
         <a class="read-more" href="posts/straight-stick-linear-regression.html">[ READ MORE &rarr; ]</a>
       </article>
