@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Neighbor Machine (k-NN by Hand) :: Rahul's ML Blog</title>
+  <title>k-Nearest Neighbours: Derivation, Scaling, Complexity :: Rahul's ML Blog</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -16,8 +16,8 @@
 
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** distance = √( gap₁² + gap₂² + … ) *** features only, never the price ***
-      nearest k → average their prices → guess *** Fix &amp; Hodges, 1951 ***
+      *** ŷ = mean of k nearest targets *** Euclidean distance is scale-sensitive → standardize ***
+      brute force O(n·d) per query *** k tunes bias vs variance *** curse of dimensionality ***
     </span>
   </div>
 
@@ -33,245 +33,231 @@
 
       <div class="article-header">
         <span class="series-badge">LAB 1 &middot; PART 2 OF 3</span>
-        <div class="article-title">The Neighbor Machine: k-Nearest Neighbours, By Hand</div>
+        <div class="article-title">k-Nearest Neighbours: Derivation, Scaling, and Complexity</div>
         <div class="article-meta">
           Posted: 2026-06-02 &nbsp;|&nbsp;
           Author: Rahul Rai &nbsp;|&nbsp;
-          Tags: knn, distance, supervised-learning, by-hand
+          Tags: knn, distance, non-parametric, complexity
         </div>
       </div>
 
       <div class="article-body">
 
-        <blockquote>
-          Guess a thing you don't know by copying the things most like it that you
-          DO know.
-        </blockquote>
-
         <p>
-          This is the idea that clicked hardest for me in
-          <a href="chapter1-what-ml-actually-does.html">Lab 1</a>. No dials. No
-          equations to solve. Just: find the places most like this one, copy their
-          prices, average. Let me build the whole machine from nothing.
+          KNN predicts a target by averaging the <code>k</code> training targets closest in
+          feature space. It is non-parametric and instance-based: there is no fit step beyond
+          storing the data. The whole method is three operations &mdash; distance, select,
+          average &mdash; but two practical details decide whether it works at all: feature
+          scaling and the choice of <code>k</code>.
         </p>
 
-        <h2>Two Sides</h2>
+        <h2>Train and Test</h2>
 
-        <p>Split the table into a known pile and a hidden pile.</p>
-
-<pre><code>   LEFT  (known, 80 rows)              RIGHT (hidden, 20 rows)
-   rooms school color sun │ price      rooms school color sun │ price
+<pre><code>   TRAIN (n rows, labeled)             TEST (targets withheld)
+   rooms income age pop │ price        rooms income age pop │ price
    ──────────────────────────────      ──────────────────────────────
-     4     2     6    3   │  3.4          3     2     5    4   │  🔒
-     8     9     1    9   │  1.5          ...                  │  🔒
-     ...                  │ ...                                │  🔒</code></pre>
-
-        <p>The rules of the game:</p>
-
-        <ul>
-          <li><strong>LEFT</strong> &rarr; read-only. We only LOOK, never change it.</li>
-          <li><strong>RIGHT price</strong> &rarr; locked. We do NOT peek &mdash; that's
-              the truth we score against later.</li>
-        </ul>
-
-        <h2>Distance = How UNLIKE Two Places Are</h2>
+     4    3.2   6   320 │  3.4           3    3.0   5  410 │  ?
+     8    1.5   1   880 │  1.5           ...                │  ?</code></pre>
 
         <p>
-          Distance is built from ALL features at once, squashed into ONE number per
-          left row.
+          Distances are computed from features only. The test targets are read once, at
+          scoring &mdash; never during prediction.
         </p>
 
-<pre><code>   hidden right:   rooms 3   school 2   color 5   sun 4
+        <h2>Distance</h2>
 
-   left row A:     rooms 4   school 2   color 6   sun 3
-     gap:            1         0          1        1
-                          └──── ONE distance ────┘
+        <p>Euclidean distance over all features:</p>
 
-   distance = √( gap_rooms² + gap_school² + gap_color² + gap_sun² )
-
-   A: √(1+0+1+1)      = √3   ≈ 1.7   (near)
-   B: √(25+49+16+25)  = √115 ≈ 10.7  (far)</code></pre>
+        <div class="math-box">
+          d(a, b) = &radic;( &Sigma;<sub>j</sub> (a<sub>j</sub> &minus; b<sub>j</sub>)&sup2; )
+        </div>
 
         <p>
-          Same <em>square &rarr; add &rarr; root</em> move as the mistake-score.
-          Reused. It's the straight-line distance through feature-space, however many
-          dimensions that space has.
+          This is the <code>p = 2</code> case of the Minkowski metric
+          <code>(&Sigma;<sub>j</sub> |a<sub>j</sub> &minus; b<sub>j</sub>|<sup>p</sup>)<sup>1/p</sup></code>;
+          <code>p = 1</code> is Manhattan distance. A worked pair, test row
+          <code>(3, 2, 5, 4)</code>:
+        </p>
+
+<pre><code>   row A: (4, 2, 6, 3)  gaps (1,0,1,1)  d = √(1+0+1+1)   = √3   ≈ 1.73
+   row B: (8, 9, 1, 9)  gaps (5,7,4,5)  d = √(25+49+16+25) = √115 ≈ 10.72</code></pre>
+
+        <h2>Scale First, or the Distance Lies</h2>
+
+        <p>
+          The distance sums squared per-feature gaps, so a feature measured in thousands
+          (population) swamps one measured in single digits (rooms). Whichever feature has the
+          largest numeric range dominates &mdash; usually an accident of units, not a statement
+          about importance. On the raw California features, KNN is effectively a 1-D model on
+          population.
+        </p>
+
+        <p>
+          Fix it by standardising each feature to zero mean and unit variance, using statistics
+          computed on the <em>training set only</em>:
+        </p>
+
+        <div class="math-box">
+          z<sub>j</sub> = (x<sub>j</sub> &minus; &mu;<sub>j</sub>) / &sigma;<sub>j</sub>
+        </div>
+
+        <p>
+          Fit <code>&mu;<sub>j</sub>, &sigma;<sub>j</sub></code> on train; apply the <em>same</em>
+          constants to test. (Min&ndash;max scaling to <code>[0,1]</code> is an alternative.)
+          After scaling, every feature contributes comparably to the distance.
         </p>
 
         <div class="callout gotcha">
-          <span class="callout-label">&#9888; GOTCHA &mdash; distance uses FEATURES only</span>
-          Distance is measured on the features only &mdash; <strong>never the price</strong>.
-          The hidden place has no price, so closeness <em>can't</em> use price. The price
-          only shows up at the very last step, when we average the chosen neighbours.
+          <span class="callout-label">&#9888; FIT THE SCALER ON TRAIN ONLY</span>
+          Computing <code>&mu;, &sigma;</code> over the full dataset before splitting leaks test
+          statistics into training &mdash; the model has seen a summary of the test set.
+          Standardise after the split, fitting on train, transforming both. Inside
+          cross-validation, the scaler must be refit per fold (use a <code>Pipeline</code>).
         </div>
 
-        <h2>For One Hidden Row</h2>
+        <h2>Predicting One Row</h2>
 
-<pre><code>   1. FIND     ▶ measure distance to ALL 80 left rows   (record each)
-   2. PICK     ▶ the 5 SMALLEST distances  (nearest 5)
-   3. AVERAGE  ▶ those 5 left PRICES        ▶ one number
-   4. WRITE    ▶ append it to this right row ▶ the guess</code></pre>
-
-        <p>Each left row does two completely separate jobs:</p>
-
-<pre><code>   [ features ] [ price ]
-        │            │
-   STEP 1 FIND   STEP 4 AVERAGE
-   (who's near)  (only the chosen 5)</code></pre>
-
-        <h2>The Whole Loop &mdash; and the Work It Costs</h2>
-
-<pre><code>   for each of the 20 hidden rows:
-        sweep all 80 known rows  ─▶  nearest 5  ─▶ average ─▶ guess</code></pre>
-
-<pre><code>   100 rows total  =  80 known  +  20 hidden
-   work            =  20 hidden  ×  80 known  =  1600 distance measures</code></pre>
+<pre><code>   1. distance to all n training rows        O(n·d)
+   2. select the k smallest                  O(n) with a partial sort / heap
+   3. average those k targets  →  ŷ</code></pre>
 
         <p>
-          That's the catch with neighbour machines: there's no "training" that
-          compresses anything. Every guess re-scans the entire known pile. It's all
-          memory, no summary. (The textbook calls this a <em>lazy learner</em>.)
+          For regression the prediction is the mean of the <code>k</code> neighbour targets.
+          An optional refinement weights nearer neighbours more heavily &mdash; inverse-distance
+          weights <code>w<sub>i</sub> = 1/d<sub>i</sub></code>:
         </p>
 
-        <h2>The Pencil Version</h2>
+        <div class="math-box">
+          &#375; = ( &Sigma;<sub>i</sub> w<sub>i</sub> y<sub>i</sub> ) / ( &Sigma;<sub>i</sub> w<sub>i</sub> )
+        </div>
+
+        <p>Uniform weights (<code>w<sub>i</sub> = 1</code>) recover the plain mean.</p>
+
+        <h2>Cost</h2>
 
         <p>
-          I did it by hand before typing a line. Five known places, one input
-          (income), a new place at income 5.0, k = 3:
+          Brute force computes <code>n_train</code> distances per query at <code>O(d)</code>
+          each &mdash; <code>O(n_train &middot; d)</code> per query, <code>O(n_train &middot;
+          n_query &middot; d)</code> total. There is no training phase to amortise this: KNN
+          trades a zero-cost fit for an expensive predict, and stores the entire dataset.
         </p>
 
-<pre><code>   Known:  (income, price)
-           (5.6, 3.4)   (4.0, 2.7)   (3.8, 2.4)
-           (2.5, 1.5)   (7.3, 3.5)
+<pre><code>   100 rows = 80 train + 20 query
+   work     = 20 × 80 × d  distance evaluations</code></pre>
 
-   New place: income = 5.0, k = 3
+        <p>
+          Spatial indexes (KD-tree, Ball-tree) cut average query time to roughly
+          <code>O(d&middot;log n)</code> in low dimensions, but degrade toward brute force as
+          <code>d</code> grows. This is the <strong>curse of dimensionality</strong>: in high
+          dimensions, distances concentrate &mdash; the nearest and farthest points sit at
+          almost the same distance &mdash; and "nearest neighbour" stops being meaningful.
+        </p>
 
-   Distances from 5.0:
-     |5.0 − 5.6| = 0.6  ←  near
-     |5.0 − 4.0| = 1.0  ←  near
-     |5.0 − 3.8| = 1.2  ←  near
-     |5.0 − 2.5| = 2.5       far
-     |5.0 − 7.3| = 2.3       far
+        <h2>Worked by Hand</h2>
 
-   3 nearest: 5.6, 4.0, 3.8
-   Their prices: 3.4, 2.7, 2.4
-   Average = (3.4 + 2.7 + 2.4) / 3 = 2.83
+        <p>
+          One feature (income), so scaling is moot here; new row at income 5.0, <code>k = 3</code>:
+        </p>
 
-   My guess: $283,000.</code></pre>
+<pre><code>   train (income, price):
+     (5.6, 3.4) (4.0, 2.7) (3.8, 2.4) (2.5, 1.5) (7.3, 3.5)
 
-        <p>The machine does this for 16,000 rows instead of 5. The thinking is identical.</p>
+   |5.0 − 5.6| = 0.6   |5.0 − 4.0| = 1.0   |5.0 − 3.8| = 1.2
+   |5.0 − 2.5| = 2.5   |5.0 − 7.3| = 2.3
+
+   3 nearest prices: 3.4, 2.7, 2.4
+   ŷ = (3.4 + 2.7 + 2.4) / 3 = 2.83</code></pre>
 
         <h2>In Code</h2>
 
         <p>
-          The ready-made tool hides the loop. <code>fit</code> just memorises the known
-          pile; <code>predict</code> runs the find-pick-average sweep:
+          A <code>Pipeline</code> binds the scaler to the estimator so scaling is fit on train
+          and reapplied on predict &mdash; and, later, refit per CV fold:
         </p>
 
-<pre><code>from sklearn.neighbors import KNeighborsRegressor
+<pre><code>from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error
 
-m = KNeighborsRegressor(n_neighbors=5)
-m.fit(X_train, y_train)          # memorize the known pile
-guesses = m.predict(X_test)      # find → pick → average for each hidden row
+knn = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=5))
+knn.fit(X_train, y_train)                 # store data; scaler learns μ, σ on train
+pred = knn.predict(X_test)                # scale → distance → select → average
 
-# RMSE: miss → square → mean → root
-rmse = mean_squared_error(y_test, guesses) ** 0.5
+rmse = mean_squared_error(y_test, pred) ** 0.5
 print(round(rmse, 3))</code></pre>
 
-        <h2>k Is a Knob</h2>
+        <h2>k Is the Bias&ndash;Variance Knob</h2>
 
         <p>
-          The number of neighbours to ask &mdash; <code>k</code> &mdash; is a setting I
-          pick <strong>before</strong> the machine runs. It's not learned. It's chosen.
+          <code>k</code> is the only real hyperparameter (alongside the metric and the weighting
+          scheme). It controls model complexity directly:
         </p>
 
-<pre><code>   k = 1  →  copy one nearest neighbour (jumpy, fragile)
-   k = 25 →  average 25 neighbours      (smooth, maybe too blurry)</code></pre>
+        <ul>
+          <li><code>k = 1</code>: zero training error, the prediction surface fits every noisy
+              point &mdash; <strong>low bias, high variance</strong>.</li>
+          <li><code>k</code> large: each prediction averages many points and flattens toward the
+              global mean &mdash; <strong>high bias, low variance</strong>. At
+              <code>k = n_train</code>, every query returns <code>&#563;</code>.</li>
+        </ul>
 
-        <p>Wrap it in a little box: a number goes in, a mistake-score comes out.</p>
+        <p>Pick <code>k</code> by cross-validation, not by eye.</p>
 
-<pre><code>def knn_rmse(k):
-    m = KNeighborsRegressor(n_neighbors=k)
-    m.fit(X_train, y_train)
-    guesses = m.predict(X_test)
-    return round(mean_squared_error(y_test, guesses) ** 0.5, 3)</code></pre>
-
-        <h2>Choosing k Fairly</h2>
+        <h2>Choosing k Without Touching the Test Set</h2>
 
         <p>
-          To pick the best k I can't use the sealed test &mdash; that's the honesty
-          check. I rotate through the training pile in 5 slices (the
-          <a href="chapter1-what-ml-actually-does.html">cross-validation</a> trick),
-          score each k, and pick the smallest mistake.
+          Cross-validate each candidate on the training set. Passing the whole
+          <code>Pipeline</code> to <code>cross_val_score</code> refits the scaler on each fold's
+          training portion &mdash; no leakage:
         </p>
 
 <pre><code>from sklearn.model_selection import KFold, cross_val_score
 
-def cross_val_knn(k_values, X_train, y_train):
+def cv_rmse(k, X_train, y_train):
+    model = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=k))
     kf = KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
-    results = {}
-    for k in k_values:
-        model = KNeighborsRegressor(n_neighbors=k)
-        scores = cross_val_score(model, X_train, y_train, cv=kf,
-                                 scoring='neg_root_mean_squared_error')
-        results[k] = round(-scores.mean(), 3)
-    return results
+    scores = cross_val_score(model, X_train, y_train, cv=kf,
+                             scoring='neg_root_mean_squared_error')
+    return round(-scores.mean(), 3)
 
 candidates = [1, 3, 5, 7, 9, 15, 25]
-cv = cross_val_knn(candidates, X_train, y_train)
-best_k = min(cv, key=cv.get)          # smallest VALUE's key
-test_rmse = knn_rmse(best_k)          # open the sealed test ONCE</code></pre>
+cv = {k: cv_rmse(k, X_train, y_train) for k in candidates}
+best_k = min(cv, key=cv.get)              # key with the smallest VALUE</code></pre>
 
         <div class="callout gotcha">
-          <span class="callout-label">&#9888; GOTCHA &mdash; two different "fives"</span>
-          <code>k</code> = how many <em>neighbours</em> to ask (changes the GUESS).
-          <code>5 slices</code> = how many <em>chunks</em> to grade with (changes the
-          SCORE). They have nothing to do with each other. <code>k=25</code> with 5
-          slices is totally fine &mdash; different jobs.
+          <span class="callout-label">&#9888; THREE THINGS THAT TRIP PEOPLE UP</span>
+          <strong>(1)</strong> <code>k</code> (neighbours, sets the guess) and the fold count
+          (grading, sets the estimate) are unrelated &mdash; <code>k=25</code> with 5 folds is
+          fine.<br>
+          <strong>(2)</strong> scikit-learn maximises its score, so RMSE is negated; un-negate
+          with <code>-scores.mean()</code>.<br>
+          <strong>(3)</strong> <code>min(cv, key=cv.get)</code> returns the key with the smallest
+          value; plain <code>min(cv)</code> returns the smallest key &mdash; the wrong answer.
         </div>
 
-        <div class="callout gotcha">
-          <span class="callout-label">&#9888; GOTCHA &mdash; the negative-RMSE sign flip</span>
-          The scoring tool always chases the <em>biggest</em> number, but mistakes
-          should be <em>small</em>. So it flips the sign: mistakes become negative, and
-          the "biggest" (closest to zero) negative is the smallest mistake. Peel the
-          minus off at the end &mdash; that's the <code>-scores.mean()</code> above.
-        </div>
-
-        <div class="callout gotcha">
-          <span class="callout-label">&#9888; GOTCHA &mdash; smallest KEY vs smallest VALUE</span>
-          <code>min(cv, key=cv.get)</code> returns the <strong>key</strong> (the k)
-          whose <strong>value</strong> (the RMSE) is smallest. Plain <code>min(cv)</code>
-          would give the smallest key &mdash; wrong. We want the k with the smallest
-          mistake, not the smallest k.
-        </div>
-
-        <h2>Who Made This (and When)</h2>
+        <h2>Origin</h2>
 
         <p>
-          This "ask the nearest neighbours" rule was written down in <strong>1951</strong>
-          by <strong>Evelyn Fix</strong> and <strong>Joseph Hodges</strong>, and
-          sharpened later by <strong>Thomas Cover</strong> and <strong>Peter Hart</strong>
-          in 1967. It's older than nearly every programming language you've heard of.
-          So when you do this by hand, you're not just following a recipe &mdash; you're
-          re-deriving a 1951 idea on paper.
+          The rule was formalised by Evelyn Fix and Joseph Hodges in 1951 and analysed by Thomas
+          Cover and Peter Hart in 1967, who proved the 1-NN error rate is asymptotically within a
+          factor of two of the optimal Bayes error.
         </p>
 
         <ol class="takeaways">
-          <li>Two piles: known (read-only) and hidden (price locked).</li>
-          <li>Distance is one number built from all features &mdash; never the price.</li>
-          <li>For each hidden row: find &rarr; pick nearest k &rarr; average their prices.</li>
-          <li>No real training &mdash; every guess re-scans the whole known pile.</li>
-          <li>k is chosen, not learned; pick it by cross-validation, prove on the test once.</li>
+          <li>Prediction = mean of the <code>k</code> nearest training targets (optionally distance-weighted).</li>
+          <li>Euclidean distance is scale-sensitive &mdash; standardise features, fitting on train only.</li>
+          <li>No training; predict is <code>O(n_train&middot;d)</code> per query and stores all data.</li>
+          <li><code>k</code> sets the bias&ndash;variance trade-off; choose it by cross-validation.</li>
+          <li>High dimensions erode the method (distance concentration).</li>
         </ol>
 
         <hr>
         <p style="font-size:13px;">
           <strong>Lab 1 series:</strong>
-          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; Overview</a> &middot;
+          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; Pipeline</a> &middot;
           Part 2 (this post) &middot;
-          <a href="straight-stick-linear-regression.html">Part 3 &mdash; The Straight Stick</a>
+          <a href="straight-stick-linear-regression.html">Part 3 &mdash; Linear Regression</a>
         </p>
         <p style="font-size:12px; color:var(--dim);">
           &larr; <a href="../index.html">Back to all posts</a>
@@ -284,7 +270,7 @@ test_rmse = knn_rmse(best_k)          # open the sealed test ONCE</code></pre>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// LAB 1 SERIES</div>
         <ul>
-          <li><a href="chapter1-what-ml-actually-does.html">Part 1: Overview</a></li>
+          <li><a href="chapter1-what-ml-actually-does.html">Part 1: Pipeline</a></li>
           <li><strong>Part 2: KNN</strong></li>
           <li><a href="straight-stick-linear-regression.html">Part 3: Linear Reg.</a></li>
         </ul>
@@ -292,21 +278,21 @@ test_rmse = knn_rmse(best_k)          # open the sealed test ONCE</code></pre>
       <div class="sidebar-box">
         <div class="sidebar-box-title">// IN THIS POST</div>
         <ul>
-          <li>Two sides</li>
-          <li>Distance formula</li>
-          <li>Find/Pick/Average</li>
-          <li>1600 measures</li>
-          <li>Pencil example</li>
-          <li>k as a knob</li>
-          <li>Choosing k fairly</li>
+          <li>Distance metric</li>
+          <li>Feature scaling</li>
+          <li>Predict / weighting</li>
+          <li>Complexity</li>
+          <li>Bias&ndash;variance of k</li>
+          <li>Leakage-safe CV</li>
         </ul>
       </div>
       <div class="sidebar-box">
-        <div class="sidebar-box-title">// DECODER</div>
+        <div class="sidebar-box-title">// COMPLEXITY</div>
         <ul>
-          <li>neighbour machine = KNN</li>
-          <li>dial = coefficient</li>
-          <li>lazy learner = no training</li>
+          <li>fit: O(1) (store)</li>
+          <li>query: O(n·d) brute</li>
+          <li>KD/Ball-tree: ~O(d·log n)</li>
+          <li>fails as d grows</li>
         </ul>
       </div>
     </aside>

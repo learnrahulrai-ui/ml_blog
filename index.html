@@ -25,9 +25,8 @@
   <!-- MARQUEE -->
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** WELCOME *** I ban the jargon, learn with a pencil, then stick the labels on ***
-      a table of numbers, one column is the answer *** miss → square → mean → root ***
-      no cookies, no trackers, just math *** WELCOME ***
+      *** supervised regression on California housing *** KNN + OLS, derived by hand ***
+      RMSE, bias–variance, k-fold cross-validation *** β = (XᵀX)⁻¹Xᵀy *** no cookies, no trackers ***
     </span>
   </div>
 
@@ -47,10 +46,10 @@
 
       <!-- FEATURED SERIES BANNER -->
       <div class="callout note" style="margin-top:0;">
-        <span class="callout-label">&#9656; NOW SERVING &mdash; LAB 1: GUESS A HOUSE PRICE</span>
-        A three-part series where I learn supervised machine learning from scratch by
-        predicting California house prices &mdash; no buzzwords, pencil first, then the
-        real Python. Start with Part 1 below.
+        <span class="callout-label">&#9656; LAB 1 &mdash; SUPERVISED REGRESSION ON CALIFORNIA HOUSING</span>
+        A three-part series on supervised regression from first principles: the train/test
+        discipline, two estimators (KNN and OLS) derived by hand, and model selection by
+        cross-validation. Start with Part 1.
       </div>
 
       <div class="section-header">// LAB 1 SERIES</div>
@@ -58,7 +57,7 @@
       <!-- Part 1 -->
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/chapter1-what-ml-actually-does.html">What Machine Learning Actually Does (Before Anyone Tells You the Fancy Words)</a>
+          <a href="posts/chapter1-what-ml-actually-does.html">Supervised Regression, End to End (No Jargon Until It's Earned)</a>
         </div>
         <div class="post-meta">
           <span>2026-06-03</span> &nbsp;|&nbsp;
@@ -67,10 +66,10 @@
           <span class="tag">supervised-learning</span>
         </div>
         <div class="post-excerpt">
-          I closed seventeen confusing browser tabs and started over with a pencil. The
-          whole premise of supervised learning in plain words: a table, a missing answer
-          column, a guess. Train-test split, two ways to guess, RMSE, cross-validation,
-          and a jargon decoder ring at the end.
+          The full pipeline on the California housing dataset: the problem stated as learning
+          f: X&rarr;y, why the test set is isolated, KNN vs. OLS, RMSE against the std(y)
+          baseline, and k-fold cross-validation with leakage-safe preprocessing. Standard
+          terminology mapped at the end.
         </div>
         <a class="read-more" href="posts/chapter1-what-ml-actually-does.html">[ READ MORE &rarr; ]</a>
       </article>
@@ -78,19 +77,18 @@
       <!-- Part 2 -->
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/neighbor-machine-knn.html">The Neighbor Machine: k-Nearest Neighbours, By Hand</a>
+          <a href="posts/neighbor-machine-knn.html">k-Nearest Neighbours: Derivation, Scaling, and Complexity</a>
         </div>
         <div class="post-meta">
           <span>2026-06-02</span> &nbsp;|&nbsp;
           <span class="tag">part 2</span>
           <span class="tag">knn</span>
-          <span class="tag">distance</span>
+          <span class="tag">complexity</span>
         </div>
         <div class="post-excerpt">
-          Guess what you don't know by copying the things most like it that you do. The
-          distance formula (features only, never the price), the find&ndash;pick&ndash;average
-          loop, a full pencil example, and choosing k fairly &mdash; re-deriving a 1951
-          idea from Fix &amp; Hodges.
+          KNN from the distance metric up: why Euclidean distance demands feature
+          standardisation, the O(n&middot;d) query cost and the curse of dimensionality, k as
+          the bias&ndash;variance knob, and selecting it with a leakage-safe CV pipeline.
         </div>
         <a class="read-more" href="posts/neighbor-machine-knn.html">[ READ MORE &rarr; ]</a>
       </article>
@@ -98,19 +96,19 @@
       <!-- Part 3 -->
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/straight-stick-linear-regression.html">The Straight Stick: Linear Regression from Three Points</a>
+          <a href="posts/straight-stick-linear-regression.html">Linear Regression: OLS, the Normal Equations, and Numerics</a>
         </div>
         <div class="post-meta">
           <span>2026-06-01</span> &nbsp;|&nbsp;
           <span class="tag">part 3</span>
           <span class="tag">linear-regression</span>
-          <span class="tag">math</span>
+          <span class="tag">least-squares</span>
         </div>
         <div class="post-excerpt">
-          A different philosophy: give every measurement a dial, multiply and add. The
-          best dials sit at the bottom of a bowl &mdash; and for a straight line you can
-          solve the exact bottom by hand. Three points, the normal equations, and why
-          fitting a line is really a projection.
+          OLS from the convex objective to the closed form &beta; = (X&#7488;X)&#8315;&sup1;X&#7488;y:
+          a three-point pencil solve of the normal equations, residual orthogonality and the
+          projection/hat matrix, the Gauss&ndash;Markov conditions, and why you factor (QR/SVD)
+          rather than invert.
         </div>
         <a class="read-more" href="posts/straight-stick-linear-regression.html">[ READ MORE &rarr; ]</a>
       </article>
