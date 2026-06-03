@@ -485,6 +485,107 @@ hr {
   to   { transform: translateX(-100%); }
 }
 
+/* ── TABLES (decoder ring etc) ── */
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+  font-size: 13px;
+  background: var(--table-bg);
+}
+
+.article-body th {
+  background: rgba(0,255,65,0.1);
+  color: var(--yellow);
+  text-align: left;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,255,65,0.3);
+  letter-spacing: 1px;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+}
+
+.article-body td {
+  padding: 6px 12px;
+  border: 1px solid rgba(0,255,65,0.2);
+  color: var(--white);
+}
+
+.article-body tr:hover td {
+  background: rgba(0,255,65,0.04);
+}
+
+.article-body td:first-child {
+  color: var(--cyan);
+}
+
+/* ── CALLOUT / GOTCHA / NOTE BOXES ── */
+.callout {
+  border: 1px solid;
+  border-left-width: 4px;
+  padding: 12px 16px;
+  margin: 18px 0;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.callout .callout-label {
+  display: block;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.callout.gotcha {
+  border-color: rgba(255,170,0,0.6);
+  background: rgba(255,170,0,0.05);
+  color: #ffcc66;
+}
+.callout.gotcha .callout-label { color: #ffaa00; }
+
+.callout.gotcha code {
+  background: rgba(255,170,0,0.1);
+  border-color: rgba(255,170,0,0.3);
+  color: #ffcc66;
+}
+
+.callout.note {
+  border-color: rgba(0,255,255,0.5);
+  background: rgba(0,255,255,0.04);
+  color: var(--cyan);
+}
+.callout.note .callout-label { color: var(--cyan); }
+
+.callout.key {
+  border-color: rgba(255,0,255,0.5);
+  background: rgba(255,0,255,0.05);
+  color: #ff99ff;
+}
+.callout.key .callout-label { color: var(--pink); }
+
+/* ── SERIES BADGE ── */
+.series-badge {
+  display: inline-block;
+  font-family: 'VT323', monospace;
+  font-size: 15px;
+  color: var(--bg);
+  background: var(--green);
+  padding: 1px 10px;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+/* ── KEY TAKEAWAYS LIST ── */
+.takeaways {
+  border: 1px solid rgba(0,255,65,0.3);
+  background: var(--table-bg);
+  padding: 16px 16px 16px 36px;
+  margin: 18px 0;
+}
+.takeaways li { color: var(--white); }
+.takeaways li::marker { color: var(--green); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 600px) {
   #content-area { flex-direction: column; }

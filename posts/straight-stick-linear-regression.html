@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Straight Stick (Linear Regression from 3 Points) :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <header id="header">
+    <div class="site-title"><a href="../index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
+    <div class="site-subtitle">// Machine Learning Notes from the Trenches //</div>
+  </header>
+
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      *** guess = Σ feature×dial + nudge *** best dials = bottom of the bowl ***
+      3b + 6w = 10 ;  6b + 14w = 23 *** β = (XᵀX)⁻¹Xᵀy *** it's a projection ***
+    </span>
+  </div>
+
+  <nav id="nav">
+    <a href="../index.html">Home</a>
+    <a href="../about.html">About</a>
+    <a href="../archive.html">Archive</a>
+    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
+  </nav>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <span class="series-badge">LAB 1 &middot; PART 3 OF 3</span>
+        <div class="article-title">The Straight Stick: Linear Regression from Three Points</div>
+        <div class="article-meta">
+          Posted: 2026-06-01 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: linear-regression, ols, least-squares, by-hand, math
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          The <a href="neighbor-machine-knn.html">neighbour machine</a> copies. This
+          one is a completely different philosophy. No neighbours, no scanning the pile.
+          Instead:
+        </p>
+
+        <blockquote>Give every measured thing a dial. Multiply and add up.</blockquote>
+
+        <div class="math-box">
+          guess = rooms&times;dial&sub1; + income&times;dial&sub2; + age&times;dial&sub3; + &hellip; + nudge
+        </div>
+
+        <p>
+          Each <em>dial</em> is a multiplier that says how much that measurement
+          matters. The <code>nudge</code> is the baseline &mdash; the guess when every
+          measurement is zero. Once the dials are set, guessing is instant: no memory,
+          just arithmetic.
+        </p>
+
+        <h2>The Bowl</h2>
+
+        <p>
+          The best dials are the ones that make the total mistake smallest. Picture a
+          bowl &mdash; the height is the mistake, and you want the bottom:
+        </p>
+
+<pre><code>         ╲         ╱
+          ╲       ╱
+           ╲     ╱
+            ╲   ╱
+             ╲ ╱
+              •  ← best dials live here (bottom of the bowl)</code></pre>
+
+        <p>Two ways to find the bottom:</p>
+
+        <ol>
+          <li><strong>Walk downhill</strong> &mdash; start anywhere, feel the slope,
+              take a small step down, repeat. (The textbook calls this
+              <em>gradient descent</em>.)</li>
+          <li><strong>Solve directly</strong> &mdash; the slope is zero at the bottom;
+              for a straight stick you can solve <em>where flat</em> in one shot.</li>
+        </ol>
+
+        <p>
+          For a straight line there's an exact answer, so I wanted the real math. Here
+          it is &mdash; three points, done entirely by pencil.
+        </p>
+
+        <h2>The Pencil Solve</h2>
+
+<pre><code>   x = 1, 2, 3       y = 2, 3, 5
+
+   Build the sums:
+   Σ1  = 3    Σx  = 6     Σy  = 10    Σxy = 23    Σx² = 14
+
+   Normal equations (the "where flat" conditions):
+     3b +  6w = 10
+     6b + 14w = 23
+
+   Solve:
+     multiply top row by 2:   6b + 12w = 20
+     subtract from bottom:          2w = 3     →  w = 3/2
+     back-substitute:    3b + 9 = 10           →  b = 1/3
+
+   The line:  ŷ = 1/3 + 1.5x</code></pre>
+
+        <p>Now check the residuals &mdash; the leftover misses:</p>
+
+<pre><code>   x=1: ŷ=1.833, miss=+0.167
+   x=2: ŷ=3.333, miss=−0.333
+   x=3: ŷ=4.833, miss=+0.167
+
+   Sum of misses   = 0     ✓  (they cancel)
+   Sum of x·miss   = 0     ✓  (residuals ⟂ inputs)
+   RMSE ≈ 0.236</code></pre>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; THE SAME OPERATION, SCALED</span>
+          This three-point pencil solve <strong>is</strong> exactly what the machine
+          does &mdash; just with 16,000 rows and 8 dials instead of 3 rows and 1 dial.
+          The dials live in <code>m.coef_</code>, the nudge in <code>m.intercept_</code>.
+        </div>
+
+        <h2>The Geometry: It's a Projection</h2>
+
+        <p>
+          Those two checks aren't a coincidence. The residuals sum to zero and they're
+          perpendicular to the inputs because fitting a straight line is a
+          <strong>projection</strong>. The best line is the <em>shadow</em> of the data
+          cast onto the space of all possible lines. You can't do better than the
+          shadow &mdash; any other line leaves a longer leftover.
+        </p>
+
+        <p>And here it is in symbols, for when you're ready to go deeper:</p>
+
+<pre><code>   minimise  J(β) = ‖Xβ − y‖²          (total squared miss)
+   set slope to zero:  XᵀX β = Xᵀy      (the normal equations)
+   solve:  β = (XᵀX)⁻¹ Xᵀy             (the exact dials)
+
+   geometry:  ŷ = Hy   →  it's a projection (H = "hat" matrix)
+   residual ⟂ inputs:   Xᵀe = 0
+   stats:  unbiased, best among all straight guessers (Gauss–Markov)</code></pre>
+
+        <p>
+          I won't pretend I absorbed all of that in one sitting. But I <em>touched</em>
+          it &mdash; I held the pieces. That matters more than memorising the final
+          formula.
+        </p>
+
+        <h2>In Code</h2>
+
+        <p>
+          The tool hides the loop again. <code>fit</code> does the real work (solving
+          the normal equations); <code>predict</code> is just multiply-and-add:
+        </p>
+
+<pre><code>from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+m = LinearRegression()           # the straight-stick machine, no neighbour knob
+m.fit(X_train, y_train)          # finds the dials (the real work)
+guesses = m.predict(X_test)
+
+rmse = mean_squared_error(y_test, guesses) ** 0.5
+print(round(rmse, 3))
+
+print("dials (coef_):", m.coef_)
+print("nudge (intercept_):", m.intercept_)</code></pre>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; No knob to tune</span>
+          Unlike KNN's <code>k</code>, plain linear regression has nothing to choose.
+          The dials are <em>solved</em>, not picked. There's no equivalent of "try k=1,
+          3, 5&hellip;" &mdash; the bottom of the bowl is wherever the math says it is.
+          (That changes once you add regularisation &mdash; a later chapter.)
+        </div>
+
+        <h2>KNN vs. The Straight Stick</h2>
+
+        <table>
+          <thead>
+            <tr><th>&nbsp;</th><th>Neighbour machine (KNN)</th><th>Straight stick (linear)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>How it guesses</td><td>copy nearest neighbours</td><td>one formula, dials + nudge</td></tr>
+            <tr><td>"Training"</td><td>none &mdash; just memorise</td><td>solve for the dials once</td></tr>
+            <tr><td>Guessing cost</td><td>re-scan whole pile</td><td>instant multiply-add</td></tr>
+            <tr><td>Knob to pick</td><td>k (cross-validate it)</td><td>none (it's solved)</td></tr>
+            <tr><td>Shape it fits</td><td>bumpy, local</td><td>one flat plane</td></tr>
+          </tbody>
+        </table>
+
+        <p>
+          Same job, opposite strategies. One leans on memory, the other on a rule.
+          Both answer the same question: <em>given what I've seen, what's my best guess
+          for something I haven't?</em>
+        </p>
+
+        <h2>Where to Go Deeper</h2>
+
+        <p>
+          When you're ready, these are the search terms that open up the math under the
+          straight stick:
+        </p>
+
+        <ul>
+          <li><strong>dot product</strong>, <strong>matrix times vector</strong> &mdash; the language</li>
+          <li><strong>normal equations</strong>, <strong>least squares</strong> &mdash; the solve</li>
+          <li><strong>least squares projection</strong> &mdash; the geometry</li>
+          <li><strong>gradient descent</strong> &mdash; the walk-downhill alternative</li>
+          <li><strong>Gauss&ndash;Markov</strong> &mdash; why this line is provably the best straight guesser</li>
+        </ul>
+
+        <ol class="takeaways">
+          <li>A straight rule = a dial per feature, plus one nudge.</li>
+          <li>Best dials = the bottom of the squared-mistake bowl.</li>
+          <li>For a line you can solve the bottom exactly (normal equations).</li>
+          <li>Residuals sum to zero and are perpendicular to the inputs &mdash; it's a projection.</li>
+          <li>Plain linear regression has no knob to tune; the dials are solved.</li>
+        </ol>
+
+        <hr>
+        <p style="font-size:13px;">
+          <strong>Lab 1 series:</strong>
+          <a href="chapter1-what-ml-actually-does.html">Part 1 &mdash; Overview</a> &middot;
+          <a href="neighbor-machine-knn.html">Part 2 &mdash; The Neighbor Machine</a> &middot;
+          Part 3 (this post)
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          <em>Next: a yes-or-no guesser with an S-curve, and drawing the dividing line
+          between groups.</em>
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// LAB 1 SERIES</div>
+        <ul>
+          <li><a href="chapter1-what-ml-actually-does.html">Part 1: Overview</a></li>
+          <li><a href="neighbor-machine-knn.html">Part 2: KNN</a></li>
+          <li><strong>Part 3: Linear Reg.</strong></li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>Dials + nudge</li>
+          <li>The bowl</li>
+          <li>Pencil solve (3 pts)</li>
+          <li>Normal equations</li>
+          <li>Projection geometry</li>
+          <li>KNN vs linear</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// DECODER</div>
+        <ul>
+          <li>straight stick = linear reg / OLS</li>
+          <li>dials = coefficients</li>
+          <li>nudge = intercept</li>
+          <li>bowl bottom = least squares</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <footer id="footer">
+    <div>&copy; 2026 Rahul Rai &mdash; All rights reserved</div>
+    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
+    <div class="footer-badges">
+      <span class="badge">HTML 5</span>
+      <span class="badge">CSS 3</span>
+      <span class="badge">No JS</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

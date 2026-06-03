@@ -11,13 +11,13 @@
 
   <header id="header">
     <div class="site-title"><a href="index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
-    <div class="site-subtitle">// Machine Learning Notes from the Trenches //</div>
+    <div class="site-subtitle">// Machine Learning, Learned by Hand //</div>
   </header>
 
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** all posts, all time *** no pagination needed yet ***
-      adding more posts regularly *** stay tuned ***
+      *** all posts, all time *** Lab 1 is live *** Lab 2 coming soon ***
+      learn the picture first, the words come free ***
     </span>
   </div>
 
@@ -33,61 +33,64 @@
 
       <div class="article-header">
         <div class="article-title">All Posts</div>
-        <div class="article-meta">Total: 3 posts</div>
+        <div class="article-meta">Total: 3 posts &middot; 1 series</div>
       </div>
 
-      <div class="section-header">// 2024</div>
+      <div class="section-header">// LAB 1 &mdash; GUESS A HOUSE PRICE (2026)</div>
 
       <article class="post-card">
         <div class="post-title">
-          <a href="posts/backpropagation.html">Backpropagation From Scratch: It's Just Chain Rule</a>
+          <a href="posts/chapter1-what-ml-actually-does.html">Part 1 &mdash; What Machine Learning Actually Does</a>
         </div>
         <div class="post-meta">
-          2024-11-20 &nbsp;|&nbsp;
-          <span class="tag">deep-learning</span>
+          2026-06-03 &nbsp;|&nbsp;
+          <span class="tag">fundamentals</span>
+          <span class="tag">supervised-learning</span>
+        </div>
+        <div class="post-excerpt">
+          The whole supervised-learning pipeline in plain words: a table, the one rule
+          (hide 20%), two ways to guess, RMSE, cross-validation, and a jargon decoder ring.
+        </div>
+        <a class="read-more" href="posts/chapter1-what-ml-actually-does.html">[ READ &rarr; ]</a>
+      </article>
+
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/neighbor-machine-knn.html">Part 2 &mdash; The Neighbor Machine (k-NN by Hand)</a>
+        </div>
+        <div class="post-meta">
+          2026-06-02 &nbsp;|&nbsp;
+          <span class="tag">knn</span>
+          <span class="tag">distance</span>
+          <span class="tag">by-hand</span>
+        </div>
+        <div class="post-excerpt">
+          Distance from features only, the find&ndash;pick&ndash;average loop, a full
+          pencil example, k as a knob, and the gotchas. A 1951 idea, re-derived on paper.
+        </div>
+        <a class="read-more" href="posts/neighbor-machine-knn.html">[ READ &rarr; ]</a>
+      </article>
+
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/straight-stick-linear-regression.html">Part 3 &mdash; The Straight Stick (Linear Regression)</a>
+        </div>
+        <div class="post-meta">
+          2026-06-01 &nbsp;|&nbsp;
+          <span class="tag">linear-regression</span>
+          <span class="tag">least-squares</span>
           <span class="tag">math</span>
-          <span class="tag">beginner</span>
         </div>
         <div class="post-excerpt">
-          Derive and implement backpropagation in pure Python. No magic, just the chain rule.
+          Dials and a nudge, the bottom of the bowl, the normal equations solved on three
+          points by pencil, and why fitting a line is geometrically a projection.
         </div>
-        <a class="read-more" href="posts/backpropagation.html">[ READ &rarr; ]</a>
-      </article>
-
-      <article class="post-card">
-        <div class="post-title">
-          <a href="posts/attention-mechanism.html">Attention Is All You Need (But Here's What That Actually Means)</a>
-        </div>
-        <div class="post-meta">
-          2024-10-05 &nbsp;|&nbsp;
-          <span class="tag">transformers</span>
-          <span class="tag">nlp</span>
-          <span class="tag">attention</span>
-        </div>
-        <div class="post-excerpt">
-          Self-attention explained with actual numbers. Q, K, V, multi-head, positional encoding.
-        </div>
-        <a class="read-more" href="posts/attention-mechanism.html">[ READ &rarr; ]</a>
-      </article>
-
-      <article class="post-card">
-        <div class="post-title">
-          <a href="posts/gradient-descent.html">Gradient Descent: SGD, Adam, and Why Your Loss Explodes</a>
-        </div>
-        <div class="post-meta">
-          2024-09-12 &nbsp;|&nbsp;
-          <span class="tag">optimization</span>
-          <span class="tag">training</span>
-        </div>
-        <div class="post-excerpt">
-          Compare SGD, momentum, and Adam. Diagnose exploding loss. Pick the right optimizer.
-        </div>
-        <a class="read-more" href="posts/gradient-descent.html">[ READ &rarr; ]</a>
+        <a class="read-more" href="posts/straight-stick-linear-regression.html">[ READ &rarr; ]</a>
       </article>
 
       <hr>
       <p style="text-align:center; font-size:12px; color:var(--dim);">
-        More posts coming. Check back soon.<span class="blink"> _</span>
+        Lab 2 coming soon: a yes-or-no guesser and the S-curve.<span class="blink"> _</span>
       </p>
     </main>
 
@@ -95,18 +98,25 @@
       <div class="sidebar-box">
         <div class="sidebar-box-title">// BY TAG</div>
         <ul>
-          <li>deep-learning (1)</li>
-          <li>transformers (1)</li>
-          <li>optimization (1)</li>
-          <li>nlp (1)</li>
-          <li>math (1)</li>
+          <li>supervised-learning (1)</li>
+          <li>knn (1)</li>
+          <li>linear-regression (1)</li>
+          <li>math (2)</li>
+          <li>by-hand (2)</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// SERIES</div>
+        <ul>
+          <li>Lab 1 &mdash; House Prices (3)</li>
+          <li>Lab 2 &mdash; coming soon</li>
         </ul>
       </div>
     </aside>
   </div>
 
   <footer id="footer">
-    <div>&copy; 2024 Rahul Rai &mdash; All rights reserved</div>
+    <div>&copy; 2026 Rahul Rai &mdash; All rights reserved</div>
     <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
     <div class="footer-badges">
       <span class="badge">HTML 5</span>
