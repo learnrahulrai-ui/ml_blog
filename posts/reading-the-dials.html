@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reading the Dials: What the Coefficients Say :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <header id="header">
+    <div class="site-title"><a href="../index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
+    <div class="site-subtitle">// Machine Learning Notes from the Trenches //</div>
+  </header>
+
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      *** each column gets one dial: + pushes up, − drags down *** most negative = MIN, not MAX ***
+      zip names onto dials *** raw dials wear the column's units → not comparable until same-ruler ***
+    </span>
+  </div>
+
+  <nav id="nav">
+    <a href="../index.html">Home</a>
+    <a href="../about.html">About</a>
+    <a href="../archive.html">Archive</a>
+    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
+  </nav>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <span class="series-badge">GRADING A GUESSER &middot; PART 2 OF 2</span>
+        <div class="article-title">Reading the Dials: What the Coefficients Say</div>
+        <div class="article-meta">
+          Posted: 2026-06-04 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: coefficients, interpretation, scaling, regression
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          The straight-stick rule keeps one dial per column. Up to now they were just numbers
+          the rule set for itself. But the dials can be <em>read</em>: each one says how its
+          column pushes the answer. The question for this post &mdash; which column drags miles
+          per gallon down the hardest? &mdash; sounds easy and hides two real traps.
+        </p>
+
+        <h2>One Dial Per Column</h2>
+
+<pre><code>   guess = d₁·disp + d₂·horse + d₃·weight + d₄·accel + nudge
+            └──┬──┘
+          turn this dial up by 1 unit of its column,
+          the guess moves by d₁ — everything else held still</code></pre>
+
+        <p>
+          A <strong>positive</strong> dial pushes the answer up as its column grows; a
+          <strong>negative</strong> dial drags it down. The size says how hard. So "drags mpg
+          down hardest" means the <em>most negative</em> dial. Easy &mdash; except the rule hands
+          them to you with the names torn off.
+        </p>
+
+        <h2>The Bare Row Problem</h2>
+
+<pre><code>   model.coef_  →  [ -0.01, -0.04, -0.007, +0.12 ]   numbers only, no names
+   X.columns    →  [ disp,  horse,  weight,  accel ]  names, same order</code></pre>
+
+        <p>
+          Two rows, same order, one missing its labels. Zip the names onto the dials and you have
+          a shelf you can read:
+        </p>
+
+<pre><code>   zip →   disp  : -0.01
+           horse : -0.04
+           weight: -0.007
+           accel : +0.12</code></pre>
+
+        <h2>Most Negative Means MIN, Not MAX</h2>
+
+<pre><code>   number line — furthest BELOW zero is the strongest drag:
+
+     -0.04      -0.01      -0.007             +0.12
+     horse       disp       weight             accel
+   ◄── most negative                      most positive ──►</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; −0.04 IS SMALLER THAN −0.007</span>
+          The trap: 4 <em>looks</em> bigger than 7, so the eye wants <code>-0.04</code> to be the
+          larger drag and reaches for the biggest number. But further below zero is the
+          <em>smaller</em> value. "Most negative" is the <strong>minimum</strong>, not the maximum.
+          Here the strongest drag is <code>horse</code> at <code>-0.04</code>.
+        </div>
+
+        <p>
+          So zip the names on, then grab the name sitting on the smallest dial &mdash; the same
+          winner-hunt used to pick the best neighbour-count earlier in the blog:
+        </p>
+
+<pre><code>dials = dict(zip(X.columns, model.coef_))
+strongest_drag = min(dials, key=dials.get)   # KEY of the smallest VALUE → a name</code></pre>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; IT HANDS BACK A NAME, NOT A NUMBER</span>
+          <code>min(dials, key=dials.get)</code> walks the shelf, scores each name by its dial,
+          and returns the <strong>name</strong> with the lowest score &mdash; not the dial itself.
+          Plain <code>min(dials)</code> would instead compare the names alphabetically and hand back
+          <code>"accel"</code> &mdash; the wrong question answered confidently.
+        </div>
+
+        <h2>The Trap Underneath: Dials Wear Their Column's Units</h2>
+
+        <p>
+          Here is the part the easy version skips. A dial is "answer-units per <em>one unit of its
+          column</em>" &mdash; and every column is measured on a different ruler:
+        </p>
+
+<pre><code>   weight dial  = mpg per   1 POUND        (pounds run 1500 … 5000)
+   horse  dial  = mpg per   1 HORSEPOWER   (horsepower runs 45 … 230)
+
+   a step of "1 pound" is tiny; a step of "1 horsepower" is large.
+   so a small weight-dial and a large horse-dial may carry
+   the SAME real punch — the numbers just wear different rulers.</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; RAW DIALS ARE NOT COMPARABLE ACROSS COLUMNS</span>
+          Comparing <code>-0.007</code> per pound against <code>-0.04</code> per horsepower is
+          comparing prices in two different currencies without the exchange rate. The bare dial
+          that <em>looks</em> smallest can be the weakest or the strongest real drag depending only
+          on how wide its column runs. "Which drags hardest" is not honestly answerable from the
+          raw dials alone.
+        </div>
+
+        <p>
+          The fix is the same-ruler trick from the neighbours post: shift each column to zero
+          average and stretch it to spread of one <em>before</em> setting the dials. Now every dial
+          means "mpg per one-spread step of its column" &mdash; one shared currency &mdash; and the
+          most-negative one is the honest strongest drag:
+        </p>
+
+<pre><code>from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+
+m = make_pipeline(StandardScaler(), LinearRegression())
+m.fit(X_train, y_train)
+dials = dict(zip(X.columns, m[-1].coef_))     # now in one shared ruler
+strongest_drag = min(dials, key=dials.get)    # an honest comparison</code></pre>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; THIS DOESN'T CONTRADICT "OLS NEEDS NO SCALING"</span>
+          The straight-stick rule's <em>guesses</em> and its MSE and R² do not care about scaling
+          &mdash; rescale a column and its dial rescales inversely, leaving the answer untouched
+          (shown in the straight-stick post). Scaling changes nothing about how well it fits. It
+          only changes whether the dials are <em>comparable to each other</em> as a measure of pull.
+          Same-ruler is for the reading, not the fitting.
+        </div>
+
+        <h2>And Don't Over-Trust a Single Dial</h2>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; "HOLDING THE OTHERS FIXED" CAN BE A FICTION</span>
+          A dial means "move this column by one, hold the rest still." But displacement, horsepower
+          and weight rise together &mdash; heavy cars tend to have big engines. When columns move as
+          a pack (collinearity), the rule cannot cleanly tell their pulls apart: it can shuffle
+          weight between their dials, so a single dial can swing wildly, even flip sign, with a tiny
+          change in the pile. Read individual dials as a story to check, not a verdict to trust.
+          Your physics hunch &mdash; heavier car, worse mileage &mdash; is a hypothesis; the dials
+          are evidence, and tangled columns make that evidence shaky.
+        </div>
+
+        <h2>Pencil It</h2>
+
+<pre><code>   shelf (already on a shared ruler):
+     disp : -0.01    horse : -0.04    weight: -0.007    accel : +0.12
+
+   most negative?  scan for the lowest:
+     -0.04  ← horse   (further below zero than -0.01 or -0.007)
+
+   strongest_drag = "horse"
+   accel (+0.12) is the only one PUSHING mpg up.</code></pre>
+
+        <ol class="takeaways">
+          <li>Each column keeps one dial: + pushes the answer up, &minus; drags it down; the size is the strength.</li>
+          <li>The rule hands back a bare row of dials &mdash; zip the column names on to read them.</li>
+          <li>"Most negative / drags hardest" is the <strong>minimum</strong> dial, not the maximum; <code>min(d, key=d.get)</code> returns its name.</li>
+          <li>Raw dials wear each column's own units &mdash; not comparable until you put the columns on one shared ruler first.</li>
+          <li>When columns move together, a single dial is shaky; treat it as evidence, not proof.</li>
+        </ol>
+
+        <h2>The Labels, Last</h2>
+
+        <table>
+          <thead>
+            <tr><th>Plain term used above</th><th>Standard label</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>dial on a column</td><td>coefficient / weight</td></tr>
+            <tr><td>the fixed nudge</td><td>intercept</td></tr>
+            <tr><td>the bare row of dials</td><td><code>model.coef_</code></td></tr>
+            <tr><td>put columns on one shared ruler</td><td>standardisation</td></tr>
+            <tr><td>dials after same-ruler</td><td>standardised (beta) coefficients</td></tr>
+            <tr><td>columns moving as a pack</td><td>collinearity / multicollinearity</td></tr>
+            <tr><td>hold the others fixed</td><td>ceteris paribus / partial effect</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+        <p style="font-size:13px;">
+          <strong>In this series:</strong>
+          <a href="grading-the-guess-mse-r2.html">Part 1 &mdash; Two Rulers for One Guess</a> &middot;
+          Part 2 (this post)
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          <em>Next: yes-or-no guessing &mdash; the S-curve and where to draw the line.</em>
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// THIS SERIES</div>
+        <ul>
+          <li><a href="grading-the-guess-mse-r2.html">Part 1: Two Rulers</a></li>
+          <li><strong>Part 2: Reading the Dials</strong></li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>One dial per column</li>
+          <li>The bare row problem</li>
+          <li>Most negative = MIN</li>
+          <li>Dials wear their units</li>
+          <li>Same-ruler to compare</li>
+          <li>Tangled columns</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// KEY MOVES</div>
+        <ul>
+          <li>zip(names, coef_)</li>
+          <li>min(d, key=d.get)</li>
+          <li>→ returns a NAME</li>
+          <li>scale before comparing</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <footer id="footer">
+    <div>&copy; 2026 Rahul Rai &mdash; All rights reserved</div>
+    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
+    <div class="footer-badges">
+      <span class="badge">HTML 5</span>
+      <span class="badge">CSS 3</span>
+      <span class="badge">No JS</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
