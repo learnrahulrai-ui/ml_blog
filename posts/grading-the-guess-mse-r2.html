@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Rulers for One Guess: MSE and R² :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <header id="header">
+    <div class="site-title"><a href="../index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
+    <div class="site-subtitle">// Machine Learning Notes from the Trenches //</div>
+  </header>
+
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      *** MSE = RMSE with the root left off *** R² = 1 − RSS/TSS *** race against the always-average fool ***
+      guess once, grade twice *** R² has no units, tops out at 1, can go below 0 ***
+    </span>
+  </div>
+
+  <nav id="nav">
+    <a href="../index.html">Home</a>
+    <a href="../about.html">About</a>
+    <a href="../archive.html">Archive</a>
+    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
+  </nav>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <span class="series-badge">GRADING A GUESSER &middot; PART 1 OF 2</span>
+        <div class="article-title">Two Rulers for One Guess: MSE and R²</div>
+        <div class="article-meta">
+          Posted: 2026-06-04 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: evaluation, mse, r-squared, regression
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          Same straight-stick rule as before &mdash; a dial on each column, multiply, add,
+          plus a fixed nudge. New sheet, though: cars now, not houses. And a new question that
+          turns out to be the whole point: once the stick has drawn its line, <em>was the line
+          any good?</em> Two different rulers answer that. They read the very same guesses and
+          report two different verdicts.
+        </p>
+
+        <h2>Same Stick, New Sheet</h2>
+
+<pre><code>   displacement  horsepower  weight  acceleration  │  MPG  ← right answer
+   ───────────────────────────────────────────────────────────
+      307          130        3504       12.0      │  18
+      350          165        3693       11.5      │  15
+       ...                                         │  ...
+   one row = one car                               │  the answer</code></pre>
+
+        <div class="math-box">
+          guess = d&#8321;&middot;disp + d&#8322;&middot;horse + d&#8323;&middot;weight + d&#8324;&middot;accel + nudge
+        </div>
+
+        <p>
+          Pick four columns, guess the fifth. The machinery is exactly the
+          <a href="straight-stick-linear-regression.html">straight-stick rule</a> &mdash;
+          set the dials by shrinking the squared leftover, one dot-product per guess. Nothing
+          new to build. The new work is grading.
+        </p>
+
+        <h2>Ruler One: MSE &mdash; Just the Size of the Miss</h2>
+
+        <p>Earlier the mistake-score was RMSE. Four steps, in order:</p>
+
+<pre><code>   miss → square → mean → root   = RMSE
+   miss → square → mean → STOP    = MSE</code></pre>
+
+        <p>Stare at the name and it gives itself away:</p>
+
+<pre><code>   M S E
+   │ │ └ Error    the miss   (y − guess)
+   │ └── Squared  kill the sign
+   └──── Mean     average them</code></pre>
+
+        <p>
+          No <strong>R</strong>. No <strong>R</strong>oot. So do the first three steps and stop
+          &mdash; leave off the <code>** 0.5</code> you tacked on last time.
+        </p>
+
+        <div class="math-box">
+          MSE = (1/n) &Sigma;<sub>i</sub> (y<sub>i</sub> &minus; &#375;<sub>i</sub>)&sup2;
+        </div>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; WHAT MSE IS, EXACTLY</span>
+          MSE is RMSE squared, so it lives in <em>squared</em> answer-units &mdash; "miles per
+          gallon, squared," which no one can picture. That is the price of dropping the root.
+          What you buy: MSE is the exact thing the straight-stick rule shrinks when it sets the
+          dials, so it is the rule's own home ruler. RMSE is just MSE pulled back into plain
+          units for a human to read. Same ordering of which fit is better &mdash; the root is a
+          rising step, so it never swaps the order.
+        </div>
+
+        <h2>The Problem MSE Can't Solve</h2>
+
+<pre><code>   "the guess was off by 9."
+
+   good?  bad?   ...compared to WHAT?</code></pre>
+
+        <p>
+          A raw miss-size has no scale of its own. Off by 9 mpg is dreadful for a car; off by 9
+          feet is wonderful for an archer firing across a valley. The number alone won't say.
+          You need something to measure it <em>against</em>. That is the second ruler.
+        </p>
+
+        <h2>Ruler Two: R² &mdash; A Race Against a Fool</h2>
+
+        <p>
+          R² grades the stick against the dumbest honest guesser there is. So start with that
+          fool. Forget the columns &mdash; here is a pile of past answers and no clues at all:
+        </p>
+
+<pre><code>   answers:  2   4   9   3   7</code></pre>
+
+        <p>
+          The fool must shout one number for everything. What is safest? The <strong>average,
+          5</strong> &mdash; not because it is clever, but because it sits at the bottom of the
+          squared-miss bowl. Any other single number misses more:
+        </p>
+
+<pre><code>   shout 5 → miss² = 9 + 1 + 16 + 4 + 4 = 34
+   shout 6 → miss² = 16 + 4 + 9 + 9 + 1 = 39   (worse)</code></pre>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; WHY THE AVERAGE IS THE FLOOR</span>
+          Shout some number <code>c</code>. Total squared miss is
+          <code>f(c) = &Sigma;(y<sub>i</sub> &minus; c)&sup2;</code>. Tip it to find the bottom:
+          <code>f&prime;(c) = &minus;2&Sigma;(y<sub>i</sub> &minus; c) = 0</code> gives
+          <code>c = (1/n)&Sigma;y<sub>i</sub></code> &mdash; the average, exactly. The curve is a
+          bowl (second slope <code>2n &gt; 0</code>), so that point is the lowest, not the
+          highest. The fool's best constant shout is always the mean.
+        </div>
+
+        <p>Call the fool's total misery the <strong>total wobble</strong>. Now race:</p>
+
+<pre><code>   truth:          2     4     9     3     7
+
+   FOOL  (says 5):  miss² =  9, 1, 16, 4, 4   → 34   ← total wobble
+   STICK (uses cols): says 2.5, 4.5, 8, 3.5, 6.5
+                      miss² = .25,.25,1,.25,.25 →  2   ← leftover</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; LEFTOVER IS THE BAD PART, NOT THE GOOD PART</span>
+          It is tempting to read "leftover = 2" as the stick's score. It is the opposite: leftover
+          is the misery <em>still left</em> after the stick tried &mdash; the small bad bit it
+          could not explain. The <em>good</em> part is what the stick <strong>ate</strong>:
+          <code>total wobble &minus; leftover</code>.
+        </div>
+
+<pre><code>   total wobble  ████████████████████   34   (the fool's whole job)
+   stick ATE     ██████████████████     32   = 34 − 2   (the good part)
+   leftover      █                       2   (the bad bit still left)</code></pre>
+
+        <p>R² is the slice the stick ate, as a fraction of the whole bar:</p>
+
+        <div class="math-box">
+          R&sup2; = (total wobble &minus; leftover) / total wobble = 32 / 34 &asymp; 0.94
+        </div>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; DIVIDE BY THE WHOLE BAR, NOT THE COUNT</span>
+          The divider is the <strong>whole wobble</strong> (34), not the row count (5). R² asks
+          "what fraction of the <em>whole</em> wobble did you eat?" &mdash; a slice of a bar, not
+          an average. The count sits on top and bottom and cancels, which is the very reason R²
+          carries no units.
+        </div>
+
+        <p>The scale falls right out:</p>
+
+<pre><code>   R² = 1.0   ate everything, leftover zero   — a perfect line
+   R² = 0.0   ate nothing — no better than the fool
+   R² < 0     WORSE than the fool — the line actively hurts</code></pre>
+
+        <p>
+          It can never top 1: you cannot eat more than the whole bar. But it <em>can</em> dip
+          below 0, and on a sheet the stick has never seen, it sometimes does.
+        </p>
+
+        <h2>Guess Once, Grade Twice</h2>
+
+<pre><code>   set the dials ─► guess the sealed pile ─► guesses (computed ONCE)
+                                                  │
+                                       ┌──────────┴──────────┐
+                                       ▼                     ▼
+                                 MSE → a SIZE           R² → a SLICE</code></pre>
+
+        <p>
+          The two rulers do not need two sets of guesses. You guess once, then hold both rulers
+          against the same misses. MSE says how big the misses are; R² says how much better than
+          a fool you did.
+        </p>
+
+<pre><code>from sklearn.metrics import mean_squared_error, r2_score
+
+def evaluate_guesser(model, X_test, y_test):
+    guesses = model.predict(X_test)              # guess ONCE
+    mse = round(mean_squared_error(y_test, guesses), 3)   # ruler 1: a size
+    r2  = round(r2_score(y_test, guesses), 3)             # ruler 2: a slice
+    return (mse, r2)                              # truth first, guesses second — both rulers</code></pre>
+
+        <p>
+          And the old discipline holds: open the sealed pile <strong>once</strong>, to grade
+          &mdash; never to choose. Grading on rows the stick never saw is the whole job of the
+          hidden pile.
+        </p>
+
+        <h2>Three Things Worth Stating Precisely</h2>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; ON THE TRAINING PILE THE BAR SPLITS CLEANLY &mdash; ON THE TEST PILE IT NEED NOT</span>
+          With a nudge column, the straight-stick rule forces its leftovers to sit at right-angles
+          to its guesses, so on the <em>training</em> pile the bar splits exactly:
+          <code>total wobble = ate + leftover</code> (textbook: <code>TSS = ESS + RSS</code>), and
+          R² lands in <code>[0, 1]</code>. On the <em>test</em> pile no such right-angle holds: the
+          leftover can be larger than the wobble, so <code>R² = 1 &minus; RSS/TSS</code> can fall
+          below zero. A negative test R² is not a bug &mdash; it is the line doing worse than
+          shouting the average.
+        </div>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; ONE COLUMN: R² IS JUST CORRELATION, SQUARED</span>
+          Fit a straight stick on a single column and R² equals the squared correlation between
+          that column and the answer &mdash; that is literally why it wears the name "R squared"
+          (<code>r</code> is the correlation). With several columns it generalises to the squared
+          correlation between the answers and the stick's guesses.
+        </div>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; R² ALWAYS RISES WHEN YOU ADD A COLUMN &mdash; ON THE TRAINING PILE</span>
+          Hand the stick one more column and training R² never drops, even if the column is pure
+          noise &mdash; the old fit is still available, so it can only do at least as well. That is
+          why training R² is a poor judge of whether a column earns its place: use the
+          <em>test</em> R², or the adjusted R² that docks you for each extra dial.
+        </div>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; WHERE THE MISS-SIZE COMES FROM (BIAS vs VARIANCE)</span>
+          Average a guesser's test MSE over many possible training piles and it splits three ways:
+          <code>E[MSE] = bias&sup2; + variance + noise</code>. <strong>Bias</strong> is the line
+          being too stiff to follow the true shape; <strong>variance</strong> is the line being too
+          jumpy, swinging with each pile it sees; <strong>noise</strong> is the part no rule can
+          ever remove. The stiff-vs-jumpy dial from the neighbours post is exactly the bias-vs-variance
+          trade, seen through MSE.
+        </div>
+
+        <ol class="takeaways">
+          <li>MSE = miss → square → mean → stop. It is RMSE without the root, in squared answer-units, and it is the very thing the stick shrinks.</li>
+          <li>A raw miss-size means nothing alone &mdash; "off by 9" needs something to measure against.</li>
+          <li>R² races the stick against a fool who only ever shouts the average (the bottom of the squared-miss bowl).</li>
+          <li>R² = (total wobble &minus; leftover) / total wobble = 1 &minus; RSS/TSS. No units. Tops out at 1; can go below 0 on unseen rows.</li>
+          <li>Guess once, grade twice: the same guesses feed both rulers.</li>
+        </ol>
+
+        <h2>The Labels, Last</h2>
+
+        <table>
+          <thead>
+            <tr><th>Plain term used above</th><th>Standard label</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>size of the miss, squared and averaged</td><td>mean squared error (MSE)</td></tr>
+            <tr><td>...with the root put back</td><td>root mean squared error (RMSE)</td></tr>
+            <tr><td>the always-average fool</td><td>the mean / baseline predictor</td></tr>
+            <tr><td>total wobble</td><td>total sum of squares (TSS)</td></tr>
+            <tr><td>leftover</td><td>residual sum of squares (RSS)</td></tr>
+            <tr><td>what the stick ate</td><td>explained sum of squares (ESS)</td></tr>
+            <tr><td>slice of wobble eaten</td><td>coefficient of determination (R²)</td></tr>
+            <tr><td>too stiff vs too jumpy</td><td>bias&ndash;variance</td></tr>
+            <tr><td>docked for each extra dial</td><td>adjusted R²</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+        <p style="font-size:13px;">
+          <strong>In this series:</strong>
+          Part 1 (this post) &middot;
+          <a href="reading-the-dials.html">Part 2 &mdash; Reading the Dials</a>
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// THIS SERIES</div>
+        <ul>
+          <li><strong>Part 1: Two Rulers</strong></li>
+          <li><a href="reading-the-dials.html">Part 2: Reading the Dials</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>Same stick, new sheet</li>
+          <li>MSE (drop the root)</li>
+          <li>Off by 9 &mdash; vs what?</li>
+          <li>R²: race a fool</li>
+          <li>Guess once, grade twice</li>
+          <li>Training vs test R²</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// KEY RESULTS</div>
+        <ul>
+          <li>MSE = mean(miss²)</li>
+          <li>R² = 1 &minus; RSS/TSS</li>
+          <li>R² &le; 1, can be &lt; 0</li>
+          <li>1 col: R² = r²</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <footer id="footer">
+    <div>&copy; 2026 Rahul Rai &mdash; All rights reserved</div>
+    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
+    <div class="footer-badges">
+      <span class="badge">HTML 5</span>
+      <span class="badge">CSS 3</span>
+      <span class="badge">No JS</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

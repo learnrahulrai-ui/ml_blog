@@ -24,8 +24,8 @@
   <!-- MARQUEE -->
   <div class="marquee-wrap">
     <span class="marquee-inner">
-      *** guess house prices from a pile of numbers *** two rules, derived by hand ***
-      RMSE, stiff-vs-jumpy, rotating folds *** β = (XᵀX)⁻¹Xᵀy *** no cookies, no trackers ***
+      *** guess from a pile of numbers, by hand *** two rules, two rulers ***
+      RMSE · MSE · R² · stiff-vs-jumpy *** read the dials *** no cookies, no trackers ***
     </span>
   </div>
 
@@ -45,11 +45,53 @@
 
       <!-- FEATURED SERIES BANNER -->
       <div class="callout note" style="margin-top:0;">
-        <span class="callout-label">&#9656; PREDICTING HOUSE PRICES FROM SCRATCH</span>
-        Three parts. A pile of numbers, two rules (ask-closest and straight-stick), and a way
-        to pick between them without peeking. Everything derived by hand before any toolbox
-        is opened. Start with Part 1.
+        <span class="callout-label">&#9656; NEW &mdash; GRADING A GUESSER</span>
+        Once a rule has drawn its line, was the line any good? Two rulers answer that &mdash; MSE
+        and R² &mdash; and the dials themselves can be read for which column pulls hardest. Built
+        by hand on a sheet of cars.
       </div>
+
+      <div class="section-header">// GRADING A GUESSER</div>
+
+      <!-- Grading Part 1 -->
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/grading-the-guess-mse-r2.html">Two Rulers for One Guess: MSE and R²</a>
+        </div>
+        <div class="post-meta">
+          <span>2026-06-04</span> &nbsp;|&nbsp;
+          <span class="tag">part 1</span>
+          <span class="tag">evaluation</span>
+          <span class="tag">r-squared</span>
+        </div>
+        <div class="post-excerpt">
+          The same straight-stick rule on a new sheet of cars, graded two ways: MSE (RMSE with the
+          root left off, in squared units) and R² &mdash; a race against a fool who only ever shouts
+          the average. Why you divide by the whole wobble not the count, why test R² can go below
+          zero, and the bias&ndash;variance split of the miss-size.
+        </div>
+        <a class="read-more" href="posts/grading-the-guess-mse-r2.html">[ READ MORE &rarr; ]</a>
+      </article>
+
+      <!-- Grading Part 2 -->
+      <article class="post-card">
+        <div class="post-title">
+          <a href="posts/reading-the-dials.html">Reading the Dials: What the Coefficients Say</a>
+        </div>
+        <div class="post-meta">
+          <span>2026-06-04</span> &nbsp;|&nbsp;
+          <span class="tag">part 2</span>
+          <span class="tag">coefficients</span>
+          <span class="tag">scaling</span>
+        </div>
+        <div class="post-excerpt">
+          Each column keeps one dial &mdash; + pushes up, &minus; drags down. Zip the names back on,
+          find the most-negative (a MIN, not a MAX), and watch the real trap: raw dials wear each
+          column's own units, so they aren't comparable until the columns sit on one shared ruler.
+          Plus why a single dial goes shaky when columns move as a pack.
+        </div>
+        <a class="read-more" href="posts/reading-the-dials.html">[ READ MORE &rarr; ]</a>
+      </article>
 
       <div class="section-header">// PREDICTING HOUSE PRICES</div>
 
@@ -145,6 +187,8 @@
           <li>Supervised Learning</li>
           <li>KNN / Neighbours</li>
           <li>Linear Regression</li>
+          <li>Scoring: MSE / R²</li>
+          <li>Reading Coefficients</li>
           <li>Cross-Validation</li>
           <li>Math &amp; Proofs</li>
           <li>Python / scikit-learn</li>
