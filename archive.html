@@ -7,169 +7,82 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="wrapper">
 
-  <header id="header">
-    <div class="site-title"><a href="index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
-    <div class="site-subtitle">// Machine Learning, Learned by Hand //</div>
-  </header>
+<pre class="banner"><a href="index.html">RAHUL'S ML BLOG</a>
+notes on machine learning, worked out by hand -- est. 2026
+==============================================================================</pre>
 
-  <div class="marquee-wrap">
-    <span class="marquee-inner">
-      *** all posts, all time *** grading a guesser is live *** predicting house prices is live ***
-      learn the picture first, the words come free ***
-    </span>
+<p id="nav">[ <a href="index.html">home</a> ] [ <a href="about.html">about</a> ] [ <a href="archive.html">archive</a> ] [ <a href="mailto:learn.rahul.rai@gmail.com">contact</a> ]</p>
+
+<p><strong>All posts</strong> &mdash; 5 posts, 2 series. Newest first.</p>
+
+<div class="section-header">GRADING A GUESSER (2026)</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/grading-the-guess-mse-r2.html">Part 1 &mdash; Two Rulers for One Guess: MSE and R&sup2;</a></div>
+  <div class="post-meta">2026-06-04 &middot; evaluation, mse, r-squared</div>
+  <div class="post-excerpt">
+    The same straight-stick rule on cars, graded two ways: MSE (RMSE minus the root) and R&sup2;,
+    a race against the always-average fool. Why you divide by the whole wobble, why test R&sup2;
+    can dip below zero, and the bias-variance split of the miss-size.
   </div>
-
-  <nav id="nav">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="archive.html">Archive</a>
-    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
-  </nav>
-
-  <div id="content-area">
-    <main id="main">
-
-      <div class="article-header">
-        <div class="article-title">All Posts</div>
-        <div class="article-meta">Total: 5 posts &middot; 2 series</div>
-      </div>
-
-      <div class="section-header">// GRADING A GUESSER (2026)</div>
-
-      <article class="post-card">
-        <div class="post-title">
-          <a href="posts/grading-the-guess-mse-r2.html">Part 1 &mdash; Two Rulers for One Guess: MSE and R²</a>
-        </div>
-        <div class="post-meta">
-          2026-06-04 &nbsp;|&nbsp;
-          <span class="tag">evaluation</span>
-          <span class="tag">mse</span>
-          <span class="tag">r-squared</span>
-        </div>
-        <div class="post-excerpt">
-          The same straight-stick rule on cars, graded two ways: MSE (RMSE minus the root) and R²,
-          a race against the always-average fool. Why you divide by the whole wobble, why test R²
-          can dip below zero, and the bias&ndash;variance split of the miss-size.
-        </div>
-        <a class="read-more" href="posts/grading-the-guess-mse-r2.html">[ READ &rarr; ]</a>
-      </article>
-
-      <article class="post-card">
-        <div class="post-title">
-          <a href="posts/reading-the-dials.html">Part 2 &mdash; Reading the Dials: What the Coefficients Say</a>
-        </div>
-        <div class="post-meta">
-          2026-06-04 &nbsp;|&nbsp;
-          <span class="tag">coefficients</span>
-          <span class="tag">interpretation</span>
-          <span class="tag">scaling</span>
-        </div>
-        <div class="post-excerpt">
-          Each column keeps one dial; zip the names back on and find the most-negative (a MIN, not a
-          MAX). The trap: raw dials wear each column's units, so they aren't comparable until the
-          columns share one ruler &mdash; and tangled columns make any single dial shaky.
-        </div>
-        <a class="read-more" href="posts/reading-the-dials.html">[ READ &rarr; ]</a>
-      </article>
-
-      <div class="section-header">// PREDICTING HOUSE PRICES (2026)</div>
-
-      <article class="post-card">
-        <div class="post-title">
-          <a href="posts/chapter1-what-ml-actually-does.html">Part 1 &mdash; Guessing House Prices, End to End</a>
-        </div>
-        <div class="post-meta">
-          2026-06-03 &nbsp;|&nbsp;
-          <span class="tag">fundamentals</span>
-          <span class="tag">supervised-learning</span>
-        </div>
-        <div class="post-excerpt">
-          The whole picture on California housing: lock away the hidden pile first, introduce
-          the ask-closest rule and the straight-stick rule, measure mistake with RMSE against
-          the always-ȳ baseline, pick settings by rotating folds.
-        </div>
-        <a class="read-more" href="posts/chapter1-what-ml-actually-does.html">[ READ &rarr; ]</a>
-      </article>
-
-      <article class="post-card">
-        <div class="post-title">
-          <a href="posts/neighbor-machine-knn.html">Part 2 &mdash; Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a>
-        </div>
-        <div class="post-meta">
-          2026-06-02 &nbsp;|&nbsp;
-          <span class="tag">knn</span>
-          <span class="tag">complexity</span>
-          <span class="tag">scaling</span>
-        </div>
-        <div class="post-excerpt">
-          The gap formula, why putting columns on the same ruler is mandatory, O(n&middot;d) cost
-          per guess and why close stops meaning close as columns pile up, k as the stiff-vs-jumpy
-          dial, and a leak-safe rotating-fold picker.
-        </div>
-        <a class="read-more" href="posts/neighbor-machine-knn.html">[ READ &rarr; ]</a>
-      </article>
-
-      <article class="post-card">
-        <div class="post-title">
-          <a href="posts/straight-stick-linear-regression.html">Part 3 &mdash; The Straight-Stick Rule: Dials, Right-Angle Leftovers, and Numerics</a>
-        </div>
-        <div class="post-meta">
-          2026-06-01 &nbsp;|&nbsp;
-          <span class="tag">linear-regression</span>
-          <span class="tag">least-squares</span>
-          <span class="tag">numerics</span>
-        </div>
-        <div class="post-excerpt">
-          The bowl-shaped squared leftover, the flat-point equations solved by hand, right-angle
-          leftovers and the flat-shadow thrower, Gauss&ndash;Markov, and why you cut the sheet
-          (QR/SVD) rather than flip it.
-        </div>
-        <a class="read-more" href="posts/straight-stick-linear-regression.html">[ READ &rarr; ]</a>
-      </article>
-
-      <hr>
-      <p style="text-align:center; font-size:12px; color:var(--dim);">
-        Up next: yes-or-no guessing and the S-curve.<span class="blink"> _</span>
-      </p>
-    </main>
-
-    <aside id="sidebar">
-      <div class="sidebar-box">
-        <div class="sidebar-box-title">// BY TAG</div>
-        <ul>
-          <li>supervised-learning (1)</li>
-          <li>knn (1)</li>
-          <li>linear-regression (1)</li>
-          <li>evaluation (1)</li>
-          <li>r-squared (1)</li>
-          <li>coefficients (1)</li>
-          <li>scaling (2)</li>
-          <li>numerics (1)</li>
-        </ul>
-      </div>
-      <div class="sidebar-box">
-        <div class="sidebar-box-title">// SERIES</div>
-        <ul>
-          <li>Grading a Guesser (2)</li>
-          <li>Predicting House Prices (3)</li>
-          <li>Up next &mdash; yes/no guessing</li>
-        </ul>
-      </div>
-    </aside>
-  </div>
-
-  <footer id="footer">
-    <div>&copy; 2026 Rahul Rai &mdash; All rights reserved</div>
-    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
-    <div class="footer-badges">
-      <span class="badge">HTML 5</span>
-      <span class="badge">CSS 3</span>
-      <span class="badge">No JS</span>
-    </div>
-  </footer>
-
+  <a class="read-more" href="posts/grading-the-guess-mse-r2.html">[ read &rarr; ]</a>
 </div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/reading-the-dials.html">Part 2 &mdash; Reading the Dials: What the Coefficients Say</a></div>
+  <div class="post-meta">2026-06-04 &middot; coefficients, interpretation, scaling</div>
+  <div class="post-excerpt">
+    Each column keeps one dial; zip the names back on and find the most-negative (a MIN, not a
+    MAX). The trap: raw dials wear each column's units, so they aren't comparable until the
+    columns share one ruler -- and tangled columns make any single dial shaky.
+  </div>
+  <a class="read-more" href="posts/reading-the-dials.html">[ read &rarr; ]</a>
+</div>
+
+<div class="section-header">PREDICTING HOUSE PRICES (2026)</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/chapter1-what-ml-actually-does.html">Part 1 &mdash; Guessing House Prices, End to End</a></div>
+  <div class="post-meta">2026-06-03 &middot; fundamentals, supervised-learning</div>
+  <div class="post-excerpt">
+    The whole picture on California housing: lock away the hidden pile first, introduce the
+    ask-closest rule and the straight-stick rule, measure mistake with RMSE against the
+    always-average baseline, pick settings by rotating folds.
+  </div>
+  <a class="read-more" href="posts/chapter1-what-ml-actually-does.html">[ read &rarr; ]</a>
+</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/neighbor-machine-knn.html">Part 2 &mdash; Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a></div>
+  <div class="post-meta">2026-06-02 &middot; knn, complexity, scaling</div>
+  <div class="post-excerpt">
+    The gap formula, why putting columns on the same ruler is mandatory, O(n&middot;d) cost per
+    guess and why close stops meaning close as columns pile up, k as the stiff-vs-jumpy dial,
+    and a leak-safe rotating-fold picker.
+  </div>
+  <a class="read-more" href="posts/neighbor-machine-knn.html">[ read &rarr; ]</a>
+</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/straight-stick-linear-regression.html">Part 3 &mdash; The Straight-Stick Rule: Dials, Right-Angle Leftovers, and Numerics</a></div>
+  <div class="post-meta">2026-06-01 &middot; linear-regression, least-squares, numerics</div>
+  <div class="post-excerpt">
+    The bowl-shaped squared leftover, the flat-point equations solved by hand, right-angle
+    leftovers and the flat-shadow thrower, Gauss-Markov, and why you cut the sheet (QR/SVD)
+    rather than flip it.
+  </div>
+  <a class="read-more" href="posts/straight-stick-linear-regression.html">[ read &rarr; ]</a>
+</div>
+
+<div class="section-header">UP NEXT</div>
+<p>Yes-or-no guessing and the S-curve.</p>
+
+<pre class="rule">==============================================================================</pre>
+<p id="footer">
+  (c) 2026 Rahul Rai &middot; pure HTML + CSS, no JavaScript, no trackers &middot;
+  <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+</p>
+
 </body>
 </html>
