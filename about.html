@@ -7,143 +7,87 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="wrapper">
 
-  <header id="header">
-    <div class="site-title"><a href="index.html" style="text-decoration:none;color:inherit;">RAHUL'S ML BLOG</a><span class="blink">_</span></div>
-    <div class="site-subtitle">// Machine Learning Notes from the Trenches //</div>
-  </header>
+<pre class="banner"><a href="index.html">RAHUL'S ML BLOG</a>
+notes on machine learning, worked out by hand -- est. 2026
+==============================================================================</pre>
 
-  <div class="marquee-wrap">
-    <span class="marquee-inner">
-      *** hello world *** learning in public since 2026 ***
-      ml notes no hype *** built with love and a text editor ***
-    </span>
-  </div>
+<p id="nav">[ <a href="index.html">home</a> ] [ <a href="about.html">about</a> ] [ <a href="archive.html">archive</a> ] [ <a href="mailto:learn.rahul.rai@gmail.com">contact</a> ]</p>
 
-  <nav id="nav">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="archive.html">Archive</a>
-    <a href="mailto:learn.rahul.rai@gmail.com">Contact</a>
-  </nav>
+<div class="article-header">
+  <div class="article-title">About This Blog</div>
+  <div class="article-meta">Last updated: 2026-06-04</div>
+</div>
 
-  <div id="content-area">
-    <main id="main">
+<div class="article-body">
 
-      <div class="article-header">
-        <div class="article-title">About This Blog</div>
-        <div class="article-meta">Last updated: 2026-06-03</div>
-      </div>
+  <h2>Who Am I</h2>
+  <p>
+    Hi, I'm <strong>Rahul Rai</strong>. I write about machine learning from first principles
+    &mdash; not the hype version, the actual nuts-and-bolts. What <em>is</em> a rule, really?
+    Why hide part of the pile? What is the machine actually doing when it guesses?
+  </p>
+  <p>
+    One rule on this blog: <strong>no jargon until it's been earned.</strong> If I can't explain
+    something in words a farmer in 1953 would understand, it hasn't been explained yet. So I ban
+    the buzzwords, draw the idea, solve it by pencil, then write the steps &mdash; and only at the
+    very end do I stick the textbook labels on.
+  </p>
 
-      <div class="article-body">
+  <h2>What This Blog Is</h2>
+  <ul>
+    <li>ML fundamentals, derived by hand before any toolbox is opened</li>
+    <li>ASCII diagrams and pencil math, then the real Python</li>
+    <li>Code that actually ran, producing results that actually work</li>
+    <li>Honest about what I don't know</li>
+  </ul>
 
-        <h2>Who Am I</h2>
-        <p>
-          Hi, I'm <strong>Rahul Rai</strong>.
-          I write about machine learning from first principles &mdash; not the hype version,
-          the actual nuts-and-bolts. What <em>is</em> a rule, really?
-          Why hide part of the pile? What is the machine actually doing when
-          it guesses?
-        </p>
-        <p>
-          One rule on this blog: <strong>no jargon until it's been earned.</strong>
-          If I can't explain something in words a farmer in 1953 would understand,
-          it hasn't been explained yet. So I ban the buzzwords, draw the idea, solve it by
-          pencil, then write the steps &mdash; and only at the very end do I stick
-          the textbook labels on.
-        </p>
+  <h2>What's Here</h2>
+  <ul>
+    <li><strong>Predicting House Prices</strong> &mdash; two estimators from scratch (ask-closest
+        and straight-stick) on the California housing pile, by hand.
+        <a href="posts/chapter1-what-ml-actually-does.html">part 1</a> &middot;
+        <a href="posts/neighbor-machine-knn.html">part 2</a> &middot;
+        <a href="posts/straight-stick-linear-regression.html">part 3</a></li>
+    <li><strong>Grading a Guesser</strong> &mdash; two ways to score a fitted line (MSE and R&sup2;)
+        and how to read the dials it sets, on a sheet of cars.
+        <a href="posts/grading-the-guess-mse-r2.html">part 1</a> &middot;
+        <a href="posts/reading-the-dials.html">part 2</a></li>
+    <li><strong>Sorting Into Bins</strong> &mdash; sorting breast lumps into sick/well: the S-curve
+        guesser, the four-box table, ROC/AUC, L2 leash on the dials, and the two-cloud wall (LDA).
+        <a href="posts/sorting-into-bins.html">part 1</a> &middot;
+        <a href="posts/the-trade-curve.html">part 2</a> &middot;
+        <a href="posts/leash-and-cloud.html">part 3</a></li>
+  </ul>
 
-        <h2>What This Blog Is</h2>
-        <ul>
-          <li>ML fundamentals, derived by hand before any library is imported</li>
-          <li>ASCII diagrams and pencil math, then the real Python</li>
-          <li>Code that I actually ran, producing results that actually work</li>
-          <li>Honest about what I don't know</li>
-        </ul>
+  <h2>What This Blog Isn't</h2>
+  <ul>
+    <li>AI hype coverage</li>
+    <li>Tutorial-farm content with 30 headers and no depth</li>
+    <li>Sponsored anything</li>
+  </ul>
 
-        <h2>What's Here</h2>
-        <ul>
-          <li><strong>Predicting House Prices:</strong> two estimators from scratch
-              (ask-closest and straight-stick) on the California housing pile, by hand.</li>
-          <li><strong>Grading a Guesser:</strong> two ways to score a fitted line &mdash; MSE and R²
-              &mdash; and how to read the dials it sets, on a sheet of cars.</li>
-          <li><strong>Coming soon:</strong> yes-or-no guessing &mdash; the S-curve and where to draw the line.</li>
-        </ul>
+  <h2>The Site</h2>
+  <p>
+    Pure HTML and CSS in one hand-written stylesheet. No JavaScript, no tracking, no cookies,
+    no frameworks, no web fonts. Plain monospace text the way a mailing-list archive reads --
+    fast, legible, and it works in any browser. Hosted on GitHub Pages.
+  </p>
 
-        <h2>What This Blog Isn't</h2>
-        <ul>
-          <li>AI hype coverage</li>
-          <li>Tutorial-farm content with 30 headers and no depth</li>
-          <li>Sponsored anything</li>
-        </ul>
-
-        <h2>The Site</h2>
-        <p>
-          Pure HTML and CSS. No JavaScript, no tracking, no cookies,
-          no frameworks. The 90s called and their web architecture
-          was actually fine for a blog. Fast, readable, works everywhere.
-          Hosted on GitHub Pages.
-        </p>
-
-        <h2>Contact</h2>
-        <p>
-          Email: <a href="mailto:learn.rahul.rai@gmail.com">learn.rahul.rai@gmail.com</a><br>
-          GitHub: <a href="https://github.com/learnrahulrai-ui" target="_blank">learnrahulrai-ui</a>
-        </p>
-
-        <div class="ascii-art" style="margin-top:32px; font-size:12px; opacity:0.5;">
- _____
-|     |  Thanks for visiting.
-|  :) |  Come back when there's a new post.
-|_____|
-        </div>
-
-        <hr>
-        <p style="font-size:12px; color:var(--dim);">
-          &larr; <a href="index.html">Back to home</a>
-        </p>
-      </div>
-    </main>
-
-    <aside id="sidebar">
-      <div class="sidebar-box">
-        <div class="sidebar-box-title">// QUICK LINKS</div>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="archive.html">Archive</a></li>
-          <li><a href="mailto:learn.rahul.rai@gmail.com">Email Me</a></li>
-          <li><a href="https://github.com/learnrahulrai-ui" target="_blank">GitHub</a></li>
-        </ul>
-      </div>
-      <div class="sidebar-box">
-        <div class="sidebar-box-title">// PREDICTING HOUSE PRICES</div>
-        <ul>
-          <li><a href="posts/chapter1-what-ml-actually-does.html">Part 1: The Full Picture</a></li>
-          <li><a href="posts/neighbor-machine-knn.html">Part 2: Ask-Closest Rule</a></li>
-          <li><a href="posts/straight-stick-linear-regression.html">Part 3: Straight-Stick Rule</a></li>
-        </ul>
-      </div>
-      <div class="sidebar-box">
-        <div class="sidebar-box-title">// GRADING A GUESSER</div>
-        <ul>
-          <li><a href="posts/grading-the-guess-mse-r2.html">Part 1: Two Rulers</a></li>
-          <li><a href="posts/reading-the-dials.html">Part 2: Reading the Dials</a></li>
-        </ul>
-      </div>
-    </aside>
-  </div>
-
-  <footer id="footer">
-    <div>&copy; 2026 Rahul Rai &mdash; All rights reserved</div>
-    <div>Hand-crafted HTML &bull; No frameworks harmed &bull; Hosted on GitHub Pages</div>
-    <div class="footer-badges">
-      <span class="badge">HTML 5</span>
-      <span class="badge">CSS 3</span>
-      <span class="badge">No JS</span>
-    </div>
-  </footer>
+  <h2>Contact</h2>
+  <p>
+    Email: <a href="mailto:learn.rahul.rai@gmail.com">learn.rahul.rai@gmail.com</a><br>
+    GitHub: <a href="https://github.com/learnrahulrai-ui">learnrahulrai-ui</a>
+  </p>
 
 </div>
+
+<pre class="rule">==============================================================================</pre>
+<p id="footer">
+  (c) 2026 Rahul Rai &middot; pure HTML + CSS, no JavaScript, no trackers &middot;
+  <a href="index.html">home</a> &middot;
+  <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+</p>
+
 </body>
 </html>
