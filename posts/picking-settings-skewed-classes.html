@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Picking Settings, Skewed Piles, and Averaging Many Classes :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <pre class="banner"><a href="../index.html">RAHUL'S ML BLOG</a>
+notes on machine learning, worked out by hand -- est. 2026
+==============================================================================</pre>
+
+  <p id="nav">[ <a href="../index.html">home</a> ] [ <a href="../about.html">about</a> ] [ <a href="../archive.html">archive</a> ] [ <a href="mailto:learn.rahul.rai@gmail.com">contact</a> ]</p>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <span class="series-badge">SORTING INTO BINS &middot; PART 4 OF 4</span>
+        <div class="article-title">Picking Settings, Skewed Piles, and Averaging Many Classes</div>
+        <div class="article-meta">
+          Posted: 2026-06-05 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: grid-search, min-max-scaling, precision-recall, class-imbalance, macro-micro-averaging
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          Parts 1&ndash;3 of this series covered one dataset (breast lumps), one binary question
+          (sick or well), and the standard grading rulers for it. This post extends that picture
+          in four directions: how to hunt the right machine settings without peeking at the exam
+          pile; the difference between two kinds of ruler-equalising; what to do when one bin has
+          99 times as many rows as the other; and how to score a machine on three or more bins
+          at once. These are the points where real data departs from the tidy classroom example.
+        </p>
+
+        <h2>Settings I Pick By Hand (Hyperparameters)</h2>
+
+        <p>
+          Some numbers inside a machine are set by rolling downhill on the loss &mdash; the dials
+          &beta; in the S-curve machine. Others are decided <em>before</em> training starts and
+          are never touched by the loss: the leash strength C, the neighbour-count k, the depth
+          of a decision tree. These are settings you pick by hand. The machine cannot tune them
+          for itself because the loss doesn't flow back through them.
+        </p>
+
+<pre><code>   dials (β):   tuned by the machine as it trains   ← the machine adjusts these
+   settings:    chosen by you before training starts ← the machine never sees these
+
+   examples:
+     C in LogisticRegression(C=0.1)    ← leash strength
+     k in KNeighborsClassifier(k=5)    ← how many neighbours to ask
+     n_estimators in RandomForest      ← how many trees to grow</code></pre>
+
+        <h2>The Grid Hunt</h2>
+
+        <p>
+          You have several settings, each with several candidate values. A grid lists every
+          combination. You try each one and measure how well it does &mdash; but you must not
+          use the sealed exam pile to measure. The fix is rotating folds: split the study pile
+          into, say, 5 equal strips; for each combination, train on 4 strips, score on the
+          5th, rotate which strip is left out, repeat, then average the 5 scores.
+        </p>
+
+<pre><code>   grid for C and k:
+   ┌───────┬────┬────┬────┐
+   │       │C=.1│C=1 │C=10│
+   ├───────┼────┼────┼────┤
+   │ k = 3 │ .  │ .  │ .  │   each cell = a combination
+   │ k = 5 │ .  │ .  │ .  │   each dot = average of 5 fold scores
+   │ k = 7 │ .  │ .  │ .  │   pick the cell with the best score
+   └───────┴────┴────┴────┘</code></pre>
+
+        <p>
+          Three things go into making a grid hunt trustworthy:
+        </p>
+
+        <ol class="takeaways">
+          <li><strong>The range and spacing of each setting.</strong> If C should be 0.01 the
+              grid must include 0.01; a grid of {1, 10, 100} misses it entirely. Both the
+              candidate values and how finely you space them are decisions you make up front.</li>
+          <li><strong>Rotating folds</strong> (cross-validation) to measure each combination
+              reliably. A single train/score split might be lucky or unlucky. Rotating over
+              5 strips gives 5 independent readings and averages out that luck.</li>
+          <li><strong>A scoring rule</strong> that matches the actual goal: accuracy if all
+              mistakes cost the same; recall if missing sick people is catastrophic; F1 if
+              both false alarms and misses matter.</li>
+        </ol>
+
+<pre><code>from sklearn.model_selection import GridSearchCV
+
+param_grid = {'C': [0.01, 0.1, 1, 10], 'penalty': ['l2']}
+gs = GridSearchCV(LogisticRegression(), param_grid,
+                  cv=5, scoring='recall')
+gs.fit(X_train_scaled, y_train)
+best_C = gs.best_params_['C']</code></pre>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; THE EXAM PILE IS STILL SEALED</span>
+          GridSearchCV only ever touches the study pile (X_train). The exam pile
+          (X_test) is opened exactly once at the very end to report the final score.
+          If you tune settings on the exam pile, you are leaking future information and
+          the final score is optimistic &mdash; the machine has already peeked.
+        </div>
+
+        <h2>Two Kinds of Same-Ruler</h2>
+
+        <p>
+          Parts 1&ndash;3 used the standard ruler: shift each column to mean 0, divide by its
+          spread. There is a second popular ruler &mdash; pinch-to-fit &mdash; that squishes
+          every column's values to sit strictly between 0 and 1.
+        </p>
+
+<pre><code>   standard ruler:  x̃ = (x − mean) / spread        → centred at 0, spread ≈ 1
+   pinch-to-fit:    x̃ = (x − min)  / (max − min)   → bounded in [0, 1]</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; PINCH-TO-FIT IS FRAGILE AROUND OUTLIERS</span>
+          One outlier stretches the range. Say house areas run 500&ndash;3000 sq ft but one
+          mansion hits 15 000. The (max&minus;min) denominator becomes 14 500. Every other
+          house gets squished into the bottom 17% of [0, 1]. The outlier sits at 1.0; the
+          rest cluster near 0. The ruler works mathematically but destroys the relative
+          spacing of normal values. The standard ruler shifts and stretches by the spread,
+          so one distant outlier only weakly pulls the spread, and the bulk of the data
+          keeps its shape.
+        </div>
+
+<pre><code>   area values:  500, 520, 3000, 15 000
+
+   pinch-to-fit (max=15000, min=500):
+     500   →  0.000
+     520   →  0.001      ← normal house, near 0
+     3000  →  0.172      ← large house, still near 0
+     15000 →  1.000      ← outlier, fills the far end
+
+   standard ruler (mean≈4755, spread≈6150):
+     500   → −0.70
+     520   → −0.69       ← normal houses spread out
+     3000  → −0.29
+     15000 →  1.67       ← outlier: unusual but doesn't crush others</code></pre>
+
+        <p>
+          For the same-ruler rule (build from study only, apply to both), the same peeking
+          logic applies: compute min, max (or mean, spread) from the study pile only.
+        </p>
+
+        <h2>When ALARM Matters More Than MISSED</h2>
+
+        <p>
+          Part 1 argued that in cancer screening, recall is the north star because a MISSED
+          sick person is catastrophic. In other settings, the ALARM is the catastrophe.
+        </p>
+
+<pre><code>   precision ↓ when ALARM is large   ← false positives pile up
+   recall    ↓ when MISSED is large  ← false negatives pile up
+
+   cancer screening:  MISSED = cancer goes untreated    → prioritise recall
+   legal evidence:    ALARM  = innocent person jailed   → prioritise precision
+   email spam:        ALARM  = real email deleted       → precision matters more
+   fraud detection:   MISSED = fraud slips through → financial loss → recall matters</code></pre>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; PRECISION REDUCES ALARMS; RECALL REDUCES MISSES</span>
+          Choosing which to prioritise is a business or clinical decision, not a machine
+          decision. The machine gives you a curve of deals (the trade curve from Part 2);
+          you pick the deal that matches what each kind of mistake actually costs.
+        </div>
+
+        <p>
+          In fraud detection, MISSED = a fraudulent transaction slips through and the
+          business absorbs the loss. ALARM = a legitimate transaction is blocked and the
+          customer is frustrated. For most fraud systems the financial loss of a missed
+          fraud is worse than the friction of a blocked legitimate purchase, so recall
+          is the primary score &mdash; but both matter, and precision-recall curves
+          (next section) show the exact deal between them.
+        </p>
+
+        <h2>Skewed Piles and the Precision-Recall Curve</h2>
+
+        <p>
+          The breast lump sheet had about 63% well and 37% sick &mdash; uneven, but not
+          drastically. Real fraud sheets might be 99.9% normal and 0.1% fraud. That is a
+          <em>skewed pile</em>.
+        </p>
+
+<pre><code>   skewed fraud sheet: 100 000 rows
+     99 900  normal transactions   (class 0)
+        100  fraud transactions    (class 1)
+
+   fool machine: always call "normal"
+     accuracy = 99 900 / 100 000 = 99.9%   ← looks extraordinary
+     recall   = 0 / 100 = 0.0%             ← catches no fraud at all</code></pre>
+
+        <p>
+          The ROC curve (trade curve) also has a problem with skewed piles. FPR divides
+          ALARM by all truly-normal rows &mdash; that denominator is 99 900. Even if the
+          machine raises 2000 false alarms, FPR = 2000/99 900 = 0.02, which looks small
+          and makes the ROC curve bulge optimistically. The 2000 blocked customers are
+          invisible in that fraction.
+        </p>
+
+<pre><code>   ROC curve is blind to class imbalance because:
+   FPR = ALARM / (ALARM + CLEAR)   ← denominator is huge; ALARM looks tiny
+
+   Precision-recall curve avoids this:
+   precision = CAUGHT / (CAUGHT + ALARM)  ← no TN in sight; focuses on the sick pile
+   recall    = CAUGHT / (CAUGHT + MISSED) ← also ignores TN</code></pre>
+
+        <p>
+          The precision-recall curve sweeps the same cutoff as the trade curve but plots
+          precision on the Y-axis and recall on the X-axis. A perfect machine hugs the
+          top-right corner (high precision <em>and</em> high recall). A flat horizontal
+          line near precision = (fraction of sick in the sheet) is the baseline &mdash;
+          the always-shout-sick fool.
+        </p>
+
+<pre><code>   precision
+    1 ┤ ● ← perfect (catch all, zero false alarms)
+      │ ●●
+      │   ●●
+      │ - - - - ← baseline (= fraction of sick in the sheet)
+    0 ┤──────────── recall
+      0              1
+
+   area under precision-recall curve → average precision (AP)</code></pre>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; USE PRECISION-RECALL CURVES WHEN THE PILE IS SKEWED</span>
+          When one class is rare (fraud, disease in a healthy population, defects on a
+          production line), the precision-recall curve is more informative than the ROC
+          curve because it does not use the true-negative count at all. The ROC curve's
+          FPR is diluted by the massive well pile; the precision-recall curve ignores
+          that pile entirely.
+        </div>
+
+<pre><code>from sklearn.metrics import precision_recall_curve, average_precision_score
+
+y_proba = model.predict_proba(X_test_scaled)[:, 1]
+precision, recall, thresholds = precision_recall_curve(y_test, y_proba)
+ap = average_precision_score(y_test, y_proba)   # area under the curve</code></pre>
+
+        <h2>Scoring With Three or More Bins</h2>
+
+        <p>
+          Cancer has subtypes. Handwritten digits have ten classes. Sentiment has three:
+          positive, neutral, negative. Now there are multiple bins and one machine must
+          sort into all of them. The four-box table expands into a K&times;K grid (one row
+          and column per class). Each class gets its own precision, recall, and F1. The
+          question becomes: how do you average those K scores into one number?
+        </p>
+
+        <h2>Two Averaging Rules</h2>
+
+<pre><code>   three-class example: cancer type A, B, C
+   ┌─────────┬───────────┬────────┬──────┐
+   │ class   │ precision │ recall │  F1  │  n (study rows)
+   ├─────────┼───────────┼────────┼──────┤
+   │ type A  │   0.90    │  0.88  │ 0.89 │  1 000
+   │ type B  │   0.70    │  0.65  │ 0.67 │  1 000
+   │ type C  │   0.30    │  0.40  │ 0.34 │     10
+   └─────────┴───────────┴────────┴──────┘</code></pre>
+
+        <p>
+          <strong>Treat-all-classes-equal averaging (macro):</strong> compute precision,
+          recall, F1 per class, then take the plain average across classes with equal
+          weight.
+        </p>
+
+<pre><code>   macro F1 = (0.89 + 0.67 + 0.34) / 3 = 0.63
+
+   class C (only 10 rows) gets the same weight as class A (1000 rows)
+   → a low F1 on class C drags the average down strongly
+   → honest picture of per-class performance regardless of class size</code></pre>
+
+        <p>
+          <strong>Count-every-label averaging (micro):</strong> pool all CAUGHT, ALARM,
+          and MISSED counts across every class, then compute one precision, one recall,
+          one F1 from those pooled totals.
+        </p>
+
+<pre><code>   micro pools raw counts:
+   total CAUGHT across A+B+C = 880 + 650 + 4   = 1534
+   total ALARM  across A+B+C = 97  + 278 + 9   = 384
+   total MISSED across A+B+C = 120 + 350 + 6   = 476
+
+   micro precision = 1534 / (1534 + 384)  = 0.80
+   micro recall    = 1534 / (1534 + 476)  = 0.76
+
+   class A (1000 rows) dominates; class C (10 rows) barely registers</code></pre>
+
+        <table>
+          <thead>
+            <tr><th>Method</th><th>How it weights classes</th><th>Use when</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Macro (equal weight)</td>
+              <td>every class counts the same regardless of size</td>
+              <td>all classes equally important; or pile is skewed and you don't want the
+                  large class to dominate the score</td>
+            </tr>
+            <tr>
+              <td>Micro (count-weighted)</td>
+              <td>large classes dominate because they contribute more counts</td>
+              <td>overall accuracy on all labels matters; class sizes reflect real importance</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; MACRO WHEN CLASSES ARE EQUALLY IMPORTANT OR PILE IS SKEWED</span>
+          With a skewed pile, micro averaging is swamped by the majority class. If type C
+          cancer (10 patients) scores F1=0.34 and the machine is otherwise excellent on the
+          common types, micro averaging buries type C's failure. Macro averaging gives type C
+          equal weight and forces the failure to show. That is the right signal when you care
+          about catching every cancer type regardless of how rare it is.
+        </div>
+
+<pre><code>from sklearn.metrics import classification_report
+
+print(classification_report(y_test, y_pred,
+      target_names=['type A', 'type B', 'type C']))
+# shows per-class precision/recall/F1, then macro avg and weighted avg</code></pre>
+
+        <h2>Summary: Which Tool for Which Problem</h2>
+
+<pre><code>   ┌──────────────────────────────┬────────────────────────────────────────┐
+   │ Situation                    │ Reach for                              │
+   ├──────────────────────────────┼────────────────────────────────────────┤
+   │ tuning C, k, depth           │ grid hunt + rotating folds (GridSearchCV│
+   │                              │  with cv=5) scored on a relevant metric │
+   │ columns on wild scales       │ standard ruler (mean 0, spread 1)       │
+   │ columns, but outliers present│ standard ruler beats pinch-to-fit       │
+   │ balanced bins                │ ROC / AUC; accuracy OK baseline         │
+   │ skewed pile (fraud, rare dz) │ precision-recall curve + average prec.  │
+   │ ALARM is the catastrophe     │ optimise precision                      │
+   │ MISSED is the catastrophe    │ optimise recall                         │
+   │ 3+ classes, all equally imp. │ macro averaging                         │
+   │ 3+ classes, size = importance│ micro (or weighted) averaging           │
+   └──────────────────────────────┴────────────────────────────────────────┘</code></pre>
+
+        <h2>The Labels, Last</h2>
+
+        <table>
+          <thead>
+            <tr><th>Plain term used above</th><th>Standard label</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>setting I pick by hand</td><td>hyperparameter</td></tr>
+            <tr><td>grid hunt</td><td>grid search / GridSearchCV</td></tr>
+            <tr><td>rotating folds</td><td>k-fold cross-validation</td></tr>
+            <tr><td>standard ruler</td><td>standard scaling / StandardScaler</td></tr>
+            <tr><td>pinch-to-fit ruler</td><td>min-max scaling / MinMaxScaler</td></tr>
+            <tr><td>skewed pile</td><td>class imbalance / imbalanced dataset</td></tr>
+            <tr><td>precision-catch curve</td><td>precision-recall curve</td></tr>
+            <tr><td>area under precision-recall curve</td><td>average precision (AP)</td></tr>
+            <tr><td>MISSED in business</td><td>false negative (FN)</td></tr>
+            <tr><td>ALARM in business</td><td>false positive (FP)</td></tr>
+            <tr><td>treat-all-classes-equal averaging</td><td>macro averaging</td></tr>
+            <tr><td>count-every-label averaging</td><td>micro averaging</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+        <p style="font-size:13px;">
+          <strong>In this series:</strong>
+          <a href="sorting-into-bins.html">Part 1 &mdash; The S-Curve, the Four-Box Table, and Why Accuracy Lies</a> &middot;
+          <a href="the-trade-curve.html">Part 2 &mdash; The Trade Curve: Sliding the Cutoff and What AUC Measures</a> &middot;
+          <a href="leash-and-cloud.html">Part 3 &mdash; Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a> &middot;
+          Part 4 (this post)
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// THIS SERIES</div>
+        <ul>
+          <li><a href="sorting-into-bins.html">Part 1: S-Curve + 4 Scores</a></li>
+          <li><a href="the-trade-curve.html">Part 2: The Trade Curve</a></li>
+          <li><a href="leash-and-cloud.html">Part 3: Leash and Cloud</a></li>
+          <li><strong>Part 4: Settings + Skewed</strong></li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>Settings vs dials</li>
+          <li>Grid hunt + folds</li>
+          <li>Standard vs pinch-to-fit</li>
+          <li>Precision vs recall tradeoff</li>
+          <li>Fraud: MISSED = loss</li>
+          <li>Skewed piles</li>
+          <li>Precision-recall curve</li>
+          <li>Macro vs micro avg</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// KEY TOOLS</div>
+        <ul>
+          <li>GridSearchCV</li>
+          <li>MinMaxScaler</li>
+          <li>precision_recall_curve</li>
+          <li>average_precision_score</li>
+          <li>classification_report</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <pre class="rule">==============================================================================</pre>
+  <footer id="footer">(c) 2026 Rahul Rai &middot; pure HTML + CSS, no JavaScript, no trackers &middot; <a href="../index.html">home</a> &middot; <a href="https://github.com/learnrahulrai-ui">source</a></footer>
+
+</div>
+</body>
+</html>

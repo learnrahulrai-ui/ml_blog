@@ -25,7 +25,7 @@ notes on machine learning, worked out by hand -- est. 2026
 
 <div class="post-card">
   <div class="post-title"><a href="posts/sorting-into-bins.html">The S-Curve, the Four-Box Table, and Why Accuracy Lies</a></div>
-  <div class="post-meta">2026-06-05 &middot; part 1 of 3 &middot; logistic-regression, classification, evaluation</div>
+  <div class="post-meta">2026-06-05 &middot; part 1 of 4 &middot; logistic-regression, classification, evaluation</div>
   <div class="post-excerpt">
     The shift from "guess a number" to "guess a bin": the S-curve squash, the cross-entropy loss,
     and how any dial sum becomes a chance. Then the four-box table of CAUGHT/ALARM/MISSED/CLEAR,
@@ -37,7 +37,7 @@ notes on machine learning, worked out by hand -- est. 2026
 
 <div class="post-card">
   <div class="post-title"><a href="posts/the-trade-curve.html">The Trade Curve: Sliding the Cutoff and What AUC Actually Measures</a></div>
-  <div class="post-meta">2026-06-05 &middot; part 2 of 3 &middot; roc-curve, auc, cutoff</div>
+  <div class="post-meta">2026-06-05 &middot; part 2 of 4 &middot; roc-curve, auc, cutoff</div>
   <div class="post-excerpt">
     One cutoff judges the machine at one spot; slide it through every position and you get the
     ROC (trade) curve. The area beneath it &mdash; AUC &mdash; compresses the whole curve to one
@@ -49,7 +49,7 @@ notes on machine learning, worked out by hand -- est. 2026
 
 <div class="post-card">
   <div class="post-title"><a href="posts/leash-and-cloud.html">Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a></div>
-  <div class="post-meta">2026-06-05 &middot; part 3 of 3 &middot; l2-regularization, lda</div>
+  <div class="post-meta">2026-06-05 &middot; part 3 of 4 &middot; l2-regularization, lda</div>
   <div class="post-excerpt">
     Two ways to humble an overconfident machine. L2: add a squared-dial price to the loss so
     no single dial dominates (C&nbsp;=&nbsp;1/&lambda; &mdash; small C is a heavy squeeze, not
@@ -58,6 +58,18 @@ notes on machine learning, worked out by hand -- est. 2026
     boundary; the agreement proves the data is cleanly separable.
   </div>
   <a class="read-more" href="posts/leash-and-cloud.html">[ read &rarr; ]</a>
+</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/picking-settings-skewed-classes.html">Picking Settings, Skewed Piles, and Averaging Many Classes</a></div>
+  <div class="post-meta">2026-06-05 &middot; part 4 of 4 &middot; grid-search, precision-recall, class-imbalance, macro-micro</div>
+  <div class="post-excerpt">
+    Grid hunting over settings by rotating folds; why pinch-to-fit scaling breaks around outliers;
+    the precision-recall tradeoff in fraud detection (MISSED = financial loss); precision-recall
+    curves for when one class is 100&times; rarer than the other; and macro vs micro averaging
+    for three-or-more-bin machines.
+  </div>
+  <a class="read-more" href="posts/picking-settings-skewed-classes.html">[ read &rarr; ]</a>
 </div>
 
 <div class="section-header">GRADING A GUESSER &mdash; how good is the guess?</div>
