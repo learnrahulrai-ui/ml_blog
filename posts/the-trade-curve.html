@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Trade Curve: Sliding the Cutoff and What AUC Actually Measures :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <pre class="banner"><a href="../index.html">RAHUL'S ML BLOG</a>
+notes on machine learning, worked out by hand -- est. 2026
+==============================================================================</pre>
+
+  <p id="nav">[ <a href="../index.html">home</a> ] [ <a href="../about.html">about</a> ] [ <a href="../archive.html">archive</a> ] [ <a href="mailto:learn.rahul.rai@gmail.com">contact</a> ]</p>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <span class="series-badge">SORTING INTO BINS &middot; PART 2 OF 3</span>
+        <div class="article-title">The Trade Curve: Sliding the Cutoff and What AUC Actually Measures</div>
+        <div class="article-meta">
+          Posted: 2026-06-05 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: roc-curve, auc, cutoff, evaluation
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          The four scores in the previous post all fixed the cutoff at 0.5. That is one
+          opinion about where to draw the line. Slide it left and the machine shouts "sick"
+          more freely &mdash; catching more real cases but also alarming more healthy people.
+          Slide it right and the machine stays quiet until very sure &mdash; fewer alarms but
+          more cases slipping through. Every position is a different deal between lives and
+          money. The trade curve draws all those deals at once.
+        </p>
+
+        <h2>Two Rates</h2>
+
+        <p>
+          At any fixed cutoff, the four-box table yields two fractions that together describe
+          that deal:
+        </p>
+
+<pre><code>   catch-rate   (TPR) = CAUGHT / all truly sick   ↑ good
+   false-alarm  (FPR) = ALARM  / all truly well   ↓ good</code></pre>
+
+        <p>
+          Formally, for a cutoff &tau; &isin; [0, 1]:
+        </p>
+
+        <div class="math-box">
+          TPR(&tau;) = P(ŷ=1 | Y=1) = TP(&tau;) / (TP(&tau;) + FN(&tau;))
+        </div>
+        <div class="math-box">
+          FPR(&tau;) = P(ŷ=1 | Y=0) = FP(&tau;) / (FP(&tau;) + TN(&tau;))
+        </div>
+
+        <p>
+          TPR is the same as recall. FPR is the fraction of healthy lumps that get
+          misread as sick. Moving the cutoff shifts both simultaneously &mdash; they
+          cannot be improved together without limit.
+        </p>
+
+        <h2>Sliding the Cutoff</h2>
+
+<pre><code>   chance 0.0 ─────────────── 1.0
+                    ▲ cutoff (slide)
+
+   slide LEFT  (cutoff ≈ 0.1): shout sick at almost everyone
+       catch-rate   ↑   (few sick lumps escape)
+       false-alarm  ↑   (healthy people caught in the net too)
+
+   slide RIGHT (cutoff ≈ 0.9): shout sick only when bone-sure
+       catch-rate   ↓   (many sick lumps called well and sent home)
+       false-alarm  ↓   (healthy people mostly called clear)
+
+   → a TRADE: cannot raise catches without raising false alarms</code></pre>
+
+        <p>
+          There is no cutoff that maximises TPR while holding FPR at zero &mdash; unless
+          the machine perfectly separates the two groups. What exists is a continuous
+          family of deals.
+        </p>
+
+        <h2>Drawing All the Deals at Once</h2>
+
+        <p>
+          Sweep the cutoff from 1 down to 0. At each position, compute (FPR, TPR) and
+          drop a dot at those coordinates. Connect the dots: that is the trade curve, or
+          ROC curve.
+        </p>
+
+<pre><code>   TPR (catch-rate, lives saved)
+    1 ┤ ★ ← perfect machine (catch all, alarm none)
+      │  ●●●
+      │     ●●
+      │  - - - - ╲  ← diagonal = useless coin flip
+    0 ┤─────────────── FPR (false-alarm, money wasted)
+      0              1
+
+   each dot = one cutoff position
+   perfect machine: hugs the top-left corner
+   coin flip: follows the diagonal</code></pre>
+
+        <p>
+          The curve is defined parametrically by &tau;:
+          {(FPR(&tau;), TPR(&tau;)) : &tau; &isin; [0, 1]}. As &tau; &rarr; 0,
+          everyone is called sick &rarr; TPR=1, FPR=1 (top-right corner). As
+          &tau; &rarr; 1, everyone is called well &rarr; TPR=0, FPR=0 (bottom-left corner).
+        </p>
+
+        <h2>The Area Under the Curve</h2>
+
+        <p>
+          The whole curve collapses into one number: the area under it, AUC. A perfect
+          machine that hugs the top-left corner has area 1.0. A coin flip that follows the
+          diagonal has area 0.5. A machine whose scores are systematically backwards has
+          area below 0.5.
+        </p>
+
+<pre><code>   AUC = 1.0   perfect — no overlap between sick and well scores
+   AUC = 0.5   useless — sick and well scores interleaved randomly
+   AUC < 0.5   backwards — sick scores lower than well scores</code></pre>
+
+        <p>
+          AUC is computed from the curve points using the trapezoidal rule:
+        </p>
+
+        <div class="math-box">
+          AUC &asymp; &Sigma;<sub>k</sub> (FPR<sub>k+1</sub> &minus; FPR<sub>k</sub>)
+          &middot; (TPR<sub>k+1</sub> + TPR<sub>k</sub>) / 2
+        </div>
+
+        <h2>What AUC Actually Measures</h2>
+
+        <p>
+          There is a cleaner way to read AUC that has nothing to do with curves or areas.
+          It is called the Wilcoxon&ndash;Mann&ndash;Whitney statistic:
+        </p>
+
+        <div class="math-box">
+          AUC = P( score(x<sup>+</sup>) &gt; score(x<sup>&minus;</sup>) )
+        </div>
+
+        <p>
+          Pick one sick lump at random and one well lump at random. What is the probability
+          that the machine gave the sick lump a higher chance-score than the well lump?
+          That is AUC.
+        </p>
+
+<pre><code>   GOOD machine — scores:
+     well lumps →  ●●●●                       (all low)
+     sick lumps →             ●●●●            (all high)
+     → almost always: sick score > well score → AUC ≈ 1.0
+
+   BAD machine — scores:
+     well lumps →   ● ● ●  ●  ●  ●
+     sick lumps →  ●  ● ●   ●  ●  ●
+     → roughly half the time sick scores below well → AUC ≈ 0.5</code></pre>
+
+        <p>
+          AUC = 0.97 means: take a random sick lump and a random well lump; 97 times out
+          of 100 the machine scored the sick lump higher. It answers "how cleanly do the
+          two groups separate?" without committing to any one cutoff.
+        </p>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; AUC IS CUTOFF-INDEPENDENT</span>
+          The four scores from Part 1 &mdash; accuracy, recall, precision, F1 &mdash; all
+          answer "how good is this machine at threshold 0.5?" AUC answers "how good is
+          this machine's <em>ranking</em> of sick chances above well chances, everywhere,
+          always?" It is the right score when you want to compare two machines before
+          deciding where to set the cutoff.
+        </div>
+
+        <h2>Why You Need Chances, Not Labels</h2>
+
+        <p>
+          The ROC sweep needs a continuous score to sweep through. <code>predict</code>
+          returns only 0 or 1 &mdash; two unique scores, two dots, a useless curve.
+          <code>predict_proba</code> returns the raw chance output before any cutoff,
+          giving a different number for every row.
+        </p>
+
+<pre><code>   predict(X_test_scaled)        → [1, 0, 1, 1, 0, …]   (0 or 1 only)
+   predict_proba(X_test_scaled)  → [[0.03, 0.97],        (well-chance, sick-chance)
+                                     [0.81, 0.19],         per row
+                                     …]</code></pre>
+
+        <p>
+          <code>predict_proba</code> returns two columns per row: column 0 is the
+          well-chance P(B), column 1 is the sick-chance P(M). For the ROC curve you want
+          the sick-chance, so grab column 1:
+        </p>
+
+<pre><code>y_proba = log_reg.predict_proba(X_test_scaled)[:, 1]   # sick-chance per row
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+roc_auc = auc(fpr, tpr)</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; COLUMN 0 FLIPS THE CURVE BELOW THE DIAGONAL</span>
+          If you pass column 0 (well-chances), sick lumps score LOW and well lumps score
+          HIGH &mdash; the ranking is backwards. The ROC curve dips below the diagonal and
+          AUC &lt; 0.5. The machine looks worse than a coin flip. Always use column 1.
+        </div>
+
+        <h2>Plotting It</h2>
+
+<pre><code>plt.figure(figsize=(7, 5))
+plt.plot(fpr, tpr, label=f'AUC = {roc_auc:.3f}')
+plt.plot([0, 1], [0, 1], linestyle='--', color='grey', label='Random guess')
+plt.xlabel('FPR  (false-alarm rate)')
+plt.ylabel('TPR  (catch-rate)')
+plt.title('Trade Curve')
+plt.legend()
+plt.show()</code></pre>
+
+        <p>
+          The grey diagonal is the reference: a machine that assigns random scores sits
+          on it. Any curve above the diagonal is better than random. The further it bulges
+          toward the top-left corner, the cleaner the separation.
+        </p>
+
+        <h2>Practical Reading</h2>
+
+<pre><code>   AUC ≈ 0.99   the two clouds are cleanly separated; almost any cutoff works
+   AUC ≈ 0.85   good separation; choice of cutoff matters; tune recall vs precision
+   AUC ≈ 0.70   noisy; the machine has a weak signal; more columns or a different
+                machine might help
+   AUC ≈ 0.50   no signal at all; the 30 columns carry no information about the bin</code></pre>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; THE TRADE CURVE AND AUC DO NOT PICK A CUTOFF FOR YOU</span>
+          They tell you how well-separated the two groups are. The choice of cutoff
+          &mdash; how much ALARM is acceptable to buy a given catch-rate &mdash; is a
+          clinical or business decision. In cancer screening, a doctor reading a curve of
+          AUC 0.97 might pick the cutoff that gives 99% recall even if FPR climbs to 15%.
+          The curve shows the available deals; the doctor picks one.
+        </div>
+
+        <h2>The Labels, Last</h2>
+
+        <table>
+          <thead>
+            <tr><th>Plain term used above</th><th>Standard label</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>catch-rate (TPR)</td><td>true positive rate / sensitivity / recall</td></tr>
+            <tr><td>false-alarm (FPR)</td><td>false positive rate / (1 &minus; specificity)</td></tr>
+            <tr><td>trade curve</td><td>ROC curve (receiver operating characteristic)</td></tr>
+            <tr><td>area under trade curve</td><td>AUC (area under the ROC curve)</td></tr>
+            <tr><td>chance-score</td><td>posterior probability / predict_proba output</td></tr>
+            <tr><td>Wilcoxon&ndash;Mann&ndash;Whitney interpretation</td><td>AUC = P(score(x+) &gt; score(x-))</td></tr>
+            <tr><td>trapezoidal rule</td><td>numerical integration used by sklearn's auc()</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+        <p style="font-size:13px;">
+          <strong>In this series:</strong>
+          <a href="sorting-into-bins.html">Part 1 &mdash; The S-Curve, the Four-Box Table, and Why Accuracy Lies</a> &middot;
+          Part 2 (this post) &middot;
+          <a href="leash-and-cloud.html">Part 3 &mdash; Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a>
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// THIS SERIES</div>
+        <ul>
+          <li><a href="sorting-into-bins.html">Part 1: S-Curve + 4 Scores</a></li>
+          <li><strong>Part 2: The Trade Curve</strong></li>
+          <li><a href="leash-and-cloud.html">Part 3: Leash and Cloud</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>Catch-rate (TPR)</li>
+          <li>False-alarm (FPR)</li>
+          <li>Sliding the cutoff</li>
+          <li>The ROC curve</li>
+          <li>AUC = area</li>
+          <li>AUC = P(score+ &gt; score-)</li>
+          <li>predict_proba column 1</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// KEY FORMULAS</div>
+        <ul>
+          <li>TPR = TP/(TP+FN)</li>
+          <li>FPR = FP/(FP+TN)</li>
+          <li>AUC = P(x+ &gt; x-)</li>
+          <li>[:, 1] for sick-chance</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <pre class="rule">==============================================================================</pre>
+  <footer id="footer">(c) 2026 Rahul Rai &middot; pure HTML + CSS, no JavaScript, no trackers &middot; <a href="../index.html">home</a> &middot; <a href="https://github.com/learnrahulrai-ui">source</a></footer>
+
+</div>
+</body>
+</html>

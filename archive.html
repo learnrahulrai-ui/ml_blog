@@ -14,7 +14,42 @@ notes on machine learning, worked out by hand -- est. 2026
 
 <p id="nav">[ <a href="index.html">home</a> ] [ <a href="about.html">about</a> ] [ <a href="archive.html">archive</a> ] [ <a href="mailto:learn.rahul.rai@gmail.com">contact</a> ]</p>
 
-<p><strong>All posts</strong> &mdash; 5 posts, 2 series. Newest first.</p>
+<p><strong>All posts</strong> &mdash; 8 posts, 3 series. Newest first.</p>
+
+<div class="section-header">SORTING INTO BINS (2026)</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/sorting-into-bins.html">Part 1 &mdash; The S-Curve, the Four-Box Table, and Why Accuracy Lies</a></div>
+  <div class="post-meta">2026-06-05 &middot; logistic-regression, classification, evaluation</div>
+  <div class="post-excerpt">
+    Number to bin via the S-curve squash, cross-entropy loss, label encoding (M&rarr;1), the
+    four-box table (CAUGHT/ALARM/MISSED/CLEAR), four scores (accuracy/recall/precision/F1), and
+    why accuracy alone is a dangerous comfort.
+  </div>
+  <a class="read-more" href="posts/sorting-into-bins.html">[ read &rarr; ]</a>
+</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/the-trade-curve.html">Part 2 &mdash; The Trade Curve: Sliding the Cutoff and What AUC Measures</a></div>
+  <div class="post-meta">2026-06-05 &middot; roc-curve, auc, cutoff</div>
+  <div class="post-excerpt">
+    Why fixing the cutoff at 0.5 is just one opinion. Sweep the cutoff: each position is a
+    (FPR, TPR) dot. Connect the dots: the trade curve. Area underneath = AUC = P(sick score &gt;
+    well score). The Wilcoxon&ndash;Mann&ndash;Whitney interpretation.
+  </div>
+  <a class="read-more" href="posts/the-trade-curve.html">[ read &rarr; ]</a>
+</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/leash-and-cloud.html">Part 3 &mdash; Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a></div>
+  <div class="post-meta">2026-06-05 &middot; l2-regularization, lda</div>
+  <div class="post-excerpt">
+    L2: add &lambda;&Sigma;&beta;&sup2; to the loss; C=1/&lambda; so small C is heavy squeeze.
+    LDA: closed-form wall from w&nbsp;&prop;&nbsp;&Sigma;<sub>W</sub><sup>-1</sup>(&mu;<sub>1</sub>-&mu;<sub>0</sub>).
+    Same boundary form as logistic regression, different derivation. Agreement = clean data.
+  </div>
+  <a class="read-more" href="posts/leash-and-cloud.html">[ read &rarr; ]</a>
+</div>
 
 <div class="section-header">GRADING A GUESSER (2026)</div>
 
@@ -75,8 +110,6 @@ notes on machine learning, worked out by hand -- est. 2026
   <a class="read-more" href="posts/straight-stick-linear-regression.html">[ read &rarr; ]</a>
 </div>
 
-<div class="section-header">UP NEXT</div>
-<p>Yes-or-no guessing and the S-curve.</p>
 
 <pre class="rule">==============================================================================</pre>
 <p id="footer">

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leash and Cloud: L2 Punishment and the Two-Cloud Wall :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <pre class="banner"><a href="../index.html">RAHUL'S ML BLOG</a>
+notes on machine learning, worked out by hand -- est. 2026
+==============================================================================</pre>
+
+  <p id="nav">[ <a href="../index.html">home</a> ] [ <a href="../about.html">about</a> ] [ <a href="../archive.html">archive</a> ] [ <a href="mailto:learn.rahul.rai@gmail.com">contact</a> ]</p>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <span class="series-badge">SORTING INTO BINS &middot; PART 3 OF 3</span>
+        <div class="article-title">Leash and Cloud: L2 Punishment and the Two-Cloud Wall</div>
+        <div class="article-meta">
+          Posted: 2026-06-05 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: l2-regularization, lda, generative-models, regularization
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          The S-curve machine in Part 1 sets its dials by rolling downhill on cross-entropy
+          loss. Nothing stops a dial from growing to 50 if that is what the descent finds.
+          A huge dial means the machine over-trusts one measured column and barely listens
+          to the rest. That machine may fit the study pile well but fail on new lumps it has
+          never seen &mdash; the dials memorised the study pile's quirks. This post covers
+          two fixes: a leash on the dials, and a different machine entirely that sidesteps
+          the problem by reading the shape of the two groups rather than rolling downhill.
+        </p>
+
+        <h2>The Free Machine</h2>
+
+<pre><code>   free machine: roll downhill → no rules → one dial might reach 40 or −60
+   patient row → ×dials → add → squash → chance
+
+   if column 7's dial = 40:
+     a shift of 0.1 in column 7 swings the sum by 4.0 → chance jumps from 0.1 to 0.98
+   the machine bets almost everything on one column
+   → cocky on study pile, shaky on new lumps</code></pre>
+
+        <h2>A Leash on the Dials (L2 Penalty)</h2>
+
+        <p>
+          Add a price tag to large dials. Every extra unit of dial size costs something.
+          The machine now minimises two things at once: fit the study pile well <em>and</em>
+          keep the dials small. The penalised objective is:
+        </p>
+
+        <div class="math-box">
+          &Lscr;<sub>L2</sub>(&beta;) = &Lscr;(&beta;) + &lambda; &Sigma;<sub>j</sub> &beta;<sub>j</sub>&sup2;
+        </div>
+
+        <p>
+          The first term is the cross-entropy from Part 1. The second term is the sum of
+          squared dials multiplied by a strength &lambda;. When &lambda; is large, even a
+          small dial&sup2; sum gets expensive, and the machine is forced to shrink everything
+          toward zero. The gradient update picks up a pull-toward-zero term:
+        </p>
+
+        <div class="math-box">
+          &part;&Lscr;<sub>L2</sub> / &part;&beta;<sub>j</sub> =
+          (1/n) &Sigma;<sub>i</sub> (&sigma;(z<sub>i</sub>) &minus; y<sub>i</sub>) x<sub>ij</sub>
+          &nbsp;+&nbsp; 2&lambda;&beta;<sub>j</sub>
+        </div>
+
+        <p>
+          The term 2&lambda;&beta;<sub>j</sub> pulls every dial toward zero at every step.
+          Result: dials spread across all 30 columns instead of concentrating on one.
+        </p>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; BAYESIAN READING</span>
+          Adding a squared-dial penalty is equivalent to placing a zero-mean Gaussian prior
+          on each dial and maximising the posterior instead of the likelihood. The prior
+          says "a dial as large as 40 is very surprising; please explain." The data can
+          override this prior if the evidence is strong enough; otherwise the dials stay
+          modest.
+        </div>
+
+        <h2>The C Parameter: Counter-Intuitive Direction</h2>
+
+        <p>
+          sklearn spells the leash strength as <code>C</code>, not &lambda;. They are
+          reciprocals:
+        </p>
+
+        <div class="math-box">
+          C = 1 / &lambda; &nbsp;&nbsp; &hArr; &nbsp;&nbsp; &lambda; = 1 / C
+        </div>
+
+<pre><code>   C = 0.1   →   λ = 10   heavy penalty — dials squeezed hard
+   C = 1.0   →   λ = 1    sklearn default
+   C = 1000  →   λ = 0.001 barely any penalty — nearly free machine</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; C=0.1 IS HEAVY PUNISHMENT, NOT LIGHT</span>
+          C is the budget you give the machine to <em>ignore</em> the penalty. A small
+          budget means little room to ignore it &mdash; a hard squeeze. A large C means
+          a large "ignore" budget &mdash; the penalty barely bites. "C small = heavy leash"
+          is counter-intuitive until you remember C = 1/&lambda;.
+        </div>
+
+<pre><code>log_reg_l2 = LogisticRegression(penalty='l2', C=0.1, random_state=42)
+log_reg_l2.fit(X_train_scaled, y_train)
+y_pred_l2 = log_reg_l2.predict(X_test_scaled)</code></pre>
+
+        <h2>Did the Dials Shrink?</h2>
+
+        <p>
+          Compare the average absolute dial size before and after the leash:
+        </p>
+
+<pre><code>avg_coef_baseline = np.mean(np.abs(log_reg_baseline.coef_))
+avg_coef_l2       = np.mean(np.abs(log_reg_l2.coef_))
+# expect: avg_coef_l2 < avg_coef_baseline</code></pre>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; WHY ABSOLUTE VALUE BEFORE AVERAGING</span>
+          Dials can be positive or negative. A positive dial +3 and a negative dial &minus;3
+          cancel to zero in a plain average, making the machine look like it has no signal
+          at all. Taking the absolute value first measures the <em>size</em> of each dial
+          regardless of sign, then averages those sizes. What you want to compare is pull
+          strength, not direction.
+        </div>
+
+        <h2>Scaling and the Leash Are Not the Same Fix</h2>
+
+<pre><code>   Scaling (put columns on one ruler):  fixes the INPUTS
+   L2 leash:                            fixes the DIALS
+
+   Even after scaling, a dial can grow huge if the machine
+   over-trusts one column. You need both. They solve different problems.</code></pre>
+
+        <p>
+          Scaling makes the 30 input columns comparable before the machine sees them.
+          The leash limits how large any individual dial grows during the dial-setting step.
+          Removing either one leaves a different problem unsolved.
+        </p>
+
+        <h2>A Completely Different Machine: The Two-Cloud Wall</h2>
+
+        <p>
+          The S-curve machine finds the dials by trial and error: adjust, check the loss,
+          adjust again. Linear discriminant analysis (LDA) takes a different route entirely.
+          Instead of fitting predictions, it looks at the <em>shape</em> of the two groups
+          in the study pile and computes the wall in one shot.
+        </p>
+
+<pre><code>   step 1: split the study pile into sick rows and well rows
+   step 2: compute 30 averages per group → two centres in 30-column space
+           (60 averages total: 30 per class, 2 class centres)
+   step 3: find the wall between the two centres
+   step 4: new lump → which side of the wall? → that is the label</code></pre>
+
+<pre><code>   well centre ●──────────┼──────────● sick centre
+                          ↑
+                        wall here</code></pre>
+
+        <h2>Fisher's Criterion: Where to Aim the Wall</h2>
+
+        <p>
+          A naive wall at the midpoint between the two centres works when both clouds are
+          round. Real clouds are stretched &mdash; some directions have more spread than
+          others, and the two classes may share some of that stretch. Fisher's criterion
+          asks: which direction w maximises the <em>ratio</em> of between-class spread to
+          within-class spread?
+        </p>
+
+        <div class="math-box">
+          maximise &nbsp; (w<sup>T</sup>S<sub>b</sub>w) / (w<sup>T</sup>S<sub>w</sub>w)
+        </div>
+
+        <p>
+          where S<sub>b</sub> = (&mu;<sub>1</sub>&minus;&mu;<sub>0</sub>)(&mu;<sub>1</sub>&minus;&mu;<sub>0</sub>)<sup>T</sup>
+          (between-class scatter) and S<sub>w</sub> = &Sigma;<sub>W</sub> (pooled within-class scatter).
+          The solution is closed-form &mdash; no rolling downhill required:
+        </p>
+
+        <div class="math-box">
+          w &prop; &Sigma;<sub>W</sub><sup>&minus;1</sup> (&mu;<sub>1</sub> &minus; &mu;<sub>0</sub>)
+        </div>
+
+        <p>
+          Meaning: take the difference between the two class centres, then rotate it
+          by the inverse of the pooled within-class spread matrix. This adjusts for the
+          tilt and shape of the clouds &mdash; if both clouds are elongated diagonally,
+          the wall tilts to match. The decision threshold sits at the midpoint of the
+          projected class means:
+        </p>
+
+        <div class="math-box">
+          threshold = w<sup>T</sup>(&mu;<sub>0</sub> + &mu;<sub>1</sub>) / 2
+        </div>
+
+<pre><code>lda = LinearDiscriminantAnalysis()
+lda.fit(X_train_scaled, y_train)
+y_pred_lda = lda.predict(X_test_scaled)</code></pre>
+
+        <h2>Generative vs Discriminative</h2>
+
+        <p>
+          The S-curve machine and LDA arrive at the same final form &mdash; a linear
+          boundary through the 30-column space &mdash; but they derive it through
+          completely different reasoning:
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>S-curve machine</th>
+              <th>Two-cloud wall (LDA)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Approach</td><td>models P(sick&thinsp;|&thinsp;x) directly</td><td>models P(x&thinsp;|&thinsp;sick) and P(sick), then combines</td></tr>
+            <tr><td>Solution</td><td>iterative (roll downhill)</td><td>closed form (one shot)</td></tr>
+            <tr><td>Assumption</td><td>no distributional assumption on x</td><td>Gaussian columns, equal spread per class</td></tr>
+            <tr><td>Breaks when</td><td>columns are perfectly tangled</td><td>spread assumption badly violated</td></tr>
+            <tr><td>Works better when</td><td>large study pile, noisy columns</td><td>small study pile, Gaussian columns</td></tr>
+          </tbody>
+        </table>
+
+        <p>
+          LDA is a <em>generative</em> model: it imagines that each class generates
+          Gaussian-distributed data and uses Bayes' theorem to flip to P(sick&thinsp;|&thinsp;x).
+          Via that flip, P(sick&thinsp;|&thinsp;x) works out to &sigma;(w<sup>T</sup>x + w<sub>0</sub>)
+          &mdash; the same S-curve form as logistic regression. Same decision boundary shape,
+          different route.
+        </p>
+
+        <h2>Same Accuracy: What It Means</h2>
+
+        <p>
+          On the Wisconsin breast cancer sheet, LDA and the S-curve machine give nearly
+          identical accuracy. Two completely different approaches, same result. That is not
+          a coincidence:
+        </p>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; AGREEMENT = CLEAN DATA, GENUINELY SEPARABLE CLASSES</span>
+          When the two methods agree, the data is telling you the answer. A logistic machine
+          that maximises likelihood and an LDA that reads cloud shapes both find the same
+          dividing line because that line is clearly written in the data. If the sheet were
+          noisy or the two groups heavily overlapping, the two methods would diverge and
+          their disagreement would tell you something important: the boundary is ambiguous.
+        </div>
+
+        <h2>Why Scaling Also Matters for LDA</h2>
+
+        <p>
+          LDA computes &Sigma;<sub>W</sub>, the pooled within-class spread matrix. If column
+          "area" runs in the thousands while column "smoothness" runs in hundredths, the area
+          column dominates the covariance matrix &mdash; its large numbers swamp the matrix
+          entries and distort the projection direction w. Putting every column on the same
+          ruler before feeding LDA makes &Sigma;<sub>W</sub> well-conditioned and the
+          projection direction meaningful.
+        </p>
+
+        <ol class="takeaways">
+          <li>The free S-curve machine lets dials grow without limit; L2 adds a squared-dial price that shrinks them toward zero.</li>
+          <li>C = 1/&lambda;: small C (say 0.1) means large &lambda; (10) &mdash; heavy squeeze. Counter-intuitive.</li>
+          <li>The leash fixes dials; scaling fixed inputs. They solve different problems; need both.</li>
+          <li>LDA reads the two cloud centres and their shared spread, then finds the optimal wall in one closed-form step.</li>
+          <li>w &prop; &Sigma;<sub>W</sub><sup>&minus;1</sup>(&mu;<sub>1</sub>&minus;&mu;<sub>0</sub>): the difference of centres, rotated by the inverse within-class spread.</li>
+          <li>LDA and the S-curve machine produce the same decision boundary form; they just derive it from opposite directions &mdash; generative vs discriminative.</li>
+          <li>When both machines agree on accuracy, the data is cleanly separable. Disagreement is diagnostic.</li>
+        </ol>
+
+        <h2>The Labels, Last</h2>
+
+        <table>
+          <thead>
+            <tr><th>Plain term used above</th><th>Standard label</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>leash on the dials</td><td>L2 regularisation / ridge penalty</td></tr>
+            <tr><td>dial-size price</td><td>regularisation term &lambda;&Sigma;&beta;<sub>j</sub>&sup2;</td></tr>
+            <tr><td>C (sklearn parameter)</td><td>inverse regularisation strength (C = 1/&lambda;)</td></tr>
+            <tr><td>two-cloud midpoint wall</td><td>LDA (linear discriminant analysis)</td></tr>
+            <tr><td>cloud centre</td><td>class mean &mu;<sub>k</sub></td></tr>
+            <tr><td>pooled within-class spread</td><td>within-class scatter matrix &Sigma;<sub>W</sub></td></tr>
+            <tr><td>Fisher's criterion</td><td>maximise (w<sup>T</sup>S<sub>b</sub>w)/(w<sup>T</sup>S<sub>w</sub>w)</td></tr>
+            <tr><td>models P(x&thinsp;|&thinsp;class)</td><td>generative model</td></tr>
+            <tr><td>models P(class&thinsp;|&thinsp;x) directly</td><td>discriminative model</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+        <p style="font-size:13px;">
+          <strong>In this series:</strong>
+          <a href="sorting-into-bins.html">Part 1 &mdash; The S-Curve, the Four-Box Table, and Why Accuracy Lies</a> &middot;
+          <a href="the-trade-curve.html">Part 2 &mdash; The Trade Curve: Sliding the Cutoff and What AUC Measures</a> &middot;
+          Part 3 (this post)
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// THIS SERIES</div>
+        <ul>
+          <li><a href="sorting-into-bins.html">Part 1: S-Curve + 4 Scores</a></li>
+          <li><a href="the-trade-curve.html">Part 2: The Trade Curve</a></li>
+          <li><strong>Part 3: Leash and Cloud</strong></li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>L2 penalty term</li>
+          <li>C = 1/&lambda;</li>
+          <li>C=0.1 = heavy leash</li>
+          <li>Bayesian reading</li>
+          <li>Scaling &ne; L2</li>
+          <li>LDA cloud centres</li>
+          <li>Fisher's criterion</li>
+          <li>Closed-form w</li>
+          <li>Generative vs discriminative</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// KEY FORMULAS</div>
+        <ul>
+          <li>&Lscr;<sub>L2</sub> = &Lscr; + (1/C)&Vert;&beta;&Vert;&sup2;</li>
+          <li>w &prop; &Sigma;<sub>W</sub><sup>-1</sup>(&mu;1-&mu;0)</li>
+          <li>threshold = w<sup>T</sup>(&mu;0+&mu;1)/2</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <pre class="rule">==============================================================================</pre>
+  <footer id="footer">(c) 2026 Rahul Rai &middot; pure HTML + CSS, no JavaScript, no trackers &middot; <a href="../index.html">home</a> &middot; <a href="https://github.com/learnrahulrai-ui">source</a></footer>
+
+</div>
+</body>
+</html>

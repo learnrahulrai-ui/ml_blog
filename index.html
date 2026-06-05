@@ -21,6 +21,45 @@ notes on machine learning, worked out by hand -- est. 2026
   no JavaScript. Newest first.
 </p>
 
+<div class="section-header">SORTING INTO BINS &mdash; yes-or-no guessing, scored every way</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/sorting-into-bins.html">The S-Curve, the Four-Box Table, and Why Accuracy Lies</a></div>
+  <div class="post-meta">2026-06-05 &middot; part 1 of 3 &middot; logistic-regression, classification, evaluation</div>
+  <div class="post-excerpt">
+    The shift from "guess a number" to "guess a bin": the S-curve squash, the cross-entropy loss,
+    and how any dial sum becomes a chance. Then the four-box table of CAUGHT/ALARM/MISSED/CLEAR,
+    four scores that read different corners of it, and why a machine that catches nobody can still
+    score 63% accuracy.
+  </div>
+  <a class="read-more" href="posts/sorting-into-bins.html">[ read &rarr; ]</a>
+</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/the-trade-curve.html">The Trade Curve: Sliding the Cutoff and What AUC Actually Measures</a></div>
+  <div class="post-meta">2026-06-05 &middot; part 2 of 3 &middot; roc-curve, auc, cutoff</div>
+  <div class="post-excerpt">
+    One cutoff judges the machine at one spot; slide it through every position and you get the
+    ROC (trade) curve. The area beneath it &mdash; AUC &mdash; compresses the whole curve to one
+    number with a clean probabilistic reading: pick a random sick lump and a random well lump;
+    AUC is the chance the machine scored the sick one higher.
+  </div>
+  <a class="read-more" href="posts/the-trade-curve.html">[ read &rarr; ]</a>
+</div>
+
+<div class="post-card">
+  <div class="post-title"><a href="posts/leash-and-cloud.html">Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a></div>
+  <div class="post-meta">2026-06-05 &middot; part 3 of 3 &middot; l2-regularization, lda</div>
+  <div class="post-excerpt">
+    Two ways to humble an overconfident machine. L2: add a squared-dial price to the loss so
+    no single dial dominates (C&nbsp;=&nbsp;1/&lambda; &mdash; small C is a heavy squeeze, not
+    light). LDA: forget rolling downhill entirely &mdash; read the two cloud centres and their
+    shared spread, then solve for the wall in one closed-form step. Both machines find the same
+    boundary; the agreement proves the data is cleanly separable.
+  </div>
+  <a class="read-more" href="posts/leash-and-cloud.html">[ read &rarr; ]</a>
+</div>
+
 <div class="section-header">GRADING A GUESSER &mdash; how good is the guess?</div>
 
 <div class="post-card">
@@ -84,8 +123,6 @@ notes on machine learning, worked out by hand -- est. 2026
   <a class="read-more" href="posts/straight-stick-linear-regression.html">[ read &rarr; ]</a>
 </div>
 
-<div class="section-header">UP NEXT</div>
-<p>Yes-or-no guessing -- the S-curve and where to draw the line.</p>
 
 <pre class="rule">==============================================================================</pre>
 <p id="footer">

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorting Into Bins: The S-Curve, the Four-Box Table, and Why Accuracy Lies :: Rahul's ML Blog</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div id="wrapper">
+
+  <pre class="banner"><a href="../index.html">RAHUL'S ML BLOG</a>
+notes on machine learning, worked out by hand -- est. 2026
+==============================================================================</pre>
+
+  <p id="nav">[ <a href="../index.html">home</a> ] [ <a href="../about.html">about</a> ] [ <a href="../archive.html">archive</a> ] [ <a href="mailto:learn.rahul.rai@gmail.com">contact</a> ]</p>
+
+  <div id="content-area">
+    <main id="main">
+
+      <div class="article-header">
+        <span class="series-badge">SORTING INTO BINS &middot; PART 1 OF 3</span>
+        <div class="article-title">Sorting Into Bins: The S-Curve, the Four-Box Table, and Why Accuracy Lies</div>
+        <div class="article-meta">
+          Posted: 2026-06-05 &nbsp;|&nbsp;
+          Author: Rahul Rai &nbsp;|&nbsp;
+          Tags: logistic-regression, classification, evaluation, confusion-matrix
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <p>
+          Every post so far ended with a number: predicted house price, predicted miles per gallon.
+          A real number on a line. This one ends with a box. A doctor photographs cells from a
+          breast lump and measures 30 things about them &mdash; size, texture, smoothness.
+          The question is not "how malignant?" but "malignant <em>or not</em>?"
+          Two bins. One answer. The machine still makes a sliding number internally, but now
+          that number has to be bent, squeezed, and chopped into a bin label.
+        </p>
+
+        <h2>From Number to Bin</h2>
+
+<pre><code>   previous posts (number):   ──────────●──────►   answer = 2.83
+
+   this post (bin):           [ B = well ]  [ M = sick ]   answer = ONE box</code></pre>
+
+        <p>
+          The dial-adding machine can only produce a sliding number. To land in one of two
+          bins it needs two more steps: a <strong>squash</strong> that bends any number into
+          the range 0&ndash;1 (so it reads as a chance), and a <strong>cutoff</strong>
+          that chops that chance into a label.
+        </p>
+
+<pre><code>   columns ─► ×dials ─► add ─► SQUASH ─► chance 0–1 ─► CUTOFF ─► [B] or [M]</code></pre>
+
+        <h2>The Squash Curve</h2>
+
+        <p>
+          The squash curve has an S-shape. Any real number goes in; a chance between 0 and 1
+          comes out. The formula for the curve is:
+        </p>
+
+        <div class="math-box">
+          &sigma;(z) = 1 / (1 + e<sup>&minus;z</sup>)
+        </div>
+
+        <p>
+          where z is the dial sum: z = &beta;<sub>0</sub> + x<sub>1</sub>&beta;<sub>1</sub>
+          + x<sub>2</sub>&beta;<sub>2</sub> + &hellip; + x<sub>30</sub>&beta;<sub>30</sub>.
+        </p>
+
+<pre><code>   chance
+    1 ┤              ______
+  0.5 ┤         ___／            ← dial sum = 0 → chance exactly 0.5
+    0 ┤_____／──────────── sum
+        −∞     0     +∞
+
+   big negative sum → chance ≈ 0   "well"
+   big positive sum → chance ≈ 1   "sick"
+   sum = 0          → chance = 0.5  (fence)</code></pre>
+
+        <p>
+          At the default cutoff of 0.5, this means: if the sum of weighted measurements
+          tips positive, the lump is called sick; if negative, well. The curve is also
+          doing something deeper &mdash; the linear sum z is the
+          <strong>log-odds</strong> of being sick:
+        </p>
+
+        <div class="math-box">
+          log( P(sick&thinsp;|&thinsp;x) / P(well&thinsp;|&thinsp;x) ) &nbsp;=&nbsp; &beta;<sub>0</sub> + x<sup>T</sup>&beta;
+        </div>
+
+        <p>
+          Each dial &beta;<sub>j</sub> is the change in log-odds per one-unit step in its
+          measured column, holding the other 29 fixed. Double a column's value, the log-odds
+          shifts by &beta;<sub>j</sub>. That's the unit the dials operate in.
+        </p>
+
+        <h2>Setting the Dials: What the Machine Minimises</h2>
+
+        <p>
+          In the straight-stick rule the machine minimised squared leftovers (MSE). Here
+          the answer is a label (0 or 1), so squared distance is the wrong ruler. Instead
+          the machine maximises the likelihood of the observed labels, which is equivalent
+          to minimising a <strong>cross-entropy loss</strong>:
+        </p>
+
+        <div class="math-box">
+          &Lscr;(&beta;) = &minus;(1/n) &Sigma;
+          [&thinsp;y log &sigma;(z) + (1&minus;y) log(1&minus;&sigma;(z))&thinsp;]
+        </div>
+
+        <p>
+          For a lump that is truly sick (y=1): if the machine outputs chance &asymp; 1, the
+          first term log(&asymp;1) &asymp; 0 &mdash; small loss. If it outputs chance &asymp; 0
+          on a sick lump, log(&asymp;0) &rarr; &minus;&infin; &mdash; enormous loss. The loss
+          punishes confidence in the wrong direction. There is no closed-form minimiser here;
+          the dials are found by rolling downhill through the gradient:
+        </p>
+
+<pre><code>   gradient of 𝓛 with respect to β:   (1/n) Xᵀ(σ(Xβ) − y)
+
+   each step:  β ← β − α · gradient   (α = step size)</code></pre>
+
+        <p>
+          In code, the same two-step as before &mdash; make an empty machine, show it the
+          study pile:
+        </p>
+
+<pre><code>log_reg = LogisticRegression(random_state=42)
+log_reg.fit(X_train_scaled, y_train)</code></pre>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; WHY SCALED INPUTS?</span>
+          The gradient update moves every dial by the same step size multiplied by its column's
+          values. A column measured in thousands (area &asymp; 1000) takes dial steps 1000&times;
+          larger than one measured in hundredths (smoothness &asymp; 0.1). The machine lurches
+          around the large column's dial and barely moves the small one's. Put every column on
+          the same ruler first &mdash; mean 0, spread 1 &mdash; and the step sizes become
+          comparable.
+        </div>
+
+        <h2>Encoding the Labels</h2>
+
+        <p>
+          A machine eats numbers, but the sheet holds letters: M (malignant) and B (benign).
+          The translation is a shelf: M&rarr;1, B&rarr;0. The bin you are <em>hunting</em>
+          gets the 1 &mdash; here that is the sick lump, because recall, precision, and every
+          score in this post count the sick detections.
+        </p>
+
+<pre><code>df['diagnosis'] = df['diagnosis'].map({'M': 1, 'B': 0})
+X = df.drop(columns='diagnosis')   # 30 measured columns
+y = df['diagnosis']                # 0 or 1</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; RUN THE MAP CELL ONLY ONCE</span>
+          If you run the encoding cell a second time, the column already holds 0 and 1.
+          The map searches for 'M' and 'B' &mdash; finds nothing &mdash; returns all NaN.
+          NaN is a float; every downstream step breaks. Fix: restart the kernel and run
+          top-to-bottom once. There is no shortcut after the NaN has landed.
+        </div>
+
+        <h2>The Four-Box Table</h2>
+
+        <p>
+          Every exam lump lands in exactly one of four boxes based on truth and guess:
+        </p>
+
+<pre><code>               guess SICK(1)    guess WELL(0)
+truth SICK(1)  CAUGHT         │ MISSED         ← deadly if large
+truth WELL(0)  ALARM          │ CLEAR          ← wasteful if large
+
+rows    = the truth     (sick / well)
+columns = the guess     (shouted sick / said well)
+each box = a plain count</code></pre>
+
+        <p>
+          CAUGHT is the ideal: a sick lump correctly flagged. MISSED is the catastrophe:
+          cancer goes home untreated. ALARM is the waste: a healthy person gets a scare
+          and an unnecessary biopsy. CLEAR is the other good outcome.
+        </p>
+
+<pre><code>conf_matrix = confusion_matrix(y_test, y_pred)   # truth first, guess second
+sns.heatmap(conf_matrix, annot=True, fmt='d')
+
+   grid shape:  [[ CLEAR  ALARM  ]    ← truth well  (row 0)
+                 [ MISSED CAUGHT ]]   ← truth sick  (row 1)</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; TRUTH FIRST, GUESS SECOND</span>
+          sklearn's confusion_matrix, accuracy_score, recall_score, and precision_score all
+          want (truth, guess) in that order. Swapping them flips rows and columns and
+          misassigns every count to the wrong box.
+        </div>
+
+        <h2>Four Scores, Four Angles</h2>
+
+        <p>
+          No single score summarises what a bin-sorter actually does. The four scores
+          each look at a different slice of the four-box table:
+        </p>
+
+<pre><code>   accuracy  = (CAUGHT + CLEAR) / everyone
+   recall    =  CAUGHT / (CAUGHT + MISSED)      ← top row: share of sick caught
+   precision =  CAUGHT / (CAUGHT + ALARM)       ← left col: when we cry sick, real sick?
+   F1        =  2 · precision · recall / (precision + recall)</code></pre>
+
+        <table>
+          <thead>
+            <tr><th>Score</th><th>Formula (counts)</th><th>Punishes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>accuracy</td><td>(TP + TN) / n</td><td>any wrong answer equally</td></tr>
+            <tr><td>recall</td><td>TP / (TP + FN)</td><td>MISSED (deadly)</td></tr>
+            <tr><td>precision</td><td>TP / (TP + FP)</td><td>ALARM (wasteful)</td></tr>
+            <tr><td>F1</td><td>2&middot;P&middot;R / (P+R)</td><td>either metric being low</td></tr>
+          </tbody>
+        </table>
+
+        <p>
+          In code:
+        </p>
+
+<pre><code>y_pred = log_reg.predict(X_test_scaled)
+accuracy  = accuracy_score(y_test, y_pred)
+recall    = recall_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+f1        = f1_score(y_test, y_pred)</code></pre>
+
+        <h2>Why Accuracy Alone Lies</h2>
+
+        <p>
+          The Wisconsin sheet has roughly 63% benign lumps. A machine that calls everything
+          benign &mdash; no dials, no squash, just one constant shout of "well" &mdash; scores
+          63% accuracy. It never catches a single sick person.
+          Accuracy counts all boxes equally, so MISSED costs the same as ALARM.
+          But a MISSED sick lump is cancer going home. Those mistakes are not equal.
+        </p>
+
+<pre><code>   fool machine: predict B for everything
+   accuracy  = 0.63   ← looks decent
+   recall    = 0.00   ← catches nobody
+   precision = N/A    ← never shouts sick, no CAUGHT, undefined</code></pre>
+
+        <div class="callout key">
+          <span class="callout-label">&#9733; IN CANCER SCREENING, RECALL IS THE NORTH STAR</span>
+          Missing a sick person is the catastrophe. You can tolerate some ALARM (extra
+          biopsies cost money, not lives). So the first score to check is recall &mdash; how
+          large a share of the sick lumps does the machine catch? Accuracy tells you nothing
+          about which mistake you are making.
+        </div>
+
+        <h2>F1: Why the Harmonic Mean</h2>
+
+        <p>
+          F1 is the harmonic mean of precision and recall, not the arithmetic mean.
+          The harmonic mean is dominated by whichever value is smaller. If recall = 0.98
+          but precision = 0.10, the arithmetic average is 0.54 (looks okay); the harmonic
+          mean F1 = 0.18 (correctly punishes the terrible precision). F1 collapses toward
+          zero when either score is near zero &mdash; you cannot paper over one bad score
+          with one great score.
+        </p>
+
+<pre><code>   F1 = 2 · P · R / (P + R)
+
+   example:  P=0.10,  R=0.98
+   arithmetic mean = (0.10 + 0.98) / 2 = 0.54
+   harmonic mean   = 2 · 0.10 · 0.98 / (0.10 + 0.98) = 0.18   ← honest</code></pre>
+
+        <h2>The Labels, Last</h2>
+
+        <table>
+          <thead>
+            <tr><th>Plain term used above</th><th>Standard label</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>sort into bins / bin-sorter</td><td>classification / classifier</td></tr>
+            <tr><td>S-curve yes/no guesser</td><td>logistic regression</td></tr>
+            <tr><td>squash curve</td><td>sigmoid / logistic function &sigma;</td></tr>
+            <tr><td>dial sum (z)</td><td>log-odds / logit</td></tr>
+            <tr><td>cross-entropy loss</td><td>binary cross-entropy / log-loss</td></tr>
+            <tr><td>CAUGHT</td><td>true positive (TP)</td></tr>
+            <tr><td>ALARM</td><td>false positive (FP)</td></tr>
+            <tr><td>MISSED</td><td>false negative (FN)</td></tr>
+            <tr><td>CLEAR</td><td>true negative (TN)</td></tr>
+            <tr><td>four-box table / hits-and-misses table</td><td>confusion matrix</td></tr>
+            <tr><td>recall</td><td>sensitivity / true positive rate (TPR)</td></tr>
+            <tr><td>put on one shared ruler</td><td>standardisation / StandardScaler</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+        <p style="font-size:13px;">
+          <strong>In this series:</strong>
+          Part 1 (this post) &middot;
+          <a href="the-trade-curve.html">Part 2 &mdash; The Trade Curve: Sliding the Cutoff and What AUC Measures</a> &middot;
+          <a href="leash-and-cloud.html">Part 3 &mdash; Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a>
+        </p>
+        <p style="font-size:12px; color:var(--dim);">
+          &larr; <a href="../index.html">Back to all posts</a>
+        </p>
+
+      </div>
+    </main>
+
+    <aside id="sidebar">
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// THIS SERIES</div>
+        <ul>
+          <li><strong>Part 1: S-Curve + 4 Scores</strong></li>
+          <li><a href="the-trade-curve.html">Part 2: The Trade Curve</a></li>
+          <li><a href="leash-and-cloud.html">Part 3: Leash and Cloud</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// IN THIS POST</div>
+        <ul>
+          <li>Number → bin via squash</li>
+          <li>S-curve: &sigma;(z) = 1/(1+e<sup>-z</sup>)</li>
+          <li>Log-odds interpretation</li>
+          <li>Cross-entropy loss</li>
+          <li>The four-box table</li>
+          <li>Accuracy, recall, precision, F1</li>
+          <li>Why accuracy hides which mistake</li>
+          <li>F1: harmonic mean</li>
+        </ul>
+      </div>
+      <div class="sidebar-box">
+        <div class="sidebar-box-title">// KEY FORMULAS</div>
+        <ul>
+          <li>&sigma;(z) = 1/(1+e<sup>-z</sup>)</li>
+          <li>recall = TP/(TP+FN)</li>
+          <li>precision = TP/(TP+FP)</li>
+          <li>F1 = 2PR/(P+R)</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <pre class="rule">==============================================================================</pre>
+  <footer id="footer">(c) 2026 Rahul Rai &middot; pure HTML + CSS, no JavaScript, no trackers &middot; <a href="../index.html">home</a> &middot; <a href="https://github.com/learnrahulrai-ui">source</a></footer>
+
+</div>
+</body>
+</html>
