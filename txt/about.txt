@@ -2,7 +2,7 @@
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+  [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   ABOUT THIS BLOG
@@ -54,6 +54,10 @@
       cross-entropy vs MSE, C parameter, LDA with priors, grid search fold safety,
       min-max scaling, precision vs recall in business, PR curves, and averaging.
         [classification lab](posts/classification-lab.txt)
+
+    - Glossary / Decoder Ring -- every plain term on this blog mapped to its textbook
+      buzzword, and back again. The whole "ban the jargon" idea, in one table.
+        [glossary](glossary.txt)
 
 
   What This Blog Isn't

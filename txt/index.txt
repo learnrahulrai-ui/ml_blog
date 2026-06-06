@@ -2,7 +2,7 @@
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+  [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   Plain notes on how machine-learning rules actually work. Each one is stripped of
@@ -17,6 +17,9 @@
   >> NEW HERE? Start at post 1 of 10:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
+
+  >> SPEAK FLUENT BUZZWORD? The [Glossary / Decoder Ring](glossary.txt) translates every
+     plain term on this blog into its textbook name -- and back again.
 
 
   PREDICTING HOUSE PRICES -- supervised regression from scratch

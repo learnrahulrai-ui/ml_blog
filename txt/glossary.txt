@@ -1,0 +1,153 @@
+@title Glossary :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  THE DECODER RING
+  Plain words on the left. The buzzwords they map to on the right.
+  ============================================================================================
+
+  On this blog the idea always comes first and the label comes last -- so every post ends
+  with its own little "The Labels, Last" box. This page gathers all of them into one
+  master decoder, laid out in reading order.
+
+  Two ways to use it. If you have read the posts and want the textbook term to drop into a
+  resume, a paper, or an interview, scan left to right. If you arrived already fluent in
+  jargon and want to know what on earth a "straight-stick rule" is, scan right to left.
+  Either way: the plain word and the buzzword name the SAME thing. One is just wearing a
+  suit.
+
+
+  A. THE SETUP -- data, and the one honest rule
+  ---------------------------------------------
+    sheet of written-down numbers         dataset / design matrix X
+    one measured column                   feature / predictor / independent variable
+    right-answer column                   target / label / dependent variable (y)
+    working pile                          training set
+    hidden / sealed / exam pile           test set / hold-out set
+    rotating folds                        k-fold cross-validation
+    memorising the working pile           overfitting
+    too stiff -- always a bit wrong       underfitting / high bias
+    too jumpy -- swings with the pile      high variance
+    mistake on rows never seen            generalisation error
+    letting the exam pile leak in         data leakage
+
+
+  B. THE TWO GUESSERS -- ask-closest and straight-stick
+  -----------------------------------------------------
+    ask-closest rule                      k-nearest neighbours (KNN)
+    store the pile, look it up            non-parametric / instance-based / lazy learner
+    gap between two rows                  Euclidean distance (L2); city-block = L1/Manhattan
+    straight-stick rule                   linear regression / ordinary least squares (OLS)
+    dials                                 weights / coefficients (beta)
+    fixed nudge                           intercept / bias term (beta0)
+    put columns on the same ruler         feature scaling / standardisation / normalisation
+    bowl-shaped mistake                   convex loss surface
+    flat-point equations                  normal equations (X^T X beta = X^T y)
+    flat-shadow thrower                   hat matrix / orthogonal projection
+    right-angle leftovers                 orthogonal residuals
+    cut the sheet, don't flip it          QR / SVD decomposition (vs matrix inverse)
+    shakiness number                      condition number (kappa)
+    best flat honest rule                 BLUE (Gauss-Markov theorem)
+    add a bump to the diagonal            ridge regression / L2-penalised least squares
+
+
+  C. GRADING A GUESS -- scoring a number
+  --------------------------------------
+    size of the miss                      error / residual
+    miss, squared and averaged            mean squared error (MSE)
+    ...with the root put back             root mean squared error (RMSE)
+    ...not squared, just averaged         mean absolute error (MAE)
+    the always-average fool               baseline / mean predictor
+    total wobble                          total sum of squares (TSS)
+    leftover -- the bad part              residual sum of squares (RSS)
+    what the stick ate -- the good part   explained sum of squares (ESS)
+    slice of wobble eaten                 R^2 / coefficient of determination
+    docked for each extra dial            adjusted R^2
+    too stiff vs too jumpy                bias-variance trade-off
+
+
+  D. READING THE DIALS -- what coefficients say
+  ---------------------------------------------
+    dial on a column                      coefficient / weight
+    the bare row of dials                 model.coef_
+    dials after same-ruler                standardised (beta) coefficients
+    columns moving as a pack              collinearity / multicollinearity
+    hold the others fixed                 ceteris paribus / partial effect
+
+
+  E. SORTING INTO BINS -- the yes/no machine
+  ------------------------------------------
+    sort into bins / bin-sorter           classification / classifier
+    S-curve yes/no guesser                logistic regression
+    squash curve                          sigmoid / logistic function
+    dial sum (z)                          log-odds / logit
+    cross-entropy leftover                binary cross-entropy / log-loss
+    cutoff / fence                        decision threshold
+    CAUGHT                                true positive (TP)
+    ALARM                                 false positive (FP)
+    MISSED                                false negative (FN)
+    CLEAR                                 true negative (TN)
+    four-box table                        confusion matrix
+
+
+  F. THE FOUR SCORES AND THE CURVES
+  ---------------------------------
+    catch-rate                            recall / sensitivity / true positive rate (TPR)
+    when we cry sick, real sick?          precision / positive predictive value
+    false-alarm rate                      false positive rate (FPR) / (1 - specificity)
+    balance of precision and recall       F1 score (harmonic mean of the two)
+    tilt toward recall or precision       F-beta score
+    chance-score                          posterior probability / predict_proba
+    trade curve                           ROC curve (receiver operating characteristic)
+    area under the trade curve            AUC (area under the ROC curve)
+    pick-higher reading                   Wilcoxon-Mann-Whitney statistic
+    precision-vs-recall curve             precision-recall (PR) curve
+    area under the PR curve               average precision (AP) / AUCPR
+
+
+  G. HUMBLING THE MACHINE -- leash and cloud
+  ------------------------------------------
+    leash on the dials                    L2 regularisation / ridge penalty
+    dial-size price                       penalty term, lambda * sum(beta_j^2)
+    leash tightness (the inverse)         C in sklearn (C = 1 / lambda)
+    two-cloud wall                        linear discriminant analysis (LDA)
+    cloud centre                          class mean (mu_k)
+    pooled within-class spread            within-class scatter matrix (S_W)
+    which way to aim the wall             Fisher's criterion
+    common-ness nudge                     log-prior term, log(pi1 / pi0)
+    models P(x | class)                   generative model
+    models P(class | x) directly          discriminative model
+
+
+  H. THE MESSY WORLD -- tuning, scaling, imbalance, many bins
+  -----------------------------------------------------------
+    setting I pick by hand                hyperparameter
+    dial the machine tunes itself         parameter
+    grid hunt                             grid search (GridSearchCV)
+    standard ruler                        standardisation / StandardScaler
+    pinch-to-fit ruler                    min-max scaling / MinMaxScaler
+    skewed pile                           class imbalance / imbalanced dataset
+    upweight the rare class               class_weight='balanced'
+    treat-all-classes-equal averaging     macro averaging
+    count-every-label averaging           micro averaging
+    size-weighted averaging               weighted averaging
+
+
+  ## A Note on the Plain Words
+
+  >> NOTE: THE PLAIN WORDS ARE NOT BABY-TALK
+     "Straight-stick rule" is not a dumbed-down stand-in for linear regression -- it is
+     linear regression, named for what it does instead of who invented it. The buzzword is
+     a handle: short, shared, and useful once you already hold the idea. Learn the idea by
+     its plain name first, pick up the handle here, and you will never again mistake the
+     label for the understanding.
+
+----------------------------------------------------------------------------------------------
+  <- [Back to all posts](index.txt) . [About this blog](about.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
