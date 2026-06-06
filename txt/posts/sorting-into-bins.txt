@@ -5,7 +5,7 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  SORTING INTO BINS . PART 1 OF 4
+  CHAPTER 3 . SORTING INTO BINS . PART 1 OF 4
   Sorting Into Bins: The S-Curve, the Four-Box Table, and Why Accuracy Lies
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: logistic-regression, classification, evaluation
   ============================================================================================
@@ -87,10 +87,8 @@
 
     each step:  beta <- beta - a * gradient   (a = step size)
 
-  In code, the same two-step as before -- make an empty machine, show it the study pile:
-
-    log_reg = LogisticRegression(random_state=42)
-    log_reg.fit(X_train_scaled, y_train)
+  In code it is the same two-step as before -- make an empty machine, show it the study
+  pile -- and that code waits at the end of the post.
 
   >> NOTE: WHY SCALED INPUTS?
      The gradient update moves every dial by the same step size times its column's values.
@@ -105,17 +103,8 @@
   A machine eats numbers, but the sheet holds letters: M (malignant) and B (benign). The
   translation is a shelf: M->1, B->0. The bin you are HUNTING gets the 1 -- here that is
   the sick lump, because recall, precision, and every score in this post count the sick
-  detections.
-
-    df['diagnosis'] = df['diagnosis'].map({'M': 1, 'B': 0})
-    X = df.drop(columns='diagnosis')   # 30 measured columns
-    y = df['diagnosis']                # 0 or 1
-
-  !! WARN: RUN THE MAP CELL ONLY ONCE
-     If you run the encoding cell a second time, the column already holds 0 and 1. The map
-     searches for 'M' and 'B' -- finds nothing -- returns all NaN. NaN is a float; every
-     downstream step breaks. Fix: restart the kernel and run top-to-bottom once. There is
-     no shortcut after the NaN has landed.
+  detections. (The one-line shelf that does this M->1, B->0 swap is in the code at the end,
+  along with a warning about running it twice.)
 
 
   ## The Four-Box Table
@@ -132,18 +121,9 @@
 
   CAUGHT is the ideal: a sick lump correctly flagged. MISSED is the catastrophe: cancer
   goes home untreated. ALARM is the waste: a healthy person gets a scare and an
-  unnecessary biopsy. CLEAR is the other good outcome.
-
-    conf_matrix = confusion_matrix(y_test, y_pred)   # truth first, guess second
-    sns.heatmap(conf_matrix, annot=True, fmt='d')
-
-    grid shape:  [[ CLEAR  ALARM  ]    <- truth well  (row 0)
-                  [ MISSED CAUGHT ]]   <- truth sick  (row 1)
-
-  !! WARN: TRUTH FIRST, GUESS SECOND
-     sklearn's confusion_matrix, accuracy_score, recall_score, and precision_score all
-     want (truth, guess) in that order. Swapping them flips rows and columns and
-     misassigns every count.
+  unnecessary biopsy. CLEAR is the other good outcome. Drawing this table from the guesses
+  -- and the easy-to-miss gotcha about which way round sklearn wants the arguments -- is in
+  the code at the end.
 
 
   ## Four Scores, Four Angles
@@ -163,13 +143,8 @@
     precision   TP / (TP + FP)          ALARM (wasteful)
     F1          2PR / (P + R)           either metric being low
 
-  In code:
-
-    y_pred = log_reg.predict(X_test_scaled)
-    accuracy  = accuracy_score(y_test, y_pred)
-    recall    = recall_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    f1        = f1_score(y_test, y_pred)
+  All four come straight from the four-box counts; the code that reads them off is at the
+  end of the post.
 
 
   ## Why Accuracy Alone Lies
@@ -209,6 +184,55 @@
     harmonic mean   = 2 * 0.10 * 0.98 / (0.10 + 0.98) = 0.18   <- honest
 
 
+  ## The Code, If You Want It
+
+  Four short steps, start to finish: turn the M/B letters into 1/0, fit the S-curve machine
+  on scaled inputs, build the four-box table, then read the four scores off it.
+
+  >> NEW TO PYTHON? Each named once:
+       df['col']          -- pull one named column out of a table (a pandas DataFrame)
+       .map({...})        -- swap each value using a {from: to} shelf (a dict)
+       df.drop(columns=)  -- a copy of the table with some columns removed
+
+  First, encode the answer column. The bin you are HUNTING gets the 1:
+
+    df['diagnosis'] = df['diagnosis'].map({'M': 1, 'B': 0})
+    X = df.drop(columns='diagnosis')   # 30 measured columns
+    y = df['diagnosis']                # 0 or 1
+
+  !! WARN: RUN THE MAP CELL ONLY ONCE
+     If you run the encoding cell a second time, the column already holds 0 and 1. The map
+     searches for 'M' and 'B' -- finds nothing -- returns all NaN. NaN is a float; every
+     downstream step breaks. Fix: restart the kernel and run top-to-bottom once. There is
+     no shortcut after the NaN has landed.
+
+  Fit the machine on scaled inputs:
+
+    log_reg = LogisticRegression(random_state=42)
+    log_reg.fit(X_train_scaled, y_train)
+
+  Build the four-box table from truth and guess:
+
+    conf_matrix = confusion_matrix(y_test, y_pred)   # truth first, guess second
+    sns.heatmap(conf_matrix, annot=True, fmt='d')
+
+    grid shape:  [[ CLEAR  ALARM  ]    <- truth well  (row 0)
+                  [ MISSED CAUGHT ]]   <- truth sick  (row 1)
+
+  !! WARN: TRUTH FIRST, GUESS SECOND
+     sklearn's confusion_matrix, accuracy_score, recall_score, and precision_score all
+     want (truth, guess) in that order. Swapping them flips rows and columns and
+     misassigns every count.
+
+  Read the four scores off it:
+
+    y_pred = log_reg.predict(X_test_scaled)
+    accuracy  = accuracy_score(y_test, y_pred)
+    recall    = recall_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    f1        = f1_score(y_test, y_pred)
+
+
   ## The Labels, Last
 
     Plain term used above                 Standard label
@@ -227,7 +251,7 @@
     put on one shared ruler               standardisation / StandardScaler
 
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 3 -- Sorting Into Bins):
     Part 1 (this post) .
     [Part 2 -- The Trade Curve](the-trade-curve.txt) .
     [Part 3 -- Leash and Cloud](leash-and-cloud.txt) .

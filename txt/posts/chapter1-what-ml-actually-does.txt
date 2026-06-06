@@ -5,7 +5,7 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  PREDICTING HOUSE PRICES . PART 1 OF 3
+  CHAPTER 1 . PREDICTING HOUSE PRICES . PART 1 OF 3
   Guessing House Prices, End to End (No Labels Until the End)
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: fundamentals, supervised-learning, knn
   ============================================================================================
@@ -23,6 +23,15 @@
   Greek letters, except we build it first and learn its proper names last. Parts 2 and 3
   then take the two rules apart screw by screw. For now, stand back and see the whole
   thing at once.
+
+  >> HOW THIS BOOK IS LAID OUT (read once, then forget)
+     This blog is really a short book in three chapters, meant to be read top to bottom.
+     Every post draws the idea by hand first -- plain words, a pencil sketch, simple
+     arithmetic. Any runnable Python is gathered into a "The Code, If You Want It"
+     section at the very END of each post, so you can follow the whole story without ever
+     stepping over code. That code assumes almost no Python: the handful of things you
+     need are explained in one short line the first time they appear. Skip the code or
+     study it -- the idea stands on its own either way.
 
 
   ## The Job: Guess From a Sheet of Numbers
@@ -187,7 +196,7 @@
     mistake on rows never seen            generalisation error
 
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 1 -- Predicting House Prices):
     Part 1 (this post) .
     [Part 2 -- Ask-Closest Rule](neighbor-machine-knn.txt) .
     [Part 3 -- Straight-Stick Rule](straight-stick-linear-regression.txt)

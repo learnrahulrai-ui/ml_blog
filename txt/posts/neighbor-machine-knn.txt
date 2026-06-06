@@ -5,7 +5,7 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  PREDICTING HOUSE PRICES . PART 2 OF 3
+  CHAPTER 1 . PREDICTING HOUSE PRICES . PART 2 OF 3
   Ask the Closest Rows: Gap Formula, Same-Ruler Rule, and How Slow It Gets
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: knn, distance, non-parametric, complexity
   ============================================================================================
@@ -127,24 +127,6 @@
     guess = (3.4 + 2.7 + 2.4) / 3 = 2.83
 
 
-  ## In the Toolbox
-
-  Binding the ruler-learner to the ask-closest rule means the ruler is relearned on each
-  round's building portion -- never on the grading chunk:
-
-    from sklearn.pipeline import make_pipeline
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.neighbors import KNeighborsRegressor
-    from sklearn.metrics import mean_squared_error
-
-    knn = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=5))
-    knn.fit(X_train, y_train)          # stores pile; learns mu, sd on working rows
-    pred = knn.predict(X_test)         # same ruler -> measure gaps -> average
-
-    rmse = mean_squared_error(y_test, pred) ** 0.5
-    print(round(rmse, 3))
-
-
   ## k Is the Stiff-vs-Jumpy Dial
 
     k = 1       asks 1 row     -> copies its noise exactly
@@ -160,29 +142,11 @@
 
   ## Picking k Without Touching the Hidden Pile
 
-  Try each candidate k by rotating folds on the working pile. Passing the whole bound rule
-  to the rotating-fold checker means the ruler is relearned per round -- no peeking:
-
-    from sklearn.model_selection import KFold, cross_val_score
-
-    def fold_mistake(k, X_train, y_train):
-        rule = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=k))
-        kf = KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
-        scores = cross_val_score(rule, X_train, y_train, cv=kf,
-                                 scoring='neg_root_mean_squared_error')
-        return round(-scores.mean(), 3)
-
-    candidates = [1, 3, 5, 7, 9, 15, 25]
-    cv = {k: fold_mistake(k, X_train, y_train) for k in candidates}
-    best_k = min(cv, key=cv.get)    # key with the smallest VALUE
-
-  !! WARN: THREE THINGS THAT TRIP PEOPLE UP
-     (1) k (how many neighbours) and the fold count (how many grading rounds) are
-         unrelated -- k=25 with 5 folds is fine.
-     (2) The toolbox maximises its score, so it negates the mistake; un-negate with
-         -scores.mean().
-     (3) min(cv, key=cv.get) returns the key with the smallest value; plain min(cv)
-         returns the smallest key -- wrong answer.
+  How do you find the right k without ever opening the hidden pile? The same rotating-folds
+  trick from Part 1: try each candidate k, score it by rotating folds on the working pile,
+  and keep the winner. Because k sets how jumpy the rule is, the fold scores fall to a
+  sweet spot and then climb again -- and that dip is your k. The hunt itself, in code, is
+  waiting at the end of the post.
 
 
   ## Origin
@@ -201,8 +165,62 @@
     4. k sets the stiff-vs-jumpy balance; pick it by rotating folds.
     5. When columns pile up, close stops meaning close.
 
+
+  ## The Code, If You Want It
+
+  Everything above was pencil and pictures. Here is the same machine in Python, using the
+  scikit-learn toolbox -- two snippets: the rule itself, and the hunt for the best k.
+
+  >> NEW TO PYTHON? Each piece below, named once:
+       from X import Y    -- fetch a ready-made tool named Y out of toolbox X
+       name = value       -- store a value under a name
+       thing.do(stuff)    -- tell an object to do something (a "method")
+       def name(args):    -- define your own reusable step (a "function")
+       [a, b, c]          -- a list: an ordered row of things
+       {k: v for ...}     -- a dict in one line: a labelled shelf, name -> value
+
+  Bind the ruler-learner to the ask-closest rule, so the ruler is relearned on each
+  round's building portion and never on the grading chunk:
+
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.neighbors import KNeighborsRegressor
+    from sklearn.metrics import mean_squared_error
+
+    knn = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=5))
+    knn.fit(X_train, y_train)          # stores pile; learns mu, sd on working rows
+    pred = knn.predict(X_test)         # same ruler -> measure gaps -> average
+
+    rmse = mean_squared_error(y_test, pred) ** 0.5   # ** 0.5 means square root
+    print(round(rmse, 3))
+
+  And the hunt for the best k -- try each candidate, score it by rotating folds, keep the
+  winner. Passing the whole bound rule to the checker relearns the ruler each round, so
+  nothing leaks:
+
+    from sklearn.model_selection import KFold, cross_val_score
+
+    def fold_mistake(k, X_train, y_train):
+        rule = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=k))
+        kf = KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
+        scores = cross_val_score(rule, X_train, y_train, cv=kf,
+                                 scoring='neg_root_mean_squared_error')
+        return round(-scores.mean(), 3)
+
+    candidates = [1, 3, 5, 7, 9, 15, 25]
+    cv = {k: fold_mistake(k, X_train, y_train) for k in candidates}   # k -> its mistake
+    best_k = min(cv, key=cv.get)    # the k whose mistake is smallest
+
+  !! WARN: THREE THINGS THAT TRIP PEOPLE UP
+     (1) k (how many neighbours) and the fold count (how many grading rounds) are
+         unrelated -- k=25 with 5 folds is fine.
+     (2) The toolbox maximises its score, so it negates the mistake; un-negate with
+         -scores.mean().
+     (3) min(cv, key=cv.get) returns the key with the smallest value; plain min(cv)
+         returns the smallest key -- wrong answer.
+
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 1 -- Predicting House Prices):
     [Part 1 -- The Full Picture](chapter1-what-ml-actually-does.txt) .
     Part 2 (this post) .
     [Part 3 -- Straight-Stick Rule](straight-stick-linear-regression.txt)

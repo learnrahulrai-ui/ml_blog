@@ -13,7 +13,7 @@
   <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
 ----------------------------------------------------------------------------------------------
 
-  SORTING INTO BINS . PART 2 OF 4
+  CHAPTER 3 . SORTING INTO BINS . PART 2 OF 4
   The Trade Curve: Sliding the Cutoff and What AUC Actually Measures
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: roc-curve, auc, cutoff, evaluation
   ============================================================================================
@@ -152,32 +152,15 @@
                                        ...]
 
   predict_proba returns two columns per row: column 0 is the well-chance P(B), column 1 is
-  the sick-chance P(M). For the ROC curve you want the sick-chance, so grab column 1:
-
-    y_proba = log_reg.predict_proba(X_test_scaled)[:, 1]   # sick-chance per row
-    fpr, tpr, thresholds = roc_curve(y_test, y_proba)
-    roc_auc = auc(fpr, tpr)
-
-  !! WARN: COLUMN 0 FLIPS THE CURVE BELOW THE DIAGONAL
-     If you pass column 0 (well-chances), sick lumps score LOW and well lumps score HIGH --
-     the ranking is backwards. The ROC curve dips below the diagonal and AUC &lt; 0.5. The
-     machine looks worse than a coin flip. Always use column 1.
+  the sick-chance P(M). For the ROC curve you want the sick-chance -- column 1 -- and the
+  code that sweeps it into a curve is at the end of the post.
 
 
   ## Plotting It
 
-    plt.figure(figsize=(7, 5))
-    plt.plot(fpr, tpr, label=f'AUC = {roc_auc:.3f}')
-    plt.plot([0, 1], [0, 1], linestyle='--', color='grey', label='Random guess')
-    plt.xlabel('FPR  (false-alarm rate)')
-    plt.ylabel('TPR  (catch-rate)')
-    plt.title('Trade Curve')
-    plt.legend()
-    plt.show()
-
-  The grey diagonal is the reference: a machine that assigns random scores sits on it. Any
-  curve above the diagonal is better than random. The further it bulges toward the
-  top-left corner, the cleaner the separation.
+  When you plot it (code at the end), the grey 45-degree diagonal is the reference: a
+  machine that assigns random scores sits right on it. Any curve above the diagonal beats
+  random, and the further it bulges toward the top-left corner, the cleaner the separation.
 
 
   ## Practical Reading
@@ -195,6 +178,38 @@
      doctor picks one.
 
 
+  ## The Code, If You Want It
+
+  The ROC sweep needs a continuous score, not a 0/1 label -- so grab predict_proba's
+  column 1 (the sick-chance) and feed it to roc_curve. Then plot the curve against the
+  diagonal.
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       array[:, 1]        -- take column 1 from every row (slicing a 2-D array)
+       a, b, c = func()   -- unpack several returned values into separate names
+       f'AUC = {x:.3f}'   -- an f-string: drop a value into text, here to 3 decimals
+
+    y_proba = log_reg.predict_proba(X_test_scaled)[:, 1]   # sick-chance per row
+    fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+    roc_auc = auc(fpr, tpr)
+
+  !! WARN: COLUMN 0 FLIPS THE CURVE BELOW THE DIAGONAL
+     If you pass column 0 (well-chances), sick lumps score LOW and well lumps score HIGH --
+     the ranking is backwards. The ROC curve dips below the diagonal and AUC &lt; 0.5. The
+     machine looks worse than a coin flip. Always use column 1.
+
+  And the plot -- the curve, plus the grey diagonal for reference:
+
+    plt.figure(figsize=(7, 5))
+    plt.plot(fpr, tpr, label=f'AUC = {roc_auc:.3f}')
+    plt.plot([0, 1], [0, 1], linestyle='--', color='grey', label='Random guess')
+    plt.xlabel('FPR  (false-alarm rate)')
+    plt.ylabel('TPR  (catch-rate)')
+    plt.title('Trade Curve')
+    plt.legend()
+    plt.show()
+
+
   ## The Labels, Last
 
     Plain term used above                    Standard label
@@ -208,7 +223,7 @@
     trapezoidal rule                         numerical integration used by auc()
 
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 3 -- Sorting Into Bins):
     <a href="sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table</a> .
     Part 2 (this post) .
     <a href="leash-and-cloud.html">Part 3 -- Leash and Cloud</a> .

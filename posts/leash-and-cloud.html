@@ -13,7 +13,7 @@
   <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
 ----------------------------------------------------------------------------------------------
 
-  SORTING INTO BINS . PART 3 OF 4
+  CHAPTER 3 . SORTING INTO BINS . PART 3 OF 4
   Leash and Cloud: L2 Punishment and the Two-Cloud Wall
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: l2-regularization, lda, generative-models
   ============================================================================================
@@ -102,19 +102,12 @@
      the penalty barely bites. "C small = heavy leash" is counter-intuitive until you
      remember C = 1/lambda.
 
-    log_reg_l2 = LogisticRegression(penalty='l2', C=0.1, random_state=42)
-    log_reg_l2.fit(X_train_scaled, y_train)
-    y_pred_l2 = log_reg_l2.predict(X_test_scaled)
-
 
   ## Did the Dials Shrink?
 
   Compare the average absolute dial size for the default leash (C=1.0) against the tighter
-  leash (C=0.1):
-
-    avg_coef_baseline = np.mean(np.abs(log_reg_baseline.coef_))  # C=1.0 (default)
-    avg_coef_l2       = np.mean(np.abs(log_reg_l2.coef_))         # C=0.1 (tighter)
-    # expect: avg_coef_l2 &lt; avg_coef_baseline (the tighter leash shrinks them further)
+  leash (C=0.1): if the tighter leash is doing its job, its average dial comes out smaller.
+  (The two-line check is in the code at the end of the post.)
 
   &gt;&gt; NOTE: WHY ABSOLUTE VALUE BEFORE AVERAGING
      Dials can be positive or negative. A positive dial +3 and a negative dial -3 cancel to
@@ -197,15 +190,6 @@
      predictions, you will be off. To get the clean halfway wall, force equal priors:
      LinearDiscriminantAnalysis(priors=[0.5, 0.5]).
 
-    # sklearn default: empirical priors -&gt; wall shifted off the midpoint
-    lda = LinearDiscriminantAnalysis()
-    lda.fit(X_train_scaled, y_train)
-    y_pred_lda = lda.predict(X_test_scaled)
-
-    # to reproduce the exact "halfway between the centres" wall:
-    lda_equal = LinearDiscriminantAnalysis(priors=[0.5, 0.5])
-    lda_equal.fit(X_train_scaled, y_train)
-
 
   ## Generative vs Discriminative
 
@@ -263,6 +247,40 @@
        diagnostic.
 
 
+  ## The Code, If You Want It
+
+  Three small things: fit the tighter-leashed machine, check its dials really did shrink,
+  and fit the two-cloud wall (LDA) both ways -- empirical priors and forced-equal priors.
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       np.abs(x)     -- the size of each number, sign thrown away (NumPy)
+       np.mean(x)    -- the average of a row of numbers
+
+  Tighter leash (C=0.1 is a HEAVY squeeze -- remember C = 1/lambda):
+
+    log_reg_l2 = LogisticRegression(penalty='l2', C=0.1, random_state=42)
+    log_reg_l2.fit(X_train_scaled, y_train)
+    y_pred_l2 = log_reg_l2.predict(X_test_scaled)
+
+  Did the dials shrink? Compare the average absolute dial size, default vs tighter:
+
+    avg_coef_baseline = np.mean(np.abs(log_reg_baseline.coef_))  # C=1.0 (default)
+    avg_coef_l2       = np.mean(np.abs(log_reg_l2.coef_))         # C=0.1 (tighter)
+    # expect: avg_coef_l2 &lt; avg_coef_baseline (the tighter leash shrinks them further)
+
+  The two-cloud wall, both ways -- sklearn's default uses empirical priors, so force equal
+  priors if you want the exact halfway wall:
+
+    # sklearn default: empirical priors -&gt; wall shifted off the midpoint
+    lda = LinearDiscriminantAnalysis()
+    lda.fit(X_train_scaled, y_train)
+    y_pred_lda = lda.predict(X_test_scaled)
+
+    # to reproduce the exact "halfway between the centres" wall:
+    lda_equal = LinearDiscriminantAnalysis(priors=[0.5, 0.5])
+    lda_equal.fit(X_train_scaled, y_train)
+
+
   ## The Labels, Last
 
     Plain term used above                 Standard label
@@ -278,7 +296,7 @@
     models P(class|x) directly            discriminative model
 
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 3 -- Sorting Into Bins):
     <a href="sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table</a> .
     <a href="the-trade-curve.html">Part 2 -- The Trade Curve</a> .
     Part 3 (this post) .

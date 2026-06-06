@@ -5,7 +5,7 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  GRADING A GUESSER . PART 1 OF 2
+  CHAPTER 2 . GRADING A GUESSER . PART 1 OF 2
   Two Rulers for One Guess: MSE and R^2
   Posted: 2026-06-04 . Author: Rahul Rai . Tags: evaluation, mse, r-squared, regression
   ============================================================================================
@@ -150,15 +150,8 @@
 
   The two rulers do not need two sets of guesses. You guess once, then hold both rulers
   against the same misses. MSE says how big the misses are; R^2 says how much better than
-  a fool you did.
-
-    from sklearn.metrics import mean_squared_error, r2_score
-
-    def evaluate_guesser(model, X_test, y_test):
-        guesses = model.predict(X_test)              # guess ONCE
-        mse = round(mean_squared_error(y_test, guesses), 3)   # ruler 1: a size
-        r2  = round(r2_score(y_test, guesses), 3)             # ruler 2: a slice
-        return (mse, r2)                             # truth first, guesses second
+  a fool you did. The few lines that do this -- one little helper that guesses a single
+  time and holds up both rulers -- are waiting at the end of the post.
 
   And the old discipline holds: open the sealed pile ONCE, to grade -- never to choose.
   Grading on rows the stick never saw is the whole job of the hidden pile.
@@ -204,6 +197,23 @@
     5. Guess once, grade twice: the same guesses feed both rulers.
 
 
+  ## The Code, If You Want It
+
+  Guess once, then hold both rulers against the same misses. A small helper keeps it
+  honest: it predicts a single time and hands back both scores together.
+
+  >> NEW TO PYTHON? One new piece here:
+       return (a, b)    -- hand back two values at once, bundled as a pair (a "tuple")
+
+    from sklearn.metrics import mean_squared_error, r2_score
+
+    def evaluate_guesser(model, X_test, y_test):
+        guesses = model.predict(X_test)              # guess ONCE
+        mse = round(mean_squared_error(y_test, guesses), 3)   # ruler 1: a size
+        r2  = round(r2_score(y_test, guesses), 3)             # ruler 2: a slice
+        return (mse, r2)                             # truth first, guesses second
+
+
   ## The Labels, Last
 
     Plain term used above                     Standard label
@@ -219,11 +229,11 @@
     docked for each extra dial                adjusted R^2
 
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 2 -- Grading a Guesser):
     Part 1 (this post) .
     [Part 2 -- Reading the Dials](reading-the-dials.txt)
 
-  Follows from: [Predicting House Prices](chapter1-what-ml-actually-does.txt) series.
+  Previous chapter: [Chapter 1 -- Predicting House Prices](chapter1-what-ml-actually-does.txt)
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

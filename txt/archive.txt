@@ -5,30 +5,34 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- 10 posts, 3 series. Newest series first; within each series, reading order.
+  ALL POSTS -- a book in 10 posts: 3 chapters + an appendix, in reading order.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
-  SORTING INTO BINS (2026)
-  ------------------------
-  2026-06-05  [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
-  2026-06-05  [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
-  2026-06-05  [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
-  2026-06-05  [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
-  2026-06-06  [Classification Lab -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
+  CHAPTER 1 -- PREDICTING HOUSE PRICES (2026)
+  -------------------------------------------
+  post 1/10   [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
+  post 2/10   [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
+  post 3/10   [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
 
 
-  GRADING A GUESSER (2026)
-  ------------------------
-  2026-06-04  [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
-  2026-06-04  [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
+  CHAPTER 2 -- GRADING A GUESSER (2026)
+  -------------------------------------
+  post 4/10   [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
+  post 5/10   [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
 
 
-  PREDICTING HOUSE PRICES (2026)
-  ------------------------------
-  2026-06-01  [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
-  2026-06-01  [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
-  2026-06-01  [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
+  CHAPTER 3 -- SORTING INTO BINS (2026)
+  -------------------------------------
+  post 6/10   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
+  post 7/10   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
+  post 8/10   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
+  post 9/10   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
+
+
+  APPENDIX -- CLASSIFICATION REFERENCE (2026)
+  -------------------------------------------
+  post 10/10  [Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

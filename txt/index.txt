@@ -9,10 +9,11 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is ONE course in ten posts, meant to be read
-  top to bottom. Each post opens with a "post N of 10" path header and a next-arrow, so
-  you can read the whole thing front to back without ever hunting for what comes next.
-  Three series build on each other, then a reference companion ties it together.
+  This is not a pile of loose articles -- it is a short BOOK in three chapters (ten posts),
+  meant to be read top to bottom. Each post opens with a "post N of 10" path header and a
+  next-arrow, so you can read the whole thing front to back without ever hunting for what
+  comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
+  at the end of every post, and assumes almost no Python. An appendix ties it together.
 
   >> NEW HERE? Start at post 1 of 10:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
@@ -22,8 +23,8 @@
      plain term on this blog into its textbook name -- and back again.
 
 
-  PREDICTING HOUSE PRICES -- supervised regression from scratch
-  -------------------------------------------------------------
+  CHAPTER 1 . PREDICTING HOUSE PRICES -- supervised regression from scratch
+  -------------------------------------------------------------------------
 
   [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
     post 1/10 . 2026-06-01 . part 1 of 3 . fundamentals, supervised-learning
@@ -44,8 +45,8 @@
     Gauss-Markov conditions, and why you cut the sheet (QR/SVD) rather than flip it.
 
 
-  GRADING A GUESSER -- how good is the guess?
-  -------------------------------------------
+  CHAPTER 2 . GRADING A GUESSER -- how good is the guess?
+  ------------------------------------------------------
 
   [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
     post 4/10 . 2026-06-04 . part 1 of 2 . evaluation, mse, r-squared
@@ -62,8 +63,8 @@
     shared ruler.
 
 
-  SORTING INTO BINS -- yes-or-no guessing, scored every way
-  ----------------------------------------------------------
+  CHAPTER 3 . SORTING INTO BINS -- yes-or-no guessing, scored every way
+  --------------------------------------------------------------------
 
   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
     post 6/10 . 2026-06-05 . part 1 of 4 . logistic-regression, classification, evaluation
@@ -92,14 +93,17 @@
     outliers; the precision-vs-recall trade in fraud detection; precision-recall curves
     for when one class is 100x rarer; and macro vs micro averaging for 3+ bins.
 
-  [Classification Lab -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
-    post 10/10 . 2026-06-06 . lab companion . log-loss, lda, grid-search, precision-recall
-    All classification concepts from the series in one reference: cross-entropy vs MSE,
-    the C parameter, LDA with priors, hyperparameters vs dials, GridSearchCV fold
+  APPENDIX . CLASSIFICATION REFERENCE -- every term in one place
+  -------------------------------------------------------------
+
+  [Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
+    post 10/10 . 2026-06-06 . appendix . log-loss, lda, grid-search, precision-recall
+    All classification concepts from Chapter 3 in one flip-to reference: cross-entropy vs
+    MSE, the C parameter, LDA with priors, hyperparameters vs dials, GridSearchCV fold
     safety, min-max scaling, precision vs recall in business, ROC vs PR curves, skewed
     piles, and macro/micro/weighted averaging -- plain language first, standard labels
-    last. Read the four-part series first; use this as a reference when you need to
-    look something up quickly.
+    last. Read Chapter 3 first; use this as a reference when you need to look something
+    up quickly.
 
 
 ----------------------------------------------------------------------------------------------

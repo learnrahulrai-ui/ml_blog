@@ -13,7 +13,7 @@
   <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
 ----------------------------------------------------------------------------------------------
 
-  GRADING A GUESSER . PART 2 OF 2
+  CHAPTER 2 . GRADING A GUESSER . PART 2 OF 2
   Reading the Dials: What the Coefficients Say
   Posted: 2026-06-04 . Author: Rahul Rai . Tags: coefficients, interpretation, scaling
   ============================================================================================
@@ -73,16 +73,8 @@
      negative" is the MINIMUM, not the maximum. Here the strongest drag is horse at -0.04.
 
   So zip the names on, then grab the name sitting on the smallest dial -- the same
-  winner-hunt used to pick the best neighbour-count earlier in the blog:
-
-    dials = dict(zip(X.columns, model.coef_))
-    strongest_drag = min(dials, key=dials.get)   # KEY of the smallest VALUE -&gt; a name
-
-  &gt;&gt; NOTE: IT HANDS BACK A NAME, NOT A NUMBER
-     min(dials, key=dials.get) walks the shelf, scores each name by its dial, and returns
-     the NAME with the lowest score -- not the dial itself. Plain min(dials) would instead
-     compare the names alphabetically and hand back "accel" -- the wrong question answered
-     confidently.
+  winner-hunt used to pick the best neighbour-count earlier in the blog. The two lines that
+  do it are at the end of the post.
 
 
   ## The Trap Underneath: Dials Wear Their Column's Units
@@ -107,16 +99,7 @@
   The fix is the same-ruler trick from the neighbours post: shift each column to zero
   average and stretch it to spread of one BEFORE setting the dials. Now every dial means
   "mpg per one-spread step of its column" -- one shared currency -- and the most-negative
-  one is the honest strongest drag:
-
-    from sklearn.pipeline import make_pipeline
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.linear_model import LinearRegression
-
-    m = make_pipeline(StandardScaler(), LinearRegression())
-    m.fit(X_train, y_train)
-    dials = dict(zip(X.columns, m[-1].coef_))     # now in one shared ruler
-    strongest_drag = min(dials, key=dials.get)    # an honest comparison
+  one is the honest strongest drag. (The code that does this is at the end of the post.)
 
   &gt;&gt; NOTE: THIS DOESN'T CONTRADICT "OLS NEEDS NO SCALING"
      The straight-stick rule's GUESSES and its MSE and R^2 do not care about scaling --
@@ -159,6 +142,39 @@
     5. When columns move together, a single dial is shaky; treat it as evidence, not proof.
 
 
+  ## The Code, If You Want It
+
+  Two short snippets. The first zips the column names onto the bare dials and grabs the
+  most-negative one. The second does the same AFTER putting every column on a shared ruler,
+  so the comparison is honest rather than an accident of units.
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       dict(zip(a, b))    -- pair two rows into a labelled shelf: name -&gt; value
+       min(d, key=d.get)  -- the name (key) whose value is smallest, not the smallest
+                             name; plain min(d) would sort the names alphabetically
+       m[-1]              -- the last step of a pipeline (here, the fitted stick)
+
+    # bare dials, each in its own column's units -- NOT comparable across columns
+    dials = dict(zip(X.columns, model.coef_))
+    strongest_drag = min(dials, key=dials.get)   # KEY of the smallest VALUE -&gt; a name
+
+    # same-ruler first, THEN read the dials -- now an honest comparison
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LinearRegression
+
+    m = make_pipeline(StandardScaler(), LinearRegression())
+    m.fit(X_train, y_train)
+    dials = dict(zip(X.columns, m[-1].coef_))     # now in one shared ruler
+    strongest_drag = min(dials, key=dials.get)    # an honest comparison
+
+  &gt;&gt; NOTE: IT HANDS BACK A NAME, NOT A NUMBER
+     min(dials, key=dials.get) walks the shelf, scores each name by its dial, and returns
+     the NAME with the lowest score -- not the dial itself. Plain min(dials) would instead
+     compare the names alphabetically and hand back "accel" -- the wrong question answered
+     confidently.
+
+
   ## The Labels, Last
 
     Plain term used above                 Standard label
@@ -172,11 +188,11 @@
     hold the others fixed                 ceteris paribus / partial effect
 
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 2 -- Grading a Guesser):
     <a href="grading-the-guess-mse-r2.html">Part 1 -- Two Rulers for One Guess</a> .
     Part 2 (this post)
 
-  Next: <a href="sorting-into-bins.html">Sorting Into Bins -- the S-curve, the four-box table, and why accuracy lies.</a>
+  Next chapter: <a href="sorting-into-bins.html">Chapter 3 -- Sorting Into Bins</a>
   &lt;- <a href="../index.html">Back to all posts</a>
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

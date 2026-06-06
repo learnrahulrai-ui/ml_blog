@@ -13,7 +13,7 @@
   <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
 ----------------------------------------------------------------------------------------------
 
-  PREDICTING HOUSE PRICES . PART 3 OF 3
+  CHAPTER 1 . PREDICTING HOUSE PRICES . PART 3 OF 3
   The Straight-Stick Rule: Setting the Dials, Checking the Leftovers, Getting Numbers Right
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: linear-regression, ols, least-squares
   ============================================================================================
@@ -150,19 +150,6 @@
      scale.
 
 
-  ## In the Toolbox
-
-    from sklearn.linear_model import LinearRegression
-    from sklearn.metrics import mean_squared_error
-
-    m = LinearRegression()          # SVD-based flat-point solve under the hood
-    m.fit(X_train, y_train)         # sets dials: X^T X beta = X^T y
-    pred = m.predict(X_test)        # one dot-product per row
-
-    rmse = mean_squared_error(y_test, pred) ** 0.5
-    print(round(rmse, 3), m.coef_, m.intercept_)
-
-
   ## Ask-Closest vs. Straight-Stick
 
                           Ask-Closest Rule (KNN)      Straight-Stick Rule (OLS)
@@ -197,13 +184,34 @@
        for tests.
     5. Cut the sheet (QR/SVD), don't flip it; add a bump when X^T X is flat.
 
+
+  ## The Code, If You Want It
+
+  The whole pencil derivation above is what the toolbox does for you in four lines. Notice
+  there is no setting to tune and no rotating-fold hunt here -- the dials come straight from
+  the exact formula, so LinearRegression simply solves and stops.
+
+  &gt;&gt; NEW TO PYTHON? One new piece here:
+       thing.coef_      -- a value the object stores after being fitted; sklearn marks
+                           every learned-from-data value with a trailing underscore
+
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import mean_squared_error
+
+    m = LinearRegression()          # SVD-based flat-point solve under the hood
+    m.fit(X_train, y_train)         # sets dials: X^T X beta = X^T y
+    pred = m.predict(X_test)        # one dot-product per row
+
+    rmse = mean_squared_error(y_test, pred) ** 0.5
+    print(round(rmse, 3), m.coef_, m.intercept_)
+
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 1 -- Predicting House Prices):
     <a href="chapter1-what-ml-actually-does.html">Part 1 -- The Full Picture</a> .
     <a href="neighbor-machine-knn.html">Part 2 -- Ask-Closest Rule</a> .
     Part 3 (this post)
 
-  Next series: <a href="grading-the-guess-mse-r2.html">Grading a Guesser -- MSE, R^2, and reading the dials</a>
+  Next chapter: <a href="grading-the-guess-mse-r2.html">Chapter 2 -- Grading a Guesser (MSE, R^2, reading the dials)</a>
   &lt;- <a href="../index.html">Back to all posts</a>
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

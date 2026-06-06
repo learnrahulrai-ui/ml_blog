@@ -5,7 +5,7 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  SORTING INTO BINS . PART 4 OF 4
+  CHAPTER 3 . SORTING INTO BINS . PART 4 OF 4
   Picking Settings, Skewed Piles, and Averaging Many Classes
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: grid-search, precision-recall, class-imbalance
   ============================================================================================
@@ -72,20 +72,8 @@
        recall if missing sick people is catastrophic; F1 if both false alarms and misses
        matter.
 
-    from sklearn.model_selection import GridSearchCV
-    from sklearn.pipeline import Pipeline
-    from sklearn.preprocessing import StandardScaler
-
-    # scaler lives INSIDE the pipeline so it is rebuilt on each fold's
-    # training strip only -- never on the strip being scored
-    pipe = Pipeline([
-        ('scaler', StandardScaler()),
-        ('clf',    LogisticRegression()),
-    ])
-    param_grid = {'clf__C': [0.01, 0.1, 1, 10], 'clf__penalty': ['l2']}
-    gs = GridSearchCV(pipe, param_grid, cv=5, scoring='recall')
-    gs.fit(X_train, y_train)          # pass RAW X_train, not pre-scaled
-    best_C = gs.best_params_['clf__C']
+  In code the whole hunt is a Pipeline -- scaler plus classifier -- handed to GridSearchCV;
+  that code is at the end of the post, and it carries one subtle trap worth stating now:
 
   !! WARN: BUILD THE RULER INSIDE EACH FOLD, NOT BEFORE THE HUNT
      A subtle leak: if you scale all of X_train ONCE up front and then pass that pre-scaled
@@ -211,11 +199,8 @@
      use the true-negative count at all. The ROC curve's FPR is diluted by the massive well
      pile; the precision-recall curve ignores that pile entirely.
 
-    from sklearn.metrics import precision_recall_curve, average_precision_score
-
-    y_proba = model.predict_proba(X_test_scaled)[:, 1]
-    precision, recall, thresholds = precision_recall_curve(y_test, y_proba)
-    ap = average_precision_score(y_test, y_proba)   # area under the curve
+  Computing that curve, and its area (the average precision), is three lines -- waiting in
+  the code at the end of the post.
 
 
   ## Scoring With Three or More Bins
@@ -274,18 +259,8 @@
      weight and forces the failure to show. That is the right signal when you care about
      catching every cancer type regardless of how rare it is.
 
-    from sklearn.metrics import classification_report, precision_recall_fscore_support
-
-    print(classification_report(y_test, y_pred,
-          target_names=['type A', 'type B', 'type C']))
-    # per-class precision/recall/F1, then: accuracy, macro avg, weighted avg
-
-    # note: for ordinary single-label multiclass, micro precision = micro recall
-    # = micro F1 = accuracy, so classification_report does NOT print a "micro avg"
-    # row -- it prints "accuracy" instead. To see the micro number by name, ask for it:
-    micro = precision_recall_fscore_support(y_test, y_pred, average='micro')
-    macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
-    # micro[:3] == (accuracy, accuracy, accuracy);  macro[:3] == the equal-weight blend
+  One call -- classification_report -- prints every per-class score plus the macro and
+  weighted averages (code at the end). It hides one surprise worth flagging right here:
 
   >> NOTE: WHY classification_report SHOWS "accuracy", NOT "micro avg"
      On ordinary single-label data (each row has exactly one true class), every false
@@ -313,6 +288,58 @@
     | 3+ classes, all equally imp. | macro averaging                          |
     | 3+ classes, size = importance| micro (or weighted) averaging            |
     +------------------------------+------------------------------------------+
+
+
+  ## The Code, If You Want It
+
+  Three pieces, in the order the post met them: the grid hunt (done safely, scaler inside
+  the pipeline), the precision-recall curve for skewed piles, and the many-bin scores.
+
+  >> NEW TO PYTHON? Each named once:
+       Pipeline([...])     -- chain steps so they are refit together, leak-free
+       {'clf__C': [...]}   -- a dict of settings to try; 'clf__C' names a step's knob
+       d['key']            -- look a value up in a dict by its name
+
+  The grid hunt -- a Pipeline of scaler + classifier, handed to GridSearchCV. Pass RAW
+  X_train, so the scaler is rebuilt inside each fold and nothing leaks:
+
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+
+    # scaler lives INSIDE the pipeline so it is rebuilt on each fold's
+    # training strip only -- never on the strip being scored
+    pipe = Pipeline([
+        ('scaler', StandardScaler()),
+        ('clf',    LogisticRegression()),
+    ])
+    param_grid = {'clf__C': [0.01, 0.1, 1, 10], 'clf__penalty': ['l2']}
+    gs = GridSearchCV(pipe, param_grid, cv=5, scoring='recall')
+    gs.fit(X_train, y_train)          # pass RAW X_train, not pre-scaled
+    best_C = gs.best_params_['clf__C']
+
+  The precision-recall curve for a skewed pile, and its area (average precision):
+
+    from sklearn.metrics import precision_recall_curve, average_precision_score
+
+    y_proba = model.predict_proba(X_test_scaled)[:, 1]
+    precision, recall, thresholds = precision_recall_curve(y_test, y_proba)
+    ap = average_precision_score(y_test, y_proba)   # area under the curve
+
+  And the many-bin scores -- one report, plus the micro/macro numbers asked for by name:
+
+    from sklearn.metrics import classification_report, precision_recall_fscore_support
+
+    print(classification_report(y_test, y_pred,
+          target_names=['type A', 'type B', 'type C']))
+    # per-class precision/recall/F1, then: accuracy, macro avg, weighted avg
+
+    # note: for ordinary single-label multiclass, micro precision = micro recall
+    # = micro F1 = accuracy, so classification_report does NOT print a "micro avg"
+    # row -- it prints "accuracy" instead. To see the micro number by name, ask for it:
+    micro = precision_recall_fscore_support(y_test, y_pred, average='micro')
+    macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
+    # micro[:3] == (accuracy, accuracy, accuracy);  macro[:3] == the equal-weight blend
 
 
   ## Where That Leaves Us
@@ -347,13 +374,13 @@
     count-every-label averaging           micro averaging
 
 ----------------------------------------------------------------------------------------------
-  IN THIS SERIES:
+  IN THIS CHAPTER (Chapter 3 -- Sorting Into Bins):
     [Part 1 -- The S-Curve, the Four-Box Table](sorting-into-bins.txt) .
     [Part 2 -- The Trade Curve](the-trade-curve.txt) .
     [Part 3 -- Leash and Cloud](leash-and-cloud.txt) .
     Part 4 (this post)
 
-  Lab companion: [Classification Lab -- all terms in one place](classification-lab.txt)
+  Appendix: [Classification Reference -- all terms in one place](classification-lab.txt)
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
