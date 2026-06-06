@@ -10,11 +10,20 @@
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: grid-search, precision-recall, class-imbalance
   ============================================================================================
 
-  Parts 1-3 covered one dataset (breast lumps), one binary question (sick or well), and
-  the standard grading rulers for it. This post extends that picture in four directions:
-  how to hunt the right machine settings without peeking at the exam pile; the difference
-  between two kinds of ruler-equalising; what to do when one bin has 99 times as many rows
-  as the other; and how to score a machine on three or more bins at once.
+  PATH . post 9 of 10
+    <- prev:  [Sorting 3: Leash and Cloud](leash-and-cloud.txt)
+       next:  [Classification Lab: All the Terms in One Place](classification-lab.txt) ->
+
+  So far the world has been tidy: one sheet of breast lumps, one clean yes-or-no question,
+  two groups of roughly equal size. Real problems are rarely so polite. This closing post
+  drags the series out into the messy world and arms you for four things it will throw at
+  you.
+
+  How do you tune a machine's settings without cheating by peeking at the exam? What do
+  you do when one bin outnumbers the other ninety-nine to one and your proud 99% accuracy
+  turns out to be worthless? Which ruler do you trust when an outlier wanders in? And how
+  do you grade a machine that is sorting into not two bins but ten? Answer these and you
+  have left the textbook behind and stepped onto the workshop floor.
 
 
   ## Settings I Pick By Hand (Hyperparameters)
@@ -156,8 +165,10 @@
 
   ## Skewed Piles and the Precision-Recall Curve
 
-  The breast lump sheet had about 63% well and 37% sick -- uneven, but not drastically.
-  Real fraud sheets might be 99.9% normal and 0.1% fraud. That is a SKEWED pile.
+  The breast lump sheet leaned 63% well to 37% sick -- tilted, but you could still stand on
+  it. Now imagine the floor pitched almost vertical. A real fraud sheet might run 99.9%
+  honest and 0.1% crooked. That is a SKEWED pile, and on ground this steep the ordinary
+  scores quietly start lying to you.
 
     skewed fraud sheet: 100000 rows
       99900  normal transactions   (class 0)
@@ -302,6 +313,22 @@
     | 3+ classes, all equally imp. | macro averaging                          |
     | 3+ classes, size = importance| micro (or weighted) averaging            |
     +------------------------------+------------------------------------------+
+
+
+  ## Where That Leaves Us
+
+  And there the series rests. Look back at the road: we began by turning a sliding number
+  into a yes-or-no verdict, learned why a machine that catches nobody can still boast 63%
+  accuracy, slid the cutoff to see every bargain between lives and money at once, leashed
+  an over-confident machine and met a calmer one that draws its wall in a single stroke,
+  and finally walked out into the skewed, many-binned, outlier-ridden world where the
+  textbook scores stop being enough.
+
+  None of it required Greek you had not earned. That was the whole point. The labels --
+  logistic regression, ROC, regularisation, LDA, cross-validation -- were never the
+  understanding; they were handles screwed on at the end, once the thing was already built
+  and working in your hands. Keep that order and there is very little in this field you
+  cannot teach yourself.
 
 
   ## The Labels, Last

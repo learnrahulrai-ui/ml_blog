@@ -10,10 +10,19 @@
   Posted: 2026-06-04 . Author: Rahul Rai . Tags: coefficients, interpretation, scaling
   ============================================================================================
 
-  The straight-stick rule keeps one dial per column. Up to now they were just numbers the
-  rule set for itself. But the dials can be READ: each one says how its column pushes the
-  answer. The question for this post -- which column drags miles per gallon down the
-  hardest? -- sounds easy and hides two real traps.
+  PATH . post 5 of 10
+    <- prev:  [Grading 1: Two Rulers, MSE and R^2](grading-the-guess-mse-r2.txt)
+       next:  [Sorting 1: S-Curve and Four-Box Table](sorting-into-bins.txt) ->
+
+  So far the dials have been the machine's private business -- numbers it set for itself
+  to make good guesses. But those dials are not just machinery; they are a message. Each
+  one is the rule quietly telling you how its column pushes the answer around. Learn to
+  read them and the black box starts talking.
+
+  This post asks one innocent-looking question of a sheet of cars -- which column drags
+  miles per gallon down the hardest? -- and uses it to spring two traps that catch almost
+  everyone. One is a trick of arithmetic. The other is a trick of units, and it is the
+  kind of mistake that ends up in published papers.
 
 
   ## One Dial Per Column
@@ -70,8 +79,9 @@
 
   ## The Trap Underneath: Dials Wear Their Column's Units
 
-  Here is the part the easy version skips. A dial is "answer-units per ONE unit of its
-  column" -- and every column is measured on a different ruler:
+  Here is the deeper trap, the one the easy version walks straight into. A dial is
+  "answer-units per ONE unit of its column" -- and every column is measured on its own
+  ruler, with its own idea of how big "one unit" is:
 
     weight dial  = mpg per   1 POUND        (pounds run 1500 ... 5000)
     horse  dial  = mpg per   1 HORSEPOWER   (horsepower runs 45 ... 230)

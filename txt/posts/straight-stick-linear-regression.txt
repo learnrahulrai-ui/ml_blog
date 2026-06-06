@@ -10,9 +10,20 @@
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: linear-regression, ols, least-squares
   ============================================================================================
 
-  The straight-stick rule guesses using a weighted sum of the measured columns plus a
-  fixed nudge. Unlike the ask-closest rule it squeezes the whole working pile into d+1
-  dials, then discards the pile. The dials have an exact formula -- no searching required.
+  PATH . post 3 of 10
+    <- prev:  [House Prices 2: Ask the Closest Rows](neighbor-machine-knn.txt)
+       next:  [Grading 1: Two Rulers, MSE and R^2](grading-the-guess-mse-r2.txt) ->
+
+  The ask-closest rule never really learned anything -- it just kept the answer key handy.
+  This rule is its opposite, and its better-behaved sibling. It actually studies the pile,
+  distils it down to a handful of dials, and then throws the pile away. From that point on
+  it carries no baggage: every guess is a quick weighted sum of the columns plus a fixed
+  nudge.
+
+  And here is the part that still feels like magic the first time you see it. The best
+  possible dials are not hunted for by trial and error -- they fall straight out of one
+  exact formula. No searching, no luck. This post derives that formula by hand on three
+  rows, then shows it is the very same arithmetic the toolbox runs on sixteen thousand.
 
 
   ## The Rule
@@ -155,9 +166,11 @@
     Same-ruler needed?    yes -- required             no -- not for plain rule
     Guess surface         piecewise-flat, local       one flat sheet, global
 
-  Opposite approaches, one question: given the working rows, guess the right answer for a
-  new row. Ask-closest leans on stored rows; straight-stick compresses them into a flat
-  sheet.
+  Two rules, opposite temperaments, one question: given the working rows, guess the right
+  answer for a new one. The ask-closest rule leans on stored neighbours and does its
+  thinking at the last second; the straight-stick rule does its thinking up front and
+  compresses everything into one flat sheet. Neither is "the" answer -- which to reach for
+  depends on the pile in front of you, and that judgement is the real craft.
 
 
   ## Going Deeper

@@ -18,11 +18,21 @@
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: logistic-regression, classification, evaluation
   ============================================================================================
 
-  Every post so far ended with a number: predicted house price, predicted miles per
-  gallon. This one ends with a box. A doctor photographs cells from a breast lump and
-  measures 30 things -- size, texture, smoothness. The question is not "how malignant?"
-  but "malignant OR NOT?" Two bins. One answer. The machine still makes a sliding number
-  inside, but now that number has to be bent, squeezed, and chopped into a bin label.
+  PATH . post 6 of 10
+    &lt;- prev:  <a href="reading-the-dials.html">Grading 2: Reading the Dials</a>
+       next:  <a href="the-trade-curve.html">Sorting 2: The Trade Curve</a> -&gt;
+
+  Every post so far ended with a number: a house worth 2.8, a car that does 18 to the
+  gallon. This one ends with something heavier -- a verdict. Picture the room. A doctor
+  has photographed the cells from a breast lump and measured thirty things about them:
+  size, texture, smoothness. The question on the table is not "how malignant?" It is the
+  one that keeps people up at night: malignant, OR NOT? Two bins. One answer. And a
+  wrong answer that can cost a life.
+
+  The machine still does what it always did -- it brews a sliding number inside. But that
+  number can no longer just be read aloud. It has to be bent into a chance, then chopped
+  into a label, and from here on every choice we make is haunted by which kind of mistake
+  we can least afford to make.
 
 
   ## From Number to Bin
@@ -172,11 +182,13 @@
 
   ## Why Accuracy Alone Lies
 
-  The Wisconsin sheet has roughly 63% benign lumps. A machine that calls everything
-  benign -- no dials, no squash, just one constant shout of "well" -- scores 63% accuracy.
-  It never catches a single sick person. Accuracy counts all boxes equally, so MISSED
-  costs the same as ALARM. But a MISSED sick lump is cancer going home. Those mistakes are
-  not equal.
+  Now the most important paragraph in the post. The Wisconsin sheet has roughly 63%
+  benign lumps. So a machine that learns nothing whatsoever -- no dials, no squash, just
+  one lazy constant shout of "well, well, well" -- walks away with 63% accuracy. On paper
+  it looks like it is passing. In the exam room it is a catastrophe: it never once catches
+  a sick person. Accuracy counted every box the same, so a MISSED cancer weighed exactly
+  as much as a needless ALARM. But those two mistakes are not equal, and pretending they
+  are is how people get hurt.
 
     fool machine: predict B for everything
     accuracy  = 0.63   &lt;- looks decent

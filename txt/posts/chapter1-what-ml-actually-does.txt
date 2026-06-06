@@ -10,10 +10,19 @@
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: fundamentals, supervised-learning, knn
   ============================================================================================
 
-  This is the entry point for the blog. No prior knowledge required -- just follow the
-  pencil. This series builds the machinery first -- by hand, on the California housing
-  pile -- and sticks the standard labels on at the very end. Part 1 is the whole
-  picture; Parts 2 and 3 work out each rule in detail.
+  PATH . post 1 of 10  (you are at the start -- read top to bottom)
+       next:  [House Prices 2: Ask the Closest Rows](neighbor-machine-knn.txt) ->
+
+  Welcome -- this is where the blog begins, and it asks nothing of you but curiosity
+  and a pencil. No prior knowledge, no jargon you have not earned, no hand-waving past
+  the hard parts.
+
+  Here is the promise. By the end of this single post you will have built -- by hand, on
+  a real sheet of California house prices -- a machine that guesses the price of a house
+  it has never seen. Not a toy version. The same machinery the textbooks dress up in
+  Greek letters, except we build it first and learn its proper names last. Parts 2 and 3
+  then take the two rules apart screw by screw. For now, stand back and see the whole
+  thing at once.
 
 
   ## The Job: Guess From a Sheet of Numbers
@@ -26,8 +35,10 @@
     +--------- 8 measured columns ----+|  the answer
 
   20,640 rows. Each row is one California neighbourhood. 8 measured columns. One
-  right-answer column: median house price in $100,000s. The job: build a rule that
-  guesses the right answer for a row it has NEVER seen, not a row it learned from.
+  right-answer column: median house price in $100,000s. The job sounds simple and hides
+  the whole game: build a rule that guesses the right answer for a row it has NEVER seen
+  -- not a row it already studied. Anyone can memorise answers they have been shown. The
+  trick is being right about the houses you have not.
 
   !! WARN: .shape IS A PAIR, NOT A PRODUCT
      df.shape returns (n_rows, n_cols) in that fixed order -- (20640, 9) -- never their
@@ -41,13 +52,16 @@
      working pile (80%)   hidden pile (20%)
                           ^ locked away -- read once, at the very end
 
-  Before touching anything: set aside a random 20% of rows. Their right answers must not
+  Before touching anything else, do the one thing every honest guesser does first: set
+  aside a random 20% of rows and lock them in a drawer. Their right answers must not
   touch any decision -- not the rule, not any setting, not even how the numbers are
-  prepared. They exist for one honest check at the end.
+  prepared. They exist for a single honest check, taken once, at the very end.
 
-  The reason is mechanical: any rule checked on the same rows it was built from reports a
-  false low mistake. The ask-closest rule at k=1 makes zero mistakes on its own working
-  pile and does poorly on new rows. The hidden pile is the only honest number.
+  Why be so strict? The reason is mechanical, not moral. Any rule checked on the same
+  rows it was built from reports a flattering, false-low mistake -- like grading your own
+  exam with the answer key open. The ask-closest rule at k=1 makes ZERO mistakes on its
+  own working pile and then stumbles on new rows. The drawer is the only number that does
+  not lie.
 
   ** KEY: SHUFFLE FIRST
      Rows often arrive sorted by district. Shuffle with a fixed starting point so the
@@ -67,15 +81,18 @@
 
       gap(a, b) = sqrt( sum_j (a_j - b_j)^2 )
 
-  Nothing is built ahead of time -- the whole working pile is stored and looked up each
-  time. The one setting to pick by hand: k (how many neighbours to ask). Small k -> too
-  jumpy; large k -> too stiff. Full derivation in
-  [Part 2](neighbor-machine-knn.txt).
+  This rule barely deserves the name "machine" -- it builds nothing ahead of time. It
+  just keeps the whole working pile on a shelf and, when a new house walks in, finds the
+  ones most like it and averages what they sold for. The one knob to set by hand is k:
+  how many neighbours to ask. Small k -> too jumpy; large k -> too stiff. The full
+  derivation, and how to find the sweet spot, is in [Part 2](neighbor-machine-knn.txt).
 
 
   ## Measuring How Wrong: RMSE
 
-  Leftover for one row: r_i = y_i - yhat_i (right answer minus guess).
+  A guesser is only as good as its misses are small -- so before trusting any rule we
+  need an honest way to size up how wrong it is. Leftover for one row: r_i = y_i - yhat_i
+  (right answer minus guess).
 
       RMSE = sqrt( (1/n) sum_i r_i^2 )
 
@@ -92,9 +109,10 @@
     guess = b0 + b1*(rooms) + b2*(income) + ...
           = X*beta   (one dot-product per row)
 
-  Squeeze the whole working pile into d+1 dials. Once set, the pile is discarded; each
-  guess is one dot-product. The dials are set by shrinking the squared leftover sum -- an
-  exact formula, no searching. Full derivation in
+  The second rule is the opposite temperament. Where the ask-closest rule hoards every
+  row, this one squeezes the whole working pile into just d+1 dials, throws the pile away,
+  and from then on each guess is a single dot-product. The dials are not searched for --
+  they drop out of an exact formula. Full derivation in
   [Part 3](straight-stick-linear-regression.txt).
 
 
@@ -119,8 +137,10 @@
      leaks grading-chunk numbers into the build step. A bound pipeline enforces this
      automatically (Part 2).
 
-  Procedure: pick settings using rotating folds on the working pile -> refit the winner
-  on all of the working pile -> read the hidden pile ONCE -> report that number.
+  That single discipline -- never let the drawer influence a choice -- is the spine the
+  whole blog hangs on. Procedure: pick settings using rotating folds on the working pile
+  -> refit the winner on all of the working pile -> read the hidden pile ONCE -> report
+  that number, and live with it.
 
   >> NOTE: ISN'T CHECKING THE HIDDEN PILE PEEKING?
      No -- using it to pick among rules is peeking; using it ONCE to report the chosen
@@ -128,7 +148,10 @@
      and the hidden-pile mistake means the rule memorised the working pile a little.
 
 
-  ## The Six Steps
+  ## The Six Steps -- The Whole Blog in Miniature
+
+  Everything above, boiled down to six lines. Pin them somewhere; every later post is one
+  of these steps, slowed down and worked out in full.
 
     1. Find a rule that guesses right on rows never seen; measure on the hidden pile only.
     2. Ask-closest rule -- store the pile, look it up; put columns on the same ruler;
@@ -140,6 +163,10 @@
 
 
   ## The Labels, Last
+
+  Now -- and only now that you have built the thing -- here are the proper names. Every
+  post on this blog ends this way: plain words on the left, the textbook term on the
+  right. Learn the idea first; the label is just a handle to carry it by.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

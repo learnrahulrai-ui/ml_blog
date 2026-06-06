@@ -10,12 +10,21 @@
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: roc-curve, auc, cutoff, evaluation
   ============================================================================================
 
-  The four scores in the previous post all fixed the cutoff at 0.5. That is one opinion
-  about where to draw the line. Slide it left and the machine shouts "sick" more freely --
-  catching more real cases but also alarming more healthy people. Slide it right and the
-  machine stays quiet until very sure -- fewer alarms but more cases slipping through.
-  Every position is a different deal between lives and money. The trade curve draws all
-  those deals at once.
+  PATH . post 7 of 10
+    <- prev:  [Sorting 1: S-Curve and Four-Box Table](sorting-into-bins.txt)
+       next:  [Sorting 3: Leash and Cloud](leash-and-cloud.txt) ->
+
+  Every score in the last post quietly agreed on one thing: draw the line at 0.5. But who
+  said 0.5? It is just one opinion about where "probably well" ends and "probably sick"
+  begins -- and it is an opinion you are free to overrule.
+
+  Reach out and slide that line. Push it left and the machine turns anxious, crying "sick"
+  at the faintest shadow -- it catches more real cases, but startles more healthy people
+  with false alarms. Push it right and the machine turns stoic, holding its tongue until
+  it is almost certain -- fewer false alarms, but more real cases slip quietly out the
+  door. Nowhere on that line is there a free lunch: every spot you pick is a different
+  bargain struck between lives and money. The trade curve is what you get when you stop
+  arguing over a single spot and lay all the bargains out side by side, in one picture.
 
 
   ## Two Rates
@@ -93,8 +102,9 @@
 
   ## What AUC Actually Measures
 
-  There is a cleaner way to read AUC that has nothing to do with curves or areas. It is
-  called the Wilcoxon-Mann-Whitney statistic:
+  Areas under curves are easy to compute and hard to feel. So here is the same number
+  told as a tiny story you can actually picture -- a result that goes by the name
+  Wilcoxon-Mann-Whitney:
 
       AUC = P( score(x+) > score(x-) )
 

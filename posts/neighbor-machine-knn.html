@@ -18,10 +18,21 @@
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: knn, distance, non-parametric, complexity
   ============================================================================================
 
+  PATH . post 2 of 10
+    &lt;- prev:  <a href="chapter1-what-ml-actually-does.html">House Prices 1: Guessing Prices End to End</a>
+       next:  <a href="straight-stick-linear-regression.html">House Prices 3: The Straight-Stick Rule</a> -&gt;
+
+  Here is the oldest trick in the book, and one you already use every day: to guess
+  something about a stranger, look at the people most like them. Want to know what a house
+  is worth? Find the houses most similar and see what they sold for. That is the whole
+  idea, and it barely needs a machine.
+
   The ask-closest rule guesses by averaging the k closest working-pile right-answers.
-  Nothing is built ahead of time -- the whole pile is stored and looked up each time.
-  Three steps -- measure gap, pick closest, average -- but two details decide whether it
-  works: put columns on the same ruler, and pick k with care.
+  Nothing is built ahead of time -- the whole pile is kept on a shelf and looked up each
+  time. Three honest steps -- measure the gap, pick the closest, average their answers.
+  But two quiet details decide whether it works at all: put every column on the same
+  ruler, and choose k with care. Get those wrong and the rule falls apart; get them right
+  and it is hard to beat.
 
 
   ## Working Pile and Hidden Pile
@@ -51,10 +62,12 @@
 
   ## Put Columns on the Same Ruler First
 
-  The gap adds squared per-column differences. A column measured in thousands (people)
-  drowns one measured in single digits (rooms) -- an accident of units, not importance.
-  On the raw California pile, the ask-closest rule is effectively a 1-column rule on
-  population.
+  Here is the trap that sinks most first attempts. The gap adds up squared per-column
+  differences -- and a column measured in thousands (people) simply drowns out one
+  measured in single digits (rooms). Not because population matters more, but because its
+  numbers are bigger. An accident of units masquerades as importance. On the raw
+  California pile, the proud "8-column" rule is secretly a 1-column rule that only ever
+  listens to population.
 
     raw columns:
       rooms  ~   2 - 12     &lt;- tiny gaps
@@ -90,8 +103,9 @@
 
   ## How Slow Is It
 
-  No work done ahead of time: the pile is stored, not compressed. Every guess recomputes
-  all gaps from scratch.
+  The ask-closest rule is generous at study time and stingy at guess time -- it does no
+  work up front, then pays for it on every single question. The pile is stored, never
+  compressed, so every guess recomputes all gaps from scratch.
 
     100 rows = 80 working + 20 hidden
     work per hidden row  = 80 * d  gap computations
@@ -181,9 +195,12 @@
 
   ## Origin
 
-  Evelyn Fix and Joseph Hodges wrote down this rule in 1951. Thomas Cover and Peter Hart
-  proved in 1967 that the one-closest-row version's mistake rate is at most twice the best
-  possible mistake, as the pile grows without bound.
+  The rule feels too simple to be serious, so it is worth knowing it has a pedigree.
+  Evelyn Fix and Joseph Hodges wrote it down in 1951. Sixteen years later Thomas Cover and
+  Peter Hart proved something startling about it: as the pile grows without bound, even
+  the crude one-closest-row version makes at most TWICE as many mistakes as the best
+  possible rule on Earth. Ask a single neighbour and you are already halfway to perfect.
+  Not bad for a rule that does no thinking at all.
 
     1. Guess = average of the k closest working right-answers (optionally weighted).
     2. The gap adds squared per-column differences -- put columns on the same ruler,

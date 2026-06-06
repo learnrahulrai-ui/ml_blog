@@ -18,10 +18,19 @@
   Posted: 2026-06-04 . Author: Rahul Rai . Tags: evaluation, mse, r-squared, regression
   ============================================================================================
 
+  PATH . post 4 of 10
+    &lt;- prev:  <a href="straight-stick-linear-regression.html">House Prices 3: The Straight-Stick Rule</a>
+       next:  <a href="reading-the-dials.html">Grading 2: Reading the Dials</a> -&gt;
+
+  We have built two guessers. Now comes the question that quietly decides everything, and
+  that beginners skip right past: once the stick has drawn its line -- WAS THE LINE ANY
+  GOOD? A guess you cannot grade is a guess you cannot trust.
+
   Same straight-stick rule as before -- a dial on each column, multiply, add, plus a fixed
-  nudge. New sheet, though: cars now, not houses. And a new question that turns out to be
-  the whole point: once the stick has drawn its line, WAS THE LINE ANY GOOD? Two different
-  rulers answer that. They read the very same guesses and report two different verdicts.
+  nudge -- but a new sheet to play on: cars now, not houses. Two different rulers will
+  step up to grade the very same guesses, and here is the twist that makes the post worth
+  reading: they hand back two different verdicts, and BOTH are right. One tells you how
+  big the misses are. The other tells you whether you have beaten the village idiot.
 
 
   ## Same Stick, New Sheet
@@ -82,14 +91,17 @@
 
   ## Ruler Two: R^2 -- A Race Against a Fool
 
-  R^2 grades the stick against the dumbest honest guesser there is. So start with that
-  fool. Forget the columns -- here is a pile of past answers and no clues at all:
+  A score needs something to be scored against, so R^2 picks the dumbest honest opponent
+  imaginable and makes the stick race it. Meet the fool. He has not looked at a single
+  column -- he does not even know the cars have engines. All he has is a pile of past
+  answers and no clues at all:
 
     answers:  2   4   9   3   7
 
-  The fool must shout one number for everything. What is safest? The AVERAGE, 5 -- not
-  because it is clever, but because it sits at the bottom of the squared-miss bowl. Any
-  other single number misses more:
+  The fool must shout one number for every car, no matter what. What is his safest shout?
+  The AVERAGE, 5 -- not because the fool is clever (he is not), but because the average is
+  the one spot that sits at the very bottom of the squared-miss bowl. Any other single
+  number he could pick misses more:
 
     shout 5 -&gt; miss^2 = 9 + 1 + 16 + 4 + 4 = 34
     shout 6 -&gt; miss^2 = 16 + 4 + 9 + 9 + 1 = 39   (worse)

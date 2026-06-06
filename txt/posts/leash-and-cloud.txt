@@ -10,13 +10,22 @@
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: l2-regularization, lda, generative-models
   ============================================================================================
 
-  The S-curve machine in Part 1 sets its dials by rolling downhill on cross-entropy
-  leftover. Left completely unchecked, nothing stops a dial from growing to 50 if that is
-  what the descent finds. A huge dial means the machine over-trusts one measured column
-  and barely listens to the rest -- it may fit the study pile well but fail on new lumps it
-  has never seen. This post covers two ways to keep the dials humble: a TIGHTER leash on
-  them, and a different machine entirely that sidesteps the problem by reading the shape of
-  the two groups rather than rolling downhill.
+  PATH . post 8 of 10
+    <- prev:  [Sorting 2: The Trade Curve](the-trade-curve.txt)
+       next:  [Sorting 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt) ->
+
+  An over-confident machine is a dangerous thing, and the S-curve machine from Part 1 has
+  a streak of it. It sets its dials by rolling downhill on the cross-entropy leftover, and
+  left to its own devices nothing stops a single dial from ballooning to 50 if that is
+  what makes the study pile fit. A dial that large means the machine has fallen for one
+  column and stopped listening to the other twenty-nine -- it aces the practice exam and
+  then freezes on a lump it has never seen. Confident, and wrong, which is the worst way
+  to be.
+
+  This post is about humbling it, two different ways. The first keeps the same machine but
+  puts it on a TIGHTER leash. The second throws the machine out entirely and tries a
+  completely different temperament -- one that never rolls downhill at all, but instead
+  steps back, looks at the SHAPE of the two groups, and draws the wall in a single stroke.
 
   >> NOTE: THE PART 1 BASELINE ALREADY HAS A LEASH
      Worth saying up front, because it surprises people: LogisticRegression() in sklearn is
@@ -121,10 +130,12 @@
 
   ## A Completely Different Machine: The Two-Cloud Wall
 
-  The S-curve machine finds the dials by trial and error: adjust, check the leftover,
-  adjust again. Linear discriminant analysis (LDA) takes a different route entirely.
-  Instead of fitting predictions, it looks at the SHAPE of the two groups in the study pile
-  and computes the wall in one shot.
+  Everything so far kept the same machine and tightened its leash. Now we change the
+  machine itself. The S-curve machine is a fidgeter -- it inches toward the answer by trial
+  and error: adjust, check the leftover, adjust again. Linear discriminant analysis (LDA)
+  has the opposite personality. It does not fiddle at all. It stands back, studies the
+  SHAPE of the two groups of points, and lays down the wall between them in a single
+  confident stroke.
 
     step 1: split the study pile into sick rows and well rows
     step 2: compute 30 averages per group -> two centres in 30-column space
