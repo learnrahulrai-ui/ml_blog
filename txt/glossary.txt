@@ -30,7 +30,7 @@
     rotating folds                        k-fold cross-validation
     memorising the working pile           overfitting
     too stiff -- always a bit wrong       underfitting / high bias
-    too jumpy -- swings with the pile      high variance
+    too jumpy -- swings with the pile     high variance
     mistake on rows never seen            generalisation error
     letting the exam pile leak in         data leakage
 
