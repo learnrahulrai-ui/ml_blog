@@ -1,132 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Archive :: Rahul's ML Blog</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive :: Rahul&#x27;s ML Blog</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<pre>==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  <a href="index.html">home</a> | <a href="about.html">about</a> | <a href="archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+----------------------------------------------------------------------------------------------
 
-<pre class="banner"><a href="index.html">RAHUL'S ML BLOG</a>
-notes on machine learning, worked out by hand -- est. 2026
-==============================================================================</pre>
-
-<p id="nav">[ <a href="index.html">home</a> ] [ <a href="about.html">about</a> ] [ <a href="archive.html">archive</a> ] [ <a href="mailto:learn.rahul.rai@gmail.com">contact</a> ]</p>
-
-<p><strong>All posts</strong> &mdash; 9 posts, 3 series. Newest first.</p>
-
-<div class="section-header">SORTING INTO BINS (2026)</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/sorting-into-bins.html">Part 1 &mdash; The S-Curve, the Four-Box Table, and Why Accuracy Lies</a></div>
-  <div class="post-meta">2026-06-05 &middot; logistic-regression, classification, evaluation</div>
-  <div class="post-excerpt">
-    Number to bin via the S-curve squash, cross-entropy loss, label encoding (M&rarr;1), the
-    four-box table (CAUGHT/ALARM/MISSED/CLEAR), four scores (accuracy/recall/precision/F1), and
-    why accuracy alone is a dangerous comfort.
-  </div>
-  <a class="read-more" href="posts/sorting-into-bins.html">[ read &rarr; ]</a>
-</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/the-trade-curve.html">Part 2 &mdash; The Trade Curve: Sliding the Cutoff and What AUC Measures</a></div>
-  <div class="post-meta">2026-06-05 &middot; roc-curve, auc, cutoff</div>
-  <div class="post-excerpt">
-    Why fixing the cutoff at 0.5 is just one opinion. Sweep the cutoff: each position is a
-    (FPR, TPR) dot. Connect the dots: the trade curve. Area underneath = AUC = P(sick score &gt;
-    well score). The Wilcoxon&ndash;Mann&ndash;Whitney interpretation.
-  </div>
-  <a class="read-more" href="posts/the-trade-curve.html">[ read &rarr; ]</a>
-</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/leash-and-cloud.html">Part 3 &mdash; Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a></div>
-  <div class="post-meta">2026-06-05 &middot; l2-regularization, lda</div>
-  <div class="post-excerpt">
-    L2: add &lambda;&Sigma;&beta;&sup2; to the loss; C=1/&lambda; so small C is heavy squeeze.
-    LDA: closed-form wall from w&nbsp;&prop;&nbsp;&Sigma;<sub>W</sub><sup>-1</sup>(&mu;<sub>1</sub>-&mu;<sub>0</sub>).
-    Same boundary form as logistic regression, different derivation. Agreement = clean data.
-  </div>
-  <a class="read-more" href="posts/leash-and-cloud.html">[ read &rarr; ]</a>
-</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/picking-settings-skewed-classes.html">Part 4 &mdash; Picking Settings, Skewed Piles, and Averaging Many Classes</a></div>
-  <div class="post-meta">2026-06-05 &middot; grid-search, min-max-scaling, precision-recall, class-imbalance, macro-micro</div>
-  <div class="post-excerpt">
-    Grid hunt over settings by rotating folds; pinch-to-fit vs standard ruler and why outliers
-    break min-max; precision vs recall in fraud detection; precision-recall curves for skewed
-    piles where ROC misleads; macro vs micro averaging for 3+ bins.
-  </div>
-  <a class="read-more" href="posts/picking-settings-skewed-classes.html">[ read &rarr; ]</a>
-</div>
-
-<div class="section-header">GRADING A GUESSER (2026)</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/grading-the-guess-mse-r2.html">Part 1 &mdash; Two Rulers for One Guess: MSE and R&sup2;</a></div>
-  <div class="post-meta">2026-06-04 &middot; evaluation, mse, r-squared</div>
-  <div class="post-excerpt">
-    The same straight-stick rule on cars, graded two ways: MSE (RMSE minus the root) and R&sup2;,
-    a race against the always-average fool. Why you divide by the whole wobble, why test R&sup2;
-    can dip below zero, and the bias-variance split of the miss-size.
-  </div>
-  <a class="read-more" href="posts/grading-the-guess-mse-r2.html">[ read &rarr; ]</a>
-</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/reading-the-dials.html">Part 2 &mdash; Reading the Dials: What the Coefficients Say</a></div>
-  <div class="post-meta">2026-06-04 &middot; coefficients, interpretation, scaling</div>
-  <div class="post-excerpt">
-    Each column keeps one dial; zip the names back on and find the most-negative (a MIN, not a
-    MAX). The trap: raw dials wear each column's units, so they aren't comparable until the
-    columns share one ruler -- and tangled columns make any single dial shaky.
-  </div>
-  <a class="read-more" href="posts/reading-the-dials.html">[ read &rarr; ]</a>
-</div>
-
-<div class="section-header">PREDICTING HOUSE PRICES (2026)</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/chapter1-what-ml-actually-does.html">Part 1 &mdash; Guessing House Prices, End to End</a></div>
-  <div class="post-meta">2026-06-03 &middot; fundamentals, supervised-learning</div>
-  <div class="post-excerpt">
-    The whole picture on California housing: lock away the hidden pile first, introduce the
-    ask-closest rule and the straight-stick rule, measure mistake with RMSE against the
-    always-average baseline, pick settings by rotating folds.
-  </div>
-  <a class="read-more" href="posts/chapter1-what-ml-actually-does.html">[ read &rarr; ]</a>
-</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/neighbor-machine-knn.html">Part 2 &mdash; Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a></div>
-  <div class="post-meta">2026-06-02 &middot; knn, complexity, scaling</div>
-  <div class="post-excerpt">
-    The gap formula, why putting columns on the same ruler is mandatory, O(n&middot;d) cost per
-    guess and why close stops meaning close as columns pile up, k as the stiff-vs-jumpy dial,
-    and a leak-safe rotating-fold picker.
-  </div>
-  <a class="read-more" href="posts/neighbor-machine-knn.html">[ read &rarr; ]</a>
-</div>
-
-<div class="post-card">
-  <div class="post-title"><a href="posts/straight-stick-linear-regression.html">Part 3 &mdash; The Straight-Stick Rule: Dials, Right-Angle Leftovers, and Numerics</a></div>
-  <div class="post-meta">2026-06-01 &middot; linear-regression, least-squares, numerics</div>
-  <div class="post-excerpt">
-    The bowl-shaped squared leftover, the flat-point equations solved by hand, right-angle
-    leftovers and the flat-shadow thrower, Gauss-Markov, and why you cut the sheet (QR/SVD)
-    rather than flip it.
-  </div>
-  <a class="read-more" href="posts/straight-stick-linear-regression.html">[ read &rarr; ]</a>
-</div>
+  ALL POSTS -- 9 posts, 3 series. Newest first.
 
 
-<pre class="rule">==============================================================================</pre>
-<p id="footer">
-  (c) 2026 Rahul Rai &middot; pure HTML + CSS, no JavaScript, no trackers &middot;
-  <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
-</p>
+  SORTING INTO BINS (2026)
+  ------------------------
+  2026-06-05  <a href="posts/sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies</a>
+  2026-06-05  <a href="posts/the-trade-curve.html">Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures</a>
+  2026-06-05  <a href="posts/leash-and-cloud.html">Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a>
+  2026-06-05  <a href="posts/picking-settings-skewed-classes.html">Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes</a>
 
+
+  GRADING A GUESSER (2026)
+  ------------------------
+  2026-06-04  <a href="posts/grading-the-guess-mse-r2.html">Part 1 -- Two Rulers for One Guess: MSE and R^2</a>
+  2026-06-04  <a href="posts/reading-the-dials.html">Part 2 -- Reading the Dials: What the Coefficients Say</a>
+
+
+  PREDICTING HOUSE PRICES (2026)
+  ------------------------------
+  2026-06-03  <a href="posts/chapter1-what-ml-actually-does.html">Part 1 -- Guessing House Prices, End to End</a>
+  2026-06-02  <a href="posts/neighbor-machine-knn.html">Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a>
+  2026-06-01  <a href="posts/straight-stick-linear-regression.html">Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics</a>
+
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  <a href="index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+==============================================================================================
+</pre>
 </body>
 </html>

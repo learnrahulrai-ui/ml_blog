@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="index.html">home</a> | <a href="about.html">about</a> | <a href="archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   Plain notes on how machine-learning rules actually work. Each one is stripped of
@@ -22,28 +14,28 @@
   SORTING INTO BINS -- yes-or-no guessing, scored every way
   ----------------------------------------------------------
 
-  <a href="posts/sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies</a>
+  [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
     2026-06-05 . part 1 of 4 . logistic-regression, classification, evaluation
     The shift from "guess a number" to "guess a bin": the S-curve squash, the
     cross-entropy leftover, and how any dial sum becomes a chance. Then the four-box
     table of CAUGHT/ALARM/MISSED/CLEAR, four scores that read different corners of it,
     and why a machine that catches nobody can still score 63% accuracy.
 
-  <a href="posts/the-trade-curve.html">Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures</a>
+  [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
     2026-06-05 . part 2 of 4 . roc-curve, auc, cutoff
     One cutoff judges the machine at one spot; slide it through every position and you
     get the trade curve (ROC). The area beneath it -- AUC -- compresses the whole curve
     to one number: pick a random sick lump and a random well lump; AUC is the chance the
     machine scored the sick one higher.
 
-  <a href="posts/leash-and-cloud.html">Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a>
+  [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
     2026-06-05 . part 3 of 4 . l2-regularization, lda
     Two ways to humble an over-confident machine. L2: add a squared-dial price to the
     leftover so no single dial dominates (C = 1/lambda -- small C is a heavy squeeze).
     LDA: forget rolling downhill; read the two cloud centres and their shared spread,
     then solve for the wall in one closed-form step.
 
-  <a href="posts/picking-settings-skewed-classes.html">Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes</a>
+  [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
     2026-06-05 . part 4 of 4 . grid-search, precision-recall, class-imbalance
     Grid-hunting settings by rotating folds; why pinch-to-fit scaling breaks around
     outliers; the precision-vs-recall trade in fraud detection; precision-recall curves
@@ -53,14 +45,14 @@
   GRADING A GUESSER -- how good is the guess?
   -------------------------------------------
 
-  <a href="posts/grading-the-guess-mse-r2.html">Part 1 -- Two Rulers for One Guess: MSE and R^2</a>
+  [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
     2026-06-04 . part 1 of 2 . evaluation, mse, r-squared
     The same straight-stick rule on a sheet of cars, graded two ways: MSE (RMSE with the
     root left off) and R^2 -- a race against a fool who only ever shouts the average.
     Why you divide by the whole wobble, why test R^2 can dip below zero, and the
     stiff-vs-jumpy split of the miss-size.
 
-  <a href="posts/reading-the-dials.html">Part 2 -- Reading the Dials: What the Coefficients Say</a>
+  [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
     2026-06-04 . part 2 of 2 . coefficients, interpretation, scaling
     Each column keeps one dial -- plus pushes up, minus drags down. Zip the names back
     on, find the most-negative (a MIN, not a MAX), and watch the trap: raw dials wear
@@ -71,19 +63,19 @@
   PREDICTING HOUSE PRICES -- supervised regression from scratch
   -------------------------------------------------------------
 
-  <a href="posts/chapter1-what-ml-actually-does.html">Part 1 -- Guessing House Prices, End to End</a>
+  [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
     2026-06-03 . part 1 of 3 . fundamentals, supervised-learning
     The whole picture on the California housing pile: why 20% of rows are locked away
     first, the ask-closest rule and the straight-stick rule introduced plainly, RMSE
     against the always-average baseline, and picking settings by rotating folds.
 
-  <a href="posts/neighbor-machine-knn.html">Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a>
+  [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
     2026-06-02 . part 2 of 3 . knn, complexity, scaling
     The ask-closest rule from the gap formula up: why a column measured in thousands
     runs the whole show and must be put on the same ruler, the cost per guess and why
     close stops meaning close as columns pile up, k as the stiff-vs-jumpy dial.
 
-  <a href="posts/straight-stick-linear-regression.html">Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics</a>
+  [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
     2026-06-01 . part 3 of 3 . linear-regression, least-squares, numerics
     From the bowl-shaped squared leftover to the exact dials: a three-row pencil solve
     of the flat-point equations, right-angle leftovers and the flat-shadow thrower, the
@@ -92,8 +84,5 @@
 ----------------------------------------------------------------------------------------------
   the method: ban the jargon . draw it first . solve by pencil . then write the code
   built with: pandas, scikit-learn, NumPy, and a pencil . pure HTML+CSS, no JavaScript
-  (c) 2026 Rahul Rai . no cookies, no trackers . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  (c) 2026 Rahul Rai . no cookies, no trackers . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

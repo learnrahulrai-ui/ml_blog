@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sorting Into Bins: The S-Curve, the Four-Box Table, and Why Accuracy Lies :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title Sorting Into Bins: The S-Curve, the Four-Box Table, and Why Accuracy Lies :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   SORTING INTO BINS . PART 1 OF 4
@@ -27,7 +19,7 @@
 
   ## From Number to Bin
 
-    previous posts (number):   ----------*------&gt;   answer = 2.83
+    previous posts (number):   ----------*------>   answer = 2.83
 
     this post (bin):           [ B = well ]  [ M = sick ]   answer = ONE box
 
@@ -35,7 +27,7 @@
   needs two more steps: a SQUASH that bends any number into the range 0-1 (so it reads as a
   chance), and a CUTOFF that chops that chance into a label.
 
-    columns -&gt; *dials -&gt; add -&gt; SQUASH -&gt; chance 0-1 -&gt; CUTOFF -&gt; [B] or [M]
+    columns -> *dials -> add -> SQUASH -> chance 0-1 -> CUTOFF -> [B] or [M]
 
 
   ## The Squash Curve
@@ -49,13 +41,13 @@
 
     chance
      1 |              ______
-   0.5 |         ___/            &lt;- dial sum = 0 -&gt; chance exactly 0.5
+   0.5 |         ___/            <- dial sum = 0 -> chance exactly 0.5
      0 |_____/--------------- sum
          -inf    0     +inf
 
-    big negative sum -&gt; chance ~= 0   "well"
-    big positive sum -&gt; chance ~= 1   "sick"
-    sum = 0          -&gt; chance = 0.5  (fence)
+    big negative sum -> chance ~= 0   "well"
+    big positive sum -> chance ~= 1   "sick"
+    sum = 0          -> chance = 0.5  (fence)
 
   At the default cutoff of 0.5: if the weighted measurements tip positive, the lump is
   called sick; if negative, well. The curve is also doing something deeper -- the linear
@@ -77,20 +69,20 @@
       L(beta) = -(1/n) sum [ y*log sig(z) + (1-y)*log(1-sig(z)) ]
 
   For a lump that is truly sick (y=1): if the machine outputs chance ~= 1, log(~1) ~= 0 --
-  small leftover. If it outputs chance ~= 0 on a sick lump, log(~0) -&gt; -inf -- enormous
+  small leftover. If it outputs chance ~= 0 on a sick lump, log(~0) -> -inf -- enormous
   leftover. The leftover punishes confidence in the wrong direction. There is no
   closed-form minimiser; the dials are found by rolling downhill through the gradient:
 
     gradient of L w.r.t. beta:   (1/n) X^T ( sig(X*beta) - y )
 
-    each step:  beta &lt;- beta - a * gradient   (a = step size)
+    each step:  beta <- beta - a * gradient   (a = step size)
 
   In code, the same two-step as before -- make an empty machine, show it the study pile:
 
     log_reg = LogisticRegression(random_state=42)
     log_reg.fit(X_train_scaled, y_train)
 
-  &gt;&gt; NOTE: WHY SCALED INPUTS?
+  >> NOTE: WHY SCALED INPUTS?
      The gradient update moves every dial by the same step size times its column's values.
      A column measured in thousands (area ~= 1000) takes dial steps 1000x larger than one
      measured in hundredths (smoothness ~= 0.1). The machine lurches around the large
@@ -101,7 +93,7 @@
   ## Encoding the Labels
 
   A machine eats numbers, but the sheet holds letters: M (malignant) and B (benign). The
-  translation is a shelf: M-&gt;1, B-&gt;0. The bin you are HUNTING gets the 1 -- here that is
+  translation is a shelf: M->1, B->0. The bin you are HUNTING gets the 1 -- here that is
   the sick lump, because recall, precision, and every score in this post count the sick
   detections.
 
@@ -121,8 +113,8 @@
   Every exam lump lands in exactly one of four boxes based on truth and guess:
 
                    guess SICK(1)    guess WELL(0)
-    truth SICK(1)  CAUGHT         | MISSED         &lt;- deadly if large
-    truth WELL(0)  ALARM          | CLEAR          &lt;- wasteful if large
+    truth SICK(1)  CAUGHT         | MISSED         <- deadly if large
+    truth WELL(0)  ALARM          | CLEAR          <- wasteful if large
 
     rows    = the truth     (sick / well)
     columns = the guess     (shouted sick / said well)
@@ -135,8 +127,8 @@
     conf_matrix = confusion_matrix(y_test, y_pred)   # truth first, guess second
     sns.heatmap(conf_matrix, annot=True, fmt='d')
 
-    grid shape:  [[ CLEAR  ALARM  ]    &lt;- truth well  (row 0)
-                  [ MISSED CAUGHT ]]   &lt;- truth sick  (row 1)
+    grid shape:  [[ CLEAR  ALARM  ]    <- truth well  (row 0)
+                  [ MISSED CAUGHT ]]   <- truth sick  (row 1)
 
   !! WARN: TRUTH FIRST, GUESS SECOND
      sklearn's confusion_matrix, accuracy_score, recall_score, and precision_score all
@@ -150,8 +142,8 @@
   a different slice of the four-box table:
 
     accuracy  = (CAUGHT + CLEAR) / everyone
-    recall    =  CAUGHT / (CAUGHT + MISSED)      &lt;- top row: share of sick caught
-    precision =  CAUGHT / (CAUGHT + ALARM)       &lt;- left col: when we cry sick, real sick?
+    recall    =  CAUGHT / (CAUGHT + MISSED)      <- top row: share of sick caught
+    precision =  CAUGHT / (CAUGHT + ALARM)       <- left col: when we cry sick, real sick?
     F1        =  2 * precision * recall / (precision + recall)
 
     Score       Formula (counts)        Punishes
@@ -179,9 +171,9 @@
   not equal.
 
     fool machine: predict B for everything
-    accuracy  = 0.63   &lt;- looks decent
-    recall    = 0.00   &lt;- catches nobody
-    precision = N/A    &lt;- never shouts sick, no CAUGHT, undefined
+    accuracy  = 0.63   <- looks decent
+    recall    = 0.00   <- catches nobody
+    precision = N/A    <- never shouts sick, no CAUGHT, undefined
 
   ** KEY: IN CANCER SCREENING, RECALL IS THE NORTH STAR
      Missing a sick person is the catastrophe. You can tolerate some ALARM (extra biopsies
@@ -202,7 +194,7 @@
 
     example:  P=0.10,  R=0.98
     arithmetic mean = (0.10 + 0.98) / 2 = 0.54
-    harmonic mean   = 2 * 0.10 * 0.98 / (0.10 + 0.98) = 0.18   &lt;- honest
+    harmonic mean   = 2 * 0.10 * 0.98 / (0.10 + 0.98) = 0.18   <- honest
 
 
   ## The Labels, Last
@@ -225,15 +217,12 @@
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
     Part 1 (this post) .
-    <a href="the-trade-curve.html">Part 2 -- The Trade Curve</a> .
-    <a href="leash-and-cloud.html">Part 3 -- Leash and Cloud</a> .
-    <a href="picking-settings-skewed-classes.html">Part 4 -- Picking Settings, Skewed Piles</a>
+    [Part 2 -- The Trade Curve](the-trade-curve.txt) .
+    [Part 3 -- Leash and Cloud](leash-and-cloud.txt) .
+    [Part 4 -- Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt)
 
-  &lt;- <a href="../index.html">Back to all posts</a>
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

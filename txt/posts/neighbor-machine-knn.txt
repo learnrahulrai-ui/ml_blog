@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ask the Closest Rows :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title Ask the Closest Rows :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   PREDICTING HOUSE PRICES . PART 2 OF 3
@@ -57,8 +49,8 @@
   population.
 
     raw columns:
-      rooms  ~   2 - 12     &lt;- tiny gaps
-      people ~ 100 - 35000  &lt;- huge gaps  &lt;- this column runs the whole show
+      rooms  ~   2 - 12     <- tiny gaps
+      people ~ 100 - 35000  <- huge gaps  <- this column runs the whole show
 
   Fix: shift each column to zero average and stretch it to spread of 1, using numbers
   from the working pile only:
@@ -79,7 +71,7 @@
 
     1. measure gap to every working-pile row          O(n*d)
     2. pick the k smallest gaps                        O(n) with a heap
-    3. average those k right-answers  -&gt;  guess
+    3. average those k right-answers  ->  guess
 
   An optional refinement weights closer rows more -- inverse-gap weights w_i = 1/gap_i:
 
@@ -100,7 +92,7 @@
   Sorting shelves (KD-tree, Ball-tree) cut average guess time to roughly O(d*log n) when
   columns are few, but degrade toward brute force as columns pile up. Here is why:
 
-    few columns:   nearby rows are truly nearby  &lt;- sorting shelf helps
+    few columns:   nearby rows are truly nearby  <- sorting shelf helps
     many columns:  all rows sit about the same gap away
                    "closest" stops meaning anything
 
@@ -114,7 +106,7 @@
       (5.6, 3.4)  (4.0, 2.7)  (3.8, 2.4)  (2.5, 1.5)  (7.3, 3.5)
 
     gaps from 5.0:
-      |5.0 - 5.6| = 0.6 &lt;-   |5.0 - 4.0| = 1.0 &lt;-   |5.0 - 3.8| = 1.2 &lt;-
+      |5.0 - 5.6| = 0.6 <-   |5.0 - 4.0| = 1.0 <-   |5.0 - 3.8| = 1.2 <-
       |5.0 - 2.5| = 2.5      |5.0 - 7.3| = 2.3
 
     3 closest right-answers: 3.4, 2.7, 2.4
@@ -133,7 +125,7 @@
 
     knn = make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=5))
     knn.fit(X_train, y_train)          # stores pile; learns mu, sd on working rows
-    pred = knn.predict(X_test)         # same ruler -&gt; measure gaps -&gt; average
+    pred = knn.predict(X_test)         # same ruler -> measure gaps -> average
 
     rmse = mean_squared_error(y_test, pred) ** 0.5
     print(round(rmse, 3))
@@ -141,15 +133,15 @@
 
   ## k Is the Stiff-vs-Jumpy Dial
 
-    k = 1       asks 1 row     -&gt; copies its noise exactly
+    k = 1       asks 1 row     -> copies its noise exactly
                 zero mistake on working pile
                 bad on new rows   (too jumpy)
 
-    k = large   asks many rows -&gt; smooths everything out
+    k = large   asks many rows -> smooths everything out
                 always a bit wrong, everywhere  (too stiff)
                 at k = n_working, every guess = average price
 
-    right k  -&gt;  somewhere in between -- found by rotating folds
+    right k  ->  somewhere in between -- found by rotating folds
 
 
   ## Picking k Without Touching the Hidden Pile
@@ -194,15 +186,12 @@
 
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
-    <a href="chapter1-what-ml-actually-does.html">Part 1 -- The Full Picture</a> .
+    [Part 1 -- The Full Picture](chapter1-what-ml-actually-does.txt) .
     Part 2 (this post) .
-    <a href="straight-stick-linear-regression.html">Part 3 -- Straight-Stick Rule</a>
+    [Part 3 -- Straight-Stick Rule](straight-stick-linear-regression.txt)
 
-  &lt;- <a href="../index.html">Back to all posts</a>
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

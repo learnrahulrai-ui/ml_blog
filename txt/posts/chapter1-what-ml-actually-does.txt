@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guessing House Prices, End to End :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title Guessing House Prices, End to End :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   PREDICTING HOUSE PRICES . PART 1 OF 3
@@ -25,7 +17,7 @@
 
   ## The Job: Guess From a Sheet of Numbers
 
-    rooms  income  age  ocean  people  |  PRICE   &lt;- right-answer column
+    rooms  income  age  ocean  people  |  PRICE   <- right-answer column
     --------------------------------------------------------
      4.2    3.5    25    1.0    320    |   1.4
      5.1    5.6    10    0.5    210    |   2.8
@@ -70,14 +62,14 @@
         |
     pick the k closest
         |
-    average their right-answers   -&gt;   guess
+    average their right-answers   ->   guess
 
       gap(a, b) = sqrt( sum_j (a_j - b_j)^2 )
 
   Nothing is built ahead of time -- the whole working pile is stored and looked up each
-  time. The one setting to pick by hand: k (how many neighbours to ask). Small k -&gt; too
-  jumpy; large k -&gt; too stiff. Full derivation in
-  <a href="neighbor-machine-knn.html">Part 2</a>.
+  time. The one setting to pick by hand: k (how many neighbours to ask). Small k -> too
+  jumpy; large k -> too stiff. Full derivation in
+  [Part 2](neighbor-machine-knn.txt).
 
 
   ## Measuring How Wrong: RMSE
@@ -102,19 +94,19 @@
   Squeeze the whole working pile into d+1 dials. Once set, the pile is discarded; each
   guess is one dot-product. The dials are set by shrinking the squared leftover sum -- an
   exact formula, no searching. Full derivation in
-  <a href="straight-stick-linear-regression.html">Part 3</a>.
+  [Part 3](straight-stick-linear-regression.txt).
 
 
   ## Picking Settings Without Peeking at the Hidden Pile
 
     working pile split into 5 chunks:  A  B  C  D  E
 
-    round 1  [#]  .    .    .    .    -&gt; mistake1
-    round 2  .   [#]   .    .    .    -&gt; mistake2
-    round 3  .    .   [#]   .    .    -&gt; mistake3
-    round 4  .    .    .   [#]   .    -&gt; mistake4
-    round 5  .    .    .    .   [#]   -&gt; mistake5
-                               average -&gt; honest estimate
+    round 1  [#]  .    .    .    .    -> mistake1
+    round 2  .   [#]   .    .    .    -> mistake2
+    round 3  .    .   [#]   .    .    -> mistake3
+    round 4  .    .    .   [#]   .    -> mistake4
+    round 5  .    .    .    .   [#]   -> mistake5
+                               average -> honest estimate
 
   Each round, one chunk grades the rule built on the other four. Rotate until every chunk
   has graded once. Average the five mistakes. This gives an honest estimate without ever
@@ -126,10 +118,10 @@
      leaks grading-chunk numbers into the build step. A bound pipeline enforces this
      automatically (Part 2).
 
-  Procedure: pick settings using rotating folds on the working pile -&gt; refit the winner
-  on all of the working pile -&gt; read the hidden pile ONCE -&gt; report that number.
+  Procedure: pick settings using rotating folds on the working pile -> refit the winner
+  on all of the working pile -> read the hidden pile ONCE -> report that number.
 
-  &gt;&gt; NOTE: ISN'T CHECKING THE HIDDEN PILE PEEKING?
+  >> NOTE: ISN'T CHECKING THE HIDDEN PILE PEEKING?
      No -- using it to pick among rules is peeking; using it ONCE to report the chosen
      rule's mistake is exactly what it is for. A gap between the rotating-fold estimate
      and the hidden-pile mistake means the rule memorised the working pile a little.
@@ -169,14 +161,11 @@
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
     Part 1 (this post) .
-    <a href="neighbor-machine-knn.html">Part 2 -- Ask-Closest Rule</a> .
-    <a href="straight-stick-linear-regression.html">Part 3 -- Straight-Stick Rule</a>
+    [Part 2 -- Ask-Closest Rule](neighbor-machine-knn.txt) .
+    [Part 3 -- Straight-Stick Rule](straight-stick-linear-regression.txt)
 
-  &lt;- <a href="../index.html">Back to all posts</a>
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

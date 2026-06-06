@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leash and Cloud: L2 Punishment and the Two-Cloud Wall :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title Leash and Cloud: L2 Punishment and the Two-Cloud Wall :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   SORTING INTO BINS . PART 3 OF 4
@@ -26,7 +18,7 @@
   them, and a different machine entirely that sidesteps the problem by reading the shape of
   the two groups rather than rolling downhill.
 
-  &gt;&gt; NOTE: THE PART 1 BASELINE ALREADY HAS A LEASH
+  >> NOTE: THE PART 1 BASELINE ALREADY HAS A LEASH
      Worth saying up front, because it surprises people: LogisticRegression() in sklearn is
      NOT a free machine. Its defaults are penalty='l2', C=1.0 -- so the Part 1 baseline
      already carries an L2 leash of medium strength. This post is therefore not "no leash
@@ -36,16 +28,16 @@
 
   ## What a Loose Leash Lets Happen
 
-    default machine (C=1.0):  medium leash -&gt; dials kept modest, but a dominant
+    default machine (C=1.0):  medium leash -> dials kept modest, but a dominant
                               column can still pull its dial fairly large
 
-    truly free (penalty=None): no leash -&gt; one dial might reach 40 or -60
-    patient row -&gt; *dials -&gt; add -&gt; squash -&gt; chance
+    truly free (penalty=None): no leash -> one dial might reach 40 or -60
+    patient row -> *dials -> add -> squash -> chance
 
     if column 7's dial = 40:
-      a shift of 0.1 in column 7 swings the sum by 4.0 -&gt; chance jumps from 0.1 to 0.98
+      a shift of 0.1 in column 7 swings the sum by 4.0 -> chance jumps from 0.1 to 0.98
     the machine bets almost everything on one column
-    -&gt; cocky on study pile, shaky on new lumps
+    -> cocky on study pile, shaky on new lumps
 
   So the question this post really asks is: the default C=1.0 leash is fine, but what
   happens if we pull it TIGHTER? Do the dials shrink further, and does the machine get more
@@ -70,7 +62,7 @@
   The term 2*lambda*beta_j pulls every dial toward zero at every step. Result: dials spread
   across all 30 columns instead of concentrating on one.
 
-  &gt;&gt; NOTE: BAYESIAN READING
+  >> NOTE: BAYESIAN READING
      Adding a squared-dial penalty is the same as placing a zero-mean Gaussian prior on
      each dial and maximising the posterior instead of the likelihood. The prior says "a
      dial as large as 40 is very surprising; please explain." The data can override this
@@ -81,11 +73,11 @@
 
   sklearn spells the leash strength as C, not lambda. They are reciprocals:
 
-      C = 1 / lambda   &lt;=&gt;   lambda = 1 / C
+      C = 1 / lambda   <=>   lambda = 1 / C
 
-    C = 0.1   -&gt;   lambda = 10    heavy penalty -- dials squeezed hard
-    C = 1.0   -&gt;   lambda = 1     sklearn default
-    C = 1000  -&gt;   lambda = 0.001 barely any penalty -- nearly free machine
+    C = 0.1   ->   lambda = 10    heavy penalty -- dials squeezed hard
+    C = 1.0   ->   lambda = 1     sklearn default
+    C = 1000  ->   lambda = 0.001 barely any penalty -- nearly free machine
 
   !! WARN: C=0.1 IS HEAVY PUNISHMENT, NOT LIGHT
      C is the budget you give the machine to IGNORE the penalty. A small budget means
@@ -105,9 +97,9 @@
 
     avg_coef_baseline = np.mean(np.abs(log_reg_baseline.coef_))  # C=1.0 (default)
     avg_coef_l2       = np.mean(np.abs(log_reg_l2.coef_))         # C=0.1 (tighter)
-    # expect: avg_coef_l2 &lt; avg_coef_baseline (the tighter leash shrinks them further)
+    # expect: avg_coef_l2 < avg_coef_baseline (the tighter leash shrinks them further)
 
-  &gt;&gt; NOTE: WHY ABSOLUTE VALUE BEFORE AVERAGING
+  >> NOTE: WHY ABSOLUTE VALUE BEFORE AVERAGING
      Dials can be positive or negative. A positive dial +3 and a negative dial -3 cancel to
      zero in a plain average, making the machine look like it has no signal at all. Taking
      the absolute value first measures the SIZE of each dial regardless of sign, then
@@ -135,10 +127,10 @@
   and computes the wall in one shot.
 
     step 1: split the study pile into sick rows and well rows
-    step 2: compute 30 averages per group -&gt; two centres in 30-column space
+    step 2: compute 30 averages per group -> two centres in 30-column space
             (60 averages total: 30 per class, 2 class centres)
     step 3: find the wall between the two centres
-    step 4: new lump -&gt; which side of the wall? -&gt; that is the label
+    step 4: new lump -> which side of the wall? -> that is the label
 
     well centre #----------+----------# sick centre
                            ^
@@ -186,7 +178,7 @@
      predictions, you will be off. To get the clean halfway wall, force equal priors:
      LinearDiscriminantAnalysis(priors=[0.5, 0.5]).
 
-    # sklearn default: empirical priors -&gt; wall shifted off the midpoint
+    # sklearn default: empirical priors -> wall shifted off the midpoint
     lda = LinearDiscriminantAnalysis()
     lda.fit(X_train_scaled, y_train)
     y_pred_lda = lda.predict(X_test_scaled)
@@ -268,16 +260,13 @@
 
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
-    <a href="sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table</a> .
-    <a href="the-trade-curve.html">Part 2 -- The Trade Curve</a> .
+    [Part 1 -- The S-Curve, the Four-Box Table](sorting-into-bins.txt) .
+    [Part 2 -- The Trade Curve](the-trade-curve.txt) .
     Part 3 (this post) .
-    <a href="picking-settings-skewed-classes.html">Part 4 -- Picking Settings, Skewed Piles</a>
+    [Part 4 -- Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt)
 
-  &lt;- <a href="../index.html">Back to all posts</a>
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Picking Settings, Skewed Piles, and Averaging Many Classes :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title Picking Settings, Skewed Piles, and Averaging Many Classes :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   SORTING INTO BINS . PART 4 OF 4
@@ -33,13 +25,13 @@
   decision tree. These are settings you pick by hand. The machine cannot tune them for
   itself because the leftover doesn't flow back through them.
 
-    dials (beta):   tuned by the machine as it trains   &lt;- the machine adjusts these
-    settings:       chosen by you before training starts &lt;- the machine never sees these
+    dials (beta):   tuned by the machine as it trains   <- the machine adjusts these
+    settings:       chosen by you before training starts <- the machine never sees these
 
     examples:
-      C in LogisticRegression(C=0.1)    &lt;- leash strength
-      k in KNeighborsClassifier(k=5)    &lt;- how many neighbours to ask
-      n_estimators in RandomForest      &lt;- how many trees to grow
+      C in LogisticRegression(C=0.1)    <- leash strength
+      k in KNeighborsClassifier(k=5)    <- how many neighbours to ask
+      n_estimators in RandomForest      <- how many trees to grow
 
 
   ## The Grid Hunt
@@ -95,7 +87,7 @@
      ruler is rebuilt from each fold's 4 training strips only, and the held-out strip is
      measured by a ruler it never touched. Same peeking rule from Part 1, one level deeper.
 
-  &gt;&gt; NOTE: THE EXAM PILE IS STILL SEALED
+  >> NOTE: THE EXAM PILE IS STILL SEALED
      GridSearchCV only ever touches the study pile (X_train). The exam pile (X_test) is
      opened exactly once at the very end to report the final score. If you tune settings on
      the exam pile, you are leaking future information and the final score is optimistic --
@@ -108,8 +100,8 @@
   There is a second popular ruler -- pinch-to-fit -- that squishes every column's values to
   sit strictly between 0 and 1.
 
-    standard ruler:  x~ = (x - mean) / spread        -&gt; centred at 0, spread ~= 1
-    pinch-to-fit:    x~ = (x - min)  / (max - min)   -&gt; bounded in [0, 1]
+    standard ruler:  x~ = (x - mean) / spread        -> centred at 0, spread ~= 1
+    pinch-to-fit:    x~ = (x - min)  / (max - min)   -> bounded in [0, 1]
 
   !! WARN: PINCH-TO-FIT IS FRAGILE AROUND OUTLIERS
      One outlier stretches the range. Say house areas run 500-3000 sq ft but one mansion
@@ -122,16 +114,16 @@
     area values:  500, 520, 3000, 15000
 
     pinch-to-fit (max=15000, min=500):
-      500   -&gt;  0.000
-      520   -&gt;  0.001      &lt;- normal house, near 0
-      3000  -&gt;  0.172      &lt;- large house, still near 0
-      15000 -&gt;  1.000      &lt;- outlier, fills the far end
+      500   ->  0.000
+      520   ->  0.001      <- normal house, near 0
+      3000  ->  0.172      <- large house, still near 0
+      15000 ->  1.000      <- outlier, fills the far end
 
     standard ruler (mean ~= 4755, spread ~= 6150):
-      500   -&gt; -0.70
-      520   -&gt; -0.69       &lt;- normal houses spread out
-      3000  -&gt; -0.29
-      15000 -&gt;  1.67       &lt;- outlier: unusual but doesn't crush others
+      500   -> -0.70
+      520   -> -0.69       <- normal houses spread out
+      3000  -> -0.29
+      15000 ->  1.67       <- outlier: unusual but doesn't crush others
 
   For the same-ruler rule (build from study only, apply to both), the same peeking logic
   applies: compute min, max (or mean, spread) from the study pile only.
@@ -142,13 +134,13 @@
   Part 1 argued that in cancer screening, recall is the north star because a MISSED sick
   person is catastrophic. In other settings, the ALARM is the catastrophe.
 
-    precision v when ALARM is large   &lt;- false positives pile up
-    recall    v when MISSED is large  &lt;- false negatives pile up
+    precision v when ALARM is large   <- false positives pile up
+    recall    v when MISSED is large  <- false negatives pile up
 
-    cancer screening:  MISSED = cancer goes untreated    -&gt; prioritise recall
-    legal evidence:    ALARM  = innocent person jailed    -&gt; prioritise precision
-    email spam:        ALARM  = real email deleted        -&gt; precision matters more
-    fraud detection:   MISSED = fraud slips through -&gt; loss -&gt; recall matters
+    cancer screening:  MISSED = cancer goes untreated    -> prioritise recall
+    legal evidence:    ALARM  = innocent person jailed    -> prioritise precision
+    email spam:        ALARM  = real email deleted        -> precision matters more
+    fraud detection:   MISSED = fraud slips through -> loss -> recall matters
 
   ** KEY: PRECISION REDUCES ALARMS; RECALL REDUCES MISSES
      Choosing which to prioritise is a business or clinical decision, not a machine
@@ -172,8 +164,8 @@
         100  fraud transactions    (class 1)
 
     fool machine: always call "normal"
-      accuracy = 99900 / 100000 = 99.9%   &lt;- looks extraordinary
-      recall   = 0 / 100 = 0.0%           &lt;- catches no fraud at all
+      accuracy = 99900 / 100000 = 99.9%   <- looks extraordinary
+      recall   = 0 / 100 = 0.0%           <- catches no fraud at all
 
   The ROC curve (trade curve) also has a problem with skewed piles. FPR divides ALARM by
   all truly-normal rows -- that denominator is 99900. Even if the machine raises 2000 false
@@ -181,11 +173,11 @@
   optimistically. The 2000 blocked customers are invisible in that fraction.
 
     ROC curve is blind to class imbalance because:
-    FPR = ALARM / (ALARM + CLEAR)   &lt;- denominator is huge; ALARM looks tiny
+    FPR = ALARM / (ALARM + CLEAR)   <- denominator is huge; ALARM looks tiny
 
     Precision-recall curve avoids this:
-    precision = CAUGHT / (CAUGHT + ALARM)  &lt;- no TN in sight; focuses on the sick pile
-    recall    = CAUGHT / (CAUGHT + MISSED) &lt;- also ignores TN
+    precision = CAUGHT / (CAUGHT + ALARM)  <- no TN in sight; focuses on the sick pile
+    recall    = CAUGHT / (CAUGHT + MISSED) <- also ignores TN
 
   The precision-recall curve sweeps the same cutoff as the trade curve but plots precision
   on the Y-axis and recall on the X-axis. A perfect machine hugs the top-right corner (high
@@ -193,14 +185,14 @@
   is the baseline -- the always-shout-sick fool.
 
     precision
-     1 | # &lt;- perfect (catch all, zero false alarms)
+     1 | # <- perfect (catch all, zero false alarms)
        | ##
        |   ##
-       | - - - - &lt;- baseline (= fraction of sick in the sheet)
+       | - - - - <- baseline (= fraction of sick in the sheet)
      0 +----------- recall
        0              1
 
-    area under precision-recall curve -&gt; average precision (AP)
+    area under precision-recall curve -> average precision (AP)
 
   ** KEY: USE PRECISION-RECALL CURVES WHEN THE PILE IS SKEWED
      When one class is rare (fraud, disease in a healthy population, defects on a line),
@@ -241,8 +233,8 @@
     macro F1 = (0.89 + 0.67 + 0.34) / 3 = 0.63
 
     class C (only 10 rows) gets the same weight as class A (1000 rows)
-    -&gt; a low F1 on class C drags the average down strongly
-    -&gt; honest picture of per-class performance regardless of class size
+    -> a low F1 on class C drags the average down strongly
+    -> honest picture of per-class performance regardless of class size
 
   COUNT-EVERY-LABEL averaging (micro): pool all CAUGHT, ALARM, and MISSED counts across
   every class, then compute one precision, one recall, one F1 from those pooled totals.
@@ -284,7 +276,7 @@
     macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
     # micro[:3] == (accuracy, accuracy, accuracy);  macro[:3] == the equal-weight blend
 
-  &gt;&gt; NOTE: WHY classification_report SHOWS "accuracy", NOT "micro avg"
+  >> NOTE: WHY classification_report SHOWS "accuracy", NOT "micro avg"
      On ordinary single-label data (each row has exactly one true class), every false
      positive for one class is simultaneously a false negative for another -- the pooled
      counts make micro precision, micro recall, and micro F1 all collapse to the same
@@ -329,16 +321,13 @@
 
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
-    <a href="sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table</a> .
-    <a href="the-trade-curve.html">Part 2 -- The Trade Curve</a> .
-    <a href="leash-and-cloud.html">Part 3 -- Leash and Cloud</a> .
+    [Part 1 -- The S-Curve, the Four-Box Table](sorting-into-bins.txt) .
+    [Part 2 -- The Trade Curve](the-trade-curve.txt) .
+    [Part 3 -- Leash and Cloud](leash-and-cloud.txt) .
     Part 4 (this post)
 
-  &lt;- <a href="../index.html">Back to all posts</a>
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>
