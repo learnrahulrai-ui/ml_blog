@@ -32,23 +32,42 @@ notes on machine learning, worked out by hand -- est. 2026
 
         <p>
           The S-curve machine in Part 1 sets its dials by rolling downhill on cross-entropy
-          loss. Nothing stops a dial from growing to 50 if that is what the descent finds.
-          A huge dial means the machine over-trusts one measured column and barely listens
-          to the rest. That machine may fit the study pile well but fail on new lumps it has
-          never seen &mdash; the dials memorised the study pile's quirks. This post covers
-          two fixes: a leash on the dials, and a different machine entirely that sidesteps
-          the problem by reading the shape of the two groups rather than rolling downhill.
+          loss. Left completely unchecked, nothing stops a dial from growing to 50 if that is
+          what the descent finds. A huge dial means the machine over-trusts one measured column
+          and barely listens to the rest &mdash; it may fit the study pile well but fail on new
+          lumps it has never seen. This post covers two ways to keep the dials humble: a
+          <em>tighter</em> leash on them, and a different machine entirely that sidesteps the
+          problem by reading the shape of the two groups rather than rolling downhill.
         </p>
 
-        <h2>The Free Machine</h2>
+        <div class="callout note">
+          <span class="callout-label">&#9656; THE PART 1 BASELINE ALREADY HAS A LEASH</span>
+          Worth saying up front, because it surprises people: <code>LogisticRegression()</code>
+          in sklearn is <em>not</em> a free machine. Its defaults are
+          <code>penalty='l2', C=1.0</code> &mdash; so the Part 1 baseline already carries an L2
+          leash of medium strength. This post is therefore not "no leash vs leash"; it is
+          <strong>medium leash (C=1.0) vs tighter leash (C=0.1)</strong>. To see a genuinely
+          unleashed machine you would have to pass <code>penalty=None</code> explicitly.
+        </div>
 
-<pre><code>   free machine: roll downhill → no rules → one dial might reach 40 or −60
+        <h2>What a Loose Leash Lets Happen</h2>
+
+<pre><code>   default machine (C=1.0):  medium leash → dials kept modest, but a dominant
+                             column can still pull its dial fairly large
+
+   truly free (penalty=None): no leash → one dial might reach 40 or −60
    patient row → ×dials → add → squash → chance
 
    if column 7's dial = 40:
      a shift of 0.1 in column 7 swings the sum by 4.0 → chance jumps from 0.1 to 0.98
    the machine bets almost everything on one column
    → cocky on study pile, shaky on new lumps</code></pre>
+
+        <p>
+          So the question this post really asks is: the default C=1.0 leash is fine, but
+          what happens if we pull it <em>tighter</em>? Do the dials shrink further, and does
+          the machine get more humble?
+        </p>
 
         <h2>A Leash on the Dials (L2 Penalty)</h2>
 
@@ -119,12 +138,13 @@ y_pred_l2 = log_reg_l2.predict(X_test_scaled)</code></pre>
         <h2>Did the Dials Shrink?</h2>
 
         <p>
-          Compare the average absolute dial size before and after the leash:
+          Compare the average absolute dial size for the default leash (C=1.0) against the
+          tighter leash (C=0.1):
         </p>
 
-<pre><code>avg_coef_baseline = np.mean(np.abs(log_reg_baseline.coef_))
-avg_coef_l2       = np.mean(np.abs(log_reg_l2.coef_))
-# expect: avg_coef_l2 < avg_coef_baseline</code></pre>
+<pre><code>avg_coef_baseline = np.mean(np.abs(log_reg_baseline.coef_))  # C=1.0 (default)
+avg_coef_l2       = np.mean(np.abs(log_reg_l2.coef_))         # C=0.1 (tighter)
+# expect: avg_coef_l2 < avg_coef_baseline (the tighter leash shrinks them further)</code></pre>
 
         <div class="callout note">
           <span class="callout-label">&#9656; WHY ABSOLUTE VALUE BEFORE AVERAGING</span>
@@ -196,17 +216,56 @@ avg_coef_l2       = np.mean(np.abs(log_reg_l2.coef_))
           Meaning: take the difference between the two class centres, then rotate it
           by the inverse of the pooled within-class spread matrix. This adjusts for the
           tilt and shape of the clouds &mdash; if both clouds are elongated diagonally,
-          the wall tilts to match. The decision threshold sits at the midpoint of the
-          projected class means:
+          the wall tilts to match.
+        </p>
+
+        <p>
+          Where does the wall sit along that direction? If the two classes are equally
+          common, it sits exactly at the midpoint of the projected class means:
         </p>
 
         <div class="math-box">
           threshold = w<sup>T</sup>(&mu;<sub>0</sub> + &mu;<sub>1</sub>) / 2
+          &nbsp;&nbsp;<span style="font-weight:normal; color:#555;">(only when the two classes are equally common)</span>
         </div>
 
-<pre><code>lda = LinearDiscriminantAnalysis()
+        <p>
+          But the two classes are usually <em>not</em> equally common, and that pure midpoint
+          is a special case. The full rule scores each new lump and adds a nudge for how common
+          each class is:
+        </p>
+
+        <div class="math-box">
+          score(x) = w<sup>T</sup>x + w<sub>0</sub>, &nbsp;&nbsp;
+          w<sub>0</sub> = &minus;&frac12;(&mu;<sub>0</sub>+&mu;<sub>1</sub>)<sup>T</sup>&Sigma;<sub>W</sub><sup>&minus;1</sup>(&mu;<sub>1</sub>&minus;&mu;<sub>0</sub>)
+          + log(&pi;<sub>1</sub>/&pi;<sub>0</sub>)
+        </div>
+
+        <p>
+          The first piece of w<sub>0</sub> is the midpoint; the extra <code>log(&pi;<sub>1</sub>/&pi;<sub>0</sub>)</code>
+          term slides the wall toward the rarer class so the machine doesn't over-shout it.
+          Here &pi;<sub>0</sub> and &pi;<sub>1</sub> are the class frequencies (the priors).
+        </p>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; THE WALL IS NOT EXACTLY HALFWAY ON IMBALANCED DATA</span>
+          The Wisconsin sheet is roughly 63% well and 37% sick &mdash; not equal. sklearn's
+          <code>LinearDiscriminantAnalysis()</code> uses <em>empirical priors</em> by default
+          (the actual class frequencies), so the boundary it fits carries the
+          <code>log(&pi;<sub>1</sub>/&pi;<sub>0</sub>)</code> offset and sits <em>off</em> the
+          midpoint. If you place a wall at the pure midpoint and expect to reproduce sklearn's
+          predictions, you will be off. To get the clean halfway wall, you must force equal
+          priors: <code>LinearDiscriminantAnalysis(priors=[0.5, 0.5])</code>.
+        </div>
+
+<pre><code># sklearn default: empirical priors → wall shifted off the midpoint
+lda = LinearDiscriminantAnalysis()
 lda.fit(X_train_scaled, y_train)
-y_pred_lda = lda.predict(X_test_scaled)</code></pre>
+y_pred_lda = lda.predict(X_test_scaled)
+
+# to reproduce the exact "halfway between the centres" wall:
+lda_equal = LinearDiscriminantAnalysis(priors=[0.5, 0.5])
+lda_equal.fit(X_train_scaled, y_train)</code></pre>
 
         <h2>Generative vs Discriminative</h2>
 

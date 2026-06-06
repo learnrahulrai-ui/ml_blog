@@ -93,12 +93,31 @@ notes on machine learning, worked out by hand -- est. 2026
         </ol>
 
 <pre><code>from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
-param_grid = {'C': [0.01, 0.1, 1, 10], 'penalty': ['l2']}
-gs = GridSearchCV(LogisticRegression(), param_grid,
-                  cv=5, scoring='recall')
-gs.fit(X_train_scaled, y_train)
-best_C = gs.best_params_['C']</code></pre>
+# scaler lives INSIDE the pipeline so it is rebuilt on each fold's
+# training strip only — never on the strip being scored
+pipe = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf',    LogisticRegression()),
+])
+param_grid = {'clf__C': [0.01, 0.1, 1, 10], 'clf__penalty': ['l2']}
+gs = GridSearchCV(pipe, param_grid, cv=5, scoring='recall')
+gs.fit(X_train, y_train)          # pass RAW X_train, not pre-scaled
+best_C = gs.best_params_['clf__C']</code></pre>
+
+        <div class="callout gotcha">
+          <span class="callout-label">&#9888; BUILD THE RULER INSIDE EACH FOLD, NOT BEFORE THE HUNT</span>
+          A subtle leak: if you scale all of X_train <em>once</em> up front and then pass that
+          pre-scaled pile to GridSearchCV, every validation strip has already helped shape the
+          ruler (its mean and spread). The strip you score on has leaked into the scaling, so
+          the fold scores come out optimistic &mdash; even though the final exam pile (X_test)
+          is still sealed. The fix is to put the scaler <em>inside</em> a Pipeline and pass raw
+          X_train: now the ruler is rebuilt from each fold's 4 training strips only, and the
+          held-out strip is measured by a ruler it never touched. Same peeking rule from
+          Part 1, applied one level deeper.
+        </div>
 
         <div class="callout note">
           <span class="callout-label">&#9656; THE EXAM PILE IS STILL SEALED</span>
@@ -321,11 +340,31 @@ ap = average_precision_score(y_test, y_proba)   # area under the curve</code></p
           about catching every cancer type regardless of how rare it is.
         </div>
 
-<pre><code>from sklearn.metrics import classification_report
+<pre><code>from sklearn.metrics import classification_report, precision_recall_fscore_support
 
 print(classification_report(y_test, y_pred,
       target_names=['type A', 'type B', 'type C']))
-# shows per-class precision/recall/F1, then macro avg and weighted avg</code></pre>
+# per-class precision/recall/F1, then: accuracy, macro avg, weighted avg
+
+# note: for ordinary single-label multiclass, micro precision = micro recall
+# = micro F1 = accuracy, so classification_report does NOT print a "micro avg"
+# row — it prints "accuracy" instead. To see the micro number by name, ask for it:
+micro = precision_recall_fscore_support(y_test, y_pred, average='micro')
+macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
+# micro[:3] == (accuracy, accuracy, accuracy);  macro[:3] == the equal-weight blend</code></pre>
+
+        <div class="callout note">
+          <span class="callout-label">&#9656; WHY classification_report SHOWS "accuracy", NOT "micro avg"</span>
+          On ordinary single-label data (each row has exactly one true class), every false
+          positive for one class is simultaneously a false negative for another &mdash; the
+          pooled counts make micro precision, micro recall, and micro F1 all collapse to the
+          same number: plain accuracy. So <code>classification_report</code> prints an
+          <code>accuracy</code> row instead of a <code>micro avg</code> row. If you want to
+          show the micro metric under its own name, compute it explicitly with
+          <code>precision_recall_fscore_support(..., average='micro')</code>. (A true
+          <code>micro avg</code> row only appears for multi-label problems, where the collapse
+          doesn't happen.)
+        </div>
 
         <h2>Summary: Which Tool for Which Problem</h2>
 
