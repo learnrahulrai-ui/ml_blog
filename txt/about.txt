@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title About :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="index.html">home</a> | <a href="about.html">about</a> | <a href="archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   ABOUT THIS BLOG
@@ -41,22 +33,22 @@
   -----------
     - Predicting House Prices -- two estimators from scratch (ask-closest and
       straight-stick) on the California housing pile, by hand.
-        <a href="posts/chapter1-what-ml-actually-does.html">part 1</a> .
-        <a href="posts/neighbor-machine-knn.html">part 2</a> .
-        <a href="posts/straight-stick-linear-regression.html">part 3</a>
+        [part 1](posts/chapter1-what-ml-actually-does.txt) .
+        [part 2](posts/neighbor-machine-knn.txt) .
+        [part 3](posts/straight-stick-linear-regression.txt)
 
     - Grading a Guesser -- two ways to score a fitted line (MSE and R^2) and how to read
       the dials it sets, on a sheet of cars.
-        <a href="posts/grading-the-guess-mse-r2.html">part 1</a> .
-        <a href="posts/reading-the-dials.html">part 2</a>
+        [part 1](posts/grading-the-guess-mse-r2.txt) .
+        [part 2](posts/reading-the-dials.txt)
 
     - Sorting Into Bins -- sorting breast lumps into sick/well: the S-curve guesser, the
       four-box table, ROC/AUC, the L2 leash, the two-cloud wall (LDA), grid search,
       skewed piles, and macro/micro averaging.
-        <a href="posts/sorting-into-bins.html">part 1</a> .
-        <a href="posts/the-trade-curve.html">part 2</a> .
-        <a href="posts/leash-and-cloud.html">part 3</a> .
-        <a href="posts/picking-settings-skewed-classes.html">part 4</a>
+        [part 1](posts/sorting-into-bins.txt) .
+        [part 2](posts/the-trade-curve.txt) .
+        [part 3](posts/leash-and-cloud.txt) .
+        [part 4](posts/picking-settings-skewed-classes.txt)
 
 
   What This Blog Isn't
@@ -68,7 +60,7 @@
 
   The Site
   --------
-  Plain-text source files wrapped in one &lt;pre&gt; tag each, styled by a single hand-written
+  Plain-text source files wrapped in one <pre> tag each, styled by a single hand-written
   stylesheet. No JavaScript, no tracking, no cookies, no frameworks, no web fonts.
   Authored to 100 columns so it reads the same in a browser or piped through `less` in a
   terminal. Hosted on GitHub Pages.
@@ -76,13 +68,10 @@
 
   Contact
   -------
-    Email:  <a href="mailto:learn.rahul.rai@gmail.com">learn.rahul.rai@gmail.com</a>
-    GitHub: <a href="https://github.com/learnrahulrai-ui">learnrahulrai-ui</a>
+    Email:  [learn.rahul.rai@gmail.com](mailto:learn.rahul.rai@gmail.com)
+    GitHub: [learnrahulrai-ui](https://github.com/learnrahulrai-ui)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

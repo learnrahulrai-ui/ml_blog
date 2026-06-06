@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Trade Curve: Sliding the Cutoff and What AUC Actually Measures :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title The Trade Curve: Sliding the Cutoff and What AUC Actually Measures :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   SORTING INTO BINS . PART 2 OF 4
@@ -56,7 +48,7 @@
         catch-rate   v   (many sick lumps called well and sent home)
         false-alarm  v   (healthy people mostly called clear)
 
-    -&gt; a TRADE: cannot raise catches without raising false alarms
+    -> a TRADE: cannot raise catches without raising false alarms
 
   There is no cutoff that maximises TPR while holding FPR at zero -- unless the machine
   perfectly separates the two groups. What exists is a continuous family of deals.
@@ -68,10 +60,10 @@
   those coordinates. Connect the dots: that is the trade curve, or ROC curve.
 
     TPR (catch-rate, lives saved)
-     1 | * &lt;- perfect machine (catch all, alarm none)
+     1 | * <- perfect machine (catch all, alarm none)
        |  ###
        |     ##
-       |  - - - - \  &lt;- diagonal = useless coin flip
+       |  - - - - \  <- diagonal = useless coin flip
      0 +--------------- FPR (false-alarm, money wasted)
        0              1
 
@@ -79,8 +71,8 @@
     perfect machine: hugs the top-left corner
     coin flip: follows the diagonal
 
-  The curve is defined by t: {(FPR(t), TPR(t)) : t in [0, 1]}. As t -&gt; 0, everyone is
-  called sick -&gt; TPR=1, FPR=1 (top-right). As t -&gt; 1, everyone is called well -&gt; TPR=0,
+  The curve is defined by t: {(FPR(t), TPR(t)) : t in [0, 1]}. As t -> 0, everyone is
+  called sick -> TPR=1, FPR=1 (top-right). As t -> 1, everyone is called well -> TPR=0,
   FPR=0 (bottom-left).
 
 
@@ -92,7 +84,7 @@
 
     AUC = 1.0   perfect -- no overlap between sick and well scores
     AUC = 0.5   useless -- sick and well scores interleaved randomly
-    AUC &lt; 0.5   backwards -- sick scores lower than well scores
+    AUC < 0.5   backwards -- sick scores lower than well scores
 
   AUC is computed from the curve points by the trapezoidal rule:
 
@@ -104,20 +96,20 @@
   There is a cleaner way to read AUC that has nothing to do with curves or areas. It is
   called the Wilcoxon-Mann-Whitney statistic:
 
-      AUC = P( score(x+) &gt; score(x-) )
+      AUC = P( score(x+) > score(x-) )
 
   Pick one sick lump at random and one well lump at random. What is the probability that
   the machine gave the sick lump a higher chance-score than the well lump? That is AUC.
 
     GOOD machine -- scores:
-      well lumps -&gt;  ####                       (all low)
-      sick lumps -&gt;             ####            (all high)
-      -&gt; almost always: sick score &gt; well score -&gt; AUC ~= 1.0
+      well lumps ->  ####                       (all low)
+      sick lumps ->             ####            (all high)
+      -> almost always: sick score > well score -> AUC ~= 1.0
 
     BAD machine -- scores:
-      well lumps -&gt;   # # #  #  #  #
-      sick lumps -&gt;  #  # #   #  #  #
-      -&gt; roughly half the time sick scores below well -&gt; AUC ~= 0.5
+      well lumps ->   # # #  #  #  #
+      sick lumps ->  #  # #   #  #  #
+      -> roughly half the time sick scores below well -> AUC ~= 0.5
 
   AUC = 0.97 means: take a random sick lump and a random well lump; 97 times out of 100
   the machine scored the sick lump higher. It answers "how cleanly do the two groups
@@ -136,8 +128,8 @@
   two unique scores, two dots, a useless curve. predict_proba returns the raw chance
   output before any cutoff, giving a different number for every row.
 
-    predict(X_test_scaled)        -&gt; [1, 0, 1, 1, 0, ...]   (0 or 1 only)
-    predict_proba(X_test_scaled)  -&gt; [[0.03, 0.97],          (well-chance, sick-chance)
+    predict(X_test_scaled)        -> [1, 0, 1, 1, 0, ...]   (0 or 1 only)
+    predict_proba(X_test_scaled)  -> [[0.03, 0.97],          (well-chance, sick-chance)
                                        [0.81, 0.19],           per row
                                        ...]
 
@@ -150,7 +142,7 @@
 
   !! WARN: COLUMN 0 FLIPS THE CURVE BELOW THE DIAGONAL
      If you pass column 0 (well-chances), sick lumps score LOW and well lumps score HIGH --
-     the ranking is backwards. The ROC curve dips below the diagonal and AUC &lt; 0.5. The
+     the ranking is backwards. The ROC curve dips below the diagonal and AUC < 0.5. The
      machine looks worse than a coin flip. Always use column 1.
 
 
@@ -177,7 +169,7 @@
     AUC ~= 0.70   noisy; weak signal; more columns or a different machine might help
     AUC ~= 0.50   no signal at all; the 30 columns carry no information about the bin
 
-  &gt;&gt; NOTE: THE TRADE CURVE AND AUC DO NOT PICK A CUTOFF FOR YOU
+  >> NOTE: THE TRADE CURVE AND AUC DO NOT PICK A CUTOFF FOR YOU
      They tell you how well-separated the two groups are. The choice of cutoff -- how much
      ALARM is acceptable to buy a given catch-rate -- is a clinical or business decision.
      In cancer screening, a doctor reading a curve of AUC 0.97 might pick the cutoff that
@@ -194,21 +186,18 @@
     trade curve                              ROC curve (receiver operating char.)
     area under trade curve                   AUC (area under the ROC curve)
     chance-score                             posterior probability / predict_proba
-    pick-higher reading                      Wilcoxon-Mann-Whitney: P(score+ &gt; score-)
+    pick-higher reading                      Wilcoxon-Mann-Whitney: P(score+ > score-)
     trapezoidal rule                         numerical integration used by auc()
 
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
-    <a href="sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table</a> .
+    [Part 1 -- The S-Curve, the Four-Box Table](sorting-into-bins.txt) .
     Part 2 (this post) .
-    <a href="leash-and-cloud.html">Part 3 -- Leash and Cloud</a> .
-    <a href="picking-settings-skewed-classes.html">Part 4 -- Picking Settings, Skewed Piles</a>
+    [Part 3 -- Leash and Cloud](leash-and-cloud.txt) .
+    [Part 4 -- Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt)
 
-  &lt;- <a href="../index.html">Back to all posts</a>
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reading the Dials: What the Coefficients Say :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title Reading the Dials: What the Coefficients Say :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   GRADING A GUESSER . PART 2 OF 2
@@ -38,13 +30,13 @@
 
   ## The Bare Row Problem
 
-    model.coef_  -&gt;  [ -0.01, -0.04, -0.007, +0.12 ]   numbers only, no names
-    X.columns    -&gt;  [ disp,  horse,  weight,  accel ]  names, same order
+    model.coef_  ->  [ -0.01, -0.04, -0.007, +0.12 ]   numbers only, no names
+    X.columns    ->  [ disp,  horse,  weight,  accel ]  names, same order
 
   Two rows, same order, one missing its labels. Zip the names onto the dials and you have
   a shelf you can read:
 
-    zip -&gt;  disp  : -0.01
+    zip ->  disp  : -0.01
             horse : -0.04
             weight: -0.007
             accel : +0.12
@@ -56,7 +48,7 @@
 
       -0.04      -0.01      -0.007             +0.12
       horse       disp       weight             accel
-    &lt;-- most negative                      most positive --&gt;
+    <-- most negative                      most positive -->
 
   !! WARN: -0.04 IS SMALLER THAN -0.007
      The trap: 4 LOOKS bigger than 7, so the eye wants -0.04 to be the larger drag and
@@ -67,9 +59,9 @@
   winner-hunt used to pick the best neighbour-count earlier in the blog:
 
     dials = dict(zip(X.columns, model.coef_))
-    strongest_drag = min(dials, key=dials.get)   # KEY of the smallest VALUE -&gt; a name
+    strongest_drag = min(dials, key=dials.get)   # KEY of the smallest VALUE -> a name
 
-  &gt;&gt; NOTE: IT HANDS BACK A NAME, NOT A NUMBER
+  >> NOTE: IT HANDS BACK A NAME, NOT A NUMBER
      min(dials, key=dials.get) walks the shelf, scores each name by its dial, and returns
      the NAME with the lowest score -- not the dial itself. Plain min(dials) would instead
      compare the names alphabetically and hand back "accel" -- the wrong question answered
@@ -108,7 +100,7 @@
     dials = dict(zip(X.columns, m[-1].coef_))     # now in one shared ruler
     strongest_drag = min(dials, key=dials.get)    # an honest comparison
 
-  &gt;&gt; NOTE: THIS DOESN'T CONTRADICT "OLS NEEDS NO SCALING"
+  >> NOTE: THIS DOESN'T CONTRADICT "OLS NEEDS NO SCALING"
      The straight-stick rule's GUESSES and its MSE and R^2 do not care about scaling --
      rescale a column and its dial rescales inversely, leaving the answer untouched (shown
      in the straight-stick post). Scaling changes nothing about how well it fits. It only
@@ -134,7 +126,7 @@
       disp : -0.01    horse : -0.04    weight: -0.007    accel : +0.12
 
     most negative?  scan for the lowest:
-      -0.04  &lt;- horse   (further below zero than -0.01 or -0.007)
+      -0.04  <- horse   (further below zero than -0.01 or -0.007)
 
     strongest_drag = "horse"
     accel (+0.12) is the only one PUSHING mpg up.
@@ -163,15 +155,12 @@
 
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
-    <a href="grading-the-guess-mse-r2.html">Part 1 -- Two Rulers for One Guess</a> .
+    [Part 1 -- Two Rulers for One Guess](grading-the-guess-mse-r2.txt) .
     Part 2 (this post)
 
-  Next: <a href="sorting-into-bins.html">Sorting Into Bins -- the S-curve, the four-box table, and why accuracy lies.</a>
-  &lt;- <a href="../index.html">Back to all posts</a>
+  Next: [Sorting Into Bins -- the S-curve, the four-box table, and why accuracy lies.](sorting-into-bins.txt)
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

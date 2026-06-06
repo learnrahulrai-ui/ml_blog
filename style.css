@@ -1,153 +1,16 @@
-/* Rahul's ML Blog -- plain-text, mailing-list style. One file, no fonts, no JS. */
-
+/* Plain-text blog: one <pre> per page, monospace, ~100-column frame. */
 html { -webkit-text-size-adjust: 100%; }
-
-body {
-  font-family: ui-monospace, "DejaVu Sans Mono", "Courier New", monospace;
-  font-size: 15px;
-  line-height: 1.5;
-  color: #111;
-  background: #fff;
-  max-width: 80ch;
-  margin: 0 auto;
-  padding: 1.2em 1em 3em;
-}
-
-a          { color: #1a1ae6; }
-a:visited  { color: #6a1aae; }
-a:hover    { background: #ffffcc; }
-
-hr {
-  border: none;
-  border-top: 1px solid #ccc;
-  margin: 1.4em 0;
-}
-
-/* ── ASCII banner + rules ── */
-.banner, .rule {
-  white-space: pre;
-  overflow-x: auto;
-  margin: 0 0 0.3em;
-  color: #000;
-}
-.banner    { font-weight: bold; }
-.rule      { margin: 1.6em 0 0.6em; }
-.banner a       { color: #000; text-decoration: none; }
-.banner a:hover { background: none; text-decoration: underline; }
-
-/* ── nav line ── */
-#nav {
-  margin: 0 0 1.2em;
+body { background: #fff; color: #000; margin: 0; }
+pre {
+  font-family: "DejaVu Sans Mono", "Courier New", monospace;
   font-size: 14px;
+  line-height: 1.35;
+  white-space: pre;
+  max-width: 100ch;
+  margin: 0 auto;
+  padding: 1.2em 1em 2.4em;
+  overflow-x: auto;
 }
-#nav a { text-decoration: none; }
-
-/* ── article header (email-ish) ── */
-.article-header {
-  margin: 0.4em 0 1.3em;
-  padding-bottom: 0.6em;
-  border-bottom: 1px solid #000;
-}
-.series-badge {
-  display: block;
-  font-weight: normal;
-  color: #555;
-  font-size: 13px;
-  margin-bottom: 0.15em;
-}
-.series-badge::before { content: "series: "; }
-.article-title {
-  font-size: 17px;
-  font-weight: bold;
-  margin: 0.1em 0;
-}
-.article-meta { font-size: 13px; color: #555; }
-
-/* ── body ── */
-.article-body h2 {
-  font-size: 15px;
-  font-weight: bold;
-  margin: 1.7em 0 0.5em;
-}
-.article-body h2::before { content: "## "; color: #999; }
-.article-body h3 { font-size: 15px; font-weight: bold; margin: 1.2em 0 0.4em; }
-.article-body p  { margin: 0.8em 0; }
-.article-body ul, .article-body ol { margin: 0.8em 0 0.8em 2em; }
-.article-body li { margin: 0.2em 0; }
-.article-body strong { font-weight: bold; }
-
-/* ── code / ascii blocks ── */
-pre { white-space: pre; overflow-x: auto; }
-.article-body pre {
-  background: #f4f4f4;
-  border: 1px solid #ddd;
-  padding: 0.6em 0.8em;
-  margin: 0.8em 0;
-  font-size: 13.5px;
-  line-height: 1.4;
-}
-code { background: #f4f4f4; padding: 0 2px; }
-.article-body pre code { background: none; padding: 0; }
-
-/* ── math: plain, indented ── */
-.math-box {
-  margin: 0.8em 0 0.8em 2em;
-  font-weight: bold;
-}
-
-/* ── callouts: quoted-block, no colour ── */
-.callout {
-  border-left: 3px solid #999;
-  padding: 0.1em 0 0.1em 0.9em;
-  margin: 0.9em 0;
-}
-.callout-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.2em;
-}
-
-/* ── tables: minimal ── */
-.article-body table {
-  border-collapse: collapse;
-  margin: 0.9em 0;
-  font-size: 13.5px;
-}
-.article-body th, .article-body td {
-  border: 1px solid #bbb;
-  padding: 2px 8px;
-  text-align: left;
-  vertical-align: top;
-}
-.article-body th { font-weight: bold; }
-
-/* ── takeaways ── */
-.takeaways { margin: 0.9em 0 0.9em 2em; }
-
-/* ── post listings (index / archive) ── */
-.section-header {
-  font-weight: bold;
-  margin: 1.7em 0 0.7em;
-}
-.post-card { margin: 0 0 1.1em; }
-.post-title { font-weight: bold; }
-.post-meta { font-size: 13px; color: #555; margin: 0.1em 0; }
-.post-excerpt { font-size: 14px; margin: 0.2em 0; }
-.read-more { font-size: 13px; }
-.tag { color: #555; }
-
-/* ── post sidebar: stacks below the article, plain ── */
-#content-area { display: block; }
-#sidebar { margin-top: 1.6em; }
-.sidebar-box { margin: 0 0 1em; }
-.sidebar-box-title { font-weight: bold; }
-.sidebar-box ul { list-style: none; margin: 0.2em 0 0; padding: 0; }
-.sidebar-box li { font-size: 13.5px; }
-.sidebar-box li::before { content: "- "; color: #999; }
-
-/* ── footer ── */
-#footer { font-size: 13px; color: #555; margin-top: 0.6em; }
-#footer a { color: #1a1ae6; }
-
-/* ── kill leftover 90s decorations, just in case any remain ── */
-.marquee-wrap, .counter-box, .footer-badges, .blink, .ascii-art { display: none; }
+a { color: #00188f; }
+a:visited { color: #551a8b; }
+a:hover { background: #ffffcc; }

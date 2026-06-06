@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Straight-Stick Rule :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title The Straight-Stick Rule :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   PREDICTING HOUSE PRICES . PART 3 OF 3
@@ -34,7 +26,7 @@
     all rows at once:  yhat = X*beta
     (X has a column of 1s prepended to carry b0)
 
-      yhat_i = b0 + sum_j beta_j * x_ij      &lt;=&gt;      yhat = X*beta
+      yhat_i = b0 + sum_j beta_j * x_ij      <=>      yhat = X*beta
 
   Each dial beta_j is the change in the guess per unit change in column j, all other
   columns held fixed. The columns can be squares, logs, or products of raw columns -- the
@@ -60,7 +52,7 @@
 
   Set the slope of the bowl to zero:
 
-      grad J = 2*X^T (X*beta - y) = 0   =&gt;   X^T X beta = X^T y   =&gt;   beta = (X^T X)^-1 X^T y
+      grad J = 2*X^T (X*beta - y) = 0   =>   X^T X beta = X^T y   =>   beta = (X^T X)^-1 X^T y
 
   Worked by hand at one column (d = 1) on three rows -- sum1, sumx, etc. are the entries
   of X^T X and X^T y:
@@ -68,10 +60,10 @@
     x = 1, 2, 3     y = 2, 3, 5
     sum1 = 3   sumx = 6   sumy = 10   sumxy = 23   sumx2 = 14
 
-    X^T X beta = X^T y   -&gt;    3b +  6w = 10
+    X^T X beta = X^T y   ->    3b +  6w = 10
                               6b + 14w = 23
 
-    solve:  2w = 3  -&gt;  w = 3/2 ;   3b + 9 = 10  -&gt;  b = 1/3
+    solve:  2w = 3  ->  w = 3/2 ;   3b + 9 = 10  ->  b = 1/3
     stick:  yhat = 1/3 + (3/2)x
 
 
@@ -115,7 +107,7 @@
 
   ## Getting the Dials Right: Don't Flip the Sheet
 
-    build X^T X: O(n*d^2)   &lt;- n rows, each d^2 multiplications
+    build X^T X: O(n*d^2)   <- n rows, each d^2 multiplications
     solve for beta: O(d^3)
     total: O(n*d^2 + d^3)
 
@@ -129,9 +121,9 @@
       instead of a full cut.
     - If X^T X is flat or shaky (one column is a near-recipe of another), add a small bump
       to the diagonal -- the ridge rule: beta = (X^T X + lambda*I)^-1 X^T y -- solvable
-      for any lambda &gt; 0.
+      for any lambda > 0.
 
-  &gt;&gt; NOTE: SAME-RULER CONTRAST WITH ASK-CLOSEST RULE
+  >> NOTE: SAME-RULER CONTRAST WITH ASK-CLOSEST RULE
      The straight-stick rule does NOT care which ruler you used. Rescale a column and its
      dial rescales inversely -- guesses and RMSE stay the same. (The ask-closest rule
      breaks without same-ruler treatment.) You DO need same-ruler when rolling downhill or
@@ -177,7 +169,7 @@
     - ridge, lasso -- when columns are near-recipes of each other
 
     1. Rule: yhat = X*beta; set dials by shrinking ||X*beta - y||^2.
-    2. Bowl-shaped mistake -&gt; exact dials from beta = (X^T X)^-1 X^T y.
+    2. Bowl-shaped mistake -> exact dials from beta = (X^T X)^-1 X^T y.
     3. Leftovers sit at right-angles to measured columns; yhat = H*y is a flat-sheet
        shadow.
     4. Straight-stick rule is BLUE under Gauss-Markov; bell-curve leftovers needed only
@@ -186,15 +178,12 @@
 
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
-    <a href="chapter1-what-ml-actually-does.html">Part 1 -- The Full Picture</a> .
-    <a href="neighbor-machine-knn.html">Part 2 -- Ask-Closest Rule</a> .
+    [Part 1 -- The Full Picture](chapter1-what-ml-actually-does.txt) .
+    [Part 2 -- Ask-Closest Rule](neighbor-machine-knn.txt) .
     Part 3 (this post)
 
-  &lt;- <a href="../index.html">Back to all posts</a>
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>

@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Two Rulers for One Guess: MSE and R^2 :: Rahul&#x27;s ML Blog</title>
-<link rel="stylesheet" href="../style.css">
-</head>
-<body>
-<pre>==============================================================================================
+@title Two Rulers for One Guess: MSE and R^2 :: Rahul's ML Blog
+==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
-  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
   GRADING A GUESSER . PART 1 OF 2
@@ -26,7 +18,7 @@
 
   ## Same Stick, New Sheet
 
-    displacement  horsepower  weight  acceleration  |  MPG  &lt;- right answer
+    displacement  horsepower  weight  acceleration  |  MPG  <- right answer
     -----------------------------------------------------------
        307          130        3504       12.0      |  18
        350          165        3693       11.5      |  15
@@ -36,7 +28,7 @@
       guess = d1*disp + d2*horse + d3*weight + d4*accel + nudge
 
   Pick four columns, guess the fifth. The machinery is exactly the
-  <a href="straight-stick-linear-regression.html">straight-stick rule</a> -- set the dials by
+  [straight-stick rule](straight-stick-linear-regression.txt) -- set the dials by
   shrinking the squared leftover, one dot-product per guess. Nothing new to build. The new
   work is grading.
 
@@ -45,8 +37,8 @@
 
   Earlier the mistake-score was RMSE. Four steps, in order:
 
-    miss -&gt; square -&gt; mean -&gt; root   = RMSE
-    miss -&gt; square -&gt; mean -&gt; STOP   = MSE
+    miss -> square -> mean -> root   = RMSE
+    miss -> square -> mean -> STOP   = MSE
 
   Stare at the name and it gives itself away:
 
@@ -60,7 +52,7 @@
 
       MSE = (1/n) sum_i (y_i - yhat_i)^2
 
-  &gt;&gt; NOTE: WHAT MSE IS, EXACTLY
+  >> NOTE: WHAT MSE IS, EXACTLY
      MSE is RMSE squared, so it lives in SQUARED answer-units -- "miles per gallon,
      squared," which no one can picture. That is the price of dropping the root. What you
      buy: MSE is the exact thing the straight-stick rule shrinks when it sets the dials, so
@@ -91,22 +83,22 @@
   because it is clever, but because it sits at the bottom of the squared-miss bowl. Any
   other single number misses more:
 
-    shout 5 -&gt; miss^2 = 9 + 1 + 16 + 4 + 4 = 34
-    shout 6 -&gt; miss^2 = 16 + 4 + 9 + 9 + 1 = 39   (worse)
+    shout 5 -> miss^2 = 9 + 1 + 16 + 4 + 4 = 34
+    shout 6 -> miss^2 = 16 + 4 + 9 + 9 + 1 = 39   (worse)
 
   ** KEY: WHY THE AVERAGE IS THE FLOOR
      Shout some number c. Total squared miss is f(c) = sum (y_i - c)^2. Tip it to find the
      bottom: f'(c) = -2 sum (y_i - c) = 0 gives c = (1/n) sum y_i -- the average, exactly.
-     The curve is a bowl (second slope 2n &gt; 0), so that point is the lowest, not the
+     The curve is a bowl (second slope 2n > 0), so that point is the lowest, not the
      highest. The fool's best constant shout is always the mean.
 
   Call the fool's total misery the TOTAL WOBBLE. Now race:
 
     truth:          2     4     9     3     7
 
-    FOOL  (says 5):  miss^2 =  9, 1, 16, 4, 4   -&gt; 34   &lt;- total wobble
+    FOOL  (says 5):  miss^2 =  9, 1, 16, 4, 4   -> 34   <- total wobble
     STICK (uses cols): says 2.5, 4.5, 8, 3.5, 6.5
-                       miss^2 = .25,.25,1,.25,.25 -&gt;  2  &lt;- leftover
+                       miss^2 = .25,.25,1,.25,.25 ->  2  <- leftover
 
   !! WARN: LEFTOVER IS THE BAD PART, NOT THE GOOD PART
      It is tempting to read "leftover = 2" as the stick's score. It is the opposite:
@@ -130,7 +122,7 @@
 
     R^2 = 1.0   ate everything, leftover zero   -- a perfect line
     R^2 = 0.0   ate nothing -- no better than the fool
-    R^2 &lt; 0     WORSE than the fool -- the line actively hurts
+    R^2 < 0     WORSE than the fool -- the line actively hurts
 
   It can never top 1: you cannot eat more than the whole bar. But it CAN dip below 0, and
   on a sheet the stick has never seen, it sometimes does.
@@ -138,11 +130,11 @@
 
   ## Guess Once, Grade Twice
 
-    set the dials -&gt; guess the sealed pile -&gt; guesses (computed ONCE)
+    set the dials -> guess the sealed pile -> guesses (computed ONCE)
                                                    |
                                         +----------+----------+
                                         v                     v
-                                  MSE -&gt; a SIZE          R^2 -&gt; a SLICE
+                                  MSE -> a SIZE          R^2 -> a SLICE
 
   The two rulers do not need two sets of guesses. You guess once, then hold both rulers
   against the same misses. MSE says how big the misses are; R^2 says how much better than
@@ -162,7 +154,7 @@
 
   ## Three Things Worth Stating Precisely
 
-  &gt;&gt; NOTE: ON TRAINING THE BAR SPLITS CLEANLY -- ON TEST IT NEED NOT
+  >> NOTE: ON TRAINING THE BAR SPLITS CLEANLY -- ON TEST IT NEED NOT
      With a nudge column, the straight-stick rule forces its leftovers to sit at
      right-angles to its guesses, so on the TRAINING pile the bar splits exactly:
      total wobble = ate + leftover (textbook: TSS = ESS + RSS), and R^2 lands in [0, 1].
@@ -170,7 +162,7 @@
      wobble, so R^2 = 1 - RSS/TSS can fall below zero. A negative test R^2 is not a bug --
      it is the line doing worse than shouting the average.
 
-  &gt;&gt; NOTE: ONE COLUMN -- R^2 IS JUST CORRELATION, SQUARED
+  >> NOTE: ONE COLUMN -- R^2 IS JUST CORRELATION, SQUARED
      Fit a straight stick on a single column and R^2 equals the squared correlation
      between that column and the answer -- that is literally why it wears the name "R
      squared" (r is the correlation). With several columns it generalises to the squared
@@ -189,7 +181,7 @@
      noise is the part no rule can ever remove. The stiff-vs-jumpy dial from the neighbours
      post is exactly the bias-vs-variance trade, seen through MSE.
 
-    1. MSE = miss -&gt; square -&gt; mean -&gt; stop. RMSE without the root, in squared
+    1. MSE = miss -> square -> mean -> stop. RMSE without the root, in squared
        answer-units, and the very thing the stick shrinks.
     2. A raw miss-size means nothing alone -- "off by 9" needs something to measure
        against.
@@ -217,13 +209,10 @@
 ----------------------------------------------------------------------------------------------
   IN THIS SERIES:
     Part 1 (this post) .
-    <a href="reading-the-dials.html">Part 2 -- Reading the Dials</a>
+    [Part 2 -- Reading the Dials](reading-the-dials.txt)
 
-  &lt;- <a href="../index.html">Back to all posts</a>
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
-  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
-</pre>
-</body>
-</html>
