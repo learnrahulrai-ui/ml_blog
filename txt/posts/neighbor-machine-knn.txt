@@ -7,7 +7,7 @@
 
   PREDICTING HOUSE PRICES . PART 2 OF 3
   Ask the Closest Rows: Gap Formula, Same-Ruler Rule, and How Slow It Gets
-  Posted: 2026-06-02 . Author: Rahul Rai . Tags: knn, distance, non-parametric, complexity
+  Posted: 2026-06-01 . Author: Rahul Rai . Tags: knn, distance, non-parametric, complexity
   ============================================================================================
 
   The ask-closest rule guesses by averaging the k closest working-pile right-answers.

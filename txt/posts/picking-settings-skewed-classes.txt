@@ -326,6 +326,7 @@
     [Part 3 -- Leash and Cloud](leash-and-cloud.txt) .
     Part 4 (this post)
 
+  Lab companion: [Classification Lab -- all terms in one place](classification-lab.txt)
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

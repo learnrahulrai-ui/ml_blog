@@ -182,6 +182,7 @@
     [Part 2 -- Ask-Closest Rule](neighbor-machine-knn.txt) .
     Part 3 (this post)
 
+  Next series: [Grading a Guesser -- MSE, R^2, and reading the dials](grading-the-guess-mse-r2.txt)
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

@@ -5,16 +5,17 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- 10 posts, 3 series. Newest first.
+  ALL POSTS -- 10 posts, 3 series. Newest series first; within each series, reading order.
+  First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
   SORTING INTO BINS (2026)
   ------------------------
-  2026-06-06  [Classification Lab -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
   2026-06-05  [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
   2026-06-05  [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
   2026-06-05  [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
   2026-06-05  [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
+  2026-06-06  [Classification Lab -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
 
 
   GRADING A GUESSER (2026)
@@ -25,8 +26,8 @@
 
   PREDICTING HOUSE PRICES (2026)
   ------------------------------
-  2026-06-03  [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
-  2026-06-02  [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
+  2026-06-01  [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
+  2026-06-01  [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
   2026-06-01  [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
 
 ----------------------------------------------------------------------------------------------

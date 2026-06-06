@@ -6,7 +6,7 @@
 ----------------------------------------------------------------------------------------------
 
   ABOUT THIS BLOG
-  Last updated: 2026-06-05
+  Last updated: 2026-06-06
 
 
   Who Am I
@@ -49,6 +49,11 @@
         [part 2](posts/the-trade-curve.txt) .
         [part 3](posts/leash-and-cloud.txt) .
         [part 4](posts/picking-settings-skewed-classes.txt)
+
+    - Classification Lab -- all classification concepts from the series in one reference:
+      cross-entropy vs MSE, C parameter, LDA with priors, grid search fold safety,
+      min-max scaling, precision vs recall in business, PR curves, and averaging.
+        [classification lab](posts/classification-lab.txt)
 
 
   What This Blog Isn't

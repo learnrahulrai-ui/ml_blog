@@ -16,18 +16,56 @@
   Plain notes on how machine-learning rules actually work. Each one is stripped of
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
-  Newest first.
+
+  Read in order from the top -- each series builds on the one before.
+
+  &gt;&gt; NEW HERE? Start with:
+     <a href="posts/chapter1-what-ml-actually-does.html">Guessing House Prices, End to End</a>
+     No prior knowledge required. Just follow the pencil.
+
+
+  PREDICTING HOUSE PRICES -- supervised regression from scratch
+  -------------------------------------------------------------
+
+  <a href="posts/chapter1-what-ml-actually-does.html">Part 1 -- Guessing House Prices, End to End</a>
+    2026-06-01 . part 1 of 3 . fundamentals, supervised-learning
+    The whole picture on the California housing pile: why 20% of rows are locked away
+    first, the ask-closest rule and the straight-stick rule introduced plainly, RMSE
+    against the always-average baseline, and picking settings by rotating folds.
+
+  <a href="posts/neighbor-machine-knn.html">Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a>
+    2026-06-01 . part 2 of 3 . knn, complexity, scaling
+    The ask-closest rule from the gap formula up: why a column measured in thousands
+    runs the whole show and must be put on the same ruler, the cost per guess and why
+    close stops meaning close as columns pile up, k as the stiff-vs-jumpy dial.
+
+  <a href="posts/straight-stick-linear-regression.html">Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics</a>
+    2026-06-01 . part 3 of 3 . linear-regression, least-squares, numerics
+    From the bowl-shaped squared leftover to the exact dials: a three-row pencil solve
+    of the flat-point equations, right-angle leftovers and the flat-shadow thrower, the
+    Gauss-Markov conditions, and why you cut the sheet (QR/SVD) rather than flip it.
+
+
+  GRADING A GUESSER -- how good is the guess?
+  -------------------------------------------
+
+  <a href="posts/grading-the-guess-mse-r2.html">Part 1 -- Two Rulers for One Guess: MSE and R^2</a>
+    2026-06-04 . part 1 of 2 . evaluation, mse, r-squared
+    The same straight-stick rule on a sheet of cars, graded two ways: MSE (RMSE with the
+    root left off) and R^2 -- a race against a fool who only ever shouts the average.
+    Why you divide by the whole wobble, why test R^2 can dip below zero, and the
+    stiff-vs-jumpy split of the miss-size.
+
+  <a href="posts/reading-the-dials.html">Part 2 -- Reading the Dials: What the Coefficients Say</a>
+    2026-06-04 . part 2 of 2 . coefficients, interpretation, scaling
+    Each column keeps one dial -- plus pushes up, minus drags down. Zip the names back
+    on, find the most-negative (a MIN, not a MAX), and watch the trap: raw dials wear
+    each column's own units, so they are not comparable until the columns sit on one
+    shared ruler.
 
 
   SORTING INTO BINS -- yes-or-no guessing, scored every way
   ----------------------------------------------------------
-
-  <a href="posts/classification-lab.html">Classification Lab -- Loss, Leash, Grid, and All the Terms</a>
-    2026-06-06 . lab companion . log-loss, lda, grid-search, precision-recall, averaging
-    All fifteen classification concepts from the Coursera lab in one place: cross-entropy
-    vs MSE, the C parameter, LDA with priors, hyperparameters vs dials, GridSearchCV fold
-    safety, min-max scaling, precision vs recall in business, ROC vs PR curves, skewed
-    piles, and macro/micro/weighted averaging -- plain language first, standard labels last.
 
   <a href="posts/sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies</a>
     2026-06-05 . part 1 of 4 . logistic-regression, classification, evaluation
@@ -56,45 +94,15 @@
     outliers; the precision-vs-recall trade in fraud detection; precision-recall curves
     for when one class is 100x rarer; and macro vs micro averaging for 3+ bins.
 
+  <a href="posts/classification-lab.html">Classification Lab -- Loss, Leash, Grid, and All the Terms</a>
+    2026-06-06 . lab companion . log-loss, lda, grid-search, precision-recall, averaging
+    All classification concepts from the series in one reference: cross-entropy vs MSE,
+    the C parameter, LDA with priors, hyperparameters vs dials, GridSearchCV fold
+    safety, min-max scaling, precision vs recall in business, ROC vs PR curves, skewed
+    piles, and macro/micro/weighted averaging -- plain language first, standard labels
+    last. Read the four-part series first; use this as a reference when you need to
+    look something up quickly.
 
-  GRADING A GUESSER -- how good is the guess?
-  -------------------------------------------
-
-  <a href="posts/grading-the-guess-mse-r2.html">Part 1 -- Two Rulers for One Guess: MSE and R^2</a>
-    2026-06-04 . part 1 of 2 . evaluation, mse, r-squared
-    The same straight-stick rule on a sheet of cars, graded two ways: MSE (RMSE with the
-    root left off) and R^2 -- a race against a fool who only ever shouts the average.
-    Why you divide by the whole wobble, why test R^2 can dip below zero, and the
-    stiff-vs-jumpy split of the miss-size.
-
-  <a href="posts/reading-the-dials.html">Part 2 -- Reading the Dials: What the Coefficients Say</a>
-    2026-06-04 . part 2 of 2 . coefficients, interpretation, scaling
-    Each column keeps one dial -- plus pushes up, minus drags down. Zip the names back
-    on, find the most-negative (a MIN, not a MAX), and watch the trap: raw dials wear
-    each column's own units, so they are not comparable until the columns sit on one
-    shared ruler.
-
-
-  PREDICTING HOUSE PRICES -- supervised regression from scratch
-  -------------------------------------------------------------
-
-  <a href="posts/chapter1-what-ml-actually-does.html">Part 1 -- Guessing House Prices, End to End</a>
-    2026-06-03 . part 1 of 3 . fundamentals, supervised-learning
-    The whole picture on the California housing pile: why 20% of rows are locked away
-    first, the ask-closest rule and the straight-stick rule introduced plainly, RMSE
-    against the always-average baseline, and picking settings by rotating folds.
-
-  <a href="posts/neighbor-machine-knn.html">Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a>
-    2026-06-02 . part 2 of 3 . knn, complexity, scaling
-    The ask-closest rule from the gap formula up: why a column measured in thousands
-    runs the whole show and must be put on the same ruler, the cost per guess and why
-    close stops meaning close as columns pile up, k as the stiff-vs-jumpy dial.
-
-  <a href="posts/straight-stick-linear-regression.html">Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics</a>
-    2026-06-01 . part 3 of 3 . linear-regression, least-squares, numerics
-    From the bowl-shaped squared leftover to the exact dials: a three-row pencil solve
-    of the flat-point equations, right-angle leftovers and the flat-shadow thrower, the
-    Gauss-Markov conditions, and why you cut the sheet (QR/SVD) rather than flip it.
 
 ----------------------------------------------------------------------------------------------
   the method: ban the jargon . draw it first . solve by pencil . then write the code

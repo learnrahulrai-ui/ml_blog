@@ -7,12 +7,13 @@
 
   PREDICTING HOUSE PRICES . PART 1 OF 3
   Guessing House Prices, End to End (No Labels Until the End)
-  Posted: 2026-06-03 . Author: Rahul Rai . Tags: fundamentals, supervised-learning, knn
+  Posted: 2026-06-01 . Author: Rahul Rai . Tags: fundamentals, supervised-learning, knn
   ============================================================================================
 
-  Most explanations define labels with more labels. This series builds the machinery
-  first -- by hand, on the California housing pile -- and sticks the standard labels on
-  at the very end. Part 1 is the whole picture; Parts 2 and 3 work out each rule.
+  This is the entry point for the blog. No prior knowledge required -- just follow the
+  pencil. This series builds the machinery first -- by hand, on the California housing
+  pile -- and sticks the standard labels on at the very end. Part 1 is the whole
+  picture; Parts 2 and 3 work out each rule in detail.
 
 
   ## The Job: Guess From a Sheet of Numbers

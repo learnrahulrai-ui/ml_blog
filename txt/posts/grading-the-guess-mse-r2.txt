@@ -211,6 +211,7 @@
     Part 1 (this post) .
     [Part 2 -- Reading the Dials](reading-the-dials.txt)
 
+  Follows from: [Predicting House Prices](chapter1-what-ml-actually-does.txt) series.
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
