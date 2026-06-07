@@ -165,6 +165,7 @@
   both once, to see they agree -- and to see the LADDER disagree the moment columns overlap.
 
   >> NEW TO PYTHON? Each named once:
+       Xc, y               -- Xc = X_train_scaled (zero-mean columns); y = y_train
        np.linalg.inv(M)    -- the inverse of a grid M (the untangler)
        A @ B               -- multiply two grids together (matrix multiply)
        X.T                 -- flip a grid on its side (transpose, the "X^T" above)

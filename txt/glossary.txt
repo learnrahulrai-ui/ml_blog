@@ -149,13 +149,16 @@
     200 versions of a dial                the bootstrap distribution
     the 95% wobble band                   95% confidence interval
     chop 2.5% each end                    the 2.5th and 97.5th percentiles
-    band crosses zero                     not distinguishable from zero
+    band crosses zero                     not statistically distinguishable from 0
     the ~37% left out                     out-of-bag (OOB) sample
     the free exam                         out-of-bag error estimate
     the flat-bottom solve                 the normal equations
     (X^T X)^-1 X^T y                      ordinary-least-squares (OLS) solution
     the untangler                         inverse of the Gram matrix (X^T X)
     the LADDER (one column alone)         univariate / simple-regression slope
+    stubborn driver / too stiff           high bias
+    panicky driver / too jumpy            high variance
+    the whole trade                       the bias-variance trade-off
 
 
   ## A Note on the Plain Words
