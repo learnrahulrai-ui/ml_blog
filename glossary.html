@@ -157,13 +157,47 @@
     200 versions of a dial                the bootstrap distribution
     the 95% wobble band                   95% confidence interval
     chop 2.5% each end                    the 2.5th and 97.5th percentiles
-    band crosses zero                     not distinguishable from zero
+    band crosses zero                     not statistically distinguishable from 0
     the ~37% left out                     out-of-bag (OOB) sample
     the free exam                         out-of-bag error estimate
     the flat-bottom solve                 the normal equations
     (X^T X)^-1 X^T y                      ordinary-least-squares (OLS) solution
     the untangler                         inverse of the Gram matrix (X^T X)
     the LADDER (one column alone)         univariate / simple-regression slope
+    stubborn driver / too stiff           high bias
+    panicky driver / too jumpy            high variance
+    the whole trade                       the bias-variance trade-off
+
+
+  J. QUESTION CHARTS AND COMMITTEES -- trees, ensembles, interpretation
+  ---------------------------------------------------------------------
+    question chart                        decision tree / CART
+    the whole build hunt (.fit)           recursive binary splitting
+    one yes/no question per room          a split / a node
+    the final pile at the bottom          a leaf / terminal node
+    badness (sum of squared misses)       residual sum of squares for a split
+    midpoints of the column               candidate split thresholds
+    champion of champions                 the best split (lowest impurity)
+    depth (questions deep)                max_depth hyperparameter
+    mixed-ness / how mixed                Gini impurity
+    the drop in mixing                    information gain
+    share yes / share no                  class proportion (p, q)
+    the alpha tax per leaf                cost-complexity pruning (ccp_alpha)
+    staircase of snip-points              effective-alpha sequence (ccp_alphas)
+    fire a doctor                         prune a subtree
+    keep the sick:well ratio even         stratified train/test split
+    deal with repeats x200, average       bootstrap aggregating / bagging
+    sticky note (pile of people)          bootstrap sample (with replacement)
+    vote of many charts                   ensemble prediction
+    bagging + hide columns per cut        random forest (max_features)
+    line of fixers (charts in sequence)   gradient boosting
+    stump (one question only)             weak learner / decision stump
+    trust-each-fixer knob                 learning rate / shrinkage
+    where validation error bottoms out    early stopping / best iteration
+    scramble a column, re-grade           permutation feature importance
+    sweep a column, average guesses       partial dependence plot (PDP)
+    one line per person                   individual conditional expectation (ICE)
+    credit per cut, summed over trees     mean decrease in impurity (feature_importances_)
 
 
   ## A Note on the Plain Words
