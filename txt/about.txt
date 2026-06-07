@@ -31,7 +31,7 @@
 
   What's Here
   -----------
-  A short book in three chapters (ten posts), plus an appendix and a glossary. Read it top
+  A short book in four chapters (twelve posts), plus an appendix and a glossary. Read it top
   to bottom -- each chapter draws its ideas by hand, then gathers the Python at the end.
 
     - CHAPTER 1 -- Predicting House Prices: two estimators from scratch (ask-closest and
@@ -52,6 +52,13 @@
         [part 2](posts/the-trade-curve.txt) .
         [part 3](posts/leash-and-cloud.txt) .
         [part 4](posts/picking-settings-skewed-classes.txt)
+
+    - CHAPTER 4 -- Humble Dials and Wobble Bands: regularisation and uncertainty on the
+      diabetes pile: Ridge and Lasso leashes, picking the knob by cross-validation,
+      bootstrap wobble bands, the out-of-bag free exam, and the matrix solve by hand.
+        [part 1](posts/humble-dials-ridge-lasso.txt) .
+        [part 2](posts/wobble-bands-bootstrap.txt) .
+        [part 3](posts/the-dial-by-hand.txt)
 
     - APPENDIX -- Classification Reference: all of Chapter 3's concepts in one flip-to page:
       cross-entropy vs MSE, C parameter, LDA with priors, grid search fold safety,

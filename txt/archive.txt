@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 10 posts: 3 chapters + an appendix, in reading order.
+  ALL POSTS -- a book in 12 posts: 4 chapters + an appendix, in reading order.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
@@ -24,15 +24,22 @@
 
   CHAPTER 3 -- SORTING INTO BINS (2026)
   -------------------------------------
-  post 6/10   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
-  post 7/10   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
-  post 8/10   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
-  post 9/10   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
+  post 6/12   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
+  post 7/12   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
+  post 8/12   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
+  post 9/12   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
+
+
+  CHAPTER 4 -- HUMBLE DIALS AND WOBBLE BANDS (2026)
+  -------------------------------------------------
+  post 10/12  [Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials](posts/humble-dials-ridge-lasso.txt)
+  post 11/12  [Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam](posts/wobble-bands-bootstrap.txt)
+  post 12/12  [Part 3 -- The Dial by Hand: Where the Dials Really Come From](posts/the-dial-by-hand.txt)
 
 
   APPENDIX -- CLASSIFICATION REFERENCE (2026)
   -------------------------------------------
-  post 10/10  [Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
+  reference   [Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

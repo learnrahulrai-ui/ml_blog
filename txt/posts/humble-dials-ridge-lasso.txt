@@ -1,0 +1,277 @@
+@title The Leash: Ridge, Lasso, and Humbling the Dials :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 4 . HUMBLE DIALS AND WOBBLE BANDS . PART 1 OF 3
+  The Leash: Ridge, Lasso, and Humbling the Dials
+  Posted: 2026-06-07 . Author: Rahul Rai . Tags: ridge, lasso, regularisation, cross-validation
+  ============================================================================================
+
+  PATH . post 10 of 12
+    <- prev:  [Chapter 3, Part 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt)
+       next:  [Chapter 4, Part 2: One Dial Is a Lie](wobble-bands-bootstrap.txt) ->
+
+  Back to guessing a number -- but this time the machine has a character flaw, and we are
+  going to fix it. In Chapter 1 the straight-stick rule set its dials to make the misses as
+  small as possible, and we let those dials spin as far as they liked. That freedom is the
+  flaw. Left off the leash, a dial will grow to a monster just to twitch through one more
+  point in the study pile -- and a machine that bends itself around every point it has seen
+  falls flat on its face the moment it meets someone new.
+
+  This chapter is about humility, taught two ways. Part 1 puts the dials on a LEASH so none
+  of them can grow into a tyrant. Part 2 asks a harder question -- how much should you even
+  TRUST a dial? -- and answers it by faking a hundred trips to the hospital. Part 3 lifts
+  the hood and shows where the dials come from in the first place.
+
+
+  ## A New Sheet: The Diabetes Pile
+
+    diabetes -- 442 people, 10 body measurements, one answer
+    patient   age   bmi   bp    s1 ... s6  |  answer
+    --------------------------------------------------
+     #1      0.04  0.06  0.02  ...         |   151    <- disease score one YEAR later
+     #2     -0.01 -0.05 -0.03  ...         |    75
+     ...                                   |   ...
+    +--------------- 10 columns -----------+|  the answer
+
+  Same job as Chapter 1: read a person's measurements, guess their number -- here a disease
+  progression score taken a year later. The straight-stick rule still applies, unchanged:
+
+    guess = (dial1 * age) + (dial2 * bmi) + ... + (dial10 * s6) + nudge
+
+  The dials are still whatever makes the total squared miss smallest. Nothing new yet. What
+  is new is that we no longer trust the machine to set those dials sensibly on its own.
+
+
+  ## The Disease: Huge Dials That Memorise
+
+  Here is the failure, drawn. Give the dials free rein and they grow huge to chase every
+  little wiggle in the study pile:
+
+    small honest dial:            huge memorising dial:
+    line follows the trend        line whips up and down to touch every dot
+         .  .                          .    .
+       .  .  .                       \ . /\ . /
+     .  .  .  .                      .\/  \/  .
+    smooth, travels well            perfect on study, WILD on anyone new
+
+  A huge dial means the machine has fallen in love with one column and is over-trusting it
+  to nail the people it has already seen. It scores beautifully on the study pile, then
+  shatters on a new patient. That is memorising, not learning -- and we met its name in
+  Chapter 2: it is the jumpy half of the stiff-vs-jumpy trade. We want to FORBID huge dials.
+
+
+  ## The Leash: Add a Fine
+
+  Until now the machine paid only for being wrong. Now we make it pay a second fine -- for
+  being immodest. It must drive down two things at once:
+
+    total wrongness    +    a * (a fine for big dials)
+    +- fit the data -+       +------- stay humble -------+
+
+  The letter a (the textbooks write the Greek "alpha") is a knob WE set: how hard to press
+  for humility.
+
+    a = 0     no fine -- the old free-spinning machine, back to memorising
+    a small   gentle squeeze
+    a huge    dials crushed toward nothing -- maybe too stiff now
+
+  There are two famous fines. On paper they look almost like twins. At the bottom, where it
+  counts, they behave completely differently -- and that one difference is the whole point
+  of this post.
+
+
+  ## Ridge: The Smooth Squeeze
+
+  Ridge's fine is the SQUARE of each dial, all of them added up:
+
+    make smallest:   (add up every miss^2)   +   a * (add up every dial^2)
+
+  To feel what a square does, picture a tug-of-war over a single dial. Its usefulness pulls
+  it away from zero; the fine pulls it back toward zero. How hard does the fine pull? For a
+  square, the pull is 2*a*dial -- so as the dial gets SMALLER, the fine's grip gets weaker
+  too, fading to nothing at zero:
+
+            Ridge -- a smooth bowl
+     fine |  .             .
+          |   .           .
+          |     .       .
+          |        .___.          <- almost flat at the bottom: no force left near zero
+          +---------------------- dial size
+                    0
+
+  So the tug-of-war settles at a dial that is SMALL but not zero. The fine drags every dial
+  inward, but near zero it runs out of strength, so no dial is ever shoved all the way to
+  exactly zero. Ridge shrinks the whole orchestra; it silences nobody.
+
+  And because that bowl is smooth, there is a clean one-step answer -- no searching. We
+  actually met it already, as a footnote in [Chapter 1, Part 3](straight-stick-linear-regression.txt):
+  the ridge rule beta = (X^T X + a*I)^-1 X^T y. The fine just adds a BUMP down the diagonal
+  before the solve. For one lonely dial it reads as the tidy picture:
+
+    Ridge dial =  top / (bottom + a)        bigger a -> bigger bottom -> smaller dial
+
+  ** KEY: RIDGE SHRINKS ALL, ZEROES NONE, AND SOLVES IN ONE STEP
+     The fine's pull dies at zero, so every dial lands small-but-alive. The bump-on-the-
+     diagonal makes the solve exact -- and, as a bonus, fixes the "tangled columns" crash
+     from Chapter 1 Part 3, because a full diagonal can always be inverted.
+
+
+  ## Lasso: The Sharp Snap
+
+  Lasso's fine is the ABSOLUTE size of each dial -- its size with the sign thrown away:
+
+    make smallest:   (add up every miss^2)   +   a * (add up every |dial|)
+
+  Same tug-of-war, one crucial change: the fine's pull is now CONSTANT. For an absolute
+  size the pull is just a, no matter how tiny the dial gets. It does not fade near zero --
+  it keeps shoving at full strength right up to the edge:
+
+            Lasso -- a sharp corner
+     fine |  \             /
+          |   \           /
+          |    \         /
+          |     \       /
+          |      \     /
+          |       \   /
+          |         V             <- a sharp point: full force right up to zero
+          +---------------------- dial size
+                    0
+
+  Now the ending changes. Even when a dial is already tiny, the fine still pushes with full
+  strength a. If that column's usefulness cannot beat a, the dial gets driven all the way to
+  exactly zero -- and PINNED there.
+
+    strong column (usefulness > a):  survives, just shrunk
+    weak column   (usefulness < a):  SNAPPED to exactly 0 -> dropped from the sheet
+
+  So Lasso does more than shrink -- it DELETES useless columns by zeroing their dials. It
+  hands you back a shorter sheet and, with it, an answer to a question Ridge never touches:
+  which measurements actually mattered?
+
+  The price of that sharp corner: there is no clean formula. You cannot solve it in one
+  step. The machine has to loop:
+
+    1. start every dial at 0
+    2. nudge the bmi dial -- does its usefulness beat the fine? keep it : snap to 0
+    3. nudge the age dial -- same test
+    4. ... keep looping over all the dials until they stop moving
+
+  At the end you COUNT THE SURVIVORS -- the dials that did not snap to zero.
+
+  ** KEY: LASSO SHRINKS, SNAPS WEAK DIALS TO ZERO, AND HAS NO FORMULA
+     Because the fine never lets up, Lasso zeroes out weak columns entirely and tells you
+     which ones earned their keep. The corner that buys that gift also costs the clean
+     solve: Lasso must loop until the dials stop moving.
+
+
+  ## Ridge vs Lasso, Side by Side
+
+    fine             a * sum(dial^2)        a * sum(|dial|)
+    shape            smooth bowl            sharp V-corner
+    pull near 0      fades to nothing       stays at full strength
+    weak dials       small but never 0      SNAP to exactly 0
+    columns          keeps all 10           drops the useless ones
+    by hand          yes: top/(bottom+a)    no: must loop
+    gives you        a humbler machine      a humbler machine PLUS a shortlist
+
+  The ONLY real difference is square versus absolute -- and that single choice decides
+  whether the fine's pull dies at zero (Ridge: settle near zero) or stays alive (Lasso:
+  snap to zero). Everything else follows from it.
+
+
+  ## Picking the Knob a -- Never Guess It
+
+  Both machines have the same knob a, and you do NOT eyeball it. You let the 5-slice check
+  from Chapter 1 do the choosing. Cut the study pile into 5 slices; cover one, learn the
+  dials on the other four, guess the covered slice, write down the error; rotate until every
+  slice has been the covered one; average the five errors. That average is one value of a's
+  score. Do it for a whole ladder of a-values -- about fifty of them -- and a valley appears:
+
+    error |  \                   _/     too-small a -> still memorising
+          |   \_             ___/        too-big a   -> dials crushed, too stiff
+          |     \__       __/
+          |        \__.__/               <- the valley = the best a
+          +--------------------------- a (from tiny to huge)
+
+  Pick the a at the bottom of the valley. Then REBUILD the dials on the full study pile with
+  that winning a, and grade ONCE on the sealed exam pile. Same iron rule as always: never
+  pick a by peeking at the exam.
+
+  >> NOTE: THE CURVES ARE THE ANSWER, NOT A PLOT
+     The lab asks you to report the error-versus-a curve for both machines. The plot is
+     optional; the numbers behind it are the point. The winning a is wherever the curve
+     bottoms out -- the valley above, turned into a row of numbers.
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    the leash / a fine for big dials      regularisation
+    Ridge -- the square fine              L2 regularisation / ridge regression
+    Lasso -- the absolute fine            L1 regularisation / lasso regression
+    the knob a (alpha)                    regularisation strength (alpha / lambda)
+    bump on the diagonal                  (X^T X + alpha*I)^-1 X^T y
+    snap a weak dial to zero              feature selection / sparsity
+    count the survivors                   number of non-zero coefficients
+    the 5-slice check                     k-fold cross-validation
+    the valley                            the CV error curve / bias-variance sweet spot
+    too stiff vs too jumpy                bias vs variance
+
+
+  ## The Code, If You Want It
+
+  Two ready-made machines do all of this: RidgeCV and LassoCV both sweep a ladder of a's
+  with the 5-slice check and keep the winner. Scale the columns first, the same as every
+  chapter before.
+
+  >> NEW TO PYTHON? Each named once:
+       np.logspace(-3, 3, 50)  -- 50 values from 10^-3 to 10^3, spaced evenly in powers
+       Model(...).fit(X, y)    -- build the machine and set its dials on the study pile
+       model.coef_ != 0        -- a yes/no for each dial: did it survive? (True = non-zero)
+
+    from sklearn.linear_model import RidgeCV, LassoCV
+    from sklearn.metrics import mean_squared_error, r2_score
+    import numpy as np
+
+    # Ridge: sweep 50 a's, keep the valley. store_cv_values lets us read the curve later.
+    ridge_alphas = np.logspace(-3, 3, 50)
+    ridge_cv = RidgeCV(alphas=ridge_alphas, store_cv_values=True)
+    ridge_cv.fit(X_train_scaled, y_train)
+    ridge_best_alpha = float(ridge_cv.alpha_)
+
+    # Lasso: its own a-ladder, 5 folds, more loop-room (max_iter) for the snap to settle.
+    lasso_alphas = np.logspace(-3, 1, 50)
+    lasso_cv = LassoCV(alphas=lasso_alphas, cv=5, max_iter=10000)
+    lasso_cv.fit(X_train_scaled, y_train)
+    lasso_best_alpha = float(lasso_cv.alpha_)
+    n_nonzero_lasso  = int(np.sum(lasso_cv.coef_ != 0))   # the survivors
+
+    # the error-vs-a curves the lab asks for
+    ridge_cv_mse_mean = ridge_cv.cv_values_.mean(axis=0)
+    lasso_cv_mse_mean = lasso_cv.mse_path_.mean(axis=1)
+
+  !! WARN: RIDGECV QUIETLY DROPS THE CURVE IF YOU HAND IT A CUSTOM CV
+     RidgeCV will only save its error curve (cv_values_) when it uses its own built-in
+     leave-one-out check. The moment you pass it a custom splitter -- cv=kf -- it silently
+     stops storing those values, and the later line ridge_cv.cv_values_ crashes with an
+     AttributeError. The fix is to NOT pass cv=kf here; pass store_cv_values=True and let
+     RidgeCV use its default. (LassoCV has no such quirk -- cv=5 is fine there.)
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 4 -- Humble Dials and Wobble Bands):
+    Part 1 (this post) .
+    [Part 2 -- One Dial Is a Lie](wobble-bands-bootstrap.txt) .
+    [Part 3 -- The Dial by Hand](the-dial-by-hand.txt)
+
+  Previous chapter: [Chapter 3 -- Sorting Into Bins](sorting-into-bins.txt)
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

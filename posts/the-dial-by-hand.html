@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dial by Hand: Where the Dials Really Come From :: Rahul&#x27;s ML Blog</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<pre>==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 4 . HUMBLE DIALS AND WOBBLE BANDS . PART 3 OF 3
+  The Dial by Hand: Where the Dials Really Come From
+  Posted: 2026-06-07 . Author: Rahul Rai . Tags: least-squares, collinearity, derivation
+  ============================================================================================
+
+  PATH . post 12 of 12  (the end of the book)
+    &lt;- prev:  <a href="wobble-bands-bootstrap.html">Chapter 4, Part 2: One Dial Is a Lie</a>
+
+  We have leashed the dials and measured their wobble, and through all of it we have leaned
+  on a sentence we never fully cashed: "the dials are whatever makes the total miss
+  smallest." Fine -- but where do those numbers actually COME from? Not astrology. This
+  closing post puts the whole thing on a blank sheet with nothing but a calculator, the way
+  <a href="straight-stick-linear-regression.html">Chapter 1, Part 3</a> first did it -- and then it
+  catches one honest trap that nobody warns you about until it is too late.
+
+
+  ## The Sheet, the Goal
+
+    patient   age   bmi   bp    ...   answer
+    ----------------------------------------
+     #1      0.04  0.06  0.02  ...    151
+     #2     -0.01 -0.05 -0.03  ...     75
+     #10      ?     ?     ?    ...    ???    &lt;- guess THIS number
+
+  All I have is the sheet and a calculator, and I want one number for patient #10. The shape
+  of the guess is the straight stick, unchanged from the very first chapter:
+
+    guess = (dial1 * age) + (dial2 * bmi) + ... + (dial10 * s6) + nudge
+             +-------------- 10 "dirty pieces" --------------+    +- a fixed lift
+
+  Multiply each of #10's ten columns by its dial, add the ten pieces, add the nudge. So the
+  whole machine is just eleven numbers: ten dials and one nudge. The only question worth
+  this post is where those eleven numbers come from.
+
+
+  ## What Makes a Dial "Right"
+
+  Not a guess. The dials are the exact set that drives the TOTAL WRONGNESS to its smallest:
+
+    for every study patient:  miss = answer - guess
+    total wrongness = add up all (miss^2)      &lt;- square so + and - misses cannot cancel
+    the right dials = the ones that push this to its lowest point
+
+    wrongness
+        | \              /
+        |  \            /
+        |   \_        _/
+        |     \__  __/
+        |        \./          &lt;- bottom of the bowl = the winning dials
+        +----------------- dial values
+
+  At the very bottom of that bowl the slope is flat in every dial direction at once. Writing
+  "slope = 0" for all ten dials and solving those equations is the whole job. Chapter 1 Part
+  3 ground through that solve by hand on three rows; here we just name its answer.
+
+
+  ## The EXACT Dials: One Line That Untangles Everything
+
+  Stack the sheet as a grid X (people down, columns across) and the answers as a column y.
+  The flat-bottom solve collapses to one famous line:
+
+    all 10 dials at once  =  (X^T X)^-1  X^T y
+
+    X^T y       = how each column lines up with the answer
+    (X^T X)^-1  = the UNTANGLER -- it fixes columns that move together
+
+  That second piece is the hero of the post. This is exactly what LinearRegression().fit
+  computes under the hood, and it is EXACT whether the columns overlap or not.
+
+
+  ## The LADDER: A Crutch That Looks Like the Answer
+
+  There is a tempting shortcut for a single dial -- just measure how that one column and the
+  answer move together, on their own:
+
+    LADDER:  one dial  ~=  sum( (x - xbar)(answer - ybar) )  /  sum( (x - xbar)^2 )
+                           +-- how the column and answer move together --+ / +- column wiggle -+
+
+  It is a lovely first picture of one column in isolation. It is also a TRAP, and here is
+  the exact size of the trap:
+
+  !! WARN: THE LADDER EQUALS THE REAL DIAL ONLY WHEN COLUMNS DON'T OVERLAP
+     The per-column slope above matches the true dial ONLY when no column overlaps any
+     other. Real columns always overlap -- bmi and bp and the blood serums all drift
+     together -- so these one-at-a-time numbers come out WRONG. The true dials need the
+     untangler (X^T X)^-1 to share the credit between columns that move as a pack. We met
+     the symptom in <a href="reading-the-dials.html">Chapter 2, Part 2</a>: when columns travel
+     together, a lone dial gets shaky and can even flip sign. The LADDER is that shakiness
+     baked right in.
+
+  So say it out loud, every time, BEFORE building anything on a number:
+
+    LADDER = a nice first picture of ONE dial, alone, ignoring the others
+    EXACT  = (X^T X)^-1 X^T y, all dials at once, untangling the overlap   &lt;- the real machine
+
+  The teaching trap is to show the LADDER, call it "the dial," and bury the "only if columns
+  don't overlap" as small print after you have already built on it. Don't be fooled, and
+  don't fool anyone else: name it EXACT or LADDER up front.
+
+
+  ## The Nudge -- and Its Quiet Asterisk
+
+  The fixed lift looks like it should be just as fiddly. On a centred sheet it is almost
+  insultingly simple:
+
+    nudge = the average of the study answers
+
+  But that tidy fact rests on a condition that is easy to forget:
+
+  !! WARN: "NUDGE = AVERAGE OF ANSWERS" IS EXACT ONLY ON CENTRED COLUMNS
+     It holds because every column on this sheet is already CENTRED -- its own average sits
+     at zero, so on average the ten dirty pieces contribute nothing, and the only lift left
+     to add is the answer's average. This is NOT a universal law. Un-centre the columns and
+     the nudge changes. (It is the reason every chapter puts the columns on one ruler first.)
+
+
+  ## Guess, Then Grade
+
+  With eleven numbers in hand, the rest is the old ritual from Chapter 2:
+
+    guess(#10) = sum( dial * #10's column ) + nudge        &lt;- one number
+    miss       = answer - guess
+    RMSE       = sqrt( mean( miss^2 ) )      miss -&gt; square -&gt; mean -&gt; root
+    R^2        = (total wobble - leftover) / total wobble
+
+
+  ## The Honest One Page
+
+    guess  = sum(dial * column) + nudge
+    dials  = (X^T X)^-1 X^T y           &lt;- EXACT (untangles overlapping columns)
+    slope  = sum((x-xbar)(y-ybar)) / sum((x-xbar)^2)   &lt;- LADDER (only if columns don't overlap)
+    nudge  = mean of the answers        &lt;- EXACT only because the columns are centred
+    grade  = miss -&gt; square -&gt; mean -&gt; root (RMSE) ;  R^2 = 1 - leftover/wobble
+
+  That is the engine under everything in this book: the same eleven numbers, found by the
+  same flat-bottom solve, whether we then leash them (Part 1) or measure their wobble (Part
+  2). Name your crutches out loud, keep your columns on one ruler, and the machine has no
+  black boxes left in it.
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    total wrongness                       residual sum of squares / squared loss
+    the flat-bottom solve                 the normal equations
+    (X^T X)^-1 X^T y                      the ordinary-least-squares (OLS) solution
+    the untangler                         the inverse of the Gram matrix X^T X
+    the LADDER (one column alone)         the univariate / simple-regression slope
+    columns that move together            collinearity / multicollinearity
+    the fixed lift                        the intercept / bias term
+    centred columns                       mean-centred / zero-mean features
+
+
+  ## The Code, If You Want It
+
+  The toolbox hides all of this behind one line; the by-hand version is two. Worth running
+  both once, to see they agree -- and to see the LADDER disagree the moment columns overlap.
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       np.linalg.inv(M)    -- the inverse of a grid M (the untangler)
+       A @ B               -- multiply two grids together (matrix multiply)
+       X.T                 -- flip a grid on its side (transpose, the "X^T" above)
+
+    import numpy as np
+    from sklearn.linear_model import LinearRegression
+
+    # the toolbox -- one line, exact, untangling and all
+    dials = LinearRegression(fit_intercept=False).fit(Xc, y).coef_
+
+    # the same thing by hand -- the flat-bottom solve, spelled out
+    dials_by_hand = np.linalg.inv(Xc.T @ Xc) @ Xc.T @ y     # (X^T X)^-1 X^T y
+
+    # the LADDER for one column, alone -- matches ONLY if columns don't overlap
+    x = Xc[:, 1]                                            # e.g. the bmi column, centred
+    ladder_bmi = np.sum(x * y) / np.sum(x * x)              # sum(x*y) / sum(x*x) on centred x
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 4 -- Humble Dials and Wobble Bands):
+    <a href="humble-dials-ridge-lasso.html">Part 1 -- The Leash</a> .
+    <a href="wobble-bands-bootstrap.html">Part 2 -- One Dial Is a Lie</a> .
+    Part 3 (this post)
+
+  That is the end of the book. For quick lookups, see the
+  <a href="classification-lab.html">Appendix -- Classification Reference</a> and the
+  <a href="../glossary.html">Glossary / Decoder Ring</a>.
+  &lt;- <a href="../index.html">Back to all posts</a>
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+==============================================================================================
+</pre>
+</body>
+</html>

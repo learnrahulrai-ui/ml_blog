@@ -10,7 +10,7 @@
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: logistic-regression, classification, evaluation
   ============================================================================================
 
-  PATH . post 6 of 10
+  PATH . post 6 of 12
     <- prev:  [Grading 2: Reading the Dials](reading-the-dials.txt)
        next:  [Sorting 2: The Trade Curve](the-trade-curve.txt) ->
 

@@ -10,9 +10,9 @@
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: grid-search, precision-recall, class-imbalance
   ============================================================================================
 
-  PATH . post 9 of 10
+  PATH . post 9 of 12
     <- prev:  [Sorting 3: Leash and Cloud](leash-and-cloud.txt)
-       next:  [Classification Lab: All the Terms in One Place](classification-lab.txt) ->
+       next:  [Chapter 4, Part 1: The Leash (Ridge & Lasso)](humble-dials-ridge-lasso.txt) ->
 
   So far the world has been tidy: one sheet of breast lumps, one clean yes-or-no question,
   two groups of roughly equal size. Real problems are rarely so polite. This closing post

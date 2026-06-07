@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in three chapters (ten posts),
-  meant to be read top to bottom. Each post opens with a "post N of 10" path header and a
+  This is not a pile of loose articles -- it is a short BOOK in four chapters (twelve posts),
+  meant to be read top to bottom. Each post opens with a "post N of 12" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. An appendix ties it together.
 
-  >> NEW HERE? Start at post 1 of 10:
+  >> NEW HERE? Start at post 1 of 12:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -27,19 +27,19 @@
   -------------------------------------------------------------------------
 
   [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
-    post 1/10 . 2026-06-01 . part 1 of 3 . fundamentals, supervised-learning
+    post 1/12 . 2026-06-01 . part 1 of 3 . fundamentals, supervised-learning
     The whole picture on the California housing pile: why 20% of rows are locked away
     first, the ask-closest rule and the straight-stick rule introduced plainly, RMSE
     against the always-average baseline, and picking settings by rotating folds.
 
   [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
-    post 2/10 . 2026-06-01 . part 2 of 3 . knn, complexity, scaling
+    post 2/12 . 2026-06-01 . part 2 of 3 . knn, complexity, scaling
     The ask-closest rule from the gap formula up: why a column measured in thousands
     runs the whole show and must be put on the same ruler, the cost per guess and why
     close stops meaning close as columns pile up, k as the stiff-vs-jumpy dial.
 
   [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
-    post 3/10 . 2026-06-01 . part 3 of 3 . linear-regression, least-squares, numerics
+    post 3/12 . 2026-06-01 . part 3 of 3 . linear-regression, least-squares, numerics
     From the bowl-shaped squared leftover to the exact dials: a three-row pencil solve
     of the flat-point equations, right-angle leftovers and the flat-shadow thrower, the
     Gauss-Markov conditions, and why you cut the sheet (QR/SVD) rather than flip it.
@@ -49,14 +49,14 @@
   ------------------------------------------------------
 
   [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
-    post 4/10 . 2026-06-04 . part 1 of 2 . evaluation, mse, r-squared
+    post 4/12 . 2026-06-04 . part 1 of 2 . evaluation, mse, r-squared
     The same straight-stick rule on a sheet of cars, graded two ways: MSE (RMSE with the
     root left off) and R^2 -- a race against a fool who only ever shouts the average.
     Why you divide by the whole wobble, why test R^2 can dip below zero, and the
     stiff-vs-jumpy split of the miss-size.
 
   [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
-    post 5/10 . 2026-06-04 . part 2 of 2 . coefficients, interpretation, scaling
+    post 5/12 . 2026-06-04 . part 2 of 2 . coefficients, interpretation, scaling
     Each column keeps one dial -- plus pushes up, minus drags down. Zip the names back
     on, find the most-negative (a MIN, not a MAX), and watch the trap: raw dials wear
     each column's own units, so they are not comparable until the columns sit on one
@@ -67,37 +67,60 @@
   --------------------------------------------------------------------
 
   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
-    post 6/10 . 2026-06-05 . part 1 of 4 . logistic-regression, classification, evaluation
+    post 6/12 . 2026-06-05 . part 1 of 4 . logistic-regression, classification, evaluation
     The shift from "guess a number" to "guess a bin": the S-curve squash, the
     cross-entropy leftover, and how any dial sum becomes a chance. Then the four-box
     table of CAUGHT/ALARM/MISSED/CLEAR, four scores that read different corners of it,
     and why a machine that catches nobody can still score 63% accuracy.
 
   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
-    post 7/10 . 2026-06-05 . part 2 of 4 . roc-curve, auc, cutoff
+    post 7/12 . 2026-06-05 . part 2 of 4 . roc-curve, auc, cutoff
     One cutoff judges the machine at one spot; slide it through every position and you
     get the trade curve (ROC). The area beneath it -- AUC -- compresses the whole curve
     to one number: pick a random sick lump and a random well lump; AUC is the chance the
     machine scored the sick one higher.
 
   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
-    post 8/10 . 2026-06-05 . part 3 of 4 . l2-regularization, lda
+    post 8/12 . 2026-06-05 . part 3 of 4 . l2-regularization, lda
     Two ways to humble an over-confident machine. L2: add a squared-dial price to the
     leftover so no single dial dominates (C = 1/lambda -- small C is a heavy squeeze).
     LDA: forget rolling downhill; read the two cloud centres and their shared spread,
     then solve for the wall in one closed-form step.
 
   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
-    post 9/10 . 2026-06-05 . part 4 of 4 . grid-search, precision-recall, class-imbalance
+    post 9/12 . 2026-06-05 . part 4 of 4 . grid-search, precision-recall, class-imbalance
     Grid-hunting settings by rotating folds; why pinch-to-fit scaling breaks around
     outliers; the precision-vs-recall trade in fraud detection; precision-recall curves
     for when one class is 100x rarer; and macro vs micro averaging for 3+ bins.
+
+
+  CHAPTER 4 . HUMBLE DIALS AND WOBBLE BANDS -- regularisation, and how much to trust a dial
+  ----------------------------------------------------------------------------------------
+
+  [Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials](posts/humble-dials-ridge-lasso.txt)
+    post 10/12 . 2026-06-07 . part 1 of 3 . ridge, lasso, regularisation
+    Free dials grow huge and memorise; put them on a leash. Ridge (the square fine) shrinks
+    all dials and zeroes none, solving in one step. Lasso (the absolute fine) snaps weak
+    dials to exactly zero and hands you a shortlist of columns. Pick the knob by the valley.
+
+  [Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam](posts/wobble-bands-bootstrap.txt)
+    post 11/12 . 2026-06-07 . part 2 of 3 . bootstrap, confidence-interval, out-of-bag
+    A single dial value hides how shaky it is. Fake 200 hospital visits by re-dealing the
+    pile with repeats, and read off a 95% wobble band per dial (chop 2.5% each end). The
+    ~37% left out of each deal become a free, honest exam.
+
+  [Part 3 -- The Dial by Hand: Where the Dials Really Come From](posts/the-dial-by-hand.txt)
+    post 12/12 . 2026-06-07 . part 3 of 3 . least-squares, collinearity, derivation
+    The whole machine on a blank sheet: the dials are (X^T X)^-1 X^T y, the untangler that
+    shares credit between overlapping columns. The one-column slope is a LADDER that matches
+    only when columns don't overlap -- name it out loud before you build anything on it.
+
 
   APPENDIX . CLASSIFICATION REFERENCE -- every term in one place
   -------------------------------------------------------------
 
   [Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
-    post 10/10 . 2026-06-06 . appendix . log-loss, lda, grid-search, precision-recall
+    reference . 2026-06-06 . companion to Chapter 3 . log-loss, lda, grid-search, pr-curves
     All classification concepts from Chapter 3 in one flip-to reference: cross-entropy vs
     MSE, the C parameter, LDA with priors, hyperparameters vs dials, GridSearchCV fold
     safety, min-max scaling, precision vs recall in business, ROC vs PR curves, skewed

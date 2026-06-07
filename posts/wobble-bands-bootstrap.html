@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam :: Rahul&#x27;s ML Blog</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<pre>==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 4 . HUMBLE DIALS AND WOBBLE BANDS . PART 2 OF 3
+  One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam
+  Posted: 2026-06-07 . Author: Rahul Rai . Tags: bootstrap, confidence-interval, out-of-bag
+  ============================================================================================
+
+  PATH . post 11 of 12
+    &lt;- prev:  <a href="humble-dials-ridge-lasso.html">Chapter 4, Part 1: The Leash</a>
+       next:  <a href="the-dial-by-hand.html">Chapter 4, Part 3: The Dial by Hand</a> -&gt;
+
+  Part 1 made the dials humble. This post makes them HONEST -- and the honesty stings,
+  because the first thing it admits is that a single dial value, reported on its own, is a
+  small lie.
+
+  Here is the lie. The machine studies my patients and announces a bmi-dial of 0.52. It
+  says it flatly, with a straight face, as if 0.52 were carved in stone. But I only had
+  THESE eighty-odd patients. Walk into the hospital on a different morning, scoop up eighty
+  DIFFERENT patients, and the dial comes out 0.44, or 0.58, or who knows. So what is 0.52
+  really worth? The number alone will not say. We need to know how much it would jump around
+  if the world had dealt us a slightly different crowd.
+
+
+  ## I Cannot Visit the Hospital 200 Times
+
+  The honest fix would be to gather two hundred fresh crowds and watch the dial dance. I
+  cannot do that -- I have one pile of patients and that is all. So I FAKE it. I build new
+  crowds out of the pile I already own, by re-dealing it WITH REPEATS:
+
+    pull a patient, write them down, PUT THEM BACK in the bag
+    do this until the fake pile is the same size as the real one
+    -&gt; some patients get drawn twice or three times; some never get drawn at all
+    rebuild the dials on this fake pile
+    repeat the whole performance 200 times -&gt; 200 versions of every dial
+
+  This trick has a name we will earn at the end: the bootstrap. The whole engine is "put
+  them back." Drawing with replacement is what makes each fake pile genuinely different from
+  the last, and that difference is what mimics walking into the hospital on a new day.
+
+  &gt;&gt; NOTE: WHY ABOUT 37% SIT OUT EVERY DEAL
+     Putting each patient back means some never get picked. A little pencil arithmetic, for
+     a pile of N people:
+
+       chance one patient is MISSED in a single draw  = (1 - 1/N)
+       chance they are missed in ALL N draws          = (1 - 1/N)^N
+
+     For any decent N that lands near 1/e ~= 0.37. So roughly a THIRD of the pile sits out
+     every single deal -- and those left-out people turn out to be a gift (see "The Free
+     Exam" below).
+
+
+  ## The Wobble Band
+
+  After 200 re-deals, one dial -- say bmi -- has 200 different values written down. Sort
+  them smallest to largest. Chop the extreme 2.5% off each end. What is left in the middle
+  is the 95% WOBBLE BAND:
+
+    0.38  0.40  0.42  ...  0.56  0.58  0.60
+    +chop-+      keep the middle 190      +chop-+
+                 [ 0.42 --------- 0.58 ]      &lt;- the 95% band
+
+  The WIDTH of that band is exactly how much to trust the dial:
+
+    tight band, well away from 0   -&gt;  trust it
+    wide band                      -&gt;  real, but shaky
+    band CROSSES 0                 -&gt;  might be nothing -- do not even trust its sign
+
+  That last line is the sharpest tool in the box. If a dial's band runs from -0.80 to +0.90,
+  the machine cannot even tell you whether that column pushes the answer UP or DOWN. The
+  honest report is: "this column might be doing nothing at all."
+
+  !! WARN: 95% MEANS CHOP 2.5% EACH END -- NOT 25%
+     It is dangerously easy to reach for the quartiles from way back in Chapter 1 and chop
+     25% off each end. That is the wrong band by a mile.
+
+       middle 50% (quartiles): chop 25% each end -&gt; quantile 0.25 and 0.75
+       middle 95% (this band):  chop 2.5% each end -&gt; quantile 0.025 and 0.975
+
+     Use 0.025 and 0.975 (because 100% - 2.5% = 97.5%). Reach for 0.25 and 0.75 and your
+     band comes out absurdly narrow, and you will throw away perfectly good dials as
+     "useless." We want to be almost-certain, not merely probably.
+
+  !! WARN: COUNTING NOTES IS NOT MEASURING WIDTH
+     Every dial's 95% band keeps the same NUMBER of values in the middle -- 190 of the 200,
+     always. That count tells you nothing. The trust is in the WIDTH: the gap between the
+     number on the 5th note and the number on the 195th.
+
+       bmi-dial:  0.42 to 0.58   -&gt; width 0.16  (narrow, steady, trustworthy)
+       s5-dial:  -0.80 to +0.90  -&gt; width 1.70  (wide, crosses 0, untrustworthy)
+
+     Same 190 notes in both. Wildly different trust. Never confuse the count with the gap.
+
+
+  ## The Free Exam (Out-of-Bag)
+
+  Now the gift. Remember that ~37% of patients sit out of every deal. The machine never saw
+  them while it set its dials -- which makes them a perfect, honest, FREE EXAM. No need to
+  touch the sealed exam pile at all.
+
+    for each of the 200 re-deals:
+        build the dials on the PICKED patients
+        grade on the LEFT-OUT patients -&gt; one honest error (RMSE)
+    -&gt; 200 honest errors -&gt; average them, and chop 2.5% each end for a band
+
+  The entire trick is grading on the left-out people, not on the ones the machine just
+  studied. Grade it on its own study crowd and the score is a fake -- flattering and
+  over-confident, the same self-graded-exam lie from Chapter 1. The left-out third keeps it
+  honest for free.
+
+  ** KEY: THE BAND IS THE REPORT, NOT THE SINGLE NUMBER
+     One dial value is a point; the wobble band is the truth around it. A wide band on the
+     error means the machine itself is shaky -- it would guess differently if the patients
+     had been different. Reporting the band instead of the bare number is the difference
+     between confidence and honesty.
+
+
+  ## The Tug-of-War Behind the Whole Chapter
+
+  Step all the way back. Everything in this chapter -- the leash in Part 1, the wobble band
+  here -- is one single trade-off, and it is easiest to see as two bad drivers:
+
+    STUBBORN driver (too stiff -- "bias"):
+        drives dead straight, ignores every curve in the road
+        -&gt; never panics, but calmly drives into the wrong building
+
+    PANICKY driver (too jumpy -- "variance"):
+        memorises every pebble and parked car it saw on Monday
+        -&gt; Tuesday the car has moved, it panics, drives into a lake
+
+  A free-spinning machine is the panicky driver. Crushing its dials with Ridge or Lasso
+  makes it a little more stubborn ON PURPOSE -- trading away the panic to land in the sweet
+  spot between the two. The knob a from Part 1 is exactly where you choose to sit on that
+  line; the 5-slice valley is how you find the sweet spot; and the wobble band here is how
+  you measure the panic that is left over.
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    re-deal with repeats                  bootstrap / sampling with replacement
+    200 versions of a dial                the bootstrap distribution
+    the 95% wobble band                   95% confidence interval
+    chop 2.5% each end                    the 2.5th and 97.5th percentiles
+    band crosses zero                     not statistically distinguishable from 0
+    the ~37% left out                     out-of-bag (OOB) sample
+    the free exam                         out-of-bag error estimate
+    stubborn driver / too stiff           high bias
+    panicky driver / too jumpy            high variance
+    the whole trade                       the bias-variance trade-off
+
+
+  ## The Code, If You Want It
+
+  Two small loops. The first re-deals the pile 200 times and collects every dial; the band
+  is just two quantiles of those. The second does the same but grades each deal on its
+  left-out patients.
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       rng.choice(n, size=n, replace=True)  -- draw n patients WITH repeats (the re-deal)
+       df.quantile(0.025)                    -- the value 2.5% of the way up the sorted pile
+       ~np.isin(everyone, picked)            -- the ~ flips True/False: here, "NOT picked"
+
+    import numpy as np
+    import pandas as pd
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import mean_squared_error
+
+    # --- wobble bands for the dials ---
+    def bootstrap_ols_coefficients(X_train_scaled, y_train, B=200):
+        coefs = []
+        rng = np.random.RandomState(RANDOM_STATE)
+        for _ in range(B):
+            idx = rng.choice(len(X_train_scaled), size=len(X_train_scaled), replace=True)
+            model = LinearRegression().fit(X_train_scaled[idx], y_train.iloc[idx])
+            coefs.append(model.coef_)
+        coef_bootstrap_df = pd.DataFrame(coefs, columns=X.columns)
+        lower = coef_bootstrap_df.quantile(0.025)        # chop 2.5% off the bottom
+        upper = coef_bootstrap_df.quantile(0.975)        # chop 2.5% off the top
+        coef_ci_95 = pd.DataFrame({'lower': lower, 'upper': upper})
+        return coef_bootstrap_df, coef_ci_95
+
+    # --- the free exam: out-of-bag error ---
+    def bootstrap_oob_rmse_ols(X_train_scaled, y_train, B=200):
+        rmses = []
+        rng = np.random.RandomState(RANDOM_STATE)
+        for _ in range(B):
+            idx = rng.choice(len(X_train_scaled), size=len(X_train_scaled), replace=True)
+            oob = ~np.isin(np.arange(len(X_train_scaled)), idx)   # everyone NOT picked
+            if oob.sum() == 0:
+                continue
+            model = LinearRegression().fit(X_train_scaled[idx], y_train.iloc[idx])
+            guesses = model.predict(X_train_scaled[oob])          # grade on the LEFT-OUT
+            rmses.append(np.sqrt(mean_squared_error(y_train.iloc[oob], guesses)))
+        rmses = np.array(rmses)
+        rmse_oob_mean = float(rmses.mean())
+        rmse_oob_ci95 = (float(np.quantile(rmses, 0.025)), float(np.quantile(rmses, 0.975)))
+        return rmse_oob_mean, rmse_oob_ci95
+
+  !! WARN: THE ~ IS THE WHOLE FREE EXAM
+     np.isin marks True for everyone who WAS drawn into the deal. The ~ flips it, leaving
+     True for everyone who was NOT. Drop the ~ and you grade the machine on the very
+     patients it just studied -- the self-graded exam again, fake and over-confident. The
+     one little squiggle is the difference between an honest score and a lie.
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 4 -- Humble Dials and Wobble Bands):
+    <a href="humble-dials-ridge-lasso.html">Part 1 -- The Leash</a> .
+    Part 2 (this post) .
+    <a href="the-dial-by-hand.html">Part 3 -- The Dial by Hand</a>
+
+  &lt;- <a href="../index.html">Back to all posts</a>
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+==============================================================================================
+</pre>
+</body>
+</html>

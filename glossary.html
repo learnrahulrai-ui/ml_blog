@@ -144,6 +144,28 @@
     size-weighted averaging               weighted averaging
 
 
+  I. HUMBLE DIALS AND WOBBLE BANDS -- regularisation and uncertainty
+  -----------------------------------------------------------------
+    the leash / a fine for big dials      regularisation / penalised regression
+    Ridge -- the square fine              L2 regularisation / ridge regression
+    Lasso -- the absolute fine            L1 regularisation / lasso regression
+    the knob a (alpha)                    regularisation strength (alpha / lambda)
+    bump on the diagonal                  (X^T X + alpha*I)^-1 X^T y
+    snap a weak dial to zero              sparsity / automatic feature selection
+    count the survivors                   number of non-zero coefficients
+    re-deal with repeats                  bootstrap / sampling with replacement
+    200 versions of a dial                the bootstrap distribution
+    the 95% wobble band                   95% confidence interval
+    chop 2.5% each end                    the 2.5th and 97.5th percentiles
+    band crosses zero                     not distinguishable from zero
+    the ~37% left out                     out-of-bag (OOB) sample
+    the free exam                         out-of-bag error estimate
+    the flat-bottom solve                 the normal equations
+    (X^T X)^-1 X^T y                      ordinary-least-squares (OLS) solution
+    the untangler                         inverse of the Gram matrix (X^T X)
+    the LADDER (one column alone)         univariate / simple-regression slope
+
+
   ## A Note on the Plain Words
 
   &gt;&gt; NOTE: THE PLAIN WORDS ARE NOT BABY-TALK
