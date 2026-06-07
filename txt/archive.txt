@@ -5,36 +5,43 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 12 posts: 4 chapters + an appendix, in reading order.
+  ALL POSTS -- a book in 15 posts: 5 chapters + an appendix, in reading order.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
   CHAPTER 1 -- PREDICTING HOUSE PRICES (2026)
   -------------------------------------------
-  post 1/10   [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
-  post 2/10   [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
-  post 3/10   [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
+  post 1/15   [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
+  post 2/15   [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
+  post 3/15   [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
 
 
   CHAPTER 2 -- GRADING A GUESSER (2026)
   -------------------------------------
-  post 4/10   [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
-  post 5/10   [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
+  post 4/15   [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
+  post 5/15   [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
 
 
   CHAPTER 3 -- SORTING INTO BINS (2026)
   -------------------------------------
-  post 6/12   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
-  post 7/12   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
-  post 8/12   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
-  post 9/12   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
+  post 6/15   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
+  post 7/15   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
+  post 8/15   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
+  post 9/15   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
 
 
   CHAPTER 4 -- HUMBLE DIALS AND WOBBLE BANDS (2026)
   -------------------------------------------------
-  post 10/12  [Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials](posts/humble-dials-ridge-lasso.txt)
-  post 11/12  [Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam](posts/wobble-bands-bootstrap.txt)
-  post 12/12  [Part 3 -- The Dial by Hand: Where the Dials Really Come From](posts/the-dial-by-hand.txt)
+  post 10/15  [Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials](posts/humble-dials-ridge-lasso.txt)
+  post 11/15  [Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam](posts/wobble-bands-bootstrap.txt)
+  post 12/15  [Part 3 -- The Dial by Hand: Where the Dials Really Come From](posts/the-dial-by-hand.txt)
+
+
+  CHAPTER 5 -- QUESTION CHARTS AND COMMITTEES (2026)
+  --------------------------------------------------
+  post 13/15  [Part 1 -- Question Charts: Building a Tree by Hand](posts/question-charts-by-hand.txt)
+  post 14/15  [Part 2 -- The Mixing Ruler: Gini, Information Gain, and Pruning](posts/mixing-ruler-gini-pruning.txt)
+  post 15/15  [Part 3 -- Committees: Bagging, Random Forest, and Boosting](posts/committees-bag-forest-boost.txt)
 
 
   APPENDIX -- CLASSIFICATION REFERENCE (2026)

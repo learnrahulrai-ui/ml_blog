@@ -31,7 +31,7 @@
 
   What's Here
   -----------
-  A short book in four chapters (twelve posts), plus an appendix and a glossary. Read it top
+  A short book in five chapters (fifteen posts), plus an appendix and a glossary. Read it top
   to bottom -- each chapter draws its ideas by hand, then gathers the Python at the end.
 
     - CHAPTER 1 -- Predicting House Prices: two estimators from scratch (ask-closest and
@@ -59,6 +59,15 @@
         [part 1](posts/humble-dials-ridge-lasso.txt) .
         [part 2](posts/wobble-bands-bootstrap.txt) .
         [part 3](posts/the-dial-by-hand.txt)
+
+    - CHAPTER 5 -- Question Charts and Committees: a machine that asks yes/no questions
+      instead of turning dials -- built by hand from blank sheet, then humbled by pruning.
+      Then 200 charts vote: bagging, random forest (hide the columns), and gradient
+      boosting (a line of stumps each fixing the last one's leftovers). How to make the
+      black box confess which columns it leaned on.
+        [part 1](posts/question-charts-by-hand.txt) .
+        [part 2](posts/mixing-ruler-gini-pruning.txt) .
+        [part 3](posts/committees-bag-forest-boost.txt)
 
     - APPENDIX -- Classification Reference: all of Chapter 3's concepts in one flip-to page:
       cross-entropy vs MSE, C parameter, LDA with priors, grid search fold safety,

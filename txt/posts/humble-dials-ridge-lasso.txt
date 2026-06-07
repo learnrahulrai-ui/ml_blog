@@ -10,7 +10,7 @@
   Posted: 2026-06-07 . Author: Rahul Rai . Tags: ridge, lasso, regularisation, cross-validation
   ============================================================================================
 
-  PATH . post 10 of 12
+  PATH . post 10 of 15
     <- prev:  [Chapter 3, Part 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt)
        next:  [Chapter 4, Part 2: One Dial Is a Lie](wobble-bands-bootstrap.txt) ->
 

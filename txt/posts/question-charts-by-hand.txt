@@ -1,0 +1,280 @@
+@title Question Charts: Building a Tree by Hand :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 5 . QUESTION CHARTS AND COMMITTEES . PART 1 OF 3
+  Question Charts: Building a Tree by Hand
+  Posted: 2026-06-07 . Author: Rahul Rai . Tags: decision-tree, regression, classification
+  ============================================================================================
+
+  PATH . post 13 of 15
+    <- prev:  [Chapter 4, Part 3: The Dial by Hand](the-dial-by-hand.txt)
+       next:  [Chapter 5, Part 2: The Mixing Ruler](mixing-ruler-gini-pruning.txt) ->
+
+  The straight-stick rule lived by dials -- ten multipliers and a nudge. Every guess was
+  a weighted sum. This post throws away the dials entirely and builds a machine with no
+  formula, no multipliers, and no algebra. Just a sheet, a pencil, and one repeated
+  question: "what is the CLEANEST place to draw a line?"
+
+  A question chart is a stack of yes/no questions. A new patient answers them top to
+  bottom and lands in one final pile, where the guess sits waiting. The whole engine is
+  built by splitting people into ever-smaller groups until each group's answers are tight
+  enough that their average is a good guess.
+
+
+  ## The Sheet: Two New Piles
+
+    diabetes -- 442 people, 10 body measurements, one answer
+    patient   age   bmi   bp    s1 ... s6  |  answer
+    --------------------------------------------------
+     #1      0.04  0.06  0.02  ...         |   151    <- disease score one YEAR later
+     #2     -0.01 -0.05 -0.03  ...         |    75
+     ...                                   |   ...
+    +--------------- 10 columns -----------+|  the answer
+
+    cancer -- 569 lumps, 30 measurements, one answer
+    lump   radius  texture  perimeter ...  |  target
+    --------------------------------------------------
+     #1     17.9    10.4    122.8    ...    |    0     <- sick(0) or well(1)
+     #2     20.6    17.8    132.9    ...    |    0
+     ...                                   |   ...
+
+  Same job as always: chop 75/25, cover the 25%, build on the 75%, grade once.
+
+
+  ## BUILD vs USE -- Two Different Times
+
+  This is where the first confusion lives. There are two SEPARATE phases, and mixing
+  them caused me grief for an hour:
+
+    phase 1 . BUILD . happens ONCE on the whole study pile at once
+        split 331 people into piles, pile by pile, choosing questions
+        PEOPLE get split here -- the entire crowd, not one at a time
+
+    phase 2 . USE . happens later, one patient at a time
+        a new patient walks the finished questions top to bottom
+        no splitting, no choosing -- just follow the existing signs
+
+  During BUILD, splitting and choosing are interleaved -- you cannot separate them.
+  During USE, the chart is frozen and the patient just walks through it.
+
+    BUILD:  choose split <-> walk one level <-> choose split <-> ...  (interleaved)
+    USE:    chart frozen -> walk each patient top -> bottom in one go  (walk only)
+
+
+  ## The Build Hunt, Step by Step
+
+  Everything below = what one line, tree_reg.fit(X_train, y_train), does inside.
+  I rebuilt it from a blank sheet. No black box.
+
+  Pick a column. Say bmi. I see 331 bmi values.
+
+    STEP 1 -- sort the column, find the midpoints.
+
+      sort the 331 bmi values smallest to largest.
+      between each pair of neighbours write their MIDPOINT (pairwise mean).
+      331 values -> 330 midpoints.  each midpoint is a CUT to try.
+
+    STEP 2 -- for the FIRST midpoint, draw a line across the whole sheet.
+
+      everyone with bmi BELOW the midpoint -> left pile
+      everyone with bmi ABOVE             -> right pile
+
+      left pile answers:  {150, 170, 130, ...}   mean = some number
+      right pile answers: {80, 90, 100, ...}     mean = some other number
+
+      these two means are the TWO GUESSES.  the left pile's guess = left mean.
+      the right pile's guess = right mean.
+
+    STEP 3 -- measure how WRONG those guesses are.
+
+      for EVERY person:  miss = (their answer - their pile's mean)
+      square each miss.  add them ALL up.
+
+      that sum = this midpoint's BADNESS.  one number.
+
+      330 midpoints -> 330 badness numbers.  the SMALLEST = bmi's champion.
+
+  !! WARN: THE SUM IS NOT AN RMSE
+     There is no root, no division.  Just sum of squared misses.  A huge number.
+     You are comparing 330 huge numbers and picking the smallest.  The magnitude does
+     not matter -- only the ORDER.
+
+    STEP 4 -- repeat for ALL 10 columns.
+
+      age: sort, 330 midpoints, 330 badness numbers -> age's champion
+      bp:  sort, ...                                -> bp's champion
+      ...all 10 columns
+
+    STEP 5 -- champion of champions.
+
+      10 column-champions, each with its own badness.  all in the SAME units
+      (sum of squared misses over the same 331 people), so they are FAIR to
+      compare.
+
+      the SMALLEST of the 10 = the chart's FIRST question.
+      (say bmi at midpoint 0.05 wins.)
+
+    STEP 6 -- DRAW THE LINE.
+
+      go back to the sheet.  everyone with bmi <= 0.05 goes to pile A.
+      everyone above goes to pile B.
+
+    STEP 7 -- RECURSE.
+
+      inside pile A (say 131 people):
+        run the ENTIRE hunt again -- sort, midpoints, badness, champion, champion
+        of champions -- on just THESE 131 people.  this pile's champion becomes
+        its own question.
+
+      inside pile B (200 people):
+        same hunt.  its own champion.  a different question from pile A's.
+
+      keep cracking each new pile the same way -- until a pile is too small or
+      all its answers match.  then STOP.
+
+    STEP 8 -- the final pile's guess.
+
+      each final pile: average its answer column -> one number.
+      that is the guess for any new person who lands in it.
+
+
+  ## The Corrections I Caught
+
+  Building this by hand exposed five wrong pictures I would have carried forever:
+
+    WRONG: "the tree asks one patient all its questions."
+    RIGHT: the BUILD splits the whole study CROWD at once.
+           a patient walks the finished chart only in USE.
+
+    WRONG: "bmi is used once, then another column takes over."
+    RIGHT: the same column can be reused at a deeper level with a TIGHTER cut.
+           bmi > 0.05 at level 1, then bmi > 0.12 at level 3.  nothing "used up."
+
+    WRONG: "all rooms at the same depth ask the same question."
+    RIGHT: each room hires its own doctor.  same menu of candidates, but each
+           room scores them against ITS OWN crowd -> different winners.
+
+    WRONG: "one doctor asks bmi AND age at once."
+    RIGHT: always one column, one cutoff per split.  you can ask bmi HERE and
+           age in the NEXT room -- but never both squashed into one question.
+
+    WRONG: "max depth = number of columns."
+    RIGHT: depth = how many questions deep.  columns can be reused, so depth can
+           exceed column count.  the real ceiling is PEOPLE running out (a pile
+           of 1 cannot be split).
+
+  ** KEY: THE TREE HAS NO FORMULA AND NO DIALS
+     There are no multipliers anywhere.  No sum of weighted columns.  No algebra.
+     Just questions and a number at each end.  The "flexibility knob" is DEPTH: how
+     many questions deep before you hit an answer.
+
+
+  ## The Leaf -- What Sits at the Bottom
+
+  A final pile (a leaf) is not always one person.  It can hold several people with
+  identical (or nearly identical) measurements but DIFFERENT answers.  No question
+  separates them, so they sit together:
+
+    leaf with 5 people, targets {180, 120, 150, 90, 160}
+    no question can split these
+    guess for this room = (180+120+150+90+160) / 5 = 140
+
+    a new patient who lands here gets 140 -- "people like you averaged 140."
+
+    leaf with 1 person, target 173
+    guess = 173   <- memorised that one person
+
+  Both are the same rule: guess = mean of the leaf's answers.  One person -> average
+  of one -> itself.  Why the mean?  Because it is the single number that drives
+  sum(miss^2) to its smallest -- the same "bottom of the bowl" from Chapter 4.
+
+
+  ## Depth: The Stiff-vs-Jumpy Dial of Trees
+
+    depth 1  (one question only):    2 guesses       too stubborn
+    depth 3  (three layers):         up to 8 guesses
+    depth 10 (ten layers):           up to 1024       too jumpy, memorises
+
+    study-error:   high ---------> ~0      (deep memorises everything)
+    exam-error:    high ---V--- high       (both ends bad)
+                      sweet spot = lowest exam-error
+
+  With max_depth=None, the tree keeps slicing until every leaf holds one person --
+  perfectly memorised, panics on new data.  The DEPTH SWEEP tries each ceiling
+  [1, 2, 3, 4, 5, 6, 8, 10, None] and picks the one with lowest exam-error.
+
+  Two stop signs -- the tree halts at whichever fires first:
+
+    STOP #1:  you hit your ceiling           (max_depth)
+    STOP #2:  a branch has ~1 person         (can't split one person)
+
+    max_depth = 1024 on 331 people?  people run out at ~12.  you never reach 1024.
+    max_depth = None?  same thing.   both mean "no real ceiling."
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    question chart                        decision tree
+    the whole build hunt (.fit)           recursive binary splitting / CART
+    one yes/no question per room          a split / a node
+    the final pile at the bottom          a leaf / terminal node
+    the guess (mean of targets)           the predicted value
+    badness (sum of squared misses)       the residual sum of squares (RSS) for a split
+    midpoint between sorted values        candidate split threshold
+    champion of champions                 the best split (lowest impurity / RSS)
+    depth                                 max_depth hyperparameter
+    the chart is lopsided                 the tree is not balanced
+    same menu, different winner           greedy, locally optimal splitting
+
+
+  ## The Code, If You Want It
+
+  The entire build hunt -- sort, midpoints, badness, champion, recurse -- is one line:
+
+  >> NEW TO PYTHON? Each named once:
+       DecisionTreeRegressor()  -- an empty question-chart machine for number answers
+       .fit(X, y)               -- run the whole build hunt on the study pile
+       .predict(X)              -- walk each row through the frozen chart, read guesses
+
+    from sklearn.tree import DecisionTreeRegressor
+    from sklearn.metrics import mean_squared_error, r2_score
+
+    tree_reg = DecisionTreeRegressor(random_state=42)
+    tree_reg.fit(X_train, y_train)                    # the whole BUILD hunt
+    y_pred = tree_reg.predict(X_test)                 # USE: walk exam patients
+    mse = mean_squared_error(y_test, y_pred)
+    r2  = r2_score(y_test, y_pred)
+
+    # depth sweep: try each ceiling, pick lowest exam-error
+    depths = [1, 2, 3, 4, 5, 6, 8, 10, None]
+    for d in depths:
+        t = DecisionTreeRegressor(max_depth=d, random_state=42)
+        t.fit(X_train, y_train)
+        print(d, mean_squared_error(y_test, t.predict(X_test)))
+    # pick the depth with smallest test MSE
+
+  !! WARN: EVERY ROOM'S QUESTION IS FOUND BY BRUTE FORCE
+     The machine does not guess "try bmi."  It tries EVERY column times EVERY
+     midpoint, measures the badness of EACH, and keeps the one with the smallest
+     number.  No astrology, no guessing -- just the one that measures cleanest.
+     The cost: for each room, (columns x midpoints) trials.  That adds up.
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 5 -- Question Charts and Committees):
+    Part 1 (this post) .
+    [Part 2 -- The Mixing Ruler](mixing-ruler-gini-pruning.txt) .
+    [Part 3 -- Committees](committees-bag-forest-boost.txt)
+
+  Previous chapter: [Chapter 4 -- Humble Dials](humble-dials-ridge-lasso.txt)
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

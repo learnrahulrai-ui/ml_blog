@@ -10,7 +10,7 @@
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: fundamentals, supervised-learning, knn
   ============================================================================================
 
-  PATH . post 1 of 12  (you are at the start -- read top to bottom)
+  PATH . post 1 of 15  (you are at the start -- read top to bottom)
        next:  [House Prices 2: Ask the Closest Rows](neighbor-machine-knn.txt) ->
 
   Welcome -- this is where the blog begins, and it asks nothing of you but curiosity
