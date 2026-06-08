@@ -66,6 +66,33 @@
      The jumps point in different directions and cancel when averaged.  This is the
      "wisdom of the crowds."  No single tree improved -- only the average did.
 
+  ## Vote Counting: One Patient's 200 Votes
+
+  "Average 200 guesses" is abstract.  Let me show the actual vote sheet for one
+  patient:
+
+    patient X:  bmi=0.06, age=0.04, bp=0.02, ...
+
+    tree #    guess for patient X
+    ──────────────────────────────
+     1        151
+     2        134
+     3        163
+    ...
+     200      142
+
+    bagging's guess = (151 + 134 + 163 + ... + 142) / 200 = ~148
+
+  One patient, 200 trees, 200 votes.  One average.  That's the final guess.
+
+  !! WARN: 80 (STICKY NOTE SIZE) != 200 (TREES) != 442 (TOTAL PEOPLE)
+     Each sticky note holds ~80 people drawn WITH REPLACEMENT from 354.
+     Each sticky note builds exactly ONE tree.
+     200 sticky notes -> 200 trees -> 200 votes per patient.
+     The sticky note size (80) affects how diverse the trees are, NOT
+     how many votes each patient gets.  Every tree votes once per patient,
+     regardless of how many people were on its sticky note.
+
   The name: bagging = Bootstrap AGGregating.  Two wrappers around one tree:
 
     BOOTSTRAP  = the sticky-note dealing (with put-back)  -> makes 200 different piles
@@ -84,6 +111,18 @@
     tree #200: same idea
 
     average those free-exam errors = OOB score
+
+  Spread out on paper, the OOB looks like this:
+
+    sticky note   missed people   tree guesses   OOB error
+    ──────────────────────────────────────────────────────
+       1          p4, p6          yes               42
+       2          p1, p3, p7      yes               38
+       3          p2, p5          yes               45
+      ...          ...            ...              ...
+      200         p3, p8          yes               40
+
+    OOB = (42 + 38 + 45 + ... + 40) / 200
 
   You get an honest error WITHOUT touching the sealed 25% exam pile.
 
@@ -136,6 +175,22 @@
      The only real news is that each cut sees fewer columns.  Everything else --
      bootstrap piles, build trees, average guesses, OOB exam -- is identical to bagging.
 
+  !! WARN: WHY FOREST USES MORE TREES THAN BAGGING
+     Bagging used 200 trees.  Forest uses 300.  Why?
+
+       bagging:  each tree sees all 10 columns at every cut.
+                 bmi dominates -> trees rhyme.  You don't need as many
+                 trees because each one is already strong on its own.
+
+       forest:   each tree sees only ~3 random columns per cut.
+                 Each tree is WEAKER (it ignores 7 columns per cut).
+                 You need MORE trees to compensate for the weakness.
+                 More trees = more votes = the average steadies out.
+
+     200 vs 300 is just a knob (n_estimators).  The idea: weaker trees
+     need more friends to reach the same steadiness.  If you hid even
+     fewer columns (max_features=0.3), you'd need even more trees.
+
 
   ## Feature Importances: Which Columns Leaned Hardest
 
@@ -181,34 +236,241 @@
      Validation error drops, bottoms out, then RISES -- that bottom is where to stop.
      Beyond it, each new stump is memorising study-pile noise.
 
+  ## Boosting: The Leftover Arithmetic
 
-  ## Interpretation: Scramble and Slide
+  "Guess the leftovers" is abstract.  Let me show the actual table:
 
-  After building a committee (forest or boosting), two questions remain:
+    4 patients, 3 stumps.  Each stump is max_depth=1 (one question -- a STUMP).
 
-  1) WHICH COLUMN MATTERS MOST?  -- permutation importance
+    person  answer  stump1_guess  leftover1  stump2_guess  leftover2  stump3_guess  leftover3
+    ─────── ─────── ───────────── ────────── ───────────── ────────── ───────────── ──────────
+       A      151       140          11          8             3          2            1
+       B       75        80          -5         -4            -1          0           -1
+       C      141       130          11          8             3          2            1
+       D      121       130          -9         -7            -2         -2            0
 
-    take the finished committee.  measure its exam accuracy.
-    now SCRAMBLE one column (shuffle its values randomly).
-    measure accuracy again.  if it DROPPED a lot, that column mattered.
-    do this for every column.  rank by how much the accuracy dropped.
+    round 1:  stump1 is built on the REAL answers -> guess1
+              leftover1 = answer - guess1
 
-    the shuffling is done on the EXAM pile, not the study pile -- you're measuring
-    how much the honest score worsens when a column is destroyed.
+    round 2:  stump2 is built on the LEFTOVER1 column -> guess2
+              leftover2 = leftover1 - guess2
 
-  2) HOW DOES ONE COLUMN AFFECT THE GUESS?  -- Partial Dependence Plot (PDP)
+    round 3:  stump3 is built on the LEFTOVER2 column -> guess3
+              leftover3 = leftover2 - guess3  (approaching zero)
 
-    pick one column (the top-importance one).
-    slide its value from its smallest to its largest.
-    at each position, average the committee's guess across all other people.
-    plot: x-axis = column value, y-axis = average guess.
+    final guess = stump1 + lr*stump2 + lr*stump3 + ...
+                = 140    + 0.1*8    + 0.1*2    + ...
 
-    the curve shows the column's GLOBAL effect: "as radius goes up, the committee
-    increasingly says sick."
+  Without the learning rate (lr=1.0):
+    patient A: 140 + 8 + 2 = 150  <- overshot!  Real answer is 151, now 150.
+    The stumps jumped too hard and landed past the target.
 
-    ICE (Individual Conditional Expectation): same plot but one line per person
-    instead of the average.  you see whether everyone follows the same trend
-    or whether the effect differs by person.
+  With lr=0.1:
+    patient A: 140 + 0.1*8 + 0.1*2 = 140 + 0.8 + 0.2 = 141  <- under, but steady.
+
+  The small step means each stump takes a tiny bite instead of a huge one.
+  The line moves toward the answer more slowly, but it does not overshoot.
+
+  After each round, the leftovers shrink.  The stumps focus on what the previous
+  ones missed.  By round 3, the leftovers are near zero -- the line has learned
+  the pattern.
+
+  !! WARN: YOU DO NOT SORT THE LEFTOVER COLUMN
+     Each round, the tree looks at the 10 body measurements (bmi, age, bp, ...)
+     and asks "which column gives the cleanest cut on the CURRENT target?"
+     The target changes (answer -> leftover1 -> leftover2), but the 10 columns
+     stay in the SAME order.  You sort bmi the same way every round.  The
+     leftover column is not one of the 10 measurements -- it is the current
+     target.  There is nothing to sort.
+
+  ## The Learning Curve: Where to Stop
+
+  Each stump reduces study error.  But at some point, stumps start memorising
+  noise.  Hold out 30% of the study pile as validation and watch the error:
+
+    iteration  validation MSE    direction
+    ────────────────────────────────────────
+       0         40.2            baseline (mean only)
+      10         34.1            down
+      20         31.3            down
+      30         29.0            down
+      40         28.2            bottom <- BEST (n_estimators=40)
+      50         28.5            up     <- overfitting starts
+     100         30.1            up
+     300         32.0            up
+
+    Training error keeps dropping forever.  Validation error drops, bottoms
+    out, then rises.  The bottom is where you stop.  Beyond it, each new
+    stump is memorising study-pile noise while harming exam performance.
+
+
+  ## Interpretation 1: Scramble (Which Column Mattered)
+
+  You have 300 frozen trees.  The exam pile is sealed.  True MSE = 25.
+
+  Step 1: Grade the forest on the real exam pile -> true MSE = 25 (baseline).
+  Step 2: Pick one column -- say "radius."  Shuffle its values across the 88
+          exam people.  Swap p1's radius with p7's.  p7's with p3's.  The
+          radius VALUES stay the same, but they're attached to wrong people.
+  Step 3: Feed the SCRAMBLED exam pile to the same 300 frozen trees.  Each
+          person walks each tree.  Average 300 guesses per person.  Compare
+          to real answers -> new MSE.
+  Step 4: If the new MSE jumped UP, that column mattered.
+
+  WHY DOES SCRAMBLE WORK?
+
+    Trees don't change.  The exam pile changes.  A person with scrambled
+    radius answers the tree's cuts wrong and lands in a wrong leaf.
+
+    Not all trees get fooled.  Only trees that USED "radius" in their cuts
+    send the person to a different leaf.  Trees that only asked about bmi
+    or age give the same guess as before.  The average shifts, but not to
+    pure garbage.
+
+    Concrete example -- one person, one tree:
+
+      tree #42 has a cut: "radius > 20?"
+      p1's REAL radius = 15  -> answers NO  -> goes LEFT  -> leaf guess = 140
+      p1's SCRAMBLED radius = 22 (from p7) -> answers YES -> goes RIGHT -> leaf guess = 190
+
+      p1 with fake radius 22 lands in the wrong crowd.  Leaf guess 190
+      is the average of people who REALLY had radius > 20.  p1 doesn't
+      belong there.  The guess is wrong for p1.
+
+    But not every tree uses radius.  Here is what one person walks
+    across three different trees:
+
+      tree #1 cut: "radius > 20?"    p1 says fake 22 -> YES -> wrong leaf     FOOLED
+      tree #2 cut: "bmi > 0.05?"     never asks radius  -> same leaf          SAFE
+      tree #3 cut: "radius > 15?"    p1 says fake 22 -> YES -> wrong leaf     FOOLED
+
+    Trees that used radius are fooled.  Trees that never asked about radius
+    give the same guess as before.  Across 300 trees, enough used radius
+    that the average shifts -- the MSE jumps up.
+
+  Repeat for every column.  Build a table:
+
+    column      true MSE    scrambled MSE    jump
+    ──────────────────────────────────────────────
+    radius        25           45             +20   <- mattered
+    texture       25           38             +13   <- mattered some
+    smoothness    25           26             + 1   <- didn't matter
+    perimeter     25           42             +17   <- mattered
+
+    The jump = how much the honest score worsens when that column is destroyed.
+
+  !! WARN: SCRAMBLE DOES NOT REBUILD THE FOREST
+     The 300 trees were built ONCE, before any scrambling.  Scramble happens
+     on the EXAM pile only.  Trees stay frozen.  You don't rebuild.  You
+     don't re-bootstrap.  You don't re-fit.  Just shuffle and re-grade.
+
+  !! WARN: THE JUMP IS NOT "CAUSATION"
+     If radius and perimeter are correlated, scrambling one might make the
+     other look more important than it is.  The jump tells you "how much the
+     forest relied on this column" -- not "how much this column matters in
+     the real world."
+
+
+  ## Interpretation 2: Slide (How the Column Pushes the Guess)
+
+  Scramble tells you WHICH column mattered.  Slide tells you HOW it pushes
+  the guess.  The push is called a Partial Dependence Plot (PDP).
+
+  Step 1: Pick one column -- say "bmi."  Keep all other 9 columns at their
+          real values.
+  Step 2: Give EVERY person the SAME fake bmi value.  Feed to 300 frozen trees.
+          Average 300 guesses per person.  Record the average guess across
+          all 88 people.
+  Step 3: Change the fake bmi to the next value.  Repeat.
+  Step 4: Plot fake bmi (x) vs average guess (y).
+
+  A concrete tree to see how this works (simplified to 2 cuts):
+
+               bmi > 0.045 ?
+              /             \
+            YES              NO
+             |                |
+          bmi > 0.075?    age > 30?
+           /      \        /      \
+         YES       NO    YES       NO
+          |         |      |         |
+         200      180     120       100
+
+  Slide: fake bmi = 0.01 for ALL 88 people.
+
+    person  fake_bmi  path                      guess
+    ──────────────────────────────────────────────────
+    p1      0.01      bmi>0.045? NO -> age>30? NO      100
+    p2      0.01      NO -> age>30? YES                 120
+    p3      0.01      NO -> age>30? YES                 120
+    ...
+    p88     0.01      NO -> age>30? NO                  100
+
+    SAME fake bmi (0.01).  DIFFERENT guesses (100 or 120)
+    because age splits them further at the second level.
+
+  Now fake bmi = 0.06 for ALL 88 people:
+
+    person  fake_bmi  path                      guess
+    ──────────────────────────────────────────────────
+    p1      0.06      bmi>0.045? YES -> bmi>0.075? NO  180
+    p2      0.06      YES -> bmi>0.075? NO              180
+    ...
+    p88     0.06      YES -> bmi>0.075? NO              180
+
+    This tree only has one bmi question below 0.045, so everyone
+    with fake bmi=0.06 lands at guess 180.
+
+  Now repeat for fake bmi values [0.01, 0.03, 0.06, 0.09]:
+
+    fake bmi    avg guess across 88 people
+    ────────────────────────────────────────
+    0.01        (100 + 120 + 120 + ... + 100) / 88  =  115
+    0.03        same as 0.01  (still below 0.045)   =  115
+    0.06        everyone above 0.045 -> all 180      =  180
+    0.09        same as 0.06  (still above 0.045)    =  180
+
+  Plot:
+
+    guess
+      ↑
+    180 ━━━━━━━━━━━━━━━━━━━━━━━━  ← PDP (one line, average of all 88)
+      │
+    115 ━━━━━━━━━━━━━━━━━━━━━━━━
+      └─────┬────────┬────────┬──→ bmi
+          0.01     0.06     0.09
+
+  PDP mixes people.  It shows the crowd average.  ICE (Individual Conditional
+  Expectation) shows EACH person's line:
+
+    guess
+      ↑
+    180 ────────────────────────  ← p2,p3 (age>30, jump together)
+      │       ╱
+    120 ──────╱──────────────────  ← p2,p3 start here
+      │     ╱
+    100 ─╱──────────────────────  ← p1,p88 (age<=30, start lower)
+      └─────┬────────┬────────┬──→ bmi
+          0.01     0.06     0.09
+
+    p1:  100 ─────────────── 180   (jumps at bmi>0.045)
+    p2:  120 ─────────────── 180   (already higher at low bmi)
+    p88: 100 ─────────────── 180   (same as p1)
+
+    All 88 lines jump at the SAME fake bmi (the cut point 0.045).
+    But some start at 100, some at 120.  ICE shows this spread.
+    PDP hides it by averaging into one smooth line.
+
+  !! WARN: PDP HIDES THE MESS.  ICE SHOWS IT.
+     PDP = one line, average of all people at each fake value.
+     ICE = 88 lines, one per person, their individual guess at each fake value.
+     If the tree had more cuts, different people would jump at different fake
+     values -- ICE lines spread apart.  PDP smooths them into a single curve.
+
+  !! WARN: THE COUNT IS FAKE COLUMN VALUES, NOT TREES
+     For each fake bmi value: 88 people each walk 300 trees -> 88 averages.
+     You test 20 fake bmi values -> 20 points per person -> 88 lines.
+     The trees don't change.  Only the fake column value changes.
 
 
   ## The Labels, Last
@@ -226,7 +488,7 @@
     a tiny tree (one stump)               a weak learner / max_depth=1
     leftovers from the last fixer         residuals of the current ensemble
     trust-each-fixer knob                 learning rate / shrinkage
-    where validation error bottoms out    early stopping / best iteration
+    where validation error bottoms out    watch error after each stump / early stopping
     scramble a column, measure drop       permutation importance
     slide one column, watch the guess     partial dependence plot (PDP)
     one line per person                   individual conditional expectation (ICE)

@@ -150,6 +150,137 @@
       that is the guess for any new person who lands in it.
 
 
+  ## A Worked Example: 4 People, 1 Column
+
+  A sheet with 4 people, 1 measurement, 1 answer.  Every number visible.  Every
+  cut's arithmetic done with pencil and paper.  No calculator needed.
+
+    person   bmi   age   answer
+    ────────────────────────────
+     A      0.18   55     151
+     B      0.06   35     121
+     C      0.04   25      97
+     D      0.12   45     135
+
+  STEP 1 -- sort by bmi, find midpoints.
+
+    sorted:   C(0.04,97)  B(0.06,121)  D(0.12,135)  A(0.18,151)
+    ├─ between C&amp;B ─┤  ├─ between B&amp;D ─┤  ├─ between D&amp;A ─┤
+    midpoint:  0.05             0.09             0.15
+
+  3 midpoints -&gt; 3 cuts to try.
+
+  STEP 2 -- try cut at 0.05.  Below = {C}.  Above = {B, D, A}.
+
+    below:  one person (97) -&gt; mean = 97  (no arithmetic needed)
+    above:  121 + 135 = 256.  256 + 151 = 407.  407 / 3 = 135.666...
+            call it 135.7 (close enough to rank against other cuts)
+
+    Now measure each miss.  "Squared" = multiply the number by itself.
+    A minus times a minus makes a plus (negative × negative = positive).
+
+    C:  97 - 97  =    0   0 × 0     =    0
+    B:  121 - 135.7 = -14.7  14.7 × 14.7
+        14 × 14 = 196.  14 × 0.7 = 9.8 (done twice = 19.6).  0.7 × 0.7 = 0.49
+        Total: 196 + 19.6 + 0.49 = 216.09.  Call it 216.
+    D:  135 - 135.7 = -0.7  0.7 × 0.7 = 0.49.  Call it 0.5.
+    A:  151 - 135.7 =  15.3  15.3 × 15.3
+        15 × 15 = 225.  15 × 0.3 = 4.5 (done twice = 9).  0.3 × 0.3 = 0.09
+        Total: 225 + 9 + 0.09 = 234.09.  Call it 234.
+
+    sum = 0 + 216 + 0.5 + 234 = 450.5
+
+  STEP 3 -- try cut at 0.09.  Below = {C, B}.  Above = {D, A}.
+
+    below:  97 + 121 = 218.  218 / 2 = 109.
+    above:  135 + 151 = 286.  286 / 2 = 143.
+
+    C:  97 - 109 = -12.  -12 × -12 = 144  (minus × minus = plus; 12×12=144)
+    B:  121 - 109 =  12.   12 ×  12 = 144
+    D:  135 - 143 =  -8.   -8 ×  -8 =  64  (8×8=64)
+    A:  151 - 143 =   8.    8 ×   8 =  64
+
+    sum = 144 + 144 + 64 + 64 = 416   &lt;- CHAMPION (smallest)
+
+  STEP 4 -- try cut at 0.15.  Below = {C, B, D}.  Above = {A}.
+
+    below:  97 + 121 = 218.  218 + 135 = 353.  353 / 3 = 117.666...  call it 117.7.
+    above:  one person (151) -&gt; mean = 151.  (no arithmetic needed)
+
+    C:  97 - 117.7 = -20.7  20.7 × 20.7
+        20 × 20 = 400.  20 × 0.7 = 14 (done twice = 28).  0.7 × 0.7 = 0.49
+        Total: 400 + 28 + 0.49 = 428.49.  Call it 429.
+    B:  121 - 117.7 = 3.3  3.3 × 3.3
+        3 × 3 = 9.  3 × 0.3 = 0.9 (done twice = 1.8).  0.3 × 0.3 = 0.09
+        Total: 9 + 1.8 + 0.09 = 10.89.  Call it 11.
+    D:  135 - 117.7 = 17.3  17.3 × 17.3
+        17 × 17 = 289.  17 × 0.3 = 5.1 (done twice = 10.2).  0.3 × 0.3 = 0.09
+        Total: 289 + 10.2 + 0.09 = 299.29.  Call it 299.
+    A:  151 - 151 = 0.  0 × 0 = 0.
+
+  Champion table:
+
+    cut at    sum of squared misses
+    ────────────────────────────────
+    0.05      451.5
+    0.09      416    &lt;- smallest -&gt; first question
+    0.15      739
+
+  That is bmi's champion.  But there is also age, and age deserves its own hunt.
+
+  ## Now Add Age: The Second Column
+
+  Sort age: 25, 35, 45, 55.  Midpoints: 30, 40, 50.
+
+  Cut at 30:
+    Below: C (97) -&gt; mean 97.  miss = 0.
+    Above: B(121), D(135), A(151) -&gt; mean 135.7.
+    Same squared misses as the bmi 0.05 cut: 0 + 216 + 0.5 + 234 = 450.5.
+
+  Cut at 40:
+    Below: C(97), B(121) -&gt; mean 109.
+      C: 97-109=-12 -&gt; 144.  B: 121-109=12 -&gt; 144.
+    Above: D(135), A(151) -&gt; mean 143.
+      D: 135-143=-8 -&gt; 64.  A: 151-143=8 -&gt; 64.
+    Sum = 144+144+64+64 = 416.
+
+  Cut at 50:
+    Below: C(97), B(121), D(135) -&gt; mean 117.7.
+      C: 429.  B: 11.  D: 299.
+    Above: A(151) -&gt; mean 151.  miss=0.
+    Sum = 429+11+299+0 = 739.
+
+  Age's champion: cut at 40, badness = 416.
+
+  Champion-of-champions table:
+
+      column   champion cut   badness
+      ───────────────────────────────
+      bmi          0.09         416
+      age            40         416
+
+  Tie at 416.  Arbitrary rule: bmi wins because it came first.
+  First question: "bmi &gt; 0.09?"  -&gt; below goes to one room, above to another.
+
+  Each room then runs its OWN hunt on its own people -&gt; a different question.
+
+  !! WARN: THE SUM IS NOT AN RMSE
+     There is no root, no division.  Just the raw sum of squared misses.
+     A huge number that only exists to COMPARE cuts.  RMSE would multiply
+     every number by the same constant (1/4, then root).  Order wouldn't
+     change.  Waste of ink.
+
+  !! WARN: THE THREE CUTS COMPETE FAIRLY
+     Each cut is scored against the SAME 4 people.  The sums are in the
+     same units.  451.5 and 416 and 739 are all "total wrongness if we
+     draw the line here."  The smallest wins.
+
+    !! WARN: THE CHAMPION IS LOCAL, NOT GLOBAL
+       The 0.09 cut is bmi's champion.  Age's champion (40, badness 416)
+       ties it exactly.  Column competition -- the champion of champions
+       -- happens only in Step 5.  A tie means someone picks arbitrarily.
+
+
   ## The Corrections I Caught
 
   Building this by hand exposed five wrong pictures I would have carried forever:

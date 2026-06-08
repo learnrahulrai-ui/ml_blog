@@ -43,15 +43,30 @@
   the last, and that difference is what mimics walking into the hospital on a new day.
 
   >> NOTE: WHY ABOUT 37% SIT OUT EVERY DEAL
-     Putting each patient back means some never get picked. A little pencil arithmetic, for
-     a pile of N people:
+     Putting each patient back means some never get picked.  By pencil, for a pile of
+     80 people:
 
-       chance one patient is MISSED in a single draw  = (1 - 1/N)
-       chance they are missed in ALL N draws          = (1 - 1/N)^N
+       chance one patient is MISSED in a single draw     = (80 - 1)/80  =  79/80
+       chance they are missed in ALL 80 draws            = (79/80)^80
 
-     For any decent N that lands near 1/e ~= 0.37. So roughly a THIRD of the pile sits out
-     every single deal -- and those left-out people turn out to be a gift (see "The Free
-     Exam" below).
+     Computing (79/80)^80 by repeated squaring (pencil and paper):
+
+       Step 1:   (79/80)^2   =  6241/6400      ≈ 0.975
+       Step 2:   (79/80)^4   =  0.975 × 0.975  ≈ 0.951
+       Step 3:   (79/80)^8   =  0.951 × 0.951  ≈ 0.904
+       Step 4:   (79/80)^16  =  0.904 × 0.904  ≈ 0.817
+       Step 5:   (79/80)^32  =  0.817 × 0.817  ≈ 0.668
+       Step 6:   (79/80)^64  =  0.668 × 0.668  ≈ 0.446
+
+       80 draws  =  64 + 16 (since 80 = 64 + 16)
+       So (79/80)^80 = (79/80)^64 × (79/80)^16
+                    ≈  0.446 × 0.817
+                    ≈  0.364
+
+     About 37%.  For any decent-sized pile the answer always lands near
+     1/e ≈ 0.37.  So roughly a THIRD of the pile sits out every single
+     deal -- and those left-out people turn out to be a gift (see "The
+     Free Exam" below).
 
 
   ## The Wobble Band
@@ -84,6 +99,15 @@
      Use 0.025 and 0.975 (because 100% - 2.5% = 97.5%). Reach for 0.25 and 0.75 and your
      band comes out absurdly narrow, and you will throw away perfectly good dials as
      "useless." We want to be almost-certain, not merely probably.
+
+     By pencil, for 200 values:
+
+       2.5% of 200  =  200 × 2.5/100  =  200 × 0.025  =  5
+
+     So chop the 5 smallest values and the 5 largest.  Keep index 5 through
+     194 (counting from 0).  That's 200 - 5 - 5 = 190 values in the middle.
+     The number on the 5th index (0.42) is the lower edge.  The number on the
+     194th index (0.58) is the upper edge.  The band = 0.42 to 0.58.
 
   !! WARN: COUNTING NOTES IS NOT MEASURING WIDTH
      Every dial's 95% band keeps the same NUMBER of values in the middle -- 190 of the 200,

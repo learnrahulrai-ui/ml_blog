@@ -92,6 +92,50 @@
     LADDER:  one dial  ~=  sum( (x - xbar)(answer - ybar) )  /  sum( (x - xbar)^2 )
                            +-- how the column and answer move together --+ / +- column wiggle -+
 
+  A concrete 4-person worked example, by pencil:
+
+    person   bmi (x)   answer (y)   x - xbar   y - ybar   (x-xbar)(y-ybar)   (x-xbar)^2
+    ──────────────────────────────────────────────────────────────────────────────────────
+      A       0.04        97        -0.04       -29          1.16             0.0016
+      B       0.06       121        -0.02        -5          0.10             0.0004
+      C       0.12       135         0.04         9          0.36             0.0016
+      D       0.18       151         0.10        25          2.50             0.0100
+                        ─────                                                ────────
+    xbar = (0.04+0.06+0.12+0.18)/4 = 0.40/4 = 0.10
+    ybar = (97+121+135+151)/4 = 504/4 = 126
+
+    "x - xbar" means: subtract the column's own average (0.10) from each person's bmi.
+    For person A: 0.04 - 0.10 = -0.04.  For B: 0.06 - 0.10 = -0.02.  And so on.
+
+    "y - ybar" means: subtract the answer's average (126) from each person's answer.
+    For person A: 97 - 126 = -29.  For B: 121 - 126 = -5.  And so on.
+
+    Multiply (x-xbar) by (y-ybar) for each person:
+      A: -0.04 × -29 = 1.16    (minus × minus = plus)
+      B: -0.02 × -5  = 0.10
+      C:  0.04 ×  9  = 0.36
+      D:  0.10 × 25  = 2.50
+    sum = 1.16 + 0.10 + 0.36 + 2.50 = 4.12   &lt;- this is the "top"
+
+    Square (x-xbar) for each person:
+      A: (-0.04)^2 = -0.04 × -0.04 = 0.0016
+      B: (-0.02)^2 = -0.02 × -0.02 = 0.0004
+      C: (0.04)^2  =  0.04 ×  0.04 = 0.0016
+      D: (0.10)^2  =  0.10 ×  0.10 = 0.0100
+    sum = 0.0016 + 0.0004 + 0.0016 + 0.0100 = 0.0136   &lt;- this is the "bottom"
+
+    LADDER dial = 4.12 / 0.0136 ≈ 303
+
+    That is the bmi-dial IF bmi were the ONLY column.  It is 303 because the
+    numbers here are small (0.04, 0.06, ...) and multiplying by 303 brings them
+    into the range of the answer (97 to 151).  The LADDER dial says "for every
+    1 unit bmi goes up, the guess goes up by 303."
+
+    But this is a LIE if any other column moves together with bmi.  The real
+    dial is SMALLER because the untangler (X^T X)^-1 splits the credit among
+    all columns.  The LADDER gives all credit to bmi; the EXACT gives each
+    column only its own share.
+
   It is a lovely first picture of one column in isolation. It is also a TRAP, and here is
   the exact size of the trap:
 

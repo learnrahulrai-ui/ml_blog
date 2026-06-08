@@ -112,6 +112,30 @@
      check, not a verdict to trust. Your physics hunch -- heavier car, worse mileage -- is
      a hypothesis; the dials are evidence, and tangled columns make that evidence shaky.
 
+  A concrete dial comparison, by pencil, before and after same-ruler.  Suppose 2
+  columns: weight (pounds, runs 2000-5000) and horsepower (runs 45-230):
+
+    raw dials (each in its own unit):
+      weight dial = -0.007  mpg per POUND
+      horse  dial = -0.04   mpg per HORSEPOWER
+
+    At a glance, -0.04 looks 6x stronger than -0.007.  But is it?
+
+    The dial says "per ONE unit of its column."  A step of "1 pound" is tiny;
+    a step of "1 horsepower" is large.  To compare, rescale both columns to
+    spread=1, then refit:
+
+    after same-ruler (StandardScaler):
+      weight dial = -3.2   mpg per ONE-SPREAD of weight
+      horse  dial = -2.1   mpg per ONE-SPREAD of horsepower
+
+    Now the comparison is fair: weight (-3.2) pulls harder than horse (-2.1)
+    per equal-sized step of each column.  The raw dials reversed the ranking.
+
+    weight column spread (sd) ~= 1000 pounds.  One-spread step of weight
+    changes the guess by -3.2 mpg.  One-spread step of horsepower changes it
+    by -2.1 mpg.  Same currency, honest comparison.
+
 
   ## Pencil It
 
@@ -131,7 +155,51 @@
        min(d, key=d.get) returns its name.
     4. Raw dials wear each column's own units -- not comparable until you put the columns
        on one shared ruler first.
-    5. When columns move together, a single dial is shaky; treat it as evidence, not proof.
+     5. When columns move together, a single dial is shaky; treat it as evidence, not proof.
+
+
+  ## Common Tripwires I Caught
+
+    TRIPWIRE 1:  The bare row problem -- names torn off
+       WRONG: try to read model.coef_ directly without knowing which
+              number belongs to which column.
+       RIGHT: zip the names onto the numbers:
+              dials = dict(zip(X.columns, model.coef_)).
+              Now each dial has its column's name attached.
+
+    TRIPWIRE 2:  Most negative = MIN, not MAX
+       WRONG: -0.04 is bigger than -0.007 by the digits 4 vs 7.
+       RIGHT: -0.04 is further below zero = SMALLER = most negative.
+              A negative dial drags the answer DOWN.  The most negative
+              is the STRONGEST drag downward.  Use min(...), not max(...).
+
+    TRIPWIRE 3:  min(d, key=d.get) vs plain min(d)
+       WRONG: plain min(d) on a shelf of names -> values returns the
+              smallest NAME alphabetically ("accel"), not the smallest value.
+       RIGHT: min(d, key=d.get) returns the KEY (name) whose VALUE is
+              smallest.  It returns a column name, not the dial number.
+
+    TRIPWIRE 4:  Raw dials are NOT comparable across columns
+       WRONG: compare -0.007 per pound with -0.04 per horsepower.
+       RIGHT: Each dial is "answer-units per ONE unit of its column."
+              Different columns have different-sized "one units."
+              Put every column on the same ruler (StandardScaler) FIRST,
+              then read the dials for an honest comparison.
+
+    TRIPWIRE 5:  Scaling does NOT change the fit -- only the dial
+                 readability
+       WRONG: "I scaled the columns, so the guesses change."
+       RIGHT: Rescale a column and its dial rescales inversely.
+              The guesses, MSE, and R^2 stay exactly the same.
+              Scaling only changes whether dials are COMPARABLE.
+
+    TRIPWIRE 6:  "Holding the others fixed" can be a fiction
+       WRONG: trust each individual dial as "the real effect of this
+              column."
+       RIGHT: When columns move together (displacement, horsepower,
+              weight all rise with car size), the rule cannot cleanly
+              separate their pulls.  A single dial can swing wildly or
+              even flip sign.  Read dials as evidence, not proof.
 
 
   ## The Code, If You Want It

@@ -90,6 +90,31 @@
 
       gap(a, b) = sqrt( sum_j (a_j - b_j)^2 )
 
+  A concrete 2-column example, by pencil.  New row has (rooms=4, income=3).  Compare
+  to one working row (rooms=5, income=3):
+
+    column     a_j (new)   b_j (work)   gap_j = a_j - b_j   gap_j^2
+    ─────────────────────────────────────────────────────────────────
+    rooms      4           5            -1                   1
+    income     3           3             0                   0
+                                                     sum = 1
+
+    gap = sqrt(1) = 1
+
+    Now compare the same new row to another working row (rooms=8, income=9):
+
+    column     a_j (new)   b_j (work)   gap_j = a_j - b_j   gap_j^2
+    ─────────────────────────────────────────────────────────────────
+    rooms      4           8            -4                  16
+    income     3           9            -6                  36
+                                                     sum = 52
+
+    gap = sqrt(52) ≈ 7.21
+
+    The first working row (gap=1) is much closer than the second (gap=7.21).
+    If k=1, the guess is the first row's price.  If k=3, we average the 3
+    smallest-gap rows' prices.
+
   This rule barely deserves the name "machine" -- it builds nothing ahead of time. It
   just keeps the whole working pile on a shelf and, when a new house walks in, finds the
   ones most like it and averages what they sold for. The one knob to set by hand is k:
@@ -105,10 +130,26 @@
 
       RMSE = sqrt( (1/n) sum_i r_i^2 )
 
-  RMSE stays in the same units as the right-answer column. RMSE = 0.5 here means a
-  typical miss of $50,000. The bar to beat: always guessing the average price gives
-  RMSE = std(y). Any useful rule must beat that. RMSE punishes large single misses more
-  heavily than the plain average of absolute leftovers, MAE = mean|r_i|.
+  A concrete 4-person worked example, by pencil:
+
+    person   truth y    guess yhat    miss r     r^2
+    ──────────────────────────────────────────────────
+      A       1.4       1.2          +0.2       0.04
+      B       2.8       3.1          -0.3       0.09
+      C       0.9       1.0          -0.1       0.01
+      D       3.5       3.2          +0.3       0.09
+                                       sum r^2 = 0.23
+
+    mean r^2 = 0.23 / 4 = 0.0575
+    RMSE = sqrt(0.0575) ≈ 0.24
+
+    Typical miss: about $24,000.  The bar to beat: always guessing the average price
+    (here average y = (1.4+2.8+0.9+3.5)/4 = 8.6/4 = 2.15) gives RMSE = std(y) ≈ 0.97.
+    Our rule at RMSE=0.24 is clearly beating the average.
+
+  RMSE punishes large single misses more heavily than the plain average of absolute
+  leftovers, MAE = mean|r_i|.  Check: person B missed by -0.3, squared to 0.09.
+  A single double-sized miss of -0.6 would square to 0.36 -- four times the weight.
 
 
   ## Rule 2 -- The Straight-Stick Rule
@@ -169,6 +210,36 @@
     4. Measure mistake with RMSE (same units as price); the bar to beat is std(y).
     5. Pick settings by rotating folds, preparing numbers inside each round.
     6. Refit on all of working pile; read the hidden pile exactly once.
+
+
+  ## Common Tripwires I Caught
+
+    TRIPWIRE 1:  .shape is a PAIR, not a product
+       WRONG: treat 20640 x 9 as 185760 (the product).
+       RIGHT: df.shape returns (n_rows, n_cols) in that fixed order --
+              (20640, 9) -- never their product.
+
+    TRIPWIRE 2:  random_state must be the SAME number everywhere
+       WRONG: use random_state=1 here and random_state=42 there.
+       RIGHT: use RANDOM_STATE = 42 everywhere.  Same seed -> same shuffle
+              -> your splits match the grader's splits.
+
+    TRIPWIRE 3:  k (neighbour count) and fold count (grading rounds) are
+                 unrelated
+       WRONG: "k=25 with 5 folds sounds wrong."
+       RIGHT: k is how many neighbours to ask; 5 folds is how many chunks
+              to grade with.  Different jobs, different numbers.
+
+    TRIPWIRE 4:  "Most negative" = MIN, not MAX
+       WRONG: -0.04 looks bigger than -0.007, so pick -0.007.
+       RIGHT: -0.04 is further below zero = SMALLER = most negative.
+              min(dials, key=dials.get) returns the NAME of the smallest.
+
+    TRIPWIRE 5:  The toolbox maximises, so it negates the mistake
+       WRONG: pick the candidate with the highest raw cross_val_score.
+       RIGHT: cross_val_score(..., scoring='neg_root_mean_squared_error')
+              returns NEGATIVE numbers.  The "biggest" (closest to zero) is
+              the smallest mistake.  Un-negate with -scores.mean().
 
 
   ## The Labels, Last

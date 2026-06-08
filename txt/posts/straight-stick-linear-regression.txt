@@ -65,17 +65,52 @@
 
       grad J = 2*X^T (X*beta - y) = 0   =>   X^T X beta = X^T y   =>   beta = (X^T X)^-1 X^T y
 
-  Worked by hand at one column (d = 1) on three rows -- sum1, sumx, etc. are the entries
-  of X^T X and X^T y:
+  Worked by hand at one column (d = 1) on three rows.  First, build the raw table:
 
     x = 1, 2, 3     y = 2, 3, 5
-    sum1 = 3   sumx = 6   sumy = 10   sumxy = 23   sumx2 = 14
 
-    X^T X beta = X^T y   ->    3b +  6w = 10
-                              6b + 14w = 23
+    row   x    y    x^2    x*y
+    ───────────────────────────
+    1     1    2    1      2
+    2     2    3    4      6
+    3     3    5    9     15
+    ───────────────────────────
+    sum   6   10   14     23
 
-    solve:  2w = 3  ->  w = 3/2 ;   3b + 9 = 10  ->  b = 1/3
-    stick:  yhat = 1/3 + (3/2)x
+    X has a column of 1s for the nudge, plus the x column:
+      X = [ 1 1     X^T X = [ 3   6      X^T y = [ 10
+            1 2              6  14 ]             23 ]
+            1 3 ]
+
+    The system X^T X beta = X^T y:
+
+      3*b  +  6*w  =  10     (equation 1)
+      6*b  + 14*w  =  23     (equation 2)
+
+    Solve by elimination.  Multiply equation 1 by 2:
+
+      6*b  + 12*w  =  20     (equation 1, doubled)
+
+    Subtract from equation 2:
+
+      (6*b + 14*w) - (6*b + 12*w) = 23 - 20
+      2*w  =  3
+      w  =  3/2  =  1.5      <- the dial on x
+
+    Put w back into equation 1:
+
+      3*b  +  6*(3/2)  =  10
+      3*b  +  9        =  10
+      3*b  =  1
+      b  =  1/3  ≈  0.333   <- the fixed nudge
+
+    stick:  yhat = 1/3 + (3/2)*x
+            yhat = 0.333 + 1.5*x
+
+    Check at each x:
+      x=1:  yhat = 0.333 + 1.5*1 = 1.833
+      x=2:  yhat = 0.333 + 1.5*2 = 3.333
+      x=3:  yhat = 0.333 + 1.5*3 = 4.833
 
 
   ## Checking the Leftovers
@@ -165,7 +200,7 @@
     - flat-point equations, ordinary least squares -- the solve
     - QR / SVD least squares, shakiness number (condition number) -- the numerics
     - flat-shadow thrower (hat matrix), right-angle leftovers -- the geometry
-    - Gauss-Markov, unequal leftover spread (heteroscedasticity) -- the assumptions
+    - Gauss-Markov, uneven miss spread -- the assumptions
     - ridge, lasso -- when columns are near-recipes of each other
 
     1. Rule: yhat = X*beta; set dials by shrinking ||X*beta - y||^2.
@@ -174,7 +209,48 @@
        shadow.
     4. Straight-stick rule is BLUE under Gauss-Markov; bell-curve leftovers needed only
        for tests.
-    5. Cut the sheet (QR/SVD), don't flip it; add a bump when X^T X is flat.
+     5. Cut the sheet (QR/SVD), don't flip it; add a bump when X^T X is flat.
+
+
+  ## Common Tripwires I Caught
+
+    TRIPWIRE 1:  MSE has NO root in Lab 2
+       WRONG: tack on ** 0.5 to mean_squared_error(...).
+       RIGHT: MSE = miss -> square -> mean -> STOP.  No root.
+              RMSE has the root.  MSE does not.  Read the name.
+
+    TRIPWIRE 2:  leftover is the BAD part, not the good part
+       WRONG: "leftover = 2, that's the stick's score."
+       RIGHT: leftover is the misery STILL LEFT after the stick tried.
+              The good part is total wobble - leftover.
+              R^2 = (total wobble - leftover) / total wobble.
+
+    TRIPWIRE 3:  R^2 divide by the WHOLE BAR, not the count
+       WRONG: R^2 = (total wobble - leftover) / 5  (row count).
+       RIGHT: R^2 = (total wobble - leftover) / total wobble.
+              The count cancels, which is WHY R^2 has no units.
+
+    TRIPWIRE 4:  R^2 always rises when you add a column -- on the training
+                 pile only
+       WRONG: "I added a noise column and R^2 went up -- the machine is better."
+       RIGHT: On the training pile, the old fit is still available, so it can
+              only do at least as well.  Use the TEST R^2 or adjusted R^2.
+
+    TRIPWIRE 5:  R^2 can go negative on the test pile
+       WRONG: "R^2 < 0 must be a bug."
+       RIGHT: On unseen rows, no right-angle guarantee holds.  The leftover
+              CAN exceed the wobble.  R^2 = 1 - RSS/TSS can dip below 0.
+
+    TRIPWIRE 6:  "Most negative" dragging column = MIN, not MAX
+       WRONG: -0.04 is bigger than -0.007 by the number 4 vs 7.
+       RIGHT: -0.04 is further below zero = SMALLER = most negative.
+              min(dials, key=dials.get) returns the column NAME.
+
+    TRIPWIRE 7:  Raw dials are NOT comparable across columns (different
+                 units)
+       WRONG: compare -0.007 per pound directly with -0.04 per horsepower.
+       RIGHT: Put every column on one shared ruler first (StandardScaler).
+              Then each dial means "answer-units per one-spread step."
 
 
   ## The Code, If You Want It

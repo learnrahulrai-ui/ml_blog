@@ -52,25 +52,54 @@
     below:  3 yes, 1 no       (4 people)
     above:  1 yes, 4 no       (5 people)
                                ----------
-                               4 counts total.  that's ALL you need.
+                                9 people total.  4 counts.  that's ALL you need.
 
-  STEP 1 -- turn each count into a fraction (the "share"):
+  STEP 1 -- write each count as a fraction (the "share"):
 
-    below: share yes = 3/4 = 0.75     share no = 1/4 = 0.25
-    above: share yes = 1/5 = 0.20     share no = 4/5 = 0.80
+    below:  yes = 3 out of 4 = 3/4 .    no = 1 out of 4 = 1/4
+    above:  yes = 1 out of 5 = 1/5 .    no = 4 out of 5 = 4/5
 
-  STEP 2 -- compute each side's mixed-ness:
+  STEP 2 -- compute each side's mixed-ness.
 
-    mixed = 1 - (share yes)^2 - (share no)^2
+  Each side:  "how likely are two random grabs to DISAGREE?"
 
-    below: 1 - 0.75^2 - 0.25^2  = 1 - 0.5625 - 0.0625  = 0.375
-    above: 1 - 0.20^2 - 0.80^2  = 1 - 0.04   - 0.64    = 0.32
+    mixed-ness = 1 - (share_yes)² - (share_no)²
+                   all            match             match
 
-  STEP 3 -- combine into one number, weighted by side size:
+  For the BELOW side (4 people: 3 yes, 1 no):
 
-    cut badness = (4/9)*0.375 + (5/9)*0.32
-                = 0.1667 + 0.1778
-                = 0.344
+    share_yes = 3/4 .  squared = 3/4 × 3/4 = (3×3)/(4×4) = 9/16
+    share_no  = 1/4 .  squared = 1/4 × 1/4 = (1×1)/(4×4) = 1/16
+
+    match = 9/16 + 1/16 = 10/16 = 5/8
+    differ = 1 - 5/8 = 3/8 = 0.375
+
+    (By pencil: split 8 into 8 eighths.  5/8 match, so 3/8 differ.)
+
+  For the ABOVE side (5 people: 1 yes, 4 no):
+
+    share_yes = 1/5 .  squared = 1/5 × 1/5 = (1×1)/(5×5) = 1/25
+    share_no  = 4/5 .  squared = 4/5 × 4/5 = (4×4)/(5×5) = 16/25
+
+    match = 1/25 + 16/25 = 17/25
+    differ = 1 - 17/25 = 8/25 = 0.32
+
+    (25/25 - 17/25 = 8/25.  8 ÷ 25 = 0.32, since 25 × 0.32 = 8.)
+
+  STEP 3 -- combine the two sides into one badness number, weighted by
+  how many people are on each side.
+
+    below has 4 people out of 9 total  -> weight = 4/9
+    above has 5 people out of 9 total  -> weight = 5/9
+
+    cut badness = (4/9)×(3/8) + (5/9)×(8/25)
+
+    First term:  4/9 × 3/8 = (4×3)/(9×8) = 12/72 = 1/6
+    Second term: 5/9 × 8/25 = (5×8)/(9×25) = 40/225 = 8/45
+
+    Add:  1/6 + 8/45
+          = 15/90 + 16/90    (common denominator: 90.  1/6=15/90, 8/45=16/90)
+          = 31/90 ≈ 0.344
 
   There it is.  4 counts -> one number (0.344) for this cut.
 
@@ -82,6 +111,66 @@
     smallest number = this column's champion (the cleanest split)
 
 
+  ## A Real Cancer Cut: Radius and Texture
+
+  The earlier example used abstract "yes" and "no."  Here is the same ruler
+  tied to the actual cancer sheet the lab works with.
+
+  Four lumps, two measurements (radius and texture), one answer:
+
+      lump   radius   texture   answer
+      ─────────────────────────────────
+      p1      15       0.20      sick
+      p2       8       0.10      well
+      p3      22       0.30      sick
+      p4      10       0.15      well
+
+  The tree looks for the cleanest cut.  Try radius first.
+
+  Cut radius > 12:
+
+    Below: p2(well), p4(well)  ->  pure well  ->  GINI = 0 (weight 2/4)
+    Above: p1(sick), p3(sick)  ->  pure sick  ->  GINI = 0 (weight 2/4)
+
+    Weighted GINI = 0.5 x 0 + 0.5 x 0 = 0  <- perfect, no mixing left
+
+  Cut radius > 15:
+
+    Below: p2(well), p4(well), p1(sick)  ->  1 sick, 2 well
+      share_sick = 1/3, share_well = 2/3
+      GINI = 1 - (1/3)² - (2/3)² = 1 - 1/9 - 4/9 = 4/9 ≈ 0.444
+      Weight = 3/4 = 0.75
+
+    Above: p3(sick)  ->  pure sick  ->  GINI = 0 (weight 1/4)
+
+    Weighted GINI = 0.75 x 0.444 + 0.25 x 0 = 0.333
+
+  Champion for radius: cut > 12 (GINI = 0).  Now try texture.
+
+  Cut texture > 0.12:
+
+    Below: p2(well)  ->  pure well  ->  GINI = 0 (weight 1/4)
+    Above: p1(sick), p3(sick), p4(well)  ->  2 sick, 1 well
+      share_sick = 2/3, share_well = 1/3
+      GINI = 1 - (2/3)² - (1/3)² = 1 - 4/9 - 1/9 = 4/9 ≈ 0.444
+      Weight = 3/4 = 0.75
+
+    Weighted GINI = 0.25 x 0 + 0.75 x 0.444 = 0.333
+
+  Champion of champions:
+
+      column     cut     weighted GINI
+      ─────────────────────────────────
+      radius    > 12        0           <- champion
+      texture   > 0.12      0.333
+
+  First question: "radius > 12?"  -> pure sick piles and pure well piles.
+  Then each pure pile stops (GINI = 0, nothing left to clean).
+
+  The abstract "3 yes, 1 no" from earlier is the same math -- just wrapped
+  in real column names from the cancer lab the machine actually touches.
+
+
   ## Why That Formula Is Not Astrology
 
   The formula 1 - p^2 - q^2 looks pulled from thin air.  It isn't.  It counts
@@ -89,29 +178,52 @@
 
   Gini = the chance two random grabs from a side DISAGREE.
 
-  Using the below side: 3 yes, 1 no (4 people):
+  Using the below side: 3 yes, 1 no (4 people).  You reach into the pile,
+  grab one person (write down yes or no), PUT THEM BACK, grab another.
 
-    grab one person, put back, grab another.  chance BOTH yes?
+    Chance BOTH yes?
 
-      first grab yes   = 3 out of 4 = 3/4
-      second grab yes  = 3 out of 4 = 3/4
-      BOTH yes = 3/4 OF 3/4 = 3/4 x 3/4 = 9/16 = 0.5625
+      first grab:  "3 out of 4 are yes"  -> 3/4 chance
+      second grab: same pile (you put the first back), same odds -> 3/4
 
-    "of" means multiply.  three-quarters of three-quarters.
-    that's why the square: same fraction times itself.
+      "OF" means MULTIPLY.  Three-quarters OF three-quarters:
+        3/4 × 3/4 = (3×3)/(4×4) = 9/16
 
-      both yes  = 0.75 x 0.75 = 0.75^2  = 0.5625
-      both no   = 0.25 x 0.25 = 0.25^2  = 0.0625
-      SAME (both-yes OR both-no) = add   = 0.625      <- "or" = add
-      DIFFER = 1 - 0.625 = 0.375                      <- the mixed-ness
+      Why multiply?  Because you need BOTH events to happen.
+      "both yes" = "first yes AND second yes" = multiply the fractions.
+      (By pencil: 3/4 of 3/4 is 9/16 of the whole.  You can draw a 4-by-4
+      grid, shade 3 across and 3 down — 9 shaded squares out of 16.)
 
-    plain rule:   "of" / "and"  ->  multiply (x)
-                  "or"          ->  add (+)
+    Chance BOTH no?
+
+      1/4 × 1/4 = 1/16
+
+    Chance they MATCH (both-yes OR both-no)?
+
+      "OR" means ADD.  9/16 + 1/16 = 10/16 = 5/8
+
+    Chance they DIFFER (don't match)?
+
+      1 - 5/8 = 3/8 = 0.375
+
+    That 0.375 is the Gini for this side.  No formula pulled from thin air —
+    just counting what happens when you grab two people from the pile.
 
   Check the edges:
 
-    pure side (all yes):  two grabs always match -> differ 0   -> Gini 0     good
-    half-half:            grabs differ half the time           -> Gini 0.5   bad
+    pure side (all yes):  4 yes, 0 no
+      both yes = 4/4 × 4/4 = 1.  both no = 0.  match = 1.  differ = 0.  OK.
+
+    half-half:  2 yes, 2 no
+      both yes = 2/4 × 2/4 = 4/16.  both no = 2/4 × 2/4 = 4/16.  match = 8/16 = 1/2.
+      differ = 1 - 1/2 = 1/2 = 0.5.  OK.
+
+  Gini is the DEFAULT ruler because it is fast (no logarithms).  The other option
+  -- entropy (cross-entropy) -- uses a log instead of squares and often gives the
+  same champion.  sklearn's default is criterion='gini' for speed.
+
+    criterion='gini'     -> 1 - p^2 - q^2     fast (multiply and subtract)
+    criterion='entropy'  -> -p log p - q log q slow (log is expensive)
 
 
   ## Information Gain: The Drop
@@ -181,6 +293,32 @@
      ccp_alpha  = a single knob you set on a new tree ("how hard to prune")
      Plural = the menu.  Singular = the setting.
 
+  A REAL alpha menu from the diabetes tree:
+
+    alpha       what it does                     leaves left
+    ─────────────────────────────────────────────────────────────
+    0.0         no snips, full-grown tree         331 leaves
+    12.5        snipped 1 twig (drop < 12.5)      330
+    80.0        a whole weak branch collapses     310
+    204.7       another branch, ~20 leaves gone   290
+    550.0       half the tree gone                160
+    1755.0      everything collapsed to a stump     1
+
+  Each alpha is ONE branch's saved-mess.  The tree pre-computes them by
+  walking bottom-up: for each internal room, compute "how much wrongness
+  does this room's children remove?"  That number = the alpha where that
+  branch gets snipped.  The tree doesn't invent alphas -- it reads them
+  off its own branches.
+
+  !! WARN: SNIP != REBUILD
+     The tree was ALREADY fully grown.  Pruning collapses rooms; it does
+     NOT rebuild from scratch.  No new .fit.  Just room closure.
+
+  !! WARN: ALPHA VALUES COME FROM THE TREE, NOT THE TEACHER
+     You do not guess alpha=[0.1, 1, 10].  The tree hands you exact values
+     where branches would fire.  Your job is to pick WHICH one works best
+     on the exam -- not to make up alphas.
+
 
   ## The Nested Averages Ladder
 
@@ -211,6 +349,54 @@
     misses over people --avg-->  round error   (rung 2)
     5 round-errors     --avg-->  alpha score   (rung 3)
     alpha scores       --MIN-->  alpha_hat     (top, not avg)
+
+
+  ## Common Tripwires I Caught
+
+  These are the exact wrong pictures I had to untangle -- each one cost me
+  real time until I saw the concrete shape of the mistake:
+
+    TRIPWIRE 1:  ccp_alphas (the list) == ccp_alpha (the knob)
+       WRONG: they're the same thing, just abbreviated differently.
+       RIGHT: ccp_alphas = a list of numbers the machine hands back (the menu).
+              ccp_alpha  = one number YOU set on a new tree (the setting).
+              Plural = menu.  Singular = knob.  Two different things.
+
+    TRIPWIRE 2:  pruning_path needs a fitted tree first
+       WRONG: you must .fit a tree, then call pruning_path on it.
+       RIGHT: cost_complexity_pruning_path(X, y) builds its OWN tree
+              internally just to read the menu.  No .fit needed.
+              The call IS the builder.
+
+    TRIPWIRE 3:  alpha values are invented by the teacher
+       WRONG: someone picked [0, 0.01, 0.1, 1] as reasonable guesses.
+       RIGHT: the tree computes each alpha from its own branches.
+              Each alpha = one branch's saved-mess.  The teacher never
+              touches the numbers.
+
+    TRIPWIRE 4:  snip a branch = rebuild the tree
+       WRONG: after pruning, the tree refits from scratch on the pruned
+              structure.
+       RIGHT: the tree was ALREADY fully grown.  ccp_alpha just collapses
+              rooms.  No new .fit.  No rebuild.  Just closure.
+
+    TRIPWIRE 5:  in boosting, you sort the leftover column each round
+       WRONG: each round, you re-sort bmi/age/bp against the new leftover
+              column to find the best cut.
+       RIGHT: you sort bmi/age/bp the SAME way every round.  The column
+              order never changes.  Only the TARGET column changes
+              (answer -> leftover1 -> leftover2 -> ...).  Sorting the
+              leftover column is a waste -- the tree asks "which column
+              gives the cleanest cut", and the leftover column is not one
+              of the 10 body measurements.
+
+    TRIPWIRE 6:  Rung 2 and Rung 3 are the same type of average
+       WRONG: they're both "mean of some numbers."
+       RIGHT: Rung 2 averages misses ACROSS PEOPLE in one fold.
+              Rung 3 averages fold-errors ACROSS FOLDS for one alpha.
+              Different granularity, different job.  Rung 2 = per-fold,
+              Rung 3 = cross-fold.  Mixing them is the classic cross-val
+              confusion.
 
 
   ## Any Room Has a Wrongness -- Not Just Leaves

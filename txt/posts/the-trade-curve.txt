@@ -84,6 +84,43 @@
   called sick -> TPR=1, FPR=1 (top-right). As t -> 1, everyone is called well -> TPR=0,
   FPR=0 (bottom-left).
 
+  A concrete 6-person exam pile, by pencil:
+
+    exam pile:  3 sick (truth=1), 3 well (truth=0)
+
+    lump   truth   machine chance   6 cutoff positions
+    ─────────────────────────────────────────────────────────────
+      A    sick    0.97     -> cutoff 0.99: below -> well   FN
+      B    sick    0.88     -> cutoff 0.90: below -> well   FN
+      C    sick    0.72     -> cutoff 0.80: below -> well   FN
+      D    well    0.45     -> cutoff 0.60: below -> well   TN
+      E    well    0.22     -> cutoff 0.40: below -> well   TN
+      F    well    0.11     -> cutoff 0.20: below -> well   TN
+
+    Sweep the cutoff through 6 positions and compute (FPR, TPR):
+
+      cutoff   >=cut?   CAUGHT  MISSED  ALARM  CLEAR   TPR     FPR
+      ─────────────────────────────────────────────────────────────────
+      0.99     none     0/3     3/3     0/3    3/3     0.000   0.000
+      0.90     A        1/3     2/3     0/3    3/3     0.333   0.000
+      0.80     A,B      2/3     1/3     0/3    3/3     0.667   0.000
+      0.60     A,B,C    3/3     0/3     0/3    3/3     1.000   0.000
+      0.40     A,B,C,D  3/3     0/3     1/3    2/3     1.000   0.333
+      0.20     A,B,C,D, 3/3     0/3     2/3    1/3     1.000   0.667
+              E
+      0.00     all      3/3     0/3     3/3    0/3     1.000   1.000
+
+    TPR = CAUGHT / (CAUGHT + MISSED).  FPR = ALARM / (ALARM + CLEAR).
+    At cutoff 0.90: 1 sick caught, 2 missed -> TPR=1/3=0.333;
+    0 alarms -> FPR=0/3=0.000.  At cutoff 0.40: all 3 sick caught +
+    1 well alarmed -> TPR=3/3=1.000, FPR=1/3=0.333.
+
+    Plot the 6 dots: (0.000,0.000), (0.000,0.333), (0.000,0.667),
+    (0.000,1.000), (0.333,1.000), (0.667,1.000), (1.000,1.000).
+    The curve hugs the left edge (FPR=0 for the first 4 cutoffs),
+    then bends right.  The curve is ABOVE the diagonal -- the machine
+    is doing real work.
+
 
   ## The Area Under the Curve
 
@@ -95,16 +132,30 @@
     AUC = 0.5   useless -- sick and well scores interleaved randomly
     AUC < 0.5   backwards -- sick scores lower than well scores
 
-  AUC is computed from the curve points by the trapezoidal rule:
+  AUC is computed from the curve points by the trapezoidal rule.  From the 6-cutoff
+  sweep above, by pencil:
 
-      AUC ~= sum_k (FPR_{k+1} - FPR_k) * (TPR_{k+1} + TPR_k) / 2
+      drop       FPR      TPR     (FPR_next - FPR) x (TPR_next + TPR) / 2
+      ──────────────────────────────────────────────────────────────────────
+       1         0.000    0.000   (0.000 - 0.000) x (0.333 + 0.000) / 2  = 0.000
+       2         0.000    0.333   (0.000 - 0.000) x (0.667 + 0.333) / 2  = 0.000
+       3         0.000    0.667   (0.000 - 0.000) x (1.000 + 0.667) / 2  = 0.000
+       4         0.000    1.000   (0.333 - 0.000) x (1.000 + 1.000) / 2  = 0.333
+       5         0.333    1.000   (0.667 - 0.333) x (1.000 + 1.000) / 2  = 0.333
+       6         0.667    1.000   (1.000 - 0.667) x (1.000 + 1.000) / 2  = 0.333
+       ──
+       total AUC = 0.000 + 0.000 + 0.000 + 0.333 + 0.333 + 0.333 = 1.000
+
+  The AUC is 1.0 -- a perfect ranking.  Indeed the machine sorted all 3 sick chances
+  (0.97, 0.88, 0.72) above all 3 well chances (0.45, 0.22, 0.11).  For ANY cutoff
+  between 0.72 and 0.45, the machine catches all sick and alarms none.
 
 
   ## What AUC Actually Measures
 
   Areas under curves are easy to compute and hard to feel. So here is the same number
   told as a tiny story you can actually picture -- a result that goes by the name
-  Wilcoxon-Mann-Whitney:
+  pick-higher reading:
 
       AUC = P( score(x+) > score(x-) )
 

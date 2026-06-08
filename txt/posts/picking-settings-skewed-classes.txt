@@ -72,6 +72,26 @@
        recall if missing sick people is catastrophic; F1 if both false alarms and misses
        matter.
 
+  A concrete 5-fold example for C=0.1 vs C=1.0, by pencil.  Study pile has
+  100 lumps.  Split into 5 strips of 20 each.
+
+    strip   C=0.1 recall   C=1.0 recall
+    ───────────────────────────────────────
+     1      0.92           0.95
+     2      0.88           0.90
+     3      0.94           0.89
+     4      0.90           0.93
+     5      0.86           0.82
+
+    average:  (0.92+0.88+0.94+0.90+0.86)/5 = 4.50/5 = 0.900  (C=0.1)
+              (0.95+0.90+0.89+0.93+0.82)/5 = 4.49/5 = 0.898  (C=1.0)
+
+    C=0.1 wins by 0.002.  Without the 5-fold average, you might
+    have picked strip 5 where C=1.0 scores only 0.82 -- a lucky
+    stick in that strip's eye.  The fold average smooths out the
+    luck and shows the true tendency: C=0.1 is slightly better
+    at recall on this sheet.
+
   In code the whole hunt is a Pipeline -- scaler plus classifier -- handed to GridSearchCV;
   that code is at the end of the post, and it carries one subtle trap worth stating now:
 

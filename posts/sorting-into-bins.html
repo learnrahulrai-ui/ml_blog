@@ -57,24 +57,42 @@
 
   where z is the dial sum: z = b0 + x1*b1 + x2*b2 + ... + x30*b30.
 
-    chance
-     1 |              ______
-   0.5 |         ___/            &lt;- dial sum = 0 -&gt; chance exactly 0.5
-     0 |_____/--------------- sum
-         -inf    0     +inf
+  A concrete 4-person worked example, by pencil.  Suppose we have only ONE column
+  (bmi) and 4 people:
 
-    big negative sum -&gt; chance ~= 0   "well"
-    big positive sum -&gt; chance ~= 1   "sick"
-    sum = 0          -&gt; chance = 0.5  (fence)
+    person   bmi (x)   dial sum z = b0 + b1*x
+    ──────────────────────────────────────────
+      A      0.04      1.2 - 30 * 0.04 = 1.2 - 1.2 = 0.0
+      B      0.06      1.2 - 30 * 0.06 = 1.2 - 1.8 = -0.6
+      C      0.12      1.2 - 30 * 0.12 = 1.2 - 3.6 = -2.4
+      D      0.18      1.2 - 30 * 0.18 = 1.2 - 5.4 = -4.2
 
-  At the default cutoff of 0.5: if the weighted measurements tip positive, the lump is
-  called sick; if negative, well. The curve is also doing something deeper -- the linear
-  sum z is the LOG-ODDS of being sick:
+  Now squash each z through the curve:
+
+    person   z       sig(z) = 1 / (1 + e^-z)             chance
+    ──────────────────────────────────────────────────────────────
+      A      0.0     1 / (1 + e^0)     = 1 / (1+1)       = 0.500
+      B     -0.6     1 / (1 + e^0.6)   = 1 / (1+1.822)   = 0.354
+      C     -2.4     1 / (1 + e^2.4)   = 1 / (1+11.023)  = 0.083
+      D     -4.2     1 / (1 + e^4.2)   = 1 / (1+66.686)  = 0.015
+
+    big positive z  -&gt;  sig(z) near 1  -&gt;  "sick"
+    big negative z  -&gt;  sig(z) near 0  -&gt;  "well"
+    z = 0           -&gt;  sig(0) = 0.5   -&gt;  fence
+
+    To compute e^0.6 by pencil: look up a table of exponentials, or note
+    e^0.5 ~= 1.649 and e^0.1 ~= 1.105, so e^0.6 = e^0.5 * e^0.1
+    ~= 1.649 * 1.105 ~= 1.822.  That is close enough for the picture.
+
+  At the default cutoff of 0.5: if the chance is &gt;= 0.5, call sick; below 0.5, call well.
+  Patient A (chance 0.500) is exactly at the fence -- essentially 50/50.  Patients B, C, D
+  are called well.  The machine also does something deeper: the linear sum z before the
+  squash is the LOG-ODDS:
 
       log( P(sick|x) / P(well|x) ) = b0 + x^T beta
 
   Each dial beta_j is the change in log-odds per one-unit step in its column, holding the
-  other 29 fixed.
+  other 29 fixed.  For person A, log-odds = 0 means P(sick) = P(well) = 0.5.
 
 
   ## Setting the Dials: What the Machine Minimises
@@ -87,8 +105,8 @@
       L(beta) = -(1/n) sum [ y*log sig(z) + (1-y)*log(1-sig(z)) ]
 
   For a lump that is truly sick (y=1): if the machine outputs chance ~= 1, log(~1) ~= 0 --
-  small leftover. If it outputs chance ~= 0 on a sick lump, log(~0) -&gt; -inf -- enormous
-  leftover. The leftover punishes confidence in the wrong direction. There is no
+  small leftover. If it outputs chance ~= 0 on a sick lump, log of near-zero drops to
+  bottomless -- enormous leftover. The leftover punishes confidence in the wrong direction. There is no
   closed-form minimiser; the dials are found by rolling downhill through the gradient:
 
     gradient of L w.r.t. beta:   (1/n) X^T ( sig(X*beta) - y )
@@ -126,6 +144,33 @@
     rows    = the truth     (sick / well)
     columns = the guess     (shouted sick / said well)
     each box = a plain count
+
+  A concrete 4-person example, by pencil:
+
+    exam pile has 4 lumps: 2 sick (truth=1), 2 well (truth=0)
+
+    lump   truth   machine chance   cutoff 0.5 -&gt; guess
+    ────────────────────────────────────────────────────
+    1      sick    0.92            &gt;= 0.5 -&gt; sick (1)     CAUGHT
+    2      sick    0.63            &gt;= 0.5 -&gt; sick (1)     CAUGHT
+    3      well    0.78            &gt;= 0.5 -&gt; sick (1)     ALARM
+    4      well    0.11            &lt;  0.5 -&gt; well (0)     CLEAR
+
+    Four-box table with counts:
+
+                   guess SICK      guess WELL
+    truth SICK     2 (CAUGHT)     0 (MISSED)      &lt;- 2 truly sick
+    truth WELL     1 (ALARM)      1 (CLEAR)        &lt;- 2 truly well
+
+    accuracy  = (2 + 1) / 4 = 3/4 = 0.75
+    recall    = 2 / (2 + 0) = 2/2 = 1.00   (caught every sick person)
+    precision = 2 / (2 + 1) = 2/3 = 0.67   (but 1 healthy person was alarmed)
+    F1        = 2*0.67*1.00 / (0.67 + 1.00) = 1.34 / 1.67 = 0.80
+
+    The machine caught 2/2 sick people (recall=1.00) but at the cost of 1 false
+    alarm (precision=0.67).  The four-box table shows EXACTLY which mistake
+    happened: look at the bottom-left box (ALARM) and you see the cost in plain
+    light, not buried inside a single percentage.
 
   CAUGHT is the ideal: a sick lump correctly flagged. MISSED is the catastrophe: cancer
   goes home untreated. ALARM is the waste: a healthy person gets a scare and an
@@ -175,6 +220,62 @@
      cost money, not lives). So the first score to check is recall -- how large a share of
      the sick lumps does the machine catch? Accuracy tells you nothing about which mistake
      you are making.
+
+
+  ## Common Tripwires I Caught
+
+  These are the exact wrong pictures that cost me real time.  Each one
+  stopped me cold until I drew the concrete shape of the mistake:
+
+    TRIPWIRE 1:  Extra brackets around the scaler input -&gt; 3D error
+       WRONG: scaler.fit([X_train])
+       RIGHT: scaler.fit(X_train)
+       The error says "Found array with dim 3. StandardScaler expected &lt;= 2."
+       Wrapping X_train in [ ] adds a third layer.  The scaler expects a
+       2D table (rows x columns), not a 2D table inside a list.
+
+    TRIPWIRE 2:  Running Stage 2 twice -&gt; map fails -&gt; NaN -&gt; crash
+       WRONG: run the M-&gt;1, B-&gt;0 cell a second time.
+       RIGHT: restart the kernel and run all cells top-to-bottom once.
+       First run: 'M' 'B' 'M' -&gt; map works -&gt; 1 0 1 (int64)
+       Second run: 1 0 1 -&gt; map finds no 'M' or 'B' -&gt; NaN -&gt; float -&gt; crash.
+       There is no shortcut after NaN has landed.
+
+    TRIPWIRE 3:  Predicting on raw X instead of scaled X
+       WRONG: log_reg.predict(X_test)
+       RIGHT: log_reg.predict(X_test_scaled)
+       The machine set its dials on scaled numbers.  Raw numbers send
+       it into a different space -- the dials misfire.
+
+    TRIPWIRE 4:  confusion_matrix order -- truth first, guess second
+       WRONG: confusion_matrix(y_pred, y_test)
+       RIGHT: confusion_matrix(y_test, y_pred)
+       sklearn always wants: tool(truth, guess) -- same order as
+       accuracy_score, recall_score, etc.  Swapping flips the grid.
+
+    TRIPWIRE 5:  predict_proba column 0 vs column 1
+       WRONG: y_proba = model.predict_proba(...)[:, 0]
+       RIGHT: y_proba = model.predict_proba(...)[:, 1]
+       Column 0 = P(well).  Column 1 = P(sick) -- the one you want.
+       Using column 0 makes sick people score LOW and well people HIGH,
+       flipping the ROC curve below the diagonal and AUC &lt; 0.5.
+
+    TRIPWIRE 6:  C=0.1 is heavy punishment, not light
+       WRONG: C small = light leash (sounds like "small = mild")
+       RIGHT: C = 1/lambda.  Small C -&gt; large lambda -&gt; heavy squeeze.
+       C=0.1 -&gt; lambda=10, a tight leash.  C=1000 -&gt; lambda=0.001, nearly free.
+
+    TRIPWIRE 7:  Scaling and L2 are not the same thing
+       WRONG: "I scaled the columns, so the dials are already under control."
+       RIGHT: Scaling fixes the INPUTS (columns on one ruler).  L2 fixes the
+       DIALS (no single dial dominates).  Even after scaling, a dial can grow
+       huge if the machine over-trusts one column.  Both are needed.
+
+    TRIPWIRE 8:  predict vs predict_proba
+       WRONG: use predict for the ROC curve (gives only 0 and 1).
+       RIGHT: use predict_proba (gives the raw chance before any cutoff).
+       predict gives two unique values -&gt; ROC curve has two dots -&gt; useless.
+       predict_proba gives a different number per row -&gt; the full sweep.
 
 
   ## F1: Why the Harmonic Mean

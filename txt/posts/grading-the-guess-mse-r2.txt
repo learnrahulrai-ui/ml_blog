@@ -104,6 +104,18 @@
      The curve is a bowl (second slope 2n > 0), so that point is the lowest, not the
      highest. The fool's best constant shout is always the mean.
 
+  A concrete check, by pencil.  Try four different constant guesses against the
+  same answers (2, 4, 9, 3, 7):
+
+    guess c    misses^2                         total squared miss
+    ────────────────────────────────────────────────────────────────────────
+    4          (2-4)^2+(4-4)^2+(9-4)^2+(3-4)^2+(7-4)^2 = 4+0+25+1+9  = 39
+    5 (avg)    (2-5)^2+(4-5)^2+(9-5)^2+(3-5)^2+(7-5)^2 = 9+1+16+4+4  = 34  <- smallest
+    6          (2-6)^2+(4-6)^2+(9-6)^2+(3-6)^2+(7-6)^2 =16+4+9+9+1   = 39
+    7          (2-7)^2+(4-7)^2+(9-7)^2+(3-7)^2+(7-7)^2 =25+9+4+16+0  = 54
+
+    The average (5) gives the smallest total.  Any other number misses more.
+
   Call the fool's total misery the TOTAL WOBBLE. Now race:
 
     truth:          2     4     9     3     7
@@ -195,6 +207,55 @@
     4. R^2 = (total wobble - leftover) / total wobble = 1 - RSS/TSS. No units. Tops out at
        1; can go below 0 on unseen rows.
     5. Guess once, grade twice: the same guesses feed both rulers.
+
+
+  ## Common Tripwires I Caught
+
+    TRIPWIRE 1:  MSE has NO root -- read the name
+       WRONG: mean_squared_error(...) then ** 0.5.
+       RIGHT: MSE = miss -> square -> mean -> STOP.  No root.
+              The tool already squares-and-means.  Do NOT root it.
+              RMSE has the root.  MSE does not.
+
+    TRIPWIRE 2:  leftover is the BAD part, not the good part
+       WRONG: "leftover = 2 -- that's the stick's score."
+       RIGHT: leftover is the misery STILL LEFT after the stick tried.
+              The good part is what the stick ATE: total wobble - leftover.
+
+    TRIPWIRE 3:  R^2 divide by the WHOLE wobble, not the count
+       WRONG: R^2 = (total wobble - leftover) / 5  (5 rows).
+       RIGHT: R^2 = (total wobble - leftover) / total wobble.
+              Divide by the whole bar, not the row count.
+              The count cancels, which is why R^2 has no units.
+
+    TRIPWIRE 4:  R^2 always rises when you add a column -- on the
+                 training pile only
+       WRONG: "Added a noise column and R^2 went up -- better fit."
+       RIGHT: The old fit is still a candidate, so it can only do at
+              least as well.  Use TEST R^2 or adjusted R^2 to judge.
+
+    TRIPWIRE 5:  R^2 can go negative on the test pile
+       WRONG: "R^2 < 0 is a bug."
+       RIGHT: On unseen rows, the leftover CAN exceed the wobble.
+              R^2 = 1 - RSS/TSS can dip below 0.  Not a bug -- the
+              line is doing worse than shouting the average.
+
+    TRIPWIRE 6:  Which pile feeds the rulers
+       WRONG: compute MSE and R^2 on the TRAINING pile.
+       RIGHT: Both MSE and R^2 grade on the SEALED test pile.
+              The training pile was used to set the dials.  Grading
+              on it gives a flattering, false-low mistake.
+
+    TRIPWIRE 7:  "Most negative" = MIN, not MAX
+       WRONG: -0.04 looks bigger than -0.007, so it's the strongest.
+       RIGHT: -0.04 is further below zero = SMALLER = most negative.
+              min(dials, key=dials.get) returns the column name.
+
+    TRIPWIRE 8:  Raw dials are NOT comparable across columns
+       WRONG: compare -0.007 per pound with -0.04 per horsepower.
+       RIGHT: Each dial wears its column's own units.  Put every
+              column on one shared ruler first (StandardScaler) for
+              an honest comparison.
 
 
   ## The Code, If You Want It

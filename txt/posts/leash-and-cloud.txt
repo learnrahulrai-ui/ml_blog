@@ -101,6 +101,28 @@
   leash (C=0.1): if the tighter leash is doing its job, its average dial comes out smaller.
   (The two-line check is in the code at the end of the post.)
 
+  A concrete 3-column example, by pencil.  Suppose only 3 columns -- x1, x2, x3 --
+  and two machines trained on the same data:
+
+    dial        free (no leash)   default C=1.0   tight C=0.1
+    ────────────────────────────────────────────────────────────
+    x1 dial       +8.2               +3.1            +1.4
+    x2 dial       -5.7               -2.4            -0.9
+    x3 dial       +0.3               +0.2            +0.1
+
+    |dial| average:
+      free:   (8.2 + 5.7 + 0.3) / 3  =  14.2 / 3  =  4.73
+      C=1.0:  (3.1 + 2.4 + 0.2) / 3  =   5.7 / 3  =  1.90
+      C=0.1:  (1.4 + 0.9 + 0.1) / 3  =   2.4 / 3  =  0.80
+
+    The free machine lets x1 balloon to 8.2 -- it bets heavily on one
+    column.  C=1.0 pulls it to 3.1.  C=0.1 pulls it to 1.4.  The tighter
+    the leash, the more the machine spreads trust across all 3 columns.
+
+  The absolute value is needed because a +3 and a -3 cancel in a plain
+  average, making the machine look like it has no signal at all.  The
+  absolute value measures SIZE regardless of sign.
+
   >> NOTE: WHY ABSOLUTE VALUE BEFORE AVERAGING
      Dials can be positive or negative. A positive dial +3 and a negative dial -3 cancel to
      zero in a plain average, making the machine look like it has no signal at all. Taking
@@ -163,6 +185,48 @@
   sits exactly at the midpoint of the projected class means:
 
       threshold = w^T (mu0 + mu1) / 2      (only when the two classes are equally common)
+
+  A concrete 2-column, 4-person LDA walkthrough, by pencil.
+
+    Only 2 columns (bmi and bp) and 4 people:
+
+      person   bmi    bp     truth
+      ─────────────────────────────
+        A      0.04   0.90   sick (1)
+        B      0.06   0.85   sick (1)
+        C      0.12   0.50   well (0)
+        D      0.18   0.45   well (0)
+
+    Step 1 -- 60 averages (2 class means x 2 columns = 4 averages):
+
+      sick class (A, B):  mu1 = ( (0.04+0.06)/2 , (0.90+0.85)/2 ) = (0.05 , 0.875)
+      well class (C, D):  mu0 = ( (0.12+0.18)/2 , (0.50+0.45)/2 ) = (0.15 , 0.475)
+
+    Step 2 -- midpoint between the two centres (the IMAGINARY point):
+
+      midpoint = ((0.05+0.15)/2 , (0.875+0.475)/2 ) = (0.10 , 0.675)
+
+    Step 3 -- difference between centres:
+
+      mu1 - mu0 = (0.05-0.15 , 0.875-0.475) = (-0.10 , 0.400)
+
+    Step 4 -- the wall NORMAL vector w (ignoring S_W for this clean round-cloud
+    picture; with equal covariances w = mu1 - mu0):
+
+      w = (-0.10 , 0.400)
+
+    Step 5 -- project each person onto w and compare to the midpoint projection:
+
+      w^T midpoint = -0.10*0.10 + 0.400*0.675 = -0.01 + 0.270 = 0.260
+
+      A: w^T x = -0.10*0.04 + 0.400*0.90 = -0.004 + 0.360 = 0.356  > 0.260 -> sick
+      B: w^T x = -0.10*0.06 + 0.400*0.85 = -0.006 + 0.340 = 0.334  > 0.260 -> sick
+      C: w^T x = -0.10*0.12 + 0.400*0.50 = -0.012 + 0.200 = 0.188  < 0.260 -> well
+      D: w^T x = -0.10*0.18 + 0.400*0.45 = -0.018 + 0.180 = 0.162  < 0.260 -> well
+
+    All 4 classified correctly.  The wall sits at 0.260 along w.  New
+    lump with bmi=0.10, bp=0.70: w^T x = -0.01 + 0.28 = 0.270 > 0.260 -> sick.
+    The wall is the midpoint because both classes have equal counts here.
 
   But the two classes are usually NOT equally common, and that pure midpoint is a special
   case. The full rule scores each new lump and adds a nudge for how common each class is:

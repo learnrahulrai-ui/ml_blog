@@ -122,6 +122,38 @@
 
     Ridge dial =  top / (bottom + a)        bigger a -&gt; bigger bottom -&gt; smaller dial
 
+  What are "top" and "bottom"?  Concrete numbers from the sheet:
+
+    top    = how the column and the answer move together
+           = sum of (column value - column average) x (answer - answer average)
+
+    bottom = how much the column wiggles on its own
+           = sum of (column value - column average)^2
+
+    For ONE column (say bmi), ONE dial, on 4 people:
+
+      person   bmi      answer    bmi-avg  ans-avg   (bmi-avg)*(ans-avg)  (bmi-avg)^2
+      ────────────────────────────────────────────────────────────────────────────────
+        A     0.04       97       -0.04     -31          1.24               0.0016
+        B     0.06      121       -0.02      -7          0.14               0.0004
+        C     0.12      135        0.04       7          0.28               0.0016
+        D     0.18      151        0.10      23          2.30               0.0100
+                           avg: 0.08       126           ──────             ───────
+                                                         top=3.96           bottom=0.0136
+
+      without ridge (a=0):  dial = 3.96 / 0.0136 = 291
+      with ridge a=10:      dial = 3.96 / (0.0136 + 10) = 3.96 / 10.0136 = 0.396
+      with ridge a=100:     dial = 3.96 / (0.0136 + 100) = 3.96 / 100.0136 = 0.0396
+
+      a=0 gives the plain dial (huge).  a=10 crushes it 735x smaller.
+      a=100 crushes it 7350x smaller.  The bigger the a, the smaller the dial.
+
+  The column-average and answer-average are computed over the 4 people.  "bmi-avg"
+  means bmi minus the column's own average (0.08).  "ans-avg" means answer minus
+  the answer's average (126).  Multiplying those two gives the "top" piece for each
+  person.  Adding up all four gives top = 3.96.  Adding up the squares gives
+  bottom = 0.0136.
+
   ** KEY: RIDGE SHRINKS ALL, ZEROES NONE, AND SOLVES IN ONE STEP
      The fine's pull dies at zero, so every dial lands small-but-alive. The bump-on-the-
      diagonal makes the solve exact -- and, as a bonus, fixes the "tangled columns" crash
@@ -214,6 +246,60 @@
      The lab asks you to report the error-versus-a curve for both machines. The plot is
      optional; the numbers behind it are the point. The winning a is wherever the curve
      bottoms out -- the valley above, turned into a row of numbers.
+
+
+  ## Common Tripwires I Caught
+
+  These are the exact wrong pictures I had to untangle -- each one cost me
+  real time until I saw the concrete shape of the mistake:
+
+    TRIPWIRE 1:  25% chop vs 2.5% chop
+       WRONG: the 95% band chops 25% off each end (like Lab 1's quartiles).
+       RIGHT: 95% means keep the middle 95% -&gt; chop 2.5% off each end.
+              q0.025 and q0.975 (because 100% - 2.5% = 97.5%).
+              For 200 values: 2.5% of 200 = 5.  Keep index 5 through 194
+              (counting from 0).  Chop 5 smallest and 5 largest.
+              Reaching for 0.25 instead of 0.025 gives a band 10x too narrow.
+
+    TRIPWIRE 2:  RidgeCV silently drops the error curve with a custom CV
+       WRONG: pass cv=kf to RidgeCV and later read ridge_cv.cv_values_.
+       RIGHT: RidgeCV only stores cv_values_ when using its own built-in
+              leave-one-out method.  The moment you give it cv=kf (a custom
+              splitter), it stops storing those values.  Later code that
+              reads ridge_cv.cv_values_ crashes with AttributeError.
+              Fix: do NOT pass cv=kf to RidgeCV.  Pass store_cv_values=True
+              and let it use its default.  (LassoCV has no such quirk.)
+
+    TRIPWIRE 3:  Counting sticky notes vs measuring width
+       WRONG: a 95% band with 190 notes out of 200 is always the same
+              count, so the band tells you nothing.
+       RIGHT: the COUNT of notes is always 190.  The WIDTH is the gap
+              between the number on the 5th note and the 195th note.
+              Two dials can both keep 190 notes but have wildly different
+              widths:
+
+                bmi-dial:  0.42 to 0.58  -&gt; width 0.16  (tight, trustworthy)
+                s5-dial:  -0.80 to +0.90 -&gt; width 1.70  (wide, crosses 0, useless)
+
+              Same 190 notes.  Different trust.  Never confuse count with gap.
+
+    TRIPWIRE 4:  The ~ symbol is the whole free exam
+       WRONG: np.isin marks the picked people.  Grade on them.
+       RIGHT: np.isin gives True for picked people.  The ~ flips to NOT.
+              Grade on the NOT-picked people.  Without the ~, you grade
+              the machine on the very patients it just studied -- a fake,
+              over-confident score.  One squiggle is the difference between
+              an honest score and a lie.
+
+    TRIPWIRE 5:  LADDER vs EXACT dials
+       WRONG: the per-column slope (sum((x-xbar)(y-ybar)) / sum((x-xbar)^2))
+              is the true dial.
+       RIGHT: that slope is the correct dial ONLY when no column overlaps
+              another.  Real columns always overlap (bmi, bp, blood serums
+              all drift together).  The true dial needs the untangler
+              (X^T X)^-1 X^T y to share credit between columns that move
+              together.  The simple slope is a LADDER (a crutch, a first
+              picture) -- name it that, never call it "the dial."
 
 
   ## The Labels, Last

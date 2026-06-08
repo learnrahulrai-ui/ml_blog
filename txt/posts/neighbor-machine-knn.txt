@@ -70,6 +70,36 @@
 
       z_j = (x_j - mu_j) / sd_j
 
+  A concrete 3-row, 2-column example, by pencil.  Working pile has 3 rows:
+
+    row       rooms (x1)    people (x2)
+    ────────────────────────────────────
+      P           4           320
+      Q           5           210
+      R           6           890
+
+    Column averages (mu):
+      mu1 = (4 + 5 + 6) / 3     = 15/3 = 5
+      mu2 = (320 + 210 + 890) / 3 = 1420/3 ≈ 473.3
+
+    Column spreads (sd -- how far each column's numbers typically sit from its average):
+      sd1 = sqrt( ((4-5)^2 + (5-5)^2 + (6-5)^2) / 3 )
+          = sqrt( (1 + 0 + 1) / 3 )  = sqrt(2/3)  ≈ 0.816
+      sd2 = sqrt( ((320-473.3)^2 + (210-473.3)^2 + (890-473.3)^2) / 3 )
+          = sqrt( (23509 + 69389 + 173609) / 3 )
+          = sqrt( 266507 / 3 ) = sqrt(88836) ≈ 298.1
+
+    Now shift each row:
+      row P:  z1 = (4 - 5) / 0.816    = -1.225
+              z2 = (320 - 473.3) / 298.1 = -0.514
+      row Q:  z1 = (5 - 5) / 0.816    = 0
+              z2 = (210 - 473.3) / 298.1 = -0.884
+      row R:  z1 = (6 - 5) / 0.816    = 1.225
+              z2 = (890 - 473.3) / 298.1 = 1.398
+
+    After scaling, every column is centred at 0 and stretches to roughly -1.4 to +1.4.
+    Neither column dominates the gap by accident of its raw unit size.
+
   Compute mu_j, sd_j on the working pile; apply the same constants to the hidden pile.
   After this, every column contributes equally to the gap. (Squeezing to [0,1] instead of
   unit spread is an alternative that works the same way.)
@@ -102,8 +132,10 @@
     100 rows = 80 working + 20 hidden
     work per hidden row  = 80 * d  gap computations
     total work           = 20 * 80 * d
+    time grows like people times columns
 
-  Sorting shelves (KD-tree, Ball-tree) cut average guess time to roughly O(d*log n) when
+  Sorting shelves (KD-tree, Ball-tree) cut average guess time to roughly
+  "time grows like columns times log of people" when
   columns are few, but degrade toward brute force as columns pile up. Here is why:
 
     few columns:   nearby rows are truly nearby  <- sorting shelf helps
@@ -163,7 +195,42 @@
        learning it on the working pile only.
     3. No building ahead; each guess costs O(n*d) and stores the whole pile.
     4. k sets the stiff-vs-jumpy balance; pick it by rotating folds.
-    5. When columns pile up, close stops meaning close.
+     5. When columns pile up, close stops meaning close.
+
+
+  ## Common Tripwires I Caught
+
+    TRIPWIRE 1:  Shape slot -- rows vs columns
+       WRONG: X.shape[1] gives rows.
+       RIGHT: shape = (rows, cols).  X.shape[0] = rows, X.shape[1] = columns.
+              Counting features = columns = X.shape[1].
+
+    TRIPWIRE 2:  Bracket shape -- list vs bag
+       WRONG: X = df[{'a','b','c'}]  (curly brackets = a bag, unordered).
+       RIGHT: X = df[['a','b','c']]  (square brackets = a list, ordered).
+              Outer [] = fetch from the sheet.  Inner [] = the list of names.
+
+    TRIPWIRE 3:  random_state must be the SAME number everywhere
+       WRONG: random_state=1 in one place and RANDOM_STATE in another.
+       RIGHT: RANDOM_STATE = 42 everywhere.  Different numbers give different
+              splits, so the hidden tests fail.
+
+    TRIPWIRE 4:  k (neighbour count) and fold count (grading rounds) are
+                 unrelated
+       WRONG: "k=25 with 5 folds -- that can't be right."
+       RIGHT: k=n_neighbors.  5 folds = n_splits.  Totally different knobs.
+
+    TRIPWIRE 5:  The toolbox maximises, so it negates the mistake
+       WRONG: pick the k with the highest raw score.
+       RIGHT: cross_val_score returns NEGATIVE numbers (it maximises).
+              "Biggest" = closest to zero = smallest mistake.
+              Un-negate with -scores.mean().
+
+    TRIPWIRE 6:  min(cv, key=cv.get) vs plain min(cv)
+       WRONG: plain min(cv) on a shelf of {k: mistake} returns the smallest
+              KEY (k=1), not the value (mistake).
+       RIGHT: min(cv, key=cv.get) returns the KEY with the smallest VALUE.
+              Get the name of the winner, not the smallest name alphabetically.
 
 
   ## The Code, If You Want It
