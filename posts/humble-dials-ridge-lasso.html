@@ -18,7 +18,7 @@
   Posted: 2026-06-07 . Author: Rahul Rai . Tags: ridge, lasso, regularisation, cross-validation
   ============================================================================================
 
-  PATH . post 10 of 12
+  PATH . post 10 of 15
     &lt;- prev:  <a href="picking-settings-skewed-classes.html">Chapter 3, Part 4: Picking Settings, Skewed Piles</a>
        next:  <a href="wobble-bands-bootstrap.html">Chapter 4, Part 2: One Dial Is a Lie</a> -&gt;
 
@@ -178,6 +178,7 @@
 
   ## Ridge vs Lasso, Side by Side
 
+                     Ridge                  Lasso
     fine             a * sum(dial^2)        a * sum(|dial|)
     shape            smooth bowl            sharp V-corner
     pull near 0      fades to nothing       stays at full strength
@@ -228,7 +229,7 @@
     count the survivors                   number of non-zero coefficients
     the 5-slice check                     k-fold cross-validation
     the valley                            the CV error curve / bias-variance sweet spot
-    too stiff vs too jumpy                bias vs variance
+    too stiff vs too jumpy                the bias-variance trade-off
 
 
   ## The Code, If You Want It

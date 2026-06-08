@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Committees: Bagging, Random Forest, and Boosting :: Rahul&#x27;s ML Blog</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<pre>==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 5 . QUESTION CHARTS AND COMMITTEES . PART 3 OF 3
+  Committees: Bagging, Random Forest, and Boosting
+  Posted: 2026-06-07 . Author: Rahul Rai . Tags: bagging, random-forest, boosting, ensembles
+  ============================================================================================
+
+  PATH . post 15 of 15  (the end of the book)
+    &lt;- prev:  <a href="mixing-ruler-gini-pruning.html">Chapter 5, Part 2: The Mixing Ruler</a>
+
+  Parts 1 and 2 built one question chart and tamed it with pruning.  One chart is jumpy
+  -- it memorises quirks of whichever crowd it studied.  This post builds TWO HUNDRED
+  charts and makes them vote.  The average of two hundred jumpy guesses is eerily steady
+  -- the same "wisdom of the crowds" that makes a county-fair ox-weight guess land near
+  the truth when you poll the whole crowd.
+
+  Three committees, in order of cleverness:
+
+    bagging       = deal 200 piles WITH REPEATS, build 200 trees, AVERAGE
+    random forest = bagging + HIDE COLUMNS at each cut
+    boosting      = a LINE of fixers, each one repairs the last one's leftovers
+
+  Each builds on the previous.  The ideas are small.  The power is in the pile-up.
+
+
+  ## Bagging: Deal, Build, Average
+
+  One tree is jumpy.  Why?  Because it was trained on THIS crowd.  A different crowd
+  would give a different tree.  The cure: make MANY crowds, build one tree per crowd,
+  and average the guesses.
+
+  The problem: you only have one study pile.  You cannot visit the hospital 200 times.
+  So you FAKE it -- the same trick from
+  <a href="wobble-bands-bootstrap.html">Chapter 4, Part 2 (Bootstrap)</a>:
+
+    pull a person, write them down, PUT THEM BACK
+    repeat until the fake pile is the same size as the real one
+    -&gt; some people drawn twice, some never drawn at all
+
+  That fake pile is a STICKY NOTE.  Deal 200 sticky notes.  Build one tree on each.
+
+    sticky note 1 (80 people, some repeated)  --build--&gt;  tree 1  --&gt;  guess 150
+    sticky note 2 (80 people, different mix)  --build--&gt;  tree 2  --&gt;  guess 162
+    ...
+    sticky note 200                           --build--&gt;  tree 200 --&gt; guess 158
+
+    bagging's answer for this patient = AVERAGE(150, 162, ..., 158) = ~154
+
+  !! WARN: STICKY NOTE != TREE
+     The sticky note is a PILE of people (deals, votes nothing).
+     The tree is BUILT from that pile (the cut-lines, casts the vote).
+
+       sticky note (pile) --build--&gt; tree (cut-lines) --&gt; one guess into the average
+
+     The sticky note's only job: be a slightly-different pile (because of repeats),
+     so its tree becomes a slightly-different voter.  If all 200 piles were identical,
+     the 200 trees would be identical and averaging would do nothing.
+     The randomness IS the point.
+
+  ** KEY: ONE TREE = JUMPY GARBAGE. 200 TREES AVERAGED = STEADY AND TRUSTWORTHY.
+     The jumps point in different directions and cancel when averaged.  This is the
+     "wisdom of the crowds."  No single tree improved -- only the average did.
+
+  The name: bagging = Bootstrap AGGregating.  Two wrappers around one tree:
+
+    BOOTSTRAP  = the sticky-note dealing (with put-back)  -&gt; makes 200 different piles
+    AGGREGATE  = ask all 200 trees, AVERAGE the answers
+
+
+  ## The Free Exam (OOB) -- Again
+
+  The ~37% of people left out of each sticky note were never seen by that tree.  Grade
+  it on those left-out people = an honest, FREE exam.  Same trick as Chapter 4's
+  out-of-bag error.
+
+    tree #1:  trained on sticky note #1
+              ~37% of people not on that note -&gt; grade tree #1 on them -&gt; one error
+    ...
+    tree #200: same idea
+
+    average those free-exam errors = OOB score
+
+  You get an honest error WITHOUT touching the sealed 25% exam pile.
+
+
+  ## Number Trees vs Bin Trees
+
+  Trees work for BOTH answer types.  Bagging uses whichever fits:
+
+    number answer (diabetes):  each leaf guesses its MEAN  -&gt; bagging AVERAGES 200 guesses
+    bin answer    (cancer):    each leaf guesses MAJORITY   -&gt; bagging takes MAJORITY VOTE
+
+  The lab's bagging stage uses the diabetes/number tree -&gt; 200 trees -&gt; average.
+
+
+  ## Random Forest: Bagging + Hide Columns
+
+  Bagging's flaw: all 200 trees look at the SAME 10 columns at each cut.  If bmi is
+  the strongest column, it wins the top cut of nearly every tree -&gt; the trees RHYME.
+  Averaging rhyming trees helps less than averaging truly different ones.
+
+  The fix: at each cut, roll dice and let the tree see only a random HANDFUL of columns.
+
+    bagging cut:  may try all 10 columns -&gt; champion of 10
+    forest cut:   rolls dice, sees only ~3 columns -&gt; champion of 3
+
+    cut 1:  dice pick {bmi, bp, s5}      -&gt; ignore age, weight HERE
+    cut 2:  dice RE-ROLL {age, weight, s1} -&gt; bmi ignored HERE
+    cut 3:  dice re-roll {weight, bmi, s3} -&gt; ...
+
+    "ignored" = only for the cut where it wasn't drawn
+    next cut -&gt; fresh dice -&gt; different columns on offer
+
+  Over a whole tree (and 300 trees), every column gets many chances.  No single strong
+  column can dominate every cut of every tree.
+
+  !! WARN: THE CUT HIDES COLUMNS, NOT PEOPLE
+     All people are still split up/down.  Nobody is hidden.  The knob limits which
+     COLUMNS the cut may consider when choosing its question.
+
+  The knob is max_features -- how many columns each cut may peek at:
+
+    1.0    = all columns   (= plain bagging, trees rhyme)
+    0.5    = half the columns
+    'sqrt' = about sqrt(10) ~= 3 columns  (the default, a small handful)
+
+  Fewer columns per cut -&gt; trees differ more -&gt; averaging steadier -&gt; better exam error.
+  But too few -&gt; each tree is too weak.  Sweep all three and let the exam-error pick.
+
+  ** KEY: FOREST = BAGGING + ONE KNOB (max_features)
+     The only real news is that each cut sees fewer columns.  Everything else --
+     bootstrap piles, build trees, average guesses, OOB exam -- is identical to bagging.
+
+
+  ## Feature Importances: Which Columns Leaned Hardest
+
+  After building 300 trees, you can ask: "which columns did the most work?"  Each time a
+  column's cut drops the badness, it gets credit.  Add up the credit across all 300 trees
+  = feature_importances_.  Rank them: the column at the top was leaned on the hardest.
+
+  This is not the same as "which column matters most in nature" -- it's "which column the
+  trees used the most."  A correlated stand-in might steal credit from the true cause.
+
+
+  ## Boosting: A Line of Fixers
+
+  Bagging and forests build trees IN PARALLEL on different piles.  Boosting builds them
+  IN A LINE -- each new tree fixes the LEFTOVER mistakes of the one before:
+
+    tree 1:  guess the answer              -&gt; leftovers = answer - guess
+    tree 2:  guess the LEFTOVERS from #1   -&gt; new leftovers
+    tree 3:  guess the new leftovers       -&gt; newer leftovers
+    ...
+    tree 300: by now the leftovers are tiny
+
+    final guess = tree1 + tree2 + tree3 + ... + tree300
+                  (each tree adds its small correction)
+
+  Each tree is TINY -- usually max_depth=1 (a single question, called a STUMP).  One
+  stump is weak.  Three hundred stumps, each patching the previous, become strong.
+
+  The knob is learning_rate -- how much to trust each new fixer:
+
+    learning_rate = 1.0   -&gt; trust fully  -&gt; learns fast, may overfit
+    learning_rate = 0.1   -&gt; trust 10%    -&gt; slower, steadier
+    learning_rate = 0.03  -&gt; trust 3%     -&gt; slow and safe
+
+    final guess = tree1 + lr*tree2 + lr*tree3 + ... + lr*tree300
+
+  To pick the best (learning_rate, n_trees): hold out 30% of the study pile as
+  validation, watch the validation error at each step (staged_predict), pick the
+  iteration where validation error bottomed out.
+
+  !! WARN: WATCH THE VALIDATION CURVE, NOT THE TRAINING CURVE
+     Training error keeps dropping (the line of fixers keeps fixing its own pile).
+     Validation error drops, bottoms out, then RISES -- that bottom is where to stop.
+     Beyond it, each new stump is memorising study-pile noise.
+
+
+  ## Interpretation: Scramble and Slide
+
+  After building a committee (forest or boosting), two questions remain:
+
+  1) WHICH COLUMN MATTERS MOST?  -- permutation importance
+
+    take the finished committee.  measure its exam accuracy.
+    now SCRAMBLE one column (shuffle its values randomly).
+    measure accuracy again.  if it DROPPED a lot, that column mattered.
+    do this for every column.  rank by how much the accuracy dropped.
+
+    the shuffling is done on the EXAM pile, not the study pile -- you're measuring
+    how much the honest score worsens when a column is destroyed.
+
+  2) HOW DOES ONE COLUMN AFFECT THE GUESS?  -- Partial Dependence Plot (PDP)
+
+    pick one column (the top-importance one).
+    slide its value from its smallest to its largest.
+    at each position, average the committee's guess across all other people.
+    plot: x-axis = column value, y-axis = average guess.
+
+    the curve shows the column's GLOBAL effect: "as radius goes up, the committee
+    increasingly says sick."
+
+    ICE (Individual Conditional Expectation): same plot but one line per person
+    instead of the average.  you see whether everyone follows the same trend
+    or whether the effect differs by person.
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    sticky note / fake pile               bootstrap sample (with replacement)
+    deal with repeats                     bootstrap / sampling with replacement
+    average all trees' guesses            bagging / bootstrap aggregating
+    the ~37% left out                     out-of-bag (OOB) sample
+    the free exam                         OOB error estimate
+    hide columns per cut                  random subspace / max_features
+    the trees differ (decorrelated)       decorrelated ensemble
+    line of fixers                        gradient boosting
+    a tiny tree (one stump)               a weak learner / max_depth=1
+    leftovers from the last fixer         residuals of the current ensemble
+    trust-each-fixer knob                 learning rate / shrinkage
+    where validation error bottoms out    early stopping / best iteration
+    scramble a column, measure drop       permutation importance
+    slide one column, watch the guess     partial dependence plot (PDP)
+    one line per person                   individual conditional expectation (ICE)
+    n_estimators                          number of trees in the ensemble
+    feature_importances_                  mean decrease in impurity (MDI)
+
+
+  ## The Code, If You Want It
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       BaggingRegressor()           -- 200 trees, each on a bootstrap pile, averaged
+       RandomForestRegressor()      -- bagging + hide columns (max_features)
+       GradientBoostingRegressor()  -- line of fixers, each on the last's leftovers
+       permutation_importance()     -- scramble a column, measure the drop
+       PartialDependenceDisplay     -- the slide-a-column plot
+
+    from sklearn.ensemble import BaggingRegressor, RandomForestRegressor
+    from sklearn.ensemble import GradientBoostingRegressor
+    from sklearn.tree import DecisionTreeRegressor
+
+    # bagging (200 trees, bootstrap, OOB free exam)
+    bag = BaggingRegressor(
+        DecisionTreeRegressor(random_state=42),
+        n_estimators=200, bootstrap=True, oob_score=True, random_state=42)
+    bag.fit(X_train, y_train)
+    mse_bag = mean_squared_error(y_test, bag.predict(X_test))
+    oob_r2  = bag.oob_score_
+
+    # random forest (300 trees, hide columns, OOB)
+    rf = RandomForestRegressor(
+        n_estimators=300, max_features='sqrt',
+        bootstrap=True, oob_score=True, random_state=42)
+    rf.fit(X_train, y_train)
+    # rf.feature_importances_  = how much each column was leaned on
+
+    # boosting (300 stumps, learning_rate, staged validation curve)
+    gbr = GradientBoostingRegressor(
+        n_estimators=300, max_depth=1, learning_rate=0.1, random_state=42)
+    gbr.fit(X_tr, y_tr)
+    val_mses = [mean_squared_error(y_val, yp) for yp in gbr.staged_predict(X_val)]
+    best_iter = np.argmin(val_mses) + 1   # where validation bottomed out
+
+    # interpretation
+    from sklearn.inspection import permutation_importance, PartialDependenceDisplay
+    perm = permutation_importance(rf, X_test, y_test, n_repeats=10, random_state=42)
+    # perm.importances_mean = how much each column's scramble hurt the score
+    # PartialDependenceDisplay.from_estimator(rf, X_test, [top_feature], kind='both')
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 5 -- Question Charts and Committees):
+    <a href="question-charts-by-hand.html">Part 1 -- Question Charts by Hand</a> .
+    <a href="mixing-ruler-gini-pruning.html">Part 2 -- The Mixing Ruler</a> .
+    Part 3 (this post)
+
+  That is the end of the book.  For quick lookups, see the
+  <a href="classification-lab.html">Appendix -- Classification Reference</a> and the
+  <a href="../glossary.html">Glossary / Decoder Ring</a>.
+  &lt;- <a href="../index.html">Back to all posts</a>
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+==============================================================================================
+</pre>
+</body>
+</html>

@@ -10,8 +10,9 @@
   Posted: 2026-06-07 . Author: Rahul Rai . Tags: least-squares, collinearity, derivation
   ============================================================================================
 
-  PATH . post 12 of 12  (the end of the book)
+  PATH . post 12 of 15
     <- prev:  [Chapter 4, Part 2: One Dial Is a Lie](wobble-bands-bootstrap.txt)
+       next:  [Chapter 5, Part 1: Question Charts by Hand](question-charts-by-hand.txt) ->
 
   We have leashed the dials and measured their wobble, and through all of it we have leaned
   on a sentence we never fully cashed: "the dials are whatever makes the total miss
@@ -165,6 +166,7 @@
   both once, to see they agree -- and to see the LADDER disagree the moment columns overlap.
 
   >> NEW TO PYTHON? Each named once:
+       Xc, y               -- Xc = X_train_scaled (zero-mean columns); y = y_train
        np.linalg.inv(M)    -- the inverse of a grid M (the untangler)
        A @ B               -- multiply two grids together (matrix multiply)
        X.T                 -- flip a grid on its side (transpose, the "X^T" above)
@@ -189,9 +191,6 @@
     [Part 2 -- One Dial Is a Lie](wobble-bands-bootstrap.txt) .
     Part 3 (this post)
 
-  That is the end of the book. For quick lookups, see the
-  [Appendix -- Classification Reference](classification-lab.txt) and the
-  [Glossary / Decoder Ring](../glossary.txt).
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
