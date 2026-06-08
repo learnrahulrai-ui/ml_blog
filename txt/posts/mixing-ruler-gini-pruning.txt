@@ -1,0 +1,291 @@
+@title The Mixing Ruler: Gini, Information Gain, and Pruning :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 5 . QUESTION CHARTS AND COMMITTEES . PART 2 OF 3
+  The Mixing Ruler: Gini, Information Gain, and Pruning
+  Posted: 2026-06-07 . Author: Rahul Rai . Tags: gini, information-gain, pruning, classification
+  ============================================================================================
+
+  PATH . post 14 of 15
+    <- prev:  [Chapter 5, Part 1: Question Charts by Hand](question-charts-by-hand.txt)
+       next:  [Chapter 5, Part 3: Committees](committees-bag-forest-boost.txt) ->
+
+  Part 1 built the question chart for a NUMBER answer.  Each cut's badness was the sum of
+  squared misses around the pile means -- a formula that made sense because the answer was
+  a number you could average.  Now the answer is yes/no -- sick or well, 0 or 1 -- and
+  averaging stops making sense.  You cannot take the mean of {yes, yes, no}.
+
+  So the badness ruler must change.  The new ruler counts how MIXED each side is (how many
+  yes vs how many no), and the chart picks the cut that leaves the sides LEAST mixed.
+  That ruler is Gini impurity, and this post derives it by hand from four counts.
+
+  The second half of this post solves a different problem: even a good tree grows too bushy
+  and memorises noise.  Pruning snips the weak branches after the fact, and the alpha tax
+  decides which branches to fire.
+
+
+  ## The Classification Tree: One Change at the Bottom
+
+  The build hunt is IDENTICAL to Part 1 -- sort, midpoints, champion, champion of
+  champions, recurse.  Two tiny things change:
+
+    NUMBER tree (Part 1):
+      each final pile -> AVERAGE of the answers -> one number guess
+      badness = sum of squared misses around that average
+
+    YES/NO tree (this post):
+      each final pile -> MAJORITY vote -> a bin (yes or no)
+      badness = how MIXED each side is (Gini)
+
+    same hunt, same recursion
+    only the "ruler for badness" and the "guess at the bottom" differ
+
+
+  ## From 4 Counts to 1 Number: The Gini Ruler
+
+  At the first pairwise midpoint from the sorted column, draw a line:
+
+    below:  3 yes, 1 no       (4 people)
+    above:  1 yes, 4 no       (5 people)
+                               ----------
+                               4 counts total.  that's ALL you need.
+
+  STEP 1 -- turn each count into a fraction (the "share"):
+
+    below: share yes = 3/4 = 0.75     share no = 1/4 = 0.25
+    above: share yes = 1/5 = 0.20     share no = 4/5 = 0.80
+
+  STEP 2 -- compute each side's mixed-ness:
+
+    mixed = 1 - (share yes)^2 - (share no)^2
+
+    below: 1 - 0.75^2 - 0.25^2  = 1 - 0.5625 - 0.0625  = 0.375
+    above: 1 - 0.20^2 - 0.80^2  = 1 - 0.04   - 0.64    = 0.32
+
+  STEP 3 -- combine into one number, weighted by side size:
+
+    cut badness = (4/9)*0.375 + (5/9)*0.32
+                = 0.1667 + 0.1778
+                = 0.344
+
+  There it is.  4 counts -> one number (0.344) for this cut.
+
+    pure side (all yes):  0       <- can't be cleaner
+    half-half:            0.5     <- worst possible
+    this cut:             0.344   <- somewhere in between
+
+    each of the 330 cuts -> one number
+    smallest number = this column's champion (the cleanest split)
+
+
+  ## Why That Formula Is Not Astrology
+
+  The formula 1 - p^2 - q^2 looks pulled from thin air.  It isn't.  It counts
+  something you can see with your hands.
+
+  Gini = the chance two random grabs from a side DISAGREE.
+
+  Using the below side: 3 yes, 1 no (4 people):
+
+    grab one person, put back, grab another.  chance BOTH yes?
+
+      first grab yes   = 3 out of 4 = 3/4
+      second grab yes  = 3 out of 4 = 3/4
+      BOTH yes = 3/4 OF 3/4 = 3/4 x 3/4 = 9/16 = 0.5625
+
+    "of" means multiply.  three-quarters of three-quarters.
+    that's why the square: same fraction times itself.
+
+      both yes  = 0.75 x 0.75 = 0.75^2  = 0.5625
+      both no   = 0.25 x 0.25 = 0.25^2  = 0.0625
+      SAME (both-yes OR both-no) = add   = 0.625      <- "or" = add
+      DIFFER = 1 - 0.625 = 0.375                      <- the mixed-ness
+
+    plain rule:   "of" / "and"  ->  multiply (x)
+                  "or"          ->  add (+)
+
+  Check the edges:
+
+    pure side (all yes):  two grabs always match -> differ 0   -> Gini 0     good
+    half-half:            grabs differ half the time           -> Gini 0.5   bad
+
+
+  ## Information Gain: The Drop
+
+  A cut's worth is how much it DROPS the mixing from parent to children:
+
+    gain = Gini(parent) - weighted_Gini(children)
+
+    parent:  whole pile, Gini = 0.49
+    after cut:  left 0.375, right 0.32, weighted = 0.344
+    gain = 0.49 - 0.344 = 0.146
+
+  Higher gain = cleaner split.  The champion is the cut with the HIGHEST gain -- same
+  as picking the LOWEST weighted Gini, just measured from the other direction.
+
+
+  ## Stratify: Keep the Mix Even
+
+  The cancer sheet is ~63% well, ~37% sick.  A plain random split might deal 71% well
+  into the exam pile by luck -- unfair.  stratify=y_cls forces both piles to mirror the
+  whole sheet's ratio:
+
+    plain split (luck):          stratify split (forced):
+    study  60% well              study  63% well   <- same as whole
+    exam   71% well  <- skewed   exam   63% well   <- same as whole
+
+  One flag in the split call.  No new idea -- just insurance against a lopsided deal.
+
+
+  ## Pruning: The Alpha Tax
+
+  A full-grown tree memorises every quirk.  The exam error is high.  Instead of capping
+  depth (a blunt ceiling), pruning SNIPS weak branches after the tree is fully grown.
+
+  The idea: charge a TAX per end-room (leaf).  A branch survives only if the wrongness
+  it removes is worth more than the tax:
+
+    chart's total cost  =  (total wrongness on study people)  +  alpha x (number of leaves)
+                           +-- fit the data ---+                 +--- stay humble ---+
+
+    alpha = 0     -> leaves are FREE  -> keep all  -> overgrown, memorises
+    alpha small   -> cheap            -> snip only the weakest twigs
+    alpha big     -> leaves expensive -> snip hard  -> down toward a stump
+
+    a doctor splits a room into 2:
+      wrongness dropped by 5400?   tax for +1 room = alpha
+        if 5400 > alpha   -> keep the doctor   (earns its keep)
+        if 5400 < alpha   -> FIRE him, merge rooms back   (not worth the tax)
+
+  ** KEY: MAX_DEPTH IS A CEILING; CCP_ALPHA IS A TAX
+     max_depth: chops ALL corridors at height N.  blunt, same haircut everywhere.
+     ccp_alpha: snips weak twigs ANYWHERE, keeps strong deep branches.  smart, uneven.
+
+
+  ## Where Does the Alpha Menu Come From?
+
+  You do NOT guess random alpha values.  The tree hands you the exact list of alphas
+  where a branch would snip:
+
+    cost_complexity_pruning_path(X_train, y_train) -> ccp_alphas
+    [0.0, 12.5, 80.0, ..., 1755]   <- the staircase of snip-points
+
+  Between these alphas, nothing changes.  The tree pre-computes them.
+
+  !! WARN: CCP_ALPHAS (THE LIST) vs CCP_ALPHA (THE KNOB)
+     ccp_alphas = a list the machine hands you (all the meaningful snip-points)
+     ccp_alpha  = a single knob you set on a new tree ("how hard to prune")
+     Plural = the menu.  Singular = the setting.
+
+
+  ## The Nested Averages Ladder
+
+  To pick the best alpha, the same 5-slice check from Chapter 4.  Three averages,
+  stacked, each doing a different job:
+
+    RUNG 1 -- one person's guess (mean of targets in his leaf):
+      leaf holds {120, 140, 160}  -> guess = 140
+
+    RUNG 2 -- one round's error (mean of misses over covered people):
+      person  guess  truth  miss^2
+        p1     140    150    100
+        p2      90     80    100
+        p3     210    220    100
+      round error = mean = (100+100+100)/3 = 100
+
+    RUNG 3 -- one alpha's score (mean of the 5 round-errors):
+      round1  round2  round3  round4  round5
+       100     120      90     110      80
+      alpha's score = 500/5 = 100
+
+    TOP -- pick best alpha (MIN over scores, NOT an average):
+      alpha=12.5 -> 105
+      alpha=80.0 -> 100   <-- smallest -> alpha_hat
+      alpha=300  -> 140
+
+    targets in a leaf  --avg-->  guess         (rung 1)
+    misses over people --avg-->  round error   (rung 2)
+    5 round-errors     --avg-->  alpha score   (rung 3)
+    alpha scores       --MIN-->  alpha_hat     (top, not avg)
+
+
+  ## Any Room Has a Wrongness -- Not Just Leaves
+
+  "You only measure wrongness at the end -- how can you measure it in the middle?"
+
+  Every room has a wrongness by asking "what if I stopped here?"  Its guess would be
+  the mean of everyone in the room:
+
+    middle room, 6 people, targets {100,120,140,160,180,200}
+    if I STOP here:  guess = mean = 150
+    wrongness = (100-150)^2 + (120-150)^2 + ... + (200-150)^2 = 7000
+
+    after split:  {100,120,140} mean 120, wrong 800
+                  {160,180,200} mean 180, wrong 800
+    total = 1600
+
+    drop = 7000 - 1600 = 5400   <- this doctor's worth
+
+  Wrongness is NOT leaf-only.  Any room can be graded by "pretend it's a leaf."
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    mixed-ness / how mixed                Gini impurity
+    the drop in mixing                    information gain
+    share yes / share no                  class proportion / p, q
+    pure side                             a node with Gini = 0 (homogeneous)
+    half-half (worst)                     maximum Gini = 0.5 (for 2 classes)
+    the 4 counts                          class counts per child node
+    the weighted combine                  weighted average Gini of children
+    the alpha tax                         cost-complexity pruning (ccp_alpha)
+    the staircase of snip-points          the effective-alpha sequence
+    fire a doctor                         prune a subtree
+    keep the sick:well ratio even         stratified train/test split
+
+
+  ## The Code, If You Want It
+
+  >> NEW TO PYTHON? Each named once:
+       DecisionTreeClassifier()     -- a question-chart machine for bin answers
+       criterion='gini'             -- the mixing ruler (default)
+       cost_complexity_pruning_path -- the staircase of alpha snip-points
+       KFold                        -- the 5-slice splitter for the alpha check
+
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.metrics import accuracy_score, confusion_matrix
+
+    # classification tree
+    tree_cls = DecisionTreeClassifier(criterion='gini', random_state=42)
+    tree_cls.fit(X_train_cls, y_train_cls)
+    acc = accuracy_score(y_test_cls, tree_cls.predict(X_test_cls))
+
+    # pruning: get alpha menu, 5-slice check, pick winner
+    path = DecisionTreeRegressor(random_state=42).fit(X_train, y_train) \
+           .cost_complexity_pruning_path(X_train, y_train)
+    ccp_alphas = path.ccp_alphas   # the staircase
+
+    from sklearn.model_selection import KFold
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    # for each alpha: 5-fold CV -> mean MSE -> pick argmin -> alpha_hat
+    # then: tree_pruned = DecisionTreeRegressor(ccp_alpha=alpha_hat, ...)
+    #       tree_pruned.fit(X_train, y_train)  <- rebuild with the tax
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 5 -- Question Charts and Committees):
+    [Part 1 -- Question Charts by Hand](question-charts-by-hand.txt) .
+    Part 2 (this post) .
+    [Part 3 -- Committees](committees-bag-forest-boost.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
