@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lab1-quiz-lessons</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<pre>Title: Finishing Lab 1: Traps, Headaches, and Dimensional Shadows
+
+After finishing our giant sheet of gaps, we had to answer a few riddles about the machine. Here is what we figured out using only pencil, paper, and plain sense.
+
+## 1. What does 'k' actually mean?
+When you want the agent to sweep the room and put look-alike dots into piles, you have to tell it exactly how many piles to build before it starts. That number is called **k**. 
+If you set k = 3, the agent builds exactly 3 piles (or "clusters").
+
+## 2. Measuring Words (Hamming)
+Our tape measure only works on numbers. If the sheet has words (like "Yes", "No", "Red", "Blue"), you can't stretch a tape measure between them. 
+Instead, the agent just looks at two boxes and asks: "Do they match exactly, or are they different?" It counts up the total number of mismatches. This simple mismatch-counting trick is named after Richard **Hamming**.
+
+## 3. High-Dimensional Rooms (Mahalanobis)
+When the room has 1,000 walls instead of 3, the normal Straight-Line tape measure gets totally confused and breaks down. 
+A clever mathematician named **Mahalanobis** invented a robust tape measure that accounts for how the dots are stretched and correlated, making it much safer to use in rooms with too many walls.
+
+## 4. The Spilled Coffee (Missing Data)
+If someone spills coffee on the sheet and erases some numbers, you can't just ignore it or write fake numbers in the holes (that ruins the fair ruler!). 
+Instead, you must put on a detective hat. You have to look at the **pattern** of the missing holes to figure out if they are random or if they are hiding something suspicious, and think about how those missing holes will impact the math.
+
+## 5. Crushing the Room (Dimensionality Reduction)
+"Dimensionality reduction" is just a fancy phrase for taking a 3D room and crushing it completely flat into a 2D piece of paper (or crushing a 1,000-wall room down to just 2 walls).
+Why crush the room?
+1. **Remove noise and redundancy:** To throw away the useless garbage walls that only confuse the agent.
+2. **Enhance visualization:** So we can actually draw it on flat paper and look at it with our human eyes.
+3. **Improve computational efficiency:** Because fewer walls means way less math for the agent to do.
+
+## 6. The Ethical Traps
+When we build machines, we must treat humans fairly and keep them safe.
+- **Bias in data:** If our sheet only records tall people, our piles will be completely unfair to short people.
+- **Data privacy:** If the sheet holds secret diaries, they might get leaked.
+- **Transparency:** If a person asks "Why did you put me in the bad pile?", we must be able to explain exactly how the agent measured the gap. If it is a secret black box, that is unfair.
+
+## 7. The Goal of the Piles
+The whole point of the room is just to group look-alikes together. Think of a store owner sweeping their buyers into piles (like "Bargain Hunters" and "Luxury Buyers") to know how to advertise to them. This real-world example is called **Customer Segmentation**.
+</pre>
+</body>
+</html>

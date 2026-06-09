@@ -17,7 +17,7 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in five chapters (fifteen posts),
+  This is not a pile of loose articles -- it is a short BOOK in six chapters (twenty-one posts),
   meant to be read top to bottom. Each post opens with a "post N of 15" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
@@ -161,6 +161,45 @@
     piles, and macro/micro/weighted averaging -- plain language first, standard labels
     last. Read Chapter 3 first; use this as a reference when you need to look something
     up quickly.
+
+
+  CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS -- unsupervised learning
+  ----------------------------------------------------------------------
+
+  <a href="posts/eda-and-distance.html">Part 1 -- Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem</a>
+    post 1 of 6 . 2026-06-09 . part 1 of 6 . eda, distance, standardization, unsupervised
+    No answer column, no right or wrong -- just 50 states and 3 measurements.  The mean
+    and spread of each column, the ruler problem (Assault in hundreds drowns UrbanPop
+    in tens), two gap rulers (straight-line Euclidean and city-block Manhattan), the
+    sheet of gaps, and the fix: put every column on the same ruler and measure again.
+
+  <a href="posts/the-strongest-direction-pca.html">Part 2 -- The Strongest Direction: Crushing a Many-Wall Room Into a Flat Page (PCA)</a>
+    post 2 of 6 . 2026-06-09 . part 2 of 6 . pca, dimensionality-reduction, visualization
+    13 chemical measurements = 13 walls.  You cannot draw a 13-wall room.  Shine a
+    flashlight, trace the longest shadow (PC1), then the next at a right angle (PC2).
+    A 2-column by-hand worked example, the recipe (loadings), how much each shadow
+    carries (PVE), choosing how many to keep (80% threshold), and blowing the shadow
+    back up (reconstruction error).
+
+  <a href="posts/grouping-by-nearest-centre.html">Part 3 -- Grouping by Nearest Centre (K-Means)</a>
+    post 3 of 6 . coming soon . k-means, clustering
+    Put up k flags at random spots.  Each state joins the nearest flag.  Move each flag
+    to the centre of its crowd.  Repeat.  Picking k by the elbow.
+
+  <a href="posts/the-family-tree-clustering.html">Part 4 -- The Family Tree (Hierarchical Clustering)</a>
+    post 4 of 6 . coming soon . hierarchical, dendrogram, linkage
+    No need to guess k.  Build a tree of states by gluing the closest pair together,
+    step by step, until everything is one pile.  Read the tree top-down, and chose
+    where to cut.
+
+  <a href="posts/nci60-revisited.html">Part 5 -- Both Tools on the Same Data (NCI60 Re-visited)</a>
+    post 5 of 6 . coming soon . nci60, clustering, comparison
+    The gene expression data from Part 2, revisited with both clustering tools.
+    Do K-Means and Hierarchical find the same groups?
+
+  <a href="posts/filling-the-blanks.html">Part 6 -- Filling the Blanks (Recommender Systems)</a>
+    post 6 of 6 . coming soon . matrix-completion, recommender
+    A sheet with missing cells.  Guess the blanks from the filled-in ones.
 
 
 ----------------------------------------------------------------------------------------------

@@ -10,8 +10,9 @@
   Posted: 2026-06-07 . Author: Rahul Rai . Tags: bagging, random-forest, boosting, ensembles
   ============================================================================================
 
-  PATH . post 15 of 15  (the end of the book)
+  PATH . post 15 of 15  (end of the supervised-learning book)
     <- prev:  [Chapter 5, Part 2: The Mixing Ruler](mixing-ruler-gini-pruning.txt)
+       next:  [Chapter 6, Part 1: Looking at a Sheet With No Answers](eda-and-distance.txt) ->
 
   Parts 1 and 2 built one question chart and tamed it with pruning.  One chart is jumpy
   -- it memorises quirks of whichever crowd it studied.  This post builds TWO HUNDRED
@@ -544,9 +545,10 @@
     [Part 2 -- The Mixing Ruler](mixing-ruler-gini-pruning.txt) .
     Part 3 (this post)
 
-  That is the end of the book.  For quick lookups, see the
+  That is the end of the supervised-learning book.  For quick lookups, see the
   [Appendix -- Classification Reference](classification-lab.txt) and the
   [Glossary / Decoder Ring](../glossary.txt).
+  Continue with the next chapter: [Chapter 6: Finding Patterns Without Answers](eda-and-distance.txt).
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

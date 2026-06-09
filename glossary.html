@@ -200,6 +200,39 @@
     credit per cut, summed over trees     mean decrease in impurity (feature_importances_)
 
 
+  K. FINDING PATTERNS WITHOUT ANSWERS -- unsupervised learning, distances, PCA
+  ----------------------------------------------------------------------------
+
+    sheet with no answer column           unlabeled data / unsupervised learning
+    middle of a column                    mean / average
+    spread of a column                    standard deviation (std / sigma)
+    range (max - min)                     feature range
+    straight-line gap between two rows    Euclidean distance (L2)
+    city-block gap                        Manhattan distance (L1)
+    sheet of gaps                         pairwise distance matrix
+    put every column on the same ruler    z-score / StandardScaler
+    fair gap                              standardized Euclidean distance
+    crush a many-wall room to flat        dimensionality reduction
+    longest shadow / strongest direction  first principal component (PC1)
+    second shadow (at right angle)        second principal component (PC2)
+    the recipe for a shadow               loadings / components_
+    each row's coordinate on the shadow   score / transformed data
+    how much each shadow carries          explained variance ratio (PVE)
+    keep shadows until 80% captured       cumulative PVE threshold
+    blow the shadow back up               inverse transform / reconstruction
+    blurriness after blowing up           reconstruction error (MSE)
+    column importance in the recipe       loading magnitude (absolute value)
+    put k flags, join each point to nearest  k-means clustering
+    move each flag to the centre of its crowd  k-means update step
+    pick k by the elbow                   elbow method for k
+    family tree of rows                   hierarchical clustering / dendrogram
+    glue the closest pair together        linkage (single / complete / average)
+    read the tree top-down, choose cut    cut the dendrogram at a height
+    fill in the blanks                    matrix completion / imputation
+    guess what a user likes               recommender system / collaborative filtering
+
+
+
   ## A Note on the Plain Words
 
   &gt;&gt; NOTE: THE PLAIN WORDS ARE NOT BABY-TALK
