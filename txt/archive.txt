@@ -54,9 +54,10 @@
   post 21/21  [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
 
 
-  APPENDIX -- CLASSIFICATION REFERENCE (2026)
-  -------------------------------------------
-  reference   [Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
+  APPENDICES -- FLIP-TO REFERENCES (2026)
+  ---------------------------------------
+  reference   [A. Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
+  reference   [B. Distance and Clustering Reference -- Rulers, Traps, and Ethics](posts/clustering-reference.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

@@ -1,0 +1,169 @@
+@title Distance and Clustering Reference: Rulers, Traps, and Ethics :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  APPENDIX . DISTANCE AND CLUSTERING REFERENCE
+  Rulers, Traps, and the Ethics of Sorting People Into Piles
+  Posted: 2026-06-09 . Author: Rahul Rai . Tags: clustering, distance, hamming, mahalanobis, ethics
+  ============================================================================================
+
+  PATH . APPENDIX -- Distance and Clustering Reference  (companion to Chapter 6; read any time)
+    <- back to:  [Chapter 6, Part 1: Looking at a Sheet With No Answers](eda-and-distance.txt)
+
+  This is the appendix to Chapter 6 (Finding Patterns Without Answers). The chapter draws
+  each idea by hand; this is a flip-to reference for the loose ends the chapter does not
+  stop for -- two more rulers, the traps that bite, and the part nobody puts in the lab
+  but everybody should: the ethics of sorting people into piles. Plain language first,
+  standard labels at the very bottom.
+
+
+  ## 1. How Many Piles? -- The k You Pick
+
+  K-means (Chapter 6, Part 3) cannot invent the number of groups.  You name it first.
+
+    you say k = 3   ->  the machine builds exactly 3 piles, no more, no fewer
+
+  The machine obeys blindly: ask for k = 5 on data with 2 real clumps and it WILL hand you
+  5 piles, splitting real groups to do it.  Pick k at the elbow (Part 3), not by feel.
+
+
+  ## 2. Measuring Words, Not Numbers -- Hamming Distance
+
+  Every ruler in Chapter 6 (straight-line, city-block) needs numbers to subtract.  But a
+  column might hold WORDS -- "yes/no", "red/blue/green", a strand of DNA letters.  You
+  cannot subtract "red" from "blue".
+
+  The fix is the simplest ruler there is: walk the two rows box by box and COUNT THE
+  MISMATCHES.
+
+    row A:   yes   red    L   yes
+    row B:   yes   blue   L   no
+             --------------------
+    match?    ok    X     ok   X      ->  2 mismatches  ->  Hamming gap = 2
+
+  Same boxes match -> add nothing.  Boxes differ -> add one.  That mismatch count is the
+  Hamming distance.  It is the natural gap for categories and bit-strings, where "how far
+  apart" just means "how many positions disagree."
+
+
+  ## 3. When the Room Has Too Many Walls -- Mahalanobis Distance
+
+  The straight-line ruler quietly assumes every column is independent and on the same
+  scale.  When columns move together as a pack (collinearity, from Chapter 2) or the cloud
+  is stretched lopsided, plain straight-line distance is misled -- it double-counts the
+  directions where the data is already wide.
+
+    plain straight-line:  treats the cloud as a round ball
+    Mahalanobis:          first un-stretches the cloud back to a ball, THEN measures
+
+  Mahalanobis distance accounts for how the dots are spread and correlated -- it divides
+  out the stretch before measuring, so a step across a narrow direction counts for more
+  than a step along a wide one.  It is the robust ruler for many-walled, correlated rooms.
+  (It is the same "untangler" spirit as the (X^T X)^-1 from Chapter 4, Part 3.)
+
+
+  ## 4. Spilled Coffee -- Missing Data
+
+  Real sheets have holes: someone never answered, a sensor failed, coffee erased a cell.
+  Two tempting moves are both traps:
+
+    DROP the row    ->  you may throw away most of the sheet, and bias what is left
+    WRITE A FAKE    ->  guessing the mean fills the hole but RUINS the fair ruler
+                        (it shrinks the spread and pulls every gap toward that row)
+
+  Before patching anything, put on the detective hat and ask WHY the hole is there:
+
+    missing at random          ->  a careful fill (imputation) is defensible
+    missing for a reason        ->  the hole itself is a signal (e.g. "income" blank
+                                    only for the unemployed) -- filling it hides the truth
+
+  The pattern of the holes matters more than the holes.  Decide what the blank MEANS before
+  you decide what to write in it.
+
+
+  ## 5. Why Crush the Room -- Dimensionality Reduction
+
+  PCA (Chapter 6, Part 2) crushes a many-wall room to a flat page.  Three reasons it is
+  worth doing, beyond just "to draw it":
+
+    1. throw away noise      -- the weak, redundant walls only confuse the gap; drop them
+    2. let human eyes see it  -- you cannot picture 13 walls; you can picture 2
+    3. less math to do        -- fewer walls means far cheaper distances and fits
+
+  The cost is blur (reconstruction error, Part 2): crush too hard and you lose real
+  structure.  Keep enough shadows to stay honest (the 80% rule of thumb), no more.
+
+
+  ## 6. The Part the Lab Skips -- Ethics of Sorting People
+
+  Every tool in this chapter sorts rows into piles.  When the rows are PEOPLE, the math
+  carries weight it never warns you about:
+
+    BIAS IN THE DATA
+       If the sheet only recorded tall people, every pile is unfair to short people.
+       The machine cannot find a pattern the data never showed it -- and it will
+       confidently mistreat whoever was under-counted.
+
+    PRIVACY
+       A clustering sheet can hold secret, sensitive things.  Grouping people by their
+       data can leak what they never agreed to share -- and a pile label can out someone.
+
+    TRANSPARENCY
+       If a person asks "why did you put me in the bad pile?", you must be able to point
+       to the gap you measured and the columns that drove it.  A secret black box that
+       cannot explain its piles is not just unhelpful -- it is unfair.
+
+  ** KEY: A PILE IS A DECISION ABOUT A PERSON
+     The moment a cluster decides who gets the loan, the ad, or the scrutiny, "it is just
+     distance" stops being an excuse.  Measure on data you trust, guard what it holds, and
+     be ready to explain every wall you used.
+
+
+  ## 7. What the Piles Are For -- Customer Segmentation
+
+  The whole point of grouping with no answer column: sweep look-alikes together so you can
+  treat each pile sensibly.  The everyday name is CUSTOMER SEGMENTATION.
+
+    a shop sorts its buyers into piles by what they buy:
+      "Bargain Hunters"   ->  send the discount flyer
+      "Luxury Buyers"     ->  send the premium catalogue
+
+  No one labelled those shoppers in advance.  The piles fall out of the data, and the names
+  are the story you tell after looking at each pile -- exactly the unsupervised idea from
+  the whole of Chapter 6.
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    how many piles you pick (k)           the number of clusters (n_clusters)
+    count the mismatches                  Hamming distance
+    un-stretch the cloud, then measure    Mahalanobis distance
+    the holes in the sheet                missing data
+    fill a hole with a guess              imputation
+    why the hole is there                 missing-at-random vs missing-not-at-random
+    crush the room                        dimensionality reduction
+    throw away weak walls                 noise / redundancy removal
+    unfair because of who was counted     sampling bias / fairness
+    explain which walls drove the pile    model interpretability / transparency
+    sweep buyers into piles               customer segmentation
+
+
+----------------------------------------------------------------------------------------------
+  SEE ALSO (Chapter 6 -- Finding Patterns Without Answers):
+    [Part 1 -- Looking at a Sheet With No Answers](eda-and-distance.txt) .
+    [Part 2 -- The Strongest Direction (PCA)](the-strongest-direction-pca.txt) .
+    [Part 3 -- Grouping by Nearest Centre (K-Means)](grouping-by-nearest-centre.txt) .
+    [Part 4 -- The Family Tree (Hierarchical Clustering)](the-family-tree-clustering.txt) .
+    [Part 5 -- Both Tools on NCI60](nci60-revisited.txt) .
+    [Part 6 -- Filling the Blanks (Recommender Systems)](filling-the-blanks.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
