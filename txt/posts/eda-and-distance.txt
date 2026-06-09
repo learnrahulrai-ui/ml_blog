@@ -10,7 +10,7 @@
   Posted: 2026-06-09 . Author: Rahul Rai . Tags: eda, distance, standardization, unsupervised
   ============================================================================================
 
-  PATH . post 1 of 6  (start of the unsupervised-learning chapter)
+  PATH . post 16 of 21  (start of the unsupervised-learning chapter)
     <- prev:  [Chapter 5, Part 3: Committees](committees-bag-forest-boost.txt)
        next:  [Chapter 6, Part 2: The Strongest Direction](the-strongest-direction-pca.txt) ->
 

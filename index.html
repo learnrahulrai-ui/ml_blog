@@ -18,12 +18,12 @@
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
   This is not a pile of loose articles -- it is a short BOOK in six chapters (twenty-one posts),
-  meant to be read top to bottom. Each post opens with a "post N of 15" path header and a
+  meant to be read top to bottom. Each post opens with a "post N of 21" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. An appendix ties it together.
 
-  &gt;&gt; NEW HERE? Start at post 1 of 15:
+  &gt;&gt; NEW HERE? Start at post 1 of 21:
      <a href="posts/chapter1-what-ml-actually-does.html">Guessing House Prices, End to End</a>
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -35,19 +35,19 @@
   -------------------------------------------------------------------------
 
   <a href="posts/chapter1-what-ml-actually-does.html">Part 1 -- Guessing House Prices, End to End</a>
-    post 1/15 . 2026-06-01 . part 1 of 3 . fundamentals, supervised-learning
+    post 1/21 . 2026-06-01 . part 1 of 3 . fundamentals, supervised-learning
     The whole picture on the California housing pile: why 20% of rows are locked away
     first, the ask-closest rule and the straight-stick rule introduced plainly, RMSE
     against the always-average baseline, and picking settings by rotating folds.
 
   <a href="posts/neighbor-machine-knn.html">Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets</a>
-    post 2/15 . 2026-06-01 . part 2 of 3 . knn, complexity, scaling
+    post 2/21 . 2026-06-01 . part 2 of 3 . knn, complexity, scaling
     The ask-closest rule from the gap formula up: why a column measured in thousands
     runs the whole show and must be put on the same ruler, the cost per guess and why
     close stops meaning close as columns pile up, k as the stiff-vs-jumpy dial.
 
   <a href="posts/straight-stick-linear-regression.html">Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics</a>
-    post 3/15 . 2026-06-01 . part 3 of 3 . linear-regression, least-squares, numerics
+    post 3/21 . 2026-06-01 . part 3 of 3 . linear-regression, least-squares, numerics
     From the bowl-shaped squared leftover to the exact dials: a three-row pencil solve
     of the flat-point equations, right-angle leftovers and the flat-shadow thrower, the
     Gauss-Markov conditions, and why you cut the sheet (QR/SVD) rather than flip it.
@@ -57,14 +57,14 @@
   ------------------------------------------------------
 
   <a href="posts/grading-the-guess-mse-r2.html">Part 1 -- Two Rulers for One Guess: MSE and R^2</a>
-    post 4/15 . 2026-06-04 . part 1 of 2 . evaluation, mse, r-squared
+    post 4/21 . 2026-06-04 . part 1 of 2 . evaluation, mse, r-squared
     The same straight-stick rule on a sheet of cars, graded two ways: MSE (RMSE with the
     root left off) and R^2 -- a race against a fool who only ever shouts the average.
     Why you divide by the whole wobble, why test R^2 can dip below zero, and the
     stiff-vs-jumpy split of the miss-size.
 
   <a href="posts/reading-the-dials.html">Part 2 -- Reading the Dials: What the Coefficients Say</a>
-    post 5/15 . 2026-06-04 . part 2 of 2 . coefficients, interpretation, scaling
+    post 5/21 . 2026-06-04 . part 2 of 2 . coefficients, interpretation, scaling
     Each column keeps one dial -- plus pushes up, minus drags down. Zip the names back
     on, find the most-negative (a MIN, not a MAX), and watch the trap: raw dials wear
     each column's own units, so they are not comparable until the columns sit on one
@@ -75,28 +75,28 @@
   --------------------------------------------------------------------
 
   <a href="posts/sorting-into-bins.html">Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies</a>
-    post 6/15 . 2026-06-05 . part 1 of 4 . logistic-regression, classification, evaluation
+    post 6/21 . 2026-06-05 . part 1 of 4 . logistic-regression, classification, evaluation
     The shift from "guess a number" to "guess a bin": the S-curve squash, the
     cross-entropy leftover, and how any dial sum becomes a chance. Then the four-box
     table of CAUGHT/ALARM/MISSED/CLEAR, four scores that read different corners of it,
     and why a machine that catches nobody can still score 63% accuracy.
 
   <a href="posts/the-trade-curve.html">Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures</a>
-    post 7/15 . 2026-06-05 . part 2 of 4 . roc-curve, auc, cutoff
+    post 7/21 . 2026-06-05 . part 2 of 4 . roc-curve, auc, cutoff
     One cutoff judges the machine at one spot; slide it through every position and you
     get the trade curve (ROC). The area beneath it -- AUC -- compresses the whole curve
     to one number: pick a random sick lump and a random well lump; AUC is the chance the
     machine scored the sick one higher.
 
   <a href="posts/leash-and-cloud.html">Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall</a>
-    post 8/15 . 2026-06-05 . part 3 of 4 . l2-regularization, lda
+    post 8/21 . 2026-06-05 . part 3 of 4 . l2-regularization, lda
     Two ways to humble an over-confident machine. L2: add a squared-dial price to the
     leftover so no single dial dominates (C = 1/lambda -- small C is a heavy squeeze).
     LDA: forget rolling downhill; read the two cloud centres and their shared spread,
     then solve for the wall in one closed-form step.
 
   <a href="posts/picking-settings-skewed-classes.html">Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes</a>
-    post 9/15 . 2026-06-05 . part 4 of 4 . grid-search, precision-recall, class-imbalance
+    post 9/21 . 2026-06-05 . part 4 of 4 . grid-search, precision-recall, class-imbalance
     Grid-hunting settings by rotating folds; why pinch-to-fit scaling breaks around
     outliers; the precision-vs-recall trade in fraud detection; precision-recall curves
     for when one class is 100x rarer; and macro vs micro averaging for 3+ bins.
@@ -106,19 +106,19 @@
   ----------------------------------------------------------------------------------------
 
   <a href="posts/humble-dials-ridge-lasso.html">Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials</a>
-    post 10/15 . 2026-06-07 . part 1 of 3 . ridge, lasso, regularisation
+    post 10/21 . 2026-06-07 . part 1 of 3 . ridge, lasso, regularisation
     Free dials grow huge and memorise; put them on a leash. Ridge (the square fine) shrinks
     all dials and zeroes none, solving in one step. Lasso (the absolute fine) snaps weak
     dials to exactly zero and hands you a shortlist of columns. Pick the knob by the valley.
 
   <a href="posts/wobble-bands-bootstrap.html">Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam</a>
-    post 11/15 . 2026-06-07 . part 2 of 3 . bootstrap, confidence-interval, out-of-bag
+    post 11/21 . 2026-06-07 . part 2 of 3 . bootstrap, confidence-interval, out-of-bag
     A single dial value hides how shaky it is. Fake 200 hospital visits by re-dealing the
     pile with repeats, and read off a 95% wobble band per dial (chop 2.5% each end). The
     ~37% left out of each deal become a free, honest exam.
 
   <a href="posts/the-dial-by-hand.html">Part 3 -- The Dial by Hand: Where the Dials Really Come From</a>
-    post 12/15 . 2026-06-07 . part 3 of 3 . least-squares, collinearity, derivation
+    post 12/21 . 2026-06-07 . part 3 of 3 . least-squares, collinearity, derivation
     The whole machine on a blank sheet: the dials are (X^T X)^-1 X^T y, the untangler that
     shares credit between overlapping columns. The one-column slope is a LADDER that matches
     only when columns don't overlap -- name it out loud before you build anything on it.
@@ -128,21 +128,21 @@
   --------------------------------------------------------------------------
 
   <a href="posts/question-charts-by-hand.html">Part 1 -- Question Charts: Building a Tree by Hand</a>
-    post 13/15 . 2026-06-07 . part 1 of 3 . decision-tree, regression, classification
+    post 13/21 . 2026-06-07 . part 1 of 3 . decision-tree, regression, classification
     No dials, no formula: a machine that asks yes/no questions. Built from scratch --
     sort each column, try every midpoint, pick the cleanest cut, recurse. Five wrong
     pictures corrected: one column per split, depth is people not columns, build and
     use are separate phases, same column may recur at a tighter cut.
 
   <a href="posts/mixing-ruler-gini-pruning.html">Part 2 -- The Mixing Ruler: Gini, Information Gain, and Pruning</a>
-    post 14/15 . 2026-06-07 . part 2 of 3 . gini, information-gain, pruning
+    post 14/21 . 2026-06-07 . part 2 of 3 . gini, information-gain, pruning
     Flip to the cancer sick/well sheet: the badness ruler swaps from squared misses to
     Gini (chance two random grabs disagree) -- derived by hand from four counts. Then
     pruning: a tax per leaf snips weak branches after the tree is fully grown; the alpha
     menu comes from the tree itself; the nested-averages ladder picks the best tax.
 
   <a href="posts/committees-bag-forest-boost.html">Part 3 -- Committees: Bagging, Random Forest, and Boosting</a>
-    post 15/15 . 2026-06-07 . part 3 of 3 . bagging, random-forest, boosting, ensembles
+    post 15/21 . 2026-06-07 . part 3 of 3 . bagging, random-forest, boosting, ensembles
     One chart memorises and panics; 200 averaged charts are eerily steady. Bagging
     re-deals with repeats and averages 200 trees (OOB free exam built in). Random forest
     hides a handful of columns at each cut so the trees truly differ. Boosting chains
@@ -167,39 +167,43 @@
   ----------------------------------------------------------------------
 
   <a href="posts/eda-and-distance.html">Part 1 -- Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem</a>
-    post 1 of 6 . 2026-06-09 . part 1 of 6 . eda, distance, standardization, unsupervised
+    post 16/21 . 2026-06-09 . part 1 of 6 . eda, distance, standardization, unsupervised
     No answer column, no right or wrong -- just 50 states and 3 measurements.  The mean
     and spread of each column, the ruler problem (Assault in hundreds drowns UrbanPop
     in tens), two gap rulers (straight-line Euclidean and city-block Manhattan), the
     sheet of gaps, and the fix: put every column on the same ruler and measure again.
 
   <a href="posts/the-strongest-direction-pca.html">Part 2 -- The Strongest Direction: Crushing a Many-Wall Room Into a Flat Page (PCA)</a>
-    post 2 of 6 . 2026-06-09 . part 2 of 6 . pca, dimensionality-reduction, visualization
+    post 17/21 . 2026-06-09 . part 2 of 6 . pca, dimensionality-reduction, visualization
     13 chemical measurements = 13 walls.  You cannot draw a 13-wall room.  Shine a
     flashlight, trace the longest shadow (PC1), then the next at a right angle (PC2).
     A 2-column by-hand worked example, the recipe (loadings), how much each shadow
     carries (PVE), choosing how many to keep (80% threshold), and blowing the shadow
     back up (reconstruction error).
 
-  <a href="posts/grouping-by-nearest-centre.html">Part 3 -- Grouping by Nearest Centre (K-Means)</a>
-    post 3 of 6 . coming soon . k-means, clustering
-    Put up k flags at random spots.  Each state joins the nearest flag.  Move each flag
-    to the centre of its crowd.  Repeat.  Picking k by the elbow.
+  <a href="posts/grouping-by-nearest-centre.html">Part 3 -- Grouping by Nearest Centre: K-Means From a Blank Sheet</a>
+    post 18/21 . 2026-06-09 . part 3 of 6 . k-means, clustering, unsupervised
+    The first machine that actually GROUPS: pick K, then loop two moves -- assign every dot
+    to its nearest centre, move each centre to its pile's mean. Tightness as the score, the
+    unlucky-start trap, and picking K by the elbow.
 
-  <a href="posts/the-family-tree-clustering.html">Part 4 -- The Family Tree (Hierarchical Clustering)</a>
-    post 4 of 6 . coming soon . hierarchical, dendrogram, linkage
-    No need to guess k.  Build a tree of states by gluing the closest pair together,
-    step by step, until everything is one pile.  Read the tree top-down, and chose
-    where to cut.
+  <a href="posts/the-family-tree-clustering.html">Part 4 -- The Family Tree: Hierarchical Clustering and the Dendrogram</a>
+    post 19/21 . 2026-06-09 . part 4 of 6 . hierarchical-clustering, dendrogram, linkage
+    No K up front: start with everyone alone and marry the two closest groups over and over,
+    recording each wedding's height. Read the family tree, cut it wherever you like, and the
+    cut decides how many groups. Single, complete, average, and Ward linkage compared.
 
-  <a href="posts/nci60-revisited.html">Part 5 -- Both Tools on the Same Data (NCI60 Re-visited)</a>
-    post 5 of 6 . coming soon . nci60, clustering, comparison
-    The gene expression data from Part 2, revisited with both clustering tools.
-    Do K-Means and Hierarchical find the same groups?
+  <a href="posts/nci60-revisited.html">Part 5 -- Both Tools on NCI60: PCA and Clustering on Real Gene Data</a>
+    post 20/21 . 2026-06-09 . part 5 of 6 . pca, clustering, nci60, case-study
+    All three tools on one hard sheet: 64 samples, 6,830 genes -- more columns than rows.
+    Crush with PCA, carve with K-means and the family tree, then unseal the cancer types and
+    grade the blind groups. Peeking at labels is a scorecard, never an input.
 
-  <a href="posts/filling-the-blanks.html">Part 6 -- Filling the Blanks (Recommender Systems)</a>
-    post 6 of 6 . coming soon . matrix-completion, recommender
-    A sheet with missing cells.  Guess the blanks from the filled-in ones.
+  <a href="posts/filling-the-blanks.html">Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation</a>
+    post 21/21 . 2026-06-09 . part 6 of 6 . recommender-systems, matrix-factorisation
+    A sheet that is mostly holes: users x movies, a rating only where someone watched. Split
+    the holey grid into two skinny full sheets of hidden tastes and flavours -- PCA's
+    scores-times-recipe shape again -- and the blanks fill themselves. The book lands here.
 
 
 ----------------------------------------------------------------------------------------------

@@ -10,7 +10,7 @@
   Posted: 2026-06-04 . Author: Rahul Rai . Tags: evaluation, mse, r-squared, regression
   ============================================================================================
 
-  PATH . post 4 of 15
+  PATH . post 4 of 21
     <- prev:  [House Prices 3: The Straight-Stick Rule](straight-stick-linear-regression.txt)
        next:  [Grading 2: Reading the Dials](reading-the-dials.txt) ->
 

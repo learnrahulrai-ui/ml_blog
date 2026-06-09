@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grouping by Nearest Centre: K-Means From a Blank Sheet :: Rahul&#x27;s ML Blog</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<pre>==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS . PART 3 OF 6
+  Grouping by Nearest Centre: K-Means From a Blank Sheet
+  Posted: 2026-06-09 . Author: Rahul Rai . Tags: k-means, clustering, unsupervised
+  ============================================================================================
+
+  PATH . post 18 of 21
+    &lt;- prev:  <a href="the-strongest-direction-pca.html">Chapter 6, Part 2: The Strongest Direction (PCA)</a>
+       next:  <a href="the-family-tree-clustering.html">Chapter 6, Part 4: The Family Tree</a> -&gt;
+
+  Part 1 measured the gap between every pair of rows.  Part 2 crushed many columns down
+  to a flat page.  Neither one actually GROUPED anything -- they just measured and drew.
+  This post does the grouping.  Still no answer column: nobody tells us which states or
+  wines belong together.  We have to carve the cloud of dots into K piles ourselves, using
+  nothing but the straight-line gap from Part 1.
+
+  K-means is the simplest grouping machine there is, and the whole thing is two moves
+  repeated until nothing changes: ASSIGN every dot to its nearest centre, then MOVE each
+  centre to the middle of the dots that chose it.  That is it.  Two moves, on a loop.
+
+  ## The Job
+
+    a cloud of dots (rows), and a number K you pick
+    carve the cloud into K piles so each pile is tight (its dots sit close together)
+
+      *  *           *                    [ * * ]         [ * ]
+       * *      *  *           -&gt;          [ * * ]   and   [ * * ]   (K = 2 piles)
+     *      *  *                          tight pile      tight pile
+
+  You choose K up front -- "I want 3 groups."  The machine does not invent K; it only
+  finds the best K piles once you name the number.  Picking K well is its own problem,
+  and we get to it at the end.
+
+  ## The Two Moves
+
+  Start by dropping K centres anywhere (pick K random dots to be the first centres).
+  Then loop:
+
+    MOVE 1 -- ASSIGN.  For every dot, measure its straight-line gap to all K centres.
+              The dot joins the pile of its NEAREST centre.
+
+    MOVE 2 -- UPDATE.  For each pile, find the middle (the mean of its dots, column by
+              column).  That mean becomes the pile's new centre.
+
+    repeat ASSIGN, then UPDATE, then ASSIGN, then UPDATE ...
+    STOP when no dot changes pile (the centres stop moving)
+
+  Each loop can only make the piles tighter or leave them the same -- never worse.  So it
+  always settles.  The settling point is the answer.
+
+  ## A Worked Example, by Hand
+
+  Six dots on one ruler (one column, to keep the arithmetic small).  K = 2.
+
+    dots:   1   2   3       10  11  12
+
+  Drop two starting centres.  Say we unluckily pick 2 and 10.
+
+    ROUND 1 -- ASSIGN (each dot to nearest centre):
+      dot 1  -&gt; centre 2  (gap 1 vs 9)     pile A
+      dot 2  -&gt; centre 2  (gap 0)          pile A
+      dot 3  -&gt; centre 2  (gap 1 vs 7)     pile A
+      dot 10 -&gt; centre 10                  pile B
+      dot 11 -&gt; centre 10 (gap 1)          pile B
+      dot 12 -&gt; centre 10 (gap 2)          pile B
+
+    ROUND 1 -- UPDATE (mean of each pile):
+      pile A = mean(1,2,3)    = 2
+      pile B = mean(10,11,12) = 11
+      new centres: 2 and 11
+
+    ROUND 2 -- ASSIGN: every dot stays in the same pile.
+      Nobody moved.  STOP.
+
+    Final piles:  {1, 2, 3}  and  {10, 11, 12}.  Centres 2 and 11.
+
+  The machine found the two obvious clumps on its own, with no answer key.
+
+  ## The Score: Tightness (Inertia)
+
+  How good is a grouping?  Measure how tight the piles are.  For every dot, take its
+  squared gap to its OWN centre, and add them all up:
+
+    tightness = sum over all dots of (gap from dot to its centre)^2
+
+    small tightness = dots hug their centres = tight, good piles
+    big tightness   = dots sprawl far from their centres = loose, poor piles
+
+  K-means is just the machine that drives this one number as low as it can, by the two
+  moves on a loop.  This is the same "bottom of the bowl" idea from Chapter 1 -- squared
+  misses, pushed to their smallest -- only now the "miss" is a dot's gap from its centre,
+  and there is no answer column anywhere.
+
+  ## The Catch: Where You Drop the First Centres Matters
+
+  K-means settles, but it can settle into a BAD grouping if the starting centres were
+  unlucky.  It finds a low point, not always the LOWEST point.
+
+    unlucky start:  two centres land inside the same clump
+                    -&gt; the machine splits one real clump in half and merges two others
+                    -&gt; it settles, but the piles are wrong
+
+  The fix is cheap: run the whole thing several times from different random starts, and
+  keep the run with the smallest tightness.  The toolbox does this for you (n_init), and
+  a smarter starting trick (k-means++) spreads the first centres far apart on purpose.
+
+  ## Choosing K: The Elbow
+
+  You picked K by hand -- but which K?  Run K-means for K = 1, 2, 3, 4, 5, ... and plot
+  the tightness for each:
+
+    tightness |*
+              | \
+              |  \
+              |   *
+              |    \___
+              |        *----*----*----*   &lt;- the curve flattens out
+              +------------------------- K
+                1   2   3   4   5   6
+
+  Tightness always drops as K grows (more centres -&gt; dots sit closer to one).  At K = the
+  number of real clumps, the drop suddenly flattens -- adding more centres barely helps.
+  That bend is the ELBOW, and it is your best guess at the true number of groups.
+
+  &gt;&gt; NOTE: THE ELBOW IS A JUDGEMENT CALL, NOT A FORMULA
+     There is no equation that spits out "K = 3."  You look at the bend and decide.
+     Sometimes the bend is sharp and obvious; sometimes it is a gentle curve with no
+     clear corner, and reasonable people pick different K.  That is honest -- with no
+     answer column, there is no single right number of groups.
+
+
+  ## Common Tripwires I Caught
+
+    TRIPWIRE 1:  Standardise first -- same as Part 1.
+       K-means lives entirely on the straight-line gap, so a column measured in
+       thousands hijacks every distance.  Put every column on the same ruler
+       (mean 0, spread 1) before the first centre is dropped.
+
+    TRIPWIRE 2:  K-means needs round, similar-sized clumps.
+       The "nearest centre" rule draws straight walls halfway between centres.  If
+       the real groups are long ribbons or crescents, K-means slices them wrongly.
+       It assumes blobs.  When the shape is weird, the family tree in Part 4 or
+       other methods do better.
+
+    TRIPWIRE 3:  The answer changes with the random start.
+       Two runs can hand back different piles.  This is not a bug -- it is the
+       unlucky-start problem.  Run several times (n_init) and keep the tightest.
+
+    TRIPWIRE 4:  K is yours to choose; the machine will obey blindly.
+       Ask for K = 5 on data with 2 real clumps and it WILL hand you 5 piles,
+       happily splitting real groups to do it.  The elbow is your guard against
+       a silly K.
+
+    TRIPWIRE 5:  Tightness (inertia) always falls as K rises.
+       You cannot pick K by "smallest tightness" -- that just picks the biggest K
+       (one centre per dot, tightness 0, useless).  You pick K at the ELBOW, where
+       the falling stops paying off.
+
+    TRIPWIRE 6:  A centre is not a real dot.
+       The centre is the MEAN of a pile -- usually a point with no actual row
+       sitting on it.  It is the pile's centre of gravity, not a member.
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    grouping with no answer column        clustering (unsupervised)
+    a pile of dots                        a cluster
+    the centre of a pile                  centroid / cluster mean
+    assign each dot to nearest centre     the assignment step
+    move each centre to its pile's mean   the update step
+    tightness (sum of squared gaps)       inertia / within-cluster sum of squares
+    the bend in the tightness curve       the elbow method
+    run from several random starts        n_init / multiple restarts
+    spread first centres far apart        k-means++ initialisation
+    number of piles you pick              K (the n_clusters hyperparameter)
+
+
+  ## The Code, If You Want It
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       KMeans(n_clusters=K)   -- the grouping machine, K piles
+       .fit(X)                -- run the two moves on a loop until settled
+       .labels_               -- which pile each row landed in (0..K-1)
+       .cluster_centers_      -- the final centre of each pile
+       .inertia_              -- the tightness score (lower = tighter)
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.cluster import KMeans
+
+    # same-ruler first
+    X_scaled = StandardScaler().fit_transform(df)
+
+    # one grouping with K = 3
+    km = KMeans(n_clusters=3, n_init=10, random_state=42)
+    km.fit(X_scaled)
+    labels = km.labels_              # pile per row
+    centres = km.cluster_centers_    # the 3 centres
+    print(km.inertia_)               # the tightness
+
+    # the elbow: tightness for K = 1..8
+    tightness = []
+    for k in range(1, 9):
+        km = KMeans(n_clusters=k, n_init=10, random_state=42).fit(X_scaled)
+        tightness.append(km.inertia_)
+
+    plt.plot(range(1, 9), tightness, marker="o")
+    plt.xlabel("K (number of piles)")
+    plt.ylabel("tightness (inertia)")
+    plt.title("Elbow: where does adding piles stop helping?")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    plt.show()
+    # pick K at the bend
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):
+    <a href="eda-and-distance.html">Part 1 -- Looking at a Sheet With No Answers</a> .
+    <a href="the-strongest-direction-pca.html">Part 2 -- The Strongest Direction (PCA)</a> .
+    Part 3 (this post) .
+    <a href="the-family-tree-clustering.html">Part 4 -- The Family Tree (Hierarchical Clustering)</a> .
+    <a href="nci60-revisited.html">Part 5 -- Both Tools on NCI60 (Re-visited)</a> .
+    <a href="filling-the-blanks.html">Part 6 -- Filling the Blanks (Recommender Systems)</a>
+
+  &lt;- <a href="../index.html">Back to all posts</a>
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+==============================================================================================
+</pre>
+</body>
+</html>

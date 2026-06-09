@@ -31,8 +31,8 @@
 
   What's Here
   -----------
-  A short book in five chapters (fifteen posts), plus an appendix and a glossary. Read it top
-  to bottom -- each chapter draws its ideas by hand, then gathers the Python at the end.
+  A short book in six chapters (twenty-one posts), plus an appendix and a glossary. Read it
+  top to bottom -- each chapter draws its ideas by hand, then gathers the Python at the end.
 
     - CHAPTER 1 -- Predicting House Prices: two estimators from scratch (ask-closest and
       straight-stick) on the California housing pile, by hand.
@@ -68,6 +68,17 @@
         [part 1](posts/question-charts-by-hand.txt) .
         [part 2](posts/mixing-ruler-gini-pruning.txt) .
         [part 3](posts/committees-bag-forest-boost.txt)
+
+    - CHAPTER 6 -- Finding Patterns Without Answers: unsupervised learning -- sheets with no
+      answer column. Distance and the ruler problem, PCA (the strongest direction), K-means
+      and hierarchical clustering, both tools on real gene data, and a recommender that fills
+      a sheet full of holes.
+        [part 1](posts/eda-and-distance.txt) .
+        [part 2](posts/the-strongest-direction-pca.txt) .
+        [part 3](posts/grouping-by-nearest-centre.txt) .
+        [part 4](posts/the-family-tree-clustering.txt) .
+        [part 5](posts/nci60-revisited.txt) .
+        [part 6](posts/filling-the-blanks.txt)
 
     - APPENDIX -- Classification Reference: all of Chapter 3's concepts in one flip-to page:
       cross-entropy vs MSE, C parameter, LDA with priors, grid search fold safety,

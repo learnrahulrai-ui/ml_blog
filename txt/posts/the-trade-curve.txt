@@ -10,7 +10,7 @@
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: roc-curve, auc, cutoff, evaluation
   ============================================================================================
 
-  PATH . post 7 of 15
+  PATH . post 7 of 21
     <- prev:  [Sorting 1: S-Curve and Four-Box Table](sorting-into-bins.txt)
        next:  [Sorting 3: Leash and Cloud](leash-and-cloud.txt) ->
 

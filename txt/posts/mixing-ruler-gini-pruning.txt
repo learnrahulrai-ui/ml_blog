@@ -10,7 +10,7 @@
   Posted: 2026-06-07 . Author: Rahul Rai . Tags: gini, information-gain, pruning, classification
   ============================================================================================
 
-  PATH . post 14 of 15
+  PATH . post 14 of 21
     <- prev:  [Chapter 5, Part 1: Question Charts by Hand](question-charts-by-hand.txt)
        next:  [Chapter 5, Part 3: Committees](committees-bag-forest-boost.txt) ->
 

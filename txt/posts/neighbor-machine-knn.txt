@@ -10,7 +10,7 @@
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: knn, distance, non-parametric, complexity
   ============================================================================================
 
-  PATH . post 2 of 15
+  PATH . post 2 of 21
     <- prev:  [House Prices 1: Guessing Prices End to End](chapter1-what-ml-actually-does.txt)
        next:  [House Prices 3: The Straight-Stick Rule](straight-stick-linear-regression.txt) ->
 

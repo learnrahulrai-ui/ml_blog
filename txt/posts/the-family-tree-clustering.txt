@@ -1,0 +1,224 @@
+@title The Family Tree: Hierarchical Clustering and the Dendrogram :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS . PART 4 OF 6
+  The Family Tree: Hierarchical Clustering and the Dendrogram
+  Posted: 2026-06-09 . Author: Rahul Rai . Tags: hierarchical-clustering, dendrogram, linkage
+  ============================================================================================
+
+  PATH . post 19 of 21
+    <- prev:  [Chapter 6, Part 3: Grouping by Nearest Centre (K-Means)](grouping-by-nearest-centre.txt)
+       next:  [Chapter 6, Part 5: Both Tools on NCI60](nci60-revisited.txt) ->
+
+  K-means in Part 3 made you pick K up front -- "I want 3 piles" -- and handed back 3
+  piles, no questions asked.  But what if you do not KNOW how many groups there are?  What
+  if you want to see the groups-inside-groups -- states that pair off, those pairs joining
+  into regions, regions joining into halves of the country?
+
+  Hierarchical clustering builds the whole family tree at once.  It never asks for K.  It
+  starts with every row alone and keeps marrying the two closest groups, one wedding at a
+  time, until everyone is in one giant family.  Then you read the tree and cut it wherever
+  you like -- and the height of your cut decides how many groups you get.
+
+  ## The Sheet (Same as Part 1)
+
+    50 states, 3 measurements (Murder, Assault, UrbanPop).  No answer column.
+    Standardised first, so every column sits on the same ruler.
+
+  We already built the tool we need in Part 1: the 50x50 SHEET OF GAPS, the straight-line
+  distance between every pair of states.  Hierarchical clustering is just a disciplined way
+  to read that sheet, smallest gap first.
+
+  ## The One Move: Marry the Two Closest
+
+  Start with 50 groups -- every state is its own lonely group of one.  Then repeat one
+  move until a single group remains:
+
+    find the TWO closest groups in the whole sheet
+    marry them into one new group
+    -> 50 groups become 49, then 48, then 47 ... down to 1
+
+  Each wedding is recorded with the HEIGHT at which it happened (the gap between the two
+  groups that married).  Early weddings happen at tiny heights -- near-twins joining.
+  Late weddings happen way up high -- forcing together groups that are nothing alike.
+
+  ## A Worked Example, by Hand
+
+  Four dots on one ruler.  Gaps are just differences.
+
+    dots:   1    2         6    8
+
+  Start: every dot alone -> {1} {2} {6} {8}
+
+    WEDDING 1 -- closest pair is {1} and {2}, gap 1 (smallest in the sheet).
+       marry them at height 1  ->  {1,2} {6} {8}
+
+    WEDDING 2 -- closest pair now is {6} and {8}, gap 2.
+       marry them at height 2  ->  {1,2} {6,8}
+
+    WEDDING 3 -- only two groups left: {1,2} and {6,8}.
+       their gap (more on this below) is about 6.  marry at height 6.
+       ->  {1,2,6,8}   one family.  done.
+
+  Three weddings, at heights 1, 2, and 6.  Draw them as a tree:
+
+    height
+      6 |      +--------------+
+        |      |              |
+      2 |      |          +---+---+
+        |      |          |       |
+      1 |  +---+---+      |       |
+        |  |       |      |       |
+      0 +--1-------2------6-------8---
+             twins        twins
+        \____ joined late at height 6 ____/
+
+  That tree is the DENDROGRAM.  Tall joins = forced marriages between unlike groups.
+  Short joins = natural twins.
+
+  ## Cut the Tree to Get Groups
+
+  Here is the magic K-means could not do: you choose the number of groups AFTER seeing the
+  tree, by drawing one horizontal line across it.
+
+    cut LOW (height 1.5):  3 groups -> {1,2} {6} {8}
+    cut MID (height 4):    2 groups -> {1,2} {6,8}
+    cut HIGH (height 7):   1 group  -> everybody
+
+  The number of branches your line slices through = the number of groups.  One tree, every
+  possible K, read off by sliding a ruler up and down.  Cut just below the tallest jump and
+  you get the most natural split -- the groups that resisted marrying the longest.
+
+  ## How Do You Measure the Gap BETWEEN Two GROUPS?
+
+  Marrying two lone dots is easy -- the gap is just their distance.  But once a group holds
+  several dots, "the gap between two groups" needs a rule.  This rule is called the LINKAGE,
+  and the choice changes the whole tree:
+
+    SINGLE linkage    = gap between the two CLOSEST members (nearest edge to nearest edge)
+                        -> makes long straggly chains; one bridge dot links two clumps
+    COMPLETE linkage  = gap between the two FARTHEST members (worst case)
+                        -> makes tight compact balls; cautious about marrying
+    AVERAGE linkage   = average gap over all cross-pairs
+                        -> a sensible middle
+    WARD linkage      = marry the pair that adds the LEAST extra tightness (Part 3's
+                        inertia idea) -> tends to give even, round, similar-sized groups
+
+  ** KEY: THE LINKAGE IS A REAL CHOICE, NOT A DEFAULT TO IGNORE
+     Single, complete, average, and Ward can build genuinely different trees from the
+     SAME sheet of gaps.  Ward is the common default for blob-like data; single linkage
+     is the one to reach for when groups are long thin shapes (and the one to fear when
+     you do not want chaining).  Always say which linkage you used.
+
+  ## Agglomerative (Bottom-Up) vs Divisive (Top-Down)
+
+  What we just did -- start with singletons and marry upward -- is BOTTOM-UP
+  (agglomerative).  It is by far the common one.  The opposite, TOP-DOWN (divisive),
+  starts with everyone in one group and splits the loosest group again and again.  Same
+  tree idea, opposite direction.  This whole post is bottom-up.
+
+
+  ## Common Tripwires I Caught
+
+    TRIPWIRE 1:  Standardise first -- again.
+       Like every distance method in this chapter, hierarchical clustering reads the
+       sheet of gaps, which is hijacked by a loud column unless you put every column
+       on the same ruler first.
+
+    TRIPWIRE 2:  The dendrogram HEIGHT is the gap, not the count.
+       The vertical axis is the distance at which two groups married.  It is NOT how
+       many dots are in a group.  A tall bar means "these two were far apart and got
+       married late," not "this is a big group."
+
+    TRIPWIRE 3:  Different linkage -> different tree.
+       If your tree looks like one long chain, you are probably on single linkage
+       and seeing chaining.  Switch to Ward or complete for compact groups.  Neither
+       is wrong; they answer different questions.
+
+    TRIPWIRE 4:  No K up front, but you still choose in the end.
+       Hierarchical clustering postpones the K decision -- it does not erase it.  You
+       pick K when you cut the tree.  Cutting just below the biggest vertical gap is
+       the usual rule of thumb.
+
+    TRIPWIRE 5:  It is greedy and permanent.
+       Once two groups marry, they never divorce.  An early wedding made on a small
+       gap is locked in even if it looks wrong later.  Like the decision tree in
+       Chapter 5, every step is locally best, not globally guaranteed.
+
+    TRIPWIRE 6:  It does not scale cheaply.
+       Building and re-scanning the full sheet of gaps costs a lot once you have many
+       thousands of rows.  K-means is far cheaper at large scale; the family tree
+       shines when you have a few hundred rows and want the whole hierarchy.
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    the family tree                       dendrogram
+    marry the two closest groups          agglomerative (bottom-up) merge step
+    height of a wedding                   merge distance / cophenetic height
+    cut the tree with a flat line         choosing the number of clusters by threshold
+    gap between two groups                linkage criterion
+    nearest-edge gap                      single linkage
+    farthest-edge gap                     complete linkage
+    average cross-pair gap                average linkage
+    least-extra-tightness marriage        Ward linkage
+    start whole, split down               divisive (top-down) clustering
+    the sheet of gaps (from Part 1)       the pairwise distance matrix
+
+
+  ## The Code, If You Want It
+
+  >> NEW TO PYTHON? Each named once:
+       linkage(X, method=...)        -- build the whole family tree (the weddings)
+       dendrogram(Z)                 -- draw the tree
+       fcluster(Z, t, criterion)     -- cut the tree into flat groups
+       AgglomerativeClustering(...)  -- the sklearn one-call version
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.preprocessing import StandardScaler
+    from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+
+    # same-ruler first
+    X_scaled = StandardScaler().fit_transform(df)
+
+    # build the tree (Ward linkage = compact, even groups)
+    Z = linkage(X_scaled, method="ward")
+
+    # draw it
+    plt.figure(figsize=(10, 5))
+    dendrogram(Z, labels=df.index.tolist(), leaf_rotation=90)
+    plt.ylabel("merge height (gap)")
+    plt.title("The Family Tree of States")
+    plt.tight_layout()
+    plt.show()
+
+    # cut into 3 groups
+    groups = fcluster(Z, t=3, criterion="maxclust")   # one label per row
+
+    # the sklearn one-shot equivalent
+    from sklearn.cluster import AgglomerativeClustering
+    agg = AgglomerativeClustering(n_clusters=3, linkage="ward")
+    labels = agg.fit_predict(X_scaled)
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):
+    [Part 1 -- Looking at a Sheet With No Answers](eda-and-distance.txt) .
+    [Part 2 -- The Strongest Direction (PCA)](the-strongest-direction-pca.txt) .
+    [Part 3 -- Grouping by Nearest Centre (K-Means)](grouping-by-nearest-centre.txt) .
+    Part 4 (this post) .
+    [Part 5 -- Both Tools on NCI60 (Re-visited)](nci60-revisited.txt) .
+    [Part 6 -- Filling the Blanks (Recommender Systems)](filling-the-blanks.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

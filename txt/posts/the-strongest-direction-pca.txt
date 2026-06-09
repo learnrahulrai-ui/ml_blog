@@ -10,7 +10,7 @@
   Posted: 2026-06-09 . Author: Rahul Rai . Tags: pca, dimensionality-reduction, visualization
   ============================================================================================
 
-  PATH . post 2 of 6
+  PATH . post 17 of 21
     <- prev:  [Chapter 6, Part 1: Looking at a Sheet With No Answers](eda-and-distance.txt)
        next:  [Chapter 6, Part 3: Grouping by Nearest Centre](grouping-by-nearest-centre.txt) ->
 

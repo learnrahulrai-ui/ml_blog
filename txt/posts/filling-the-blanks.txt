@@ -1,0 +1,215 @@
+@title Filling the Blanks: Recommender Systems and Matrix Factorisation :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS . PART 6 OF 6
+  Filling the Blanks: Recommender Systems and Matrix Factorisation
+  Posted: 2026-06-09 . Author: Rahul Rai . Tags: recommender-systems, matrix-factorisation, collaborative-filtering
+  ============================================================================================
+
+  PATH . post 21 of 21  (the end of the book)
+    <- prev:  [Chapter 6, Part 5: Both Tools on NCI60](nci60-revisited.txt)
+
+  The last post in the book.  Every chapter until now had a full sheet of numbers -- maybe
+  no answer column, but at least every cell was filled in.  This post starts with a sheet
+  that is mostly HOLES, and the whole job is to guess what belongs in the blanks.
+
+  This is the recommender problem: a grid of users down the side, movies across the top,
+  and a star rating in a cell only where a user actually rated a movie.  Most cells are
+  empty -- nobody watches everything.  Fill a blank well and you can say "you, who has not
+  seen this film, will probably rate it 4.5 stars" -- a recommendation.
+
+  ## The Sheet Full of Holes
+
+           Matrix  Titanic  Alien  Notebook  Rambo
+    Ann  [   5       .       4        .        . ]
+    Ben  [   .       4       .        5        . ]
+    Cal  [   4       .       5        .        4 ]
+    Dee  [   .       5       .        4        . ]
+    Eve  [   5       .       4        .        3 ]
+
+    "." = blank (this user never rated this movie)
+
+  The grid is mostly dots.  The goal: guess the dots.  If we can guess that Ben would rate
+  Alien a 4, we recommend Alien to Ben.  There is no separate "answer column" -- the answers
+  ARE the scattered ratings themselves, and the blanks are what we predict.
+
+  ## The Old Idea in New Clothes: Hidden Tastes
+
+  Stare at the filled cells and a pattern leaks out.  Ann and Eve both love Matrix and
+  Alien -- sci-fi.  Ben and Dee both love Titanic and Notebook -- romance.  Nobody told us
+  "sci-fi" and "romance" exist; they fall out of the ratings.  These are HIDDEN TASTES, and
+  they are exactly PCA's shadows from Part 2, wearing a new coat.
+
+  The trick (matrix factorisation): every rating is the match between a user's taste and a
+  movie's flavour.  Give each user a short list of hidden-taste scores, and each movie the
+  same short list of hidden-flavour scores.  A rating is their dot-product:
+
+    rating(user, movie) = (user's taste) matched against (movie's flavour)
+
+       Ann's tastes:    sci-fi 0.9,  romance 0.1
+       Alien's flavour: sci-fi 0.8,  romance 0.0
+       guess = 0.9 x 0.8 + 0.1 x 0.0 = 0.72  -> scaled up to ~4 stars
+
+  High when taste lines up with flavour, low when it does not.  That is the whole engine.
+
+  ## Two Skinny Sheets Instead of One Holey One
+
+  Matrix factorisation splits the big holey grid into two SKINNY full sheets -- one for
+  users, one for movies -- with a few hidden columns each:
+
+       big holey grid          user tastes        movie flavours
+       (users x movies)    =   (users x K)   times  (K x movies)
+
+       5 users x 5 movies  ~=  5 users x 2     x    2 x 5 movies
+         (mostly blank)         (full)              (full)
+
+  K is the number of hidden tastes (2 here: sci-fi, romance).  The two skinny sheets are
+  full -- no holes.  Multiply them back together and you get a COMPLETE grid: every cell
+  filled, including the ones that were blank.  Those filled-in blanks are the predictions.
+
+  This is the same shape as PCA's "scores times loadings" from Part 2.  PCA crushed a full
+  sheet to a smaller one and blew it back up blurry; here we LEARN the two skinny sheets so
+  that blowing them back up reproduces the ratings we DO have -- and fills the ones we don't.
+
+  ## How the Skinny Sheets Are Learned
+
+  We never saw the hidden tastes -- we invent them and tune them.  Start both skinny sheets
+  with random numbers, then drive down one familiar score:
+
+    for every rating we ACTUALLY have:
+        guess = user-taste matched against movie-flavour
+        miss  = real rating - guess
+    total wrongness = sum of miss^2   (only over the cells we have!)
+    nudge both skinny sheets to shrink that wrongness, and repeat
+
+  The bottom-of-the-bowl, squared-miss idea from Chapter 1 -- one last time.  The one new
+  wrinkle: we only sum the miss over the FILLED cells.  The blanks have no truth to compare
+  against, so they sit out the scoring entirely.  Once the filled cells are well-predicted,
+  the blanks come along for free when you multiply the two sheets.
+
+  >> NOTE: A LEASH, BECAUSE THE SHEET IS MOSTLY HOLES
+     With so few filled cells and freely-spinning hidden tastes, the machine will happily
+     memorise the handful of ratings it has and predict nonsense in the blanks.  So we add
+     the Chapter 4 leash -- a fine on big taste/flavour numbers -- to keep it humble.  Same
+     leash, brand new place to need it.
+
+  ## Cold Start: The Honest Limit
+
+  The method only works where there is something to chew on.  A brand-new user who has
+  rated NOTHING has an all-blank row -- no tastes can be inferred, so no honest
+  recommendation can be made.  Same for a movie nobody has rated yet.  This is the COLD
+  START problem, and it is a real wall, not a bug you can code around: with zero ratings
+  there is simply no signal.  Real systems paper over it with side facts (your age, the
+  movie's genre) until enough ratings arrive.
+
+  ## Where the Book Lands
+
+  Look back at the whole arc.  We began in Chapter 1 guessing a house price with a straight
+  stick and squared misses.  Six chapters later we are guessing a missing movie rating with
+  two skinny sheets -- and it is the SAME squared-miss bowl, the SAME leash, the SAME
+  scores-times-recipe shape as PCA.  The cast of tricks is small.  We just kept meeting them
+  in new costumes: dials, leashes, wobble bands, question charts, committees, shadows,
+  piles, and now hidden tastes.  Name the trick under the costume and the machine has no
+  black boxes left in it.
+
+
+  ## Common Tripwires I Caught
+
+    TRIPWIRE 1:  Only score the cells you actually have.
+       The wrongness sum runs over FILLED ratings only.  Counting the blanks (which
+       have no truth) is meaningless and breaks the whole method.
+
+    TRIPWIRE 2:  K (number of hidden tastes) is a knob, like everywhere else.
+       Too few hidden tastes and the machine cannot tell sci-fi from romance; too
+       many and it memorises noise in the handful of ratings.  Pick K by holding out
+       some known ratings and checking the guesses -- the Chapter 1 habit, again.
+
+    TRIPWIRE 3:  Hidden tastes are not labelled "sci-fi" by the machine.
+       The machine finds K useful directions; it never names them.  "Sci-fi" and
+       "romance" are stories WE tell after looking at which movies score high.  Same
+       as PCA loadings -- the math finds the axis; the meaning is our interpretation.
+
+    TRIPWIRE 4:  Cold start is a wall, not a tuning problem.
+       No ratings means no tastes means no honest guess.  Do not fake it with the
+       global average and call it personalised -- it is not.
+
+    TRIPWIRE 5:  You still need a leash.
+       A mostly-empty sheet is the easiest thing in the world to overfit.  Without
+       the Chapter 4 penalty on big numbers, predictions in the blanks go wild.
+
+    TRIPWIRE 6:  This is unsupervised in spirit, supervised in mechanics.
+       There is no tidy answer column, yet we DO fit to known ratings.  It sits on
+       the border -- learning hidden structure (unsupervised) by predicting observed
+       values (supervised).  Do not box it too hard either way.
+
+
+  ## The Labels, Last
+
+    Plain term used above                 Standard label
+    -----------------------------------   ------------------------------------------
+    sheet full of holes                   sparse user-item rating matrix
+    guess the blanks                      rating prediction / recommendation
+    hidden tastes / flavours              latent factors
+    number of hidden tastes (K)           latent dimensionality / rank
+    two skinny sheets                     user and item factor matrices
+    matched against (dot-product)         the inner product of factor vectors
+    split the grid into two sheets        matrix factorisation
+    learn from ratings of similar users   collaborative filtering
+    score only the filled cells           loss over observed entries only
+    the leash on big taste numbers        L2 regularisation (from Chapter 4)
+    no ratings yet, no guess              the cold-start problem
+
+
+  ## The Code, If You Want It
+
+  >> NEW TO PYTHON? Each named once:
+       np.where(mask, a, b)   -- pick a where mask is true, else b (filled vs blank)
+       X @ Y                  -- multiply the two skinny sheets back into a full grid
+       np.isnan(R)            -- find the blank cells (NaN = "not a number" = blank)
+
+    import numpy as np
+
+    # R = ratings grid, np.nan in the blanks
+    mask = ~np.isnan(R)                 # True where we HAVE a rating
+    n_users, n_movies = R.shape
+    K = 2                               # hidden tastes
+
+    rng = np.random.RandomState(42)
+    U = rng.normal(size=(n_users, K))   # user tastes  (skinny, full)
+    V = rng.normal(size=(n_movies, K))  # movie flavours (skinny, full)
+
+    lr, leash = 0.01, 0.1
+    for step in range(2000):
+        pred = U @ V.T                  # blow the two sheets back to a full grid
+        err = np.where(mask, R - pred, 0.0)   # miss on FILLED cells only
+        U += lr * (err @ V - leash * U)       # nudge tastes (with the leash)
+        V += lr * (err.T @ U - leash * V)     # nudge flavours
+
+    full_grid = U @ V.T                 # every blank now filled -> recommendations
+
+    # the heavyweight toolbox route (the surprise package: from sklearn / surprise):
+    #   from sklearn.decomposition import TruncatedSVD   # factor a filled matrix
+    #   or a dedicated library (e.g. `surprise`) for the holey, regularised case
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):
+    [Part 1 -- Looking at a Sheet With No Answers](eda-and-distance.txt) .
+    [Part 2 -- The Strongest Direction (PCA)](the-strongest-direction-pca.txt) .
+    [Part 3 -- Grouping by Nearest Centre (K-Means)](grouping-by-nearest-centre.txt) .
+    [Part 4 -- The Family Tree (Hierarchical Clustering)](the-family-tree-clustering.txt) .
+    [Part 5 -- Both Tools on NCI60 (Re-visited)](nci60-revisited.txt) .
+    Part 6 (this post)
+
+  That is the end of the book.  For quick lookups, see the
+  [Appendix -- Classification Reference](classification-lab.txt) and the
+  [Glossary / Decoder Ring](../glossary.txt).
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
