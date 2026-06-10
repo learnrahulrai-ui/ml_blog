@@ -217,6 +217,8 @@
     put k flags, join each point to nearest  k-means clustering
     move each flag to the centre of its crowd  k-means update step
     pick k by the elbow                   elbow method for k
+    home vs next-door fit score           silhouette coefficient
+    pick k at the highest fit peak        silhouette analysis
     family tree of rows                   hierarchical clustering / dendrogram
     glue the closest pair together        linkage (single / complete / average)
     read the tree top-down, choose cut    cut the dendrogram at a height

@@ -142,6 +142,64 @@
      clear corner, and reasonable people pick different K.  That is honest -- with no
      answer column, there is no single right number of groups.
 
+     If "big vs small by eye" feels like astrology, there is a judgement-free trick:
+     lay a ruler from the FIRST dot of the curve to the LAST dot, then measure how far
+     each dot sags below that ruler.  The dot with the BIGGEST sag is the elbow.  The
+     two endpoints always sag zero, so the answer is forced to sit somewhere in between.
+
+  ## A Second Ruler: How Well Does Each Dot Fit Its Pile?
+
+  The elbow reads ONE number for the whole grouping (total tightness) and asks you to
+  eyeball a bend.  There is a second, sharper question you can ask of EVERY single dot:
+
+    "Are you snug in your own pile -- or would the pile next door fit you better?"
+
+  For one dot, compute two averages:
+
+    a = average gap from this dot to its OWN pile-mates        (how far from home)
+    b = average gap from this dot to the NEAREST OTHER pile    (how far to next door)
+
+    fit score = (b - a) / whichever of a, b is bigger
+
+    near +1   -&gt;  home is much closer than next door.  snug.  well-grouped.
+    near  0   -&gt;  home and next door are the same distance.  on the fence.
+    negative  -&gt;  next door is CLOSER than home.  this dot is in the WRONG pile.
+
+  By hand, on the six dots from before ({1,2,3} and {10,11,12}):
+
+    dot 1:  a = avg gap to {2,3}        = (1 + 2) / 2        = 1.5
+            b = avg gap to {10,11,12}   = (9 + 10 + 11) / 3  = 10
+            fit = (10 - 1.5) / 10  = 0.85      &lt;- snug at home
+
+    dot 3:  a = avg gap to {1,2}        = (2 + 1) / 2        = 1.5
+            b = avg gap to {10,11,12}   = (7 + 8 + 9) / 3    = 8
+            fit = (8 - 1.5) / 8    = 0.81      &lt;- the pile's edge dot, still snug
+
+  Average the fit score over ALL dots and you get one number for the whole grouping.
+  Now run K-means for K = 2, 3, 4, 5 ... and plot that average:
+
+    avg fit |        *
+            |       / \
+            |      /   \
+            |     *     *---*
+            |    /
+            +--------------------- K
+               2    3    4    5
+
+  No bend to squint at -- you just pick the K with the HIGHEST peak.  A clean
+  maximum instead of a fuzzy corner.
+
+  ** KEY: TWO RULERS, SAME QUESTION, PICK DIFFERENTLY
+     The elbow reads TIGHTNESS (squared gaps to centres) and you hunt a BEND.
+     The fit score reads HOME-VS-NEXT-DOOR gaps and you hunt a PEAK.
+     They answer the same "how many groups?" question with different measurements,
+     and the peak is the easier read.  When both agree on K, trust it.
+
+  &gt;&gt; NOTE: THE FIT SCORE STARTS AT K = 2, NOT K = 1
+     With one pile there is no "next door" -- b does not exist, so the score is
+     undefined.  The elbow curve can start at K = 1; the fit-score curve cannot.
+     That is why the loop below runs K = 2 upward.
+
 
   ## Common Tripwires I Caught
 
@@ -174,6 +232,18 @@
        The centre is the MEAN of a pile -- usually a point with no actual row
        sitting on it.  It is the pile's centre of gravity, not a member.
 
+    TRIPWIRE 7:  The fit score's b uses the NEAREST other pile, not all of them.
+       With 3+ piles it is tempting to average the gaps to every foreign dot.
+       Wrong -- b is the average gap to the one CLOSEST foreign pile only.  The
+       question is "would next door fit better?", and next door means the nearest
+       neighbour pile, not the whole neighbourhood.
+
+    TRIPWIRE 8:  Tightness is ONE total, not one-per-dot.
+       Each dot gets a pile label; the GROUPING gets a single tightness number
+       (all the squared gaps summed).  The fit score is the opposite: one score
+       per dot first, averaged into one number at the end.  Do not mix the two
+       shapes up.
+
 
   ## The Labels, Last
 
@@ -186,6 +256,10 @@
     move each centre to its pile's mean   the update step
     tightness (sum of squared gaps)       inertia / within-cluster sum of squares
     the bend in the tightness curve       the elbow method
+    the biggest sag below the ruler       the perpendicular-distance elbow rule
+    home vs next-door fit score           silhouette coefficient
+    average fit over all dots             mean silhouette score
+    pick K at the highest peak            silhouette analysis
     run from several random starts        n_init / multiple restarts
     spread first centres far apart        k-means++ initialisation
     number of piles you pick              K (the n_clusters hyperparameter)
@@ -199,6 +273,7 @@
        .labels_               -- which pile each row landed in (0..K-1)
        .cluster_centers_      -- the final centre of each pile
        .inertia_              -- the tightness score (lower = tighter)
+       silhouette_score(X, labels) -- the average home-vs-next-door fit score
 
     import numpy as np
     import matplotlib.pyplot as plt
@@ -228,6 +303,21 @@
     plt.grid(True, linestyle="--", alpha=0.4)
     plt.show()
     # pick K at the bend
+
+    # the second ruler: average fit score per K  (starts at K=2 -- see the note)
+    from sklearn.metrics import silhouette_score
+    fits = []
+    for k in range(2, 9):
+        km = KMeans(n_clusters=k, n_init=10, random_state=42).fit(X_scaled)
+        fits.append(silhouette_score(X_scaled, km.labels_))
+
+    plt.plot(range(2, 9), fits, marker="o")
+    plt.xlabel("K (number of piles)")
+    plt.ylabel("average fit score (silhouette)")
+    plt.title("Fit score: pick K at the highest peak")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    plt.show()
+    # pick K at the PEAK -- no squinting at a bend
 
 
 ----------------------------------------------------------------------------------------------
