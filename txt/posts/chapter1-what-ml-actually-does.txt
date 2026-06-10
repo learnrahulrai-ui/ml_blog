@@ -94,7 +94,7 @@
   to one working row (rooms=5, income=3):
 
     column     a_j (new)   b_j (work)   gap_j = a_j - b_j   gap_j^2
-    ─────────────────────────────────────────────────────────────────
+    -----------------------------------------------------------------
     rooms      4           5            -1                   1
     income     3           3             0                   0
                                                      sum = 1
@@ -104,12 +104,12 @@
     Now compare the same new row to another working row (rooms=8, income=9):
 
     column     a_j (new)   b_j (work)   gap_j = a_j - b_j   gap_j^2
-    ─────────────────────────────────────────────────────────────────
+    -----------------------------------------------------------------
     rooms      4           8            -4                  16
     income     3           9            -6                  36
                                                      sum = 52
 
-    gap = sqrt(52) ≈ 7.21
+    gap = sqrt(52) ~ 7.21
 
     The first working row (gap=1) is much closer than the second (gap=7.21).
     If k=1, the guess is the first row's price.  If k=3, we average the 3
@@ -133,7 +133,7 @@
   A concrete 4-person worked example, by pencil:
 
     person   truth y    guess yhat    miss r     r^2
-    ──────────────────────────────────────────────────
+    --------------------------------------------------
       A       1.4       1.2          +0.2       0.04
       B       2.8       3.1          -0.3       0.09
       C       0.9       1.0          -0.1       0.01
@@ -141,10 +141,10 @@
                                        sum r^2 = 0.23
 
     mean r^2 = 0.23 / 4 = 0.0575
-    RMSE = sqrt(0.0575) ≈ 0.24
+    RMSE = sqrt(0.0575) ~ 0.24
 
     Typical miss: about $24,000.  The bar to beat: always guessing the average price
-    (here average y = (1.4+2.8+0.9+3.5)/4 = 8.6/4 = 2.15) gives RMSE = std(y) ≈ 0.97.
+    (here average y = (1.4+2.8+0.9+3.5)/4 = 8.6/4 = 2.15) gives RMSE = std(y) ~ 0.97.
     Our rule at RMSE=0.24 is clearly beating the average.
 
   RMSE punishes large single misses more heavily than the plain average of absolute

@@ -27,7 +27,7 @@
   ## The Sheet
 
     State       Murder    Assault    UrbanPop
-    ───────     ──────    ───────    ────────
+    -------     ------    -------    --------
     Alabama      13.2       236         58
     Alaska       10.0       263         48
     Arizona       8.1       294         80
@@ -55,7 +55,7 @@
   With the full sheet in front of you (all 50 states):
 
     column      mean      spread
-    ───────     ─────     ───────
+    -------     -----     -------
     Murder       7.79      4.36
     Assault    170.76     83.34
     UrbanPop    65.54     14.47
@@ -83,7 +83,7 @@
 
   --- STRAIGHT-LINE GAP (Euclidean distance) ---
 
-    gap = sqrt( (m1 - m2)² + (a1 - a2)² + (u1 - u2)² )
+    gap = sqrt( (m1 - m2)^2 + (a1 - a2)^2 + (u1 - u2)^2 )
 
   Square each difference so negative and positive gaps don't cancel.  Add them.
   Take the square root to get back to the original units.
@@ -103,9 +103,9 @@
 
   STRAIGHT-LINE:
 
-    Murder gap:  13.2 - 10.0 = 3.2     squared = 3.2 × 3.2 = 10.24
-    Assault gap: 236 - 263 = -27       squared = 27 × 27 = 729
-    UrbanPop gap: 58 - 48 = 10         squared = 10 × 10 = 100
+    Murder gap:  13.2 - 10.0 = 3.2     squared = 3.2 * 3.2 = 10.24
+    Assault gap: 236 - 263 = -27       squared = 27 * 27 = 729
+    UrbanPop gap: 58 - 48 = 10         squared = 10 * 10 = 100
 
     sum of squares: 10.24 + 729 + 100 = 839.24
     sqrt:  sqrt(839.24) ~= 28.97
@@ -183,9 +183,9 @@
 
   Straight-line gap on standardised numbers:
 
-    Murder gap:  1.24 - 0.51 = 0.73       squared = 0.73 × 0.73 = 0.53
-    Assault gap: 0.78 - 1.11 = -0.33      squared = 0.33 × 0.33 = 0.11
-    UrbanPop:   -0.52 - (-1.21) = 0.69    squared = 0.69 × 0.69 = 0.48
+    Murder gap:  1.24 - 0.51 = 0.73       squared = 0.73 * 0.73 = 0.53
+    Assault gap: 0.78 - 1.11 = -0.33      squared = 0.33 * 0.33 = 0.11
+    UrbanPop:   -0.52 - (-1.21) = 0.69    squared = 0.69 * 0.69 = 0.48
 
     sum of squares: 0.53 + 0.11 + 0.48 = 1.12
     sqrt:  sqrt(1.12) ~= 1.06

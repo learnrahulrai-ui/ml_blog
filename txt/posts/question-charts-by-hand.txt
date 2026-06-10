@@ -148,7 +148,7 @@
   cut's arithmetic done with pencil and paper.  No calculator needed.
 
     person   bmi   age   answer
-    ────────────────────────────
+    ----------------------------
      A      0.18   55     151
      B      0.06   35     121
      C      0.04   25      97
@@ -157,7 +157,7 @@
   STEP 1 -- sort by bmi, find midpoints.
 
     sorted:   C(0.04,97)  B(0.06,121)  D(0.12,135)  A(0.18,151)
-    ├─ between C&B ─┤  ├─ between B&D ─┤  ├─ between D&A ─┤
+    +- between C&B -+  +- between B&D -+  +- between D&A -+
     midpoint:  0.05             0.09             0.15
 
   3 midpoints -> 3 cuts to try.
@@ -169,15 +169,15 @@
             call it 135.7 (close enough to rank against other cuts)
 
     Now measure each miss.  "Squared" = multiply the number by itself.
-    A minus times a minus makes a plus (negative × negative = positive).
+    A minus times a minus makes a plus (negative * negative = positive).
 
-    C:  97 - 97  =    0   0 × 0     =    0
-    B:  121 - 135.7 = -14.7  14.7 × 14.7
-        14 × 14 = 196.  14 × 0.7 = 9.8 (done twice = 19.6).  0.7 × 0.7 = 0.49
+    C:  97 - 97  =    0   0 * 0     =    0
+    B:  121 - 135.7 = -14.7  14.7 * 14.7
+        14 * 14 = 196.  14 * 0.7 = 9.8 (done twice = 19.6).  0.7 * 0.7 = 0.49
         Total: 196 + 19.6 + 0.49 = 216.09.  Call it 216.
-    D:  135 - 135.7 = -0.7  0.7 × 0.7 = 0.49.  Call it 0.5.
-    A:  151 - 135.7 =  15.3  15.3 × 15.3
-        15 × 15 = 225.  15 × 0.3 = 4.5 (done twice = 9).  0.3 × 0.3 = 0.09
+    D:  135 - 135.7 = -0.7  0.7 * 0.7 = 0.49.  Call it 0.5.
+    A:  151 - 135.7 =  15.3  15.3 * 15.3
+        15 * 15 = 225.  15 * 0.3 = 4.5 (done twice = 9).  0.3 * 0.3 = 0.09
         Total: 225 + 9 + 0.09 = 234.09.  Call it 234.
 
     sum = 0 + 216 + 0.5 + 234 = 450.5
@@ -187,10 +187,10 @@
     below:  97 + 121 = 218.  218 / 2 = 109.
     above:  135 + 151 = 286.  286 / 2 = 143.
 
-    C:  97 - 109 = -12.  -12 × -12 = 144  (minus × minus = plus; 12×12=144)
-    B:  121 - 109 =  12.   12 ×  12 = 144
-    D:  135 - 143 =  -8.   -8 ×  -8 =  64  (8×8=64)
-    A:  151 - 143 =   8.    8 ×   8 =  64
+    C:  97 - 109 = -12.  -12 * -12 = 144  (minus * minus = plus; 12*12=144)
+    B:  121 - 109 =  12.   12 *  12 = 144
+    D:  135 - 143 =  -8.   -8 *  -8 =  64  (8*8=64)
+    A:  151 - 143 =   8.    8 *   8 =  64
 
     sum = 144 + 144 + 64 + 64 = 416   <- CHAMPION (smallest)
 
@@ -199,21 +199,21 @@
     below:  97 + 121 = 218.  218 + 135 = 353.  353 / 3 = 117.666...  call it 117.7.
     above:  one person (151) -> mean = 151.  (no arithmetic needed)
 
-    C:  97 - 117.7 = -20.7  20.7 × 20.7
-        20 × 20 = 400.  20 × 0.7 = 14 (done twice = 28).  0.7 × 0.7 = 0.49
+    C:  97 - 117.7 = -20.7  20.7 * 20.7
+        20 * 20 = 400.  20 * 0.7 = 14 (done twice = 28).  0.7 * 0.7 = 0.49
         Total: 400 + 28 + 0.49 = 428.49.  Call it 429.
-    B:  121 - 117.7 = 3.3  3.3 × 3.3
-        3 × 3 = 9.  3 × 0.3 = 0.9 (done twice = 1.8).  0.3 × 0.3 = 0.09
+    B:  121 - 117.7 = 3.3  3.3 * 3.3
+        3 * 3 = 9.  3 * 0.3 = 0.9 (done twice = 1.8).  0.3 * 0.3 = 0.09
         Total: 9 + 1.8 + 0.09 = 10.89.  Call it 11.
-    D:  135 - 117.7 = 17.3  17.3 × 17.3
-        17 × 17 = 289.  17 × 0.3 = 5.1 (done twice = 10.2).  0.3 × 0.3 = 0.09
+    D:  135 - 117.7 = 17.3  17.3 * 17.3
+        17 * 17 = 289.  17 * 0.3 = 5.1 (done twice = 10.2).  0.3 * 0.3 = 0.09
         Total: 289 + 10.2 + 0.09 = 299.29.  Call it 299.
-    A:  151 - 151 = 0.  0 × 0 = 0.
+    A:  151 - 151 = 0.  0 * 0 = 0.
 
   Champion table:
 
     cut at    sum of squared misses
-    ────────────────────────────────
+    --------------------------------
     0.05      451.5
     0.09      416    <- smallest -> first question
     0.15      739
@@ -247,7 +247,7 @@
   Champion-of-champions table:
 
       column   champion cut   badness
-      ───────────────────────────────
+      -------------------------------
       bmi          0.09         416
       age            40         416
 

@@ -75,7 +75,7 @@
     patient X:  bmi=0.06, age=0.04, bp=0.02, ...
 
     tree #    guess for patient X
-    ──────────────────────────────
+    ------------------------------
      1        151
      2        134
      3        163
@@ -116,7 +116,7 @@
   Spread out on paper, the OOB looks like this:
 
     sticky note   missed people   tree guesses   OOB error
-    ──────────────────────────────────────────────────────
+    ------------------------------------------------------
        1          p4, p6          yes               42
        2          p1, p3, p7      yes               38
        3          p2, p5          yes               45
@@ -244,7 +244,7 @@
     4 patients, 3 stumps.  Each stump is max_depth=1 (one question -- a STUMP).
 
     person  answer  stump1_guess  leftover1  stump2_guess  leftover2  stump3_guess  leftover3
-    ─────── ─────── ───────────── ────────── ───────────── ────────── ───────────── ──────────
+    ------- ------- ------------- ---------- ------------- ---------- ------------- ----------
        A      151       140          11          8             3          2            1
        B       75        80          -5         -4            -1          0           -1
        C      141       130          11          8             3          2            1
@@ -290,7 +290,7 @@
   noise.  Hold out 30% of the study pile as validation and watch the error:
 
     iteration  validation MSE    direction
-    ────────────────────────────────────────
+    ----------------------------------------
        0         40.2            baseline (mean only)
       10         34.1            down
       20         31.3            down
@@ -352,7 +352,7 @@
   Repeat for every column.  Build a table:
 
     column      true MSE    scrambled MSE    jump
-    ──────────────────────────────────────────────
+    ----------------------------------------------
     radius        25           45             +20   <- mattered
     texture       25           38             +13   <- mattered some
     smoothness    25           26             + 1   <- didn't matter
@@ -400,7 +400,7 @@
   Slide: fake bmi = 0.01 for ALL 88 people.
 
     person  fake_bmi  path                      guess
-    ──────────────────────────────────────────────────
+    --------------------------------------------------
     p1      0.01      bmi>0.045? NO -> age>30? NO      100
     p2      0.01      NO -> age>30? YES                 120
     p3      0.01      NO -> age>30? YES                 120
@@ -413,7 +413,7 @@
   Now fake bmi = 0.06 for ALL 88 people:
 
     person  fake_bmi  path                      guess
-    ──────────────────────────────────────────────────
+    --------------------------------------------------
     p1      0.06      bmi>0.045? YES -> bmi>0.075? NO  180
     p2      0.06      YES -> bmi>0.075? NO              180
     ...
@@ -425,7 +425,7 @@
   Now repeat for fake bmi values [0.01, 0.03, 0.06, 0.09]:
 
     fake bmi    avg guess across 88 people
-    ────────────────────────────────────────
+    ----------------------------------------
     0.01        (100 + 120 + 120 + ... + 100) / 88  =  115
     0.03        same as 0.01  (still below 0.045)   =  115
     0.06        everyone above 0.045 -> all 180      =  180
@@ -434,29 +434,29 @@
   Plot:
 
     guess
-      ↑
-    180 ━━━━━━━━━━━━━━━━━━━━━━━━  ← PDP (one line, average of all 88)
-      │
-    115 ━━━━━━━━━━━━━━━━━━━━━━━━
-      └─────┬────────┬────────┬──→ bmi
+      ^
+    180 ========================  <- PDP (one line, average of all 88)
+      |
+    115 ========================
+      +-----+--------+--------+---> bmi
           0.01     0.06     0.09
 
   PDP mixes people.  It shows the crowd average.  ICE (Individual Conditional
   Expectation) shows EACH person's line:
 
     guess
-      ↑
-    180 ────────────────────────  ← p2,p3 (age>30, jump together)
-      │       ╱
-    120 ──────╱──────────────────  ← p2,p3 start here
-      │     ╱
-    100 ─╱──────────────────────  ← p1,p88 (age<=30, start lower)
-      └─────┬────────┬────────┬──→ bmi
+      ^
+    180 ------------------------  <- p2,p3 (age>30, jump together)
+      |       /
+    120 ------/------------------  <- p2,p3 start here
+      |     /
+    100 -/----------------------  <- p1,p88 (age<=30, start lower)
+      +-----+--------+--------+---> bmi
           0.01     0.06     0.09
 
-    p1:  100 ─────────────── 180   (jumps at bmi>0.045)
-    p2:  120 ─────────────── 180   (already higher at low bmi)
-    p88: 100 ─────────────── 180   (same as p1)
+    p1:  100 --------------- 180   (jumps at bmi>0.045)
+    p2:  120 --------------- 180   (already higher at low bmi)
+    p88: 100 --------------- 180   (same as p1)
 
     All 88 lines jump at the SAME fake bmi (the cut point 0.045).
     But some start at 100, some at 120.  ICE shows this spread.

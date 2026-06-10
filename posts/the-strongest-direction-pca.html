@@ -42,7 +42,7 @@
     178 wines.  13 chemical measurements.  One row per wine.
 
       wine    alcohol   malic_acid   ash    ...   proline
-      ─────   ───────   ─────────   ────   ...   ───────
+      -----   -------   ---------   ----   ...   -------
        1       14.23      1.71      2.43   ...   1065.0
        2       13.20      1.78      2.14   ...   1050.0
        3       13.16      2.36      2.67   ...   1185.0
@@ -63,7 +63,7 @@
     |   *     *    |
     | *       *  * |
     |              |
-    ────────────────
+    ----------------
     shadow on the wall
 
   The shadow flattens the 13 walls into 1 line.  The dots that were far apart in
@@ -87,7 +87,7 @@
   the room on paper and see the shadow with your own eyes.
 
     wine    alcohol    color_intensity
-    ─────   ───────    ───────────────
+    -----   -------    ---------------
      A        13.0          5.0
      B        13.5          7.0
      C        14.0          4.0
@@ -107,39 +107,39 @@
   line until the dots spread along it as far as possible.  The answer (by
   formula, not flashlight) is a weighted combination of the two columns:
 
-    PC1 = 0.71 × alcohol_z + 0.71 × color_z
+    PC1 = 0.71 * alcohol_z + 0.71 * color_z
 
   This is a RECIPE: take 0.71 parts of alcohol score, add 0.71 parts of color
   score.  The resulting number is each wine's PC1 coordinate.
 
-    A: 0.71 × (-1.15) + 0.71 × (-0.39) = -0.82 + -0.28 = -1.09
-    B: 0.71 × (-0.38) + 0.71 × (1.16)  = -0.27 +  0.82 =  0.55
-    C: 0.71 × (0.38)  + 0.71 × (-1.16) =  0.27 + -0.82 = -0.55
-    D: 0.71 × (1.15)  + 0.71 × (0.39)  =  0.82 +  0.28 =  1.09
+    A: 0.71 * (-1.15) + 0.71 * (-0.39) = -0.82 + -0.28 = -1.09
+    B: 0.71 * (-0.38) + 0.71 * (1.16)  = -0.27 +  0.82 =  0.55
+    C: 0.71 * (0.38)  + 0.71 * (-1.16) =  0.27 + -0.82 = -0.55
+    D: 0.71 * (1.15)  + 0.71 * (0.39)  =  0.82 +  0.28 =  1.09
 
   PC1 spreads from -1.09 to +1.09.  PC2 is the next shadow at a right angle:
 
-    PC2 = -0.71 × alcohol_z + 0.71 × color_z
+    PC2 = -0.71 * alcohol_z + 0.71 * color_z
 
-    A: -0.71 × (-1.15) + 0.71 × (-0.39) = 0.82 + -0.28 = 0.54
-    B: -0.71 × (-0.38) + 0.71 × (1.16)  = 0.27 +  0.82 = 1.09
-    C: -0.71 × (0.38)  + 0.71 × (-1.16) = -0.27 + -0.82 = -1.09
-    D: -0.71 × (1.15)  + 0.71 × (0.39)  = -0.82 +  0.28 = -0.54
+    A: -0.71 * (-1.15) + 0.71 * (-0.39) = 0.82 + -0.28 = 0.54
+    B: -0.71 * (-0.38) + 0.71 * (1.16)  = 0.27 +  0.82 = 1.09
+    C: -0.71 * (0.38)  + 0.71 * (-1.16) = -0.27 + -0.82 = -1.09
+    D: -0.71 * (1.15)  + 0.71 * (0.39)  = -0.82 +  0.28 = -0.54
 
   Plot each wine at (PC1, PC2):
 
-    PC2 ↑
-     1.0 │                B
-        │
-     0.5 │    A
-        │
-     0.0 ──────────────────────→ PC1
-        │
-    -0.5 │                D
-        │
-    -1.0 │    C
-        │
-         ─────┬────┬────┬────
+    PC2 ^
+     1.0 |                B
+        |
+     0.5 |    A
+        |
+     0.0 -----------------------&gt; PC1
+        |
+    -0.5 |                D
+        |
+    -1.0 |    C
+        |
+         -----+----+----+----
            -1.0  -0.5   0   0.5  1.0
 
   The dots spread more along PC1 than PC2.  PC1 captures the stronger pattern.
@@ -157,7 +157,7 @@
     PC2 fraction = 0.69 / 1.40 = 0.49  (49%)
 
   (Note: the exact variances depend on the eigenvalues; the 2D worked example
-  above gives PC1 ≈ 0.70, PC2 ≈ 0.69, so fractions are close to half each.)
+  above gives PC1 ~ 0.70, PC2 ~ 0.69, so fractions are close to half each.)
 
   With 2 original columns, each PC carries about half the information.  With
   the real 13-column wine data, PC1 carries ~36%, PC2 carries ~19%, and the
@@ -172,7 +172,7 @@
     PC3: 11%   cumulative: 66%
     PC4:  7%   cumulative: 73%
     PC5:  5%   cumulative: 78%
-    PC6:  4%   cumulative: 82%  ← past 80%
+    PC6:  4%   cumulative: 82%  &lt;- past 80%
 
   With 5 PCs you have ~78%.  With 6 PCs you have ~82%.  Most of the structure
   is captured in the first 5 or 6 shadows.  The remaining 7 PCs carry mostly
@@ -182,7 +182,7 @@
 
   Each PC is a RECIPE -- how much of each original column goes into it.
 
-    PC1 = 0.14 × alcohol + 0.16 × malic_acid + ... + 0.32 × proline
+    PC1 = 0.14 * alcohol + 0.16 * malic_acid + ... + 0.32 * proline
 
   The numbers (loadings) tell you which columns the PC leans on.  A high loading
   means that column is important for that PC.  For PC1 on the wine data, the
@@ -196,7 +196,7 @@
   page.
 
     wine    PC1       PC2
-    ─────   ──────    ──────
+    -----   ------    ------
      1      2.13     -0.45
      2      1.62     -0.85
      3      2.05      0.32
@@ -217,8 +217,8 @@
 
   The more PCs you keep, the less blur:
 
-    keep 2 PCs:  MSE ≈ 0.45
-    keep 5 PCs:  MSE ≈ 0.19
+    keep 2 PCs:  MSE ~ 0.45
+    keep 5 PCs:  MSE ~ 0.19
     keep all 13: MSE = 0.00 (perfect, but pointless)
 
   Reconstruction error measures "how much structure was lost" when you
