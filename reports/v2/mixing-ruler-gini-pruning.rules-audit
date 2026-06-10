@@ -1,0 +1,27 @@
+mixing-ruler-gini-pruning:
+
+=================================================================
+RULES CORRELATION:
+
+  |L| = 478
+  |paragraphs| = 133
+
+SECTION A (Axiomatic Derivation):
+  A1: Line N uses {1..N-1}         OK
+  A8: Track NEW THINGS               [see below]
+
+SECTION B (Numerical-First):
+  B1: Start with numbers             [auto]
+
+SECTION C (Tutoring):
+  C12: Steps not solutions           OK
+
+=================================================================
+NEW THINGS INTRODUCED WITHOUT DERIVATION:
+
+  × pile
+  × mean
+
+  RESULT: REJECTED (undefined items)
+
+=================================================================

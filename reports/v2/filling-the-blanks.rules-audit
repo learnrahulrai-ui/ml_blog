@@ -1,0 +1,27 @@
+filling-the-blanks:
+
+=================================================================
+RULES CORRELATION:
+
+  |L| = 443
+  |paragraphs| = 107
+
+SECTION A (Axiomatic Derivation):
+  A1: Line N uses {1..N-1}         OK
+  A8: Track NEW THINGS               [see below]
+
+SECTION B (Numerical-First):
+  B1: Start with numbers             [auto]
+
+SECTION C (Tutoring):
+  C12: Steps not solutions           OK
+
+=================================================================
+NEW THINGS INTRODUCED WITHOUT DERIVATION:
+
+  × fit
+  × centre
+
+  RESULT: REJECTED (undefined items)
+
+=================================================================
