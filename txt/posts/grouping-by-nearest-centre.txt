@@ -60,7 +60,7 @@
 
     dots:   1   2   3       10  11  12
 
-  Drop two starting centres.  Say we unluckily pick 2 and 10.
+  Drop two starting centres.  Say the random pick lands on 2 and 10.
 
     ROUND 1 -- ASSIGN (each dot to nearest centre):
       dot 1  -> centre 2  (gap 1 vs 9)     pile A
