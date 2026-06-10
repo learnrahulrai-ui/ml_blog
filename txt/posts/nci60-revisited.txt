@@ -102,6 +102,52 @@
      the labels influence the grouping, you are no longer doing unsupervised learning; you
      are just drawing the answer you already had.
 
+  ## Scoring Two Groupings Against Each Other (One Number)
+
+  Run K-means and the family tree on the same sheet and you get two columns of pile
+  numbers.  Did the two tools find the SAME groups?  You cannot just line the columns
+  up and check row by row, because the pile numbers are arbitrary STICKERS:
+
+    dot    K-means    family tree
+     1        2            1
+     2        2            1
+     3        0            3
+
+  Every row "disagrees" on the number -- yet the two tools may have built identical
+  groups.  K-means called a pile "2" where the tree called the same pile "1".  Asking
+  "is 2 == 1?" tests the stickers, not the grouping.
+
+  The fix is to stop comparing names and compare PAIRS instead.  Take two dots at a
+  time and ask each tool one sticker-free question: are these two TOGETHER or APART?
+
+    pair (dot 1, dot 2):  K-means 2,2 -> together.  tree 1,1 -> together.  AGREE.
+    pair (dot 1, dot 3):  K-means 2,0 -> apart.     tree 1,3 -> apart.     AGREE.
+
+  Walk every pair, count how often the two tools AGREE (both "together" or both
+  "apart"), divide by the number of pairs.  That fraction is the raw agreement.
+
+  But raw agreement flatters garbage.  Two blindfolded taggers slapping random pile
+  numbers on the dots will still AGREE on most pairs -- because in any grouping most
+  pairs land APART, and apart-plus-apart counts as agreement by sheer luck.  So the
+  raw fraction sits fat above zero even for nonsense.
+
+  The cure is to slide the zero onto that luck mark:
+
+    raw ruler:        0 ----------- luck ------- 1
+    re-zeroed ruler:      (minus) -- 0 --------- 1
+                      worse-than-luck  luck      identical groupings
+
+  The re-zeroed score is the ADJUSTED RAND SCORE.  It reads +1 when the two groupings
+  are identical, 0 when they agree no better than two blindfolded taggers, and goes
+  negative when they agree even LESS than random.
+
+  ** KEY: ONE NUMBER, AND IT DOES NOT CARE WHICH TOOL YOU NAME FIRST
+     The score asks "do these two dots get the same fate in both groupings?" -- a
+     question that reads the same backwards.  Swapping the two columns leaves every
+     pair's together/apart answer untouched, so the score never changes.  It is a
+     symmetric agreement number, not "how well did tool B copy tool A".
+
+
   ## Why Two Tools, Not One
 
   PCA and clustering answer different questions and back each other up:
@@ -144,6 +190,18 @@
        K-means assumes round blobs; the tree depends on the linkage.  Comparing them
        is itself informative: agreement is a good sign the groups are real.
 
+    TRIPWIRE 7:  Pile numbers are stickers -- never compare them directly.
+       Tool A's "pile 2" and tool B's "pile 1" can be the EXACT same dots.  Lining
+       the two label columns up and checking "2 == 1?" tests the arbitrary names,
+       not the grouping.  Compare PAIRS (together/apart) instead, which is what the
+       adjusted Rand score does under the hood.
+
+    TRIPWIRE 8:  Raw agreement flatters random labels; re-zero at chance.
+       Most pairs land apart in any grouping, so apart-plus-apart racks up
+       "agreement" by luck -- two random taggers still score fat above zero.  The
+       adjusted Rand score subtracts that luck baseline, so 0 means chance-level and
+       +1 means identical.  Reading the raw fraction makes nonsense look like a match.
+
 
   ## The Labels, Last
 
@@ -157,6 +215,8 @@
     muddled group                         low-purity / mixed cluster
     side-by-side count table              contingency table / confusion of clusters vs labels
     everything is far from everything     the curse of dimensionality
+    together-or-apart, then agree/disagree  pair-counting (the Rand index)
+    re-zeroed agreement score (-1..1)     adjusted Rand score (adjusted_rand_score)
 
 
   ## The Code, If You Want It
@@ -165,6 +225,7 @@
        pd.crosstab(a, b)     -- the side-by-side count table (groups vs true types)
        PCA(n_components=k)    -- crush to k strongest shadows (from Part 2)
        KMeans / linkage       -- the grouping tools (from Parts 3 and 4)
+       adjusted_rand_score(a, b) -- do two groupings agree? one number, -1..1
 
     import numpy as np
     import pandas as pd
@@ -189,6 +250,10 @@
     # cluster on the crushed scores
     km_labels = KMeans(n_clusters=4, n_init=10, random_state=42).fit_predict(scores)
     agg_labels = AgglomerativeClustering(n_clusters=4, linkage="ward").fit_predict(scores)
+
+    # do the two tools agree?  one number, sticker-free (+1 identical, 0 chance)
+    from sklearn.metrics import adjusted_rand_score
+    print(adjusted_rand_score(km_labels, agg_labels))   # swapping args = same score
 
     # grade blind groups against the sealed types (the peek)
     print(pd.crosstab(pd.Series(km_labels, name="group"),

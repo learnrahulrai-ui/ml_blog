@@ -166,6 +166,41 @@
   the real 13-column wine data, PC1 carries ~36%, PC2 carries ~19%, and the
   rest scatters across PCs 3-13.
 
+  ## Why Kept + Lost Always Adds Back to the Same Total
+
+  Here is the lock that makes the fraction trustworthy.  Take one dot and the line
+  it casts its shadow on.  Draw three lengths:
+
+    stick    = straight line from the middle (origin) to the dot
+    shadow   = how far the dot's shadow lands along the line  (KEPT)
+    perp     = the dot's sideways gap off the line            (LOST)
+
+         * dot
+        /|
+   stick |  perp (off the line)
+      /  |
+    -+---+-------- the line
+     middle  shadow (along the line)
+
+  Those three make a right angle, so Pythagoras locks them:
+
+    stick^2  =  shadow^2  +  perp^2
+
+  The stick was fixed the moment you measured the dot -- spinning the line never
+  changes it.  Spinning only shuffles the split between shadow and perp.  Add this
+  over all the dots:
+
+    sum of stick^2  =  sum of shadow^2  +  sum of perp^2
+    (what the dots ARE)  (what the drawing KEEPS)  (what flattening LOSES)
+
+  The left side never moves.  So the line that KEEPS the most (biggest sum of
+  shadow^2) is automatically the line that LOSES the least (smallest sum of perp^2).
+  Most-kept and least-lost are the same line seen from two sides -- which is why PC1,
+  the longest-shadow direction, is also the smallest-reconstruction-error direction.
+  And the kept fraction is just:
+
+    kept fraction  =  sum of shadow^2  /  sum of stick^2
+
   ## Choosing How Many Shadows to Keep
 
   Add the fractions from the biggest shadows downward until you hit 80%:
@@ -268,12 +303,30 @@
        extreme wine in the 2D crushed view.  It might be an outlier or
        just a very distinctive chemical profile.  Worth checking.
 
+    TRIPWIRE 8:  A low kept-fraction means the PICTURE LIES -- do not read groups off it.
+       When PC1+PC2 keep only, say, 40% of the spread, 60% died in the
+       sideways gaps -- and that lost 60% can hold two dots that are far
+       apart in truth but land on the SAME spot in the drawing.  Two real
+       islands can print as one, or one as two.  Trust the islands you see
+       only when the kept fraction is high (close to 1); a low fraction means
+       the flat page is hiding most of the real placement.
+
+    TRIPWIRE 9:  The kept fraction divides by the TOTAL spread, not the dot count.
+       The fraction is sum(shadow^2) / sum(stick^2) -- a slice of the spread
+       pie over the whole pie.  Dividing by the number of dots instead gives
+       "spread per dot", a per-head number that is not a fraction at all and
+       will not land between 0 and 1.
+
 
   ## The Labels, Last
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     crush a many-wall room to flat        dimensionality reduction
+    stick from middle to dot              the centred data vector (its norm)
+    shadow along the line (kept)          the PC score / projection
+    sideways gap off the line (lost)      the reconstruction residual
+    stick^2 = shadow^2 + perp^2           Pythagoras / orthogonal decomposition
     longest shadow / strongest direction  first principal component (PC1)
     second shadow (at right angle)        second principal component (PC2)
     the recipe for a shadow               loadings / components_

@@ -125,6 +125,36 @@
   tree idea, opposite direction.  This whole post is bottom-up.
 
 
+  ## Reading the Merge Diary (the Z Table)
+
+  Every wedding writes one line in a diary.  With 50 states there are 49 weddings,
+  so the diary has 49 rows.  Four columns per row:
+
+    column:    0          1         2           3
+              who         who      gap        headcount
+    row 0     dot17      dot42    0.31          2        <- first wedding (closest pair)
+    row 1     dot3       dot9     0.44          2
+    ...
+    row -1    group      group    7.0          50        <- last wedding = the ROOT
+
+  Column 2 is the GAP each wedding happened at -- the same height the dendrogram
+  draws.  Because the family tree always marries the CLOSEST pair left, that gap can
+  only grow as you walk down the diary: every wedding is at least as far apart as the
+  one before.  So the BIGGEST gap is always the LAST row -- the root, where the final
+  two camps are forced together.
+
+    Z[-1, 2]  =  last row, gap column  =  the root's height  =  the biggest merge gap
+
+  That one number is the fingerprint of the whole tree's top: big means the two
+  top-level camps stood genuinely far apart (the groups mean something); small means
+  everything was mushed close together anyway.
+
+  >> NOTE: ROW -1 MEANS "LAST ROW", COUNTING FROM THE BOTTOM
+     Instead of remembering the diary has 49 rows and writing Z[48, 2], the minus
+     sign counts from the end: -1 is the last row, -2 the second-to-last.  Z[-1, 2]
+     reads the root's gap without you ever counting the rows.
+
+
   ## Common Tripwires I Caught
 
     TRIPWIRE 1:  Standardise first -- again.
@@ -164,6 +194,12 @@
        married is a SINGLE.  Calling lone dots "groups" inflates the group
        count and makes later steps confusing to count.
 
+    TRIPWIRE 8:  The biggest merge gap is always the LAST row, never the first.
+       The diary's gap column (column 2) only grows downward -- closest pairs
+       marry first, far-apart camps marry last.  So the root's gap sits in row
+       -1, and reaching for row 0 gives you the SMALLEST gap (the first twins),
+       the exact opposite of what you wanted.
+
 
   ## The Labels, Last
 
@@ -180,6 +216,8 @@
     least-extra-tightness marriage        Ward linkage
     start whole, split down               divisive (top-down) clustering
     the sheet of gaps (from Part 1)       the pairwise distance matrix
+    the merge diary (Z table)             the linkage matrix
+    the root's gap (Z[-1, 2])             the maximum merge distance
 
 
   ## The Code, If You Want It
