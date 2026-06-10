@@ -61,13 +61,16 @@
        marry them at height 2  ->  {1,2} {6,8}
 
     WEDDING 3 -- only two groups left: {1,2} and {6,8}.
-       their gap (more on this below) is about 6.  marry at height 6.
+       Using COMPLETE linkage (farthest cross-pair), list all four cross-pair gaps:
+         |1-6| = 5,  |1-8| = 7,  |2-6| = 4,  |2-8| = 6
+       Complete linkage takes the FARTHEST: max(5, 7, 4, 6) = 7.
+       marry at height 7.
        ->  {1,2,6,8}   one family.  done.
 
-  Three weddings, at heights 1, 2, and 6.  Draw them as a tree:
+  Three weddings, at heights 1, 2, and 7.  Draw them as a tree:
 
     height
-      6 |      +--------------+
+      7 |      +--------------+
         |      |              |
       2 |      |          +---+---+
         |      |          |       |
@@ -75,7 +78,7 @@
         |  |       |      |       |
       0 +--1-------2------6-------8---
              twins        twins
-        \____ joined late at height 6 ____/
+        \____ joined late at height 7 ____/
 
   That tree is the DENDROGRAM.  Tall joins = forced marriages between unlike groups.
   Short joins = natural twins.
@@ -86,8 +89,8 @@
   tree, by drawing one horizontal line across it.
 
     cut LOW (height 1.5):  3 groups -> {1,2} {6} {8}
-    cut MID (height 4):    2 groups -> {1,2} {6,8}
-    cut HIGH (height 7):   1 group  -> everybody
+    cut MID (height 3):    2 groups -> {1,2} {6,8}
+    cut HIGH (height 8):   1 group  -> everybody
 
   The number of branches your line slices through = the number of groups.  One tree, every
   possible K, read off by sliding a ruler up and down.  Cut just below the tallest jump and

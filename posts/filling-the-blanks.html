@@ -60,7 +60,12 @@
 
        Ann's tastes:    sci-fi 0.9,  romance 0.1
        Alien's flavour: sci-fi 0.8,  romance 0.0
-       guess = 0.9 x 0.8 + 0.1 x 0.0 = 0.72  -&gt; scaled up to ~4 stars
+       guess = 0.9 x 0.8 + 0.1 x 0.0 = 0.72
+
+  (The actual numbers the machine finds won't be tidy 0.9 and 0.8; those
+   are for illustration.  The optimiser picks whatever scale makes the
+   predicted ratings match the true ones -- so if real ratings are 1-5
+   the factors end up in a range that produces 1-5 predictions.)
 
   High when taste lines up with flavour, low when it does not.  That is the whole engine.
 
