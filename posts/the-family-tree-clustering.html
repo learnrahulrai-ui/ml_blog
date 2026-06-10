@@ -54,6 +54,11 @@
   groups that married).  Early weddings happen at tiny heights -- near-twins joining.
   Late weddings happen way up high -- forcing together groups that are nothing alike.
 
+  &gt;&gt; NOTE: NO DICE IN THIS MACHINE
+     K-means (Part 3) starts from random flags and can land badly -- you re-run it ten
+     times and keep the best.  The family tree has no random start at all: the same
+     sheet of gaps gives the SAME tree, every single run.  Nothing to re-roll.
+
   ## A Worked Example, by Hand
 
   Four dots on one ruler.  Gaps are just differences.
@@ -111,11 +116,17 @@
   and the choice changes the whole tree:
 
     SINGLE linkage    = gap between the two CLOSEST members (nearest edge to nearest edge)
-                        -&gt; makes long straggly chains; one bridge dot links two clumps
+                        -&gt; makes long straggly chains: one close pair of toes is enough
+                           to bridge two whole crowds, so groups grow by CHAINING
     COMPLETE linkage  = gap between the two FARTHEST members (worst case)
-                        -&gt; makes tight compact balls; cautious about marrying
+                        -&gt; makes tight compact balls; cautious about marrying.  The
+                           price: one loner inside a group speaks for the WHOLE group's
+                           gap to everyone -- loner-sensitive
     AVERAGE linkage   = average gap over all cross-pairs
                         -&gt; a sensible middle
+
+  Build the tree under all three from the same sheet and the root heights line up
+  single &lt; average &lt; complete -- the cautious worst-case rule always waits longest.
     WARD linkage      = marry the pair that adds the LEAST extra tightness (Part 3's
                         inertia idea) -&gt; tends to give even, round, similar-sized groups
 
@@ -124,6 +135,30 @@
      SAME sheet of gaps.  Ward is the common default for blob-like data; single linkage
      is the one to reach for when groups are long thin shapes (and the one to fear when
      you do not want chaining).  Always say which linkage you used.
+
+  ## The Engine Never Re-Measures (the Row-Merge Trick)
+
+  A worry, caught while building it by hand: after every wedding, must you re-measure
+  the gap from the new group to everybody else?  With 150 rows the starting sheet
+  already holds 150 x 149 / 2 = 11,175 gaps -- re-measuring after each of 149 weddings
+  sounds crushing.
+
+  You never re-measure.  Most gaps do not involve the newly-weds at all and sit
+  untouched.  And under complete linkage, even the gaps that DO touch the new group are
+  built from numbers already on the sheet:
+
+    new group {A,B}, any outsider C:
+      gap(new group, C) = max( gap(A,C), gap(B,C) )   &lt;- both already written down
+
+  So one wedding costs three cheap moves:
+
+    1. delete A's row and B's row from the sheet
+    2. add ONE new row: position by position, keep the BIGGER of the two old numbers
+    3. scan for the new smallest gap -&gt; that pair marries next
+
+  The ruler comes out once, at the very start.  After that, the entire tree is built by
+  comparing numbers you already have -- no dot is ever measured twice.
+
 
   ## Agglomerative (Bottom-Up) vs Divisive (Top-Down)
 
@@ -190,10 +225,11 @@
        gap is locked in even if it looks wrong later.  Like the decision tree in
        Chapter 5, every step is locally best, not globally guaranteed.
 
-    TRIPWIRE 6:  It does not scale cheaply.
-       Building and re-scanning the full sheet of gaps costs a lot once you have many
-       thousands of rows.  K-means is far cheaper at large scale; the family tree
-       shines when you have a few hundred rows and want the whole hierarchy.
+    TRIPWIRE 6:  It does not scale cheaply -- count it.
+       The sheet of gaps holds N x (N-1) / 2 numbers.  50 rows -&gt; 1,225 gaps.
+       150 rows -&gt; 11,175.  10,000 rows -&gt; about 50 MILLION, before the first
+       wedding even happens.  K-means is far cheaper at large scale; the family
+       tree shines when you have a few hundred rows and want the whole hierarchy.
 
     TRIPWIRE 7:  An unpaired dot is a SINGLE, not a group of one.
        After the very first wedding you have N-2 singles and 1 pair.  Every
@@ -207,6 +243,12 @@
        marry first, far-apart camps marry last.  So the root's gap sits in row
        -1, and reaching for row 0 gives you the SMALLEST gap (the first twins),
        the exact opposite of what you wanted.
+
+    TRIPWIRE 9:  .idxmax() hands you the NAME; .max() hands you the NUMBER.
+       Describing each group ("which group runs highest on Murder?"), the question
+       wants a group NAME -- that is .idxmax().  Reaching for .max() returns the
+       value itself, a different question, and the two read almost identically in
+       code.  Say out loud which one the question asks for BEFORE typing the dot.
 
 
   ## The Labels, Last
@@ -226,6 +268,7 @@
     the sheet of gaps (from Part 1)       the pairwise distance matrix
     the merge diary (Z table)             the linkage matrix
     the root's gap (Z[-1, 2])             the maximum merge distance
+    the row-merge trick (keep the bigger)  the Lance-Williams update (complete linkage)
 
 
   ## The Code, If You Want It
@@ -257,6 +300,11 @@
 
     # cut into 3 groups
     groups = fcluster(Z, t=3, criterion="maxclust")   # one label per row
+
+    # describe each group: the middle of every column, per group
+    desc = df.assign(group=groups).groupby("group").mean()
+    desc["Murder"].idxmax()   # NAME of the group where Murder runs highest
+    desc["Murder"].max()      # the number itself -- a different question
 
     # the sklearn one-shot equivalent
     from sklearn.cluster import AgglomerativeClustering
