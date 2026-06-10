@@ -157,6 +157,13 @@
        thousands of rows.  K-means is far cheaper at large scale; the family tree
        shines when you have a few hundred rows and want the whole hierarchy.
 
+    TRIPWIRE 7:  An unpaired dot is a SINGLE, not a group of one.
+       After the very first wedding you have N-2 singles and 1 pair.  Every
+       dot that has not yet married is still just itself -- do NOT call it
+       "a group of one."  A GROUP is formed by a wedding; a dot that has not
+       married is a SINGLE.  Calling lone dots "groups" inflates the group
+       count and makes later steps confusing to count.
+
 
   ## The Labels, Last
 

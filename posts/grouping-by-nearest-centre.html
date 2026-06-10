@@ -226,7 +226,10 @@
     TRIPWIRE 5:  Tightness (inertia) always falls as K rises.
        You cannot pick K by "smallest tightness" -- that just picks the biggest K
        (one centre per dot, tightness 0, useless).  You pick K at the ELBOW, where
-       the falling stops paying off.
+       the falling stops paying off.  Chasing the "smallest DROP between neighbouring
+       K values" is equally wrong: the smallest drop is always at the far right, where
+       tightness is nearly flat and each extra centre barely moves the needle.  The
+       smallest drop is a way of finding the most useless K, not the most useful one.
 
     TRIPWIRE 6:  A centre is not a real dot.
        The centre is the MEAN of a pile -- usually a point with no actual row
@@ -243,6 +246,27 @@
        (all the squared gaps summed).  The fit score is the opposite: one score
        per dot first, averaged into one number at the end.  Do not mix the two
        shapes up.
+
+    TRIPWIRE 9:  .labels_ gives pile number, not distance.
+       After .fit, km.labels_ holds one integer per row -- which pile that
+       row landed in (0, 1, 2 ... K-1).  It tells you WHICH pile, not HOW
+       FAR from its centre.  To get distances, call km.transform(X), which
+       returns a gap-to-every-centre matrix.
+
+    TRIPWIRE 10:  STOP means no dot switched pile -- not "distances stopped changing."
+       The loop halts when an entire round produces zero pile-switches: every
+       dot ends in the same pile it was already in.  A dot CAN keep the same
+       label while its distance to the centre changes -- the centre moved
+       because its other pile-mates shifted.  The STOP check is "did this
+       round's assignment exactly match the previous round's?" not "did the
+       distances stop shrinking?"
+
+    TRIPWIRE 11:  Distance lives only in the ASSIGN step.
+       Two moves, one loop.  ASSIGN uses the straight-line gap to choose the
+       nearest centre.  UPDATE uses column means to recompute each centre --
+       no distances anywhere.  The UPDATE step averages coordinates; it never
+       measures a gap.  Keeping the two moves separate makes the whole
+       algorithm a lot cleaner to reason about.
 
 
   ## The Labels, Last
