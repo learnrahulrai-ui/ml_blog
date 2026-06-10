@@ -1,0 +1,123 @@
+AUDIT REPORT: RULE 3 (SYMBOLIC AXIOMATIC DERIVATION)
+TIMESTAMP: 20260611_154500
+
+1. /txt/posts/chapter1-what-ml-actually-does.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "@title Chapter 1", "Rule 1 -- Ask the Closest Rows", "We measure the distance..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Starts with metadata and prose)
+
+2. /txt/posts/the-trade-curve.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "@title The Trade Curve", "The Area Under the Curve", "Sensitivity = True Positives..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for definitions)
+
+3. /txt/posts/the-strongest-direction-pca.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "@title PCA", "Imagine a cloud of points", "PC1 is the direction..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for intuition)
+
+4. /txt/posts/the-family-tree-clustering.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "@title Hierarchical Clustering", "The distance between clusters...", "Merge the closest pair..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for algorithm steps)
+
+5. /txt/posts/the-dial-by-hand.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "@title Multiple Regression", "The Exact Dials", "We use matrix algebra..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for context)
+
+6. /txt/posts/straight-stick-linear-regression.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Linear Regression", "The slope-intercept form", "Minimize the squared error..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for optimization goals)
+
+7. /txt/posts/sorting-into-bins.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Logistic Regression", "The Sigmoid Curve", "Map Z to a probability..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for mapping logic)
+
+8. /txt/posts/reading-the-dials.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Z-Scores", "Standardize the data", "Mean and Standard Deviation..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for scaling explanation)
+
+9. /txt/posts/question-charts-by-hand.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Decision Trees", "Split the data", "Calculate the impurity..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for tree logic)
+
+10. /txt/posts/picking-settings-skewed-classes.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "F1 and Precision", "Harmonic mean of...", "Focus on the minority class..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for metrics)
+
+11. /txt/posts/neighbor-machine-knn.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "K-Nearest Neighbors", "Find the K closest", "Vote on the class..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for voting)
+
+12. /txt/posts/nci60-revisited.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Gap Statistic", "Reference distribution", "Compare W_k to..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for comparison)
+
+13. /txt/posts/mixing-ruler-gini-pruning.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Gini Impurity", "Cost-complexity pruning", "The alpha parameter..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for pruning)
+
+14. /txt/posts/leash-and-cloud.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Regularization", "L1 vs L2", "Shrink the coefficients..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for shrinkage)
+
+15. /txt/posts/humble-dials-ridge-lasso.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Ridge and Lasso", "Constraint geometry", "Diamond vs Circle..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for geometry)
+
+16. /txt/posts/grouping-by-nearest-centre.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "K-Means", "Update centroids", "Re-assign points..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for iteration)
+
+17. /txt/posts/grading-the-guess-mse-r2.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "MSE and R2", "Variance and Bias", "Total Sum of Squares..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for decomposition)
+
+18. /txt/posts/filling-the-blanks.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Collaborative Filtering", "Latent features", "Predict the rating..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for latent space)
+
+19. /txt/posts/eda-and-distance.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "EDA", "Manhattan distance", "Check for outliers..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for inspection)
+
+20. /txt/posts/committees-bag-forest-boost.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Ensemble Methods", "Weak learners", "Weighted sum of..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for aggregation)
+
+21. /txt/posts/clustering-reference.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Distance Metrics", "Cosine Similarity", "Hamming distance..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for definitions)
+
+22. /txt/posts/classification-lab.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Classification Results", "Threshold adjustment", "AUC curve..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for evaluation)
+
+23. /txt/posts/wobble-bands-bootstrap.txt
+- STATUS: REJECTED
+- VIOLATION: Contains English text: "Bootstrap", "Sampling distribution", "Standard error of..."
+- SYMBOLIC TRACE ATTEMPT: ✗ (Prose used for sampling)
+
+FINAL SUMMARY:
+TOTAL FILES AUDITED: 23
+TOTAL REJECTED: 23
+TOTAL PASSED: 0
+REASON: Every file uses English words for explanations, violating Rule 3 (Zero English words). None follow a purely symbolic axiomatic chain starting from Line 1.
