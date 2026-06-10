@@ -1,0 +1,23 @@
+mixing-ruler-gini-pruning:
+───────────────────────────
+|L| = 292
+|K| = 14
+
+  sum          L 17→
+  pile         L 18→
+  squared      L 18→
+  average      L 19→
+  mean         L 20→
+  guess        L 37→
+  column       L 50→
+  split        L 82→
+  rule         L108→
+  fit          L153→
+
+⚠:
+  L17 ← sum      | L26 → ✗
+  L18 ← pile     | L26 → ✗
+  L18 ← squared  | L26 → ✗
+  L19 ← average  | L26 → ✗
+  L20 ← mean     | L26 → ✗
+

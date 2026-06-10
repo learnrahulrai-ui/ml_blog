@@ -1,0 +1,23 @@
+grading-the-guess-mse-r2:
+───────────────────────────
+|L| = 242
+|K| = 11
+
+  guess        L  1→
+  squared      L 10→
+  rule         L 14→
+  column       L 21→
+  row          L 35→
+  mean         L 49→
+  average      L 57→
+  fit          L 69→
+  pile         L 88→
+  sum          L102→
+
+⚠:
+  L1 ← guess    | L2 → ✗
+  L10 ← squared  | L11 → ✗
+  L14 ← rule     | L15 → ✗
+  L21 ← column   | L22 → ✗
+  L35 ← row      | L37 → ✗
+

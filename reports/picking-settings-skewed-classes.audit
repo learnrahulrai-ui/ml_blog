@@ -1,0 +1,23 @@
+picking-settings-skewed-classes:
+───────────────────────────
+|L| = 389
+|K| = 12
+
+  K            L 33→
+  pile         L 50→
+  split        L 50→
+  train        L 51→
+  average      L 52→
+  fold         L 59→
+  rule         L 71→
+  mean         L 81→
+  spread       L 81→
+  column       L 96→
+
+⚠:
+  L33 ← K        | L37 → ✗
+  L50 ← pile     | L54 → ✗
+  L50 ← split    | L54 → ✗
+  L51 ← train    | L54 → ✗
+  L52 ← average  | L54 → ✗
+

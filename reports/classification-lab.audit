@@ -1,0 +1,23 @@
+classification-lab:
+───────────────────────────
+|L| = 358
+|K| = 17
+
+  guess        L 26→
+  rule         L 26→
+  squared      L 26→
+  distance     L 29→
+  sum          L 34→
+  pile         L 81→
+  mean         L 89→
+  centre       L 89→
+  fit          L122→
+  fold         L130→
+
+⚠:
+  L26 ← guess    | L27 → ✗
+  L26 ← squared  | L27 → ✗
+  L34 ← sum      | L38 → ✗
+  L81 ← pile     | L85 → ✗
+  L89 ← mean     | L96 → ✗
+

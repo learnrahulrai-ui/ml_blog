@@ -1,0 +1,23 @@
+straight-stick-linear-regression:
+───────────────────────────
+|L| = 212
+|K| = 13
+
+  rule         L  1→
+  guess        L 15→
+  pile         L 18→
+  sum          L 20→
+  row          L 31→
+  column       L 33→
+  squared      L 47→
+  mean         L 93→
+  average      L108→
+  spread       L109→
+
+⚠:
+  L1 ← rule     | L2 → ✗
+  L15 ← guess    | L20 → ✗
+  L18 ← pile     | L20 → ✗
+  L20 ← sum      | L31 → ✗
+  L31 ← row      | L33 → ✗
+

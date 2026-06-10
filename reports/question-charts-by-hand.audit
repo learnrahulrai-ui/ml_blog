@@ -1,0 +1,23 @@
+question-charts-by-hand:
+───────────────────────────
+|L| = 281
+|K| = 13
+
+  guess        L 17→
+  rule         L 17→
+  sum          L 18→
+  pile         L 23→
+  group        L 24→
+  average      L 25→
+  split        L 54→
+  fit          L 70→
+  column       L 73→
+  mean         L 78→
+
+⚠:
+  L17 ← guess    | L20 → ✗
+  L17 ← rule     | L20 → ✗
+  L18 ← sum      | L20 → ✗
+  L23 ← pile     | L28 → ✗
+  L25 ← average  | L28 → ✗
+

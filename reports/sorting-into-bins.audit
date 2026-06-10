@@ -1,0 +1,23 @@
+sorting-into-bins:
+───────────────────────────
+|L| = 265
+|K| = 12
+
+  sum          L 50→
+  column       L 68→
+  rule         L 74→
+  squared      L 74→
+  distance     L 75→
+  pile         L 91→
+  mean         L 98→
+  spread       L 98→
+  guess        L112→
+  row          L135→
+
+⚠:
+  L50 ← sum      | L54 → ✗
+  L68 ← column   | L72 → ✗
+  L74 ← squared  | L77 → ✗
+  L98 ← mean     | L103 → ✗
+  L112 ← guess    | L118 → ✗
+
