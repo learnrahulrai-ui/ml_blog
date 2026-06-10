@@ -14,8 +14,10 @@
     <- prev:  [Sorting 2: The Trade Curve](the-trade-curve.txt)
        next:  [Sorting 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt) ->
 
-  An over-confident machine is a dangerous thing, and the S-curve machine from Part 1 has
-  a streak of it. It sets its dials by rolling downhill on the cross-entropy leftover, and
+  An over-confident machine is a dangerous thing, and the S-curve machine from Part 1 --
+  one dial per column, multiply and add, squash the sum into a 0-to-1 chance -- has
+  a streak of it. It sets its dials by rolling downhill on the cross-entropy leftover
+  (the score that charges it for each lump by how confidently wrong its chance was), and
   left to its own devices nothing stops a single dial from ballooning to 50 if that is
   what makes the study pile fit. A dial that large means the machine has fallen for one
   column and stopped listening to the other twenty-nine -- it aces the practice exam and
@@ -61,8 +63,10 @@
 
       L_L2(beta) = L(beta) + lambda * sum_j beta_j^2
 
-  The first term is the cross-entropy from Part 1. The second is the sum of squared dials
-  times a strength lambda. When lambda is large, even a small dial^2 sum gets expensive,
+  The first term is the cross-entropy from Part 1 -- the plain-fit score: for each lump,
+  take the chance the machine gave the TRUE bin, and fine it by -log of that chance, so a
+  confident wrong chance costs a lot and a hedged one costs little.  The second is the sum
+  of squared dials times a strength lambda. When lambda is large, even a small dial^2 sum gets expensive,
   and the machine is forced to shrink everything toward zero. The gradient update picks up
   a pull-toward-zero term:
 

@@ -68,8 +68,10 @@
 
   Why be so strict? The reason is mechanical, not moral. Any rule checked on the same
   rows it was built from reports a flattering, false-low mistake -- like grading your own
-  exam with the answer key open. The ask-closest rule at k=1 makes ZERO mistakes on its
-  own working pile and then stumbles on new rows. The drawer is the only number that does
+  exam with the answer key open. The ask-closest rule at k=1 (a rule we build a few
+  sections down: guess by copying the answer of the single most similar row) makes ZERO
+  mistakes on its own working pile -- every row's most similar row is ITSELF, so it copies
+  its own answer -- and then stumbles on new rows. The drawer is the only number that does
   not lie.
 
   ** KEY: SHUFFLE FIRST
