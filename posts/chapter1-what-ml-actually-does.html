@@ -32,6 +32,14 @@
   then take the two rules apart screw by screw. For now, stand back and see the whole
   thing at once.
 
+  ** KEY: THE 1950 CONTRACT
+     Pretend it is 1950.  Print these pages.  Pencils, graph paper, a blackboard --
+     and a room of infinite, tireless clerks for the heavy arithmetic.  No computer,
+     no calculator, anywhere in the teaching.  Every number is recomputed where it is
+     needed (no page assumes you remember the last one), every worked example is
+     followed by a YOUR TURN drill for your slate, and every cost is counted in
+     clerk-steps.  Your attention is the scarce thing; arithmetic is free.
+
   &gt;&gt; HOW THIS BOOK IS LAID OUT (read once, then forget)
      This blog is really a short book in six chapters (twenty-one posts), meant to be read top to bottom.
      Every post draws the idea by hand first -- plain words, a pencil sketch, simple
@@ -90,6 +98,10 @@
 
   ## Rule 1 -- Ask the Closest Rows
 
+  IN HAND: a sheet of 20,640 rows -- 8 measured columns plus one right-answer column
+  (price).  Cut 80/20: working pile = 20,640 x 8/10 = 16,512 rows on the desk; hidden
+  pile = 20,640 - 16,512 = 4,128 rows locked in the drawer.  Now the first guessing rule.
+
     new row ?
         |
     measure gap to every working-pile row
@@ -125,11 +137,25 @@
     If k=1, the guess is the first row's price.  If k=3, we average the 3
     smallest-gap rows' prices.
 
+  &gt;&gt; YOUR TURN (one clerk, one slate)
+     Same new row (rooms=4, income=3).  A third working row sits at (rooms=4,
+     income=7).  Compute its gap before reading on.
+
+     check your slate:  rooms 4-4 = 0, square 0;  income 3-7 = -4, square 16;
+     sum 0 + 16 = 16;  gap = sqrt(16) = 4.  Of the three working rows the closest
+     is still the first (1 &lt; 4 &lt; 7.21) -- at k=1 the guess is that row's price.
+
   This rule barely deserves the name "machine" -- it builds nothing ahead of time. It
   just keeps the whole working pile on a shelf and, when a new house walks in, finds the
   ones most like it and averages what they sold for. The one knob to set by hand is k:
   how many neighbours to ask. Small k -&gt; too jumpy; large k -&gt; too stiff. The full
   derivation, and how to find the sweet spot, is in <a href="neighbor-machine-knn.html">Part 2</a>.
+
+  Count the clerk-steps for ONE guess, all 8 columns this time: per working row, 8
+  subtractions, 8 squarings, 7 additions, 1 root = 24 strokes; times 16,512 working
+  rows = 16,512 x 24 = 396,288 strokes -- call it four hundred thousand pencil strokes
+  for a single new house.  A room of clerks does it by lunch, but remember the bill:
+  it comes due every time another house walks in.
 
 
   ## Measuring How Wrong: RMSE
@@ -153,9 +179,34 @@
     mean r^2 = 0.23 / 4 = 0.0575
     RMSE = sqrt(0.0575) ~ 0.24
 
-    Typical miss: about $24,000.  The bar to beat: always guessing the average price
-    (here average y = (1.4+2.8+0.9+3.5)/4 = 8.6/4 = 2.15) gives RMSE = std(y) ~ 0.97.
-    Our rule at RMSE=0.24 is clearly beating the average.
+    Typical miss: about $24,000.  The bar to beat is the FOOL who always shouts the
+    average.  Work the fool out on the same 4 people.  His one guess: average y =
+    (1.4+2.8+0.9+3.5)/4 = 8.6/4 = 2.15, shouted four times:
+
+    person   truth y    fool's guess    miss r     r^2
+    ----------------------------------------------------
+      A       1.4       2.15           -0.75      0.5625
+      B       2.8       2.15           +0.65      0.4225
+      C       0.9       2.15           -1.25      1.5625
+      D       3.5       2.15           +1.35      1.8225
+                                        sum r^2 = 4.3700
+
+    mean r^2 = 4.37 / 4 = 1.0925        fool's RMSE = sqrt(1.0925) ~ 1.05
+
+    Notice what we just computed: squared gaps from the average, averaged, rooted --
+    that is the SPREAD of the truth column itself.  The fool's RMSE and std(y) are
+    the same recipe; they cannot help but be the same number.  (Set the clerks on the
+    full 20,640-row column with these exact steps and the fool lands near 0.97.)
+    Our rule at RMSE = 0.24 beats the fool four times over.
+
+  &gt;&gt; YOUR TURN
+     Person E walks in: truth 2.0, our rule guesses 2.4.  Add him to OUR table
+     (sum r^2 was 0.23 over 4 people) and recompute the rule's RMSE.
+
+     check your slate:  miss r = 2.0 - 2.4 = -0.4;  r^2 = 0.16;  new sum = 0.23 +
+     0.16 = 0.39;  mean = 0.39 / 5 = 0.078;  RMSE = sqrt(0.078) ~ 0.28.  One sloppy
+     guess dragged the typical miss from $24,000 up to $28,000 -- squaring makes big
+     misses shout.
 
   RMSE punishes large single misses more heavily than the plain average of absolute
   leftovers, MAE = mean|r_i|.  Check: person B missed by -0.3, squared to 0.09.
@@ -163,6 +214,10 @@
 
 
   ## Rule 2 -- The Straight-Stick Rule
+
+  IN HAND: one guessing rule (ask-closest: measure gaps, average the k nearest answers)
+  and one honest ruler (RMSE: miss -&gt; square -&gt; mean -&gt; root).  Now a second rule of the
+  opposite temperament.
 
     d+1 dials:  [nudge b0,  dial1 b1,  dial2 b2, ...]
 
@@ -177,6 +232,10 @@
 
 
   ## Picking Settings Without Peeking at the Hidden Pile
+
+  IN HAND: two rules (ask-closest with its knob k; straight-stick with its d+1 dials),
+  one ruler (RMSE), and one drawer that must stay shut.  Left to do: pick k -- without
+  the drawer.
 
     working pile split into 5 chunks:  A  B  C  D  E
 
@@ -277,6 +336,9 @@
     mistake on rows never seen            generalisation error
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same six steps, spoken in Python.
 
   &gt;&gt; NEW TO PYTHON? Each named once:
        fetch_california_housing()  -- loads the sheet (no file needed)

@@ -19,6 +19,12 @@
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
+  >> THE 1950 CONTRACT: print these pages and work them with a pencil -- nothing in the
+     teaching ever needs a computer.  Where arithmetic gets heavy, imagine a room of
+     tireless clerks; every cost is counted in clerk-steps, and every number is
+     recomputed where it is needed, never remembered.  Full contract on the
+     [about page](about.txt).
+
   >> SPEAK FLUENT BUZZWORD? The [Glossary / Decoder Ring](glossary.txt) translates every
      plain term on this blog into its textbook name -- and back again.
 
