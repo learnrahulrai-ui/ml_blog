@@ -1,0 +1,110 @@
+AUDIT REPORT: RULE 1 (AXIOMATIC DERIVATION)
+TIMESTAMP: 20260611_153500
+
+1. /txt/posts/chapter1-what-ml-actually-does.txt
+- Violation: Yes
+- Details: Introduces 'gap(a, b)' formula before derivation (derivation is in Part 2).
+
+2. /txt/posts/the-trade-curve.txt
+- Violation: Yes
+- Details: Calculates AUC without deriving trapezoidal rule or area summation logic.
+
+3. /txt/posts/the-dial-by-hand.txt
+- Violation: Yes
+- Details: Introduces (X^T X)^-1 X^T y as a fact without derivation.
+
+4. /txt/posts/grading-the-guess-mse-r2.txt
+- Violation: Yes
+- Details: States bias^2 + variance + noise decomposition as a fact without derivation.
+
+5. /txt/posts/sorting-into-bins.txt
+- Violation: Yes
+- Details: Introduces sigmoid function sig(z) = 1 / (1 + e^-z) without derivation/justification.
+
+6. /txt/posts/question-charts-by-hand.txt
+- Violation: Yes
+- Details: Uses squared misses for badness metric without deriving why.
+
+7. /txt/posts/wobble-bands-bootstrap.txt
+- Violation: Yes
+- Details: Introduces bootstrap sampling without deriving the law of large numbers or why re-sampling works.
+
+8. /txt/posts/the-strongest-direction-pca.txt
+- Violation: Yes
+- Details: Introduces variance maximization/eigenvectors without deriving the rotation transformation.
+
+9. /txt/posts/the-family-tree-clustering.txt
+- Violation: Yes
+- Details: Introduces linkage methods (Single/Complete) without deriving the merge criteria logic.
+
+10. /txt/posts/straight-stick-linear-regression.txt
+- Violation: Yes
+- Details: Introduces the slope-intercept form as a starting point without deriving from points.
+
+11. /txt/posts/sorting-into-bins.txt
+- Violation: Yes
+- Details: Uses log-loss or entropy without deriving from probability axioms.
+
+12. /txt/posts/reading-the-dials.txt
+- Violation: No
+- Details: Sequential z-score derivation followed correctly.
+
+13. /txt/posts/picking-settings-skewed-classes.txt
+- Violation: Yes
+- Details: Introduces F1-Score without deriving the harmonic mean necessity.
+
+14. /txt/posts/neighbor-machine-knn.txt
+- Violation: No
+- Details: Derives gap and z_j sequentially.
+
+15. /txt/posts/nci60-revisited.txt
+- Violation: Yes
+- Details: Uses Gap statistic without derivation.
+
+16. /txt/posts/mixing-ruler-gini-pruning.txt
+- Violation: Yes
+- Details: States Gini index formula as a fact.
+
+17. /txt/posts/leash-and-cloud.txt
+- Violation: Yes
+- Details: Introduces penalty terms (L1/L2) without deriving the constraint geometry.
+
+18. /txt/posts/humble-dials-ridge-lasso.txt
+- Violation: Yes
+- Details: States lambda parameter without deriving the regularization path.
+
+19. /txt/posts/grouping-by-nearest-centre.txt
+- Violation: Yes
+- Details: Introduces K-Means objective function without derivation.
+
+20. /txt/posts/filling-the-blanks.txt
+- Violation: Yes
+- Details: Introduces Matrix Factorization without deriving the latent space.
+
+21. /txt/posts/eda-and-distance.txt
+- Violation: No
+- Details: Basic data summary, follows linear flow.
+
+22. /txt/posts/committees-bag-forest-boost.txt
+- Violation: Yes
+- Details: Introduces Adaboost weights without derivation.
+
+23. /txt/posts/clustering-reference.txt
+- Violation: Yes
+- Details: States distance metrics as facts.
+
+24. /txt/posts/classification-lab.txt
+- Violation: Yes
+- Details: Uses confusion matrix metrics without deriving their relevance to decision thresholds.
+
+25. /txt/index.txt
+- Violation: No
+- Details: Metadata only.
+
+26. /txt/glossary.txt
+- Violation: No
+- Details: Definitions only.
+
+27. /txt/archive.txt
+- Violation: No
+- Details: Metadata only.

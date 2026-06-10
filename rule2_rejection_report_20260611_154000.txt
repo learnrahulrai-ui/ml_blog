@@ -1,0 +1,100 @@
+AUDIT REPORT: RULE 2 (STRICT PRIMATE AXIOMATIC LINEAGE)
+TIMESTAMP: 20260611_154000
+
+1. /txt/posts/chapter1-what-ml-actually-does.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: gap(a,b) function, Euclidean distance concept, square root operation.
+
+2. /txt/posts/the-trade-curve.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: AUC (Area Under Curve), Sensitivity/Specificity thresholds, ROC curve coordinates.
+
+3. /txt/posts/the-strongest-direction-pca.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Principal Component (PC1), weighting factors, variance maximization, eigenvectors.
+
+4. /txt/posts/the-family-tree-clustering.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Dendrogram representation, Single Linkage, Complete Linkage, Ward's method.
+
+5. /txt/posts/the-dial-by-hand.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Matrix inversion ((X^T X)^-1), Matrix transpose (X^T), Normal equation.
+
+6. /txt/posts/straight-stick-linear-regression.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Least Squares (OLS), Slope (beta_1), Intercept (beta_0).
+
+7. /txt/posts/sorting-into-bins.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Sigmoid function (1/(1+e^-z)), Euler's number (e), Log-odds.
+
+8. /txt/posts/reading-the-dials.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Standard deviation (sigma), Mean (mu), Z-score scaling.
+
+9. /txt/posts/question-charts-by-hand.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Tree splitting criteria, Mean Squared Error (MSE) as a 'badness' ruler.
+
+10. /txt/posts/picking-settings-skewed-classes.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: F1-Score, Harmonic Mean, Precision, Recall.
+
+11. /txt/posts/neighbor-machine-knn.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Majority voting rule, K-parameter (neighborhood size).
+
+12. /txt/posts/nci60-revisited.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Gap statistic, Reference distribution, Log(W_k).
+
+13. /txt/posts/mixing-ruler-gini-pruning.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Gini Impurity formula, Node pruning logic, Cost-complexity alpha.
+
+14. /txt/posts/leash-and-cloud.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Penalty term (lambda), L1 norm (Lasso), L2 norm (Ridge).
+
+15. /txt/posts/humble-dials-ridge-lasso.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Regularization parameters, Shrinkage effects.
+
+16. /txt/posts/grouping-by-nearest-centre.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Centroid calculation, Within-cluster sum of squares (WCSS).
+
+17. /txt/posts/grading-the-guess-mse-r2.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Bias-Variance decomposition, Irreducible noise, R-squared.
+
+18. /txt/posts/filling-the-blanks.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Matrix Factorization, Latent features, Singular Value Decomposition (SVD).
+
+19. /txt/posts/eda-and-distance.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Summary statistics (median, quartiles), Manhattan distance.
+
+20. /txt/posts/committees-bag-forest-boost.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Bootstrapped aggregation (Bagging), Gradient Boosting, Learner weights.
+
+21. /txt/posts/clustering-reference.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Distance metrics (Hamming, Cosine), Linkage types.
+
+22. /txt/posts/classification-lab.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Confusion matrix, False Positive Rate, False Negative Rate.
+
+23. /txt/posts/wobble-bands-bootstrap.txt
+- STATUS: REJECTED
+- NEW THINGS INTRODUCED WITHOUT DERIVATION: Re-sampling with replacement, Confidence intervals, Sampling distribution.
+
+FINAL SUMMARY:
+TOTAL FILES AUDITED: 23
+TOTAL REJECTED: 23
+TOTAL ACCEPTED: 0
+REASON: Every file introduces a concept (formula, variable, or method) as a "given" fact or definition without a line-by-line derivation from primate axioms (counting/basic math).
