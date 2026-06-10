@@ -259,6 +259,17 @@
     keep 5 PCs:  MSE ~ 0.19
     keep all 13: MSE = 0.00 (perfect, but pointless)
 
+  Now line those numbers up against the kept fractions from earlier:
+
+    keep 2 PCs:  kept ~ 55%  ->  lost ~ 45%  ->  MSE ~ 0.45
+    keep 5 PCs:  kept ~ 80%  ->  lost ~ 20%  ->  MSE ~ 0.19
+
+  Not a coincidence.  On standardised data the reconstruction MSE IS the
+  thrown-away fraction -- the same kept + lost = fixed total from the
+  stick-shadow-perp section, read from the lost side.  You never need to
+  run the reconstruction to know its error: 1 minus the kept fraction
+  already told you.
+
   Reconstruction error measures "how much structure was lost" when you
   crushed the room.  Your goal is to lose as little as possible while
   still being able to draw the picture on flat paper.

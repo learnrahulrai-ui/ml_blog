@@ -62,6 +62,18 @@
   Each loop can only make the piles tighter or leave them the same -- never worse.  So it
   always settles.  The settling point is the answer.
 
+  Why can UPDATE never make things worse?  Because the mean IS the spot that makes its
+  own pile's squared gaps smallest -- that is what a mean does.  Moving the centre to
+  the mean either lowers the pile's tightness or leaves it alone; it cannot raise it.
+  (A quiz likes to claim "the update step increases the within-group sum of squares" --
+  that is exactly backwards.)
+
+  &gt;&gt; NOTE: COMPARE SQUARED GAPS -- SKIP THE SQUARE ROOT
+     ASSIGN only asks WHICH centre is nearest, never HOW FAR.  If gap A-squared is
+     smaller than gap B-squared, then gap A is smaller than gap B -- squaring keeps
+     the order.  So the machine compares squared gaps directly and never takes a
+     root.  Same winner, less arithmetic.
+
   ## A Worked Example, by Hand
 
   Six dots on one ruler (one column, to keep the arithmetic small).  K = 2.
@@ -200,6 +212,27 @@
      undefined.  The elbow curve can start at K = 1; the fit-score curve cannot.
      That is why the loop below runs K = 2 upward.
 
+  One more read the fit score gives for free: average it PER PILE, not just overall.
+  A whole pile averaging near 0 means that entire pile straddles the border with its
+  neighbour -- two piles drawn where the data holds one.
+
+  ## What Makes ANY Grouper Good
+
+  Before the tripwires, the yardstick that outlives K-means.  Whatever grouping
+  machine you ever meet, it is judged on the same short list:
+
+    within a pile:    look-alikes hugging          -&gt; want gaps SMALL
+    between piles:    piles far from each other    -&gt; want gaps BIG
+    bonus:            handles bent or stretched crowds, not only round blobs
+    bonus:            still runs when the sheet holds a million dots
+    never:            depends on an answer column -- there isn't one
+
+  K-means scores well on the million-dots line and fails the bent-crowds line: one
+  gap-to-centre treats every pile as a round, same-size blob.  Crowds shaped like
+  ribbons or crescents get butchered.  The family tree (Part 4, single linkage) chains
+  along bent shapes; there are also machines that fit each pile a lean-and-stretch
+  recipe (Gaussian mixtures) instead of a single centre.
+
 
   ## Common Tripwires I Caught
 
@@ -283,6 +316,7 @@
     the biggest sag below the ruler       the perpendicular-distance elbow rule
     home vs next-door fit score           silhouette coefficient
     average fit over all dots             mean silhouette score
+    lean-and-stretch pile recipes         Gaussian mixture models (GMM)
     pick K at the highest peak            silhouette analysis
     run from several random starts        n_init / multiple restarts
     spread first centres far apart        k-means++ initialisation
