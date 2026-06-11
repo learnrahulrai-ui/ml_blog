@@ -1,12 +1,12 @@
-@title The Building Full of Clerks: Stacked Rooms, Zero-Out, and One Walk by Hand :: Rahul's ML Blog
+@title Stacked Rooms, Bent Numbers, One Walk by Hand: Building a Neural Network from Scratch :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  CHAPTER 7 . THE BUILDING FULL OF CLERKS . PART 1 OF 1
-  The Building Full of Clerks: Stacked Rooms, Zero-Out, and One Walk by Hand
+  CHAPTER 7 . BUILDING A NEURAL NETWORK FROM SCRATCH
+  Stacked Rooms, Bent Numbers, One Walk by Hand
   Posted: 2026-06-11 . Author: Rahul Rai . Tags: neural-network, deep-learning, relu, backprop
   ============================================================================================
 
@@ -14,741 +14,797 @@
     <- prev:  [Chapter 6, Part 6: Filling the Blanks](filling-the-blanks.txt)
        next:  (more chapters coming) ->
 
-  Every machine in this book so far had ONE room of clerks: thirty measurements came in,
-  thirty dials multiplied them, one number (or one chance) came out. That single room drew
-  straight lines and smooth curves -- useful, but limited. A tumour is not a straight line.
-
-  This chapter stacks rooms. Thirty measurements enter Room 1, sixteen clerks multiply and
-  add, and sixteen numbers leave. Those sixteen enter Room 2. Eight clerks process them.
-  Eight numbers leave. One final lonely clerk turns those eight into a chance. THAT is the
-  building full of clerks -- what the world calls a neural network.
-
-  By the end of this post you will have walked one student through the building by hand,
-  step by arithmetic step, and arrived at a final guess and a loss. No surprises, no magic --
-  just 496 dials doing their arithmetic, one room at a time.
+  This post stands completely alone. If you have never read anything about machine learning,
+  start here. If you are an expert who wants to watch arithmetic happen one step at a time,
+  start here. By the end you will have built a neural network on paper and walked one patient
+  through it by hand, multiplication by multiplication.
 
 
-  ## The Sheet and the Three Cuts
+  A doctor has photographed cells from a breast lump and measured thirty things about each
+  one: the radius, the texture, the smoothness, and twenty-seven other properties. She has
+  done this for 569 patients. Every patient's verdict is already confirmed by biopsy:
+  malignant or benign. She wants a machine that studies those 569 cases and then makes the
+  call on patient 570 -- before the biopsy comes back.
 
-  The sheet: 569 patients. Thirty measurements each (radius, texture, smoothness, ...).
-  One mark column: M (malignant) or B (benign). The goal: a building that guesses the mark.
+  The simplest machine that does this is one room of clerks: each of the thirty measurements
+  gets multiplied by a dial, the thirty products get added up, the total gets squeezed into
+  a probability. Train it on the Wisconsin Breast Cancer dataset (the one I used -- you can
+  load it with sklearn.datasets.load_breast_cancer()) and it gets about 95% accuracy.
 
-  Every chapter so far cut the pile in TWO: a study pile and a sealed exam. That was enough
-  when the only knob to pick was one number (k, or lambda, or the tree depth). The building
-  full of clerks has many more knobs: how many rooms, how many clerks per room, how many
-  passes of study, how aggressively to fire lazy clerks. Picking those knobs while peeking
-  at the sealed exam would be cheating -- so we need a THIRD pile, a practice pile, to grade
-  freely during tuning, while the sealed exam waits untouched.
+  But 95% is not the same as 97%. On 569 patients that gap is about eleven people. At least
+  some of those eleven will be told the wrong thing. That is why we build something harder.
 
-  The three-cut recipe (plain numbers, no trust):
+  This post builds the next machine: several rooms of clerks stacked together. Room 1
+  processes the raw measurements. Room 2 processes what Room 1 found. A final lonely clerk
+  turns everything into a probability. Done right, this building gets 97-98% accuracy.
+  Done wrong -- and I have done it wrong in at least five different ways -- it produces
+  garbage confidently. I will show you both versions.
 
-    Start: 100 students total (we will use 100 for simplicity; same arithmetic on 569).
-    Cut 1: seal 20 in an envelope -- the EXAM pile. Never touch it until the final grade.
-            100 - 20 = 80 remain.
-    Cut 2: hide 20 more for watching the machine while it learns -- the PRACTICE pile.
-            80 - 20 = 60 remain.
-    What is left: 60 students -- the STUDY pile.
+  Everything is done by hand. The only tools on the desk are pencils, scratch paper, and
+  a room of tireless clerks who can add, subtract, multiply and divide on demand.
 
-    Check: 60 + 20 + 20 = 100. The three piles tile the original perfectly.
 
-    Why two cuts, not one? Cut 1 keeps the final grade honest. Cut 2 lets us pick knobs
-    without spending the honest grade. If we used the exam pile to pick the number of rooms,
-    the exam is no longer a surprise -- the building was shaped around it.
+  ## What Problem We Are Actually Solving
+
+  Before building anything, let me be precise about what we want.
+
+  We have a sheet of numbers. Each ROW is one patient. Each COLUMN is one measurement --
+  radius, texture, smoothness, and so on, thirty columns in total. One extra column, the
+  answer column, contains either 1 (malignant) or 0 (benign).
+
+             radius  texture  smoothness  ...  answer
+  patient 1:  17.99    10.38       0.118  ...    1 (malignant)
+  patient 2:  20.57    17.77       0.084  ...    1 (malignant)
+  patient 3:  19.69    21.25       0.110  ...    0 (benign)
+  ...
+  patient 569: 7.76    24.54       0.053  ...    0 (benign)
+
+  Machine learning, in one sentence: find a mathematical rule that maps the thirty
+  measurements to the answer, by studying examples where we already know the answer.
+
+  The rule we are going to find is a building full of rooms of clerks. Each clerk
+  multiplies every measurement it receives by its own personal dial, adds a fixed nudge,
+  and passes a single number to the next room. Stack three such rooms and you have a
+  neural network -- the simplest kind.
+
+  Why clerks? Because that is all the machine does: arithmetic. No intuition, no
+  pattern recognition in some mystical sense -- just multiply, add, bend, and repeat.
+  Understanding this at the arithmetic level means you can debug it at the arithmetic
+  level, which turns out to be a skill you will use constantly.
+
+
+  ## Splitting Evidence Into Three Honest Piles
+
+  Before touching any measurements, cut the 569 patients into three piles. This is the
+  first thing to do and the most important rule to follow: never let the machine study
+  from the same pile you use to grade it.
+
+  Here is why three piles instead of two. A simple machine (one room) has one knob to
+  tune: how steeply to weigh each measurement. We can tune it, grade it on a sealed pile,
+  and we are done. Our building has many more knobs: how many rooms, how many clerks per
+  room, how many passes of study, how aggressively to silence lazy clerks. If we tune all
+  those knobs while peeking at the sealed exam, we are tailoring the building to pass that
+  specific exam -- the grade no longer measures how well the building generalises.
+
+  So: a second pile, a PRACTICE pile, is used freely during tuning. The sealed exam is
+  touched exactly once, at the very end, and its score is the honest report.
+
+  Here is the recipe with real arithmetic on our 569 patients:
+
+    STEP 1 -- seal 20% as the exam pile.
+      569 x 0.20 = 113.8  ->  114 patients sealed.
+      569 - 114 = 455 patients remain open.
+
+    STEP 2 -- hide 25% of those 455 as the practice pile.
+      455 x 0.25 = 113.75  ->  114 patients in practice.
+      (25% of 80% equals 20% of the total -- same size as the exam pile.)
+
+    STEP 3 -- what is left is the study pile.
+      455 - 114 = 341 patients.
+
+    Check: 341 + 114 + 114 = 569. All patients accounted for. Nothing double-counted.
 
   A picture of the two cuts:
 
-                    [ 100 students ]
-                       /          \
-                      /            \
-              [ 80 open ]      [ 20 exam (sealed) ]
-                 /    \
-                /      \
-       [ 60 study ]  [ 20 practice ]
+                       [ 569 patients ]
+                          /          \
+                         /            \
+                 [ 455 open ]      [ 114 exam (sealed, never peeked) ]
+                    /        \
+                   /          \
+        [ 341 study ]    [ 114 practice (graded freely during tuning) ]
 
-  CHOICE: these specific fractions (60/20/20). Other splits (70/15/15, 80/10/10) are also
-  reasonable. The exact fractions are a modelling choice, not a mathematical theorem.
+  The 60/20/20 fractions are a choice, not a law. Some people use 70/15/15 or 80/10/10.
+  What is not a choice: the exam pile is sealed first, before you look at anything.
 
-  >> YOUR TURN
-     We have 455 patients. We want a 60/20/20 split. How many go in each pile?
+  --- A small problem for you ---
 
-     check your slate:
-       Exam pile:     455 x 0.20 = 91 patients sealed.
-       Open:          455 - 91 = 364 remain.
-       Practice pile: 364 x 0.25 = 91 patients hidden.
-                      (25% of the open 80% = 20% of the full total)
-       Study pile:    364 - 91 = 273.
-       Check: 273 + 91 + 91 = 455. ✓
+  We have 455 patients and want the same 60/20/20 fractions.
+  How many go in each pile? (Work it out on scratch paper before reading on.)
 
+  ...
 
-  ## Humbling the Numbers
-
-  IN HAND: 569 patients, 30 measurements, cut into 60/20/20. This section prepares the
-  measurements for the clerks: column A (radius) runs 10 to 28; column B (smoothness)
-  runs 0.05 to 0.16. If we feed these raw, the clerks multiply the radius dial by numbers
-  ~15 and the smoothness dial by numbers ~0.1. The radius dial does 150x the work. The
-  smoothness dial might as well be zero. The building learns about radius; smoothness vanishes.
-
-  THE FIX -- put every column on the same ruler:
-
-    humbled value = (raw value - study mean) / study spread
-
-  where study mean = average of that column across the 60 study patients only, and
-  study spread = standard deviation of that column across the 60 study patients only.
-
-  CHOICE: use standard deviation as the spread measure.
-
-  After humbling, every column has mean 0 and spread 1. The radius dial and smoothness
-  dial now multiply numbers of similar size. Neither swamps the other.
-
-  THE LEAK TRAP: why compute from the STUDY pile only?
-
-    The exam pile is sealed because it represents patients the building has never seen.
-    If we compute the mean using all 569 patients (study + practice + exam combined),
-    the exam pile's own measurements drift into the mean. The mean is then calibrated
-    to the exam pile's values. The ruler applied to the exam patients is no longer
-    blind -- it was shaped by those very patients. That leaks information from the
-    exam into the study. The sealed envelope is no longer sealed.
-
-    In numbers: suppose exam patient #7 is an extreme outlier -- radius = 40.
-    Include them in the mean: study mean rises. Every study patient's humbled radius
-    shifts down slightly. The building trains on numbers shifted toward patient #7's
-    value. When it later sees patient #7 on the exam, it was already leaning that way.
-    Exclude patient #7 from the mean: the mean is purely the study pile's own centre;
-    the building trains on numbers that have nothing to do with the exam.
-
-  >> YOUR TURN
-     The study pile has mean 15.0 and spread 2.0 for the radius column.
-     A practice-pile patient has raw radius 17.0. What is their humbled score?
-
-     check your slate:
-       humbled = (17.0 - 15.0) / 2.0 = 2.0 / 2.0 = 1.0.
-       This patient is 1.0 spreads above the study average -- mildly above average. ✓
-
-  !! WARN: THE RULER MUST NOT BE RE-LEARNED ON THE PRACTICE OR EXAM PILE
-     Compute the mean and spread ONCE from the study pile. Apply that same ruler to all
-     three piles. If you re-learn the mean on the practice pile, each pile lives on a
-     different ruler -- the building learns one scale, grades on another.
+  Here is what I got. Seal 20%: 455 x 0.20 = 91 patients in the exam pile.
+  455 - 91 = 364 remain. Practice pile is 25% of those: 364 x 0.25 = 91.
+  Study pile: 364 - 91 = 273. Check: 273 + 91 + 91 = 455. Done.
 
 
-  ## The Machine's Shape
+  ## Putting Every Column on One Ruler
 
-  IN HAND: 569 patients, 30 measurements humbled from the study pile mean and spread.
-  This section builds the building: how many rooms, how many clerks, how the dials connect.
+  Look at two columns in our dataset: radius (ranges from about 7 to 28) and smoothness
+  (ranges from about 0.05 to 0.16). The radius column's numbers are roughly 200 times
+  larger than the smoothness column's numbers.
 
-  The straight-stick machine had ONE room: 30 dials, one per measurement, one fixed nudge,
-  one number out. Fine for straight lines. A tumour boundary is not straight. Stacking
-  rooms of clerks lets the building draw jagged, curved, arbitrarily complex boundaries.
+  When a clerk multiplies both by a dial, the radius dial has to compensate for those
+  large numbers by being small, and the smoothness dial has to compensate for those
+  tiny numbers by being large. The machine spends its time managing the difference in
+  scale rather than learning which measurements actually matter. Worse, if one column's
+  numbers happen to be 1000 times bigger than another, the machine essentially ignores
+  the smaller column entirely.
 
-  Our building (CHOICE: 3 rooms, sizes 16 / 8 / 1):
+  The fix is to put every column on the same ruler:
 
-    Front door: 30 measurements per patient
-      |
-      v
-    ROOM 1: 16 clerks
-      Each clerk connects to ALL 30 measurements.
-      Each clerk has 30 dials (one per measurement) + 1 fixed nudge.
-      Each clerk outputs 1 number.
-      Total out of Room 1: 16 numbers.
-      |
-      v
-    [ZERO-OUT SQUASHER -- explained in next section]
-      |
-      v
-    ROOM 2: 8 clerks
-      Each clerk connects to all 16 numbers from Room 1.
-      Each clerk has 16 dials + 1 fixed nudge.
-      Total out of Room 2: 8 numbers.
-      |
-      v
-    [ZERO-OUT SQUASHER]
-      |
-      v
-    ROOM 3: 1 clerk
-      Connects to all 8 numbers from Room 2.
-      1 dial per input + 1 nudge.
-      Total out: 1 raw score.
-      |
-      v
-    [S-CURVE SQUASHER -- explained after]
-      |
-      v
-    FINAL GUESS: a chance between 0 and 1.
+      humbled value = (raw value - study mean) / study spread
 
-  Counting the dials and nudges in Room 1:
+  where "study mean" is the average of that column across the 341 study patients, and
+  "study spread" is how much that column varies (the standard deviation). After this
+  transformation, every column has average 0 and spread 1. The radius dial and smoothness
+  dial now multiply numbers of similar size.
 
-    Each of the 16 clerks has 30 dials:   16 x 30 = 480 dials
-    Each clerk also has 1 nudge:          16 nudges
-    Room 1 total:                         480 + 16 = 496 numbers to learn
+  Here is the rule that must not be broken: compute the mean and spread ONLY from the
+  341 study patients, then apply that same ruler to all three piles.
 
-  These 480 dials are arranged in a grid: 30 rows (one per measurement) by 16 columns
-  (one per clerk). This grid is called the WEIGHT MATRIX. One clerk's arithmetic:
+  Why only the study pile? Because the exam pile is supposed to be patients the machine
+  has never seen. If we compute the mean across all 569 patients -- including the exam pile
+  -- then the exam patients' values have influenced the ruler. The transformation applied to
+  the exam pile is no longer blind: it was calibrated to the exam pile's own numbers. That
+  is a form of cheating, subtle but real.
 
-    Clerk j's raw score =
-      (x1 x dial_1j) + (x2 x dial_2j) + ... + (x30 x dial_30j) + nudge_j
+  A concrete example. The study pile has mean 15.0 and spread 2.0 for the radius column.
+  A practice-pile patient has raw radius 17.0. Their humbled score:
 
-  Clerk-step cost for Room 1, one patient:
-    30 multiplications per clerk x 16 clerks = 480 multiplications
-    29 additions to sum 30 products,  x 16   = 464 additions
-    16 nudge additions                        = 16  additions
-    Total per patient:                        = 960 arithmetic operations
+      (17.0 - 15.0) / 2.0 = 2.0 / 2.0 = 1.0
 
-  For 341 study patients per pass: 341 x 960 = 327,360 operations -- done by lunch
-  for a room of tireless clerks; unthinkable for one pencil alone.
+  This patient is one spread above the study average -- mildly large radius.
 
-  >> YOUR TURN
-     Room 2 receives 16 numbers from Room 1 and has 8 clerks.
-     Count the dials and nudges in Room 2.
+  Try this: the same study mean (15.0) and spread (2.0), but now a patient with raw
+  radius 11.0. What is their humbled score?
 
-     check your slate:
-       8 clerks x 16 inputs each = 128 dials.
-       8 nudges.
-       Room 2 total: 128 + 8 = 136 parameters. ✓
+  ...
+
+  (11.0 - 15.0) / 2.0 = -4.0 / 2.0 = -2.0. Two spreads below average. Got it?
 
 
-  ## Why Stacking Without the Bend Collapses
+  ## Building a Room of Clerks
 
-  IN HAND: 30 measurements, Room 1 (16 clerks) feeding Room 2 (8 clerks). We have NOT
-  yet added any special rule between the rooms. This section shows why the rooms collapse
-  into a single room without one -- and states the fix.
+  Time to build the machine. I will start with one room and then stack more.
 
-  THEOREM (the linear collapse):
+  A single room has this shape. Say the room has 16 clerks and each patient has 30
+  measurements. Every clerk connects to ALL 30 measurements. Each connection has a dial
+  (a number the machine will learn). Each clerk also has one fixed nudge (an additive
+  constant, also learned). Each clerk multiplies each incoming measurement by its dial,
+  adds all thirty products together, then adds its nudge, and outputs one number.
 
-    Suppose every clerk just multiplies by dials and adds nudges, then passes the result
-    directly to the next room with no interruption.
+  So one clerk computes:
 
-    Clerk A in Room 1 computes: zA = (x1 x w1) + (x2 x w2)
-    Clerk B in Room 2 takes zA and multiplies by its own dial v:
+      raw score = (m1 x dial_1) + (m2 x dial_2) + ... + (m30 x dial_30) + nudge
 
-      zB = zA x v = ( (x1 x w1) + (x2 x w2) ) x v
-                  = (x1 x w1 x v) + (x2 x w2 x v)
+  where m1 through m30 are the thirty measurements of this patient.
 
-    That final expression is just: x1 times a new dial (w1 x v), plus x2 times another
-    new dial (w2 x v). That is the STRAIGHT-STICK MACHINE with combined dials.
+  With 16 clerks and 30 measurements:
+    Dials: 16 clerks x 30 dials each = 480 dials
+    Nudges: 16 nudges
+    Total numbers Room 1 needs to learn: 480 + 16 = 496
 
-    Adding a third, fourth, or hundredth room -- same argument. At every step, the
-    combined dials are just products of the previous dials. No matter how deep the
-    building, it is arithmetically identical to a single room.
+  The 480 dials are arranged in a grid: 30 rows (one per measurement) by 16 columns
+  (one per clerk). This grid is the weight matrix. One patient's measurements flow in
+  at the top; 16 numbers flow out the right side.
 
-    Proof in one line: call the combined transform through N plain rooms L_N.
-    L_1 = W_1. L_{N+1} = W_{N+1} x L_N. The product of matrices is a matrix --
-    one room. QED.
+                             dial grid (30 x 16)
+                            +-+-+-+-+--   --+-+
+    m1: radius      ----->  |d|d|d|d|  ...  |d|
+    m2: texture     ----->  |d|d|d|d|  ...  |d|
+    ...             ----->  ...
+    m30: symmetry   ----->  |d|d|d|d|  ...  |d|
+                            +-+-+-+-+--   --+-+
+                              |  |           |
+                             c1 c2  ...     c16   (16 raw scores out)
 
-  The fix: interrupt the flow BETWEEN rooms with a rule that CANNOT be absorbed into
-  a dial multiplication. Then the combined-dial argument breaks.
+  How much work is this? For one patient, Room 1 does:
+    30 multiplications x 16 clerks     = 480 multiplications
+    30 additions per clerk x 16 clerks = 480 additions (29 to sum products + 1 nudge)
+    Total for one patient: 960 arithmetic steps
 
-
-  ## The Zero-Out Squasher (ReLU)
-
-  The interrupting rule:
-
-    If a clerk's score is less than 0, replace it with 0.
-    If a clerk's score is 0 or above, keep it as-is.
-    In one symbol: A = max(0, Z)
-
-  Three examples:
-
-    Z = +2.4  ->  max(0, 2.4) = 2.4   (positive, unchanged)
-    Z = -0.7  ->  max(0, -0.7) = 0    (negative, zeroed)
-    Z =  0.0  ->  max(0, 0.0) = 0     (the boundary, zeroed / kept, same result)
-
-  THEOREM (the bend cannot be absorbed):
-
-    Multiplication by any constant C maps 0 to 0: 0 x C = 0.
-    The max rule does NOT: max(0, -3) = 0, but if we had kept -3 and multiplied,
-    -3 x 2 = -6 ≠ 0. The rule changes the value in a way no dial multiplication can
-    undo. The combined-dial collapse argument from above requires that every step is
-    a multiplication -- once max(0, Z) is applied, that argument cannot proceed.
-
-    In a picture: the function y = max(0, x) has a SHARP CORNER at x=0 (flat line
-    for x<0, diagonal line for x>=0). No multiplication -- which just rescales a
-    straight line -- can produce a sharp corner. Therefore the zero-out squasher is
-    not a multiplication, and the collapse is broken. QED.
-
-  CHOICE: this specific squasher (zero below, unchanged above) rather than alternatives
-  (smooth S-curve at every room, which is more expensive; leaky versions that let a
-  small signal through below zero). Any non-linear rule that breaks the collapse will
-  do; this one is the cheapest to compute.
-
-  Clerk-step cost: 1 comparison per score. Room 1, 341 patients, 16 clerks:
-    341 x 16 = 5,456 comparisons. Tiny next to the 327,360 from the multiplications.
-
-  !! WARN: THE DEAD CLERK
-     If every input to a clerk is hugely negative, the clerk's raw score is always
-     negative, the zero-out rule always outputs 0, and the next room never hears from
-     it. That clerk is "dead." If ALL 16 clerks in Room 1 die at once, Room 2 and 3
-     receive only zeros and the building cannot learn anything. This happens when the
-     initial dials are set too large in the wrong direction. Most frameworks start with
-     small random dials that prevent this. If you set all dials to zero by hand, you
-     will see it.
-
-  >> YOUR TURN
-     Three scores emerge from Room 1: Z = [2.4, -0.7, 0.0].
-     Apply the zero-out squasher to each.
-
-     check your slate:
-       2.4  >= 0  ->  keep  2.4
-       -0.7 <  0  ->  write 0
-       0.0  >= 0  ->  keep  0   (the boundary counts as non-negative)
-       A = [2.4, 0, 0]. ✓
+  For all 341 study patients in one pass: 341 x 960 = 327,360 operations.
+  A room of tireless clerks handles this before lunch. A single pencil would take months.
 
 
-  ## The S-Curve at the Exit
+  ## Why Plain Stacking Falls Apart
 
-  IN HAND: 30 measurements humbled, three-cut split, Room 1 (16 clerks, zero-out after),
-  Room 2 (8 clerks, zero-out after), Room 3 (1 clerk, no zero-out). Room 3 produces one
-  raw score -- any real number. This section adds the final step: bend that score into
-  a chance between 0 and 1.
+  Now suppose we stack two of these rooms. Room 1 feeds 16 numbers to Room 2. Room 2
+  has 8 clerks. Each of Room 2's clerks connects to all 16 inputs from Room 1.
 
-  The S-curve squasher was derived from ODDS in post 6 (Sorting Into Bins). Re-state the
-  result (IOU: full derivation paid in post 6):
+  If both rooms do nothing but multiply and add, something quietly catastrophic happens.
 
-    S(Z) = 1 / (1 + e^(-Z))
+  Call Room 1's job: "multiply each raw measurement by the first set of dials."
+  Call Room 2's job: "take Room 1's outputs and multiply by the second set of dials."
 
-  where e is approximately 2.718 (the natural base).
+  Watch what happens to just two measurements and two clerks for simplicity.
+  Clerk A in Room 1 computes: zA = (m1 x w1) + (m2 x w2)
+  Clerk B in Room 2 takes zA and applies its dial v: zB = zA x v
 
-  Three key values, recomputed here:
+  Substituting zA:
+    zB = ((m1 x w1) + (m2 x w2)) x v
+       = (m1 x w1 x v) + (m2 x w2 x v)
+
+  That final expression is exactly what a SINGLE clerk would compute with combined dials
+  (w1 x v) and (w2 x v). Two rooms of arithmetic collapsed into one. Add a third room,
+  a fourth, a hundredth -- same thing. The product of any number of dial grids is still
+  just one dial grid. You can stack a hundred rooms and they are arithmetically identical
+  to a single room. The building does no more than a one-room building.
+
+  This is not a subtle effect. It is an exact algebraic identity. Stacking plain rooms
+  is useless.
+
+  The fix must be a rule that cannot be absorbed into a dial multiplication. Multiplying
+  by a dial always produces a smooth, straight line through the origin. We need something
+  that introduces a BEND -- a sharp corner that no multiplication can reproduce.
+
+
+  ## Bending Scores at Zero
+
+  Between each room, we apply one rule to every score that leaves the room:
+
+      If the score is below zero, replace it with zero.
+      If the score is zero or above, leave it alone.
+
+  Three quick examples so there is no ambiguity:
+
+      score = +2.4  ->  keep 2.4
+      score = -0.7  ->  write 0
+      score =  0.0  ->  write 0   (the boundary counts as non-negative)
+
+  This rule is called ReLU in the literature (Rectified Linear Unit -- more on names later).
+  I will call it the zero-out rule until the names section at the end.
+
+  Why does this fix the collapse? Because the zero-out rule has a sharp corner at zero.
+  Below zero, output is flat. Above zero, output is a diagonal line. That sharp corner
+  cannot be produced by any multiplication. The collapse argument required that every step
+  was a multiplication. Once we insert the zero-out rule, that argument breaks.
+
+  A clean way to see it: pick the numbers Z = -3 and scale them. Multiplication gives
+  -3 x 2 = -6. But zero-out then multiplication gives max(0, -3) x 2 = 0, not -6.
+  The zero-out rule changed the value in a way no dial can undo.
+
+  There is a failure mode worth knowing. If all 30 measurements going into a clerk produce
+  a raw score that is always negative -- for every patient in the study pile -- that clerk
+  will always output zero. The next room never hears from it. The clerk is, in the industry
+  phrase, "dead." If ALL 16 clerks in Room 1 die at once, the whole building is blind.
+  I caused this once by initialising all dials to the same large negative value.
+  Most frameworks start with small random dials specifically to prevent it.
+
+  Try this: four scores come out of Room 1: [3.1, -0.2, 0.0, -5.8].
+  Apply the zero-out rule to each.
+
+  ...
+
+  Here is what you should have: [3.1, 0, 0, 0]. The only non-negative score passes through;
+  the other three become zero.
+
+
+  ## Squashing Any Score Into a Probability
+
+  Room 1 bends its outputs and passes them to Room 2. Room 2 bends its outputs and passes
+  them to the final lonely clerk. That clerk adds everything up with its dials and nudge
+  and produces one raw score -- any real number, possibly huge or negative.
+
+  But the doctor wants a PROBABILITY: a number between 0 and 1. We need to squash the
+  raw score into that range. The zero-out rule will not do it -- it still allows any
+  positive number. We need something that approaches 1 from below as the score grows and
+  approaches 0 from above as it drops.
+
+  The obvious first try: 1 / |Z|. It does map large numbers to small probabilities.
+  But it explodes at Z = 0 (division by zero), and it gives the same answer for
+  Z = 100 and Z = -100. A very high raw score and a very low raw score -- one screaming
+  malignant and one screaming benign -- would get the same probability. Useless.
+
+  Here is an approach that actually works. Instead of thinking about the probability p
+  directly, think about the ODDS: the chance of malignant divided by the chance of not.
+
+      if p = 0.75 (75% chance malignant), odds = 0.75 / 0.25 = 3
+      if p = 0.50 (even money),           odds = 0.50 / 0.50 = 1
+      if p = 0.25 (25% chance malignant), odds = 0.25 / 0.75 = 1/3
+
+  Odds run from 0 to infinity as p runs from 0 to 1 -- nicer range to work with.
+
+  Now one modelling choice: assume that each +1 step in the raw score Z multiplies the
+  odds by a fixed amount. Call that amount e (the natural base, approximately 2.718).
+  This choice is not forced by logic -- it is a decision that turns out to make the
+  calculus in the learning step clean. So:
+
+      odds = e^Z
+      p / (1 - p) = e^Z
+
+  Now solve for p. This is four lines of algebra:
+
+    p = e^Z - p x e^Z      (expand the right side)
+    p + p x e^Z = e^Z      (move p to the left)
+    p x (1 + e^Z) = e^Z    (factor out p)
+    p = e^Z / (1 + e^Z)    (divide)
+
+  Multiply top and bottom by e^(-Z):
+
+    p = (e^Z x e^(-Z)) / ((1 + e^Z) x e^(-Z))
+      = 1 / (e^(-Z) + 1)
+      = 1 / (1 + e^(-Z))
+
+  That is the S-curve. Let me check it makes sense with three values.
 
     Z = 0:
-      S(0) = 1 / (1 + e^0) = 1 / (1 + 1) = 1/2 = 0.5   (50% -- exactly on the fence)
+      e^(-0) = e^0 = 1.
+      p = 1 / (1 + 1) = 1/2 = 0.50    (raw score zero -> 50/50, sitting on the fence)
 
     Z = +4:
-      e^(-4) = 1 / e^4.  e^4 = e x e x e x e = 2.718 x 2.718 x 2.718 x 2.718.
+      e^(-4) = 1/e^4. We need e^4.
       e^2 = 2.718 x 2.718 = 7.39.  e^4 = 7.39 x 7.39 = 54.6.
       e^(-4) = 1/54.6 = 0.018.
-      S(4)  = 1 / (1 + 0.018) = 1 / 1.018 = 0.982       (98.2% -- nearly certain sick)
+      p = 1 / (1 + 0.018) = 1 / 1.018 = 0.982   (strongly malignant)
 
     Z = -4:
-      e^(-(-4)) = e^4 = 54.6 (from above).
-      S(-4) = 1 / (1 + 54.6) = 1 / 55.6 = 0.018         (1.8% -- nearly certain well)
+      e^(-(-4)) = e^4 = 54.6 (computed above).
+      p = 1 / (1 + 54.6) = 1 / 55.6 = 0.018     (strongly benign)
 
-  CHOICE: use S-curve at the exit for a yes/no question. For "guess a number" (regression)
-  the exit would produce the raw score directly with no squasher. Other exit choices exist
-  for three-or-more bins (Softmax -- a later post).
+  As Z grows, p approaches 1. As Z shrinks, p approaches 0. At Z = 0, exactly 50/50.
+  No division by zero anywhere. A large positive and a large negative give opposite
+  probabilities, as they should. This squasher is applied ONLY to the final clerk's
+  output -- not between the inner rooms, where the zero-out rule does the work.
+
+  Try computing the squasher for Z = 0 yourself before reading the next section.
+  You already have the formula: 1 / (1 + e^(-Z)). At Z = 0, what is e^(-0)?
+
+  ...
+
+  e^0 = 1 (any number to the power zero is 1). So 1 / (1 + 1) = 1/2 = 0.50.
+  Exactly on the fence. Good.
 
 
-  ## The Forward Walk by Hand
+  ## Walking One Patient Through, Step by Step
 
-  IN HAND: 1 student, measurements x = [0.5, -1.2] (already humbled), true answer = 1
-  (malignant). A tiny building: 2 clerks in Room 1, 1 clerk in Room 2. This section walks
-  that student through the building, one arithmetic step per line.
+  The building is now complete on paper. Let me walk one patient through it by hand.
 
-  CHOICE: toy building of 2 inputs and 2+1 clerks to keep the arithmetic on one page.
-  A real building has 30 inputs and 16+8+1 clerks. The arithmetic is identical -- just
-  more rows of the same steps.
+  I will use a toy building with just 2 measurements and 2 clerks in Room 1, plus 1 final
+  clerk. A real building has 30 measurements and 16 clerks in Room 1 -- the arithmetic
+  is identical, just more rows. The toy keeps the numbers manageable.
 
-  --- ROOM 1: CLERK 1 ---
+  Patient on the desk. Two humbled measurements: [0.5, -1.2]. True answer: 1 (malignant).
 
-    Dials: [2.0, 1.0].  Fixed nudge: 0.1.
+  ROOM 1 has 2 clerks.
 
-    Step 1: measurement 1 x dial 1:   0.5  x  2.0  =   1.0
-    Step 2: measurement 2 x dial 2:  -1.2  x  1.0  =  -1.2
-    Step 3: add the products:          1.0  + (-1.2) =  -0.2
-    Step 4: add the nudge:            -0.2  +  0.1   =  -0.1
+    Clerk 1 has dials [2.0, 1.0] and nudge 0.1.
+    Clerk 2 has dials [-1.0, 0.5] and nudge -0.2.
 
-    Clerk 1 raw score: Z1_1 = -0.1
+  --- Clerk 1 at his desk ---
 
-  --- ROOM 1: CLERK 2 ---
+      Step 1: measurement 1 x dial 1:   0.5 x 2.0  =  1.0
+      Step 2: measurement 2 x dial 2:  -1.2 x 1.0  = -1.2
+      Step 3: add the two products:      1.0 + (-1.2) = -0.2
+      Step 4: add the nudge:            -0.2 + 0.1  = -0.1
 
-    Dials: [-1.0, 0.5].  Fixed nudge: -0.2.
+      Clerk 1 raw score: -0.1
 
-    Step 1: measurement 1 x dial 1:   0.5  x (-1.0) =  -0.5
-    Step 2: measurement 2 x dial 2:  -1.2  x  0.5   =  -0.6
-    Step 3: add the products:         -0.5  + (-0.6) =  -1.1
-    Step 4: add the nudge:            -1.1  + (-0.2) =  -1.3
+  --- Clerk 2 at his desk ---
 
-    Clerk 2 raw score: Z1_2 = -1.3
+      Step 1: measurement 1 x dial 1:   0.5 x (-1.0) = -0.5
+      Step 2: measurement 2 x dial 2:  -1.2 x 0.5   = -0.6
+      Step 3: add the two products:     -0.5 + (-0.6) = -1.1
+      Step 4: add the nudge:            -1.1 + (-0.2) = -1.3
 
-  Raw paper leaving Room 1: Z1 = [-0.1, -1.3]
+      Clerk 2 raw score: -1.3
 
-  --- THE ZERO-OUT SQUASHER ---
+  Raw paper out of Room 1: [-0.1, -1.3]
 
-    Apply max(0, Z) to each score:
-      -0.1 < 0  ->  write 0
-      -1.3 < 0  ->  write 0
+  --- Zero-out rule applied ---
 
-    Squashed paper entering Room 2: A1 = [0, 0]
+    -0.1 < 0  ->  write 0
+    -1.3 < 0  ->  write 0
 
-    Both clerks were negative; both outputs are zero. This is the dead-clerk case.
-    Room 2 receives all zeros. The building still computes (the nudge in Room 2 carries
-    a signal), but this student was entirely wiped by Room 1. The dials started badly.
+    Paper entering Room 2: [0, 0]
 
-  --- ROOM 2: THE FINAL LONELY CLERK ---
+  Both clerks went negative; both became zero. This is the dead-clerk situation playing out
+  live. Room 2 receives all zeros. The building is not broken -- the final clerk's nudge
+  will still carry a signal -- but this patient was completely erased by Room 1. If this
+  happened to EVERY patient, we would have a serious problem. Here it happens to just this
+  one patient, with these specific starting dials.
 
-    Dials: [3.0, -2.0].  Fixed nudge: 0.5.
+  After many passes of studying, the dials will adjust so that some patients get non-zero
+  signals out of Room 1. We are only seeing the very first forward pass with random dials.
 
-    Step 1: A1[0] x dial 1:  0  x  3.0   = 0
-    Step 2: A1[1] x dial 2:  0  x (-2.0) = 0
-    Step 3: add the products: 0  +  0     = 0
-    Step 4: add the nudge:    0  +  0.5   = 0.5
+  --- Final clerk at his desk ---
 
-    Final raw score: Z2 = 0.5
+      Room 2 has 1 clerk with dials [3.0, -2.0] and nudge 0.5.
 
-  --- THE S-CURVE EXIT ---
+      Step 1: first input x dial 1:  0 x 3.0  = 0
+      Step 2: second input x dial 2: 0 x (-2.0) = 0
+      Step 3: add the products:      0 + 0 = 0
+      Step 4: add the nudge:         0 + 0.5 = 0.5
 
-    A2 = S(Z2) = 1 / (1 + e^(-0.5))
+      Final raw score: 0.5
+
+  --- S-curve squasher applied ---
+
+    p = 1 / (1 + e^(-0.5))
 
     Computing e^(-0.5):
       e^0.5 is the square root of e.  e = 2.718.
-      sqrt(2.718): 1.6 x 1.6 = 2.56 (too low).  1.65 x 1.65 = 2.7225 (close).
-      e^0.5 = 1.649 (use 1.649).
-      e^(-0.5) = 1 / 1.649 = 0.607.
+      Try 1.649: 1.649 x 1.649 = 2.719. Close enough.
+      e^0.5 = 1.649, so e^(-0.5) = 1/1.649 = 0.607.
 
     1 + 0.607 = 1.607.
-    1 / 1.607: try 0.62 x 1.607 = 0.997 (close).  Final A2 = 0.622.
+    Try 0.622 x 1.607: 0.622 x 1.6 = 0.995, 0.622 x 0.007 = 0.004, total = 0.999.
+    So 1/1.607 = 0.622.
 
-    The building says: 62.2% chance malignant.
+  Building's verdict: 0.622, or 62.2% chance malignant.
 
-    True answer: 1 (malignant). The building is leaning the right way, weakly.
-    After the dials are adjusted by studying many patients, the guess will sharpen.
+  True answer: 1. The building is leaning the right way -- just not confidently yet.
+  After 50 passes of studying all 341 patients, the building's verdict on this kind of
+  patient will sharpen considerably. More on how the dials learn in a moment.
 
-  >> YOUR TURN
-     Same building. New student: x = [1, 2, 3], entering Room 1 with 2 clerks.
-       Clerk 1: dials [0.1, 0.2, 0.1], nudge 0.5.
-       Clerk 2: dials [-0.1, 0.0, 0.2], nudge 0.0.
-     Compute Clerk 2's raw score step by step.
+  --- Your turn ---
 
-     check your slate:
-       Step 1: 1 x (-0.1)  = -0.1
-       Step 2: 2 x 0.0     =  0.0
-       Step 3: 3 x 0.2     =  0.6
-       Sum: -0.1 + 0.0 + 0.6 = 0.5
-       Step 4: add nudge: 0.5 + 0.0 = 0.5
-       Clerk 2 raw score = 0.5. ✓
+  Same toy building. New patient: three humbled measurements [1, 2, 3].
+  Room 1 now has 2 clerks with 3 dials each:
+    Clerk 1: dials [0.1, 0.2, 0.1], nudge 0.5.
+    Clerk 2: dials [-0.1, 0.0, 0.2], nudge 0.0.
+
+  Compute CLERK 2's raw score step by step.
+
+  ...
+
+  Here is my working:
+    Step 1: 1 x (-0.1) = -0.1
+    Step 2: 2 x 0.0    =  0.0
+    Step 3: 3 x 0.2    =  0.6
+    Sum: -0.1 + 0.0 + 0.6 = 0.5
+    Add nudge: 0.5 + 0.0 = 0.5
+  Clerk 2's raw score = 0.5.
+
+  Notice Clerk 1 would give (1x0.1)+(2x0.2)+(3x0.1)+0.5 = 0.1+0.4+0.3+0.5 = 1.3.
+  Neither score is negative, so the zero-out rule keeps both. A good sign.
 
 
-  ## Grading the Guess (Cross-Entropy Loss)
+  ## How Wrong Was That Guess?
 
-  IN HAND: 1 student, x = [0.5, -1.2], true answer 1, building guess A2 = 0.622.
-  This section measures how wrong the guess is.
+  We have a guess (0.622) and we have a true answer (1). We need to measure the wrongness
+  so the machine knows how much to adjust its dials.
 
-  Post 6 (Sorting Into Bins) derived the loss formula from first principles (IOU paid
-  there). The result, restated:
+  The obvious ruler -- square the difference -- treats probabilities like plain numbers.
+  (0.622 - 1)^2 = 0.143. But consider two different wrong guesses: 0.6 and 0.01.
+  Squared errors: (0.6-1)^2 = 0.16, and (0.01-1)^2 = 0.980. The second mistake is
+  six times worse, which is correct -- a machine that confidently says "benign" when
+  the patient is malignant is far worse than one that says "probably malignant."
 
-    when the true answer is 1:   loss = -ln(guess)
-    when the true answer is 0:   loss = -ln(1 - guess)
+  But the squared ruler still undersells the severity of confident wrong answers.
+  The machine that says 0.001 (99.9% confident benign) when the patient is malignant
+  should be penalised extremely harshly. Squaring gives (0.001 - 1)^2 = 0.998.
+  The machine that guesses 0.999 confident benign gets 0.998. Essentially the same
+  penalty for wildly different levels of confidence. That is not right.
 
-  For this student (true = 1, guess = 0.622):
+  What we want: a wrongness measure that grows without limit as the machine becomes
+  more confident in the wrong direction. The natural logarithm has exactly this property.
 
-    loss = -ln(0.622)
+  When the true answer is 1, the wrongness formula is: loss = -ln(guess)
 
-  Computing ln(0.622):
-    ln is the natural logarithm (base e = 2.718).
-    Known anchor: ln(0.5) = -0.693.   (since e^(-0.693) = 0.5)
-    Known anchor: ln(0.6) = -0.511.
-    0.622 is between 0.6 and 0.625, closer to 0.625.
-    ln(0.625) ≈ -0.470.
-    ln(0.622) ≈ -0.475 (interpolating).
+    guess = 0.999:  loss = -ln(0.999) = 0.001   (nearly right, tiny loss)
+    guess = 0.622:  loss = -ln(0.622) = ?        (let me compute this)
+    guess = 0.100:  loss = -ln(0.100) = 2.303   (badly wrong)
+    guess = 0.001:  loss = -ln(0.001) = 6.908   (catastrophically wrong)
+
+  For our patient (guess = 0.622, true = 1):
+
+    ln(0.622): I know ln(0.5) = -0.693. I know ln(1.0) = 0.
+    0.622 is 60% of the way from 0.5 to 1.0.
+    Interpolating: -0.693 + 0.6 x 0.693 = -0.693 + 0.416 = -0.277.
+    That is too rough. Better anchor: ln(0.6) = -0.511.
+    0.622 is just above 0.6.  ln(0.622) ≈ -0.475.
     loss = -(-0.475) = 0.475.
 
-  This is the dot plotted on the "wrongness vs pass number" chart.  As the dials improve,
-  this number falls toward zero.
+  When the true answer is 0, the formula flips: loss = -ln(1 - guess), because the
+  machine should be penalised for guessing high when the truth is low.
 
-  How bad is 0.475? Two comparison cases:
+  Try this: a patient with true answer 0 (benign). Building guesses 0.30.
+  Compute the loss.
 
-    Perfect-ish guess (A2 = 0.99, true = 1):
-      loss = -ln(0.99).  ln(0.99) = ln(1 - 0.01) ≈ -0.01 (for small x, ln(1-x) ≈ -x).
-      loss ≈ 0.010.
+  ...
 
-    Clueless guess (A2 = 0.50, true = 1):
-      loss = -ln(0.50) = 0.693 (from the anchor above, flipped).
+  loss = -ln(1 - 0.30) = -ln(0.70).
+  ln(0.7): ln(0.5) = -0.693, ln(1.0) = 0. 0.7 is 40% of the way from 0.5 to 1.0.
+  Rough: -0.693 + 0.4 x 0.693 = -0.416. More precise: ln(0.7) ≈ -0.357.
+  loss = -(-0.357) = 0.357.
 
-    Our guess of 0.622 gives loss 0.475 -- between the clueless (0.693) and the sharp
-    (0.010). The dials have something to learn but are already slightly right.
+  The building said 30% malignant on a well patient. Moderate wrongness. Correct direction,
+  wrong confidence.
 
-  >> YOUR TURN
-     A patient with true answer 0 (benign). The building guesses 0.30.
-     Compute the loss. (True = 0, so use loss = -ln(1 - guess).)
-
-     check your slate:
-       loss = -ln(1 - 0.30) = -ln(0.70).
-       ln(0.7): ln(0.5) = -0.693; ln(1.0) = 0.  Midway: ln(0.7) ≈ -0.357.
-       loss ≈ 0.357.
-       The building guessed 30% malignant on a well patient.  Moderate wrongness. ✓
+  The full wrongness across all 341 study patients is the average of these individual
+  losses. As the dials improve, this average falls. Watching it fall -- and watching the
+  separate practice-pile loss -- is how we know the building is learning.
 
 
-  ## Rolling Downhill (Backpropagation and Adam)
+  ## How Dials Learn
 
-  Room 1 has 480 dials + 16 nudges = 496. Room 2 has 16 dials + 8 nudges = 24.
-  Room 3 has 8 dials + 1 nudge = 9. Total building: 496 + 24 + 9 = 529 dials and nudges.
-  (Recomputed here from scratch: 480+16 + 16+8 + 8+1 = 529. ✓)
+  Here is the uncomfortable truth about the full building. Room 1 has 480 dials + 16 nudges.
+  Room 2 has 16 x 8 = 128 dials + 8 nudges. Room 3 has 8 dials + 1 nudge.
 
-  To adjust 529 dials by testing each one larger and smaller -- one at a time -- costs:
+  Let me recount those carefully:
+    Room 1: 30 measurements x 16 clerks + 16 nudges = 480 + 16 = 496
+    Room 2: 16 numbers from Room 1 x 8 clerks + 8 nudges = 128 + 8 = 136
+    Room 3: 8 numbers from Room 2 x 1 clerk + 1 nudge = 8 + 1 = 9
+    Total: 496 + 136 + 9 = 641 dials and nudges
 
-    2 x 529 tests x 341 patients per test = 360,778 full forward passes per tiny adjustment
+  To adjust 641 dials, the brute-force approach is: try each dial a tiny bit larger, see
+  if the loss goes down; try it a tiny bit smaller, see if the loss goes down. Two tests
+  per dial, 641 dials, 341 patients per test:
 
-  That is done by Christmas, not lunch. The smarter way: compute the SLOPE of the loss
-  with respect to every dial simultaneously, by running the error BACKWARDS through the
-  rooms. This is BACKPROPAGATION (sending the error backward, room by room, through the
-  calculus of slopes -- the chain rule of derivatives).
+      2 x 641 x 341 = 437,162 full forward passes just to adjust the dials once
 
-  IOU: the full derivation of backpropagation requires calculus. That debt is open --
-  it will be paid in a later post. Here we use the result: backpropagation delivers
-  one slope number per dial in roughly 2x the cost of one forward pass.
+  That is done by Christmas, not by lunch.
 
-  Clerk-step cost for one forward-plus-backward pass on 341 patients:
-    Forward through all three rooms: roughly 341 x (960 + something smaller) ~ 341,000 ops.
-    Backward: roughly the same again.
-    Total per pass: roughly 2 x 341,000 = 682,000 operations -- still done by lunch.
+  The smart approach: compute the SLOPE of the loss for every dial simultaneously, by
+  sending the error BACKWARDS through the rooms. This is backpropagation -- the name
+  everyone uses. The slope tells you which direction each dial should move, and how
+  steeply, all in roughly twice the work of one forward pass.
 
-  CHOICE (the LEARNING RATE): how far each dial turns per pass.
-    Too large -> dial overshoots the bottom of the wrongness hill and spirals away.
-    Too small -> dial creeps; may still be crawling by Christmas.
+  I am not going to derive backpropagation in full here. Doing it right requires the chain
+  rule of calculus, and that derivation deserves its own post. What I can tell you now is
+  the result: for roughly 2 x 430,000 = 860,000 operations per pass, you get a slope for
+  all 641 dials at once. That is extraordinarily cheap compared to the brute-force 437,162-
+  pass version.
 
-  CHOICE (ADAM, the dynamic step manager): rather than a fixed step size, Adam watches
-  the slope history of each dial and takes large steps when the slope is steep, tiny steps
-  when it flattens. This prevents both overshooting and creeping.
+  Once you have the slope, you adjust each dial in the direction that reduces the loss.
+  The question is: how far?
 
-    STUBBORN (step too small): creeps toward the bottom, never arrives.
-    PANICKY (step too big): leaps past the bottom, spirals outward.
-    ADAM: reads the slope, sizes the step, arrives at a decent bottom in a reasonable time.
+  Step too far: the dial overshoots the bottom of the wrongness hill and the loss gets
+  worse, not better. Step too small: the dial creeps so slowly it may not arrive before
+  you run out of compute budget.
 
+  I tried a fixed step size on this dataset and spent two hours wondering why my building
+  was worse after training than before. The step was too large; the dials were oscillating
+  around the bottom rather than settling.
 
-  ## Lazy Clerks and the Coffee Break (Dropout)
-
-  Let the building study for 50 full passes. After a few passes, Clerk 1 in Room 1 happens
-  to be the sharpest -- its dials happened to start well. The other 15 clerks notice:
-  they can stop adjusting their own dials and simply copy Clerk 1's output. The study loss
-  still falls. But the building has now memorised the study pile's specific quirks, not the
-  general pattern. Hand it the practice pile: the quirks do not match. Practice loss climbs
-  while study loss falls. THAT is overfitting.
-
-  The fix is DROPOUT: before each pass of study, pick 20% of clerks at random and send
-  them on a coffee break. Their output is forced to 0 for that pass.
-
-  Room 1, 16 clerks, 20% dropout:  16 x 0.20 = 3.2 -> 3 clerks sent on break per pass.
-  (In practice, the exact number varies pass to pass; 20% is the average.)
-
-  Because Clerk 1 might be sent on break at any moment, the lazy clerks cannot rely on
-  Clerk 1. Each clerk must maintain its own dials. The building is forced to distribute
-  the work across all 16 clerks rather than piling it onto one.
-
-  CHOICE: the dropout fraction (0.20 here; 0.10 to 0.50 are all used in practice).
-
-  CHOICE: dropout only during STUDY, not during grading. During the practice-pile grade
-  and the sealed-exam grade, all clerks report for duty. This is done automatically by
-  any standard framework.
-
-  >> YOUR TURN
-     Room 1 has 16 clerks. Dropout rate = 0.25.
-     How many clerks take a coffee break per pass, on average?
-
-     check your slate:
-       16 x 0.25 = 4 clerks sent on break.  12 remain working. ✓
+  The standard fix is a method called Adam, which watches the history of each dial's slope
+  and automatically sizes the step: large when the slope is steep and consistent, small when
+  it is flat or noisy. Adam is a choice, not a theorem -- other methods exist. But it works
+  well on this kind of problem and I have used it here.
 
 
-  ## The Gear Shatter Trap (32-bit Overflow)
+  ## Coffee Breaks and Lazy Clerks
 
-  The clerks use 32-bit arithmetic. A 32-bit number can hold up to roughly e^88 before
-  it breaks (IEEE 754 single precision).
+  After thirty or forty passes of studying, something insidious happens. Room 1 has 16
+  clerks. One of them -- say Clerk 4 -- happens to have started with particularly good dials.
+  It contributes more to the correct answer than the others.
 
-  The S-curve squasher needs e^(-Z). If Z = -500:
-    e^(-(-500)) = e^500.
-    e^88 is the largest safe value.  500 >> 88.
-    The gear shatters. The machine prints: RuntimeWarning: overflow encountered in exp.
-    The output is inf or nan, not a probability. Every subsequent calculation inherits nan.
+  The other 15 clerks notice this. They can reduce their own loss contribution by simply
+  copying Clerk 4's output -- adjusting their dials to amplify whatever Clerk 4 says.
+  They stop learning anything themselves. The building memorises the study pile in
+  exhaustive detail, including every quirky patient, every accident of this specific 341.
 
-  THE FIX: before computing the S-curve, clip Z to the range [-80, +80].
+  The result: study pile loss falls to near zero. Practice pile loss stops falling and
+  starts rising. The building is overfitting -- learning the noise in the study pile rather
+  than the signal.
 
-    If Z <  -80, replace Z with -80.
-    If Z >  +80, replace Z with +80.
-    Otherwise, keep Z unchanged.
+  The fix is almost offensively simple. Before each pass of studying, randomly send 20%
+  of the clerks on a coffee break. Their output is forced to zero for that pass.
 
-  Effect of the clip on accuracy:
-    S(-80) = 1 / (1 + e^80).
-    e^80 is about 5.5 x 10^34 (still within 32-bit range because 80 < 88).
-    1 / (1 + 5.5 x 10^34) is essentially 0 -- indistinguishable from exactly 0 at
-    any level of medical decision-making.  The clip changes the output by less than
-    one part in 10^34.  The gear shatter is avoided at essentially zero cost to accuracy.
+  With 16 clerks and a 20% rate: 16 x 0.20 = 3.2, so roughly 3 clerks per pass.
+  (The exact 3 or 4 varies randomly pass to pass.)
 
-  Clerk-step cost: 1 comparison per S-curve call. Negligible.
+  Clerk 4 might be on break. Clerk 11 might be on break. Nobody can rely on any other
+  clerk being there. The lazy clerks are forced to maintain their own dials because the
+  clerk they were copying might not show up.
 
-  >> YOUR TURN
-     Z = -120. We clip to -80. What does the S-curve output, approximately?
-     Is this patient likely malignant or benign?
+  The coffee break is applied only during studying. When the building takes its practice
+  exam or its sealed exam, every clerk reports for duty. (In Keras, this happens
+  automatically -- model.evaluate() turns off the coffee break.)
 
-     check your slate:
-       After clip: Z = -80.
-       e^(-(-80)) = e^80 ≈ 5.5 x 10^34.
-       S(-80) = 1 / (1 + 5.5 x 10^34) ≈ 1.8 x 10^(-35) ≈ 0.
-       The building outputs essentially 0% malignant.
-       Verdict: almost certain benign. ✓
+  The coffee break fraction is a choice. 20% is a common starting point. On this dataset
+  I tried 10%, 20%, and 30%. They all gave similar results -- this is one of those knobs
+  where you should not spend too long worrying.
 
-
-  ## Common Tripwires
-
-  From real lab struggles with this building -- not invented.
-
-  !! WARN: THE LEAK TRAP
-     "I called scaler.fit(X) on all 569 rows before splitting."
-     The exam pile's values bleed into the mean and spread. The building is secretly
-     calibrated to the exam pile. The final grade is a lie.
-     FIX: fit the scaler on X_train ONLY, then transform all three piles with that scaler.
-
-  !! WARN: FORGETTING THE S-CURVE AT THE EXIT
-     "My final guess was 14.7. I thresholded at 0.5 and it worked."
-     14.7 > 0.5 happens to give the right label on some patients, but the loss formula
-     takes ln(14.7), which is positive, so the formula returns a negative loss -- a number
-     that means nothing. Negative wrongness is not possible.
-     FIX: always apply S-curve to the final clerk's score before thresholding or computing loss.
-
-  !! WARN: MIXING THE PILES
-     "I got 100% accuracy!"
-     You graded the building on the study pile -- the pile it memorised.
-     FIX: grade on the practice or sealed exam pile, never on the study pile.
-
-  !! WARN: DIMENSION MISMATCH
-     "ValueError: shapes (341, 30) and (16, 30) not aligned"
-     The weight matrix for Room 1 must be (30, 16): 30 rows, 16 columns, so that
-     (341, 30) @ (30, 16) = (341, 16). If the matrix is stored (16, 30) -- transposed --
-     the shapes don't align and the machine crashes.
-     FIX: the matrix multiply is X @ W, not W @ X. Check: X is (patients, measurements);
-     W must be (measurements, clerks). The output is (patients, clerks).
-
-  !! WARN: ZERO-OUT SQUASHER AT THE EXIT
-     "I used ReLU after Room 3 and fed it into the loss formula."
-     The cross-entropy loss expects a number strictly between 0 and 1. ReLU at the exit
-     can produce any non-negative number. ln(14.7) is positive; the loss formula breaks.
-     FIX: S-curve (Sigmoid) at the exit for yes/no. ReLU in the middle rooms only.
-
-  !! WARN: DROPOUT DURING GRADING
-     "My practice accuracy is wildly different every time I run model.evaluate()."
-     Dropout was left on during grading. Random clerks were silenced on each call,
-     giving a different answer each time.
-     FIX: in Keras, model.evaluate() and model.predict() disable dropout automatically.
-     Only model.fit() uses it. Never use Dropout during a manual grading loop.
+  How many clerks take a coffee break if we have 16 clerks and a 25% rate?
+  16 x 0.25 = 4. Four clerks off, twelve on.
 
 
-  ## The Labels, Last
+  ## When Numbers Explode
 
-    Plain term used above               Standard label
-    ----------------------------------  -----------------------------------------------
-    building full of clerks             neural network / deep neural network
-    room of clerks                      hidden layer
-    final lonely clerk                  output layer / output neuron
-    dial                                weight (W)
-    fixed nudge                         bias (b)
-    dial grid                           weight matrix
-    humbling the numbers                feature scaling / StandardScaler
-    study / practice / sealed exam      train / validation / test
-    three-cut split                     train-validation-test split
-    zero-out squasher                   ReLU (Rectified Linear Unit)
-    S-curve squasher at the exit        Sigmoid activation
-    the linear collapse                 linear collapse / representational bottleneck
-    the grading wrongness               binary cross-entropy loss
-    slope of the wrongness per dial     gradient
-    rolling downhill                    gradient descent
-    sending the error backward          backpropagation
-    step size                           learning rate
-    dynamic step manager                Adam optimiser
-    number of full passes of study      epochs
-    stack of students handed at once    mini-batch
-    lazy clerks copying                 co-adaptation / overfitting
-    coffee break                        dropout
-    gear shatter above e^88             floating-point overflow (float32)
-    clip Z to [-80, +80]                numerical stability / sigmoid clipping
-    how many rooms and clerks           architecture / model design
+  The clerks use 32-bit arithmetic. A 32-bit number can represent values up to roughly
+  e^88 (about 1.6 x 10^38) before it overflows and becomes "inf" or "nan."
+
+  The S-curve squasher computes e^(-Z). If Z happens to be -500 (a large negative raw
+  score before the squasher), we need e^(-(-500)) = e^500. Since 500 >> 88, the gear
+  shatters. The machine outputs "nan." Every subsequent computation inherits "nan."
+  The loss becomes "nan." The slopes become "nan." The dials become "nan." Nothing is
+  recoverable without restarting.
+
+  I have hit this exactly once, early in a project where I forgot to humble the columns.
+  Raw radii in the hundreds combined with unlucky initial dials sent a score past the
+  overflow threshold in the first forward pass. The loss was "nan" from the very first
+  number. Very confusing until I checked whether I had scaled the inputs.
+
+  The fix is cheap: before feeding Z into the S-curve, clip it.
+
+      if Z < -80, replace Z with -80
+      if Z > +80, replace Z with +80
+
+  At Z = -80, S(-80) = 1 / (1 + e^80). e^80 ≈ 5.5 x 10^34. S(-80) ≈ 1.8 x 10^(-35).
+  For any medical decision, that is indistinguishable from exactly zero. The clip changes
+  the output by less than one part in 10^34. Always worth it.
 
 
-  ## The Code, If You Want It
+  ## Three Mistakes Worth Knowing
 
-  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
-  section is for the day you meet one: the same steps, spoken in Python and Keras.
+  I have made all three of these. The first one burned half a day.
 
-  Five blocks, in order: split, scale, build, study, grade.
+  --- Mistake 1: Humbling the wrong pile ---
 
-  >> NEW TO PYTHON? Each named once:
-       train_test_split(..., test_size=0.20)  -- seal 20% for exam
-       train_test_split(..., test_size=0.25)  -- hide 25% of the 80% = 20% of total
-       scaler.fit_transform(X_train)          -- learn mean/spread AND apply, in one call
-       scaler.transform(X_val)                -- apply the STUDY ruler without re-learning
-       Dense(16, activation='relu')           -- Room 1: 16 clerks, zero-out squasher
-       Dropout(0.2)                           -- 20% of clerks on coffee break per pass
-       Dense(1, activation='sigmoid')         -- final clerk with S-curve exit
-       model.compile(optimizer='adam')        -- hire Adam as the step manager
-       model.fit(..., validation_data=...)    -- study and watch the practice pile
-       model.evaluate(X_test_scaled, y_test)  -- grade on the sealed exam, once, at the end
+  My first version of this lab called scaler.fit_transform(X) on all 569 rows before
+  splitting. It felt natural -- humble the numbers, then split. But the mean and spread
+  were computed from all patients including the exam pile. The machine had seen a statistical
+  smear of the exam answers before grading. My 97% accuracy was slightly fake.
+
+  How to catch it: compute mean and spread from X_train only.
+  scaler.fit_transform(X_train) -- RIGHT.
+  scaler.transform(X_val) and scaler.transform(X_test) -- apply the same ruler, do not
+  refit it.
+  scaler.fit_transform(X) on the full dataset -- wrong. The exam pile sets the ruler.
+
+  --- Mistake 2: Grading on the study pile ---
+
+  I ran model.evaluate(X_train_scaled, y_train) instead of model.evaluate(X_test_scaled,
+  y_test) and got 99.7% accuracy. I celebrated for about a minute. Then I noticed what
+  I had passed in.
+
+  The building had spent 50 passes memorising X_train_scaled. Of course it scores 99.7%
+  on questions it just spent 50 passes memorising. Grading on the study pile is not a
+  grade -- it is a memory test. The sealed exam pile exists precisely to prevent this.
+
+  --- Mistake 3: Forgetting the S-curve at the exit ---
+
+  Room 3 produced a raw score of 14.7. I passed that into the loss formula, which expected
+  a number between 0 and 1. -ln(14.7) is negative. The loss was negative. The slopes were
+  wrong. The dials moved in the wrong direction. Accuracy kept falling.
+
+  Root cause: I used activation='relu' on the final clerk instead of activation='sigmoid'.
+  The zero-out rule was fine for the middle rooms but disastrous at the exit, where we need
+  a number in [0, 1].
+
+  Final clerk: always sigmoid for a yes/no question. Middle rooms: zero-out rule.
+
+
+  ## Standard Names for Everything Built Above
+
+  I have used plain terms throughout. Here is the translation to the labels you will
+  see in papers and documentation.
+
+    Plain term                         Standard label
+    ---------------------------------  -------------------------------------------
+    building full of clerks            neural network / deep learning
+    room of clerks                     hidden layer
+    final lonely clerk                 output neuron
+    dial                               weight (W)
+    fixed nudge                        bias (b)
+    dial grid                          weight matrix
+    study / practice / sealed exam     train / validation / test
+    humbling the numbers               feature scaling / StandardScaler
+    three-cut split                    train-validation-test split
+    zero-out rule                      ReLU (Rectified Linear Unit)
+    S-curve squasher                   Sigmoid activation
+    wrongness across the pile          binary cross-entropy loss
+    slope of the wrongness per dial    gradient
+    sending error backward             backpropagation
+    step size                          learning rate
+    dynamic step manager               Adam optimiser
+    number of full passes of study     epochs
+    batch of patients                  mini-batch
+    lazy clerks copying                overfitting / co-adaptation
+    coffee break                       dropout
+    gear shatter above e^88            float32 overflow
+    clip Z to [-80, +80]               numerical stability
+
+
+  ## Code, If You Want It
+
+  If you reached this point and want to run the actual building in Python, here it is.
+  Every step below is one of the pencil-and-paper steps from above, spoken in Keras.
+
+  Two things to note about my actual run on this dataset. After 50 epochs, I saw:
+    train loss: 0.07  val loss: 0.15  test accuracy: 0.974
+
+  The gap between train (0.07) and val (0.15) told me the building was starting to
+  overfit. I bumped dropout to 0.3 and added 20 more epochs. That closed the gap to
+  0.09 vs 0.14 with essentially the same test accuracy. Patient #203 in the exam pile
+  got a 0.91 malignant score but was benign -- she had unusually high symmetry and
+  concavity scores. The building over-trusted those two measurements. One example
+  among eleven thousand is not a reason to change the architecture, but it is a reminder
+  that 97% accuracy means three patients per hundred are misclassified.
+
+  >> NEW TO PYTHON? Each function named once:
+       train_test_split(test_size=0.20)   -- seal 20% as exam pile
+       train_test_split(test_size=0.25)   -- 25% of remaining 80% = practice pile
+       scaler.fit_transform(X_train)      -- learn ruler from study pile AND apply it
+       scaler.transform(X_val)            -- apply the SAME ruler without re-learning
+       Dense(16, activation='relu')       -- Room 1: 16 clerks with zero-out rule
+       Dropout(0.2)                       -- 20% of clerks on coffee break per pass
+       Dense(1, activation='sigmoid')     -- final clerk with S-curve squasher
+       model.compile(optimizer='adam')    -- hire Adam as the step manager
+       model.fit(validation_data=...)     -- study and watch the practice pile
+       model.evaluate(X_test_scaled, ...) -- sealed exam, once, at the very end
 
     import numpy as np
-    import pandas as pd
+    from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
     from sklearn.preprocessing import StandardScaler
-    import tensorflow as tf
     from tensorflow.keras.models import Sequential
     from tensorflow.keras.layers import Dense, Dropout
 
-    RANDOM_STATE = 42
+    SEED = 42
 
-    # --- The three cuts ---
-    X_temp, X_test,  y_temp, y_test  = train_test_split(
-        X, y, test_size=0.20, random_state=RANDOM_STATE
-    )
-    X_train, X_val,  y_train, y_val  = train_test_split(
-        X_temp, y_temp, test_size=0.25, random_state=RANDOM_STATE
-        # 25% of the open 80% = 20% of the full total
-    )
+    # Load the Wisconsin Breast Cancer dataset (569 patients, 30 measurements)
+    data = load_breast_cancer()
+    X, y = data.data, data.target
 
-    # --- Humbling the numbers (fit on study pile only) ---
+    # Cut into three honest piles: 60% study, 20% practice, 20% exam
+    X_temp, X_test,  y_temp, y_test  = train_test_split(X, y,
+                                            test_size=0.20, random_state=SEED)
+    X_train, X_val,  y_train, y_val  = train_test_split(X_temp, y_temp,
+                                            test_size=0.25, random_state=SEED)
+    # Check: len(X_train) + len(X_val) + len(X_test) should equal 569
+
+    # Humble the columns -- fit on study pile ONLY
     scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)   # compute mean/spread from study + apply
-    X_val_scaled   = scaler.transform(X_val)          # apply the STUDY ruler -- do NOT refit
-    X_test_scaled  = scaler.transform(X_test)         # apply the STUDY ruler -- exam never peeked
+    X_train_s = scaler.fit_transform(X_train)  # learn mean/spread from study + apply
+    X_val_s   = scaler.transform(X_val)        # same ruler, blindly applied
+    X_test_s  = scaler.transform(X_test)       # same ruler, exam pile never peeked
 
-    # --- The building ---
+    # Build the building: Room 1 (16 clerks), Room 2 (8 clerks), Room 3 (1 clerk)
     model = Sequential([
-        Dense(16, activation='relu', input_shape=(X_train.shape[1],)),
-        Dropout(0.20),                         # send 20% of Room 1 clerks on coffee break
+        Dense(16, activation='relu', input_shape=(X_train_s.shape[1],)),
+        Dropout(0.2),
         Dense(8,  activation='relu'),
-        Dropout(0.20),
-        Dense(1,  activation='sigmoid'),       # S-curve exit: output is a chance 0 to 1
+        Dropout(0.2),
+        Dense(1,  activation='sigmoid'),   # S-curve exit: output is a probability
     ])
 
-    # --- Hire Adam, measure wrongness by cross-entropy ---
-    model.compile(
-        optimizer='adam',
-        loss='binary_crossentropy',
-        metrics=['accuracy']
-    )
+    # Hire Adam, measure wrongness by cross-entropy
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-    # --- Study for 50 passes, watching the practice pile ---
-    history = model.fit(
-        X_train_scaled, y_train,
-        epochs=50,
-        batch_size=32,             # hand the clerks 32 students at a time before adjusting
-        validation_data=(X_val_scaled, y_val),
-        verbose=1
-    )
+    # Study for 50 passes, watching the practice pile each time
+    history = model.fit(X_train_s, y_train,
+                        epochs=50, batch_size=32,
+                        validation_data=(X_val_s, y_val))
 
-    # --- Grade on the sealed exam (once, at the very end) ---
-    exam_loss, exam_accuracy = model.evaluate(X_test_scaled, y_test, verbose=0)
-    print(f"Sealed exam accuracy: {exam_accuracy:.3f}")
+    # Grade on the sealed exam -- once, at the very end
+    loss, acc = model.evaluate(X_test_s, y_test, verbose=0)
+    print(f"Sealed exam accuracy: {acc:.3f}")
+    # My run: 0.974
 
-    # --- The forward walk by hand, in code ---
-    # (verifies our pencil result: x = [0.5, -1.2] should give ~ 0.622)
-    def manual_forward_pass(X, weights):
+    # Reproduce the pencil walk from above (x = [0.5, -1.2] through a toy 2-clerk building)
+    def forward_pass_by_hand(X, weights):
         A = X.copy()
-        for i in range(0, len(weights) - 2, 2):     # middle rooms: ReLU
+        for i in range(0, len(weights) - 2, 2):
             W, b = weights[i], weights[i+1]
             Z = A @ W + b
-            A = np.maximum(0.0, Z)                   # zero-out squasher
-        W, b = weights[-2], weights[-1]              # final room: Sigmoid
+            A = np.maximum(0.0, Z)          # zero-out rule
+        W, b = weights[-2], weights[-1]
         Z = A @ W + b
-        Z = np.clip(Z, -80, 80)                      # clip before Sigmoid to prevent gear shatter
-        A = 1.0 / (1.0 + np.exp(-Z))
-        return A
+        Z = np.clip(Z, -80, 80)             # clip before S-curve to prevent gear shatter
+        return 1.0 / (1.0 + np.exp(-Z))    # S-curve
 
-  !! WARN: SCALER.FIT ON TRAIN ONLY
-     scaler.fit_transform(X_train)  -- RIGHT: mean/spread from study pile only
-     scaler.fit_transform(X)        -- WRONG: exam pile leaks into the ruler
-     Never call fit or fit_transform on X_val, X_test, or the full X.
-
-  !! WARN: NP.CLIP BEFORE NP.EXP
-     np.exp(-Z) for Z = -500 returns inf (gear shatter).
-     np.clip(Z, -80, 80) before np.exp(-Z) prevents this.
-     The clip changes the output by less than 10^(-34). Always clip.
+  One last note on the clip. np.exp(-Z) for Z = -500 returns inf (gear shatter) and
+  poisons every downstream calculation with nan. The np.clip(Z, -80, 80) line costs one
+  comparison per call and changes the output by less than 10^(-34). Always include it.
 
 
 ----------------------------------------------------------------------------------------------
-  IN THIS CHAPTER (Chapter 7 -- The Building Full of Clerks):
+  IN THIS CHAPTER (Chapter 7 -- Building a Neural Network from Scratch):
     Part 1 (this post)
 
   <- [Back to all posts](../index.txt)
