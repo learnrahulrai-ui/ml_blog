@@ -177,7 +177,32 @@
   The chain rule still works; we just multiply more links. And here is the trick that makes
   it cheap: we already computed the error arriving at z2. We reuse it and keep going backward.
 
-  Start from the error at z2, which we found was p - y = -0.198. Send it back:
+  Here is the whole network drawn twice -- the forward pass on top (numbers flowing right to
+  a guess) and the backward pass below (the error flowing LEFT, getting multiplied at each
+  arrow). This single picture is the entire algorithm:
+
+    FORWARD (compute the guess) ------------------------------------------------>
+
+       x=0.5      z1=0.8       a1=0.8        z2=1.4       p=0.802      L=0.221
+        o ---xw1--> o ---ReLU--> o ---xw2----> o ---Scurve-> o ---(-ln)-> o
+                  (=0.5x1.0      (max(0,        (=0.8x1.5                (true y=1)
+                    +0.3)          0.8))          +0.2)
+
+    <------------------------------------------------ BACKWARD (send error left)
+
+       dL/dw1      err@z1       err@a1        err@z2
+       =-0.148 <-x0.5- -0.297 <-gate x1- -0.297 <-x w2=1.5- -0.198  = (p - y)
+        ^                ^                    ^                 ^
+        |                |                    |                 |
+     multiply by      multiply by         multiply by      the error is born
+     the input x      the ReLU gate       the dial w2      here: guess - truth
+     (=0.5)           (1 open / 0 shut)    it crosses       = 0.802 - 1
+
+  Read the bottom row right to left. The error is BORN at the output as p - y = -0.198. It
+  travels left, and at every arrow it is multiplied by exactly one thing: the dial it crosses
+  (w2), the gate it passes through (1 if the clerk was open, 0 if dead), or -- when it finally
+  lands on a dial -- that dial's own input. Each landing point is a slope. Now the same thing
+  in arithmetic. Start from the error at z2, which is p - y = -0.198, and send it back:
 
     Step A -- through the output dial w2 to reach a1:
         z2 = a1 x w2 + b2, so increasing a1 by 1 increases z2 by w2 = 1.5.
@@ -196,18 +221,10 @@
         slope of L w.r.t. b1 = (error at z1) x 1 = -0.297
 
   So w1's slope is about -0.148: negative, so increasing w1 lowers the loss, so we nudge w1
-  up. With step 0.1:
-
-    new w1 = 1.0 - (0.1 x -0.148) = 1.0 + 0.0148 = 1.0148
-
-  --- Verify this one too, the lazy way ---
-
-    w1 = 1.1:  z1 = 0.5 x 1.1 + 0.3 = 0.85 ;  a1 = 0.85
-               z2 = 0.85 x 1.5 + 0.2 = 1.475 ;  e^(-1.475) ≈ 0.229 ;  p ≈ 1/1.229 ≈ 0.814
-               L  = -ln(0.814) ≈ 0.206
-    measured slope = (0.206 - 0.221) / (1.1 - 1.0) = -0.015 / 0.1 = -0.15
-
-  Chain rule said -0.148; brute force says -0.15. Agreement again.
+  up: new w1 = 1.0 - (0.1 x -0.148) = 1.0148. The same finite-difference check confirms it --
+  nudging w1 to 1.1 drops the loss to about 0.206, a measured slope of -0.15 against our
+  chain-rule -0.148. Agreement again, and this time the error had to travel through two rooms
+  to get there.
 
   That is the entire algorithm. The error at the output (p - y) is computed once, then passed
   backward room by room: multiply by the dial it crosses, multiply by the gate it passes
@@ -252,13 +269,24 @@
   and different dials want different sizes. Rather than tune one number forever, the standard
   practice is to hire a manager that sizes each dial's step automatically.
 
-  The popular one is called Adam. Plainly, Adam watches the recent history of each dial's
-  slope. When a dial's slope has been pointing the same way for a while (a steep, consistent
-  hill), Adam lets it take big confident strides. When a dial's slope keeps flipping sign
-  (noisy, near the bottom), Adam shortens its stride so it does not bounce. Each of the 641
-  dials gets its own adaptive step. Adam is a choice, not a law -- plain gradient descent
-  with a hand-tuned step also works -- but Adam saves you the tuning and behaves well on this
-  kind of problem, so I use it.
+  The popular one is called Adam, and it keeps TWO running averages for each dial, not one.
+
+    Average 1 -- the recent DIRECTION of the slope (its running mean). If a dial's slope has
+      pointed the same way for several passes, this average is large, and the dial keeps its
+      momentum -- it strides confidently in that direction instead of restarting from a
+      standstill each pass.
+
+    Average 2 -- the recent SIZE of the slope, regardless of sign (a running mean of the
+      slope SQUARED). Adam divides each step by the square root of this. So a dial whose
+      slopes have been large or jittery gets its step shrunk; a dial whose slopes have been
+      small and steady gets its step left long.
+
+  Put together: step direction comes from Average 1 (momentum), and step LENGTH is scaled
+  DOWN for dials with big or noisy slopes using Average 2. (Adam also applies a small early-
+  pass correction to both averages, since they start at zero and need a few passes to warm
+  up; that bookkeeping is not essential to the intuition.) The effect is that each of the 641
+  dials gets its own self-sizing step. Adam is a choice, not a law -- plain gradient descent
+  with a hand-tuned step also works -- but Adam saves you the tuning, so I use it.
 
 
   ## Lazy Clerks and Coffee Breaks (Dropout)
@@ -291,8 +319,12 @@
 
   ## When Numbers Explode (Numerical Stability)
 
-  One sharp edge from the real machine. The clerks compute in 32-bit arithmetic, which holds
-  numbers only up to about e^88 before it overflows to "inf" and then "nan" (not-a-number).
+  One sharp edge from the real machine. The clerks usually compute in standard 32-bit
+  floating-point numbers (float32), and in that format the largest representable value is
+  roughly e^88. Push past it and the number overflows to "inf," and the next operation on
+  it tends to produce "nan" (not-a-number). The exact threshold depends on the number format,
+  the framework, and the hardware -- a 64-bit float reaches far higher -- but float32 is the
+  common default for training, so this is the edge you will actually meet.
 
   The S-curve needs e^(-Z). If a raw score Z reaches -500, we compute e^(-(-500)) = e^500.
   Since 500 is far past 88, the gear shatters: the output is "nan," and nan poisons
@@ -345,8 +377,11 @@
 
   ## Putting It All in Motion (The Real Run)
 
-  Stack everything from both posts and let it run. On my machine, 50 passes over the study
-  pile gave:
+  Everything above was one dial moving one step, by hand. A real run is just that same step
+  -- error born at the output, sent backward through every dial, each one nudged by step x
+  slope -- repeated for all 641 dials, over all 341 study patients, fifty times over. Nothing
+  new happens; it only happens faster and more often. Stack both posts together and let it
+  run. On my machine, 50 passes over the study pile gave:
 
     train loss 0.07   .   practice loss 0.15   .   sealed-exam accuracy 0.974
 
