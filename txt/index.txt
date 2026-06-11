@@ -9,7 +9,7 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in six chapters (twenty-one posts),
+  This is not a pile of loose articles -- it is a short BOOK in seven chapters (twenty-two posts),
   meant to be read top to bottom. Each post opens with a "post N of 21" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
@@ -205,12 +205,25 @@
     grade the blind groups. Peeking at labels is a scorecard, never an input.
 
   [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
-    post 21/21 . 2026-06-09 . part 6 of 6 . recommender-systems, matrix-factorisation
+    post 21/22 . 2026-06-09 . part 6 of 6 . recommender-systems, matrix-factorisation
     A sheet that is mostly holes: users x movies, a rating only where someone watched. Split
     the holey grid into two skinny full sheets of hidden tastes and flavours -- PCA's
     scores-times-recipe shape again. Then the lab end to end: humble each movie column, drop
     lazy zeros, and run rebuild-restore rounds until the marks freeze -- past the hand recipe
-    that died of its own echo. The book lands here.
+    that died of its own echo.
+
+
+  CHAPTER 7 . THE BUILDING FULL OF CLERKS -- deep learning from a blank sheet
+  ---------------------------------------------------------------------------
+
+  [Part 1 -- The Building Full of Clerks: Stacked Rooms, Zero-Out, and One Walk by Hand](posts/the-web-of-adders.txt)
+    post 22/22 . 2026-06-11 . part 1 of 1 . neural-network, deep-learning, relu, backprop
+    The machine grows a second room of clerks, then a third. One room draws straight lines;
+    stacked rooms draw anything -- but only if a non-linear bend (zero-out squasher, ReLU)
+    breaks each room. The whole building walked by hand: one student, two rooms, every
+    multiplication shown, dead clerks and the gear-shatter trap explained, lazy clerks
+    sent on coffee breaks (dropout). Full three-cut split, humbling-the-numbers leak trap,
+    the S-curve exit, cross-entropy loss, and Adam the step manager -- all in one post.
 
 
 ----------------------------------------------------------------------------------------------

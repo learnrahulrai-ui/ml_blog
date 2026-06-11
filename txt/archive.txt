@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 21 posts: 6 chapters + an appendix, in reading order.
+  ALL POSTS -- a book in 22 posts: 7 chapters + an appendix, in reading order.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
@@ -51,7 +51,12 @@
   post 18/21  [Part 3 -- Grouping by Nearest Centre: K-Means From a Blank Sheet](posts/grouping-by-nearest-centre.txt)
   post 19/21  [Part 4 -- The Family Tree: Hierarchical Clustering and the Dendrogram](posts/the-family-tree-clustering.txt)
   post 20/21  [Part 5 -- Both Tools on NCI60: PCA and Clustering on Real Gene Data](posts/nci60-revisited.txt)
-  post 21/21  [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
+  post 21/22  [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
+
+
+  CHAPTER 7 -- THE BUILDING FULL OF CLERKS (2026)
+  ------------------------------------------------
+  post 22/22  [Part 1 -- The Building Full of Clerks: Stacked Rooms, Zero-Out, and One Walk by Hand](posts/the-web-of-adders.txt)
 
 
   APPENDICES -- FLIP-TO REFERENCES (2026)
