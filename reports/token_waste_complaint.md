@@ -47,19 +47,44 @@ The failure loop:
 - Session 2 (next 5-hour window): No way to inspect the previous container state. Forced to re-audit all 23 files to find what was done and what was not. Token budget again depleted on partially-duplicate work.
 - Session 3: Abandoned parallel agents entirely. Did all work in the main session. Task completed.
 
-**The billing problem:**
+**The root cause (please route to engineering, not just billing):**
 
-Parallel agents multiply token burn at N× the single-agent rate. Session/budget limits can terminate a session mid-task. Completed sub-task results exist only in the ephemeral container — I cannot read them after the container is wiped, so I cannot selectively redo only the incomplete work. The result is that I paid for the same file edits 2–3 times.
+This is a cross-session KV-cache prefix-sharing failure. I have a systems background — let me state it precisely so it can be triaged directly.
 
-This is not a mistake on my part. I followed Claude's recommended workflow. The architecture creates a situation where a user who follows best practices is penalized.
+When N background agents are spawned, each one is an INDEPENDENT, stateless inference session. They do not share a KV cache. The shared, read-only prefix — system prompt, conversation history, the file contents already read into context — is identical across all N agents, but each agent is billed the full prefix as fresh input tokens:
+
+```
+Agent 0:  [system prompt 3K] + [history 8K] + [file reads 5K] = 16K input  <- billed
+Agent 1:  [system prompt 3K] + [history 8K] + [file reads 5K] = 16K input  <- billed AGAIN
+...
+Agent 9:  [system prompt 3K] + [history 8K] + [file reads 5K] = 16K input  <- billed AGAIN
+```
+
+In OpenMP terms, the orchestrator is forking the agents with the shared context declared `private` instead of `shared`:
+
+```c
+#pragma omp parallel for private(shared_context)   // copies the 16K prefix per thread  <- current behavior
+#pragma omp parallel for shared(shared_context)    // prefix encoded once, reused        <- correct behavior
+```
+
+The shared prefix is typically 80–90% of each agent's input cost. With 10 agents, the prefix is paid 10 times instead of once. Prefix caching exists for sequential requests against a warm cache; it is NOT being applied across the parallel agent fork, so the dominant cost term is replicated N times.
+
+This is strictly worse than a normal false-share. In OpenMP the wasted work is CPU cycles — free to retry. Here the wasted work is BILLED tokens — not retryable. And the budget cut terminates the session before the Nth agent finishes, so the next session re-pays the entire prefix again on the redo. The replication compounds across sessions.
+
+**The billing problem this creates:**
+
+The session/budget limit terminates mid-task. Completed sub-task results exist only in the ephemeral container, which is wiped — I cannot read them after the fact, so I cannot selectively redo only the incomplete work. Net result: I paid the shared prefix N× per session, across 2–3 sessions, for one 23-file task.
+
+This is not user error. I followed Claude Code's own recommended parallel-agent workflow. The architecture penalizes the recommended pattern.
 
 **What I am requesting:**
 
-1. A review of my recent token usage (account: learn.rahul.rai@gmail.com) and credit for the duplicate burn caused by this loop.
-2. A product-level fix or warning: when N parallel background agents are spawned, users should be warned that their effective token burn rate is N× and that incomplete tasks will not survive a session reset.
-3. Ideally: a mechanism to inspect a previous container's git diff before it is wiped, so a user can resume from an accurate checkpoint rather than starting over.
+1. A review of my recent token usage (account: learn.rahul.rai@gmail.com) and credit for the duplicated prefix burn caused by this loop.
+2. The engineering fix: apply prefix-cache deduplication across the parallel agent fork, so the shared system-prompt + history + file-context prefix is encoded once and reused by all N agents (`shared`, not `private`), rather than re-billed per agent.
+3. A user-facing warning at spawn time: "N parallel agents = N× input-token burn on the shared prefix; incomplete tasks will not survive a session reset."
+4. Ideally: a checkpoint/inspection mechanism so a wiped container's git diff is readable on resume, so a user can continue from an accurate state instead of re-paying to re-audit.
 
-I am a paying customer. I am not asking for a refund for productive work. I am asking for a credit for tokens spent doing the same work multiple times due to an architectural gap between the parallel-agent recommendation and the session-limit reality.
+I am a paying customer. I am not asking for a refund for productive work. I am asking for a credit for tokens spent re-encoding the same prefix multiple times due to missing cross-session prefix-cache sharing in the parallel-agent path.
 
 Thank you for reviewing this.
 
