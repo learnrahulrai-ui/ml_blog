@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rolling Downhill by Hand: How a Neural Network Learns (Backpropagation from Scratch) :: Rahul&#x27;s ML Blog</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<pre>==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 7 . BUILDING A NEURAL NETWORK FROM SCRATCH . PART 2 OF 2
+  Rolling Downhill by Hand: How a Neural Network Learns
+  Posted: 2026-06-11 . Author: Rahul Rai . Tags: backpropagation, gradient-descent, adam, dropout
+  ============================================================================================
+
+  PATH . post 23 of 23
+    &lt;- prev:  <a href="the-web-of-adders.html">Chapter 7, Part 1: How a Network Computes a Guess</a>
+
+  Part 1 built a building full of clerks and walked one patient through it: thirty
+  measurements in, a probability out. At the end the building guessed 0.622 (62.2% malignant)
+  for a patient whose true answer was 1, and we measured the wrongness: a loss of about 0.475.
+
+  But the building never improved. Its dials were random and stayed random. This post fixes
+  that. Here we make the dials LEARN -- and we do it the honest way, by computing the actual
+  slopes by hand, with the chain rule, on a tiny network you can hold in your head.
+
+  If you have not read Part 1, the one thing you need from it is this: a clerk takes its
+  inputs, multiplies each by a dial, adds them with a nudge to make a raw score Z, and either
+  bends Z at zero (the zero-out rule, between rooms) or squashes it into a probability with
+  the S-curve p = 1 / (1 + e^(-Z)) (at the exit). The loss when the true answer is 1 is
+  -ln(p). That is the whole forward machine. Now we run it backward.
+
+
+  ## Why Brute Force Will Not Do
+
+  Our full building has more dials than you might guess. Let me count them.
+
+    Room 1: 30 measurements x 16 clerks + 16 nudges = 480 + 16 = 496
+    Room 2: 16 inputs x 8 clerks + 8 nudges          = 128 + 8  = 136
+    Room 3: 8 inputs x 1 clerk + 1 nudge             = 8 + 1    = 9
+    Total: 496 + 136 + 9 = 641 dials and nudges
+
+  The dumb way to improve them: take one dial, nudge it up a hair, run all 341 study patients
+  through, see if the loss dropped. Then nudge it down a hair, run all 341 again. Keep
+  whichever direction helped. Then move to the next dial.
+
+    2 directions x 641 dials x 341 patients = 437,162 full forward passes
+
+  ...just to adjust the dials ONCE. And you must adjust them thousands of times. This is the
+  "done by Christmas" plan, and it is hopeless.
+
+  There is a far better way. It computes the slope of the loss for ALL 641 dials at once, in
+  a single backward sweep that costs about the same as one forward pass. It is called
+  backpropagation. And contrary to its fearsome reputation, on a small network it is just
+  the chain rule from calculus, applied a few times. Let me show you on a network so small
+  it fits in a sentence.
+
+
+  ## A Network You Can Hold in Your Head
+
+  One measurement. One hidden clerk. One output clerk. That is the entire network.
+
+      x ---&gt; [hidden clerk] ---&gt; a1 ---&gt; [output clerk] ---&gt; p ---&gt; loss
+
+  The numbers (I am choosing small round ones so every step is checkable):
+
+    Input:          x  = 0.5
+    Hidden clerk:   w1 = 1.0,  nudge b1 = 0.3
+    Output clerk:   w2 = 1.5,  nudge b2 = 0.2
+    True answer:    y  = 1
+
+  --- FORWARD PASS (from Part 1, so you can see where we start) ---
+
+    Hidden raw score:  z1 = (x x w1) + b1 = (0.5 x 1.0) + 0.3 = 0.5 + 0.3 = 0.8
+    Zero-out rule:     a1 = max(0, 0.8) = 0.8        (0.8 is positive, kept)
+    Output raw score:  z2 = (a1 x w2) + b2 = (0.8 x 1.5) + 0.2 = 1.2 + 0.2 = 1.4
+    S-curve:           p = 1 / (1 + e^(-1.4))
+                       e^(-1.4) ≈ 0.247.   p = 1 / 1.247 ≈ 0.802
+    Loss (true=1):     L = -ln(0.802) ≈ 0.221
+
+  So the building currently guesses 0.802 and carries a loss of 0.221. We want to nudge the
+  four dials (w1, b1, w2, b2) so that next time the loss is smaller. To know which way to
+  nudge each one, we need its SLOPE: if I increase this dial a little, does the loss go up
+  or down, and how steeply?
+
+
+  ## Chain Rule, Said Plainly
+
+  The loss does not depend on w2 directly. It depends on w2 through a chain:
+
+    w2  changes  z2  (because z2 = a1 x w2 + b2)
+    z2  changes  p   (because p = S-curve of z2)
+    p   changes  L   (because L = -ln(p))
+
+  The chain rule says: to get the slope of L with respect to w2, multiply the slopes along
+  the chain.
+
+    slope of L w.r.t. w2  =  (slope of L w.r.t. p)
+                           x (slope of p w.r.t. z2)
+                           x (slope of z2 w.r.t. w2)
+
+  Let me compute each link. (Two of them need a derivative you can just take on faith for
+  now, or look up: the slope of -ln(p) is -1/p, and the slope of the S-curve is p x (1 - p).
+  Both are standard one-line calculus facts; I will not re-derive them mid-walk.)
+
+    Link 1 -- slope of L w.r.t. p:
+        L = -ln(p), so the slope is -1/p = -1/0.802 ≈ -1.247
+
+    Link 2 -- slope of p w.r.t. z2:
+        the S-curve's slope is p x (1 - p) = 0.802 x (1 - 0.802) = 0.802 x 0.198 ≈ 0.159
+
+    Link 3 -- slope of z2 w.r.t. w2:
+        z2 = a1 x w2 + b2.  Increasing w2 by 1 increases z2 by a1. So the slope is a1 = 0.8
+
+  Multiply the chain:
+
+    slope of L w.r.t. w2 = (-1.247) x (0.159) x (0.8)
+
+  Do it in two steps:
+    (-1.247) x (0.159) ≈ -0.198
+    (-0.198) x (0.8)   ≈ -0.158
+
+  The slope of the loss with respect to w2 is about -0.158.
+
+  A small miracle hides in those first two links. Watch:
+
+    (slope of L w.r.t. p) x (slope of p w.r.t. z2)
+      = (-1/p) x (p x (1 - p))
+      = -(1 - p)
+      = p - 1
+      = p - y      (since y = 1 here)
+
+  The two ugly links collapse into p - y -- guess minus truth. This is not a coincidence of
+  these numbers; it is exactly why the S-curve and the -ln loss are used together. The error
+  that flows backward out of the output clerk is simply (guess - truth) = 0.802 - 1 = -0.198.
+  Clean enough to do in your head.
+
+
+  ## Reading the Slope, and Taking a Step
+
+  The slope of L w.r.t. w2 is -0.158. NEGATIVE. What does that mean in plain words?
+
+    A negative slope means: increasing w2 DECREASES the loss.
+
+  So we should increase w2. By how much? Multiply the slope by a small step size (call it
+  0.1 -- the learning rate, more on it below) and subtract:
+
+    new w2 = w2 - (step x slope) = 1.5 - (0.1 x -0.158) = 1.5 + 0.0158 = 1.5158
+
+  We nudged w2 up, exactly as the negative slope advised. Note the pattern: we always
+  subtract step x slope. When the slope is negative, subtracting a negative ADDS -- the dial
+  goes up. When the slope is positive, the dial goes down. The minus sign does the steering
+  automatically. This single rule -- dial = dial - step x slope -- is gradient descent.
+
+  --- Does the slope tell the truth? Check it by brute force ---
+
+  We claimed increasing w2 lowers the loss with slope about -0.158. Let me verify the lazy
+  way: actually nudge w2 from 1.5 to 1.6 and recompute the loss from scratch.
+
+    w2 = 1.6:  z2 = 0.8 x 1.6 + 0.2 = 1.48
+               p  = 1 / (1 + e^(-1.48)) ;  e^(-1.48) ≈ 0.228 ;  p ≈ 1/1.228 ≈ 0.815
+               L  = -ln(0.815) ≈ 0.205
+
+  The loss fell from 0.221 to 0.205 when w2 rose by 0.1. The measured slope is:
+
+    (0.205 - 0.221) / (1.6 - 1.5) = -0.016 / 0.1 = -0.16
+
+  Our chain-rule slope was -0.158. The brute-force slope is -0.16. They agree. The chain rule
+  got the same answer as actually wiggling the dial -- but it got it for all dials at once,
+  without 437,162 forward passes. THAT is backpropagation's whole reason to exist.
+
+
+  ## Sending the Error One Room Further Back
+
+  We have the slope for w2 and b2 (the output clerk). But how does the HIDDEN clerk's dial w1
+  learn? It sits one room back. The loss depends on w1 through a longer chain:
+
+    w1  changes  z1  -&gt;  a1 (through the zero-out rule)  -&gt;  z2  -&gt;  p  -&gt;  L
+
+  The chain rule still works; we just multiply more links. And here is the trick that makes
+  it cheap: we already computed the error arriving at z2. We reuse it and keep going backward.
+
+  Start from the error at z2, which we found was p - y = -0.198. Send it back:
+
+    Step A -- through the output dial w2 to reach a1:
+        z2 = a1 x w2 + b2, so increasing a1 by 1 increases z2 by w2 = 1.5.
+        error at a1 = (error at z2) x w2 = -0.198 x 1.5 ≈ -0.297
+
+    Step B -- through the zero-out gate to reach z1:
+        a1 = max(0, z1). For z1 = 0.8 (positive), the gate is OPEN: its slope is 1.
+        (If z1 had been negative, the gate would be SHUT, slope 0, and NO error passes back --
+        a dead clerk learns nothing. This is the dead-clerk problem from Part 1, seen from
+        the back.)
+        error at z1 = (error at a1) x 1 = -0.297
+
+    Step C -- through the dial w1 to reach w1's slope:
+        z1 = x x w1 + b1, so increasing w1 by 1 increases z1 by x = 0.5.
+        slope of L w.r.t. w1 = (error at z1) x x = -0.297 x 0.5 ≈ -0.148
+        slope of L w.r.t. b1 = (error at z1) x 1 = -0.297
+
+  So w1's slope is about -0.148: negative, so increasing w1 lowers the loss, so we nudge w1
+  up. With step 0.1:
+
+    new w1 = 1.0 - (0.1 x -0.148) = 1.0 + 0.0148 = 1.0148
+
+  --- Verify this one too, the lazy way ---
+
+    w1 = 1.1:  z1 = 0.5 x 1.1 + 0.3 = 0.85 ;  a1 = 0.85
+               z2 = 0.85 x 1.5 + 0.2 = 1.475 ;  e^(-1.475) ≈ 0.229 ;  p ≈ 1/1.229 ≈ 0.814
+               L  = -ln(0.814) ≈ 0.206
+    measured slope = (0.206 - 0.221) / (1.1 - 1.0) = -0.015 / 0.1 = -0.15
+
+  Chain rule said -0.148; brute force says -0.15. Agreement again.
+
+  That is the entire algorithm. The error at the output (p - y) is computed once, then passed
+  backward room by room: multiply by the dial it crosses, multiply by the gate it passes
+  through (1 if the zero-out clerk was open, 0 if shut), and wherever it lands on a dial,
+  multiply by that dial's input to get the slope. One backward sweep, every slope, done.
+
+  --- Your turn ---
+
+  Suppose the output error (p - y) had come out as -0.40 instead of -0.198, with everything
+  else the same (w2 = 1.5, the hidden gate open at slope 1, input x = 0.5). What is the slope
+  of the loss with respect to w1?
+
+  ...
+
+    error at a1 = -0.40 x 1.5 = -0.60
+    error at z1 = -0.60 x 1 = -0.60        (gate open)
+    slope w.r.t. w1 = -0.60 x 0.5 = -0.30
+
+  A bigger output error pushes a bigger slope back to w1 -- so w1 takes a bigger step. The
+  network corrects fastest exactly where it was most wrong.
+
+
+  ## How Big a Step? (Learning Rate)
+
+  We used a step size of 0.1 above. That number is the learning rate, and it is its own small
+  art.
+
+    Step too big: the dial overshoots the bottom of the wrongness hill and lands further up
+      the other side. Next step it overshoots back. The loss oscillates or even explodes.
+    Step too small: the dial creeps. It will get there eventually, but you may run out of
+      patience (and compute budget) first.
+
+  I once set a fixed step that was slightly too large and spent two hours wondering why my
+  building was WORSE after training than before. The dials were bouncing around the valley
+  floor, never settling in it. Halving the step fixed it instantly. The lesson stuck: when
+  training diverges, suspect the step size first.
+
+
+  ## A Manager Who Sizes the Steps (Adam)
+
+  A fixed step is crude: early on you want big strides, near the bottom you want tiny ones,
+  and different dials want different sizes. Rather than tune one number forever, the standard
+  practice is to hire a manager that sizes each dial's step automatically.
+
+  The popular one is called Adam. Plainly, Adam watches the recent history of each dial's
+  slope. When a dial's slope has been pointing the same way for a while (a steep, consistent
+  hill), Adam lets it take big confident strides. When a dial's slope keeps flipping sign
+  (noisy, near the bottom), Adam shortens its stride so it does not bounce. Each of the 641
+  dials gets its own adaptive step. Adam is a choice, not a law -- plain gradient descent
+  with a hand-tuned step also works -- but Adam saves you the tuning and behaves well on this
+  kind of problem, so I use it.
+
+
+  ## Lazy Clerks and Coffee Breaks (Dropout)
+
+  Run the study loop for thirty or forty passes and a subtler failure appears. Among Room 1's
+  16 clerks, one happens to start with good dials and contribute a lot. The others discover
+  they can lower their own loss simply by amplifying whatever that one clerk says, instead of
+  learning anything themselves.
+
+  In mechanism terms (not just metaphor): several clerks' dials co-adapt so that their
+  outputs become near-copies of one strong clerk's output, scaled. The network leans on that
+  one feature detector and stops developing independent ones. It fits the 341 study patients
+  in fine detail -- including their noise -- so study loss keeps falling while practice loss
+  stalls and then climbs. That gap IS overfitting, and you watch it open in real time by
+  plotting study loss and practice loss together each pass.
+
+  The fix is almost rude in its simplicity: before each pass, randomly silence 20% of the
+  clerks -- force their output to zero for that pass. With 16 clerks, 16 x 0.20 = 3.2, so
+  about 3 clerks sit out each pass (which 3 changes randomly).
+
+  Because any clerk might be silenced on any pass, no clerk can rely on another being present.
+  Each must keep its own dials useful. The network is forced to spread the work across all 16
+  detectors instead of piling onto one. Silencing happens only during study; at practice and
+  exam time every clerk reports for duty (Keras handles this switch for you).
+
+  The 20% is a choice. On this dataset I tried 10%, 20%, and 30% and they landed in the same
+  neighbourhood -- this is a knob not worth agonising over. How many clerks sit out if 16
+  clerks face a 25% rate? 16 x 0.25 = 4. Four out, twelve working.
+
+
+  ## When Numbers Explode (Numerical Stability)
+
+  One sharp edge from the real machine. The clerks compute in 32-bit arithmetic, which holds
+  numbers only up to about e^88 before it overflows to "inf" and then "nan" (not-a-number).
+
+  The S-curve needs e^(-Z). If a raw score Z reaches -500, we compute e^(-(-500)) = e^500.
+  Since 500 is far past 88, the gear shatters: the output is "nan," and nan poisons
+  everything downstream -- the loss is nan, every slope is nan, every dial becomes nan.
+  Nothing recovers without a restart.
+
+  I hit this once by forgetting to humble the columns (Part 1). Raw radii in the hundreds,
+  times unlucky starting dials, sent a score past the overflow line on the very first forward
+  pass. The loss was nan before the first dial ever moved. Baffling until I checked whether
+  the inputs were scaled.
+
+  The fix is cheap: clip Z into a safe band before the S-curve.
+
+    if Z &lt; -80, use -80 ;  if Z &gt; +80, use +80 ;  otherwise leave Z alone
+
+  At Z = -80, S(-80) = 1 / (1 + e^80) ≈ 1.8 x 10^(-35) -- indistinguishable from 0 for any
+  medical decision. The clip changes the answer by less than one part in 10^34 and costs one
+  comparison. Always worth it. (This is the np.clip(Z, -80, 80) line in the Part 1 code, now
+  explained.)
+
+
+  ## Three Mistakes Worth Knowing
+
+  I have made all three. The first burned half a day.
+
+  --- Mistake 1: Humbling the wrong pile ---
+
+  My first version called scaler.fit_transform(X) on all 569 rows before splitting. Natural-
+  feeling -- humble, then split -- but the mean and spread were computed from all patients,
+  exam pile included. The building had absorbed a statistical whiff of the exam answers
+  before grading. My reported accuracy was slightly fake.
+    Right: scaler.fit_transform(X_train), then scaler.transform on val and test.
+    Wrong: scaler.fit_transform(X) -- the exam pile helps set the ruler.
+
+  --- Mistake 2: Grading on the study pile ---
+
+  I ran model.evaluate(X_train_scaled, y_train) and saw 99.7% accuracy. I was thrilled for
+  about a minute, then I read what I had passed in. The building had spent 50 passes
+  memorising that exact pile. Scoring it there is a memory test, not a grade. Grade on the
+  sealed exam (X_test), never on the pile the network studied.
+
+  --- Mistake 3: Forgetting the S-curve at the exit ---
+
+  Room 3 emitted a raw 14.7. I fed it straight into the loss, which expects a number in
+  [0, 1]. -ln(14.7) is negative; the loss went negative; the slopes pointed the wrong way;
+  accuracy fell as "training" proceeded. Cause: I had put activation='relu' on the final
+  clerk instead of activation='sigmoid'. Zero-out belongs between rooms; the S-curve belongs
+  at the exit.
+
+
+  ## Putting It All in Motion (The Real Run)
+
+  Stack everything from both posts and let it run. On my machine, 50 passes over the study
+  pile gave:
+
+    train loss 0.07   .   practice loss 0.15   .   sealed-exam accuracy 0.974
+
+  The gap between train (0.07) and practice (0.15) was the overfitting tell from the dropout
+  section -- the building was starting to memorise. I raised dropout from 0.2 to 0.3 and
+  added 20 more passes; the gap closed to about 0.09 vs 0.14 with essentially the same exam
+  accuracy. Patient #203 in the exam pile drew a 0.91 malignant score but was benign -- she
+  had unusually high symmetry and concavity, and the building over-trusted those two
+  measurements. One odd case in a hundred is no reason to redesign the architecture, but it
+  is a standing reminder that 97.4% accuracy still means roughly three patients in every
+  hundred are told the wrong thing.
+
+
+  ## Standard Names for Part 2
+
+    Plain term                          Standard label
+    ----------------------------------  -------------------------------------------
+    slope of the loss for a dial        gradient (partial derivative)
+    sending the error backward          backpropagation
+    dial = dial - step x slope          gradient descent update
+    step size                           learning rate
+    the manager who sizes steps         Adam optimiser
+    one full pass over the study pile   epoch
+    a handful of patients at a time     mini-batch
+    error at the exit = guess - truth   delta = (y_hat - y) for sigmoid + cross-entropy
+    lazy clerks copying one detector    co-adaptation
+    coffee break                        dropout
+    gear shatter past e^88              float32 overflow
+    clipping Z to [-80, +80]            numerical stability / sigmoid clipping
+
+
+  ## Code, If You Want It
+
+  Part 1 stopped at a built-but-untrained model. Here is the rest: compile it (choose the
+  manager, the wrongness ruler, and what to report), study it, and grade it once on the
+  sealed exam.
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       model.compile(optimizer='adam')    -- hire Adam as the step manager
+       loss='binary_crossentropy'         -- the -ln wrongness ruler from Part 1
+       model.fit(validation_data=...)     -- study, watching the practice pile each pass
+       epochs=50                          -- 50 full passes over the study pile
+       batch_size=32                      -- adjust dials after every 32 patients
+       model.evaluate(X_test_s, y_test)   -- the sealed exam, once, at the very end
+
+    # (continues directly from the Part 1 code: X_train_s, X_val_s, X_test_s, model)
+
+    model.compile(
+        optimizer='adam',
+        loss='binary_crossentropy',
+        metrics=['accuracy'],
+    )
+
+    history = model.fit(
+        X_train_s, y_train,
+        epochs=50,
+        batch_size=32,
+        validation_data=(X_val_s, y_val),   # the practice pile, watched but never studied
+        # TODO: add EarlyStopping on val_loss so it stops when practice loss turns upward
+    )
+
+    loss, acc = model.evaluate(X_test_s, y_test, verbose=0)
+    print(f"Sealed exam accuracy: {acc:.3f}")   # my run: 0.974
+
+  I left the random_state at 42 throughout so you can reproduce my exact numbers. Drop it and
+  your accuracy will jitter by a percent or so from run to run -- itself a useful reminder
+  that the starting dials matter, and that a single number from a single seed is never the
+  whole story. The honest report is a band, not a point -- but that is a lesson for another
+  chapter.
+
+  That is a neural network, end to end, by hand: forward in Part 1, backward here. Every step
+  was arithmetic a tireless clerk could do. No magic turned the dials -- only the chain rule,
+  run backward, one slope at a time.
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 7 -- Building a Neural Network from Scratch):
+    <a href="the-web-of-adders.html">Part 1 -- How a Network Computes a Guess</a> .
+    Part 2 (this post)
+
+  &lt;- <a href="../index.html">Back to all posts</a>
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+==============================================================================================
+</pre>
+</body>
+</html>

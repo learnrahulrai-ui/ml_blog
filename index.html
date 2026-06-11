@@ -17,7 +17,7 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in seven chapters (twenty-two posts),
+  This is not a pile of loose articles -- it is a short BOOK in seven chapters (twenty-three posts),
   meant to be read top to bottom. Each post opens with a "post N of 21" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
@@ -213,7 +213,7 @@
     grade the blind groups. Peeking at labels is a scorecard, never an input.
 
   <a href="posts/filling-the-blanks.html">Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation</a>
-    post 21/22 . 2026-06-09 . part 6 of 6 . recommender-systems, matrix-factorisation
+    post 21/23 . 2026-06-09 . part 6 of 6 . recommender-systems, matrix-factorisation
     A sheet that is mostly holes: users x movies, a rating only where someone watched. Split
     the holey grid into two skinny full sheets of hidden tastes and flavours -- PCA's
     scores-times-recipe shape again. Then the lab end to end: humble each movie column, drop
@@ -221,17 +221,24 @@
     that died of its own echo.
 
 
-  CHAPTER 7 . THE BUILDING FULL OF CLERKS -- deep learning from a blank sheet
-  ---------------------------------------------------------------------------
+  CHAPTER 7 . BUILDING A NEURAL NETWORK FROM SCRATCH -- deep learning, forward then backward
+  -----------------------------------------------------------------------------------------
 
-  <a href="posts/the-web-of-adders.html">Part 1 -- The Building Full of Clerks: Stacked Rooms, Zero-Out, and One Walk by Hand</a>
-    post 22/22 . 2026-06-11 . part 1 of 1 . neural-network, deep-learning, relu, backprop
-    The machine grows a second room of clerks, then a third. One room draws straight lines;
-    stacked rooms draw anything -- but only if a non-linear bend (zero-out squasher, ReLU)
-    breaks each room. The whole building walked by hand: one student, two rooms, every
-    multiplication shown, dead clerks and the gear-shatter trap explained, lazy clerks
-    sent on coffee breaks (dropout). Full three-cut split, humbling-the-numbers leak trap,
-    the S-curve exit, cross-entropy loss, and Adam the step manager -- all in one post.
+  <a href="posts/the-web-of-adders.html">Part 1 -- Stacked Rooms and One Walk by Hand: How a Network Computes a Guess</a>
+    post 22/23 . 2026-06-11 . part 1 of 2 . neural-network, deep-learning, relu, sigmoid
+    A fully self-contained start -- no prior posts needed. One room of clerks draws straight
+    lines; stacked rooms draw anything, but only if a non-linear bend (the zero-out rule,
+    ReLU) breaks the collapse between them. The forward pass walked by hand: three-cut split,
+    humbling the columns, every multiplication of one patient shown, the S-curve derived from
+    odds, and cross-entropy loss. Ends with a built network whose dials have not yet moved.
+
+  <a href="posts/how-the-dials-learn.html">Part 2 -- Rolling Downhill by Hand: How a Network Learns</a>
+    post 23/23 . 2026-06-11 . part 2 of 2 . backpropagation, gradient-descent, adam, dropout
+    The dials finally learn. Backpropagation worked by hand on a one-input, one-hidden,
+    one-output network: the chain rule link by link, the (guess - truth) shortcut derived,
+    every slope checked against a brute-force wiggle, then the error sent one room further
+    back through the dead-clerk gate. Learning rate, Adam, dropout as co-adaptation, the
+    overflow clip, three real debugging mistakes, and the end-to-end run (0.974 exam).
 
 
 ----------------------------------------------------------------------------------------------
