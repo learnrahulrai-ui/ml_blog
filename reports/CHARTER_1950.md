@@ -21,7 +21,7 @@ THE SIX LAWS
 
   LAW 2 -- REDO EVERY CALCULATION, EVERY TIME.
     Never carry a number forward on trust.  If a section uses
-    the middle of 4,6,6,8, it computes (4+6+6+8)/4 = 20/4 = 5
+    the middle of 4,6,6,8, it computes (4+6+6+8)/4 = 24/4 = 6
     again, right there.  Assume the reader remembers NOTHING
     from the previous page -- including the previous section.
 
