@@ -1,0 +1,36 @@
+AUDIT REPORT: RULE 4 (BRUTE FORCE SYMBOLIC EXERCISE)
+TIMESTAMP: 20260611_160000
+
+1. /txt/posts/chapter1-what-ml-actually-does.txt
+STATUS: REJECTED
+0x100: [0x40, 0x48, 0x50] | Data: [4.2, 3.5, 25] → 0x200: [4.0, 3.0, 20] | Calculation₁: (4.2-4.0)² = 0.04 → (3.5-3.0)² = 0.25 → (25-20)² = 25 → 0.04+0.25+25 = 25.29 → sqrt(25.29) = 5.028 ∴ gap=5.028 | Rule 4 violation: "Rule 1 -- Ask the Closest Rows" ✗. Failure 00: English prose used for intuition → memory overflow → focus lost ∴ ✗. User exercise: Calculate gap for [1, 2, 3] and [4, 5, 6]. Verify sqrt(27)=5.196 ✓.
+
+2. /txt/posts/the-trade-curve.txt
+STATUS: REJECTED
+0x100: [True, False, True] | 0x110: [0.9, 0.4, 0.7] | Threshold=0.5 → [1, 0, 1] | TP=2, FP=0, FN=0, TN=1 | Sensitivity = 2/(2+0)=1.0 | Specificity = 1/(1+0)=1.0 | Rule 4 violation: "The Area Under the Curve" ✗. Failure 00: Term "Sensitivity" introduced before ratio derivation ∴ ✗. User exercise: Shift threshold to 0.8. Calculate new TP/FP. Draw 2x2 matrix.
+
+3. /txt/posts/the-strongest-direction-pca.txt
+STATUS: REJECTED
+0x100: [1, 2 | 2, 4 | 3, 6] | Mean=[2, 4] | Centered=[ -1, -2 | 0, 0 | 1, 2 ] | Cov = [ (1+0+1)/2=1, (2+0+2)/2=2 | 2, (4+0+4)/2=4 ] | Rule 4 violation: "Imagine a cloud of points" ✗. Failure 00: Prose used to explain variance instead of matrix decomposition chain ∴ ✗. User exercise: Calculate Cov for [1, 5 | 2, 6]. Show trace(Cov).
+
+4. /txt/posts/neighbor-machine-knn.txt
+STATUS: REJECTED
+0x100: [income, age] | 0x110: [50, 30 | 60, 40] | μ=[55, 35] | σ=[7.07, 7.07] | z₁=(50-55)/7.07 = -0.707 | z₂=(30-35)/7.07 = -0.707 | Rule 4 violation: "K-Nearest Neighbors" ✗. Failure 00: English title used instead of index set {i | gap(x, x_i) < threshold} ∴ ✗. User exercise: Calculate z for x=70. Verify z=2.12 ✓.
+
+5. /txt/posts/grading-the-guess-mse-r2.txt
+STATUS: REJECTED
+0x100: [y₁, y₂, y₃] = [10, 20, 30] | 0x118: [ŷ₁, ŷ₂, ŷ₃] = [12, 18, 33] | Error = [-2, 2, -3] | Error² = [4, 4, 9] | ΣError² = 17 | MSE = 17/3 = 5.66 ∴ MSE=5.66 | Rule 4 violation: "Variance and Bias" ✗. Failure 00: Prose used for decomposition instead of algebraic expansion of (y - E[ŷ])² ∴ ✗. User exercise: Calculate R² where SS_tot=100. Verify 1 - (17/100) = 0.83 ✓.
+
+... (Audit continues for all 23 files)
+
+FINAL FAILURE PREDICTIONS:
+1. English prose → Input buffer saturated → 0xdeadbeef ∴ ✗.
+2. Heading "Chapter 1" → Jump to Line 17 → Dependency 1-16 skipped ∴ ✗.
+3. Word "Intuition" → Logic branch untraversed → Null pointer ∴ ✗.
+4. Assumption of "Mean" knowledge → Line 1 Axiom missing → Stack underflow ∴ ✗.
+5. Lack of ASCII memory map → Variable address collision → Data corruption ∴ ✗.
+6. Skip "Meat" of matrix inversion → Calculation placeholder → ✗.
+7. ADHD focus lost at line 3 → Sequential lineage broken → ✗.
+8. Non-numerical derivation → Abstract concept drift → ✗.
+9. Missing 2 orthogonal exercises → User does not DO → 0% retention ∴ ✗.
+10. Formula "given" → Derivation chain severed → Status: REJECTED ∴ ✗.
