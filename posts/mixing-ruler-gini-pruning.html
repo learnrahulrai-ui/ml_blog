@@ -111,10 +111,20 @@
 
   There it is.  4 counts -&gt; one number (0.344) for this cut.
 
+  &gt;&gt; YOUR TURN
+     A different side holds 2 yes and 3 no (made-up).  Work its Gini on the slate.
+
+     check your slate:  shares -- yes 2/5 = 0.4, no 3/5 = 0.6;  Gini = 1 - 0.4^2 -
+     0.6^2 = 1 - 0.16 - 0.36 = 0.48.  Close to the half-half worst of 0.5 -- this
+     side is badly mixed, a poor place to stop.
+
     pure side (all yes):  0       &lt;- can't be cleaner
     half-half:            0.5     &lt;- worst possible
     this cut:             0.344   &lt;- somewhere in between
 
+    each Gini costs only a handful of strokes, but the hunt is wide: 330 cuts x 10
+    columns = 3,300 Gini numbers at THIS node alone, and a tree grows many nodes --
+    clerk-work that stacks up fast as the chart deepens.
     each of the 330 cuts -&gt; one number
     smallest number = this column's champion (the cleanest split)
 
@@ -178,6 +188,18 @@
   The abstract "3 yes, 1 no" from earlier is the same math -- just wrapped
   in real column names from the cancer lab the machine actually touches.
 
+
+  IN HAND: a cut turned 4 counts into one mixed-ness number -- below 3 yes 1 no gave
+  0.375, above 1 yes 4 no gave 0.32, weighted into 0.344 -- where 0 is pure and 0.5 is
+  half-half.  This section shows that 1 - p^2 - q^2 is no magic spell.
+
+  &gt;&gt; YOUR TURN
+     A cut drops the parent's mixing from 0.48 down to a weighted-children 0.30 (both
+     made-up).  How much did the cut buy -- its information gain?
+
+     check your slate:  gain = parent Gini - weighted child Gini = 0.48 - 0.30 = 0.18.
+     A positive gain means the cut left the two sides cleaner than the parent;  the
+     champion cut is the one with the biggest gain.
 
   ## Why That Formula Is Not Astrology
 

@@ -115,6 +115,15 @@
     cut MID (height 3):    2 groups -> {1,2} {6,8}
     cut HIGH (height 8):   1 group  -> everybody
 
+  >> YOUR TURN
+     The three weddings sit at heights 1, 2, and 7.  Slide your cut to height 5.  How
+     many groups fall out?
+
+     check your slate:  a cut keeps every wedding BELOW it and undoes every wedding
+     ABOVE it.  Below 5: the height-1 and height-2 weddings stand ({1,2} and {6,8});
+     above 5: the height-7 wedding is undone.  So 2 groups -- {1,2} and {6,8}.  Any
+     cut between 2 and 7 gives the same answer.
+
   The number of branches your line slices through = the number of groups.  One tree, every
   possible K, read off by sliding a ruler up and down.  Cut just below the tallest jump and
   you get the most natural split -- the groups that resisted marrying the longest.

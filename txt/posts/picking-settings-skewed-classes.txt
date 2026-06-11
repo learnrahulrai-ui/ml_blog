@@ -92,6 +92,14 @@
     luck and shows the true tendency: C=0.1 is slightly better
     at recall on this sheet.
 
+  >> YOUR TURN
+     A grid pairs 4 candidate C-values with 3 candidate k-values, and scores every
+     pair by 5-fold rotation (made-up).  How many full model-fits is that?
+
+     check your slate:  pairs = 4 x 3 = 12;  fits = 12 x 5 folds = 60 complete fits.
+     Each fit is a whole downhill solve -- this is why a clerk-room, not a single
+     clerk, runs a grid hunt, and why the grid's size is a cost you choose.
+
   In code the whole hunt is a Pipeline -- scaler plus classifier -- handed to GridSearchCV;
   that code is at the end of the post, and it carries one subtle trap worth stating now:
 
@@ -232,6 +240,10 @@
   those K scores into one number?
 
 
+  IN HAND: a three-class scorecard -- type A F1 0.89, type B 0.67, type C 0.34 -- with
+  class C holding only 10 rows against the others' 1000.  This section asks how to roll
+  three F1 numbers into one, and shows the two answers disagree on purpose.
+
   ## Two Averaging Rules
 
     three-class example: cancer type A, B, C
@@ -247,6 +259,14 @@
   take the plain average across classes with equal weight.
 
     macro F1 = (0.89 + 0.67 + 0.34) / 3 = 0.63
+
+  >> YOUR TURN
+     Three classes score F1 of 0.80, 0.60, 0.40 (made-up).  Work the macro F1 -- the
+     equal-weight average.
+
+     check your slate:  macro F1 = (0.80 + 0.60 + 0.40) / 3 = 1.80 / 3 = 0.60.  Macro
+     weights a 10-row class the same as a 1000-row class, so a weak rare class drags
+     the score down on purpose -- that is the honest per-class picture.
 
     class C (only 10 rows) gets the same weight as class A (1000 rows)
     -> a low F1 on class C drags the average down strongly

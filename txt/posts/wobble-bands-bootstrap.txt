@@ -38,6 +38,11 @@
     rebuild the dials on this fake pile
     repeat the whole performance 200 times -> 200 versions of every dial
 
+  Count the price in clerk-steps: the straight-stick rule did ONE full dial-solve;  the
+  bootstrap does 200 of them, one per fake pile of the same 442 people.  200 complete
+  solves where there was one -- trivial for a room of tireless clerks, unthinkable for
+  a single pencil, which is the whole reason this trick waited for a crowd to share it.
+
   This trick has a name we will earn at the end: the bootstrap. The whole engine is "put
   them back." Drawing with replacement is what makes each fake pile genuinely different from
   the last, and that difference is what mimics walking into the hospital on a new day.
@@ -82,6 +87,11 @@
 
   ## The Wobble Band
 
+  IN HAND: one real pile, re-dealt WITH REPEATS into 200 fake piles (the pile stands in
+  for the world because the world is where the pile came from), each fake pile refit into
+  its own version of every dial -- so each dial now has 200 values, not one.  This section
+  turns those 200 values into a trust range.
+
   After 200 re-deals, one dial -- say bmi -- has 200 different values written down. Sort
   them smallest to largest. Chop the extreme 2.5% off each end. What is left in the middle
   is the 95% WOBBLE BAND:
@@ -120,6 +130,14 @@
      The number on the 5th index (0.42) is the lower edge.  The number on the
      194th index (0.58) is the upper edge.  The band = 0.42 to 0.58.
 
+  >> YOUR TURN
+     Suppose you ran 400 re-deals instead of 200 (made-up).  How many dial values do
+     you chop off EACH end for the 95% band, and how many stay in the middle?
+
+     check your slate:  2.5% of 400 = 400 x 0.025 = 10;  chop 10 smallest and 10
+     largest;  400 - 10 - 10 = 380 stay in the middle.  More re-deals, a smoother
+     band -- but always 2.5% sliced off each tail, never 25%.
+
   !! WARN: COUNTING NOTES IS NOT MEASURING WIDTH
      Every dial's 95% band keeps the same NUMBER of values in the middle -- 190 of the 200,
      always. That count tells you nothing. The trust is in the WIDTH: the gap between the
@@ -127,6 +145,14 @@
 
        bmi-dial:  0.42 to 0.58   -> width 0.16  (narrow, steady, trustworthy)
        s5-dial:  -0.80 to +0.90  -> width 1.70  (wide, crosses 0, untrustworthy)
+
+  >> YOUR TURN
+     Two more dials (made-up):  age-dial band 0.20 to 0.60;  bp-dial band -0.30 to
+     +0.50.  Work each width, and say which you can trust.
+
+     check your slate:  age width = 0.60 - 0.20 = 0.40, and the whole band sits ABOVE
+     zero -> trust it (a real push up).  bp width = 0.50 - (-0.30) = 0.80, and the band
+     STRADDLES zero -> cannot even trust its sign;  bp might be doing nothing at all.
 
      Same 190 notes in both. Wildly different trust. Never confuse the count with the gap.
 
@@ -191,6 +217,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   Two small loops. The first re-deals the pile 200 times and collects every dial; the band
   is just two quantiles of those. The second does the same but grades each deal on its

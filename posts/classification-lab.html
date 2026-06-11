@@ -52,6 +52,14 @@
     ~= 2 x 2.303 = 4.606, so -log(0.01) ~= 4.6.  The near-miss: -log(0.99) ~= 0.01,
     since shaving 1% off 1 barely moves the log.
 
+  &gt;&gt; YOUR TURN
+     A truly-sick lump (y = 1) is handed chance p = 0.5 by a hedging machine.  Work its
+     cross-entropy fine.
+
+     check your slate:  fine = -log(p) = -log(0.5) = log(2) ~= 0.693.  A coin-flip
+     hedge costs about 0.69 -- more than the confident-right 0.01, far less than the
+     confident-wrong 4.6.  Hedging is punished gently;  being sure and wrong is not.
+
   The machine is penalised hardest for being CONFIDENT and WRONG. MSE would score the last
   case as (0.99-0)^2 = 0.99 x 0.99 = 0.9801, call it 0.98 -- large but bounded. Log-loss
   drives toward infinity, so the gradient always points away from confident wrong answers.
@@ -80,6 +88,14 @@
     C = 1.0    medium (sklearn default)
     C = 10     loose
     C = 1000   nearly free -- almost no squeeze
+
+  &gt;&gt; YOUR TURN
+     A machine has just two dials, 2 and 3, under a tight leash C = 0.1 (made-up).
+     Work the leash's slice of the cost, (1/C) * sum(beta^2).
+
+     check your slate:  1/C = 1/0.1 = 10;  sum of squares = 2^2 + 3^2 = 4 + 9 = 13;
+     leash cost = 10 x 13 = 130.  Loosen the leash to C = 10 and the same dials cost
+     only (1/10) x 13 = 1.3 -- the tight leash makes big dials hurt a hundred times more.
 
   !! WARN: C IS THE INVERSE OF LAMBDA
      In textbooks regularisation strength is written as lambda, and the leash term is

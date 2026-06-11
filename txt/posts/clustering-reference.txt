@@ -45,7 +45,21 @@
     match?    ok    X     ok   X      ->  2 mismatches  ->  Hamming gap = 2
 
   Same boxes match -> add nothing.  Boxes differ -> add one.  That mismatch count is the
-  Hamming distance.  It is the natural gap for categories and bit-strings, where "how far
+  Hamming distance.
+
+  >> YOUR TURN
+     Two bit-strings (made-up): 10110 and 11100.  Count the Hamming gap.
+
+     check your slate:  compare position by position -- 1=1 ok, 0 vs 1 X, 1=1 ok,
+     1 vs 0 X, 0=0 ok.  Two boxes differ, so the Hamming gap = 2.
+
+  >> YOUR TURN
+     Two words: HOT and HAT.  Count the Hamming gap.
+
+     check your slate:  H=H ok, O vs A X, T=T ok.  One box differs, so the Hamming
+     gap = 1 -- a single-letter swap apart.
+
+  It is the natural gap for categories and bit-strings, where "how far
   apart" just means "how many positions disagree."
 
 

@@ -126,6 +126,14 @@
 
     LADDER dial = 4.12 / 0.0136 ~ 303
 
+  &gt;&gt; YOUR TURN
+     One person on a one-column sheet (made-up) sits at x - xbar = 0.05 and
+     y - ybar = 20.  Give this person's contribution to the "top" and to the "bottom".
+
+     check your slate:  top piece = (x-xbar) x (y-ybar) = 0.05 x 20 = 1.0;  bottom
+     piece = (x-xbar)^2 = 0.05 x 0.05 = 0.0025.  Sum the top pieces over everyone for
+     the LADDER's numerator, the bottom pieces for its denominator.
+
     That is the bmi-dial IF bmi were the ONLY column.  It is 303 because the
     numbers here are small (0.04, 0.06, ...) and multiplying by 303 brings them
     into the range of the answer (97 to 151).  The LADDER dial says "for every
@@ -158,12 +166,25 @@
   don't fool anyone else: name it EXACT or LADDER up front.
 
 
+  IN HAND: the bmi LADDER dial, worked from top 4.12 over bottom 0.0136 ~ 303 -- the
+  credit bmi grabs if it stands alone -- with the warning that the EXACT dials need the
+  untangler (X^T X)^-1 to share credit among overlapping columns.  This section adds the
+  eleventh number, the nudge.
+
   ## The Nudge -- and Its Quiet Asterisk
 
   The fixed lift looks like it should be just as fiddly. On a centred sheet it is almost
   insultingly simple:
 
     nudge = the average of the study answers
+
+  &gt;&gt; YOUR TURN
+     On a centred sheet, four study answers (made-up) are 100, 120, 140, 160.  What is
+     the nudge?
+
+     check your slate:  nudge = (100 + 120 + 140 + 160)/4 = 520/4 = 130.  On a centred
+     sheet the dials contribute nothing on average, so the only lift left to add is the
+     answers' own average -- 130.
 
   But that tidy fact rests on a condition that is easy to forget:
 

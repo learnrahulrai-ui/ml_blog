@@ -76,35 +76,35 @@ WHAT DOES NOT CHANGE
     (refreshers, drills, recomputations, clerk counts)
 
 PER-POST ROLLOUT CHECKLIST
-  [ ] 1950 contract note present or inherited from index/about
-  [ ] IN HAND block at each major section boundary
-  [ ] every carried-forward number recomputed in place
-  [ ] >= 2 YOUR TURN drills with checked answers
-  [ ] every cost stated in clerk-steps
-  [ ] code endnote carries the "day you meet one" line
+  [x] 1950 contract note present or inherited from index/about
+  [x] IN HAND block at each major section boundary
+  [x] every carried-forward number recomputed in place
+  [x] >= 2 YOUR TURN drills with checked answers
+  [x] every cost stated in clerk-steps
+  [x] code endnote carries the "day you meet one" line
 
 ROLLOUT STATUS
   [x] chapter1-what-ml-actually-does   (exemplar, this commit)
-  [ ] neighbor-machine-knn
-  [ ] straight-stick-linear-regression
-  [ ] grading-the-guess-mse-r2
-  [ ] reading-the-dials
-  [ ] sorting-into-bins
-  [ ] the-trade-curve
-  [ ] leash-and-cloud
-  [ ] picking-settings-skewed-classes
-  [ ] humble-dials-ridge-lasso
-  [ ] wobble-bands-bootstrap
-  [ ] the-dial-by-hand
-  [ ] question-charts-by-hand
-  [ ] mixing-ruler-gini-pruning
-  [ ] committees-bag-forest-boost
-  [ ] eda-and-distance
-  [ ] the-strongest-direction-pca
-  [ ] grouping-by-nearest-centre
-  [ ] the-family-tree-clustering
-  [ ] nci60-revisited
-  [ ] filling-the-blanks
-  [ ] classification-lab (appendix)
-  [ ] clustering-reference (appendix)
+  [x] neighbor-machine-knn
+  [x] straight-stick-linear-regression
+  [x] grading-the-guess-mse-r2
+  [x] reading-the-dials
+  [x] sorting-into-bins
+  [x] the-trade-curve
+  [x] leash-and-cloud
+  [x] picking-settings-skewed-classes
+  [x] humble-dials-ridge-lasso
+  [x] wobble-bands-bootstrap
+  [x] the-dial-by-hand
+  [x] question-charts-by-hand
+  [x] mixing-ruler-gini-pruning
+  [x] committees-bag-forest-boost
+  [x] eda-and-distance
+  [x] the-strongest-direction-pca
+  [x] grouping-by-nearest-centre
+  [x] the-family-tree-clustering
+  [x] nci60-revisited
+  [x] filling-the-blanks
+  [x] classification-lab (appendix)
+  [x] clustering-reference (appendix)
 ═══════════════════════════════════════════════════════════════
