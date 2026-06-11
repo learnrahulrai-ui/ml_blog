@@ -51,6 +51,14 @@
     row A: (4, 2, 6, 3)   gaps (1, 0, 1, 1)   gap = sqrt(1+0+1+1)    = sqrt(3)   ~= 1.73
     row B: (8, 9, 1, 9)   gaps (5, 7, 4, 5)   gap = sqrt(25+49+16+25)= sqrt(115) ~= 10.72
 
+  >> YOUR TURN
+     Same new row (3, 2, 5, 4).  A row C sits at (3, 4, 5, 2) (made-up).  Compute its
+     gap before reading on.
+
+     check your slate:  gaps 3-3 = 0, 2-4 = -2, 5-5 = 0, 4-2 = 2;  squares 0, 4, 0, 4;
+     sum 0 + 4 + 0 + 4 = 8;  gap = sqrt(8) ~= 2.83.  Row C lands between A (sqrt(3) ~=
+     1.73) and B (sqrt(115) ~= 10.72) -- a middling neighbour, nowhere near the closest.
+
 
   ## Put Columns on the Same Ruler First
 

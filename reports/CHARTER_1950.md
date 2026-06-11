@@ -49,6 +49,24 @@ THE SIX LAWS
     SELF_CONTAINED_VERDICT.md).  Jargon still waits for
     "The Labels, Last".
 
+  LAW 7 -- THE AXIOM FLOOR, AND CHOICES vs THEOREMS.
+    (Earned in the PR #13 adjudication.)  The floor the reader
+    stands on: counting, add, subtract, multiply, divide,
+    fractions, squares, roots.  The floor is assumed, never
+    derived; demanding a derivation of the square root is below
+    the floor and out of order.  Everything ABOVE the floor is
+    one of exactly three things, and the post must say which:
+      THEOREM -- must be derived by pencil (Gini, the squash
+                 curve from odds, kept+lost = fixed total)
+      CHOICE  -- must be named as a choice, never dressed as a
+                 fact (the line model, a linkage rule, K, e as
+                 the odds multiplier)
+      IOU     -- a fact used before its proof; must be flagged
+                 out loud in place, with where the debt is paid
+                 (the gap formula in post 1 -> paid in post 2;
+                 bias^2+variance+noise -> debt still open)
+    An unflagged IOU is the only mortal sin.
+
 WHAT DOES NOT CHANGE
   - The voice (plain words, 1950s teacher, ASCII drawings)
   - The post skeleton (sheet -> idea -> worked example ->

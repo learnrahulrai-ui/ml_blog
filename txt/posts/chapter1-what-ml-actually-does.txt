@@ -104,6 +104,11 @@
 
       gap(a, b) = sqrt( sum_j (a_j - b_j)^2 )
 
+  One honest IOU, named out loud: this formula is handed to you here, not derived.
+  WHY square-then-root measures distance (it is the ruler-on-graph-paper distance,
+  by Pythagoras) and what goes wrong with it when columns wear different units is
+  exactly Part 2's first job.  For this post, watch it work on small numbers:
+
   A concrete 2-column example, by pencil.  New row has (rooms=4, income=3).  Compare
   to one working row (rooms=5, income=3):
 

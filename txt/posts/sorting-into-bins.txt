@@ -49,6 +49,35 @@
 
   where z is the dial sum: z = b0 + x1*b1 + x2*b2 + ... + x30*b30.
 
+  Where does that formula come from?  It is not astrology -- derive it from ODDS.
+  Odds = chance for, divided by chance against:
+
+    chance 0.5  ->  odds = 0.5 / 0.5 = 1      (even money)
+    chance 0.8  ->  odds = 0.8 / 0.2 = 4      (4 to 1 on)
+    chance 0.9  ->  odds = 0.9 / 0.1 = 9      (9 to 1 on)
+
+  Now the one modelling CHOICE in this whole machine: let each +1 step of the dial
+  sum z MULTIPLY the odds by a fixed amount (call it e, about 2.718 -- any fixed
+  multiplier gives the same S-shape; e is picked because its slopes come out clean).
+  So odds = e^z.  At z = 0 the odds are e^0 = 1, even money.  Each +1 of z nearly
+  triples the odds; each -1 cuts them to about a third.
+
+  Walk it back to a chance.  If odds = (chance) / (1 - chance) = e^z, solve by pencil:
+
+    chance        = e^z x (1 - chance)
+    chance        = e^z - e^z x chance
+    chance + e^z x chance = e^z
+    chance x (1 + e^z)    = e^z
+    chance        = e^z / (1 + e^z)
+
+  Divide top and bottom by e^z:
+
+    chance        = 1 / (1/e^z + 1)  =  1 / (1 + e^-z)        <- the squash curve
+
+  So the S-curve is nothing but "dial sum sets the odds, odds walked back to a
+  chance."  Check the ends: z huge -> e^-z tiny -> chance near 1.  z hugely
+  negative -> e^-z huge -> chance near 0.  z = 0 -> 1/(1+1) = 0.5, even money.
+
   A concrete 4-person worked example, by pencil.  Suppose we have only ONE column
   (bmi) and 4 people:
 

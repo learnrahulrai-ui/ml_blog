@@ -42,6 +42,17 @@
   them back." Drawing with replacement is what makes each fake pile genuinely different from
   the last, and that difference is what mimics walking into the hospital on a new day.
 
+  WHY is the trick allowed?  Name the one assumption it leans on.  A fresh crowd would
+  be drawn from the world of all possible patients -- a bag I cannot reach.  The pile I
+  own is the best stand-in for that bag I will ever hold: every patient in it WAS drawn
+  from that world, in the proportions the world coughed up.  So drawing from my pile,
+  with repeats, imitates drawing from the world -- imperfectly, and the imperfection
+  shrinks as the pile grows.  With 4 patients the fake crowds are a crude puppet of the
+  world; with 442 they are a decent one.  That is the whole licence: the pile stands in
+  for the world because the world is where the pile came from.  No theorem hides here --
+  if the pile was gathered crookedly (one clinic, one age group), the fakes inherit the
+  crookedness, and no amount of re-dealing washes it out.
+
   >> NOTE: WHY ABOUT 37% SIT OUT EVERY DEAL
      Putting each patient back means some never get picked.  By pencil, for a pile of
      80 people:
