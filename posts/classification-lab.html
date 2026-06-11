@@ -48,9 +48,13 @@
     truly well (y=0), machine says p=0.01  -&gt;  -log(0.99) ~=  0.01   tiny
     truly well (y=0), machine says p=0.99  -&gt;  -log(0.01) ~=  4.6    huge
 
+    work the big one on the slate:  log(0.01) = -log(100), and log(100) = 2 x log(10)
+    ~= 2 x 2.303 = 4.606, so -log(0.01) ~= 4.6.  The near-miss: -log(0.99) ~= 0.01,
+    since shaving 1% off 1 barely moves the log.
+
   The machine is penalised hardest for being CONFIDENT and WRONG. MSE would score the last
-  case as (0.99-0)^2 = 0.98 -- large but bounded. Log-loss drives toward infinity, so the
-  gradient always points away from confident wrong answers.
+  case as (0.99-0)^2 = 0.99 x 0.99 = 0.9801, call it 0.98 -- large but bounded. Log-loss
+  drives toward infinity, so the gradient always points away from confident wrong answers.
 
   ** KEY: USE LOG-LOSS FOR CLASSIFICATION, MSE FOR REGRESSION
      sklearn's LogisticRegression minimises log-loss by default. MSE has no ceiling on a

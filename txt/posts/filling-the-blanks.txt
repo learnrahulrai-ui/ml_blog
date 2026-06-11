@@ -105,7 +105,8 @@
   ## The Lab, End to End: 100 People, 50 Movies, 3,786 Holes
 
   Concept done -- now the real sheet from the lab.  100 people down the side, 50 movies
-  across the top: 5,000 cells.  Only 1,214 hold a rating; the other 3,786 are blank.
+  across the top: 100 x 50 = 5,000 cells.  Only 1,214 hold a rating; the other
+  5,000 - 1,214 = 3,786 are blank.
 
     blank fraction = 3786 / 5000 = 0.757     <- three-quarters of the sheet is holes
 
@@ -125,6 +126,14 @@
     the person who said 5  ->  5 - 4 = +1     liked it MORE than the crowd
     the person who said 4  ->  4 - 4 =  0     exactly the crowd
 
+  >> YOUR TURN
+     A sixth person rated this same movie a 2.  Its middle is still 4 (the middle is
+     fixed from the present values; a new low rating does not change the worked middle
+     here).  Humble his 2.
+
+     check your slate:  2 - 4 = -2.  He liked it two stars LESS than the crowd -- the
+     most-below-the-middle voter so far.  The minus sign is information, not a penalty.
+
   Why by COLUMN and not by row?  A movie carries a baseline fame -- some films everyone
   rates high, some low.  Subtracting the movie's middle strips the fame off and leaves
   the pure signal: this person, more or less than the crowd, on this film.  After the
@@ -132,7 +141,8 @@
 
   ## Round 0: A Lazy Zero in Every Blank
 
-  Write 0 into all 3,786 blanks.  On the humbled sheet, 0 claims "this person would rate
+  Write 0 into all 3,786 blanks (the 5,000 - 1,214 = 3,786 cells with no rating).  On the
+  humbled sheet, 0 claims "this person would rate
   it exactly at the movie's middle" -- a guess that uses NO evidence about the person.
   Dumb, harmless, temporary: it budges no column's middle, and the rounds below will
   overwrite every one of these zeros with something earned.
@@ -168,6 +178,11 @@
 
   ## The Machine Loop: Rebuild, Restore, Repeat
 
+  IN HAND: a lab sheet of 100 people x 50 movies = 5,000 cells, of which 5,000 - 1,214 =
+  3,786 are blank (3,786 / 5,000 = 0.757, three-quarters holes).  Each blank is humbled by
+  its movie's middle, then started at a lazy zero.  This section turns those zeros into
+  earned marks: rebuild the whole sheet, keep the blanks, restore the truth, repeat.
+
     round 0:  write the lazy zeros into the blanks
     round 1:  the machine re-writes the WHOLE sheet from its k strongest directions
               paste the machine's marks into the BLANKS ONLY
@@ -188,6 +203,11 @@
   fake zeros, so its marks are crude.  Round 2's machine studies a sheet whose blanks
   hold those crude-but-better-than-zero marks, and spits cleaner ones.  Each round eats
   a cleaner sheet and returns a cleaner sheet, until the marks stop moving.
+
+  Count the clerk bill for this loop.  Each rebuild re-writes every cell: 100 people x 50
+  movies = 5,000 cell-writes.  Run it for 20 rounds and the clerks lay down 5,000 x 20 =
+  100,000 cell-writes before the marks freeze.  Heavy, but every stroke is plain
+  arithmetic -- no magic, just patience.
 
   ## Inside the Machine, Knob Set to 1
 
@@ -222,6 +242,17 @@
 
     strength = (1x2 + 2x4 + 3x6 + 4x8) / (4 + 16 + 36 + 64) = 60 / 120 = 1/2   correct.
 
+  >> YOUR TURN
+     Same corner, same strengths (1, 1/2, -1).  Now build the SECOND entry of the
+     builtrow from the second column (+4, +2, -4).  Do the top, the bottom, and divide.
+
+     check your slate:
+       top    = 1x4 + (1/2)x2 + (-1)x(-4) = 4 + 1 + 4 = 9
+       bottom = 1 + 1/4 + 1               = 2.25
+       entry  = 9 / 2.25 = 4
+     The real row's second entry is +4 -- the ladder pulled it back out clean, just as
+     it did the first entry (2).
+
   Once the two have settled, filling a blank costs ONE multiply:
 
     person 7's mark at movie m  =  strength_7  x  builtrow[m]
@@ -232,6 +263,10 @@
   you claim the sheet really has.
 
   ## Pick the Knob by Hiding What You Know
+
+  IN HAND: a 100 x 50 = 5,000-cell lab sheet, 3,786 of them blank, humbled by movie
+  middles and filled by the rebuild-restore loop -- whose one knob is how many builtrows
+  to keep.  This section sets that knob honestly, without ever peeking at a true blank.
 
   A mark written into a blank can never be graded -- a blank has no answer behind it.
   So manufacture blanks whose answers you KEEP:
@@ -253,10 +288,25 @@
 
   ## Un-Humble and Recommend
 
+  IN HAND: a full 100 x 50 = 5,000-cell sheet, every one of the 3,786 blanks now holding
+  an earned mark, the knob picked by hiding rated cells -- but every number still in
+  humbled units ("more or less than the crowd").  This section turns those marks back into
+  stars a person can read.
+
   The finished sheet still speaks in humbled units ("more or less than the crowd").
   To speak in stars, add the movie's middle back, then clamp into the 1-to-5 range:
 
     predicted stars = mark + that movie's middle     (clamped into 1..5)
+
+  Worked once: a blank came back with mark +1, and that movie's middle is 4.  Stars =
+  1 + 4 = 5, already inside 1..5, so it stands at 5 -- a strong recommendation.
+
+  >> YOUR TURN
+     Another blank for the same movie (middle 4) came back with mark -3.5.  Un-humble it,
+     then clamp into 1..5.
+
+     check your slate:  stars = -3.5 + 4 = 0.5;  0.5 is below the floor of 1, so clamp
+     up to 1.  Predicted 1 star -- the lowest the scale allows; do not recommend it.
 
   For one person: predict every movie he never rated, sort, and the top 5 is his
   recommendation list.  That single un-humble line is the point of the whole pipeline
@@ -367,6 +417,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   >> NEW TO PYTHON? Each named once:
        np.where(mask, a, b)   -- pick a where mask is true, else b (filled vs blank)

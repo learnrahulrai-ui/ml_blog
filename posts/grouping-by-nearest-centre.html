@@ -102,7 +102,19 @@
 
   The machine found the two obvious clumps on its own, with no answer key.
 
+  &gt;&gt; YOUR TURN
+     A seventh dot walks in at 5.  The settled centres are 2 and 11.  Which pile does
+     ASSIGN hand it to?  Compare squared gaps -- no roots needed.
+
+     check your slate:  gap to centre 2: 5 - 2 = 3, squared 9;  gap to centre 11:
+     5 - 11 = -6, squared 36.  9 &lt; 36, so the dot joins pile A -- and since squaring
+     keeps the order, the winner is the same one a square root would have crowned.
+
   ## The Score: Tightness (Inertia)
+
+  IN HAND: six dots carved into two piles, {1,2,3} and {10,11,12}, by two moves on a
+  loop; the settled centres are mean(1,2,3) = 6/3 = 2 and mean(10,11,12) = 33/3 = 11.
+  This section adds: one number that says how GOOD that grouping is.
 
   How good is a grouping?  Measure how tight the piles are.  For every dot, take its
   squared gap to its OWN centre, and add them all up:
@@ -111,6 +123,23 @@
 
     small tightness = dots hug their centres = tight, good piles
     big tightness   = dots sprawl far from their centres = loose, poor piles
+
+  Foot it on the six dots.  Pile A first, centre mean(1,2,3) = 6/3 = 2:
+
+    dot    gap to centre 2    squared
+    -----------------------------------
+     1       1 - 2 = -1          1
+     2       2 - 2 =  0          0
+     3       3 - 2 =  1          1
+                      pile A sum = 2
+
+  &gt;&gt; YOUR TURN
+     Foot pile B the same way (dots 10, 11, 12; centre mean(10,11,12) = 33/3 = 11),
+     then add the two piles into one tightness for the whole grouping.
+
+     check your slate:  10 - 11 = -1, squared 1;  11 - 11 = 0, squared 0;
+     12 - 11 = 1, squared 1;  pile B sum = 1 + 0 + 1 = 2.  Whole grouping:
+     2 + 2 = 4.  Four is the number the two moves were driving down all along.
 
   K-means is just the machine that drives this one number as low as it can, by the two
   moves on a loop.  This is the same "bottom of the bowl" idea from Chapter 1 -- squared
@@ -131,6 +160,11 @@
   a smarter starting trick (k-means++) spreads the first centres far apart on purpose.
 
   ## Choosing K: The Elbow
+
+  IN HAND: two moves on a loop, a tightness to score what they settle on (the six-dot
+  grouping foots to 1+0+1 = 2 per pile, 2 + 2 = 4 in all), and the warning that an
+  unlucky start can trap the machine in a poor low spot.  This section adds: how to
+  choose K itself.
 
   You picked K by hand -- but which K?  Run K-means for K = 1, 2, 3, 4, 5, ... and plot
   the tightness for each:
@@ -160,6 +194,10 @@
      two endpoints always sag zero, so the answer is forced to sit somewhere in between.
 
   ## A Second Ruler: How Well Does Each Dot Fit Its Pile?
+
+  IN HAND: a grouping for every K, each scored by one tightness total (at K = 2 the six
+  dots foot to 2 + 2 = 4), and an elbow to squint at on the tightness curve.  This
+  section adds: a second ruler, read per dot, with a peak instead of a bend.
 
   The elbow reads ONE number for the whole grouping (total tightness) and asks you to
   eyeball a bend.  There is a second, sharper question you can ask of EVERY single dot:

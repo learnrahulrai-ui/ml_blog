@@ -77,6 +77,11 @@
      human to read. Same ordering of which fit is better -- the root is a rising step, so
      it never swaps the order.
 
+  Count the clerk-steps for MSE on a whole sheet of 400 cars (made-up count): per car,
+  1 subtraction and 1 squaring = 2 strokes, so 400 x 2 = 800; then 399 additions to sum
+  and 1 division by the count -- 800 + 399 + 1 = 1,200 strokes.  One clerk clears it in
+  an hour; the room, before the coffee cools.
+
 
   ## The Problem MSE Can't Solve
 
@@ -91,6 +96,10 @@
 
   ## Ruler Two: R^2 -- A Race Against a Fool
 
+  IN HAND: a sheet of cars, a stick that guesses mpg from four columns, and one ruler --
+  MSE: miss -&gt; square -&gt; mean -&gt; stop -- which sizes the misses but cannot say whether
+  the size is good.  This section adds the second ruler: a race against an opponent.
+
   A score needs something to be scored against, so R^2 picks the dumbest honest opponent
   imaginable and makes the stick race it. Meet the fool. He has not looked at a single
   column -- he does not even know the cars have engines. All he has is a pile of past
@@ -99,8 +108,9 @@
     answers:  2   4   9   3   7
 
   The fool must shout one number for every car, no matter what. What is his safest shout?
-  The AVERAGE, 5 -- not because the fool is clever (he is not), but because the average is
-  the one spot that sits at the very bottom of the squared-miss bowl. Any other single
+  The AVERAGE -- (2+4+9+3+7)/5 = 25/5 = 5 -- not because the fool is clever (he is not),
+  but because the average is the one spot that sits at the very bottom of the
+  squared-miss bowl. Any other single
   number he could pick misses more:
 
     shout 5 -&gt; miss^2 = 9 + 1 + 16 + 4 + 4 = 34
@@ -124,6 +134,14 @@
 
     The average (5) gives the smallest total.  Any other number misses more.
 
+  &gt;&gt; YOUR TURN
+     Same answers (2, 4, 9, 3, 7).  Try the constant shout c = 3 and see where it
+     lands against the average's 34.
+
+     check your slate:  (2-3)^2 = 1;  (4-3)^2 = 1;  (9-3)^2 = 36;  (3-3)^2 = 0;
+     (7-3)^2 = 16;  total = 1 + 1 + 36 + 0 + 16 = 54.  Worse than the average's
+     34 -- the bowl rises on both sides of 5.
+
   Call the fool's total misery the TOTAL WOBBLE. Now race:
 
     truth:          2     4     9     3     7
@@ -131,6 +149,9 @@
     FOOL  (says 5):  miss^2 =  9, 1, 16, 4, 4   -&gt; 34   &lt;- total wobble
     STICK (uses cols): says 2.5, 4.5, 8, 3.5, 6.5
                        miss^2 = .25,.25,1,.25,.25 -&gt;  2  &lt;- leftover
+
+    (stick's misses, worked: 2-2.5 = -.5, 4-4.5 = -.5, 9-8 = +1, 3-3.5 = -.5,
+     7-6.5 = +.5;  squares .25, .25, 1, .25, .25;  sum = 2.)
 
   !! WARN: LEFTOVER IS THE BAD PART, NOT THE GOOD PART
      It is tempting to read "leftover = 2" as the stick's score. It is the opposite:
@@ -150,6 +171,16 @@
      of the WHOLE wobble did you eat?" -- a slice of a bar, not an average. The count sits
      on top and bottom and cancels, which is the very reason R^2 carries no units.
 
+  &gt;&gt; YOUR TURN
+     A clumsier stick (made-up) guesses 3, 5, 8, 2, 6 for the same truths
+     (2, 4, 9, 3, 7).  The fool's total wobble is still 9 + 1 + 16 + 4 + 4 = 34.
+     Work this stick's leftover and its R^2.
+
+     check your slate:  misses 2-3 = -1, 4-5 = -1, 9-8 = +1, 3-2 = +1, 7-6 = +1;
+     squares 1, 1, 1, 1, 1;  leftover = 5.  Ate = 34 - 5 = 29.  R^2 = 29/34 ~ 0.85.
+     A bigger leftover means a smaller slice eaten -- this stick grades below the
+     first one's 32/34 ~ 0.94.
+
   The scale falls right out:
 
     R^2 = 1.0   ate everything, leftover zero   -- a perfect line
@@ -162,6 +193,11 @@
 
   ## Guess Once, Grade Twice
 
+  IN HAND: two rulers for the same misses.  MSE: miss -&gt; square -&gt; mean -&gt; stop.  R^2:
+  the slice eaten -- on the five cars the fool's wobble is 9+1+16+4+4 = 34, the stick's
+  leftover .25+.25+1+.25+.25 = 2, so R^2 = (34 - 2)/34 = 32/34 ~ 0.94.  This section
+  adds the discipline: guess once, then hold both rulers to the same guesses.
+
     set the dials -&gt; guess the sealed pile -&gt; guesses (computed ONCE)
                                                    |
                                         +----------+----------+
@@ -173,11 +209,20 @@
   a fool you did. The few lines that do this -- one little helper that guesses a single
   time and holds up both rulers -- are waiting at the end of the post.
 
+  The clerk bill agrees.  Guessing is the dear part: one guess = 4 multiplications +
+  4 additions = 8 strokes, so 400 cars (made-up count) cost 400 x 8 = 3,200 strokes.
+  MSE after that is the 1,200 counted above; R^2 adds the fool's wobble (near 1,600
+  strokes) and a 2-stroke slice.  Both rulers together cost less than guessing once.
+
   And the old discipline holds: open the sealed pile ONCE, to grade -- never to choose.
   Grading on rows the stick never saw is the whole job of the hidden pile.
 
 
   ## Three Things Worth Stating Precisely
+
+  IN HAND: one set of guesses off the sealed pile, graded twice -- MSE for the size of
+  the misses, R^2 for the slice of the fool's wobble eaten.  This section adds the
+  fine print: the facts about the two rulers that are easiest to get wrong.
 
   &gt;&gt; NOTE: ON TRAINING THE BAR SPLITS CLEANLY -- ON TEST IT NEED NOT
      With a nudge column, the straight-stick rule forces its leftovers to sit at
@@ -275,6 +320,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   Guess once, then hold both rulers against the same misses. A small helper keeps it
   honest: it predicts a single time and hands back both scores together.

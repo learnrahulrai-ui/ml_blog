@@ -54,7 +54,8 @@
     patient row -&gt; *dials -&gt; add -&gt; squash -&gt; chance
 
     if column 7's dial = 40:
-      a shift of 0.1 in column 7 swings the sum by 4.0 -&gt; chance jumps from 0.1 to 0.98
+      a shift of 0.1 in column 7 swings the sum by 40 x 0.1 = 4.0
+      -&gt; chance jumps from 0.1 to 0.98
     the machine bets almost everything on one column
     -&gt; cocky on study pile, shaky on new lumps
 
@@ -100,6 +101,8 @@
     C = 1.0   -&gt;   lambda = 1     sklearn default
     C = 1000  -&gt;   lambda = 0.001 barely any penalty -- nearly free machine
 
+    check each on the slate:  1/0.1 = 10;  1/1.0 = 1;  1/1000 = 0.001
+
   !! WARN: C=0.1 IS HEAVY PUNISHMENT, NOT LIGHT
      C is the budget you give the machine to IGNORE the penalty. A small budget means
      little room to ignore it -- a hard squeeze. A large C means a large "ignore" budget --
@@ -108,6 +111,11 @@
 
 
   ## Did the Dials Shrink?
+
+  IN HAND: one S-curve machine, its leftover now two-part -- plain fit plus a fine of
+  lambda times the sum of squared dials -- and the dictionary C = 1/lambda, so the tight
+  setting C = 0.1 means lambda = 1/0.1 = 10.  This section adds the receipt: proof the
+  dials actually shrank.
 
   Compare the average absolute dial size for the default leash (C=1.0) against the tighter
   leash (C=0.1): if the tighter leash is doing its job, its average dial comes out smaller.
@@ -130,6 +138,17 @@
     The free machine lets x1 balloon to 8.2 -- it bets heavily on one
     column.  C=1.0 pulls it to 3.1.  C=0.1 pulls it to 1.4.  The tighter
     the leash, the more the machine spreads trust across all 3 columns.
+
+  &gt;&gt; YOUR TURN
+     Charge the FREE machine's dials (+8.2, -5.7, +0.3) the fine the tight leash
+     charges: lambda = 10 times the sum of squared dials.  Work it on the slate
+     before reading on.
+
+     check your slate:  8.2^2 = 67.24;  5.7^2 = 32.49;  0.3^2 = 0.09;  sum = 67.24 +
+     32.49 + 0.09 = 99.82;  fine = 10 x 99.82 = 998.2.  The tight machine's own dials
+     cost only 10 x (1.4^2 + 0.9^2 + 0.1^2) = 10 x (1.96 + 0.81 + 0.01) = 10 x 2.78 =
+     27.8.  Ballooned dials cost about 36 times as much -- that is exactly the pressure
+     that makes the machine shrink them.
 
   The absolute value is needed because a +3 and a -3 cancel in a plain
   average, making the machine look like it has no signal at all.  The
@@ -156,6 +175,11 @@
 
 
   ## A Completely Different Machine: The Two-Cloud Wall
+
+  IN HAND: the leashed S-curve machine -- fit plus lambda times squared dials, tight
+  setting C = 0.1 (lambda = 1/0.1 = 10) -- and the receipt that its dials shrank: average
+  size (1.4 + 0.9 + 0.1)/3 = 2.4/3 = 0.80 against the default's (3.1 + 2.4 + 0.2)/3 =
+  5.7/3 = 1.90.  This section adds a second machine of the opposite temperament.
 
   Everything so far kept the same machine and tightened its leash. Now we change the
   machine itself. The S-curve machine is a fidgeter -- it inches toward the answer by trial

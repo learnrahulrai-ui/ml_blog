@@ -105,6 +105,16 @@
     e^0.5 ~= 1.649 and e^0.1 ~= 1.105, so e^0.6 = e^0.5 * e^0.1
     ~= 1.649 * 1.105 ~= 1.822.  That is close enough for the picture.
 
+  >> YOUR TURN
+     A fifth person E walks in (made-up): bmi 0.10, same dials (b0 = 1.2, b1 = -30).
+     Compute the dial sum z and the squashed chance on your slate.  Hint:
+     e^1.8 = e^0.6 * e^0.6 * e^0.6, and e^0.6 ~= 1.822 from the note above.
+
+     check your slate:  z = 1.2 - 30 * 0.10 = 1.2 - 3.0 = -1.8;  e^1.8 ~= 1.822 *
+     1.822 * 1.822 ~= 3.320 * 1.822 ~= 6.05;  sig(-1.8) = 1 / (1 + 6.05) = 1 / 7.05
+     ~= 0.142.  Below the 0.5 cutoff, E is called well -- about a 14-in-100 chance
+     of sick.
+
   At the default cutoff of 0.5: if the chance is >= 0.5, call sick; below 0.5, call well.
   Patient A (chance 0.500) is exactly at the fence -- essentially 50/50.  Patients B, C, D
   are called well.  The machine also does something deeper: the linear sum z before the
@@ -134,6 +144,12 @@
 
     each step:  beta <- beta - a * gradient   (a = step size)
 
+  Count the clerk-steps for ONE downhill step.  Per lump: 30 multiplies and 30 adds
+  for the dial sum z, one squash and one subtraction, then 30 multiplies and 30 adds
+  for the gradient -- call it 125 strokes.  The Wisconsin sheet holds 569 lumps, so
+  one step costs 569 x 125 = 71,125 strokes, and a thousand steps run near 71 million.
+  That is why the clerks, not you, hold the pencils here.
+
   In code it is the same two-step as before -- make an empty machine, show it the study
   pile -- and that code waits at the end of the post.
 
@@ -155,6 +171,11 @@
 
 
   ## The Four-Box Table
+
+  IN HAND: a machine that adds 30 dialed columns into z, squashes z into a chance
+  (z = 0 gives 1 / (1 + 1) = 0.5, even money), and chops at a cutoff of 0.5; labels
+  on the shelf, M->1, B->0.  This section adds: a table counting the four ways a
+  verdict can land.
 
   Every exam lump lands in exactly one of four boxes based on truth and guess:
 
@@ -193,6 +214,15 @@
     happened: look at the bottom-left box (ALARM) and you see the cost in plain
     light, not buried inside a single percentage.
 
+  >> YOUR TURN
+     A bigger exam pile (made-up): 10 lumps land as CAUGHT 4, MISSED 1, ALARM 2,
+     CLEAR 3.  Work all four scores on your slate before reading on.
+
+     check your slate:  everyone = 4 + 1 + 2 + 3 = 10;  accuracy = (4 + 3) / 10 =
+     7/10 = 0.70;  recall = 4 / (4 + 1) = 4/5 = 0.80;  precision = 4 / (4 + 2) =
+     4/6 ~= 0.67;  F1 = 2 * 0.80 * 0.67 / (0.80 + 0.67) = 1.072 / 1.47 ~= 0.73.
+     This machine let 1 sick lump walk out the door -- recall 0.80 says so first.
+
   CAUGHT is the ideal: a sick lump correctly flagged. MISSED is the catastrophe: cancer
   goes home untreated. ALARM is the waste: a healthy person gets a scare and an
   unnecessary biopsy. CLEAR is the other good outcome. Drawing this table from the guesses
@@ -201,6 +231,10 @@
 
 
   ## Four Scores, Four Angles
+
+  IN HAND: a four-box table; on the 4-lump pile the boxes held CAUGHT 2, MISSED 0,
+  ALARM 1, CLEAR 1 -- 2 + 0 + 1 + 1 = 4, every lump counted once.  This section
+  adds: four scores, each reading a different slice of those boxes.
 
   No single score summarises what a bin-sorter actually does. The four scores each look at
   a different slice of the four-box table:

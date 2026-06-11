@@ -70,6 +70,11 @@
 
   ## Put Columns on the Same Ruler First
 
+  IN HAND: one gap rule -- subtract column by column, square, add, root -- worked on a
+  new row (3, 2, 5, 4): row A sat at sqrt(1+0+1+1) = sqrt(3) ~= 1.73, row B at
+  sqrt(25+49+16+25) = sqrt(115) ~= 10.72, so A is the neighbour.  This section adds the
+  trap hiding inside that sum: columns measured on different rulers.
+
   Here is the trap that sinks most first attempts. The gap adds up squared per-column
   differences -- and a column measured in thousands (people) simply drowns out one
   measured in single digits (rooms). Not because population matters more, but because its
@@ -150,6 +155,14 @@
     total work           = 20 * 80 * d
     time grows like people times columns
 
+  Count that bill in pencil strokes.  In the toy above, one gap over d = 4 columns costs
+  4 subtractions, 4 squarings, 3 additions, 1 root = 12 strokes; 20 hidden rows x 80
+  working rows = 1,600 gaps, and 1,600 x 12 = 19,200 strokes -- one clerk's morning.  On
+  the full pile (working = 20,640 x 8/10 = 16,512 rows; hidden = 20,640 - 16,512 = 4,128),
+  one guess over 8 columns costs 8 + 8 + 7 + 1 = 24 strokes per row, 16,512 x 24 = 396,288
+  in all -- and grading every hidden row runs to 4,128 x 396,288 = 1,635,876,864 strokes.
+  The room of clerks does NOT finish by lunch.
+
   Sorting shelves (KD-tree, Ball-tree) cut average guess time to roughly
   "time grows like columns times log of people" when
   columns are few, but degrade toward brute force as columns pile up. Here is why:
@@ -160,6 +173,11 @@
 
 
   ## Worked by Hand
+
+  IN HAND: the gap rule (subtract column by column, square, add, root) and the same-ruler
+  fix z = (x - mu) / sd, with mu and sd learned on the working pile only.  Each guess
+  costs one gap per working row, then the average of the k closest right-answers.  This
+  section adds the whole rule, run end to end on a pile small enough for one slate.
 
   One column (income) only, so the same-ruler step is moot here. New row at income 5.0,
   k = 3:
@@ -172,7 +190,16 @@
       |5.0 - 2.5| = 2.5      |5.0 - 7.3| = 2.3
 
     3 closest right-answers: 3.4, 2.7, 2.4
-    guess = (3.4 + 2.7 + 2.4) / 3 = 2.83
+    guess = (3.4 + 2.7 + 2.4) / 3 = 8.5 / 3 ~= 2.83
+
+  &gt;&gt; YOUR TURN
+     Same five-row pile.  A new row walks in at income 3.0 (made-up), k = 3.  Work the
+     gaps, pick the 3 closest, average their prices.
+
+     check your slate:  gaps |3.0-5.6| = 2.6, |3.0-4.0| = 1.0, |3.0-3.8| = 0.8,
+     |3.0-2.5| = 0.5, |3.0-7.3| = 4.3;  3 smallest gaps 0.5, 0.8, 1.0 -&gt; prices 1.5,
+     2.4, 2.7;  guess = (1.5 + 2.4 + 2.7) / 3 = 6.6 / 3 = 2.2.  Move the question and
+     the guess moves with it -- the rule simply follows whoever its neighbours are.
 
 
   ## k Is the Stiff-vs-Jumpy Dial
@@ -189,6 +216,11 @@
 
 
   ## Picking k Without Touching the Hidden Pile
+
+  IN HAND: the full rule, run once by hand -- five working rows, new row at income 5.0,
+  three closest answers 3.4, 2.7, 2.4, guess (3.4 + 2.7 + 2.4) / 3 = 8.5 / 3 ~= 2.83 --
+  and one loose knob, k: small k too jumpy, large k too stiff.  This section adds the
+  honest way to set that knob.
 
   How do you find the right k without ever opening the hidden pile? The same rotating-folds
   trick from Part 1: try each candidate k, score it by rotating folds on the working pile,
@@ -250,6 +282,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   Everything above was pencil and pictures. Here is the same machine in Python, using the
   scikit-learn toolbox -- two snippets: the rule itself, and the hunt for the best k.

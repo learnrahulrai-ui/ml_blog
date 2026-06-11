@@ -120,8 +120,24 @@
       x=2:  yhat = 0.333 + 1.5*2 = 3.333
       x=3:  yhat = 0.333 + 1.5*3 = 4.833
 
+  &gt;&gt; YOUR TURN
+     New pile (made-up), same recipe:  x = 1, 2, 3 and y = 1, 3, 5.  Build the four
+     sums, write the two flat-point equations, and solve for the dials.
+
+     check your slate:  sum x = 1+2+3 = 6;  sum y = 1+3+5 = 9;  sum x^2 = 1+4+9 = 14;
+     sum x*y = 1 + 6 + 15 = 22.  Equations:  3*b + 6*w = 9  and  6*b + 14*w = 22.
+     Double the first: 6*b + 12*w = 18;  subtract: 2*w = 22 - 18 = 4, so w = 2;  put
+     back: 3*b + 6*2 = 9, 3*b = 9 - 12 = -3, b = -1.  Stick: yhat = -1 + 2*x, which
+     hits 1, 3, 5 exactly -- every leftover is zero; this stick runs straight through
+     all three points.
+
 
   ## Checking the Leftovers
+
+  IN HAND: three rows (x = 1, 2, 3 against y = 2, 3, 5) and the dials the flat-point
+  solve dropped out: 2*w = 3 so w = 3/2 = 1.5, then 3*b = 10 - 6*1.5 = 10 - 9 = 1 so
+  b = 1/3 ~= 0.333.  The stick reads yhat = 0.333 + 1.5*x.  This section adds the test
+  every honest fit must pass: what its leftovers obey.
 
   At the best dials, X^T (y - X*beta) = 0, written X^T e = 0: the leftover column sits at
   right-angles to every measured column. Because one column is all ones, the leftovers
@@ -133,16 +149,26 @@
 
     sum leftover        = 0  ok   (right-angles to the ones column)
     sum x * leftover    = 0  ok   (right-angles to x column)
-    RMSE = sqrt(mean leftover^2) ~= 0.236
+    RMSE, worked: the exact leftovers are 1/6, -1/3, 1/6;  squares 1/36 + 4/36 + 1/36
+    = 6/36 = 1/6;  mean = (1/6) / 3 = 1/18 ~= 0.0556;  RMSE = sqrt(1/18) ~= 0.236
+
+  &gt;&gt; YOUR TURN
+     Verify the second right-angle check on your own slate: multiply each leftover by
+     its x and add.  Use the exact fractions: leftovers 1/6, -1/3, 1/6.
+
+     check your slate:  1*(1/6) = 1/6;  2*(-1/3) = -2/3 = -4/6;  3*(1/6) = 3/6;
+     sum = (1 - 4 + 3)/6 = 0/6 = 0.  The leftover column sits at right-angles to the
+     x column: the stick has already squeezed out everything x can explain.
 
   Geometrically: yhat = H*y where the flat-shadow thrower H = X (X^T X)^-1 X^T projects y
   onto the flat sheet spanned by the measured columns. H is symmetric and squaring it
-  gives itself back (H^2 = H). trace(H) equals the number of fitted dials. No point on the
-  flat sheet sits closer to y.
+  gives itself back (H^2 = H). trace(H) equals the number of fitted dials -- here the
+  nudge b plus the dial w, 1 + 1 = 2. No point on the flat sheet sits closer to y.
 
   ** KEY: SAME WORK, BIGGER SHEET
-     The three-row pencil solve is identical to what the toolbox runs on 16,000 rows and
-     8 columns -- only the size of X^T X changes. Fitted dials land in m.coef_, the fixed
+     The three-row pencil solve is identical to what the toolbox runs on 16,000-odd rows
+     (the working pile: 20,640 x 8/10 = 16,512) and 8 columns -- only the size of X^T X
+     changes. Fitted dials land in m.coef_, the fixed
      nudge in m.intercept_.
 
 
@@ -161,9 +187,20 @@
 
   ## Getting the Dials Right: Don't Flip the Sheet
 
+  IN HAND: the exact formula beta = (X^T X)^-1 X^T y, proved bowl-bottomed and checked
+  by hand -- three rows gave w = 3/2 = 1.5 and b = 1/3 ~= 0.333, with leftovers
+  1/6 - 2/6 + 1/6 = 0 summing to zero.  This section adds the bill for the solve, and
+  the safe way to run it.
+
     build X^T X: O(n*d^2)   &lt;- n rows, each d^2 multiplications
     solve for beta: O(d^3)
     total: O(n*d^2 + d^3)
+
+  Pencil that bill in clerk-steps on our pile.  With the ones column, d = 8 + 1 = 9, so
+  each row costs 9 x 9 = 81 multiplications; the working pile's 20,640 x 8/10 = 16,512
+  rows cost 16,512 x 81 = 1,337,472 strokes to build X^T X, and the solve adds about
+  9 x 9 x 9 = 729 more.  A room of clerks clears it in a day or two -- ONCE.  After that
+  every guess is 8 multiplications + 8 additions = 16 strokes: one clerk, one breath.
 
   Do NOT compute (X^T X)^-1 by flipping the sheet directly. Forming X^T X squares the
   shakiness number (kappa(X^T X) = kappa(X)^2) and loses precision. Instead:
@@ -186,6 +223,11 @@
 
 
   ## Ask-Closest vs. Straight-Stick
+
+  IN HAND: both rules of this chapter, built and checked.  Ask-closest keeps the whole
+  working pile (20,640 x 8/10 = 16,512 rows) and pays 16,512 x 24 = 396,288 strokes per
+  guess; straight-stick keeps 8 + 1 = 9 dials and pays 8 multiplications + 8 additions
+  = 16 strokes per guess.  This section adds the two temperaments side by side.
 
                           Ask-Closest Rule (KNN)      Straight-Stick Rule (OLS)
     ------------------    ------------------------    --------------------------
@@ -262,6 +304,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   The whole pencil derivation above is what the toolbox does for you in four lines. Notice
   there is no setting to tune and no rotating-fold hunt here -- the dials come straight from

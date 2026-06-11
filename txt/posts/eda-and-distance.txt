@@ -60,9 +60,10 @@
     Assault    170.76     83.34
     UrbanPop    65.54     14.47
 
-  Assault's mean is ~171 -- twenty-two times larger than Murder's mean.  Its spread
-  is ~83 -- also twenty times larger.  Already a warning light: Assault's numbers
-  are much bigger.  It will dominate any gap measurement unless we intervene.
+  Assault's mean is ~171 -- twenty-two times larger than Murder's mean (170.76 / 7.79
+  ~= 21.9).  Its spread is ~83 -- also twenty times larger (83.34 / 4.36 ~= 19.1).
+  Already a warning light: Assault's numbers are much bigger.  It will dominate any
+  gap measurement unless we intervene.
 
   ## The Ruler Problem
 
@@ -74,10 +75,15 @@
 
   Assault has the widest range by far.  When you measure "how far apart are two
   states", the Assault gap can be up to 290 units, while the Murder gap is at most 16
-  units.  The Assault column shouts 10 times louder than Murder.  The gap number
-  mostly reflects Assault, not the full picture.
+  units.  The Assault column shouts 10 times louder than Murder -- and the slate says
+  even more: 292 / 16.6 ~= 17.6.  The gap number mostly reflects Assault, not the
+  full picture.
 
   ## The Gap Between Two States: Two Rulers
+
+  IN HAND: a sheet of 50 states x 3 columns, a middle and a spread for each column,
+  and a warning: Assault's range (337 - 45 = 292) dwarfs Murder's (17.4 - 0.8 = 16.6).
+  This section adds the ruler itself -- two ways to measure the gap between two rows.
 
   You have two states with three numbers each.  How far apart are they?
 
