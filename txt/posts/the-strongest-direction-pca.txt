@@ -45,6 +45,12 @@
   dominate a column measured in single digits.  First step: standardise every column
   to mean=0, spread=1.  Same ruler for all 13.
 
+  Count the standardising in clerk-steps: 178 wines x 13 columns = 2,314 numbers, each
+  costing one subtract and one divide = 2 strokes, so 2,314 x 2 = 4,628 strokes before
+  PCA even begins.  Then one PC score per wine costs 13 multiplies + 12 adds = 25
+  strokes, and all 178 wines on one component run 178 x 25 = 4,450 strokes.  A room of
+  clerks clears the whole crush by lunch; you would still be sharpening your pencil.
+
   ## The Core Metaphor: Flashlight and Shadows
 
   Imagine each wine is a dot floating in a 13-wall room.  You cannot draw this room.
@@ -136,7 +142,19 @@
 
   The dots spread more along PC1 than PC2.  PC1 captures the stronger pattern.
 
+  >> YOUR TURN
+     A fifth wine E (made-up) lands at alcohol_z = 1.0 and color_z = 1.0.  Work its
+     PC1 and PC2 from the two recipes above.
+
+     check your slate:  PC1 = 0.71 * 1.0 + 0.71 * 1.0 = 0.71 + 0.71 = 1.42;
+     PC2 = -0.71 * 1.0 + 0.71 * 1.0 = -0.71 + 0.71 = 0.  E sits far out along PC1
+     and dead centre on PC2 -- a wine the strongest shadow finds extreme.
+
   ## How Much Does Each Shadow Capture?
+
+  IN HAND: four wines put on the same ruler, then a recipe PC1 = 0.71*alcohol_z +
+  0.71*color_z that spread them from -1.09 to +1.09, and PC2 at a right angle.  This
+  section asks how much of the total spread each shadow actually caught.
 
   PC1 explained fraction = variance_of_PC1_scores / (variance_of_PC1 + variance_of_PC2)
 
@@ -170,6 +188,14 @@
 
   Here is the lock that makes the fraction trustworthy.  Take one dot and the line
   it casts its shadow on.  Draw three lengths:
+
+  >> YOUR TURN (do this one after reading the three lengths just below)
+     A dot's shadow on the line is 4 long, and its perp (the walk off the line to
+     the dot) is 3 long.  How long is the stick from the origin to the dot?
+
+     check your slate:  stick^2 = shadow^2 + perp^2 = 4*4 + 3*3 = 16 + 9 = 25, so
+     stick = sqrt(25) = 5.  The 3-4-5 triangle: kept (shadow) and lost (perp) always
+     square back to the same fixed stick.
 
     stick    = straight line from the middle (origin) to the dot
     shadow   = how far the dot's shadow lands along the line  (KEPT)
@@ -352,6 +378,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   >> NEW TO PYTHON? Each named once:
        PCA(n_components=...)     -- the shadow-finder machine

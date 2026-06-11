@@ -41,6 +41,11 @@
   distance between every pair of states.  Hierarchical clustering is just a disciplined way
   to read that sheet, smallest gap first.
 
+  Count that sheet in clerk-steps.  50 states make 50 x 49 / 2 = 1,225 distinct pairs;
+  each straight-line gap over 3 columns costs 3 subtracts, 3 squarings, 2 adds, 1 root
+  = 9 strokes, so the whole sheet is 1,225 x 9 = 11,025 strokes -- one clerk's long
+  morning, and (by the row-merge trick below) the ONLY measuring the whole tree needs.
+
   ## The One Move: Marry the Two Closest
 
   Start with 50 groups -- every state is its own lonely group of one.  Then repeat one
@@ -80,6 +85,15 @@
        marry at height 7.
        -&gt;  {1,2,6,8}   one family.  done.
 
+  &gt;&gt; YOUR TURN
+     Re-run WEDDING 3 under SINGLE linkage (closest cross-pair) and AVERAGE linkage
+     (mean of the four cross-pairs |1-6|=5, |1-8|=7, |2-6|=4, |2-8|=6) instead of
+     complete.
+
+     check your slate:  SINGLE = min(5, 7, 4, 6) = 4;  AVERAGE = (5 + 7 + 4 + 6)/4
+     = 22/4 = 5.5;  COMPLETE (shown above) = max = 7.  So the same four dots give
+     root heights 4 &lt; 5.5 &lt; 7 -- single marries soonest, complete waits longest.
+
   Three weddings, at heights 1, 2, and 7.  Draw them as a tree:
 
     height
@@ -97,6 +111,10 @@
   Short joins = natural twins.
 
   ## Cut the Tree to Get Groups
+
+  IN HAND: four dots 1, 2, 6, 8 married into one family closest-pair-first -- {1,2} at
+  height 1, {6,8} at height 2, then the two pairs at height max(5,7,4,6) = 7.  This
+  section reads groups back OUT of that finished tree.
 
   Here is the magic K-means could not do: you choose the number of groups AFTER seeing the
   tree, by drawing one horizontal line across it.
@@ -272,6 +290,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   &gt;&gt; NEW TO PYTHON? Each named once:
        linkage(X, method=...)        -- build the whole family tree (the weddings)

@@ -223,6 +223,9 @@
 
   ## The Code, If You Want It
 
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
+
   The ROC sweep needs a continuous score, not a 0/1 label -- so grab predict_proba's
   column 1 (the sick-chance) and feed it to roc_curve. Then plot the curve against the
   diagonal.

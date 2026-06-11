@@ -69,6 +69,11 @@
   do it are at the end of the post.
 
 
+  IN HAND: a bare row of dials [-0.01, -0.04, -0.007, +0.12] with the names zipped
+  back on (disp, horse, weight, accel), and the most-negative hunt that crowns horse
+  (-0.04) the hardest drag.  This section shows that crown is counterfeit until the
+  columns share a ruler.
+
   ## The Trap Underneath: Dials Wear Their Column's Units
 
   Here is the deeper trap, the one the easy version walks straight into. A dial is
@@ -136,6 +141,14 @@
     changes the guess by -3.2 mpg.  One-spread step of horsepower changes it
     by -2.1 mpg.  Same currency, honest comparison.
 
+  >> YOUR TURN
+     A weight dial reads -0.005 mpg per pound (made-up), and weight's spread is 800
+     pounds.  Convert it to the shared currency: mpg per one-spread step.
+
+     check your slate:  per-spread dial = raw dial x column spread = -0.005 x 800 =
+     -4.0.  One typical-sized step in weight (800 pounds) drops the guess by 4 mpg --
+     the honest pull, now comparable to any other column's per-spread dial.
+
 
   ## Pencil It
 
@@ -147,6 +160,18 @@
 
     strongest_drag = "horse"
     accel (+0.12) is the only one PUSHING mpg up.
+
+  >> YOUR TURN
+     A different shelf (made-up), already on a shared ruler:  cyl +0.05, disp -0.02,
+     horse -0.06, accel +0.09.  Name the strongest drag.
+
+     check your slate:  scan for the lowest -- +0.05, -0.02, -0.06, +0.09.  The
+     smallest (furthest below zero) is -0.06 = horse.  Most-negative is a MIN: the
+     digit 6 looks small, but -0.06 sits lower than -0.02, so horse drags hardest.
+
+  Finding that strongest drag is the cheapest step in the whole blog: d dials need
+  d - 1 comparisons -- just 3 for these four.  No room of clerks; one clerk crowns
+  the winner before the kettle boils.
 
     1. Each column keeps one dial: + pushes the answer up, - drags it down; size is
        strength.
@@ -203,6 +228,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   Two short snippets. The first zips the column names onto the bare dials and grabs the
   most-negative one. The second does the same AFTER putting every column on a shared ruler,
