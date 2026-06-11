@@ -152,6 +152,14 @@
   person.  Adding up all four gives top = 3.96.  Adding up the squares gives
   bottom = 0.0136.
 
+  >> YOUR TURN
+     Same column (top = 3.96, bottom = 0.0136).  Set the knob to a = 1 and work the
+     ridge dial on the slate.
+
+     check your slate:  dial = top / (bottom + a) = 3.96 / (0.0136 + 1) = 3.96 /
+     1.0136 ~= 3.91.  Even a gentle a = 1 drags the plain dial of 291 down to about
+     3.9 -- the bump on the bottom does nearly all the work.
+
   ** KEY: RIDGE SHRINKS ALL, ZEROES NONE, AND SOLVES IN ONE STEP
      The fine's pull dies at zero, so every dial lands small-but-alive. The bump-on-the-
      diagonal makes the solve exact -- and, as a bonus, fixes the "tangled columns" crash
@@ -246,6 +254,14 @@
      bottoms out -- the valley above, turned into a row of numbers.
 
 
+  >> YOUR TURN
+     One candidate a was scored by the 5-slice check; its five covered-slice errors
+     came out 52, 48, 55, 50, 45 (made-up).  Turn them into that a's one score.
+
+     check your slate:  sum = 52 + 48 + 55 + 50 + 45 = 250;  score = 250 / 5 = 50.
+     That single 50 is one dot on the valley curve;  the winning a is wherever the
+     row of such dots bottoms out.
+
   ## Common Tripwires I Caught
 
   These are the exact wrong pictures I had to untangle -- each one cost me
@@ -317,6 +333,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   Two ready-made machines do all of this: RidgeCV and LassoCV both sweep a ladder of a's
   with the 5-slice check and keep the winner. Scale the columns first, the same as every

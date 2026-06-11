@@ -256,6 +256,13 @@
     lump with bmi=0.10, bp=0.70: w^T x = -0.01 + 0.28 = 0.270 > 0.260 -> sick.
     The wall is the midpoint because both classes have equal counts here.
 
+  >> YOUR TURN
+     Same wall: w = (-0.10, 0.400), and a lump sits on the sick side when w^T x beats
+     0.260.  A new lump walks in (made-up): bmi = 0.08, bp = 0.60.  Score it.
+
+     check your slate:  w^T x = -0.10 * 0.08 + 0.400 * 0.60 = -0.008 + 0.240 = 0.232.
+     0.232 < 0.260, so the lump falls on the WELL side of the wall -- called well.
+
   But the two classes are usually NOT equally common, and that pure midpoint is a special
   case. The full rule scores each new lump and adds a nudge for how common each class is:
 
@@ -332,6 +339,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   Three small things: fit the tighter-leashed machine, check its dials really did shrink,
   and fit the two-cloud wall (LDA) both ways -- empirical priors and forced-equal priors.

@@ -355,6 +355,9 @@
 
   ## The Code, If You Want It
 
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
+
   >> NEW TO PYTHON? Each named once:
        KMeans(n_clusters=K)   -- the grouping machine, K piles
        .fit(X)                -- run the two moves on a loop until settled

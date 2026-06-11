@@ -350,6 +350,9 @@
 
   ## The Code, If You Want It
 
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
+
   Four short steps, start to finish: turn the M/B letters into 1/0, fit the S-curve machine
   on scaled inputs, build the four-box table, then read the four scores off it.
 

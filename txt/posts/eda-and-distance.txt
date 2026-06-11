@@ -131,6 +131,15 @@
   The city-block gap is always larger than the straight-line gap for the same
   two points (the diagonal is shorter than the L-shaped walk).
 
+  >> YOUR TURN
+     Two more states (made-up):  X has Murder 6.0, Assault 200, UrbanPop 50;  Y has
+     Murder 9.0, Assault 240, UrbanPop 60.  Work BOTH gaps on the slate.
+
+     check your slate:  STRAIGHT-LINE -- gaps 6 - 9 = -3 (sq 9), 200 - 240 = -40
+     (sq 1600), 50 - 60 = -10 (sq 100);  sum 9 + 1600 + 100 = 1709;  sqrt(1709)
+     ~= 41.3.  CITY-BLOCK -- 3 + 40 + 10 = 53.  City-block (53) tops straight-line
+     (41.3), as the L-walk always does -- and Assault's 1600 drowns the other two.
+
   ## The Sheet of Gaps
 
   Now repeat the straight-line gap for ALL pairs of states.  50 states -> 50x50
@@ -200,6 +209,14 @@
 
   The raw gap was 28.97.  The fair gap is 1.06.  The raw gap was dominated by
   Assault's units (hundreds).  The fair gap treats every column equally.
+
+  >> YOUR TURN
+     A state (made-up) has Murder = 16.0.  Murder's mean is 7.79 and its spread is
+     4.36.  Put that one number on the same ruler.
+
+     check your slate:  z = (16.0 - 7.79) / 4.36 = 8.21 / 4.36 ~= 1.88.  The state
+     sits about 1.88 spreads ABOVE the average murder rate -- a high-murder state,
+     now in plain ruler-units any other column can be compared against.
 
   ## The Closest Pair
 
@@ -281,6 +298,9 @@
 
 
   ## The Code, If You Want It
+
+  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
+  section is for the day you meet one: the same steps, spoken in Python.
 
   >> NEW TO PYTHON? Each named once:
        pd.read_csv()         -- load a sheet from a .csv file
