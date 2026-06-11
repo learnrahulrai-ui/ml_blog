@@ -31,11 +31,18 @@
   malignant or benign. She wants a machine that studies those 569 cases and then makes the
   call on patient 570 -- before the biopsy comes back.
 
-  The simplest machine that does this is one room of clerks: each of the thirty measurements
-  gets multiplied by a dial, the thirty products get added up, the total gets squeezed into
-  a probability. Trained on the Wisconsin Breast Cancer dataset (the one I used -- you can
-  load it with sklearn.datasets.load_breast_cancer()) it often lands around 95% accuracy,
-  though the exact figure wobbles with the split and the random seed.
+  The simplest machine that does this is one room of clerks. Each of the thirty measurements
+  gets multiplied by its own DIAL -- and a dial is just a number the machine will learn,
+  saying how much that one measurement counts toward the verdict. The thirty products are
+  added into a single running total. That total can come out any size, positive or negative,
+  so a final step squeezes it into a probability between 0 and 1 (a 0.8 reads as "80% chance
+  malignant"). That squeeze is not obvious and it is not magic: I derive it by hand later in
+  this post, in the section "Squashing Any Score Into a Probability." For now, take it on
+  credit -- a total goes in, a probability comes out.
+
+  Trained on the Wisconsin Breast Cancer dataset (the one I used -- you can load it with
+  sklearn.datasets.load_breast_cancer()) this one-room machine often lands around 95%
+  accuracy, though the exact figure wobbles with the split and the random seed.
 
   But 95% is not 97%. On 569 patients that gap is about eleven people, and at least some of
   those eleven will be told the wrong thing. That is why we build something harder.
@@ -68,15 +75,25 @@
   Machine learning, in one sentence: find a mathematical rule that maps the thirty
   measurements to the answer, by studying examples where we already know the answer.
 
-  The rule we are going to find is a building full of rooms of clerks. Each clerk
-  multiplies every measurement it receives by its own personal dial, adds a fixed nudge,
-  and passes a single number to the next room. Stack three such rooms and you have a
-  neural network -- the simplest kind.
+  The rule we are going to find is a building full of clerks, working in groups we will call
+  ROOMS. A room is nothing more than a bunch of clerks working side by side at the same stage
+  -- the word "room" is just a name for one row of them. Every clerk in a room takes the
+  numbers handed to it, multiplies each by its own personal dial, adds a fixed NUDGE (a nudge
+  is one more number the machine learns -- added on at the very end to shift the clerk's
+  result up or down), and writes down a single number.
+
+  Here is the part that trips people up, so let me be exact about who hands what to whom.
+  Clerks hand numbers to CLERKS, not to rooms -- "room" is only the grouping. Each clerk in a
+  room writes ONE number, and hands a copy of that number to EVERY clerk in the next room. So
+  the clerks in Room 1 read the thirty raw measurements; each Room-1 clerk writes one number;
+  every clerk in Room 2 reads all of Room-1's written numbers; and so on down the line. Stack
+  three such rooms and you have a neural network -- the simplest kind.
 
   Why clerks? Because that is all the machine does: arithmetic. No intuition, no mystical
-  pattern recognition -- just multiply, add, bend, and repeat. Understanding it at the
-  arithmetic level means you can debug it at the arithmetic level, which is a skill you
-  will use constantly.
+  pattern recognition -- just multiply, add, BEND (force any negative running total up to
+  zero -- a trick we need shortly and explain in full in "Bending Scores at Zero"), and
+  repeat. Understanding it at the arithmetic level means you can debug it at the arithmetic
+  level, which is a skill you will use constantly.
 
 
   ## Splitting Evidence Into Three Honest Piles
@@ -85,12 +102,17 @@
   first thing to do and the most important rule to follow: never let the machine study
   from the same pile you use to grade it.
 
-  Why three piles, not two. A simple machine (one room) has one knob to tune: how steeply
-  to weigh each measurement. We can tune it, grade it on a sealed pile, done. Our building
-  has many more knobs: how many rooms, how many clerks per room, how many passes of study,
-  how aggressively to silence lazy clerks. If we tune all those knobs while peeking at the
-  sealed exam, we are tailoring the building to pass that specific exam -- and the grade
-  stops measuring how well the building handles new patients.
+  Why three piles, not two. First, one word we will lean on hard: a KNOB is a setting YOU
+  choose by hand before the machine starts learning -- exactly like the dial on a washing
+  machine, where you pick "cottons, 40 degrees, fast spin" before you press start. A knob is
+  not the same as a dial. The machine learns its own dials by itself, turning them as it
+  studies; but the knobs are yours to set, and the machine never touches them.
+
+  A one-room machine has only a knob or two to pick. Our building has many: how many rooms,
+  how many clerks per room, how many passes of study, how aggressively to silence lazy
+  clerks. If we pick all those knobs while peeking at the sealed exam, we are quietly shaping
+  the building to pass that one specific exam -- and the grade stops measuring how well the
+  building handles new patients.
 
   So: a second pile, a PRACTICE pile, used freely during tuning. The sealed exam is touched
   exactly once, at the very end, and its score is the honest report.
