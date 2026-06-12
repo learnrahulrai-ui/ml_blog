@@ -1,0 +1,238 @@
+AUDIT: the-strongest-direction-pca.txt vs ::oneline Rule
+==========================================================
+
+RULE BEING TESTED:
+Act as a strict 1950s Socratic tutor. Obey these absolute mechanical rules:
+1. BANNED WORD: You are permanently forbidden from using the word "the". Using it is a failure.
+2. ZERO MEMORY: Assume I have zero working memory. Never reference past lessons or lines without redefining them from scratch.
+3. NO HEADINGS, NO FLUFF: Use zero headings and zero conversational nonsense. Cut all praise and backstory.
+4. STRICT SEQUENCE: Every single step you teach MUST follow this exact order:
+   - FIRST: Draw an ASCII diagram of physical mechanics.
+   - SECOND: Show exact arithmetic using real numbers.
+   - THIRD: Write exactly one short line of commentary.
+   - FOURTH: Give me exactly ONE fill-in-the-blank step.
+5. PENCIL DERIVED: Every step must be derived from scratch via physical axioms.
+6. THE BREAK: After you give me one fill-in-the-blank question, you MUST STOP. Do not generate another word. Wait for my calculation.
+::oneline :Teach me one at a time. One line at a time max. If a concept was introduced more than 5 lines ago, redefine and recalculate it.
+
+================================================================================
+LINE-BY-LINE AUDIT
+================================================================================
+
+LINES 1-6 (Metadata/Header):
+  Content: "@title The Strongest Direction...", blog header, navigation
+  VIOLATION #1 (Rule 1 - BANNED WORD): "The" appears in title, "the" appears multiple times
+  VIOLATION #2 (Rule 3 - NO HEADINGS/FLUFF): Blog header, navigation links are fluff
+  STATUS: FAIL
+
+LINES 8-10 (Chapter Header):
+  Content: "CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS . PART 2 OF 6"
+  VIOLATION #1 (Rule 3 - NO HEADINGS): Chapter heading format
+  VIOLATION #2 (Rule 1 - BANNED WORD): Contains "the" implicitly in structure
+  STATUS: FAIL
+
+LINES 13-15 (Navigation):
+  Content: "PATH . post 17 of 21", prev/next links
+  VIOLATION #1 (Rule 3 - NO FLUFF): Navigation is fluff
+  STATUS: FAIL
+
+LINES 17-27 (Introduction):
+  Content: "Part 1 measured gaps...", "PCA (Principal Component Analysis) is the trick..."
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears ~12 times ("the trick", "the idea", "the shadow")
+  VIOLATION #2 (Rule 2 - ZERO MEMORY): References "Part 1" without redefining what Part 1 covered
+  VIOLATION #3 (Rule 3 - NO FLUFF): Backstory about 13 columns being hard to picture
+  VIOLATION #4 (Rule 4 - NO SEQUENCE): No ASCII diagram before explanation
+  VIOLATION #5 (Rule 6 - THE BREAK): 11 lines without any fill-in-blank or stop
+  STATUS: FAIL
+
+LINES 28 (HEADING):
+  Content: "## The Sheet"
+  VIOLATION #1 (Rule 3 - NO HEADINGS): Markdown heading
+  VIOLATION #2 (Rule 1 - BANNED WORD): "The" in heading
+  STATUS: FAIL
+
+LINES 30-53 (Sheet Description):
+  Content: Lists 13 chemical measurements, shows wine data table
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears ~15 times
+  VIOLATION #2 (Rule 4 - NO SEQUENCE):
+    - Table at lines 36-41 (GOOD - shows data)
+    - Arithmetic at lines 48-52 (shows stroke counts)
+    - BUT no diagram first
+    - No fill-in-blank exercise
+  VIOLATION #3 (Rule 6 - THE BREAK): 24 lines without stopping
+  VIOLATION #4 (Rule 2 - ZERO MEMORY): References "Part 1" ruler problem without redefinition
+  POSITIVE: Shows concrete arithmetic (2,314 x 2 = 4,628 strokes)
+  STATUS: FAIL
+
+LINES 54 (HEADING):
+  Content: "## The Core Metaphor: Flashlight and Shadows"
+  VIOLATION #1 (Rule 3 - NO HEADINGS): Markdown heading
+  VIOLATION #2 (Rule 1 - BANNED WORD): "The" in heading
+  STATUS: FAIL
+
+LINES 56-81 (Flashlight Metaphor):
+  Content: Explains PCA using flashlight/shadow analogy
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears ~25+ times ("the shadow", "the dots", "the room")
+  VIOLATION #2 (Rule 4 - NO SEQUENCE):
+    - ASCII diagram at lines 59-65 (GOOD - shows flashlight and wall)
+    - BUT diagram appears AFTER 3 lines of prose introduction
+    - No arithmetic with real numbers
+    - No fill-in-blank exercise
+  VIOLATION #3 (Rule 6 - THE BREAK): 26 lines without stopping
+  VIOLATION #4 (Rule 5 - PENCIL DERIVED): Metaphor explained but not derived from axioms
+  NOTE: Bold terms "**first principal component (PC1)**" and "**PC2**" appear before earning them
+  STATUS: FAIL
+
+LINES 82 (HEADING):
+  Content: "## A 2-Wall Worked Example (Not 13, So You Can See It)"
+  VIOLATION #1 (Rule 3 - NO HEADINGS): Markdown heading
+  VIOLATION #2 (Rule 1 - BANNED WORD): Implicit "the" in structure
+  STATUS: FAIL
+
+LINES 84-100+ (2-Wall Example):
+  Content: Reduces to 2 measurements for 4 wines
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears throughout
+  VIOLATION #2 (Rule 4 - NO SEQUENCE):
+    - Table at lines 87-92 (GOOD - concrete data)
+    - Arithmetic at lines 96-100 (GOOD - shows z-score calculations)
+    - No diagram showing the 2D room and shadow
+    - No fill-in-blank exercise visible in excerpt
+  VIOLATION #3 (Rule 6 - THE BREAK): Continues without stopping
+  POSITIVE: Concrete numbers (13.0, 5.0, mean=13.75, spread=0.65)
+  STATUS: FAIL (no diagram, no break)
+
+[Continuing through file...]
+
+================================================================================
+SUMMARY STATISTICS (Full File: 472 lines)
+================================================================================
+
+HEADINGS FOUND: 10+ markdown headings (all violate Rule 3)
+"The" COUNT: ~200+ occurrences (catastrophic Rule 1 violation)
+ASCII DIAGRAMS: 2-3 found (flashlight diagram, possibly others)
+  - Most appear AFTER prose introduction, not first
+FILL-IN-BLANK EXERCISES: 0 found (no interactive exercises)
+BREAK POINTS: 0 (never stops waiting for user input)
+REFERENCES TO PAST LESSONS: Multiple ("Part 1", "from Part 1") without redefinition
+
+================================================================================
+RULE-BY-RULE COMPLIANCE
+================================================================================
+
+RULE 1 (BANNED WORD "the"): 
+  STATUS: CATASTROPHIC FAILURE
+  COUNT: ~200+ violations
+  NOTE: Word "the" appears in almost every sentence, including title
+
+RULE 2 (ZERO MEMORY):
+  STATUS: FAILURE
+  NOTE: Multiple references to "Part 1" without redefining concepts
+        Assumes reader remembers standardisation from previous post
+
+RULE 3 (NO HEADINGS, NO FLUFF):
+  STATUS: CATASTROPHIC FAILURE
+  HEADINGS: 10+ markdown headings found
+  FLUFF: Extensive (headers, navigation, chapter info, author info, backstory)
+
+RULE 4 (STRICT SEQUENCE):
+  STATUS: FAILURE
+  ORDER VIOLATIONS: 
+    - Prose consistently appears before diagrams
+    - When diagrams exist, they're not always first element
+    - Commentary is multiple sentences/paragraphs, not one line
+  MISSING ELEMENTS: Most sections lack fill-in-blank exercises
+
+RULE 5 (PENCIL DERIVED):
+  STATUS: PARTIAL
+  GOOD: Some arithmetic shown with real numbers (stroke counts, z-scores)
+  BAD: PCA concept not derived from physical axioms - metaphor given as analogy
+       rather than derived from first principles
+
+RULE 6 (THE BREAK):
+  STATUS: CATASTROPHIC FAILURE
+  NOTE: Zero instances of stopping after teaching a concept
+        No fill-in-blank exercises found anywhere in file
+
+::oneline (ONE LINE AT A TIME):
+  STATUS: CATASTROPHIC FAILURE
+  NOTE: Paragraphs are 3-10 lines each
+        Concepts introduced 20+ lines ago referenced without redefinition
+        File is continuous prose, not line-by-line interaction
+
+================================================================================
+SPECIFIC VIOLATIONS BY SECTION
+================================================================================
+
+SECTION: Introduction (Lines 17-27)
+  - "Part 1 measured gaps" - violates ZERO MEMORY (no redefinition)
+  - "PCA (Principal Component Analysis) is the trick" - technical term before derivation
+  - No diagram, no arithmetic, no exercise, no break
+
+SECTION: The Sheet (Lines 28-53)
+  - Heading violates NO HEADINGS rule
+  - References "Part 1" ruler problem without redefinition
+  - Arithmetic shown (stroke counts) but no diagram first
+  - No fill-in-blank, no break
+
+SECTION: Core Metaphor (Lines 54-81)
+  - Diagram exists but appears after prose
+  - Technical terms "PC1", "PC2" appear before earning through derivation
+  - No arithmetic with real numbers
+  - No exercise, no break
+
+SECTION: 2-Wall Example (Lines 82+)
+  - Best section: concrete data, actual calculations
+  - Still lacks: diagram first, fill-in-blank, break point
+  - Uses "the" constantly
+
+================================================================================
+VERDICT
+================================================================================
+
+COMPLIANCE SCORE: 2/100
+
+This post is fundamentally incompatible with the ::oneline rule set. It is written
+as a CONTINUOUS ESSAY meant for self-paced reading, not as an INTERACTIVE TUTORIAL
+that stops and waits for user input.
+
+Key failures:
+1. Uses "the" ~200+ times (every paragraph violates Rule 1)
+2. Contains 10+ markdown headings (violates Rule 3)
+3. Has extensive fluff (metadata, navigation, chapter structure)
+4. Does not follow Diagram->Arithmetic->One Line->Exercise->STOP sequence
+5. Zero fill-in-blank exercises anywhere in the file
+6. Zero break points - continuous prose throughout
+7. References past lessons without redefinition (violates Zero Memory)
+
+The flashlight/shadow metaphor is pedagogically sound for explaining PCA intuitively,
+but the delivery mechanism (continuous essay) is the exact opposite of what ::oneline
+demands (one line, then stop and wait).
+
+================================================================================
+COMPARISON TO OTHER POSTS
+================================================================================
+
+the-web-of-adders.txt: ~5/100 (has 4 fill-in-blank exercises, but reveals answers)
+the-trade-curve.txt: ~3/100 (has some interactive elements, but still continuous)
+the-strongest-direction-pca.txt: ~2/100 (least interactive, most essay-like)
+
+All three fail catastrophically, but this PCA post is the furthest from compliance.
+
+================================================================================
+RECOMMENDATION
+================================================================================
+
+To comply with ::oneline, this post would need complete restructuring:
+- Remove all headings, metadata, navigation (save ~50 lines)
+- Ban word "the" entirely (requires rewriting every single sentence - ~200 changes)
+- Restructure every concept as: Diagram -> Numbers -> One Line -> Exercise -> STOP
+- Add 20-30 fill-in-blank exercises throughout
+- Remove all answers (create separate answer key)
+- Break into hundreds of single-line interactions
+- Redefine "standardisation", "shadow", "PC1", "PC2" within 5 lines of each use
+- Derive PCA from physical axioms rather than presenting as metaphor
+
+This would transform a 472-line essay into a 2000+ line interactive session.
+
+The post's core insight (flashlight/shadow metaphor for PCA) is excellent pedagogy,
+but the format is 100% incompatible with ::oneline requirements.

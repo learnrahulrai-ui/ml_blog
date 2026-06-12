@@ -1,0 +1,171 @@
+AUDIT REPORT: the-trade-curve.txt
+================================================================================
+Rule: ::news :Crack the math behind each new word. From scratch via axioms and 
+no news on any stage. Always start from the beginning. Do not introduce new 
+terminology without physical derivation.
+================================================================================
+
+LINE-BY-LINE AUDIT:
+--------------------------------------------------------------------------------
+
+Lines 1-6: Metadata/header - PASS (no technical content)
+
+Lines 8-10: Chapter title and posting info - PASS (contextual framing)
+
+Lines 13-15: Path navigation - PASS (structural)
+
+Lines 17-27: Introduction to cutoff sliding concept
+  - "draw the line at 0.5" - PASS (concrete number, familiar concept)
+  - "slide that line" - PASS (physical metaphor)
+  - "catch more real cases" / "false alarms" - PASS (plain English, no jargon)
+  - "trade curve" - PARTIAL: Term introduced but immediately explained via 
+    metaphor ("lay all the bargains out side by side")
+  - Overall: Good physical intuition before any formulas
+
+Lines 30-44: Two Rates section
+  - "catch-rate (TPR)" - FAIL: Acronym TPR introduced alongside plain term
+    before full derivation. Should use only "catch-rate" until after math.
+  - "false-alarm (FPR)" - FAIL: Same issue with FPR acronym
+  - Formula: TPR(t) = P(yhat=1 | Y=1) = TP(t) / (TP(t) + FN(t)) - PARTIAL:
+    Probability notation P() and conditional notation | are used without
+    deriving what they mean from scratch. Assumes reader knows probability.
+  - "TPR is the same as recall" - FAIL: New term "recall" introduced here
+    without derivation. This violates "no news on any stage."
+  - Content of formula is correct but notation assumes prior knowledge
+
+Lines 47-63: Sliding the Cutoff section
+  - ASCII diagram with cutoff positions - PASS (visual, physical)
+  - "slide LEFT", "slide RIGHT" - PASS (directional, intuitive)
+  - "catch-rate ^", "false-alarm ^" - PASS (shows trade-off physically)
+  - "TRADE: cannot raise catches without raising false alarms" - PASS
+    (derived from the sliding examples)
+
+Lines 66-132: Drawing All the Deals at Once section
+  - "Sweep the cutoff from 1 down to 0" - PASS (action verb, physical)
+  - "drop a dot at those coordinates" - PASS (concrete action)
+  - "ROC curve" - FAIL: Standard term introduced abruptly in line 69
+    without earning it through the derivation first
+  - ASCII plot of curve - PASS (excellent visual derivation)
+  - "perfect machine", "coin flip" - PASS (metaphors grounded in examples)
+  - 6-person worked example with actual numbers - EXCELLENT PASS
+    * Every step shown: cutoff positions, counts, TPR/FPR calculations
+    * Table format makes arithmetic visible
+    * Reader can verify each number
+  - "YOUR TURN" exercise - PASS (forces engagement)
+  - "check your slate" answer - PASS (verification provided)
+  - Clerk-step calculation (324,330 comparisons) - PASS (physical cost shown)
+
+Lines 139-180: The Area Under the Curve section
+  - "AUC" - FAIL: Acronym introduced before being spelled out or derived
+  - "area under it" - PASS (geometric, intuitive)
+  - "AUC = 1.0 perfect", "AUC = 0.5 useless" - PARTIAL: Values stated but
+    not derived from first principles yet
+  - "trapezoidal rule" - FAIL: Technical term dropped without explaining
+    what a trapezoid is or why this rule works
+  - "YOUR TURN" with trapezoid calculation - PASS (shows the arithmetic)
+  - Actual trapezoid math: width x average height - PASS (derived)
+  - Worked example with 6 cutoffs - EXCELLENT PASS
+    * Each strip calculated explicitly
+    * Sum shown step-by-step
+    * Result (1.000) verified against intuition (perfect ranking)
+
+Lines 181-212: What AUC Actually Measures section
+  - "pick-higher reading" - PASS (plain English description)
+  - Formula: AUC = P( score(x+) > score(x-) ) - PARTIAL: Probability
+    notation used without derivation, but concept is explained in words
+  - "Pick one sick lump at random and one well lump at random" - EXCELLENT
+    This is the best kind of derivation: concrete scenario anyone can picture
+  - Visual with #### bars showing separation - PASS (intuitive)
+  - "AUC = 0.97 means..." with concrete interpretation - PASS
+  - KEY box about cutoff-independence - PASS (contrasts with Part 1 metrics)
+  - Comparison to accuracy/recall/precision/F1 - FAIL: These terms are
+    referenced as if reader knows them from Part 1, but this violates
+    "always start from the beginning" for readers starting here
+
+Lines 213-227: Why You Need Chances, Not Labels section
+  - "continuous score" vs "0 or 1" - PASS (clear distinction)
+  - predict vs predict_proba - PARTIAL: Code function names appear without
+    explaining what "proba" means (should say "probability" first)
+  - Column explanation (well-chance, sick-chance) - PASS
+  - "column 1 is the sick-chance" - PASS (concrete indexing explained)
+
+Lines 229-235: Plotting It section
+  - "grey 45-degree diagonal" - PASS (visual reference)
+  - "bulges toward the top-left corner" - PASS (physical description)
+
+Lines 236-249: Practical Reading section
+  - AUC interpretations (0.99, 0.85, 0.70, 0.50) - PASS (calibrated examples)
+  - Clinical decision example (cancer screening) - PASS (real-world grounding)
+
+Lines 251-284: The Code section
+  - Python code with comments - PASS (labeled as optional)
+  - "NEW TO PYTHON?" explanations - PASS (derives syntax)
+  - WARN about column 0 - PASS (explains consequence physically)
+  - Plot code with labels - PASS
+
+Lines 286-297: The Labels, Last section
+  - Mapping table from plain terms to standard labels - GOOD INTENT
+  - BUT issues:
+    * "true positive rate / sensitivity / recall" - These standard terms
+      were already used earlier (line 43: "TPR is the same as recall")
+    * "false positive rate / (1 - specificity)" - "specificity" appears
+      here for the first time but was implicitly referenced via FPR earlier
+    * "posterior probability" - Technical Bayesian term appears without
+      derivation from axioms
+    * "Wilcoxon-Mann-Whitney" - Statistical test name dropped without
+      explaining the connection to the pick-higher story
+  - PARTIAL FAIL: Terms used throughout post before this mapping section
+
+SUMMARY OF VIOLATIONS:
+--------------------------------------------------------------------------------
+1. PREMATURE ACRONYMS: "TPR", "FPR", "ROC", "AUC" all appear before being
+   fully earned. Rule says terminology must follow physical derivation.
+   
+2. PROBABILITY NOTATION ASSUMED: P(yhat=1 | Y=1) uses conditional probability
+   notation without deriving what P() or | mean from axioms. A reader starting
+   "from the beginning" may not know this notation.
+
+3. REFERENCED TERMS FROM PART 1: Line 207 mentions "accuracy, recall, precision,
+   F1" assuming reader did Part 1. This violates "always start from the beginning"
+   - each post should stand alone per the blog's philosophy.
+
+4. TECHNICAL TERMS WITHOUT DERIVATION:
+   - "trapezoidal rule" (line 153): Named but not derived (why trapezoids?)
+   - "sensitivity", "specificity" (lines 290-291): Appear only in final mapping
+   - "posterior probability" (line 294): Bayesian term without foundation
+   - "Wilcoxon-Mann-Whitney" (line 295): Statistical test name without 
+     explaining the mathematical connection to P(score+ > score-)
+
+5. CODE TERMS: "predict_proba" uses abbreviation "proba" without first saying
+   "probability" in full.
+
+WHAT WORKS WELL:
+--------------------------------------------------------------------------------
+- 6-person worked example is EXCEPTIONAL - every arithmetic step visible
+- "Pick one sick lump, one well lump" story is perfect physical derivation
+- ASCII plots make abstract concepts concrete
+- Trade-off shown via sliding cutoff, not just asserted
+- Clerk-step calculations show computational cost
+- "YOUR TURN" exercises with answers force engagement
+- Cancer screening example grounds the math in reality
+- Trapezoid area calculation shown explicitly (width x average height)
+
+RECOMMENDATION:
+--------------------------------------------------------------------------------
+This post is ~75% compliant. To achieve full compliance:
+1. Remove TPR/FPR/ROC/AUC acronyms from early sections; use only plain terms
+2. Derive probability notation or replace with fraction language throughout
+3. Either include brief recap of Part 1 terms or remove references to them
+4. Explain WHY trapezoidal rule works (sum of rectangular strips) before naming
+5. Move ALL standard terminology (sensitivity, specificity, posterior, 
+   Wilcoxon-Mann-Whitney) to "The Labels, Last" section ONLY
+6. Spell out "probability" before using "proba" abbreviation
+7. Ensure post stands completely alone without requiring Part 1
+
+SEVERITY: MEDIUM-HIGH - The core derivations (6-person example, pick-higher
+story, trapezoid math) are excellent and physically grounded. However, 
+standard terminology appears too early and probability notation assumes
+prior knowledge, violating both "from scratch via axioms" and "always start
+from the beginning."
+
+================================================================================

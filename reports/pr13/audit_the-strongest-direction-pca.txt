@@ -1,0 +1,134 @@
+AUDIT REPORT: the-strongest-direction-pca.txt
+================================================================================
+Rule: ::news :Crack the math behind each new word. From scratch via axioms and 
+no news on any stage. Always start from the beginning. Do not introduce new 
+terminology without physical derivation.
+================================================================================
+
+LINE-BY-LINE AUDIT:
+--------------------------------------------------------------------------------
+
+Lines 1-6: Metadata/header - PASS (no technical content)
+
+Lines 8-10: Chapter title and posting info - PASS (contextual framing)
+
+Lines 13-15: Path navigation - PASS (structural)
+
+Lines 17-26: Introduction to PCA problem and core metaphor
+  - "13 columns" / "100" - PASS (concrete numbers from dataset)
+  - "PCA (Principal Component Analysis)" - FAIL: New term introduced without 
+    derivation. Should first explain what problem it solves before naming it.
+  - "CRUSHES that many-wall room down to a flat page" - PASS (physical metaphor)
+  - "shine a flashlight" / "shadow" - PASS (physical derivation follows)
+  - "LONGEST spread" - PASS (intuitive, derived via shadow metaphor)
+  - "first principal component" - FAIL: Term introduced before physical 
+    derivation is complete. Should say "first shadow direction" then map to term.
+  - "second" (PC2) - FAIL: Same issue - term before full derivation
+
+Lines 28-52: The Sheet section
+  - Column names (alcohol, malic_acid, etc.) - PASS (data description)
+  - "178 wines. 13 chemical measurements." - PASS (factual)
+  - "standardise every column to mean=0, spread=1" - PARTIAL: Concept introduced 
+    but formula given immediately after (lines 96-102 show derivation)
+  - Clerk-step calculations (4,628 strokes, etc.) - PASS (physical arithmetic)
+
+Lines 54-81: Core Metaphor section
+  - "flashlight and shadows" - PASS (excellent physical derivation)
+  - "13-wall room" - PASS (extended metaphor, physically grounded)
+  - "PC1", "PC2" - FAIL: Acronyms used before being fully earned through 
+    derivation. Should wait until after shadow math is shown.
+  - "most informative way" - PASS (derived from longest shadow concept)
+
+Lines 82-152: 2-Wall Worked Example
+  - All arithmetic shown step-by-step - PASS
+  - Standardisation formulas with actual numbers - PASS
+  - PC1 = 0.71 * alcohol_z + 0.71 * color_z - PASS (recipe shown, not just stated)
+  - "YOUR TURN" exercises - PASS (forces reader to derive)
+  - "check your slate" answers - PASS (verification provided)
+
+Lines 153-186: How Much Does Each Shadow Capture?
+  - Variance calculation shown explicitly - PASS
+  - Formula: variance_of_PC1_scores / (variance_of_PC1 + variance_of_PC2) - PASS
+    (derived from first principles)
+  - Actual numbers: 0.75, 0.74, 1.49, 0.50 - PASS (arithmetic verified)
+  - "explained fraction" - PASS (term follows derivation)
+
+Lines 187-230: Why Kept + Lost Always Adds Back
+  - stick/shadow/perp metaphor - PASS (excellent physical grounding)
+  - Pythagoras derivation: stick^2 = shadow^2 + perp^2 - PASS (axiomatic)
+  - "KEPT" and "LOST" labels - PASS (introduced alongside physical meaning)
+  - Connection to reconstruction error - PASS (derived, not asserted)
+
+Lines 231-244: Choosing How Many Shadows
+  - Cumulative percentages shown - PASS
+  - "80% threshold" - PASS (framed as rule of thumb, not law)
+
+Lines 245-273: Recipe/Loadings and Scores sections
+  - "loadings" - FAIL: Term introduced without first calling them "recipe weights"
+  - "scores" - FAIL: Same - should derive concept before naming
+  - But content itself shows the math - PASS
+
+Lines 274-302: Blowing It Back Up
+  - Reconstruction error shown with actual MSE values - PASS
+  - Connection to kept fraction derived - PASS
+  - "blurry version" - PASS (physical metaphor)
+
+Lines 304-357: Common Tripwires
+  - TRIPWIRE 1 (Standardise BEFORE PCA) - PASS (explains WHY with physics)
+  - TRIPWIRE 2 (Loadings NOT correlations) - PASS (distinguishes concepts)
+  - TRIPWIRE 3-9: All explain failure modes with physical reasoning - PASS
+  - However, terms like "explained_variance_ratio_" appear - PARTIAL: These are 
+    code-specific terms that should be introduced only after concept is clear
+
+Lines 358-397: The Labels, Last section
+  - This section attempts to map plain terms to standard labels - GOOD INTENT
+  - BUT: Many standard labels appear here that were already used earlier:
+    * "dimensionality reduction" - used in line 10 tags, before this mapping
+    * "principal component" - used throughout before this section
+    * "eigenvalue/eigenvector" - mentioned but not derived from scratch
+  - PARTIAL FAIL: The mapping comes at the end, but terms were used before
+
+Lines 398-420: Code section
+  - Python code with explanations - PASS (labeled as optional)
+  - "NEW TO PYTHON?" notes - PASS (derives syntax meaning)
+  - WARN about column 0 vs column 1 - PASS (explains consequence physically)
+
+SUMMARY OF VIOLATIONS:
+--------------------------------------------------------------------------------
+1. PREMATURE TERMINOLOGY: "PCA", "Principal Component Analysis", "PC1", "PC2", 
+   "loadings", "scores" all appear before their physical derivations are complete.
+   Rule says: "Do not introduce new terminology without physical derivation."
+   These terms should wait until AFTER the shadow/flashlight math is fully worked.
+
+2. STANDARD LABELS IN TAGS/METADATA: Line 10 has "Tags: pca, dimensionality-reduction"
+   which introduces terms before the post even begins its derivation.
+
+3. EIGENVALUE/EIGENVECTOR MENTION: Lines 367-370 mention these terms but do NOT
+   derive them from scratch via axioms. They are named but the mathematical 
+   foundation (solving det(A - λI) = 0) is not shown.
+
+4. CODE TERMS BEFORE CONCEPT: "explained_variance_ratio_" appears in tripwire 
+   discussion before the concept is fully derived in plain language.
+
+WHAT WORKS WELL:
+--------------------------------------------------------------------------------
+- Flashlight/shadow metaphor is excellent physical derivation
+- All arithmetic shown explicitly with real numbers
+- "YOUR TURN" exercises force reader engagement with derivation
+- Stick/shadow/perp Pythagorean derivation is axiomatic and clear
+- Tripwires explain failure modes with physical reasoning
+- "The Labels, Last" section attempts proper term mapping (but too late)
+
+RECOMMENDATION:
+--------------------------------------------------------------------------------
+This post is ~80% compliant. To achieve full compliance:
+1. Remove "PCA" and "Principal Component Analysis" from early lines
+2. Use only "longest shadow direction" until after Section 82-152
+3. Move ALL standard terminology to "The Labels, Last" section
+4. Either fully derive eigenvalues from axioms or remove the mention
+5. Ensure tags/metadata don't preview terminology
+
+SEVERITY: MEDIUM - The derivations are present and excellent, but terminology
+appears before being fully earned, violating the letter of the rule.
+
+================================================================================
