@@ -17,7 +17,7 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in seven chapters (twenty-three posts),
+  This is not a pile of loose articles -- it is a short BOOK in eight chapters (twenty-four posts),
   meant to be read top to bottom. Each post opens with a "post N of 21" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
@@ -233,12 +233,25 @@
     odds, and cross-entropy loss. Ends with a built network whose dials have not yet moved.
 
   <a href="posts/how-the-dials-learn.html">Part 2 -- Rolling Downhill by Hand: How a Network Learns</a>
-    post 23/23 . 2026-06-11 . part 2 of 2 . backpropagation, gradient-descent, adam, dropout
+    post 23/24 . 2026-06-11 . part 2 of 2 . backpropagation, gradient-descent, adam, dropout
     The dials finally learn. Backpropagation worked by hand on a one-input, one-hidden,
     one-output network: the chain rule link by link, the (guess - truth) shortcut derived,
     every slope checked against a brute-force wiggle, then the error sent one room further
     back through the dead-clerk gate. Learning rate, Adam, dropout as co-adaptation, the
     overflow clip, three real debugging mistakes, and the end-to-end run (0.974 exam).
+
+
+  CHAPTER 8 . KEEPING A NETWORK HONEST -- the fight against memorising
+  -------------------------------------------------------------------
+
+  <a href="posts/five-machines-against-memorising.html">Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler</a>
+    post 24/24 . 2026-06-12 . overfitting, regularisation, dropout, batchnorm
+    A network that learns too well memorises the study pile's freckles and flunks new
+    patients. One plain machine catches the disease on a sheet of clothing photos; four cures
+    each fight it differently -- a tax on big dials (L2), sending clerks home (dropout), a fire
+    alarm that stops at the valley floor (early stopping), and a humbler between floors (batch
+    norm). Softmax and its ten chances derived by hand, then all five judged on one sealed
+    pile, with the study-minus-practice gap naming the biggest memoriser.
 
 
 ----------------------------------------------------------------------------------------------

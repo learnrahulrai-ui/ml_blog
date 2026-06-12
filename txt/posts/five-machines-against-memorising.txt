@@ -1,0 +1,443 @@
+@title Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 8 . KEEPING A NETWORK HONEST
+  Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler
+  Posted: 2026-06-12 . Author: Rahul Rai . Tags: overfitting, regularisation, dropout, batchnorm
+  ============================================================================================
+
+  PATH . post 24 of 24
+    <- prev:  [Chapter 7, Part 2: How a Network Learns](how-the-dials-learn.txt)
+
+  Chapter 7 built a network and taught its dials to learn. This chapter is about the thing
+  that goes wrong NEXT -- the network learns too well, memorises the study pile down to its
+  freckles, and then flunks every patient it has not seen before. We build one plain machine
+  that catches this disease, then four machines that each carry a different cure, and we judge
+  all five honestly on a pile none of them was allowed to touch.
+
+  If you have not read Chapter 7, here is all you need. A network is rooms of clerks. A clerk
+  multiplies each number it receives by a learned DIAL, adds them with a NUDGE, and either
+  bends the result at zero (the zero-out rule, ReLU, between rooms) or squashes it into a
+  probability (the S-curve, at the exit). The dials learn by rolling downhill: compute how
+  wrong the guess was, send that error backward, nudge every dial a little. That is the whole
+  machine. This chapter changes nothing about it -- it only adds guards against memorising.
+
+
+  ## A Disease Called Memorising
+
+  Here is the disease in one picture. Train a plain network for thirty passes over the study
+  pile and plot two scores each pass: how well it does on the study pile it learns from, and
+  how well it does on a held-aside practice pile it only watches.
+
+    score
+    1.0 |                          study-score --> 0.99   keeps climbing
+        |                 ________________
+    0.9 |        _______/   practice-score --> peaks ~0.88, then SAGS
+        |    ___/        \______
+        +-----+-----+-----+-----+----- pass
+              5     10    15    30
+
+  For the first ten passes both climb together -- the network is learning real patterns that
+  hold on both piles. Then they split. The study-score keeps rising toward a perfect 0.99,
+  while the practice-score peaks and starts sinking. That split is the disease. The network
+  has stopped learning what a coat looks like in general and started memorising the exact
+  freckles of THESE study coats -- creases, lighting, sensor noise -- details the practice
+  coats do not share. The gap between the two scores is the size of the rot.
+
+  Everything in this chapter is a way to keep that gap small.
+
+
+  ## Sheet of Clothes, and Goal
+
+  A new sheet, not Chapter 7's tumours. Each row is one photograph of a piece of clothing,
+  28 pixels across by 28 pixels tall -- 784 little grey numbers, each from 0 (black) to 255
+  (white). The answer is one integer from 0 to 9, naming the bin:
+
+    0 T-shirt   1 Trouser   2 Pullover   3 Dress   4 Coat
+    5 Sandal    6 Shirt     7 Sneaker    8 Bag     9 Ankle-boot
+
+  Two differences from Chapter 7 worth naming now. First, the answer is no longer yes/no --
+  it is one of TEN bins, so the exit needs ten chances instead of one (the next section
+  builds that). Second, the inputs are raw 0-to-255 greys, so we humble them the easy way:
+  divide every pixel by 255, landing every number between 0 and 1. Then cut the pile the
+  usual three ways -- study 60%, practice 20%, sealed exam 20%.
+
+  The goal: build five machines that sort a photo into its bin, and find which one memorises
+  least.
+
+
+  ## Baseline Machine With No Defence
+
+  Start with the plain machine, no cure at all. Four rooms of clerks:
+
+    784 numbers in
+      -> room 1: 256 clerks, zero-out rule
+      -> room 2: 128 clerks, zero-out rule
+      -> room 3:  64 clerks, zero-out rule
+      -> exit:    10 clerks, softmax (ten chances -- built next section)
+
+  Count the dials, do not trust the count -- compute it. Each clerk has one dial per incoming
+  number plus one nudge:
+
+    room 1: 784 x 256 + 256 = 200,704 + 256 = 200,960
+    room 2: 256 x 128 + 128 =  32,768 + 128 =  32,896
+    room 3: 128 x  64 +  64 =   8,192 +  64 =   8,256
+    exit:    64 x  10 +  10 =     640 +  10 =     650
+    -----------------------------------------------------
+    total                                     = 242,762 dials and nudges
+
+  Check the total by adding the four: 200,960 + 32,896 = 233,856; + 8,256 = 242,112;
+  + 650 = 242,762. A quarter of a million dials, and almost all of them (200,960 of 242,762)
+  live in room 1, wired to the 784 raw pixels. A machine with that many free dials and only a
+  few thousand study photos is exactly the kind that memorises. Good -- that is the patient we
+  want to cure.
+
+
+  ## Softmax: Turning Ten Scores Into Ten Chances
+
+  The exit has ten clerks now, one per bin. Each produces a raw score -- any number. We need
+  to turn ten raw scores into ten CHANCES that are all between 0 and 1 and add up to exactly
+  1, so they read as "a 66% chance it is a T-shirt, 25% a trouser, 9% a pullover."
+
+  The S-curve from Chapter 7 squashed ONE score into ONE chance. For ten competing bins we
+  need its big brother, softmax. The recipe: raise e to the power of each score (which makes
+  every one positive), then divide each by the total.
+
+    chance for bin i = e^(score i) / (sum of e^(score) over all bins)
+
+  Work a small one by hand -- three bins with scores 2, 1, 0:
+
+    e^2 = 7.389      (e is about 2.718, and 2.718 x 2.718 = 7.389)
+    e^1 = 2.718
+    e^0 = 1.000
+    total = 7.389 + 2.718 + 1.000 = 11.107
+
+    chance bin A = 7.389 / 11.107 = 0.665
+    chance bin B = 2.718 / 11.107 = 0.245
+    chance bin C = 1.000 / 11.107 = 0.090
+
+  Check they add to 1: 0.665 + 0.245 + 0.090 = 1.000. The biggest score (2) won the biggest
+  chance (0.665), the smallest score (0) the smallest -- and raising e to each power before
+  dividing exaggerates the gaps, so a clear winner pulls well ahead. That exaggeration is the
+  point: softmax is decisive, not wishy-washy.
+
+  The wrongness ruler changes to match. For ten bins it is: take the chance the machine gave
+  to the TRUE bin, and score -ln(that chance). If the true answer is bin 7 and the machine
+  gave bin 7 a chance of 0.6, the wrongness is -ln(0.6) = 0.511. Gave it 0.9 instead? -ln(0.9)
+  = 0.105, much smaller. Gave it a miserable 0.1? -ln(0.1) = 2.303, much larger. The machine
+  is graded only on how much faith it put in the right answer. (The standard name carries the
+  word "sparse" because the answer key is a single integer -- 7 -- not a row of ten 0/1 marks.)
+
+  Try this: a machine faces two bins with scores 3 and 1. What chance does softmax give the
+  first bin? (You will need e^3 and e^1; e^3 = e^2 x e = 7.389 x 2.718.)
+
+  ...
+
+  e^3 = 7.389 x 2.718 = 20.09. e^1 = 2.718. total = 20.09 + 2.718 = 22.81.
+  chance first bin = 20.09 / 22.81 = 0.881. The first bin's score was only 2 higher, but
+  softmax hands it an 88% chance -- the exponential stretch at work.
+
+
+  ## Watching It Rot
+
+  Run the baseline for thirty passes and the disease from the opening picture appears on
+  schedule. The study-score marches toward 0.99; the practice-score peaks somewhere in the
+  high 0.80s and then sags. The machine is memorising. Now the four cures. Each one is a
+  different answer to the same question: how do you stop a machine with 242,762 dials from
+  bending itself around noise?
+
+
+  ## Cure 1 -- A Tax on Big Dials (L2)
+
+  The first cure starts from a clue: a memorising machine needs HUGE, precise dials. To bend
+  sharply around one freckle in one photo, some dial has to crank to an extreme value. A
+  machine that only draws smooth, general rules keeps its dials modest. So: make big dials
+  expensive.
+
+  Add a tax to the wrongness. Every dial pays a fine equal to its own value squared, times a
+  small rate (0.001 is common):
+
+    dial of 50:   fine = 50 x 50 x 0.001 = 2.5        (enormous -- a 50 dial is punished hard)
+    dial of 0.5:  fine = 0.5 x 0.5 x 0.001 = 0.00025  (a rounding error -- small dials are free)
+
+  Squaring is what makes the tax bite the big ones: doubling a dial quadruples its fine. The
+  machine now faces a trade. A big dial lowers the wrongness on a few memorised photos, but it
+  costs tax on every single pass. Unless that dial earns its keep across the whole pile, the
+  tax wins and the dial shrinks. The result is a machine of humble dials -- a smoother rule
+  that generalises better. The standard name is L2 regularisation, and the rate (0.001) is a
+  knob you pick, not a dial the machine learns.
+
+
+  ## Cure 2 -- Sending Clerks Home (Dropout)
+
+  Chapter 7 met dropout as a coffee break. Here is the disease it cures, stated sharply,
+  because it is subtler than "big dials."
+
+  Picture two clerks on a floor who have struck a private deal. Clerk 5 always shouts +10;
+  clerk 6, whom the next floor reads together with clerk 5, always shouts -10. Their sum is
+  +10 + (-10) = 0, which happens to look perfect to the floor above, so the wrongness never
+  complains and their dials never get corrected. They have co-adapted into a useless pair
+  that survives only because they are always present together. Several such secret teams form,
+  and the machine leans on them instead of learning honest, standalone features.
+
+  Dropout breaks the deals. On each training pass, flip a coin for every clerk and send a
+  fraction of them home -- their output forced to zero for that pass. With a rate of 0.3,
+  about 30 of every 100 clerks sit out. The moment clerk 6 is sent home, clerk 5's +10 is no
+  longer cancelled; the sum is +10, not 0; the lie is exposed; the tax of wrongness lands and
+  the dials finally get fixed. Because no clerk can count on its partner being present, every
+  clerk is forced to be useful on its own.
+
+  Two things to keep straight. The home-sending happens ONLY during study; when the machine
+  takes the practice or sealed exam, every clerk reports for duty. And the rate (0.3) is a
+  knob you choose. Send too few home and the deals survive; send too many and the floor is too
+  crippled each pass to learn anything.
+
+
+  ## Cure 3 -- A Fire Alarm That Stops the Clock (Early Stopping)
+
+  The first two cures change the machine. This one changes nothing about the machine -- it
+  just knows when to quit.
+
+  Recall the disease: the practice-score peaks, then sags. Equivalently, the practice-pile
+  WRONGNESS (call it val-loss -- the total -ln cost on the practice pile) falls, bottoms out,
+  and then climbs as memorising sets in. The best machine is the one at the bottom of that
+  valley. Early stopping watches the val-loss every pass, remembers the lowest seen, and quits
+  when it has gone too long without a new low.
+
+  Watch it run. The "patience" is set to 5 -- five passes with no new low triggers the alarm:
+
+    pass:      1     2     3     4     5     6     7     8
+    val-loss: .50   .42   .39   .41   .40   .43   .44   .45
+              low   low   LOW   +1    +2    +3    +4    +5  -> ALARM
+
+  Pass 3 set the lowest val-loss, 0.39. Passes 4 through 8 each failed to beat it -- that is
+  five strikes -- so the alarm fires after pass 8 and training stops. Then the crucial last
+  step: rewind the dials back to where they were at pass 3, the bottom of the valley. (The
+  standard name for that rewind is restore-best-weights, and forgetting it is a classic
+  mistake -- you stop at pass 8's worse dials instead of pass 3's best.) You set a high
+  ceiling of passes -- say 100 -- knowing the alarm will almost always stop you long before.
+
+  Try this: same alarm, patience 5, but a new run with val-losses .60 .55 .50 .48 .47 .49 .52
+  .50 .51 .53. Which pass set the best, and at which pass does the alarm fire?
+
+  ...
+
+  The lowest is 0.47 at pass 5. Passes 6 through 10 all fail to beat it -- five strikes -- so
+  the alarm fires after pass 10, and the dials rewind to pass 5.
+
+
+  ## Cure 4 -- A Humbler Between Floors (Batch Normalisation)
+
+  The last cure fixes a problem you would not guess at: the floors of the network keep moving
+  the goalposts on each other.
+
+  As room 1's dials get tuned, the numbers it hands room 2 swing wildly from pass to pass --
+  one pass they are around 2, 5, 3; a few passes later, after the dials shifted, they are 600,
+  900, 700; later still, 0.01, 0.03. Room 2 is trying to learn on ground that keeps tilting
+  under it. It never gets steady footing.
+
+  The fix: after each hidden floor, humble the hand-off the same way we humble raw inputs --
+  but do it freshly for each handful of photos. Work one by hand. Say a clerk hands these five
+  numbers to the next floor: 10, 20, 30, 40, 50.
+
+    middle  = (10 + 20 + 30 + 40 + 50) / 5 = 150 / 5 = 30
+    diffs   = 10-30, 20-30, 30-30, 40-30, 50-30 = -20, -10, 0, 10, 20
+    squared = 400, 100, 0, 100, 400
+    average = (400 + 100 + 0 + 100 + 400) / 5 = 1000 / 5 = 200
+    scatter = root of 200 = 14.14
+    humbled = -20/14.14, -10/14.14, 0, 10/14.14, 20/14.14 = -1.41, -0.71, 0, 0.71, 1.41
+
+  Now the hand-off has middle 0 and scatter 1, steady every pass no matter how the dials
+  below shifted. Room 2 gets firm footing.
+
+  One refinement so the humbling is not a straitjacket: each floor also gets two rescue dials,
+  a STRETCH (starts at 1) and a SHIFT (starts at 0), and the final hand-off is
+  humbled x stretch + shift. If the floor decides the raw, un-humbled numbers were actually
+  better, it can learn to stretch and shift its way back. A small bonus falls out for free:
+  because each handful of 32 photos has a slightly different middle, the humbling jiggles a
+  touch from handful to handful, and that mild random jiggle is itself a weak dose of
+  anti-memorising. The standard name is batch normalisation. One caution: never place it after
+  the exit -- it would wreck the ten softmax chances.
+
+  Try this: a floor hands the next one these four numbers: 2, 4, 6, 8. Humble them by hand.
+
+  ...
+
+  middle = (2+4+6+8)/4 = 20/4 = 5. diffs = -3, -1, 1, 3. squared = 9, 1, 1, 9.
+  average = 20/4 = 5. scatter = root of 5 = 2.236. humbled = -3/2.236, -1/2.236, 1/2.236,
+  3/2.236 = -1.34, -0.45, 0.45, 1.34. Middle 0, scatter 1.
+
+
+  ## One Honest Judge (Breaking the Sealed Pile)
+
+  Now grade all five machines: the baseline plus the four cures. But on which pile?
+
+  Not the study pile -- every machine memorised pieces of it; scoring there is a memory test.
+  Not even the practice pile, and here is the subtle part: the practice pile was PEEKED at
+  thirty times (we plotted its score every pass), and for the early-stopping machine it
+  actively steered when training halted. A pile you have looked at thirty times and used to
+  make decisions is no longer a clean surprise. It is faintly tainted.
+
+  The sealed exam pile is the only clean judge. It was looked at zero times -- sealed since
+  the very first cut, never plotted, never used to choose a knob. Open it once now, score
+  every machine on it, and that single number is the honest verdict. Whichever machine scores
+  highest on the sealed pile wins. (In practice the four cures usually beat the baseline, and
+  which cure wins depends on the sheet -- there is no permanent champion.)
+
+  The rule this whole chapter rests on: a pile you make decisions with is a pile you have
+  spent. Keep one pile sealed and unspent, or you will have no honest judge left at the end.
+
+
+  ## Naming the Biggest Liar (the Memorising Gap)
+
+  One more number tells you something the sealed score alone cannot: WHICH machine memorised
+  least, regardless of who scored highest. For each machine, take its final study-score and
+  subtract its final practice-score.
+
+    big gap   = the machine learned the study pile far better than the practice pile = memoriser
+    small gap = the machine treated both piles alike = honest, whatever its raw score
+
+  A machine can score high AND have a big gap (it learned a lot, but memorised a lot too); or
+  score modestly with a tiny gap (it learned less, but everything it learned was real). The
+  smallest gap names the least-memorising machine -- usually one of the four cures, and often
+  dropout or batch-norm. Two numbers, read together -- the sealed score and the gap -- tell
+  the whole story: how good, and how honest.
+
+
+  ## Common Tripwires
+
+  Real struggles from running this lab, not invented ones.
+
+  Humbling the wrong pile. Divide pixels by 255 -- fine, that is fixed and needs no pile. But
+  if you ever compute a middle or scatter for humbling, compute it on the STUDY pile only. Use
+  all the data and the sealed pile leaks into training, exactly as in Chapter 7.
+
+  Leaving dropout on at exam time. If your practice score jumps around wildly every time you
+  evaluate, dropout is still sending clerks home during grading. It must run only during
+  study; every clerk reports for the exam. Most frameworks switch this automatically -- if you
+  grade by hand, switch it off yourself.
+
+  Forgetting to rewind after the fire alarm. Early stopping that stops at pass 8 but keeps
+  pass 8's dials has thrown away the whole point. Rewind to the best pass (pass 3 in the
+  example). The flag is restore-best-weights; set it.
+
+  Batch-norm after the exit. Humbling the ten softmax scores destroys them -- they no longer
+  add to 1, no longer read as chances. Humble between hidden floors only, never after the last.
+
+  Judging on a spent pile. The most expensive mistake: reporting the practice score as your
+  final grade. You peeked at it thirty times. Report the sealed pile, opened once.
+
+
+  ## Standard Names for Everything Above
+
+    Plain term used above                 Standard label
+    ------------------------------------  -------------------------------------------
+    memorising                            overfitting
+    study / practice / sealed exam        train / validation / test
+    ten scores into ten chances           softmax
+    wrongness for ten bins                sparse categorical cross-entropy
+    a tax on big dials                    L2 regularisation / weight decay
+    the tax rate (0.001)                  the regularisation strength (lambda)
+    sending clerks home                   dropout
+    secret-team disease                   co-adaptation
+    fire alarm that stops the clock       early stopping
+    passes-with-no-new-low limit          patience
+    rewind to the best pass               restore_best_weights
+    humbler between floors                batch normalisation
+    stretch and shift rescue dials        gamma (scale) and beta (shift)
+    study-score minus practice-score      the generalisation gap
+
+
+  ## Code, If You Want It
+
+  Five machines, one per cure. They share the same skeleton -- only the guard differs. Below,
+  the baseline and the four cures, each as a small change to it.
+
+  >> NEW TO PYTHON? Each named once:
+       x / 255.0                          -- humble raw 0-255 greys into 0-1
+       Dense(256, activation='relu')      -- a room of 256 zero-out clerks
+       Dense(10, activation='softmax')    -- the ten-chance exit
+       kernel_regularizer=l2(0.001)       -- Cure 1: the tax on big dials
+       Dropout(0.3)                       -- Cure 2: send 30% of clerks home each pass
+       EarlyStopping(patience=5, restore_best_weights=True)  -- Cure 3: the fire alarm
+       BatchNormalization()               -- Cure 4: the humbler between floors
+       sparse_categorical_crossentropy    -- wrongness when the answer is one integer
+
+    import numpy as np
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
+    from tensorflow.keras.regularizers import l2
+    from tensorflow.keras.callbacks import EarlyStopping
+
+    # x_train etc. are 28x28 photos flattened to 784 and divided by 255 (humbled to 0..1),
+    # then cut 60/20/20 into study (x_train), practice (x_val), sealed exam (x_test).
+
+    def compile_and_report(model):
+        model.compile(optimizer='adam',
+                      loss='sparse_categorical_crossentropy',
+                      metrics=['accuracy'])
+        return model
+
+    # --- Baseline: no defence ---
+    baseline = compile_and_report(Sequential([
+        Dense(256, activation='relu', input_shape=(784,)),
+        Dense(128, activation='relu'),
+        Dense(64,  activation='relu'),
+        Dense(10,  activation='softmax'),
+    ]))
+
+    # --- Cure 1: a tax on big dials (L2) ---
+    l2_model = compile_and_report(Sequential([
+        Dense(300, activation='relu', input_shape=(784,), kernel_regularizer=l2(0.001)),
+        Dense(100, activation='relu', kernel_regularizer=l2(0.001)),
+        Dense(10,  activation='softmax'),
+    ]))
+
+    # --- Cure 2: send clerks home (Dropout) ---
+    dropout_model = compile_and_report(Sequential([
+        Dense(300, activation='relu', input_shape=(784,)),
+        Dropout(0.3),
+        Dense(100, activation='relu'),
+        Dropout(0.3),
+        Dense(10,  activation='softmax'),
+    ]))
+
+    # --- Cure 3: the fire alarm (Early Stopping) ---
+    early = compile_and_report(Sequential([
+        Dense(256, activation='relu', input_shape=(784,)),
+        Dense(128, activation='relu'),
+        Dense(64,  activation='relu'),
+        Dense(10,  activation='softmax'),
+    ]))
+    alarm = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+    # early.fit(..., epochs=100, callbacks=[alarm])   # 100 is a ceiling; the alarm stops it
+
+    # --- Cure 4: the humbler between floors (BatchNorm) ---
+    batchnorm_model = compile_and_report(Sequential([
+        Dense(256, activation='relu', input_shape=(784,)),
+        BatchNormalization(),
+        Dense(128, activation='relu'),
+        BatchNormalization(),
+        Dense(64,  activation='relu'),
+        BatchNormalization(),
+        Dense(10,  activation='softmax'),       # no BatchNorm after the exit -- it would
+    ]))                                          # wreck the ten softmax chances
+
+    # --- The one honest grade: open the sealed pile ONCE, per machine ---
+    # loss, acc = model.evaluate(x_test, y_test, verbose=0)
+    # The generalisation gap = final train accuracy - final val accuracy (smaller = honester).
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 8 -- Keeping a Network Honest):
+    Part 1 (this post)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

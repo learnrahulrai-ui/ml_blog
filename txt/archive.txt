@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 23 posts: 7 chapters + an appendix, in reading order.
+  ALL POSTS -- a book in 24 posts: 8 chapters + an appendix, in reading order.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
@@ -56,8 +56,13 @@
 
   CHAPTER 7 -- BUILDING A NEURAL NETWORK FROM SCRATCH (2026)
   ---------------------------------------------------------
-  post 22/23  [Part 1 -- Stacked Rooms and One Walk by Hand: How a Network Computes a Guess](posts/the-web-of-adders.txt)
-  post 23/23  [Part 2 -- Rolling Downhill by Hand: How a Network Learns](posts/how-the-dials-learn.txt)
+  post 22/24  [Part 1 -- Stacked Rooms and One Walk by Hand: How a Network Computes a Guess](posts/the-web-of-adders.txt)
+  post 23/24  [Part 2 -- Rolling Downhill by Hand: How a Network Learns](posts/how-the-dials-learn.txt)
+
+
+  CHAPTER 8 -- KEEPING A NETWORK HONEST (2026)
+  --------------------------------------------
+  post 24/24  [Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler](posts/five-machines-against-memorising.txt)
 
 
   APPENDICES -- FLIP-TO REFERENCES (2026)
