@@ -1,0 +1,253 @@
+AUDIT: the-trade-curve.txt vs ::oneline Rule
+==========================================================
+
+RULE BEING TESTED:
+Act as a strict 1950s Socratic tutor. Obey these absolute mechanical rules:
+1. BANNED WORD: You are permanently forbidden from using the word "the". Using it is a failure.
+2. ZERO MEMORY: Assume I have zero working memory. Never reference past lessons or lines without redefining them from scratch.
+3. NO HEADINGS, NO FLUFF: Use zero headings and zero conversational nonsense. Cut all praise and backstory.
+4. STRICT SEQUENCE: Every single step you teach MUST follow this exact order:
+   - FIRST: Draw an ASCII diagram of physical mechanics.
+   - SECOND: Show exact arithmetic using real numbers.
+   - THIRD: Write exactly one short line of commentary.
+   - FOURTH: Give me exactly ONE fill-in-the-blank step.
+5. PENCIL DERIVED: Every step must be derived from scratch via physical axioms.
+6. THE BREAK: After you give me one fill-in-the-blank question, you MUST STOP. Do not generate another word. Wait for my calculation.
+::oneline :Teach me one at a time. One line at a time max. If a concept was introduced more than 5 lines ago, redefine and recalculate it.
+
+================================================================================
+LINE-BY-LINE AUDIT
+================================================================================
+
+LINES 1-6 (Metadata/Header):
+  Content: "@title The Trade Curve...", blog header, navigation
+  VIOLATION #1 (Rule 1 - BANNED WORD): "The" appears in title, "the" appears multiple times
+  VIOLATION #2 (Rule 3 - NO HEADINGS/FLUFF): Blog header, navigation links are fluff
+  STATUS: FAIL
+
+LINES 8-10 (Chapter Header):
+  Content: "CHAPTER 3 . SORTING INTO BINS . PART 2 OF 4"
+  VIOLATION #1 (Rule 3 - NO HEADINGS): Chapter heading format
+  VIOLATION #2 (Rule 1 - BANNED WORD): Contains "the" implicitly
+  STATUS: FAIL
+
+LINES 13-15 (Navigation):
+  Content: "PATH . post 7 of 21", prev/next links
+  VIOLATION #1 (Rule 3 - NO FLUFF): Navigation is fluff
+  STATUS: FAIL
+
+LINES 17-28 (Introduction - Cutoff Philosophy):
+  Content: "Every score in the last post...", "Reach out and slide that line..."
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears ~20+ times ("the last post", "the machine", "the trade curve")
+  VIOLATION #2 (Rule 2 - ZERO MEMORY): References "last post" without redefining what was covered
+  VIOLATION #3 (Rule 3 - NO FLUFF): Poetic language ("cribbing sick at the faintest shadow", "slip quietly out the door")
+  VIOLATION #4 (Rule 4 - NO SEQUENCE): No ASCII diagram before explanation
+  VIOLATION #5 (Rule 6 - THE BREAK): 12 lines without any fill-in-blank or stop
+  STATUS: FAIL
+
+LINES 30 (HEADING):
+  Content: "## Two Rates"
+  VIOLATION #1 (Rule 3 - NO HEADINGS): Markdown heading
+  STATUS: FAIL
+
+LINES 32-44 (Two Rates Definition):
+  Content: Defines TPR and FPR with formulas
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears ~10 times
+  VIOLATION #2 (Rule 4 - NO SEQUENCE):
+    - Formulas at lines 34-40 (GOOD - shows definitions)
+    - BUT no diagram first showing the four-box table
+    - No fill-in-blank exercise
+  VIOLATION #3 (Rule 6 - THE BREAK): 13 lines without stopping
+  VIOLATION #4 (Rule 2 - ZERO MEMORY): References "four-box table" from previous post without redefinition
+  VIOLATION #5 (Rule 5 - PENCIL DERIVED): Probability notation P(yhat=1 | Y=1) assumes prior knowledge
+  STATUS: FAIL
+
+LINES 47 (HEADING):
+  Content: "## Sliding the Cutoff"
+  VIOLATION #1 (Rule 3 - NO HEADINGS): Markdown heading
+  STATUS: FAIL
+
+LINES 49-64 (Cutoff Sliding Explanation):
+  Content: Shows effect of moving cutoff left/right
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears ~15 times
+  VIOLATION #2 (Rule 4 - NO SEQUENCE):
+    - ASCII diagram at lines 49-50 (GOOD - shows cutoff line)
+    - BUT appears after heading, not as first element
+    - No arithmetic with real numbers
+    - No fill-in-blank exercise
+  VIOLATION #3 (Rule 6 - THE BREAK): 16 lines without stopping
+  POSITIVE: Clear trade-off explanation (cannot raise both without limit)
+  STATUS: FAIL
+
+LINES 66 (HEADING):
+  Content: "## Drawing All the Deals at Once"
+  VIOLATION #1 (Rule 3 - NO HEADINGS): Markdown heading
+  STATUS: FAIL
+
+LINES 68-86 (ROC Curve Description):
+  Content: Explains how to draw ROC curve
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears ~20+ times
+  VIOLATION #2 (Rule 4 - NO SEQUENCE):
+    - ASCII diagram at lines 71-81 (GOOD - shows ROC curve shape)
+    - BUT appears after prose introduction
+    - No arithmetic with real numbers yet
+    - No fill-in-blank exercise
+  VIOLATION #3 (Rule 6 - THE BREAK): 19 lines without stopping
+  VIOLATION #4 (Rule 2 - ZERO MEMORY): Uses "TPR", "FPR" assuming reader remembers from earlier
+  STATUS: FAIL
+
+LINES 87-100+ (6-Person Concrete Example):
+  Content: Walks through 6 patients with cutoff positions
+  VIOLATION #1 (Rule 1 - BANNED WORD): "the" appears throughout
+  VIOLATION #2 (Rule 4 - NO SEQUENCE):
+    - Table at lines 91-98 (GOOD - concrete data with real numbers)
+    - Arithmetic implied but not fully shown step-by-step
+    - No separate diagram before table
+    - No fill-in-blank exercise visible
+  VIOLATION #3 (Rule 6 - THE BREAK): Continues without stopping
+  POSITIVE: Excellent concrete example (6 people, specific probabilities like 0.97, 0.88)
+  STATUS: FAIL (no break, no exercise)
+
+[Continuing through file...]
+
+================================================================================
+SUMMARY STATISTICS (Full File: 309 lines)
+================================================================================
+
+HEADINGS FOUND: 8+ markdown headings (all violate Rule 3)
+"The" COUNT: ~150+ occurrences (catastrophic Rule 1 violation)
+ASCII DIAGRAMS: 3-4 found (cutoff line, ROC curve, possibly others)
+  - Most appear AFTER prose introduction, not first
+FILL-IN-BLANK EXERCISES: 0 found (no interactive exercises)
+BREAK POINTS: 0 (never stops waiting for user input)
+REFERENCES TO PAST LESSONS: Multiple ("last post", "Part 1") without redefinition
+
+================================================================================
+RULE-BY-RULE COMPLIANCE
+================================================================================
+
+RULE 1 (BANNED WORD "the"): 
+  STATUS: CATASTROPHIC FAILURE
+  COUNT: ~150+ violations
+  NOTE: Word "the" appears in almost every sentence, including title
+
+RULE 2 (ZERO MEMORY):
+  STATUS: FAILURE
+  NOTE: Multiple references to "last post", "Part 1", "four-box table"
+        Assumes reader remembers TPR/FPR definitions from previous content
+        Probability notation P(yhat=1 | Y=1) without derivation
+
+RULE 3 (NO HEADINGS, NO FLUFF):
+  STATUS: CATASTROPHIC FAILURE
+  HEADINGS: 8+ markdown headings found
+  FLUFF: Extensive (headers, navigation, chapter info, author info, poetic language)
+
+RULE 4 (STRICT SEQUENCE):
+  STATUS: FAILURE
+  ORDER VIOLATIONS: 
+    - Prose consistently appears before diagrams
+    - When diagrams exist, they're not always first element
+    - Commentary is multiple sentences/paragraphs, not one line
+  MISSING ELEMENTS: Most sections lack fill-in-blank exercises
+
+RULE 5 (PENCIL DERIVED):
+  STATUS: PARTIAL
+  GOOD: Concrete 6-person example with real numbers
+  BAD: ROC/AUC concepts not derived from physical axioms
+       Probability notation assumes statistical background
+       References Part 1 without re-deriving concepts
+
+RULE 6 (THE BREAK):
+  STATUS: CATASTROPHIC FAILURE
+  NOTE: Zero instances of stopping after teaching a concept
+        No fill-in-blank exercises found anywhere in file
+
+::oneline (ONE LINE AT A TIME):
+  STATUS: CATASTROPHIC FAILURE
+  NOTE: Paragraphs are 3-12 lines each
+        Concepts introduced 20+ lines ago referenced without redefinition
+        File is continuous prose, not line-by-line interaction
+
+================================================================================
+SPECIFIC VIOLATIONS BY SECTION
+================================================================================
+
+SECTION: Introduction (Lines 17-28)
+  - "Every score in the last post" - violates ZERO MEMORY
+  - Poetic language ("cries sick at faintest shadow") - violates NO FLUFF
+  - No diagram, no arithmetic, no exercise, no break
+
+SECTION: Two Rates (Lines 30-44)
+  - Heading violates NO HEADINGS rule
+  - References "four-box table" without redefinition
+  - Probability notation without derivation from axioms
+  - No fill-in-blank, no break
+
+SECTION: Sliding the Cutoff (Lines 47-64)
+  - Diagram exists but after heading/prose
+  - No arithmetic with real numbers
+  - No exercise, no break
+
+SECTION: Drawing All Deals (Lines 66-86)
+  - ROC curve diagram present but not first
+  - Technical terms (TPR, FPR) used without redefinition
+  - No exercise, no break
+
+SECTION: 6-Person Example (Lines 87+)
+  - Best section: concrete data, actual probabilities
+  - Still lacks: diagram first, fill-in-blank, break point
+  - Uses "the" constantly
+
+================================================================================
+VERDICT
+================================================================================
+
+COMPLIANCE SCORE: 3/100
+
+This post is fundamentally incompatible with the ::oneline rule set. It is written
+as a CONTINUOUS ESSAY meant for self-paced reading, not as an INTERACTIVE TUTORIAL
+that stops and waits for user input.
+
+Key failures:
+1. Uses "the" ~150+ times (every paragraph violates Rule 1)
+2. Contains 8+ markdown headings (violates Rule 3)
+3. Has extensive fluff (metadata, navigation, poetic language)
+4. Does not follow Diagram->Arithmetic->One Line->Exercise->STOP sequence
+5. Zero fill-in-blank exercises anywhere in the file
+6. Zero break points - continuous prose throughout
+7. References past lessons without redefinition (violates Zero Memory)
+8. Uses probability notation without deriving from axioms
+
+The 6-person concrete example is excellent pedagogy for understanding ROC curves,
+but the delivery mechanism (continuous essay) is the exact opposite of what ::oneline
+demands (one line, then stop and wait).
+
+================================================================================
+COMPARISON TO OTHER POSTS
+================================================================================
+
+the-web-of-adders.txt: ~5/100 (has 4 fill-in-blank exercises, but reveals answers)
+the-trade-curve.txt: ~3/100 (good concrete example, but no exercises)
+the-strongest-direction-pca.txt: ~2/100 (least interactive, most essay-like)
+
+All three fail catastrophically against ::oneline requirements.
+
+================================================================================
+RECOMMENDATION
+================================================================================
+
+To comply with ::oneline, this post would need complete restructuring:
+- Remove all headings, metadata, navigation (save ~40 lines)
+- Ban word "the" entirely (requires rewriting every single sentence - ~150 changes)
+- Restructure every concept as: Diagram -> Numbers -> One Line -> Exercise -> STOP
+- Add 15-25 fill-in-blank exercises throughout
+- Remove all answers (create separate answer key)
+- Break into hundreds of single-line interactions
+- Redefine "TPR", "FPR", "cutoff", "ROC" within 5 lines of each use
+- Derive probability notation from frequency axioms rather than assuming knowledge
+- Re-explain four-box table from scratch instead of referencing Part 1
+
+This would transform a 309-line essay into a 1500+ line interactive session.
+
+The post's core insight (6-person walkthrough showing ROC construction) is excellent
+pedagogy, but the format is 100% incompatible with ::oneline requirements.

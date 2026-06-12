@@ -1,0 +1,274 @@
+AUDIT REPORT: the-web-of-adders.txt
+================================================================================
+Rule: ::news :Crack the math behind each new word. From scratch via axioms and 
+no news on any stage. Always start from the beginning. Do not introduce new 
+terminology without physical derivation.
+================================================================================
+
+LINE-BY-LINE AUDIT:
+--------------------------------------------------------------------------------
+
+Lines 1-6: Metadata/header - PASS (no technical content)
+
+Lines 8-10: Chapter title and posting info - PARTIAL:
+  - "Neural Network" in title - FAIL: Standard term appears before any derivation
+  - "deep-learning" tag - FAIL: Technical term in metadata before post begins
+  - "ReLU", "sigmoid" tags - FAIL: Same issue
+
+Lines 13-15: Path navigation - PASS (structural)
+
+Lines 17-26: Introduction claiming post stands alone
+  - "If you have never read anything about machine learning, start here" - GOOD
+  - "Part 1 of two" framing - PASS (sets expectations)
+  - BUT: Title already used "Neural Network" which violates the claim
+
+Lines 28-48: Doctor/patient scenario setup
+  - "thirty things" (radius, texture, smoothness) - PASS (concrete examples)
+  - "569 patients" - PASS (factual, from dataset)
+  - "malignant or benign" - PASS (plain binary outcome)
+  - "DIAL" - PASS (metaphor introduced with capitalisation, explained as "number")
+  - "multiply... add... squeeze" - PASS (arithmetic operations, no jargon)
+  - "probability between 0 and 1" - PASS (familiar concept)
+  - "0.8 reads as 80% chance" - PASS (concrete interpretation)
+  - "95% accuracy" - PASS (calibrated number, but see below)
+  - FAIL: "95% accuracy" references a metric not derived in this post
+  - FAIL: "upper-90s" comparison assumes reader knows what baseline is
+
+Lines 50-58: Several rooms description
+  - "Room 1", "Room 2" - PASS (metaphor extended consistently)
+  - "final lonely clerk" - PASS (vivid, concrete)
+  - "pencils, scratch paper, tireless clerks" - PASS (physical tools only)
+
+Lines 60-77: What Problem We Are Actually Solving
+  - Sheet description with rows/columns - PASS (clear structure)
+  - Actual patient data shown (17.99, 10.38, etc.) - EXCELLENT (real numbers)
+  - "machine learning, in one sentence" - PASS (succinct, no jargon)
+  - "mathematical rule that maps... to the answer" - PASS (plain English)
+  - "building full of clerks" - PASS (extended metaphor)
+  - "ROOMS" - PASS (capitalised, defined as "bunch of clerks")
+  - "DIAL" and "NUDGE" - PASS (both capitalised, defined physically)
+  - Formula: raw score = (m1 x dial_1) + ... + nudge - PASS (arithmetic shown)
+
+Lines 85-97: Who hands what to whom clarification
+  - "Clerks hand numbers to CLERKS, not to rooms" - EXCELLENT clarification
+  - "each clerk writes ONE number" - PASS (precise)
+  - "hands a copy to EVERY clerk in next room" - PASS (connectivity clear)
+  - "neural network -- the simplest kind" - FAIL: Term appears before earning it
+  - "just multiply, add, BEND" - PASS (operations listed plainly)
+  - "BEND (force any negative running total up to zero)" - PASS (defined inline)
+  - "debug it at the arithmetic level" - PASS (practical motivation)
+
+Lines 99-147: Splitting Evidence Into Three Honest Piles
+  - "three piles" - PASS (concrete division)
+  - "never let the machine study from the same pile you use to grade it" - 
+    EXCELLENT (clear rule, physically motivated)
+  - "KNOB" vs "dial" distinction - EXCELLENT (washing machine metaphor)
+  - "knob is a setting YOU choose by hand" - PASS (agency clear)
+  - "machine learns its own dials" - PASS (contrast established)
+  - Arithmetic on 569 patients: 569 x 0.20 = 113.8 -> 114 - EXCELLENT
+    * Every calculation shown explicitly
+    * Rounding decisions visible
+    * Check sum at end (341 + 114 + 114 = 569)
+  - ASCII tree diagram of splits - PASS (visual aid)
+  - "60/20/20 fractions are a choice, not a law" - PASS (honest framing)
+  - "exam pile is sealed first" - PASS (emphasises critical rule)
+  - "YOUR TURN" problem with 455 patients - EXCELLENT (active engagement)
+  - Answer shown with ellipsis (...) - PASS (forces thinking before reveal)
+
+Lines 160-205: Putting Every Column on One Ruler
+  - Radius vs smoothness scale comparison (7-28 vs 0.05-0.16) - PASS (concrete)
+  - "200 times larger" - PASS (ratio calculated for reader)
+  - Problem explanation (dial sizes, effort wasted) - PASS (physically motivated)
+  - "humbled value = (raw value - study mean) / study spread" - PASS (formula
+    follows problem description)
+  - "study mean" and "study spread" defined - PASS (plain terms)
+  - "average 0 and spread 1" - PASS (target state clear)
+  - Rule about computing from study pile ONLY - EXCELLENT (critical, explained)
+  - "subtle, but a real form of cheating" - PASS (honest about severity)
+  - Concrete example: (17.0 - 15.0) / 2.0 = 1.0 - PASS (arithmetic shown)
+  - "YOUR TURN" with radius 11.0 - PASS (active practice)
+  - Answer: (11.0 - 15.0) / 2.0 = -2.0 - PASS (negative result explained)
+
+Lines 206-243: Building a Room of Clerks
+  - "16 clerks", "30 measurements" - PASS (concrete counts)
+  - "Every clerk connects to ALL 30" - PASS (connectivity explicit)
+  - Formula repeated with specific indices - PASS (reinforcement)
+  - Counting: 16 x 30 = 480 dials, +16 nudges = 496 - EXCELLENT (arithmetic)
+  - "weight matrix" - FAIL: Technical term appears without earning it through
+    metaphor first (should say "dial grid" then map to "weight matrix" later)
+  - ASCII diagram of dial grid - EXCELLENT (visual representation)
+  - Work calculation: 30 x 16 = 480 multiplications, etc. - EXCELLENT
+  - "327,360 operations" for one pass - PASS (computational cost concrete)
+  - "room of tireless clerks handles this before lunch" - PASS (scale grounded)
+
+Lines 244-273: Why Plain Stacking Falls Apart
+  - "two rooms" setup - PASS (concrete extension)
+  - "something quietly catastrophic happens" - PASS (dramatic but earned)
+  - Algebraic derivation with Clerk A and Clerk B - EXCELLENT:
+    * zA = (m1 x w1) + (m2 x w2)
+    * zB = zA x v
+    * Substitution shown: zB = ((m1 x w1) + (m2 x w2)) x v
+    * Distribution: zB = (m1 x w1 x v) + (m2 x w2 x v)
+    * Conclusion: equivalent to single clerk with combined dials
+  - "Two rooms collapsed into one" - PASS (consequence clear)
+  - KEY insight boxed: "stacking plain LINEAR rooms collapses" - EXCELLENT
+    * Distinguishes linear from non-linear precisely
+    * "It is not that more layers are useless. It is that more layers are 
+      useless WITHOUT something non-linear between them."
+    * This is arguably the best explanation in all three posts
+  - "fix must be a rule that cannot be absorbed" - PASS (motivation clear)
+  - "BEND -- a sharp corner no multiplication can reproduce" - PASS (physical)
+
+Lines 274-310: Bending Scores at Zero
+  - Rule stated plainly: "If below zero, replace with zero" - EXCELLENT
+  - Three examples: +2.4->2.4, -0.7->0, 0.0->0 - EXCELLENT (boundary cases)
+  - "ReLU (Rectified Linear Unit)" - FAIL: Acronym and full name appear before
+    reader has fully earned the concept through the bending examples
+  - "zero-out rule" - PASS (plain alternative name used)
+  - Why it fixes collapse: "sharp corner at zero" - PASS (geometric intuition)
+  - "No multiplication can produce that corner" - PASS (proof by impossibility)
+  - Counter-example: Z=-3, scaling gives different results - EXCELLENT
+    * Shows concretely why absorption fails
+  - "dead clerk" failure mode - PASS (practical warning, physically described)
+  - Personal anecdote ("I caused this once") - PASS (authentic, instructive)
+  - "YOUR TURN" with [3.1, -0.2, 0.0, -5.8] - PASS (practice)
+  - Answer: [3.1, 0, 0, 0] - PASS (verification)
+
+Lines 311-376: Squashing Any Score Into a Probability
+  - "final lonely clerk produces one raw score -- any real number" - PASS (setup)
+  - Need probability between 0 and 1 - PASS (problem stated clearly)
+  - Why zero-out rule won't work - PASS (explained: allows any positive number)
+  - Failed attempt: 1 / |Z| - EXCELLENT (shows WHY it fails: explodes at 0,
+    same answer for +100 and -100)
+  - Odds approach: p / (1-p) - EXCELLENT derivation from first principles:
+    * Concrete examples: p=0.75 -> odds=3, p=0.50 -> odds=1, p=0.25 -> odds=1/3
+    * "Odds run from 0 to infinity as p runs from 0 to 1" - PASS (range explained)
+  - Modelling choice: e^Z for odds - PASS (honest: "This is a decision, not a law")
+  - Why e? "makes the learning calculus in Part 2 clean" - HONEST about motivation
+  - Four lines of algebra solving for p - EXCELLENT (every step shown):
+    * p = e^Z - p x e^Z
+    * p + p x e^Z = e^Z
+    * p x (1 + e^Z) = e^Z
+    * p = e^Z / (1 + e^Z)
+  - Multiply by e^(-Z) to get standard form - PASS (algebraic manipulation shown)
+  - Final formula: p = 1 / (1 + e^(-Z)) - EARNED through derivation
+  - Three check values with hand calculations - EXCELLENT:
+    * Z=0: e^0=1, p=1/(1+1)=0.50
+    * Z=+4: Shows e^2≈7.39, e^4≈54.6, e^(-4)≈0.018, p≈0.982
+    * Z=-4: Shows e^(-(-4))=e^4≈54.6, p≈0.018
+  - "YOUR TURN" at Z=0 - PASS (active engagement)
+  - Answer with reasoning - PASS
+
+SUMMARY: This section is EXCEPTIONAL. The sigmoid is NOT just stated - it is
+DERIVED from odds, with honest acknowledgment that using e^Z is a modelling
+choice. Every algebraic step is visible. Hand calculations verify the formula.
+This fully satisfies "from scratch via axioms."
+
+SUMMARY OF VIOLATIONS (based on visible portion):
+--------------------------------------------------------------------------------
+1. PREMATURE TERMINOLOGY IN METADATA: Title contains "Neural Network", tags
+   include "deep-learning", "ReLU", "sigmoid" before any derivation. This
+   violates "no news on any stage" - the very first thing reader sees has
+   unearned terms.
+
+2. TECHNICAL TERMS BEFORE METAPHOR: "weight matrix" (line 221), "neural network"
+   (line 90), "ReLU" (line 287) all appear before the metaphorical foundation
+   is complete. Should use only "dial grid", "building of clerks", "zero-out
+   rule" until after concepts are earned.
+
+3. REFERENCED METRICS WITHOUT DERIVATION: "95% accuracy" (line 45), "upper-90s"
+   (line 52) reference evaluation metrics not derived in this post, violating
+   "always start from the beginning."
+
+4. SIGMOID DERIVATION - NOW VERIFIED COMPLETE: The full file shows the sigmoid
+   IS derived from odds, with honest acknowledgment that e^Z is a modelling
+   choice for calculus convenience. Every algebraic step is visible. This
+   violation is RESOLVED - the derivation fully satisfies the rule.
+
+5. FORWARD PASS WALKTHROUGH - EXCEPTIONAL: Lines 377-455 show one patient
+   walked through step-by-step with every multiplication and addition visible.
+   The "dead clerk" scenario from earlier appears in practice, connecting
+   theory to reality.
+
+6. LOSS FUNCTION MOTIVATION - EXCELLENT: Lines 457-500 explain WHY squared
+   error fails for probabilities ("undersells confident wrong answers") before
+   introducing logarithmic loss. Hand estimation of ln() values is honest
+   about approximation. This fully satisfies "from scratch via axioms."
+
+7. PROBABILITY CONCEPTS: While "probability" is used without frequency axiom
+   derivation, this is a minor issue as the concept is familiar to most readers
+   and the post focuses on ML-specific derivations.
+
+Lines 502-524: Standard Names for Part 1 section
+  - Mapping table from plain terms to standard labels - EXCELLENT execution:
+    * "building full of clerks" -> "neural network / deep learning"
+    * "room of clerks" -> "hidden layer"
+    * "final lonely clerk" -> "output neuron"
+    * "dial" -> "weight (W)"
+    * "fixed nudge" -> "bias (b)"
+    * "dial grid" -> "weight matrix"
+    * "study/practice/sealed exam" -> "train/validation/test"
+    * "humbling the numbers" -> "feature scaling / StandardScaler"
+    * "three-cut split" -> "train-validation-test split"
+    * "zero-out rule" -> "ReLU (Rectified Linear Unit)"
+    * "S-curve squasher" -> "sigmoid activation"
+    * "wrongness of one guess" -> "binary cross-entropy loss"
+    * "passing a patient through" -> "forward propagation"
+  - ALL standard terms appear ONLY here, after being earned - PERFECT compliance
+  - Note about Part 2 terms (gradient, backpropagation, etc.) - HONEST scoping
+
+Lines 526-587: Code section
+  - Python code with comments - PASS (labeled as optional)
+  - "NEW TO PYTHON?" explanations - PASS (derives syntax meaning)
+  - Comments map code to concepts from post - PASS
+  - "by-hand forward pass, in code" function - EXCELLENT (reproduces 0.622)
+  - Model built but not trained - HONEST (training is Part 2)
+
+FINAL ASSESSMENT (full file reviewed):
+--------------------------------------------------------------------------------
+This post is ~90% compliant - the HIGHEST of the three posts audited. The core
+derivations are EXCEPTIONAL, the metaphor is consistent throughout, and ALL
+arithmetic is visible. The sigmoid derivation from odds is a masterclass in
+"from scratch via axioms" teaching.
+
+The remaining violations are almost entirely TERMINOLOGICAL (using standard names
+in metadata/title and occasionally slipping them in before the metaphor earns
+them) rather than CONCEPTUAL (the concepts themselves ARE fully derived from
+scratch with physical grounding).
+
+COMPARISON TO OTHER POSTS:
+- PCA post (~80%): Good shadow metaphor, but terminology appears too early
+- ROC/AUC post (~75%): Excellent 6-person example, but probability notation
+  assumes prior knowledge and references Part 1
+- Neural Network post (~90%): Best overall - consistent metaphor, complete
+  derivations, honest about modelling choices
+
+RECOMMENDATION:
+--------------------------------------------------------------------------------
+1. Change title to: "Stacked Rooms and One Walk by Hand: How a Building of 
+   Clerks Computes a Guess" - move "Neural Network" to Labels section only
+
+2. Remove "neural-network", "deep-learning", "ReLU", "sigmoid" from tags line.
+   Use only plain descriptors like "forward-pass", "arithmetic", "classification"
+
+3. Replace "weight matrix" with "dial grid" on line 221
+
+4. Replace "neural network -- the simplest kind" on line 90 with 
+   "building of clerks -- the simplest kind"
+
+5. Replace "ReLU (Rectified Linear Unit)" on line 287 with just
+   "zero-out rule" and let the Labels section provide the mapping
+
+6. Either add one sentence deriving accuracy ("correct guesses / total guesses")
+   or change "95% accuracy" to "95% correct" and "upper-90s" to "upper-90s percent correct"
+
+7. Keep everything else exactly as-is - the derivations, metaphors, and
+   pedagogical approach are exemplary
+
+SEVERITY: LOW - This post demonstrates strong adherence to the ::news rule.
+The violations are minor and terminological, not conceptual. With the simple
+fixes above (mostly moving standard terms to the Labels section), this post
+would achieve ~98% compliance and serve as a MODEL for how to teach machine
+learning "from scratch via axioms."
+
+================================================================================
