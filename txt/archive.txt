@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 24 posts: 8 chapters + an appendix, in reading order.
+  ALL POSTS -- a book in 25 posts: 9 chapters + an appendix, in reading order.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
@@ -62,7 +62,12 @@
 
   CHAPTER 8 -- KEEPING A NETWORK HONEST (2026)
   --------------------------------------------
-  post 24/24  [Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler](posts/five-machines-against-memorising.txt)
+  post 24/25  [Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler](posts/five-machines-against-memorising.txt)
+
+
+  CHAPTER 9 -- MACHINES THAT LOOK AT PICTURES (2026)
+  --------------------------------------------------
+  post 25/25  [Part 1 -- A Magic Paper Slid Over a Photo: How a Picture Network Sees](posts/the-magic-paper-factory.txt)
 
 
   APPENDICES -- FLIP-TO REFERENCES (2026)

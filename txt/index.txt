@@ -9,7 +9,7 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in eight chapters (twenty-four posts),
+  This is not a pile of loose articles -- it is a short BOOK in nine chapters (twenty-five posts),
   meant to be read top to bottom. Each post opens with a "post N of 21" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
@@ -237,13 +237,27 @@
   -------------------------------------------------------------------
 
   [Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler](posts/five-machines-against-memorising.txt)
-    post 24/24 . 2026-06-12 . overfitting, regularisation, dropout, batchnorm
+    post 24/25 . 2026-06-12 . overfitting, regularisation, dropout, batchnorm
     A network that learns too well memorises the study pile's freckles and flunks new
     patients. One plain machine catches the disease on a sheet of clothing photos; four cures
     each fight it differently -- a tax on big dials (L2), sending clerks home (dropout), a fire
     alarm that stops at the valley floor (early stopping), and a humbler between floors (batch
     norm). Softmax and its ten chances derived by hand, then all five judged on one sealed
     pile, with the study-minus-practice gap naming the biggest memoriser.
+
+
+  CHAPTER 9 . MACHINES THAT LOOK AT PICTURES -- convolution, by hand
+  -----------------------------------------------------------------
+
+  [Part 1 -- A Magic Paper Slid Over a Photo: How a Picture Network Sees](posts/the-magic-paper-factory.txt)
+    post 25/25 . 2026-06-12 . part 1 . cnn, convolution, pooling, computer-vision
+    Flatten a photo and you destroy every "next to" -- so this machine keeps the picture folded
+    and slides a tiny 3x3 window (a magic paper of nine dials) across it, lighting up where its
+    shape sits. Built one worker at a time with every wrong picture corrected: the edge-finder
+    that scores 60 on an edge and 0 on flat grey, 27 dials across three colours, 32 inspectors
+    into 32 score-sheets, the shrink boss that keeps the loudest of each 2x2, the second floor
+    drilling through all 32, and the punchline -- 262,208 of 282,250 dials hide in one Dense
+    floor because the small papers are reused everywhere. (Colour photos, CIFAR-10. More ahead.)
 
 
 ----------------------------------------------------------------------------------------------

@@ -10,8 +10,9 @@
   Posted: 2026-06-12 . Author: Rahul Rai . Tags: overfitting, regularisation, dropout, batchnorm
   ============================================================================================
 
-  PATH . post 24 of 24
+  PATH . post 24 of 25
     <- prev:  [Chapter 7, Part 2: How a Network Learns](how-the-dials-learn.txt)
+       next:  [Chapter 9: How a Picture Network Sees](the-magic-paper-factory.txt) ->
 
   Chapter 7 built a network and taught its dials to learn. This chapter is about the thing
   that goes wrong NEXT -- the network learns too well, memorises the study pile down to its

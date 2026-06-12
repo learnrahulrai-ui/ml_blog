@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Magic Paper Slid Over a Photo: How a Picture Network Sees (CNNs by Hand) :: Rahul&#x27;s ML Blog</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<pre>==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 9 . MACHINES THAT LOOK AT PICTURES . PART 1
+  A Magic Paper Slid Over a Photo: How a Picture Network Sees
+  Posted: 2026-06-12 . Author: Rahul Rai . Tags: cnn, convolution, pooling, computer-vision
+  ============================================================================================
+
+  PATH . post 25 of 25
+    &lt;- prev:  <a href="five-machines-against-memorising.html">Chapter 8: Five Machines Against Memorising</a>
+       next:  (more of this chapter coming) -&gt;
+
+  Every machine so far read a flat row of numbers: thirty tumour measurements, or 784 pixels
+  laid out in one long line. That works until the numbers are a PHOTOGRAPH, where what matters
+  is not the value of any one pixel but how pixels sit NEXT to each other -- an edge is a
+  bright row above a dark row, a corner is where two edges meet. Flatten a photo into a line
+  and you throw away every "next to," because in a flat line a pixel's neighbours are scattered
+  784 places apart. This chapter builds the machine that keeps the neighbours: it slides a tiny
+  window over the picture and looks at small patches, one at a time.
+
+  Fair warning -- this is the most confusing machine in the book, and it confused me badly the
+  first time. So we go painfully slowly: one worker, one window, one patch, real numbers, and
+  every wrong mental picture corrected the moment it bites. If you have not read the earlier
+  chapters, here is all you need: a network learns numbers called DIALS by rolling downhill,
+  each worker multiplies its inputs by its dials and adds them up, and the zero-out rule (ReLU)
+  forces negatives to zero. Everything else, we build here.
+
+
+  ## Sheet of Colour Photos, and Goal
+
+  A new pile, and louder than usual because it trips people: this is NOT the grey clothing of
+  Chapter 8. These are colour photographs, and colour changes the shape of everything.
+
+    Chapter 8: grey clothes, 28 x 28 = 784 numbers, one colour
+    this post:  colour photos, 32 x 32 = 1024 spots, x 3 colours = 3,072 numbers each
+
+  Each photo is 32 spots across, 32 spots down. But every spot carries THREE numbers, not one:
+  how red it is, how green, how blue -- each from 0 to 1 (we divide the raw 0-to-255 by 255).
+  So one spot at position (5,5) might read red 0.8, green 0.2, blue 0.2, which your eye reads
+  as "reddish." A photo is really three stacked sheets -- a red sheet, a green sheet, a blue
+  sheet -- each 32 by 32.
+
+  The answer is one of ten bins:
+
+    0 airplane  1 automobile  2 bird   3 cat   4 deer
+    5 dog       6 frog        7 horse  8 ship  9 truck
+
+  The goal: read the 3,072 numbers of a new photo and name the bin.
+
+
+  ## Folding the Flat String Into a Grid
+
+  The photo arrives as a flat string -- one long line of 3,072 numbers. The very first move is
+  to FOLD it back into its true shape: a 32-by-32 square, three colours deep. In code that is
+  reshape(-1, 32, 32, 3), and it loses nothing -- 32 x 32 x 3 = 3,072, the same numbers, just
+  arranged as a square again instead of a line.
+
+    flat string (3,072 numbers)            folded grid
+    [120, 135, 98, ...]      --fold--&gt;     32 across
+                                           +------------+
+                                           |  picture   | 32 down
+                                           |   here     |   x 3 colour sheets
+                                           +------------+
+
+  Why bother? Because the whole trick of this chapter is a window that moves ACROSS and DOWN
+  over the picture. A flat line has no across and down -- no neighbourhoods. The square does.
+  Moving a window over a two-direction square is exactly what gives the machine its name:
+  Conv-2D, the 2D being the two directions. Cut the pile the usual three ways first -- study
+  60%, practice 20%, sealed exam 20% -- then fold each photo.
+
+
+  ## What One Magic Paper Does
+
+  Forget the whole machine. One worker, one small window. I will call the window a MAGIC PAPER:
+  a little 3-by-3 sheet of graph paper carrying nine numbers -- its dials. Lay it on the photo
+  and it covers a 3-by-3 patch of nine spots. It multiplies each spot under it by the matching
+  dial, adds the nine products into ONE number, and writes that number down. A big number
+  means "the shape I am tuned to find is HERE." A near-zero means "not here."
+
+  Make this concrete with a magic paper tuned to find a TOP EDGE -- bright above, dark below.
+  Its nine dials (made up, to show the mechanism):
+
+       1   1   1
+       0   0   0
+      -1  -1  -1
+
+  Now lay it on a patch that really is a top edge: a bright row (10s) above a dark row (-10s):
+
+      patch:  10  10  10
+               0   0   0
+             -10 -10 -10
+
+    multiply-add:
+      top row:    (10 x 1)  + (10 x 1)  + (10 x 1)   =  30
+      middle row: (0 x 0)   + (0 x 0)   + (0 x 0)    =   0
+      bottom row: (-10 x -1)+ (-10 x -1)+ (-10 x -1) =  30
+      total = 30 + 0 + 30 = 60        &lt;- BIG: "edge found here!"
+
+  Now lay the SAME magic paper on a flat grey patch, every spot 5:
+
+      (5 x 1) x 3   +   (5 x 0) x 3   +   (5 x -1) x 3  =  15 + 0 - 15  =  0
+                                                          &lt;- "nothing here"
+
+  Same nine dials, two patches: 60 versus 0. THAT is how a magic paper finds a shape -- it
+  lights up over the pattern it matches and stays dark everywhere else. A "shape to find" is
+  nothing more mystical than a particular pattern of nine dials. And the machine does not set
+  those dials by hand: they start random and get tuned downhill, loop after loop, until they
+  settle on patterns worth looking for.
+
+  &gt;&gt; YOUR TURN
+     The same top-edge magic paper (dials: row of 1s, row of 0s, row of -1s) lands on a patch
+     that is dark on top and bright below -- the OPPOSITE of an edge it likes:
+
+        patch:  -10 -10 -10
+                  0   0   0
+                 10  10  10
+
+     What score does it write? (Work the three rows.)
+
+     check your slate:
+       top:    (-10 x 1) x 3 = -30 ;  middle: 0 ;  bottom: (10 x -1) x 3 = -30.
+       total = -30 + 0 - 30 = -60. A big NEGATIVE -- this magic paper screams "the edge here is
+       upside-down from the one I hunt." (After the zero-out rule, -60 becomes 0: not my shape.)
+
+
+  ## One Inspector, One Scan -- and the Traps
+
+  One worker carrying one magic paper is an INSPECTOR. Here is what an inspector actually does,
+  and here are the three wrong pictures everyone (me included) builds first.
+
+  TRAP 1 -- "the magic paper sits on one spot." No. It is 3 by 3; it covers NINE spots at once,
+  centred on one. The nine comes from the paper's size, not from the spot.
+
+      +---+---+---+
+      | d | d | d |     o = the centre spot the paper sits on
+      +---+---+---+     d = its eight neighbours
+      | d | o | d |     nine spots read, ONE score written (placed at o)
+      +---+---+---+
+      | d | d | d |
+
+  TRAP 2 -- "first one magic paper scans, then a second magic paper scans the next patch." No.
+  ONE inspector owns ONE magic paper the whole time -- the same nine dials. Moving to the next
+  patch is that same paper SLID over. A second magic paper exists only when a second inspector
+  is hired. Magic papers used by inspector 1: one, forever.
+
+  TRAP 3 -- "the scan chops the photo into separate 9-spot tiles, so it runs 1024/9 times." No.
+  The paper steps ONE spot at a time, so consecutive patches OVERLAP -- each step shares six of
+  its nine spots with the last:
+
+      centre (1,1): reads columns 0,1,2
+      centre (1,2): reads columns 1,2,3   &lt;- slid +1, shares columns 1,2
+      centre (1,3): reads columns 2,3,4   &lt;- shares columns 2,3
+
+  So the paper visits every spot as a centre. On a 32-by-32 photo that is 32 x 32 = 1,024
+  centres, one score each. (A small trick called padding -- a border of zeros around the photo
+  -- lets even the corner spots sit at a centre, so the output stays a full 32 by 32 rather
+  than shrinking.) The inspector's whole run:
+
+    one photo . one inspector . one magic paper . slid to 1,024 centres
+      -&gt; 1,024 scores written -&gt; ONE finished 32-by-32 score-sheet -&gt; done
+
+  And the dials are FROZEN during a scan. They only get nudged BETWEEN loops, by how wrong the
+  final ten chances turned out. A scan is pure looking; the learning happens after.
+
+
+  ## Colour: Twenty-Seven Numbers Under the Paper
+
+  One more layer of truth, because the photo is three colours deep. When the magic paper covers
+  nine spots, each spot carries three numbers (red, green, blue). So the paper actually sits
+  over 9 x 3 = 27 numbers, and it carries 27 dials -- nine for red, nine for green, nine for
+  blue, all living in the same paper. All 27 multiply-adds collapse into ONE single number per
+  centre. Never three numbers, never a colour triplet out -- one number.
+
+  Watch a magic paper tuned to find REDNESS: all nine red-dials are 1, all green- and blue-dials
+  are 0. Lay it on a reddish patch, every spot red 0.8, green 0.2, blue 0.2:
+
+      nine red numbers:   0.8 x 1, nine times  = 7.2
+      nine green numbers: 0.2 x 0, nine times  = 0
+      nine blue numbers:  0.2 x 0, nine times  = 0
+      add all 27 -&gt; score 7.2     written at the centre
+
+  Now the same paper on a sky patch, every spot red 0.1, green 0.2, blue 0.9:
+
+      nine red: 0.1 x 1, nine times = 0.9   (green and blue ignored)
+      add all 27 -&gt; score 0.9     written at the centre
+
+  7.2 over the red patch, 0.9 over the sky. Keep red, ignore green and blue, and the score IS a
+  redness measurement. Nobody chose "3 deep" -- the photo's three colours FORCE the paper to be
+  three deep. The paper's depth always auto-matches whatever arrives. Remember that line; it is
+  the key to the second floor.
+
+  &gt;&gt; YOUR TURN
+     A magic paper has all nine BLUE-dials set to 1 and all red- and green-dials 0 (a sky-finder).
+     Lay it on the same sky patch (red 0.1, green 0.2, blue 0.9 at every spot). What score?
+
+     check your slate:
+       blue only: 0.9 x 1, nine times = 8.1. Red and green multiplied by 0 add nothing.
+       Score 8.1 -- the sky-finder lights up bright over sky, where the redness-finder gave only
+       0.9. Different dials, different shape hunted, same multiply-add.
+
+
+  ## A Floor of Thirty-Two Inspectors
+
+  One inspector finds one shape. A floor hires many. Conv2D(32, (3,3)) hires 32 inspectors,
+  each with his OWN magic paper -- his own 27 dials -- each hunting a different shape (one
+  vertical edges, one corners, one red blobs, and so on). Each inspector slides his paper over
+  the whole photo and fills his own fresh 32-by-32 score-sheet. Thirty-two inspectors, 32
+  score-sheets, stacked:
+
+      one 32 x 32 x 3 photo in
+        -&gt; 32 inspectors slide their papers
+        -&gt; OUT: 32 x 32 x 32   (still 32 across and down, but now 32 sheets DEEP)
+
+  Something important happens to the depth here. It went in as 3 (the colours) and comes out as
+  32 (the inspectors). And the meaning changed completely. At one spot, the 32 numbers are no
+  longer colours -- they are 32 different ANSWERS about that neighbourhood:
+
+      at (5,5):  inspector 1  "redness here?"  -&gt; 7.2
+                 inspector 2  "top edge here?" -&gt; 0.3
+                 inspector 3  "corner here?"   -&gt; 5.1
+                 ... 32 questions, 32 answers
+
+  Colour meaning dies at floor 1. From here on, depth means "how many different shapes we are
+  tracking," not "how many colours."
+
+  &gt;&gt; YOUR TURN
+     Conv2D(32, (3,3)) on a 32x32x3 photo. How many separate 3-by-3 magic papers exist on this
+     floor, and how many score-sheets come out?
+
+     check your slate:
+       32 papers (one per inspector) and 32 score-sheets. The "(3,3)" is the size of each paper;
+       the "32" is how many inspectors. Output: 32 x 32 x 32.
+
+
+  ## A Shrink Boss That Keeps the Loudest
+
+  Thirty-two full 32-by-32 score-sheets is a lot of paper. A boss now shrinks each one.
+  MaxPooling2D((2,2)) chops a sheet into 2-by-2 blocks and keeps ONLY the loudest number in
+  each block, tossing the other three:
+
+      old 4 x 4 (made up):          new 2 x 2:
+        7  2 | 1  0
+        3  1 | 0  4      --&gt;        7   4
+       ------+-----                 8   6
+        8  0 | 6  2
+        1  5 | 3  1
+
+  Across and down both halve: 32 x 32 becomes 16 x 16. Depth is untouched -- the boss shrinks
+  each of the 32 sheets separately, so 32 sheets stay 32 sheets. The count: 1,024 scores on a
+  sheet become 256 kept, 768 thrown away -- 75% of the inspector's work binned, per sheet.
+
+  That sounds reckless. It is deliberate. Four nearly-identical alarms crowded into one tiny
+  region say no more than one alarm does: "my shape is somewhere around here." Keeping the
+  loudest and dropping the rest loses the exact spot but keeps the finding. The question quietly
+  changes from "what is at the exact dot (5,5)?" (1,024 answers) to "what is in the region
+  around (5,5)?" (256 answers) -- and region-sharpness is all the machine needs, since no two
+  cats ever sit on exactly the same dots anyway. A quiet block is safe to drop: quiet meant "my
+  shape is NOT here."
+
+  One worry worth killing now: does this mean the machine "forgets"? The DIALS are never
+  forgotten -- they are the learning, nudged every loop and kept forever. The score-sheets are
+  just scratch paper, made and binned for every single photo. Throwing scratch paper away is not
+  forgetting the lesson; it is clearing the desk for the next photo.
+
+  &gt;&gt; YOUR TURN
+     A 16-by-16 score-sheet goes through one more MaxPooling2D((2,2)). What size comes out?
+
+     check your slate:
+       Both directions halve: 16/2 = 8 by 8. Depth unchanged. So 16x16 becomes 8x8.
+
+
+  ## A Second Floor That Drills Through All Thirty-Two
+
+  After floor 1 and its boss: 32 sheets, each 16 by 16, stacked -- inspector 1's on top down to
+  inspector 32's at the bottom, all lined up so that position (5,5) on every sheet covers the
+  same region of the original photo.
+
+  Floor 2 plays the SAME game, with one change that trips everyone. A floor-2 inspector does NOT
+  read one sheet at a time. His 3-by-3 magic paper covers nine places on the TOP sheet -- but at
+  each of those nine places he drills straight DOWN through all 32 stacked sheets, exactly as
+  floor 1's paper drilled through the three colours. Nine places, 32 levels deep:
+
+      his paper at centre (5,5):
+        nine places on the face (centre + 8 neighbours)
+        at each place, bore down through 32 levels
+        -&gt; 9 x 32 = 288 numbers pulled up
+        -&gt; x his 288 dials -&gt; add -&gt; ONE number, written at (5,5) of his fresh sheet
+
+  Same move as floor 1, just deeper. And the paper's depth (32) was never typed in -- it
+  auto-matched the 32 sheets arriving, just as floor 1's paper auto-matched the 3 colours. The
+  only thing the code names is the paper's width: Conv2D(64, (3,3)). The 64 is the number of
+  floor-2 inspectors; the (3,3) is the width; the depth takes care of itself.
+
+  Why drill through all 32? Because floor 2 is hunting COMBINATIONS. At one region the 32
+  numbers say "redness 7.2, edge 0.3, corner 5.1, ..." A floor-2 inspector reading all 32 at
+  once can fire on "fur-texture AND ear-curve in the same region" -- a thing visible only by
+  reading several floor-1 answers together. Floor 1 found simple shapes; floor 2 combines them
+  into bigger ones. Floor 2 hires 64 inspectors, makes 64 fresh 16-by-16 sheets, and the boss
+  halves again to 8 x 8 x 64.
+
+      compare:            floor 1                     floor 2
+      reads:              photo 32x32, 3 deep         stack 16x16, 32 deep
+      one place holds:    3 numbers (R,G,B)           32 numbers (one per sheet)
+      paper:              3x3 wide, 3 deep = 27 dials  3x3 wide, 32 deep = 288 dials
+      writes:             ONE number per centre        ONE number per centre
+
+  The shape is identical; only the depth grows. Memorise the shape, not the figures.
+
+
+  ## Ironing the Grid Flat, Then the Old Clerks Finish
+
+  After two floors and two bosses we hold 8 x 8 x 64 -- a small, deep stack of score-sheets.
+  Now we hand it to the plain sorting clerks from the earlier chapters, who read a flat line.
+  So we IRON the stack flat: 8 x 8 x 64 = 4,096 numbers in one long row. This is pure
+  re-shelving -- no dials, no arithmetic, just unfolding the grid back into a line (the exact
+  reverse of the fold we did at the start).
+
+  Then two ordinary clerk-floors finish the job, each clerk wired to every incoming number:
+
+    Dense(64, relu):     64 clerks, each reads all 4,096 numbers -&gt; 64 numbers out
+    Dense(10, softmax):  10 clerks, each reads those 64 -&gt; 10 raw scores
+                         -&gt; softmax -&gt; 10 chances adding to 1 -&gt; biggest is the guess
+
+  Softmax is the ten-bin exit from Chapter 8: raise e to each score, divide by the total, and
+  the ten results are chances that add to 1. The inspector and the clerk share one arithmetic
+  heart -- multiply-add -- but differ in habit: an inspector slides a tiny paper and cares WHERE
+  a shape sits; a clerk sits still, reads the whole line at once, and weighs all the evidence
+  with no regard for where it came from.
+
+
+  ## Whole Machine, Size Flow, and Where the Dials Hide
+
+  Here is the entire factory and the size of the paper at every step:
+
+      step                       across x down x deep      dials on this step
+      ---------------------------------------------------------------------------
+      input grid                  32 x 32 x  3             0
+      Conv2D(32, 3x3, same)       32 x 32 x 32             32 x (3x3x3 + 1) =     896
+      MaxPooling2D(2x2)           16 x 16 x 32             0
+      Conv2D(64, 3x3, same)       16 x 16 x 64             64 x (3x3x32 + 1) =  18,496
+      MaxPooling2D(2x2)            8 x  8 x 64             0
+      Flatten                     4,096                    0
+      Dense(64, relu)             64                       4,096 x 64 + 64 =   262,208
+      Dense(10, softmax)          10                       64 x 10 + 10 =          650
+      ---------------------------------------------------------------------------
+                                                  total =                      282,250
+
+  Check the two convolution counts by hand. Floor 1: each of 32 papers has 3x3x3 = 27 dials
+  plus 1 nudge = 28, and 32 x 28 = 896. Floor 2: each of 64 papers has 3x3x32 = 288 dials plus
+  1 nudge = 289, and 64 x 289 = 18,496. Add everything: 896 + 18,496 + 262,208 + 650 = 282,250.
+
+  Now the punchline, and the real lesson of this whole machine. Of the 282,250 dials, 262,208 --
+  more than nine in ten -- sit in ONE place: the single Dense floor right after the flatten,
+  wiring 4,096 numbers to 64 clerks. The magic papers are astonishingly CHEAP by comparison
+  (896 and 18,496) because ONE small paper is reused at all 1,024 positions instead of needing
+  fresh dials per position. That reuse -- the same nine (or 288) dials slid everywhere -- is the
+  entire genius of a picture network. It is why a machine can look at a million-pixel image
+  without needing a billion dials: the eye is small and moves, rather than huge and fixed.
+
+  &gt;&gt; YOUR TURN
+     Suppose floor 1 hired 16 inspectors instead of 32 (still 3x3 papers, still colour photos).
+     How many dials would floor 1 hold?
+
+     check your slate:
+       Each paper still has 3x3x3 + 1 = 28. With 16 papers: 16 x 28 = 448 dials. Half the
+       inspectors, half the floor-1 dials -- and the papers stay cheap either way.
+
+
+  ## Common Tripwires
+
+  Real snags from building this, each fixed at the spot it bites.
+
+  !! WARN: ONE PAPER OUT IS ONE NUMBER, NOT A COLOUR TRIPLET
+     An inspector's paper is three deep (27 dials), but all 27 multiply-adds collapse to ONE
+     number per spot. People expect a red-guess, green-guess, blue-guess triplet. No -- one
+     number per spot per inspector. A whole floor of 32 inspectors gives 32 numbers per spot,
+     and those are 32 different shape-answers, not colours.
+
+  !! WARN: THE PAPER IS ALWAYS SMALL -- NEVER THE SHEET'S SIZE
+     On floor 2 the sheets are 16x16, but the paper is still 3x3, not 16x16. A 16x16 paper could
+     not move -- one position, no neighbourhoods, no scan. Only the paper's DEPTH grows to match
+     the incoming sheets; its width stays the typed (3,3).
+
+  !! WARN: POOLING DOES NOT KEEP COORDINATES
+     The shrink boss writes a fresh, smaller, FULL sheet -- no holes, no kept dot-addresses.
+     Each 2x2 block writes its loudest value at the block's position. Which corner it came from
+     is deliberately forgotten. You are not meant to track where the survivor sat.
+
+  !! WARN: COUNT THE PAPER DEPTH FROM WHAT ARRIVES, NOT WHAT YOU TYPE
+     Conv2D(64, (3,3)) on a 16x16x32 stack makes papers that are 3x3x32 = 288 dials each, not
+     3x3 = 9. The depth (32) is invisible in the code because it auto-matches the input. Forget
+     it and your hand dial-count comes out wildly too low.
+
+  !! WARN: FLATTEN HAS NO DIALS
+     Flatten is re-shelving, not arithmetic. It moves zero dials. If your hand count attributes
+     any dials to the flatten step, you have miscounted -- the dials are all in the Dense floor
+     that READS the flattened line.
+
+
+  ## Standard Names for Everything Above
+
+    Plain term used above               Standard label
+    ----------------------------------  -------------------------------------------
+    magic paper                         filter / kernel
+    inspector                           a single convolutional filter's output channel
+    a floor of inspectors               a convolutional layer (Conv2D)
+    sliding the paper one spot at a time the convolution / stride 1
+    border of zeros to reach the edge   padding='same'
+    score-sheet                         feature map
+    shrink boss, keep the loudest of 4  max pooling (MaxPooling2D)
+    ironing the grid flat               Flatten
+    a clerk wired to every number       a Dense (fully-connected) neuron
+    ten scores into ten chances         softmax
+    depth auto-matches the input        channel dimension
+    one small paper reused everywhere   weight sharing / parameter sharing
+
+
+  ## Code, If You Want It
+
+  The whole factory, the same steps spoken in Keras. Nothing here needs a computer to
+  understand -- the section above did it all by hand -- but here is the day you meet one.
+
+  &gt;&gt; NEW TO PYTHON? Each named once:
+       reshape(-1, 32, 32, 3)             -- fold the flat 3072 into a 32x32x3 grid
+       Conv2D(32, (3,3), padding='same')  -- a floor of 32 inspectors, 3x3 papers, edges reachable
+       MaxPooling2D((2,2))                -- the shrink boss: keep the loudest of each 2x2 block
+       Flatten()                          -- iron the deep grid into one flat line
+       Dense(64, activation='relu')       -- 64 plain clerks reading the whole line
+       Dense(10, activation='softmax')    -- ten-chance exit, chances add to 1
+       count_params()                     -- the machine's own dial count (should be 282,250)
+
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+
+    model_cnn = Sequential([
+        Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=(32, 32, 3)),
+        MaxPooling2D((2, 2)),
+        Conv2D(64, (3, 3), activation='relu', padding='same'),
+        MaxPooling2D((2, 2)),
+        Flatten(),
+        Dense(64, activation='relu'),
+        Dense(10, activation='softmax'),    # 10 bins, chances add to 1
+    ])
+
+    model_cnn.compile(
+        loss='sparse_categorical_crossentropy',   # answer key is ONE integer 0..9
+        optimizer='adam',
+        metrics=['accuracy'],
+    )
+
+    print(model_cnn.count_params())   # 282,250 -- matches our hand count
+
+  !! WARN: input_shape ONLY ON THE FIRST FLOOR
+     The first Conv2D must be told the grid size, input_shape=(32, 32, 3). The later floors
+     work out their own input size from what the floor below hands them -- never type it twice.
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 9 -- Machines That Look at Pictures):
+    Part 1 (this post)
+
+  &lt;- <a href="../index.html">Back to all posts</a>
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  <a href="../index.html">home</a> . <a href="https://github.com/learnrahulrai-ui">source on GitHub</a>
+==============================================================================================
+</pre>
+</body>
+</html>
