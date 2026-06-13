@@ -23,13 +23,17 @@
        next:  (more coming) -&gt;
 
   Part 1 built the SIMPLE factory: two floors of inspectors with magic papers, one shrink
-  boss each, ironed flat, sorted by two clerk floors. On CIFAR-10 that simple machine lands
-  around 68-70%. This post adds the three layers of armour that push it into the upper 70s:
-  a humbler that steadies every inspector's numbers, a send-home rule that zeroes random
-  entries, and a deeper build that stacks these in the right order. Then, to read the result,
-  we crack the CONFUSION SHEET -- a ten-by-ten pile model that names the two animals the
-  machine mixes up most. And finally we crack open floor 1 and read the SHAPE of its magic
-  papers directly.
+  boss each, ironed flat, sorted by two clerk floors. Trained for five loops it lands around
+  60% on CIFAR-10. This post adds the armour that lets a network keep climbing where the
+  plain one stalls: AUGMENTATION (jiggled copies of each photo), a HUMBLER that steadies
+  every inspector's numbers, and a SEND-HOME rule that zeroes random entries. A blunt,
+  honest warning up front: at only five training loops these add almost nothing to the
+  score -- the deep factory lands ~60.5% against the plain factory's ~60.2%. Their payoff
+  is in the LONG run, over many more loops, where the plain factory memorises and rots while
+  the armoured one keeps improving. We build them by hand anyway, because the mechanism is
+  the lesson, not the five-loop number. Then we crack the CONFUSION SHEET -- a ten-by-ten
+  pile model that names the two animals the machine mixes up most -- and finally crack open
+  floor 1 to read the SHAPE of its magic papers directly.
 
   Two things you need from Part 1: (1) an inspector covers a 3x3 patch of 27 numbers and
   writes ONE score, (2) the shrink boss halves the sheet by keeping the loudest of each 2x2.
@@ -42,8 +46,75 @@
 
   IN HAND: simple factory. 32x32x3 photo → 32 inspector papers → boss → 64 papers → boss
   → flatten 4096 → Dense(64) → Dense(10). Dial count: 32x28 + 64x289 + 4096x64+64
-  + 64x10+10 = 896 + 18,496 + 262,208 + 650 = 282,250. Accuracy around 68-70%.
-  This section explains WHY the scores drift between inspector floors, and shows the fix.
+  + 64x10+10 = 896 + 18,496 + 262,208 + 650 = 282,250. Five loops → ~60% on the exam pile.
+  The rest of this post adds three cures -- jiggled copies, a humbler, a send-home -- then
+  reads the trained machine.
+
+
+  ## Training in Handfuls of Sixty-Four (Q5)
+
+  Before any cure, recall how the dials get tuned at all. The study pile holds about 42,000
+  photo-cards. The factory does NOT study them one at a time, nor all at once. It GRABS a
+  handful of 64, runs all 64 through the whole factory, measures how wrong the 10 chances
+  came out (averaged over the 64), and turns EVERY dial a tiny notch toward right. Then it
+  drops that handful and grabs the next 64.
+
+    cards per loop      = 42,000
+    grab size           = 64
+    grabs per loop      = 42,000 / 64 ≈ 657 dial-turns
+    five loops          = 657 x 5 ≈ 3,285 dial-turns total
+
+  Why grab 64 and not 1? A single card's wrongness is jumpy -- one weird cat would yank
+  every dial. Averaging the wrongness over 64 cards steadies the pull, so each dial-turn
+  rides the trend of 64 photos, not the whim of one. This handful of 64 is the same handful
+  the humbler will pool over later, so hold the number 64 in your pocket.
+
+  How does the factory know right from wrong? Every card carries its true answer on the
+  back. If the back says CAT and the clerks gave cat a chance of 0.61, the wrongness is
+  small (0.61 is near 1.0); if they gave cat only 0.05, the wrongness is huge. That
+  wrongness is exactly what drives every dial-turn. No back-answer, no learning.
+
+    &gt;&gt; YOUR TURN
+       Study pile of 50,000 cards, grab size 100, three loops. How many dial-turns?
+
+       check your slate: 50,000 / 100 = 500 grabs per loop. 500 x 3 = 1,500 dial-turns.
+
+
+  ## Jiggled Copies: Augmentation (Q6)
+
+  IN HAND: study pile ~42,000 cards, grabbed 64 at a time, ~657 dial-turns per loop. The
+  plain factory sees the EXACT same 42,000 cards every loop. This section adds the first
+  cure -- and it costs not a single new dial.
+
+  The disease: shown the identical cards loop after loop, the factory memorises exact
+  dot-positions -- "a cat is brightness 0.8 at spot (14,11)" -- instead of the general
+  shape of a cat. It scores high on the study pile and flunks new photos.
+
+  The cure: before a card is studied, make a JIGGLED copy of it -- same animal, moved a
+  little. Four jiggles, all label-safe:
+
+    tilt        up to 15 degrees either way
+    shove across  up to 10% left or right
+    shove down    up to 10% up or down
+    mirror        flip left-to-right
+
+  Because every grab now serves freshly jiggled cards, the factory never sees the identical
+  photo twice. It can no longer memorise frozen dot-positions; it is forced to learn what
+  makes a cat a cat across every tilt and shove.
+
+  FLIP-SAFE IS NOT THE SAME AS SYMMETRIC. A mirror flip is allowed only when the flipped
+  card is STILL a true example of its label:
+
+    cat   → mirror → still a cat            label TRUE   ✓ safe to flip
+    "2"   → mirror → backwards-2            label LYING  ✗ never flip
+    "b"   → mirror → "d"                    label WRONG  ✗ never flip
+
+  You do not need a cat to fold onto itself. You need CAT-NESS to survive the mirror. All
+  ten CIFAR things are flip-safe (a mirrored truck is still a truck), so the lab flips.
+
+  Two rules that never bend: (1) the jiggle is REBUILT into a fresh machine -- you do not
+  reuse a trained one; (2) the EXAM pile is NEVER jiggled. You grade on honest, un-jiggled
+  cats, or the grade is a lie.
 
 
   ## Why Scores Drift -- The Problem the Humbler Solves
@@ -120,9 +191,19 @@
     SHIFT           -- tuned by wrongness (a regular dial)
 
   The settled middle and scatter are running averages of what the inspector has seen so far.
-  They are used ONLY at exam time, when one photo arrives alone with no batch of 64 to
-  average over. Then the humbler uses the remembered middle and scatter -- not a fresh
-  average (there is only one photo).
+  THE DIARY, worked by hand -- each new handful of 64 photos updates a plain running average:
+
+    first 64 photos:  this handful's middle = 25  →  diary = 25
+    next  64 photos:  this handful's middle =  5  →  diary = (25 + 5) / 2 = 15
+    next  64 photos:  this handful's middle =  9  →  diary = (25 + 5 + 9) / 3 = 13
+
+  The diary blends ONLY the middles it has seen. The back-of-card answer -- cat? right?
+  wrong? -- NEVER touches it. That is what "remembered, not tuned" means.
+
+  Why the diary exists: at exam time ONE photo arrives alone, with no handful of 64 to
+  average over. The humbler cannot compute a fresh middle from a single photo, so it uses
+  the frozen diary number (13 above) instead. Every exam photo gets the same humbling, no
+  matter which photos happen to sit beside it -- an honest, steady grade.
 
   ORDER inside the deep factory (this order is fixed, never shuffled):
     inspector floor → HUMBLER → shrink boss → send-home
@@ -195,10 +276,10 @@
 
   ## The Deep Factory -- Full Build (Q7)
 
-  IN HAND: simple factory produces ~70%. Two new tools: humbler (standardise over the
-  64-photo handful, then stretch + shift), send-home (25% coin, off at exam time). This
-  section inserts them into the simple factory in the fixed order: floor → HUMBLER → boss
-  → send-home.
+  IN HAND: simple factory, 282,250 dials, ~60% at five loops. Two new floors: humbler
+  (standardise over the 64-photo handful, then stretch + shift, four numbers kept per
+  inspector), send-home (25% coin, off at exam time). This section inserts them into the
+  simple factory in the fixed order: floor → HUMBLER → boss → send-home.
 
     photo 32 x 32 x 3
     → inspector floor 1 (32 inspectors, 3x3x3 papers)   → 32 score-sheets, 32x32
@@ -214,20 +295,24 @@
     → send-home (zero 50% -- clerks get the stricter coin)
     → clerk floor, Dense(10, softmax)                    → 10 chances
 
-  Dial count for the deep factory:
+  Dial count for the deep factory. The humbler keeps FOUR numbers per inspector, and the
+  machine stores and counts all four -- the two tuned (stretch, shift) AND the two
+  remembered (settled middle, settled scatter). So a humbler over 32 inspectors carries
+  32 x 4 numbers, not 32 x 2:
 
-    Conv1:   32 x (3x3x3 + 1 nudge) = 32 x 28 =     896
-    Humbler1: 32 x (stretch + shift) = 32 x 2  =      64
-    Conv2:   64 x (3x3x32 + 1 nudge) = 64 x 289 = 18,496
-    Humbler2: 64 x (stretch + shift) = 64 x 2  =     128
-    Dense64: 4096 x 64 + 64         =           262,208
-    Dense10:   64 x 10 + 10         =               650
-                                         total: 282,442
+    Conv1:    32 x (3x3x3 + 1 nudge) = 32 x 28  =     896
+    Humbler1: 32 x 4 numbers each              =     128
+    Conv2:    64 x (3x3x32 + 1 nudge) = 64 x 289 = 18,496
+    Humbler2: 64 x 4 numbers each              =     256
+    Dense64:  4096 x 64 + 64                    = 262,208
+    Dense10:    64 x 10 + 10                    =     650
+                                          total: 282,634
 
-  The humbler adds 192 dials (64 + 128). The simple factory had 282,250; the deep factory
-  has 282,442 -- barely more, but far more stable in training.
-
-  The send-home and boss layers have no dials at all. Zero.
+  The two humblers add 384 numbers (128 + 256). The simple factory had 282,250; the deep
+  factory has 282,634 -- barely more, but far steadier in training. (If you only counted
+  the two TUNED dials per inspector you would get 282,442; the machine's own count_params
+  reports 282,634 because the remembered diary numbers are stored too.) Send-home, boss,
+  and iron add ZERO numbers -- they only zero, shrink, and reshape.
 
   Note on the batch axis: at training time, 64 photos pass through the factory together.
   Inspector 1 therefore makes 64 sheets at once -- one per photo. The HUMBLER reaches
@@ -315,11 +400,16 @@
 
     accuracy = (sum of the diagonal) / (total cards on the sheet)
 
-    simple:     diagonal sum / 10,000 = say 0.68
-    augmented:  diagonal sum / 10,000 = say 0.72
-    deep:       diagonal sum / 10,000 = say 0.76
+  At five training loops, the three factories land close together -- all near 60%:
 
-  Largest accuracy wins. Three numbers, one comparison, done.
+    simple (Q3):     diagonal sum / 10,000 ≈ 0.602
+    augmented (Q6):  diagonal sum / 10,000 ≈ 0.605 -- 0.610  (jiggles help a little even at 5)
+    deep (Q7):       diagonal sum / 10,000 ≈ 0.605           (humbler barely shows at 5 loops)
+
+  Largest wins. The gap is small because five loops is not enough to show the long-run
+  payoff. Over fifty or a hundred loops the deep and augmented factories keep climbing; the
+  plain one stalls. The comparison is honest: pick whichever scored highest on the sealed
+  pile you never touched during training.
 
   The confusion sheet stays whole -- never altered to make this calculation.
 
@@ -432,6 +522,12 @@
 
   ## The Labels, Last
 
+    handful of 64 photos          batch (batch_size=64)
+    dial-turn per handful         gradient update / optimiser step
+    jiggled copy                  augmented sample
+    jiggles (tilt, shove, mirror) data augmentation
+    flip-safe label               label-preserving transform
+    jiggle tool                   ImageDataGenerator (Keras)
     humbler / steadier            batch normalisation (BatchNorm, BN)
     settled middle                running mean
     settled scatter               running variance (= scatter squared); scatter = std
@@ -454,6 +550,43 @@
   ## Code, If You Want It
 
   Nothing above needed a computer; this section is for the day you meet one.
+
+  Train the simple factory in handfuls (Q5):
+
+  ```python
+  history_cnn = model_cnn.fit(
+      X_train, y_train,
+      epochs=5,
+      batch_size=64,               # handful of 64 cards per dial-turn
+      validation_data=(X_val, y_val),
+  )
+  q5_val_acc = round(float(history_cnn.history['val_accuracy'][-1]), 3)
+  # history[-1] = the last of the 5 loops; expect ~0.60
+  ```
+
+  The augmented factory (Q6) -- same shape as Q3, built fresh, jiggled cards:
+
+  ```python
+  from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+  datagen = ImageDataGenerator(
+      rotation_range=15,           # tilt up to 15 degrees
+      width_shift_range=0.1,       # shove left/right up to 10%
+      height_shift_range=0.1,      # shove up/down up to 10%
+      horizontal_flip=True,        # mirror left-right (all CIFAR things are flip-safe)
+  )
+
+  model_aug = Sequential([ ... same 7 floors as Q3 ... ])   # FRESH machine, not the trained one
+  model_aug.compile(loss='sparse_categorical_crossentropy',
+                    optimizer='adam', metrics=['accuracy'])
+
+  history_aug = model_aug.fit(
+      datagen.flow(X_train, y_train, batch_size=64),  # grab-64, each card freshly jiggled
+      epochs=5,
+      validation_data=(X_val, y_val),    # exam pile: NEVER jiggled
+  )
+  q6_aug_val_acc = round(float(history_aug.history['val_accuracy'][-1]), 3)
+  ```
 
   The deep factory (Q7):
 
