@@ -11,58 +11,58 @@
 
   CHAPTER 1 -- PREDICTING HOUSE PRICES (2026)
   -------------------------------------------
-  post 1/21   [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
-  post 2/21   [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
-  post 3/21   [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
+  post 1/28   [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
+  post 2/28   [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
+  post 3/28   [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
 
 
   CHAPTER 2 -- GRADING A GUESSER (2026)
   -------------------------------------
-  post 4/21   [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
-  post 5/21   [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
+  post 4/28   [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
+  post 5/28   [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
 
 
   CHAPTER 3 -- SORTING INTO BINS (2026)
   -------------------------------------
-  post 6/21   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
-  post 7/21   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
-  post 8/21   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
-  post 9/21   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
+  post 6/28   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
+  post 7/28   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
+  post 8/28   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
+  post 9/28   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
 
 
   CHAPTER 4 -- HUMBLE DIALS AND WOBBLE BANDS (2026)
   -------------------------------------------------
-  post 10/21  [Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials](posts/humble-dials-ridge-lasso.txt)
-  post 11/21  [Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam](posts/wobble-bands-bootstrap.txt)
-  post 12/21  [Part 3 -- The Dial by Hand: Where the Dials Really Come From](posts/the-dial-by-hand.txt)
+  post 10/28  [Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials](posts/humble-dials-ridge-lasso.txt)
+  post 11/28  [Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam](posts/wobble-bands-bootstrap.txt)
+  post 12/28  [Part 3 -- The Dial by Hand: Where the Dials Really Come From](posts/the-dial-by-hand.txt)
 
 
   CHAPTER 5 -- QUESTION CHARTS AND COMMITTEES (2026)
   --------------------------------------------------
-  post 13/21  [Part 1 -- Question Charts: Building a Tree by Hand](posts/question-charts-by-hand.txt)
-  post 14/21  [Part 2 -- The Mixing Ruler: Gini, Information Gain, and Pruning](posts/mixing-ruler-gini-pruning.txt)
-  post 15/21  [Part 3 -- Committees: Bagging, Random Forest, and Boosting](posts/committees-bag-forest-boost.txt)
+  post 13/28  [Part 1 -- Question Charts: Building a Tree by Hand](posts/question-charts-by-hand.txt)
+  post 14/28  [Part 2 -- The Mixing Ruler: Gini, Information Gain, and Pruning](posts/mixing-ruler-gini-pruning.txt)
+  post 15/28  [Part 3 -- Committees: Bagging, Random Forest, and Boosting](posts/committees-bag-forest-boost.txt)
 
 
   CHAPTER 6 -- FINDING PATTERNS WITHOUT ANSWERS (2026)
   ----------------------------------------------------
-  post 16/21  [Part 1 -- Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem](posts/eda-and-distance.txt)
-  post 17/21  [Part 2 -- The Strongest Direction: Crushing a Many-Wall Room Into a Flat Page (PCA)](posts/the-strongest-direction-pca.txt)
-  post 18/21  [Part 3 -- Grouping by Nearest Centre: K-Means From a Blank Sheet](posts/grouping-by-nearest-centre.txt)
-  post 19/21  [Part 4 -- The Family Tree: Hierarchical Clustering and the Dendrogram](posts/the-family-tree-clustering.txt)
-  post 20/21  [Part 5 -- Both Tools on NCI60: PCA and Clustering on Real Gene Data](posts/nci60-revisited.txt)
-  post 21/23  [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
+  post 16/28  [Part 1 -- Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem](posts/eda-and-distance.txt)
+  post 17/28  [Part 2 -- The Strongest Direction: Crushing a Many-Wall Room Into a Flat Page (PCA)](posts/the-strongest-direction-pca.txt)
+  post 18/28  [Part 3 -- Grouping by Nearest Centre: K-Means From a Blank Sheet](posts/grouping-by-nearest-centre.txt)
+  post 19/28  [Part 4 -- The Family Tree: Hierarchical Clustering and the Dendrogram](posts/the-family-tree-clustering.txt)
+  post 20/28  [Part 5 -- Both Tools on NCI60: PCA and Clustering on Real Gene Data](posts/nci60-revisited.txt)
+  post 21/28  [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
 
 
   CHAPTER 7 -- BUILDING A NEURAL NETWORK FROM SCRATCH (2026)
   ---------------------------------------------------------
-  post 22/24  [Part 1 -- Stacked Rooms and One Walk by Hand: How a Network Computes a Guess](posts/the-web-of-adders.txt)
-  post 23/24  [Part 2 -- Rolling Downhill by Hand: How a Network Learns](posts/how-the-dials-learn.txt)
+  post 22/28  [Part 1 -- Stacked Rooms and One Walk by Hand: How a Network Computes a Guess](posts/the-web-of-adders.txt)
+  post 23/28  [Part 2 -- Rolling Downhill by Hand: How a Network Learns](posts/how-the-dials-learn.txt)
 
 
   CHAPTER 8 -- KEEPING A NETWORK HONEST (2026)
   --------------------------------------------
-  post 24/25  [Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler](posts/five-machines-against-memorising.txt)
+  post 24/28  [Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler](posts/five-machines-against-memorising.txt)
 
 
   CHAPTER 9 -- MACHINES THAT LOOK AT PICTURES (2026)

@@ -10,7 +10,7 @@
   Posted: 2026-06-05 . Author: Rahul Rai . Tags: l2-regularization, lda, generative-models
   ============================================================================================
 
-  PATH . post 8 of 21
+  PATH . post 8 of 28
     <- prev:  [Sorting 2: The Trade Curve](the-trade-curve.txt)
        next:  [Sorting 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt) ->
 

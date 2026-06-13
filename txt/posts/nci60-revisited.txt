@@ -10,7 +10,7 @@
   Posted: 2026-06-09 . Author: Rahul Rai . Tags: pca, clustering, nci60, case-study
   ============================================================================================
 
-  PATH . post 20 of 21
+  PATH . post 20 of 28
     <- prev:  [Chapter 6, Part 4: The Family Tree (Hierarchical Clustering)](the-family-tree-clustering.txt)
        next:  [Chapter 6, Part 6: Filling the Blanks (Recommender Systems)](filling-the-blanks.txt) ->
 

@@ -10,7 +10,7 @@
   Posted: 2026-06-09 . Author: Rahul Rai . Tags: recommender-systems, matrix-factorisation, collaborative-filtering
   ============================================================================================
 
-  PATH . post 21 of 23
+  PATH . post 21 of 28
     <- prev:  [Chapter 6, Part 5: Both Tools on NCI60](nci60-revisited.txt)
        next:  [Chapter 7, Part 1: How a Network Computes a Guess](the-web-of-adders.txt) ->
 

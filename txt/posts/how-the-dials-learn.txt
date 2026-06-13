@@ -10,7 +10,7 @@
   Posted: 2026-06-11 . Author: Rahul Rai . Tags: backpropagation, gradient-descent, adam, dropout
   ============================================================================================
 
-  PATH . post 23 of 24
+  PATH . post 23 of 28
     <- prev:  [Chapter 7, Part 1: How a Network Computes a Guess](the-web-of-adders.txt)
        next:  [Chapter 8: Five Machines Against Memorising](five-machines-against-memorising.txt) ->
 

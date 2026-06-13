@@ -10,7 +10,7 @@
   Posted: 2026-06-09 . Author: Rahul Rai . Tags: k-means, clustering, unsupervised
   ============================================================================================
 
-  PATH . post 18 of 21
+  PATH . post 18 of 28
     <- prev:  [Chapter 6, Part 2: The Strongest Direction (PCA)](the-strongest-direction-pca.txt)
        next:  [Chapter 6, Part 4: The Family Tree](the-family-tree-clustering.txt) ->
 

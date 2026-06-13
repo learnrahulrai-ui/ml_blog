@@ -10,7 +10,7 @@
   Posted: 2026-06-07 . Author: Rahul Rai . Tags: bagging, random-forest, boosting, ensembles
   ============================================================================================
 
-  PATH . post 15 of 21  (end of the supervised-learning book)
+  PATH . post 15 of 28  (end of the supervised-learning book)
     <- prev:  [Chapter 5, Part 2: The Mixing Ruler](mixing-ruler-gini-pruning.txt)
        next:  [Chapter 6, Part 1: Looking at a Sheet With No Answers](eda-and-distance.txt) ->
 

@@ -10,7 +10,7 @@
   Posted: 2026-06-01 . Author: Rahul Rai . Tags: linear-regression, ols, least-squares
   ============================================================================================
 
-  PATH . post 3 of 21
+  PATH . post 3 of 28
     <- prev:  [House Prices 2: Ask the Closest Rows](neighbor-machine-knn.txt)
        next:  [Grading 1: Two Rulers, MSE and R^2](grading-the-guess-mse-r2.txt) ->
 

@@ -10,7 +10,7 @@
   Posted: 2026-06-09 . Author: Rahul Rai . Tags: hierarchical-clustering, dendrogram, linkage
   ============================================================================================
 
-  PATH . post 19 of 21
+  PATH . post 19 of 28
     <- prev:  [Chapter 6, Part 3: Grouping by Nearest Centre (K-Means)](grouping-by-nearest-centre.txt)
        next:  [Chapter 6, Part 5: Both Tools on NCI60](nci60-revisited.txt) ->
 

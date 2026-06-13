@@ -10,7 +10,7 @@
   Posted: 2026-06-12 . Author: Rahul Rai . Tags: cnn, convolution, pooling, computer-vision
   ============================================================================================
 
-  PATH . post 25 of 26
+  PATH . post 25 of 28
     <- prev:  [Chapter 8: Five Machines Against Memorising](five-machines-against-memorising.txt)
        next:  [Chapter 9, Part 2: The Deep Factory](the-deep-factory.txt) ->
 

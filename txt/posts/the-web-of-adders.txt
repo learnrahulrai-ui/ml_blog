@@ -10,7 +10,7 @@
   Posted: 2026-06-11 . Author: Rahul Rai . Tags: neural-network, deep-learning, relu, sigmoid
   ============================================================================================
 
-  PATH . post 22 of 23
+  PATH . post 22 of 28
     <- prev:  [Chapter 6, Part 6: Filling the Blanks](filling-the-blanks.txt)
        next:  [Chapter 7, Part 2: How a Network Learns](how-the-dials-learn.txt) ->
 
