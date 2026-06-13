@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 26 posts: 9 chapters + an appendix, in reading order.
+  ALL POSTS -- a book in 28 posts: 10 chapters + an appendix, in reading order.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
@@ -67,8 +67,14 @@
 
   CHAPTER 9 -- MACHINES THAT LOOK AT PICTURES (2026)
   --------------------------------------------------
-  post 25/26  [Part 1 -- A Magic Paper Slid Over a Photo: How a Picture Network Sees](posts/the-magic-paper-factory.txt)
-  post 26/26  [Part 2 -- The Deep Factory: Humbler, Send-Home, and the Confusion Sheet](posts/the-deep-factory.txt)
+  post 25/28  [Part 1 -- A Magic Paper Slid Over a Photo: How a Picture Network Sees](posts/the-magic-paper-factory.txt)
+  post 26/28  [Part 2 -- The Deep Factory: Humbler, Send-Home, and the Confusion Sheet](posts/the-deep-factory.txt)
+
+
+  CHAPTER 10 -- MACHINES THAT READ WORDS (2026)
+  ---------------------------------------------
+  post 27/28  [Part 1 -- Words Into a Machine: The Notepad and the Walking Worker](posts/the-walking-worker.txt)
+  post 28/28  [Part 2 -- The Two-Memory Worker: How an LSTM Remembers Far-Back Words](posts/the-two-memory-worker.txt)
 
 
   APPENDICES -- FLIP-TO REFERENCES (2026)

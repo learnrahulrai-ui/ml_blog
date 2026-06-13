@@ -10,9 +10,9 @@
   Posted: 2026-06-13 . Author: Rahul Rai . Tags: cnn, batch-norm, dropout, confusion-matrix
   ============================================================================================
 
-  PATH . post 26 of 26
+  PATH . post 26 of 28
     <- prev:  [Chapter 9, Part 1: A Magic Paper Slid Over a Photo](the-magic-paper-factory.txt)
-       next:  (more coming) ->
+       next:  [Chapter 10, Part 1: Words Into a Machine](the-walking-worker.txt) ->
 
   Part 1 built the SIMPLE factory: two floors of inspectors with magic papers, one shrink
   boss each, ironed flat, sorted by two clerk floors. Trained for five loops it lands around

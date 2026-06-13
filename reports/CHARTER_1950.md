@@ -112,4 +112,6 @@ ROLLOUT STATUS
   [x] five-machines-against-memorising
   [x] the-magic-paper-factory
   [x] the-deep-factory
+  [x] the-walking-worker
+  [x] the-two-memory-worker
 ═══════════════════════════════════════════════════════════════

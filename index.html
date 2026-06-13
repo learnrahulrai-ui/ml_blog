@@ -17,13 +17,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in nine chapters (twenty-six posts),
-  meant to be read top to bottom. Each post opens with a "post N of 26" path header and a
+  This is not a pile of loose articles -- it is a short BOOK in ten chapters (twenty-eight posts),
+  meant to be read top to bottom. Each post opens with a "post N of 28" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. An appendix ties it together.
 
-  &gt;&gt; NEW HERE? Start at post 1 of 26:
+  &gt;&gt; NEW HERE? Start at post 1 of 28:
      <a href="posts/chapter1-what-ml-actually-does.html">Guessing House Prices, End to End</a>
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -277,6 +277,29 @@
     into 10 true-animal piles, sort each pile by guess, and the biggest off-diagonal cell
     names cat↔dog as the most-confused pair. Ends with reading the magic-paper shape (3,3,3,32)
     directly from the trained floor.
+
+
+  CHAPTER 10 . MACHINES THAT READ WORDS -- recurrent networks, by hand
+  -------------------------------------------------------------------
+
+  <a href="posts/the-walking-worker.html">Part 1 -- Words Into a Machine: The Notepad and the Walking Worker</a>
+    post 27/28 . 2026-06-13 . part 1 of 2 . rnn, embedding, nlp, sequence-models
+    A photo was already numbers; a review is WORDS, and a factory can only multiply numbers.
+    Number the 10,000 commonest words by frequency, pad every review to 100, then a NOTEPAD
+    swaps each word-number for a learned 32-number note (so "boring" and "dull" drift close,
+    and "not" can carry a flip). One walking worker reads the 100 notes IN ORDER, reusing one
+    dial-set to rewrite a 32-number memory -- the RNN cell, walked by hand word by word -- and
+    a final S-curve clerk reads the last memory for thumbs up or down. (IMDB sentiment.)
+
+  <a href="posts/the-two-memory-worker.html">Part 2 -- The Two-Memory Worker: How an LSTM Remembers Far-Back Words</a>
+    post 28/28 . 2026-06-13 . part 2 of 2 . lstm, bilstm, sequence-models
+    The plain worker crushes its one memory every word, so word 1 fades to nothing by word 90.
+    The fix, derived by hand: carry TWO memories -- a long keep (A, never crushed, free to grow
+    past 1) and a spoken recent (B) -- and let three 0..1 voters decide what to keep, admit, and
+    speak. That is the LSTM (the old RNN cell plus three dimmer knobs), shown with a full
+    real-number combine. Then the BiLSTM reads the review both directions and glues the two
+    memories, an honest four-way comparison, and a blunt note: the fade is a theorem, the exact
+    wiring is an engineered choice.
 
 
 ----------------------------------------------------------------------------------------------
