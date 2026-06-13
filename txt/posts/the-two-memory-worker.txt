@@ -168,9 +168,9 @@
   What lands on the long memory is loudness TIMES worth, slot by slot. Watch two slots:
 
     LOUD but worthless:  fresh +0.9  x  admit-frac 0.10  =  +0.09   (let in almost nothing)
-    QUIET but crucial:   fresh +0.2  x  admit-frac 0.95  =  +0.19   (let in nearly all)
+    QUIET but needed:    fresh +0.2  x  admit-frac 0.95  =  +0.19   (let in nearly all)
 
-  The quiet-but-crucial slot contributes MORE than the loud-but-worthless one -- +0.19
+  The quiet-but-needed slot contributes MORE than the loud-but-worthless one -- +0.19
   against +0.09 -- even though its raw value is far smaller. The admit-voter looked at
   today's word and the recent memory, judged the loud value irrelevant right now, and choked
   it down to a whisper before it ever reached memory-A. Loud does not buy a seat; the voter

@@ -21,7 +21,7 @@
 
   This is Part 1 of two. Part 1 builds the network and computes a guess -- the forward pass.
   Part 2 shows how the network LEARNS: how the dials change, worked by hand with the chain
-  rule. If you only want to understand how a network produces an answer, Part 1 is complete
+  rule. If you only want to calculate how a network produces an answer, Part 1 is complete
   on its own.
 
 
@@ -89,7 +89,7 @@
   every clerk in Room 2 reads all of Room-1's written numbers; and so on down the line. Stack
   three such rooms and you have a neural network -- the simplest kind.
 
-  Why clerks? Because that is all the machine does: arithmetic. No intuition, no mystical
+  Why clerks? Because that is all the machine does: arithmetic. No gut feeling, no mystical
   pattern recognition -- just multiply, add, BEND (force any negative running total up to
   zero -- a trick we need shortly and explain in full in "Bending Scores at Zero"), and
   repeat. Understanding it at the arithmetic level means you can debug it at the arithmetic

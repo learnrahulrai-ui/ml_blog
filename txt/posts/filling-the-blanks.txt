@@ -106,7 +106,7 @@
 
   ## The Lab, End to End: 100 People, 50 Movies, 3,786 Holes
 
-  Concept done -- now the real sheet from the lab.  100 people down the side, 50 movies
+  Rule done -- now the real sheet from the lab.  100 people down the side, 50 movies
   across the top: 100 x 50 = 5,000 cells.  Only 1,214 hold a rating; the other
   5,000 - 1,214 = 3,786 are blank.
 

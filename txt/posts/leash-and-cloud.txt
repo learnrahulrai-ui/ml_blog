@@ -328,7 +328,7 @@
        Counter-intuitive.
     3. The leash fixes dials; scaling fixed inputs. They solve different problems; need
        both.
-    4. LDA reads the two cloud centres and their shared spread, then finds the optimal wall
+    4. LDA reads the two cloud centres and their shared spread, then finds the best wall
        in one closed-form step.
     5. w prop. S_W^-1 (mu1 - mu0): the difference of centres, rotated by the inverse
        within-class spread.

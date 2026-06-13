@@ -337,7 +337,7 @@
   Put together: step direction comes from Average 1 (momentum), and step LENGTH is scaled
   DOWN for dials with big or noisy slopes using Average 2. (Adam also applies a small early-
   pass correction to both averages, since they start at zero and need a few passes to warm
-  up; that bookkeeping is not essential to the intuition.) The effect is that each of the 641
+  up; that bookkeeping is not essential to the picture.) The effect is that each of the 641
   dials gets its own self-sizing step. Adam is a choice, not a law -- plain gradient descent
   with a hand-tuned step also works -- but Adam saves you the tuning, so I use it.
 
@@ -376,7 +376,7 @@
   floating-point numbers (float32), and in that format the largest representable value is
   roughly e^88. Push past it and the number overflows to "inf," and the next operation on
   it tends to produce "nan" (not-a-number). The exact threshold depends on the number format,
-  the framework, and the hardware -- a 64-bit float reaches far higher -- but float32 is the
+  the toolbox, and the hardware -- a 64-bit float reaches far higher -- but float32 is the
   common default for training, so this is the edge you will actually meet.
 
   The S-curve needs e^(-Z). If a raw score Z reaches -500, we compute e^(-(-500)) = e^500.

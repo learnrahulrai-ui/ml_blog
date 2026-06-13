@@ -221,7 +221,7 @@
               low   low   LOW   +1    +2    +3    +4    +5  -> ALARM
 
   Pass 3 set the lowest val-loss, 0.39. Passes 4 through 8 each failed to beat it -- that is
-  five strikes -- so the alarm fires after pass 8 and training stops. Then the crucial last
+  five strikes -- so the alarm fires after pass 8 and training stops. Then the needed last
   step: rewind the dials back to where they were at pass 3, the bottom of the valley. (The
   standard name for that rewind is restore-best-weights, and forgetting it is a classic
   mistake -- you stop at pass 8's worse dials instead of pass 3's best.) You set a high

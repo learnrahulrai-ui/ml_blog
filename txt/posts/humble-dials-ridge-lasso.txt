@@ -172,7 +172,7 @@
 
     make smallest:   (add up every miss^2)   +   a * (add up every |dial|)
 
-  Same tug-of-war, one crucial change: the fine's pull is now CONSTANT. For an absolute
+  Same tug-of-war, one key change: the fine's pull is now CONSTANT. For an absolute
   size the pull is just a, no matter how tiny the dial gets. It does not fade near zero --
   it keeps shoving at full strength right up to the edge:
 
@@ -233,7 +233,7 @@
   ## Picking the Knob a -- Never Guess It
 
   Both machines have the same knob a, and you do NOT eyeball it. You let the 5-slice check
-  from Chapter 1 do the choosing. Cut the study pile into 5 slices; cover one, learn the
+  from Chapter 1 do the choosing. Cut the study pile into 5 slices; cover one, build the
   dials on the other four, guess the covered slice, write down the error; rotate until every
   slice has been the covered one; average the five errors. That average is one value of a's
   score. Do it for a whole ladder of a-values -- about fifty of them -- and a valley appears:

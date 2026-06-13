@@ -204,7 +204,7 @@
   !! WARN: ONE OUTLIER SQUASHES EVERYTHING ELSE
      If a column has one value of 10000 and everything else sits between 1 and 100, the
      min-max range is ~9999. After scaling, the bulk of the data squeezes into 0 to 0.01 --
-     a thin sliver. Standard scaling is more robust to outliers.
+     a thin sliver. Standard scaling handles outliers better.
 
     use STANDARD (mean 0, spread 1)  when: roughly bell-shaped, no extreme outliers
     use MIN-MAX  (0 to 1)            when: bounded range required, known clean limits,

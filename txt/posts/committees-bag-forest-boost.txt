@@ -250,7 +250,7 @@
 
   To pick the best (learning_rate, n_trees): hold out 30% of the study pile as
   validation, watch the validation error at each step (staged_predict), pick the
-  iteration where validation error bottomed out.
+  pass where validation error bottomed out.
 
   !! WARN: WATCH THE VALIDATION CURVE, NOT THE TRAINING CURVE
      Training error keeps dropping (the line of fixers keeps fixing its own pile).
@@ -309,7 +309,7 @@
   Each stump reduces study error.  But at some point, stumps start memorising
   noise.  Hold out 30% of the study pile as validation and watch the error:
 
-    iteration  validation MSE    direction
+    pass       validation MSE    direction
     ----------------------------------------
        0         40.2            baseline (mean only)
       10         34.1            down

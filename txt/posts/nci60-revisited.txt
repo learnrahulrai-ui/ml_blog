@@ -42,7 +42,7 @@
     64 rows.  6,830 columns.  The type column is sealed away during clustering.
 
   Stop and look at the shape: 64 rows, 6,830 columns.  WAY more columns than rows.  This
-  is the opposite of every sheet so far, and it breaks your intuition.  In a 6,830-wall
+  is the opposite of every sheet so far, and it breaks your gut feeling.  In a 6,830-wall
   room with only 64 dots, EVERYTHING is far from everything else, and almost any direction
   looks like it separates the dots.  This is the curse of dimensionality from Chapter 1,
   Part 2, in its purest form.
@@ -207,7 +207,7 @@
 
   ## Common Tripwires I Caught
 
-    TRIPWIRE 1:  More columns than rows flips your intuition.
+    TRIPWIRE 1:  More columns than rows flips your gut feeling.
        With 6,830 walls and 64 dots, distances bunch up -- everything is roughly
        equally far from everything.  Do not trust a clustering on all raw columns;
        crush with PCA first or the gaps are mostly noise.

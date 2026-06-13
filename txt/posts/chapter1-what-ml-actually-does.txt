@@ -20,7 +20,7 @@
   Here is the promise. By the end of this single post you will have built -- by hand, on
   a real sheet of California house prices -- a machine that guesses the price of a house
   it has never seen. Not a toy version. The same machinery the textbooks dress up in
-  Greek letters, except we build it first and learn its proper names last. Parts 2 and 3
+  Greek letters, except we build it first and name it last. Parts 2 and 3
   then take the two rules apart screw by screw. For now, stand back and see the whole
   thing at once.
 
@@ -312,7 +312,7 @@
 
   Now -- and only now that you have built the thing -- here are the proper names. Every
   post on this blog ends this way: plain words on the left, the textbook term on the
-  right. Learn the idea first; the label is just a handle to carry it by.
+  right. Practice it first; the label is just a handle to carry it by.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

@@ -486,8 +486,8 @@
 
   ## Code, If You Want It
 
-  The whole factory, the same steps spoken in Keras. Nothing here needs a computer to
-  understand -- the section above did it all by hand -- but here is the day you meet one.
+  The whole factory, the same steps spoken in Keras. Nothing here needs a machine to follow
+  -- the section above did it all by hand -- but here is the day you meet one.
 
   >> NEW TO PYTHON? Each named once:
        reshape(-1, 32, 32, 3)             -- fold the flat 3072 into a 32x32x3 grid

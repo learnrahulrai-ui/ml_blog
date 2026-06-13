@@ -257,7 +257,7 @@
        and the distance calculations include the state name column.
 
     TRIPWIRE 4:  Euclidean vs Manhattan -- both are valid, different uses.
-       Euclidean is the default but Manhattan is more robust to outliers
+       Euclidean is the default but Manhattan handles outliers better
        (no squaring means no single large gap dominates).  Neither is
        "right" or "wrong" -- they measure different kinds of distance.
 

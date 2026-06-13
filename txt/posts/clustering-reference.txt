@@ -75,7 +75,7 @@
 
   Mahalanobis distance accounts for how the dots are spread and correlated -- it divides
   out the stretch before measuring, so a step across a narrow direction counts for more
-  than a step along a wide one.  It is the robust ruler for many-walled, correlated rooms.
+  than a step along a wide one.  It is the stronger ruler for many-walled, correlated rooms.
   (It is the same "untangler" spirit as the (X^T X)^-1 from Chapter 4, Part 3.)
 
 

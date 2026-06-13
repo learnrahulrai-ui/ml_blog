@@ -16,8 +16,8 @@
 
   So far the dials have been the machine's private business -- numbers it set for itself
   to make good guesses. But those dials are not just machinery; they are a message. Each
-  one is the rule quietly telling you how its column pushes the answer around. Learn to
-  read them and the black box starts talking.
+  one is the rule quietly telling you how its column pushes the answer around. Read them
+  and the black box starts talking.
 
   This post asks one innocent-looking question of a sheet of cars -- which column drags
   miles per gallon down the hardest? -- and uses it to spring two traps that catch almost
