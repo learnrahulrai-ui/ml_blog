@@ -126,6 +126,14 @@
     tanh    crushes to -1..+1  (a VALUE, can be positive or negative)
     sigmoid crushes to  0..1   (a FRACTION -- "how much", a dimmer knob from 0% to 100%)
 
+  ONE MACHINE -- TWO PAPERS INSIDE. Pick any formula above, say KEEP-VOTER:
+    sigmoid( word32 x Wk  +  memoryB x Uk  +  nudge_k )
+  word32 goes through paper Wk (a 32x32 matrix of dials); memory-B goes through paper Uk (a
+  separate 32x32 matrix). Their two outputs ADD, the nudge joins, THEN the one squash. This
+  is NOT a "word-machine" whose output feeds a "memory-machine" -- both papers live INSIDE the
+  same one machine, and the combine happens BEFORE the squash. All four machines follow this
+  exact shape, each with its own W, its own U, its own nudge.
+
   Here is the quiet punchline: the FRESH VALUE machine -- tanh of (word + old recent + nudge)
   -- IS the plain worker's recipe from Part 1, unchanged. The LSTM does not throw the old
   worker away. It keeps it as ONE of four parts (the fresh candidate value), and wraps three
@@ -194,7 +202,24 @@
   slots is inside each machine's dial-paper, where a row of products is summed to one number.
   The voter-multiplies in the combine do NOT sum.)
 
-  A worked combine on 3 slots (a real review would use 32; 3 fits the page):
+  One number first -- the hardest step, proved for 1 slot before all 3:
+
+    old A       = 5.0   (the long keep; never crushed, so it grew big)
+    FRESH       = 0.6   (new content, tanh-bounded to -1..+1)
+    keep-frac   = 0.9   (vote: hold 90% of A)
+    admit-frac  = 0.2   (vote: let in 20% of FRESH)
+    show-frac   = 0.7   (vote: speak 70% of the tamed A)
+
+    new A = 0.9 x 5.0  +  0.2 x 0.6  =  4.5 + 0.12  =  4.62
+    A went 5.0 -> 4.62. Held almost all of itself (4.5). Let in a touch (0.12).
+
+    tanh(4.62) ~ 1.0   (A grew large; tanh tames it back into -1..+1)
+    new B = show x tanh(new A) = 0.7 x 1.0 = 0.70
+
+    A = the silent vault (4.62, uncrushed, can grow big). B = what you say out loud about it
+    (0.70). A survives because it was only scaled-and-added, never crushed on the carry.
+
+  All 3 slots, same rule applied element-wise (a real review uses 32):
 
     memory-A   = [ 5.0 , -2.0 , 0.3 ]     <- note the 5.0: never crushed, so it grew big
     keep-frac  = [ 0.9 ,  0.5 , 1.0 ]
@@ -222,6 +247,12 @@
   -A's slot 1 is 4.26 -- well past 1, because it was only scaled and added, never crushed.
   THAT is the escape from the fade: a far-back mark can sit in A at 5.0 and still be there
   90 words later.
+
+  Show's dual role: every new B lands in two places.
+    1. NEXT WORD -- all four machines read it alongside the next word's note.
+    2. LAST WORD -- on word 100, B is the memory the final clerk reads for liked/not.
+  B is the LSTM's public face, built anew each word, always read by what comes next.
+  (A is never handed to the clerk and never read by any machine -- only used in the combine.)
 
   The dial count for an LSTM worker, by hand: it is the plain worker FOUR TIMES OVER (four
   machines, each with a word-paper, a memory-paper, a nudge):
@@ -307,6 +338,17 @@
   the same honesty Chapter 9 needed. The ranking is the lesson, not the exact decimals. Pick
   whichever scored highest on the pile you never touched while training.
 
+  How the Transformer differs from all three, in one line each:
+
+    LSTM / BiLSTM   WALK word by word. Carry pockets A and B. 4 machines each step. Votes
+                    decide what survives in A and what is spoken as B. A word's past lives in
+                    A; its future is unknown to a plain LSTM.
+
+    TRANSFORMER     NO walk. NO pocket. ALL words at once. Each word makes three tags (want /
+                    have / give); each word checks ALL other words' "have" against its own
+                    "want", to decide how much of each "give" to blend in. No sequence, no
+                    memory chain, no votes. That is a later chapter.
+
 
   ## Honest Note: Engineered, Not Derived
 
@@ -375,6 +417,17 @@
     No. The fade is derivable; the exact wiring was engineered by trial. Variants (e.g. the
     GRU) work about as well. The mechanism is the lesson, not the precise voter count.
 
+  TRIPWIRE 11  "The four machines are two machines -- a word-machine that feeds a B-machine."
+    No -- ONE machine, two papers inside. In KEEP-VOTER: sigmoid(word32 x Wk + memoryB x Uk
+    + nudge_k), word32 and memoryB are both inputs that ADD inside the same one machine before
+    the squash. There is no cascade. Each of the four machines has this one-combine structure,
+    with its own W, its own U, its own nudge.
+
+  TRIPWIRE 12  "Memory-B is a matrix."
+    No. B is a VECTOR -- 32 numbers, same shape as the word32 embedding. The DIALS are the
+    matrices: 8 papers (Wf/Uf, Wk/Uk, Wa/Ua, Ws/Us), each 32x32. A and B are vectors; W and
+    U are 32x32 matrices; nudges are 32-wide vectors (one per machine).
+
 
   ## The Labels, Last
 
@@ -395,6 +448,9 @@
     read both directions, glue       Bidirectional wrapper
     glued forward+back memory        concatenated hidden states (2 x units)
     share right on sealed pile       validation accuracy
+    A, B, word-note (vectors)        shape (units,) -- 32 numbers each
+    W, U (matrices / papers)         shape (input_dim, units) -- 32x32 each
+    nudge per machine                bias vector, shape (units,)
 
 
   ## Code, If You Want It
