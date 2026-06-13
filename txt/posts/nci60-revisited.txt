@@ -26,6 +26,8 @@
   ## The Sheet: Wide, Not Tall
 
     NCI60 -- 64 cell-line samples, ~6,830 gene measurements each
+    (each measurement = log-brightness of one gene's activity in that cell line:
+     +0.30 means that gene is a little more active than average; -1.20 means well below)
 
       sample   gene1   gene2   gene3   ...   gene6830   | (hidden) type
       ------   -----   -----   -----   ...   --------   | -------------
@@ -75,8 +77,9 @@
   PCA down to a few honest shadows we could plot and eyeball.  This section stops looking
   and starts carving: build the family tree on those samples and cut it into groups.
 
-  Now Part 4 on the same sheet.  Standardise the genes, build the dendrogram (Ward or
-  complete linkage), and cut it into a handful of groups:
+  Now Part 4 on the same sheet.  Standardise the genes, build the dendrogram -- a branching
+  tree where each fork's height is the gap at that merge -- (Ward or complete linkage), and
+  cut it into a handful of groups:
 
     height
         |        +-------------------+
