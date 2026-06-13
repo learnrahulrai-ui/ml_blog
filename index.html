@@ -17,13 +17,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in nine chapters (twenty-five posts),
-  meant to be read top to bottom. Each post opens with a "post N of 21" path header and a
+  This is not a pile of loose articles -- it is a short BOOK in nine chapters (twenty-six posts),
+  meant to be read top to bottom. Each post opens with a "post N of 26" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. An appendix ties it together.
 
-  &gt;&gt; NEW HERE? Start at post 1 of 21:
+  &gt;&gt; NEW HERE? Start at post 1 of 26:
      <a href="posts/chapter1-what-ml-actually-does.html">Guessing House Prices, End to End</a>
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -258,14 +258,25 @@
   -----------------------------------------------------------------
 
   <a href="posts/the-magic-paper-factory.html">Part 1 -- A Magic Paper Slid Over a Photo: How a Picture Network Sees</a>
-    post 25/25 . 2026-06-12 . part 1 . cnn, convolution, pooling, computer-vision
+    post 25/26 . 2026-06-12 . part 1 . cnn, convolution, pooling, computer-vision
     Flatten a photo and you destroy every "next to" -- so this machine keeps the picture folded
     and slides a tiny 3x3 window (a magic paper of nine dials) across it, lighting up where its
     shape sits. Built one worker at a time with every wrong picture corrected: the edge-finder
     that scores 60 on an edge and 0 on flat grey, 27 dials across three colours, 32 inspectors
     into 32 score-sheets, the shrink boss that keeps the loudest of each 2x2, the second floor
     drilling through all 32, and the punchline -- 262,208 of 282,250 dials hide in one Dense
-    floor because the small papers are reused everywhere. (Colour photos, CIFAR-10. More ahead.)
+    floor because the small papers are reused everywhere. (Colour photos, CIFAR-10.)
+
+  <a href="posts/the-deep-factory.html">Part 2 -- The Deep Factory: Humbler, Send-Home, and the Confusion Sheet</a>
+    post 26/26 . 2026-06-13 . part 2 . cnn, batch-norm, dropout, confusion-matrix
+    The simple factory lands ~70%. Three layers of armour push it further: a humbler steadies
+    every inspector's 65,536 numbers to middle 0, scatter 1 (arithmetic done by hand, full
+    clerk count); send-home zeroes a random 25% of sheet entries to break secret teams (one
+    coin per entry, off at exam time); the deep factory inserts both in the right order --
+    floor → humbler → boss → send-home. Then the confusion sheet: sort 10,000 test cards
+    into 10 true-animal piles, sort each pile by guess, and the biggest off-diagonal cell
+    names cat↔dog as the most-confused pair. Ends with reading the magic-paper shape (3,3,3,32)
+    directly from the trained floor.
 
 
 ----------------------------------------------------------------------------------------------

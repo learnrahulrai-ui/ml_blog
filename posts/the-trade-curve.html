@@ -35,14 +35,19 @@
   arguing over a single spot and lay all the bargains out side by side, in one picture.
 
 
+  IN HAND: machine gives each lump a score 0-to-1; draw a line (the cutoff) somewhere on
+  that scale. Four boxes: CAUGHT (truly sick, called sick), FALSE ALARM (truly well, called
+  sick), MISSED (truly sick, called well), CLEARED (truly well, called well).
+  This section measures the two rates those boxes produce as the cutoff slides.
+
   ## Two Rates
 
-  At any fixed cutoff, the four-box table yields two fractions:
+  At any fixed cutoff, the four boxes yield two fractions:
 
     catch-rate   (TPR) = CAUGHT / all truly sick   ^ good
     false-alarm  (FPR) = ALARM  / all truly well   v good
 
-  Formally, for a cutoff t in [0, 1]:
+  Formally (Y = true verdict: 1 sick, 0 well; yhat = machine's called verdict):
 
       TPR(t) = P(yhat=1 | Y=1) = TP(t) / (TP(t) + FN(t))
       FPR(t) = P(yhat=1 | Y=0) = FP(t) / (FP(t) + TN(t))

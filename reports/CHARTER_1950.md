@@ -111,4 +111,5 @@ ROLLOUT STATUS
   [x] how-the-dials-learn
   [x] five-machines-against-memorising
   [x] the-magic-paper-factory
+  [x] the-deep-factory
 ═══════════════════════════════════════════════════════════════

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Deep Factory: Humbler, Send-Home, and the Confusion Sheet (CNNs by Hand, Part 2) :: Rahul&#x27;s ML Blog</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<pre>==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  <a href="../index.html">home</a> | <a href="../about.html">about</a> | <a href="../archive.html">archive</a> | <a href="../glossary.html">glossary</a> | <a href="mailto:learn.rahul.rai@gmail.com">contact</a>
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 9 . MACHINES THAT LOOK AT PICTURES . PART 2 OF 2
+  The Deep Factory: Humbler, Send-Home, and the Confusion Sheet
+  Posted: 2026-06-13 . Author: Rahul Rai . Tags: cnn, batch-norm, dropout, confusion-matrix
+  ============================================================================================
+
+  PATH . post 26 of 26
+    &lt;- prev:  <a href="the-magic-paper-factory.html">Chapter 9, Part 1: A Magic Paper Slid Over a Photo</a>
+       next:  (more coming) -&gt;
+
+  Part 1 built the SIMPLE factory: two floors of inspectors with magic papers, one shrink
+  boss each, ironed flat, sorted by two clerk floors. On CIFAR-10 that simple machine lands
+  around 68-70%. This post adds the three layers of armour that push it into the upper 70s:
+  a humbler that steadies every inspector's numbers, a send-home rule that zeroes random
+  entries, and a deeper build that stacks these in the right order. Then, to read the result,
+  we crack the CONFUSION SHEET -- a ten-by-ten pile model that names the two animals the
+  machine mixes up most. And finally we crack open floor 1 and read the SHAPE of its magic
+  papers directly.
+
+  Two things you need from Part 1: (1) an inspector covers a 3x3 patch of 27 numbers and
+  writes ONE score, (2) the shrink boss halves the sheet by keeping the loudest of each 2x2.
+  Everything else is rebuilt here.
+
+  Pencil and scratch paper out. Both new tools get real arithmetic.
+
+
+  ## IN HAND
+
+  IN HAND: simple factory. 32x32x3 photo → 32 inspector papers → boss → 64 papers → boss
+  → flatten 4096 → Dense(64) → Dense(10). Dial count: 32x28 + 64x289 + 4096x64+64
+  + 64x10+10 = 896 + 18,496 + 262,208 + 650 = 282,250. Accuracy around 68-70%.
+  This section explains WHY the scores drift between inspector floors, and shows the fix.
+
+
+  ## Why Scores Drift -- The Problem the Humbler Solves
+
+  After inspector 1 fills his 32x32 score-sheet, the values might all sit between 5 and 45.
+  Inspector 2's sheet might run -3 to +3. Inspector 3 might range from 0 to 200.
+
+  These wild scales are not wrong -- the zero-out (ReLU) handles negatives, and the next
+  floor's dials can compensate in principle. In practice, one floor screaming values of 200
+  while another whispers 0.03 makes the dial-nudging step fragile. The learning step has
+  to be calibrated for each inspector's private scale simultaneously. Miss by a fraction on
+  one and the whole factory's dial updates blow up.
+
+  The fix: before the shrink boss processes a floor's sheets, MAKE EVERY INSPECTOR'S
+  NUMBERS SPEAK THE SAME LANGUAGE. Pull each inspector's pile to middle 0, scatter 1.
+  That is the humbler.
+
+
+  ## The Humbler by Hand (Batch Normalisation)
+
+  The humbler works on ONE inspector's pile at a time. During training, the machine
+  processes a HANDFUL of photos together -- say 64. So inspector 1 produces not one
+  32x32 sheet but 64 of them stacked: 64 x 32 x 32 = 65,536 numbers.
+
+  The humbler reads all 65,536 and computes two summary numbers:
+
+    SETTLED MIDDLE  = (sum of all 65,536 numbers) / 65,536     the average
+    SETTLED SCATTER = root( (sum of (each - middle)^2) / 65,536 )   the spread
+
+  Worked example (made-up numbers):
+
+    65,536 numbers for inspector 1, suppose their sum = 1,638,400
+    settled middle = 1,638,400 / 65,536 = 25
+
+    Clerk count for the middle alone:
+      65,535 additions (running total) + 1 division = 65,536 arithmetic steps.
+
+    Now the scatter. Suppose the sum of (each - 25)^2 across all 65,536 = 1,638,400:
+      settled scatter = root( 1,638,400 / 65,536 ) = root(25) = 5
+
+    Clerk count for the scatter:
+      65,536 subtractions + 65,536 squarings + 65,535 additions + 1 division + 1 root
+      = 262,109 more steps.
+
+    Total clerk count for settled middle + scatter on inspector 1's pile: ~328,000 strokes.
+    A room of 32 clerks clears it in ~10,250 steps each -- done well before lunch.
+
+  Now STANDARDISE every number in the pile:
+
+    standardised = (number - settled middle) / settled scatter
+
+    number 30 → (30 - 25) / 5 = 5 / 5 = 1.0
+    number 20 → (20 - 25) / 5 = -5 / 5 = -1.0
+    number 25 → (25 - 25) / 5 = 0 / 5 = 0.0
+
+  After standardising, ALL 65,536 numbers have middle = 0, scatter = 1. Every inspector's
+  pile now speaks the same scale.
+
+  But stripping the scale entirely might throw away useful information. So two extra dials
+  per inspector are added -- a STRETCH and a SHIFT -- tuned by wrongness like all other dials:
+
+    humbled output = stretch x standardised + shift
+
+    if stretch = 1, shift = 0: output equals the standardised number unchanged
+    if stretch = 2, shift = 3: output = 2 x standardised + 3  (scale restored, centre moved)
+
+  These two dials are the ONLY two parts of the humbler the answer key touches.
+
+  FOUR numbers total per inspector, and they are NOT all the same kind:
+
+    SETTLED MIDDLE  -- remembered running average; answer key NEVER touches it
+    SETTLED SCATTER -- remembered running average; answer key NEVER touches it
+    STRETCH         -- tuned by wrongness (a regular dial)
+    SHIFT           -- tuned by wrongness (a regular dial)
+
+  The settled middle and scatter are running averages of what the inspector has seen so far.
+  They are used ONLY at exam time, when one photo arrives alone with no batch of 64 to
+  average over. Then the humbler uses the remembered middle and scatter -- not a fresh
+  average (there is only one photo).
+
+  ORDER inside the deep factory (this order is fixed, never shuffled):
+    inspector floor → HUMBLER → shrink boss → send-home
+
+  Steady FIRST. Then shrink. Then silence.
+
+
+  &gt;&gt; YOUR TURN
+     Inspector 2: settled middle = 10, settled scatter = 4, stretch = 1, shift = 0.
+     A number in the pile reads 18. What does the humbler write in its place?
+
+     check your slate: standardised = (18 - 10) / 4 = 8 / 4 = 2.0.
+     humbled output = 1 x 2.0 + 0 = 2.0.
+     The humbler replaced 18 with 2.0.
+
+
+  ## Send-Home -- Randomly Silencing Numbers (Dropout)
+
+  IN HAND: humbler standardises inspector 1's 65,536 numbers to middle 0, scatter 1
+  (settled middle 25, scatter 5 from above). Stretch = 1, shift = 0. Humbler done.
+  Then the shrink boss halves to 256 per inspector. This section silences random entries
+  AFTER the boss and before the next inspector floor.
+
+  The problem send-home solves: SECRET TEAMS. Over many loops, inspector 7 might learn
+  to score +10 at a spot exactly when inspector 22 scores -10 there, and the clerk floor
+  below always uses 7 and 22 together to cancel noise. This secret team works perfectly on
+  the study pile and fails on new photos -- it is memorisation, not pattern-finding.
+
+  The cure: before every training step, flip a coin for every number on every sheet.
+
+    heads (75% chance): keep the number
+    tails (25% chance): replace it with 0
+
+  One entry, one coin. The 25% is NOT "zero one entry per group of four" -- every entry
+  flips its own independent coin. Sometimes two in a row get zeroed; sometimes none do.
+  The secret team cannot rely on both members showing up, so it never forms.
+
+  To keep the surviving numbers' expected total unchanged, scale them up:
+
+    surviving entry → surviving entry x (1 / (1 - 0.25)) = surviving entry x 4/3
+
+    Example on four entries [7, -3, 0, 5], coins: heads, tails, heads, heads:
+      7  → heads → 7 x 4/3 ≈ 9.33     kept, scaled up
+      -3 → tails → 0                  zeroed
+      0  → heads → 0 x 4/3 = 0        kept, still zero
+      5  → heads → 5 x 4/3 ≈ 6.67    kept, scaled up
+      output: [9.33, 0, 0, 6.67]
+
+  Clerk count for 65,536 entries: 65,536 coin flips + roughly 49,152 multiplications
+  (about 75% survive) = ~114,688 steps.
+
+  CRITICAL: send-home is OFF at exam time. One sealed photo arrives; every number passes
+  through unchanged. No coins, no zeroing, no scaling. The humbler's remembered middle and
+  scatter take over for steady scaling; send-home simply steps aside.
+
+
+  &gt;&gt; YOUR TURN
+     Six entries: [4, -2, 8, 0, 3, 6]. Coin results in order: tails, heads, heads, tails,
+     heads, tails. Send-home rate 25%, scale factor 4/3. What is the output?
+
+     check your slate:
+       4  → tails → 0
+      -2  → heads → -2 x 4/3 = -8/3 ≈ -2.67
+       8  → heads →  8 x 4/3 = 32/3 ≈ 10.67
+       0  → tails → 0
+       3  → heads →  3 x 4/3 = 4.0
+       6  → tails → 0
+     output: [0, -2.67, 10.67, 0, 4.0, 0]
+
+
+  ## The Deep Factory -- Full Build (Q7)
+
+  IN HAND: simple factory produces ~70%. Two new tools: humbler (standardise over the
+  64-photo handful, then stretch + shift), send-home (25% coin, off at exam time). This
+  section inserts them into the simple factory in the fixed order: floor → HUMBLER → boss
+  → send-home.
+
+    photo 32 x 32 x 3
+    → inspector floor 1 (32 inspectors, 3x3x3 papers)   → 32 score-sheets, 32x32
+    → HUMBLER (65,536 numbers per inspector, pooled over 64 photos)  → 32x32x32
+    → boss (keep loudest of each 2x2)                    → 16x16x32
+    → send-home (zero 25% of entries at random)
+    → inspector floor 2 (64 inspectors, 3x3x32 papers)  → 64 score-sheets, 16x16
+    → HUMBLER                                            → 16x16x64
+    → boss                                               → 8x8x64
+    → send-home (zero 25%)
+    → iron (flatten 8x8x64)                              → 4096
+    → clerk floor, Dense(64, relu)                       → 64
+    → send-home (zero 50% -- clerks get the stricter coin)
+    → clerk floor, Dense(10, softmax)                    → 10 chances
+
+  Dial count for the deep factory:
+
+    Conv1:   32 x (3x3x3 + 1 nudge) = 32 x 28 =     896
+    Humbler1: 32 x (stretch + shift) = 32 x 2  =      64
+    Conv2:   64 x (3x3x32 + 1 nudge) = 64 x 289 = 18,496
+    Humbler2: 64 x (stretch + shift) = 64 x 2  =     128
+    Dense64: 4096 x 64 + 64         =           262,208
+    Dense10:   64 x 10 + 10         =               650
+                                         total: 282,442
+
+  The humbler adds 192 dials (64 + 128). The simple factory had 282,250; the deep factory
+  has 282,442 -- barely more, but far more stable in training.
+
+  The send-home and boss layers have no dials at all. Zero.
+
+  Note on the batch axis: at training time, 64 photos pass through the factory together.
+  Inspector 1 therefore makes 64 sheets at once -- one per photo. The HUMBLER reaches
+  ACROSS all 64 photos' worth of sheets to compute the average and scatter. That is the
+  only floor that sees across the batch. Every other floor -- boss, send-home, clerks --
+  is photo-blind: each photo's sheets never touch another photo's sheets.
+
+
+  ## The Confusion Sheet -- Which Animals Does the Machine Mix Up? (Q8)
+
+  IN HAND: deep factory trained and exam pile sealed (10,000 test photos, roughly 1,000
+  per animal). The machine gives 10 chance-scores per photo. This section builds the pile
+  model that names the single most-confused animal pair.
+
+  Lay 10 empty piles on the table, one per TRUE animal. Flip through every test card:
+
+    each card → drop onto the pile named by its BACK (the true animal)
+                NEVER by its front (the guess)
+
+  When the flipping is done, every card on the CAT pile truly IS a cat. Some were guessed
+  right; some were guessed wrong -- but they all truly are cats.
+
+  Now open one pile and sort it by FRONT (the guess):
+
+    CAT pile (all cards truly cat, say 1,000 of them):
+      guessed cat   : 380   ← matched (truth = guess)
+      guessed dog   :  95   ← biggest stray
+      guessed deer  :  12
+      guessed bird  :   7
+      guessed horse :   5
+      (the rest, adding to 1,000 total)
+
+  Do that for all 10 piles. Stack the sorted piles together:
+
+                       GUESSED →
+              plane auto bird  CAT  deer  DOG  frog horse ship truck
+    TRUE
+    plane  [ ...                                                     ]
+    ...
+    CAT    [ ...            380   ...   95  ...                     ]  ← row 3
+    ...
+    DOG    [ ...             88  ...   390  ...                     ]  ← row 5
+    ...
+
+  One pile = one ROW (the true animal).
+  Sorted counts within a pile = the COLUMNS (what it was guessed as).
+  Where a row meets its own column = the DIAGONAL (matched, hits).
+  Everything off the diagonal = a miss.
+
+  All 100 cells sum to 10,000 (every card sits somewhere on the sheet).
+
+  FINDING THE BIGGEST MISS:
+
+  Zero the diagonal (hits are not mistakes) and take the largest remaining number.
+
+    In the example: CAT row, DOG column = 95.
+    (row 3, col 5) = (true cat, guessed dog).
+
+  Reading a cell: (3, 5) means row 3 (truth = cat), column 5 (guess = dog).
+  Meaning: go to the CAT pile. The biggest STRAY corner -- 95 cards truly cat but
+  called dog -- is the largest wrong-corner anywhere on the whole 10x10 sheet.
+
+  Cat-and-dog at 32x32 pixels are furry four-legged blobs at the same scale. The machine's
+  biggest confusion is sensible, not random. (32x32 is the DATA's limit, not a factory
+  stupidity -- even a human eye struggles at that resolution.)
+
+  THE COPY TRAP:
+
+  The test cell checks that the confusion sheet still sums to 10,000. If you zero the
+  diagonal on the REAL sheet to find the biggest miss, the hits vanish, the sum drops
+  below 10,000, and the test crashes.
+
+    WRONG: np.fill_diagonal(q8_conf_matrix, 0)   &lt;- mutates the real sheet, sum breaks
+    RIGHT: off = q8_conf_matrix.copy()            &lt;- always work on a copy
+           np.fill_diagonal(off, 0)
+
+
+  ## One Number Per Factory -- The Selection Rule (Q9)
+
+  IN HAND: three factories trained (simple, augmented, deep). Each produced a 10x10
+  confusion sheet. This section picks the winner with one number per factory.
+
+  Do NOT pick per animal -- that gives 10 numbers per factory and no single winner.
+  Use the ONE number that summarises the whole sheet:
+
+    accuracy = (sum of the diagonal) / (total cards on the sheet)
+
+    simple:     diagonal sum / 10,000 = say 0.68
+    augmented:  diagonal sum / 10,000 = say 0.72
+    deep:       diagonal sum / 10,000 = say 0.76
+
+  Largest accuracy wins. Three numbers, one comparison, done.
+
+  The confusion sheet stays whole -- never altered to make this calculation.
+
+
+  ## Reading the Filters -- What Shape Are the Magic Papers? (Q10)
+
+  IN HAND: trained simple factory (model_cnn from Q3). Floor 1 = Conv2D(32, 3x3).
+  This section cracks open that floor and reads the shape of its 32 magic papers.
+
+  Every inspector floor stores TWO piles in the machine's memory:
+
+    filters = the DIALS (the magic papers themselves)   shape (3, 3, 3, 32)
+    biases  = the NUDGES (one per inspector)             shape (32,)
+
+  The nudges are the "+32" you counted in Q3's dial total. Q10 asks only for the
+  dials' shape -- grab both piles but only store the first.
+
+  Reading the shape (3, 3, 3, 32):
+
+    (3, 3, 3, 32)
+      |  |  |   |
+      |  |  |   32 inspectors (how many magic papers)
+      |  |  3   color-sheets of dials  (R, G, B -- one sheet per color)
+      |  3       tall  (the paper is 3 dots tall)
+      3           wide  (the paper is 3 dots wide)
+
+  The magic paper is 3 wide x 3 tall (the little window that moves over the 32x32
+  photo -- NOT 32x32 itself), 3 deep for the three colors, and there are 32 of them.
+
+  Both views of the paper fit the same shape:
+
+    "1 paper, 3 colors deep, 27 dials"  =  "3 color-sheets of dials that ADD to 1 number"
+
+  q10_filter_shape = (3, 3, 3, 32).
+
+
+  ## Common Tripwires
+
+  Built from the live lab session. Every confusion actually hit, in the order it bit.
+
+  TRIPWIRE 1  The batch axis -- "1 photo → 1 sheet."
+    At training time, 64 photos pass through together. Inspector 1 makes 64 sheets,
+    one per photo. 32 inspectors x 64 photos = 2,048 sheets in flight simultaneously.
+    The HUMBLER is the only floor that reaches across all 64 photos' sheets to compute
+    the average and scatter. Every other floor is photo-blind.
+
+  TRIPWIRE 2  "The humbler has 4 numbers -- aren't they all tuned by wrongness?"
+    No. Only stretch and shift are dials tuned by wrongness. Settled middle and settled
+    scatter are running averages -- they are REMEMBERED but the answer key never touches
+    them. They are used only at exam time when a single photo arrives.
+
+  TRIPWIRE 3  "Send-home zeroes workers, or the whole image."
+    Neither. It zeroes NUMBERS on the scratch sheets (individual entries). Inspector 3
+    still runs, his paper still moves, the photo is unchanged. Some of his output
+    entries get set to zero; the others survive and are scaled up.
+
+  TRIPWIRE 4  "Floor-2 magic paper must be 16x16 -- that is the sheet size after the boss."
+    No. The paper is always small (3x3) and moves one step at a time. Its DEPTH
+    auto-stretches to match what arrives (32 deep, since 32 inspector sheets fed in).
+    A 16x16 paper couldn't move -- one position, no neighborhoods.
+
+  TRIPWIRE 5  "The machine never forgets -- but we throw away the sheets?!"
+    Two separate things.
+    DIALS: never discarded; nudged every loop; kept forever. That is the learning.
+    SHEETS: scratch paper; made for one photo; used; binned. Every photo, every loop.
+    Even the 256 kept numbers after the boss get binned once the answer is computed.
+    "Learns forever" = dials.  "Forgets instantly" = sheets.
+
+  TRIPWIRE 6  "The boss deletes 75% of each inspector's work -- 768 of 1024 scores."
+    Yes, and that is the design. Four near-identical alarm readings in one 2x2 region
+    say no more than one. The loudest carries the information. The quiet three are dead
+    forever -- the blame-nudging from later floors never flows back through them.
+
+  TRIPWIRE 7  "1 in 4 send-home means group the entries into groups of 4 and zero one."
+    No. Each entry independently flips its own coin. Sometimes two in a row get zeroed;
+    sometimes none do. The independence is what breaks the secret teams.
+
+  TRIPWIRE 8  Zeroing the diagonal to find the biggest miss.
+    Always zero it on a COPY, never on the real sheet. The test cell checks
+    np.sum(q8_conf_matrix) == 10,000. Zeroing the real diagonal drops the sum and crashes.
+
+  TRIPWIRE 9  "Flip-safe means the image is symmetric."
+    Not the same thing. A flip is safe if the FLIPPED CARD is STILL a true example
+    of the label -- the label survives the mirror.
+    cat → mirror → still a cat  ✓
+    "2" → mirror → backwards "2"  ✗  (not a valid 2 anymore)
+    You do not need the cat to be symmetric; you need CAT-NESS to survive the flip.
+
+  TRIPWIRE 10  "32x32 is the factory's limit -- a better factory would fix it."
+    The ceiling is in the DATA, not the factory. At 32 dots a side, even a human eye
+    cannot reliably tell a blurry cat from a blurry dog. The machine's biggest confusion
+    (cat↔dog) is the same pair that fools humans at that resolution. Sensible machine,
+    sensible mistakes.
+
+  TRIPWIRE 11  "get_weights() returns one pile -- the dials."
+    It returns TWO: dials (shape (3,3,3,32)) and nudges (shape (32,)).
+    Unpack both; store only the dials' shape for Q10.
+
+  TRIPWIRE 12  "The 32 score-sheets after floor 1 are some kind of colour sheets."
+    No. Colour meaning DIES at floor 1. Each of the 32 numbers at a given spot is the
+    answer to a DIFFERENT QUESTION about that neighborhood:
+
+      at (5,5):  inspector 1  "redness here?"  7.2
+                 inspector 2  "top edge here?" 0.3
+                 inspector 3  "corner here?"   5.1
+                 ... 32 questions, 32 answers.
+
+    Not 32 colour channels. 32 different measurements of the same region.
+
+
+  ## The Labels, Last
+
+    humbler / steadier            batch normalisation (BatchNorm, BN)
+    settled middle                running mean
+    settled scatter               running variance (= scatter squared); scatter = std
+    stretch dial                  gamma (γ)
+    shift dial                    beta (β)
+    send-home (25% or 50%)        dropout (rate 0.25 or 0.5)
+    scale factor 4/3              inverted dropout scaling: 1 / (1 - rate)
+    confusion sheet               confusion matrix
+    pile = one row                true class
+    guess = column                predicted class
+    diagonal = matched counts     true positives (per class)
+    off-diagonal = misses         misclassifications
+    one-number accuracy           overall accuracy = trace(C) / sum(C)
+    filter dials                  filter weights / kernel weights
+    shape (3, 3, 3, 32)           (height, width, in_channels, filters)
+    deep factory order            Conv → BN → MaxPool → Dropout
+    nudges                        biases
+
+
+  ## Code, If You Want It
+
+  Nothing above needed a computer; this section is for the day you meet one.
+
+  The deep factory (Q7):
+
+  ```python
+  from tensorflow.keras.models import Sequential
+  from tensorflow.keras.layers import (
+      Conv2D, MaxPooling2D, Flatten, Dense,
+      BatchNormalization, Dropout
+  )
+
+  model_deep = Sequential([
+      Conv2D(32, (3,3), activation='relu', padding='same', input_shape=(32,32,3)),
+      BatchNormalization(),    # humbler: standardise over the 64-photo batch
+      MaxPooling2D((2,2)),     # boss: keep loudest of each 2x2, halve the sheet
+      Dropout(0.25),           # send-home: zero 25% of entries at random
+
+      Conv2D(64, (3,3), activation='relu', padding='same'),
+      BatchNormalization(),
+      MaxPooling2D((2,2)),
+      Dropout(0.25),
+
+      Flatten(),               # iron flat: 8x8x64 = 4096 numbers
+      Dense(64, activation='relu'),
+      Dropout(0.5),            # stricter coin at the clerk level
+      Dense(10, activation='softmax'),
+  ])
+
+  model_deep.compile(
+      loss='sparse_categorical_crossentropy',
+      optimizer='adam',
+      metrics=['accuracy'],
+  )
+  ```
+
+  The confusion sheet (Q8):
+
+  ```python
+  from sklearn.metrics import confusion_matrix
+  import numpy as np
+
+  preds   = model_deep.predict(X_test)       # 10 chances per photo
+  y_guess = np.argmax(preds, axis=1)         # loudest chance → one animal per photo
+
+  q8_conf_matrix = confusion_matrix(y_test, y_guess)   # 10x10 pile-sort
+                                                        # rows = truth, cols = guess
+
+  off = q8_conf_matrix.copy()               # ALWAYS copy first
+  np.fill_diagonal(off, 0)                 # zero matched corners (hits not mistakes)
+  i, j = np.unravel_index(np.argmax(off), off.shape)
+  q8_most_confused = (int(i), int(j))       # (true animal row, guessed animal col)
+  ```
+
+  Reading the filter shape (Q10):
+
+  ```python
+  filters, biases = model_cnn.layers[0].get_weights()   # two piles: dials and nudges
+  q10_filter_shape = filters.shape                       # (3, 3, 3, 32)
+  ```
+</pre>
+</body>
+</html>
