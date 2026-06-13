@@ -392,6 +392,49 @@
        inspectors, half the floor-1 dials -- and the papers stay cheap either way.
 
 
+  ## Predicting the Grid Size by Hand
+
+  IN HAND: our factory's grid runs 32x32x3 -> 32x32x32 -> 16x16x32 -> 16x16x64 -> 8x8x64,
+  because every Conv2D carries padding='same' (the border of zeros that lets corner spots
+  be centres, so across-and-down never shrink at a paper step) and every boss halves.
+  This section shows the OTHER convention -- a bare paper with no border -- and how to
+  predict the size after every floor on pencil alone.
+
+  Whether a paper shrinks the grid is a CHOICE, named in the order, not a law:
+
+    padding='same'  -- pad a border of zeros; across and down STAY the same at a Conv floor
+    no padding      -- no border; the paper only sits where it fully fits, so the grid SHRINKS
+
+  With no border, a 3-wide paper cannot centre on the very edge column -- it would hang off.
+  So it starts one column in and stops one column early, losing one column at each end. The
+  shrink formula counts exactly that:
+
+    new size = old size - paper size + 1
+
+    a 3x3 paper on a 32x32 grid:  32 - 3 + 1 = 30   ->  the grid becomes 30x30
+
+  The boss rule is unchanged either way: MaxPooling2D((2,2)) halves across and down (drop
+  any half-dot), depth untouched. Trace a no-padding factory all the way down:
+
+    after Conv1 (32 papers, no pad)   32 - 3 + 1 = 30   ->  (30, 30, 32)
+    after Pool1 (boss halves)         30 / 2 = 15       ->  (15, 15, 32)
+    after Conv2 (64 papers, no pad)   15 - 3 + 1 = 13   ->  (13, 13, 64)
+    after Pool2 (boss halves)         13 / 2 = 6        ->  ( 6,  6, 64)   (drop the half)
+
+  Two traps worth flagging. First: a Conv floor does NOT shrink the grid by halving -- that
+  is the boss's job on the next line. With no padding a Conv floor shrinks only by the small
+  -2 the formula gives (30, not 16). Second: the depth after a Conv floor is the number of
+  inspectors hired there (32, then 64), never the colour count -- colour meaning died at
+  floor 1.
+
+  >> YOUR TURN
+     A bare 3x3 paper (no padding) scans a 28x28 grid. Then a 2x2 boss halves it. Give both
+     output sizes (ignore depth).
+
+     check your slate:
+       Conv: 28 - 3 + 1 = 26, so 26x26.  Boss: 26 / 2 = 13, so 13x13.
+
+
   ## Common Tripwires
 
   Real snags from building this, each fixed at the spot it bites.
