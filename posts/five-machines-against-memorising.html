@@ -108,6 +108,10 @@
 
   ## Softmax: Turning Ten Scores Into Ten Chances
 
+  IN HAND: baseline machine built (784-&gt;256-&gt;128-&gt;64-&gt;10). Dial count: 200,960+32,896+8,256
+  +650 = 242,762. The exit has 10 clerks producing raw scores -- any real numbers.
+  This section turns those ten raw scores into ten chances that add to exactly 1.
+
   The exit has ten clerks now, one per bin. Each produces a raw score -- any number. We need
   to turn ten raw scores into ten CHANCES that are all between 0 and 1 and add up to exactly
   1, so they read as "a 66% chance it is a T-shirt, 25% a trouser, 9% a pullover."
@@ -283,6 +287,10 @@
 
   ## One Honest Judge (Breaking the Sealed Pile)
 
+  IN HAND: five machines trained on the study pile -- baseline, L2 tax, dropout, early-
+  stopping, batch-norm. Practice pile was watched every pass and steered the fire alarm.
+  This section picks the only pile that gives a clean, honest grade.
+
   Now grade all five machines: the baseline plus the four cures. But on which pile?
 
   Not the study pile -- every machine memorised pieces of it; scoring there is a memory test.
@@ -362,6 +370,9 @@
 
 
   ## Code, If You Want It
+
+  Nothing above needed a computer: every dial count, every wrongness step, and every cure
+  was pencil and arithmetic. This section is for the day you meet one.
 
   Five machines, one per cure. They share the same skeleton -- only the guard differs. Below,
   the baseline and the four cures, each as a small change to it.

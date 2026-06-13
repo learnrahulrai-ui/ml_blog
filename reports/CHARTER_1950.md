@@ -107,4 +107,8 @@ ROLLOUT STATUS
   [x] filling-the-blanks
   [x] classification-lab (appendix)
   [x] clustering-reference (appendix)
+  [x] the-web-of-adders
+  [x] how-the-dials-learn
+  [x] five-machines-against-memorising
+  [x] the-magic-paper-factory
 ═══════════════════════════════════════════════════════════════

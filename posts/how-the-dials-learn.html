@@ -92,6 +92,10 @@
 
   ## Chain Rule, Said Plainly
 
+  IN HAND: tiny network with numbers locked in -- x=0.5, w1=1.0, b1=0.3, w2=1.5, b2=0.2,
+  y=1. Forward pass gave z1=0.8, a1=0.8, z2=1.4, p=0.802, L=0.221.
+  This section finds the slope of L with respect to w2.
+
   The loss does not depend on w2 directly. It depends on w2 through a chain:
 
     w2  changes  z2  (because z2 = a1 x w2 + b2)
@@ -105,9 +109,28 @@
                            x (slope of p w.r.t. z2)
                            x (slope of z2 w.r.t. w2)
 
-  Let me compute each link. (Two of them need a derivative you can just take on faith for
-  now, or look up: the slope of -ln(p) is -1/p, and the slope of the S-curve is p x (1 - p).
-  Both are standard one-line calculus facts; I will not re-derive them mid-walk.)
+  Let me compute each link. Two require calculus derivatives -- facts above the floor of this
+  chapter (the floor is: add, subtract, multiply, divide, squares, roots). I flag each as an
+  IOU and give a wiggle-check so you can verify the claim without the calculus.
+
+  IOU -- slope of -ln(p) w.r.t. p is -1/p:
+    (Follows from d/dx[ln x] = 1/x; proof belongs in a calculus chapter. Debt open.)
+    Why it makes sense: at p = 0.9 the slope is -1.1 (gentle push -- nearly right); at p = 0.1
+    the slope is -10 (hard yank -- deeply wrong). The wrongness bites hardest when you are
+    confident and wrong.
+    Wiggle check: -ln(0.792) ≈ 0.233, -ln(0.812) ≈ 0.208.
+    Rate = (0.208 - 0.233) / (0.812 - 0.792) = -0.025 / 0.020 = -1.25.
+    Formula at p = 0.802: -1/0.802 = -1.247. Agree to three places. ✓
+
+  IOU -- slope of S-curve p = 1/(1+e^{-Z}) w.r.t. Z is p x (1-p):
+    (Follows from the quotient rule applied to 1/(1+e^{-Z}); proof belongs in a calculus
+    chapter. Debt open.)
+    Why it makes sense: at p = 0.5, slope = 0.25 -- the steepest the S-curve ever gets, right
+    at the fence. At p = 0.99, slope = 0.01 -- nearly flat; a fully decided machine barely
+    moves when you nudge Z. Always between 0 and 0.25.
+    Wiggle check: at Z = 1.3, p ≈ 0.786; at Z = 1.5, p ≈ 0.818.
+    Rate = (0.818 - 0.786) / (1.5 - 1.3) = 0.032 / 0.2 = 0.16.
+    Formula at Z = 1.4: 0.802 x 0.198 = 0.159. Agree. ✓
 
     Link 1 -- slope of L w.r.t. p:
         L = -ln(p), so the slope is -1/p = -1/0.802 ≈ -1.247
@@ -140,6 +163,16 @@
   these numbers; it is exactly why the S-curve and the -ln loss are used together. The error
   that flows backward out of the output clerk is simply (guess - truth) = 0.802 - 1 = -0.198.
   Clean enough to do in your head.
+
+  One slope that requires no chain at all: b2, the nudge on the output clerk. The formula is
+  z2 = a1 x w2 + b2, so raising b2 by 1 raises z2 by exactly 1 -- no dial, no input, just a
+  direct lift. The chain has one link only:
+
+    slope of L w.r.t. b2 = (error at z2) x (slope of z2 w.r.t. b2)
+                         = (-0.198) x 1  =  -0.198
+
+  New b2 = 0.2 - (0.1 x -0.198) = 0.2 + 0.020 = 0.220. Rule for every nudge: its slope equals
+  the error at the clerk it belongs to. No input factor, no chain to trace.
 
 
   ## Reading the Slope, and Taking a Step
@@ -175,8 +208,27 @@
   got the same answer as actually wiggling the dial -- but it got it for all dials at once,
   without 437,162 forward passes. THAT is backpropagation's whole reason to exist.
 
+  --- Your turn: verify b2 by wiggling ---
+
+  We derived that b2's slope is -0.198 (the error at z2). Verify this the lazy way: set b2 to
+  0.3 (raised by 0.1), recompute z2 and the loss, and check that the measured slope is close
+  to -0.198. (z2 = a1 x w2 + b2; a1 = 0.8, w2 = 1.5 stay fixed; only b2 changes.)
+
+  ...
+
+    b2 = 0.3:  z2 = 0.8 x 1.5 + 0.3 = 1.2 + 0.3 = 1.5
+               p  = 1/(1 + e^{-1.5}) ;  e^{-1.5} ≈ 0.223 ;  p ≈ 1/1.223 ≈ 0.818
+               L  = -ln(0.818) ≈ 0.201
+    Measured slope = (0.201 - 0.221) / (0.3 - 0.2) = -0.020 / 0.100 = -0.20.
+    Our chain-rule value: -0.198. Agree. ✓
+    A nudge changes z2 exactly one-for-one, so its slope IS the error -- nothing else dilutes it.
+
 
   ## Sending the Error One Room Further Back
+
+  IN HAND: error born at the output = p - y = -0.198. Slopes already found:
+  w2 slope = -0.158, new w2 = 1.516. b2 slope = -0.198, new b2 = 0.220.
+  This section sends that same error further left to find w1 and b1.
 
   We have the slope for w2 and b2 (the output clerk). But how does the HIDDEN clerk's dial w1
   learn? It sits one room back. The loss depends on w1 through a longer chain:
@@ -423,6 +475,9 @@
 
 
   ## Code, If You Want It
+
+  Nothing above needed a computer: the chain rule, the error flows, and every slope calculation
+  fit on scratch paper. This section is for the day you meet one.
 
   Part 1 stopped at a built-but-untrained model. Here is the rest: compile it (choose the
   manager, the wrongness ruler, and what to report), study it, and grade it once on the

@@ -166,6 +166,12 @@
   And the dials are FROZEN during a scan. They only get nudged BETWEEN loops, by how wrong the
   final ten chances turned out. A scan is pure looking; the learning happens after.
 
+  Clerk-step count for one inspector on one photo:
+    at each centre: 27 multiplications + 26 additions = 53 arithmetic steps
+    1,024 centres per photo: 53 x 1,024 = 54,272 steps per inspector per photo
+    32 inspectors on floor 1: 32 x 54,272 = 1,736,704 steps per photo, floor 1 only
+  Tireless clerks: done before lunch. Pencil-and-paper worker: about a year per photo.
+
 
   ## Colour: Twenty-Seven Numbers Under the Paper
 
@@ -204,6 +210,11 @@
 
 
   ## A Floor of Thirty-Two Inspectors
+
+  IN HAND: one magic paper (3x3 wide, 3 colours deep = 27 dials + 1 nudge = 28 numbers).
+  One inspector slides it to 1,024 centres, writing one score at each: 54,272 steps total.
+  The top-edge paper scored 60 on a matching edge, 0 on flat grey, -60 on an inverted edge.
+  This section hires 32 inspectors at once, each with his own paper hunting a different shape.
 
   One inspector finds one shape. A floor hires many. Conv2D(32, (3,3)) hires 32 inspectors,
   each with his OWN magic paper -- his own 27 dials -- each hunting a different shape (one
@@ -275,6 +286,12 @@
 
   ## A Second Floor That Drills Through All Thirty-Two
 
+  IN HAND: floor 1 (32 inspectors, each 3x3x3 = 27 dials + 1 nudge = 28 per paper; total
+  32 x 28 = 896 dials) + boss produced 32 score-sheets, each 16x16. At each spot the 32
+  numbers are shape-answers (redness, edge-ness, corner-ness...) -- colour meaning died at
+  floor 1. The boss tossed 75% of scores; the 896 dials are unchanged.
+  This section hires 64 new inspectors whose papers drill through all 32 sheets at once.
+
   After floor 1 and its boss: 32 sheets, each 16 by 16, stacked -- inspector 1's on top down to
   inspector 32's at the bottom, all lined up so that position (5,5) on every sheet covers the
   same region of the original photo.
@@ -312,6 +329,11 @@
 
 
   ## Ironing the Grid Flat, Then the Old Clerks Finish
+
+  IN HAND: two floors + two bosses produced 8x8x64. Floor 1: 896 dials. Floor 2: each of 64
+  papers is 3x3x32 = 288 dials + 1 nudge = 289; 64 x 289 = 18,496 dials. Together the two
+  conv floors hold only 896 + 18,496 = 19,392 dials -- a bargain, because the papers slide.
+  This section irons the deep stack into a flat line so the plain clerk-rooms can finish.
 
   After two floors and two bosses we hold 8 x 8 x 64 -- a small, deep stack of score-sheets.
   Now we hand it to the plain sorting clerks from the earlier chapters, who read a flat line.

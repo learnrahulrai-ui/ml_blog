@@ -243,6 +243,10 @@
 
   ## Why Plain Stacking Falls Apart
 
+  IN HAND: Room 1 built (16 clerks, 30 inputs, 496 dials). For one patient, Room 1 does
+  480 multiplications + 480 additions = 960 steps. The zero-out rule will bend negatives.
+  This section shows what happens when two plain rooms are stacked without that bend.
+
   Now stack two rooms. Room 1 feeds 16 numbers to Room 2, which has 8 clerks. Each Room 2
   clerk connects to all 16 inputs from Room 1.
 
@@ -456,6 +460,10 @@
 
   ## How Wrong Was That Guess?
 
+  IN HAND: patient [0.5, -1.2], true answer 1. Room 1 raw scores [-0.1, -1.3]; zero-out
+  gave [0, 0]; final clerk raw score 0.5; S-curve gave p = 0.622.
+  This section measures the wrongness of guessing 0.622 when the truth is 1.
+
   We have a guess (0.622) and a true answer (1). We need to measure the wrongness -- both to
   report it and, in Part 2, to know which way to turn the dials.
 
@@ -524,6 +532,9 @@
 
 
   ## Code, If You Want It
+
+  Nothing above needed a computer: every step was pencil arithmetic a tireless clerk could do.
+  This section is for the day you meet one.
 
   Here is the forward half in Python: load, split, scale, build, and the by-hand forward
   pass in code so you can check the 0.622 we computed above. The training call lives in
