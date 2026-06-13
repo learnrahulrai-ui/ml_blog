@@ -14,9 +14,12 @@
     <- prev:  [Chapter 6, Part 4: The Family Tree (Hierarchical Clustering)](the-family-tree-clustering.txt)
        next:  [Chapter 6, Part 6: Filling the Blanks (Recommender Systems)](filling-the-blanks.txt) ->
 
-  Parts 2, 3, and 4 each built one tool in a clean room: PCA on wine, K-means on dots,
-  the family tree on states.  This post turns all three loose on ONE hard, real sheet at
-  once -- and shows what happens when the room has more walls than you have rows.
+  Earlier we built three tools in clean rooms: PCA (find the few directions the data spreads
+  along most, and crush every row onto them), K-means (drop K centres and pull each dot to
+  its nearest, then move each centre to its pile's middle, repeat), and the family tree
+  (marry the two closest groups over and over, recording each wedding's height).  This post
+  turns all three loose on ONE hard, real sheet at once -- and shows what happens when the
+  room has more walls than you have rows.
 
   The twist of this chapter is honesty: we DO have labels for these samples (the cancer
   type of each), but we hide them while we cluster.  We let the unsupervised tools find

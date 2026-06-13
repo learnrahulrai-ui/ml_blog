@@ -29,9 +29,10 @@
     50 states, 3 measurements (Murder, Assault, UrbanPop).  No answer column.
     Standardised first, so every column sits on the same ruler.
 
-  We already built the tool we need in Part 1: the 50x50 SHEET OF GAPS, the straight-line
-  distance between every pair of states.  Hierarchical clustering is just a disciplined way
-  to read that sheet, smallest gap first.
+  The one tool we need is a 50x50 SHEET OF GAPS: the straight-line distance between every
+  pair of states (for each pair, subtract column by column, square the gaps, add them, take
+  the root).  Hierarchical clustering is just a disciplined way to read that sheet, smallest
+  gap first.
 
   Count that sheet in clerk-steps.  50 states make 50 x 49 / 2 = 1,225 distinct pairs;
   each straight-line gap over 3 columns costs 3 subtracts, 3 squarings, 2 adds, 1 root

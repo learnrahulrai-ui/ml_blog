@@ -269,8 +269,9 @@
     4. add + nudge + tanh                                     -> the newer memory
     5. put it back in pocket A
 
-  Same dials as word 1 -- reused. That reuse is the whole idea, and it is why the textbook
-  calls this RECURRENT. The one recipe to memorise:
+  Same dials as word 1 -- reused. That reuse -- one dial-set looping back over word after
+  word -- is the whole idea, and it is why the textbook calls this RECURRENT (recurring:
+  the same dials come round again every word). The one recipe to memorise:
 
     new memory = tanh(  word's 32  x  word-dials   +   old memory  x  memory-dials   +  nudge )
                         \__ this word folded in __/     \__ the past carried forward _/

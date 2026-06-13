@@ -126,7 +126,8 @@
   At the default cutoff of 0.5: if the chance is &gt;= 0.5, call sick; below 0.5, call well.
   Patient A (chance 0.500) is exactly at the fence -- essentially 50/50.  Patients B, C, D
   are called well.  The machine also does something deeper: the linear sum z before the
-  squash is the LOG-ODDS:
+  squash is the LOG-ODDS (the natural log of the odds, where odds = chance-sick divided by
+  chance-well):
 
       log( P(sick|x) / P(well|x) ) = b0 + x^T beta
 

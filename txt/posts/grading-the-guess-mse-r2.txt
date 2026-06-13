@@ -110,7 +110,9 @@
 
   ** KEY: WHY THE AVERAGE IS THE FLOOR
      Shout some number c. Total squared miss is f(c) = sum (y_i - c)^2. Tip it to find the
-     bottom: f'(c) = -2 sum (y_i - c) = 0 gives c = (1/n) sum y_i -- the average, exactly.
+     bottom: f'(c) = -2 sum (y_i - c) = 0. Divide both sides by -2: sum (y_i - c) = 0.
+     That sum is sum y_i minus n copies of c, so sum y_i - n*c = 0, i.e. c = (1/n) sum y_i
+     -- the average, exactly.
      The curve is a bowl (second slope 2n > 0), so that point is the lowest, not the
      highest. The fool's best constant shout is always the mean.
 

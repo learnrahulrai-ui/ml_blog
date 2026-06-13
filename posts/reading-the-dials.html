@@ -101,8 +101,8 @@
      be the weakest or the strongest real drag depending only on how wide its column runs.
      "Which drags hardest" is not honestly answerable from the raw dials alone.
 
-  The fix is the same-ruler trick from the neighbours post: shift each column to zero
-  average and stretch it to spread of one BEFORE setting the dials. Now every dial means
+  The fix is the same-ruler trick: replace each value x with (x - column average) / column
+  spread, so every column ends at zero average and a spread of one BEFORE setting the dials. Now every dial means
   "mpg per one-spread step of its column" -- one shared currency -- and the most-negative
   one is the honest strongest drag. (The code that does this is at the end of the post.)
 

@@ -185,8 +185,9 @@
   Picture two clerks on a floor who have struck a private deal. Clerk 5 always shouts +10;
   clerk 6, whom the next floor reads together with clerk 5, always shouts -10. Their sum is
   +10 + (-10) = 0, which happens to look perfect to the floor above, so the wrongness never
-  complains and their dials never get corrected. They have co-adapted into a useless pair
-  that survives only because they are always present together. Several such secret teams form,
+  complains and their dials never get corrected. They have co-adapted -- their dials tuned
+  to lean on each other rather than each standing on its own -- into a useless pair that
+  survives only because they are always present together. Several such secret teams form,
   and the machine leans on them instead of learning honest, standalone features.
 
   Dropout breaks the deals. On each training pass, flip a coin for every clerk and send a

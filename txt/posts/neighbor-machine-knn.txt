@@ -46,7 +46,8 @@
       gap(a, b) = sqrt( sum_j (a_j - b_j)^2 )
 
   This is p = 2 of the general rule ( sum_j |a_j - b_j|^p )^(1/p). At p = 1 it counts
-  straight city-block steps. Worked pair -- new row (3, 2, 5, 4):
+  straight city-block steps (add up the plain gaps column by column, no squaring or root --
+  like walking a grid of streets, never cutting diagonally). Worked pair -- new row (3, 2, 5, 4):
 
     row A: (4, 2, 6, 3)   gaps (1, 0, 1, 1)   gap = sqrt(1+0+1+1)    = sqrt(3)   ~= 1.73
     row B: (8, 9, 1, 9)   gaps (5, 7, 4, 5)   gap = sqrt(25+49+16+25)= sqrt(115) ~= 10.72

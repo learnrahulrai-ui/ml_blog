@@ -77,7 +77,8 @@
   full -- no holes.  Multiply them back together and you get a COMPLETE grid: every cell
   filled, including the ones that were blank.  Those filled-in blanks are the predictions.
 
-  This is the same shape as PCA's "scores times loadings" from Part 2.  PCA crushed a full
+  This is the same shape PCA used -- a short list of per-row scores multiplied by a shared
+  recipe (loadings) rebuilds the full sheet.  PCA crushed a full
   sheet to a smaller one and blew it back up blurry; here we LEARN the two skinny sheets so
   that blowing them back up reproduces the ratings we DO have -- and fills the ones we don't.
 
