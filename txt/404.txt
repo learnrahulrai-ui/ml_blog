@@ -1,0 +1,35 @@
+@title 404 -- Page Not Found :: Rahul's ML Blog
+@desc That page is not here. Head back to the front page and follow the next-arrows.
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+
+  404 -- THAT PAGE IS NOT HERE
+
+
+      You asked for a page that does not exist (or has moved). No machine broke;
+      the address just points at empty desk space.
+
+      Three ways back onto the path:
+
+        ->  [Start at post 1 of 28](posts/chapter1-what-ml-actually-does.txt)
+            Guessing House Prices, End to End. No prior knowledge needed.
+
+        ->  [The full archive](archive.txt)
+            Every one of the 28 posts, in order, in one list.
+
+        ->  [The front page](index.txt)
+            Ten chapters, top to bottom.
+
+
+  >> If you reached this from a link on the blog itself, that is a real bug --
+     please mail [learn.rahul.rai@gmail.com](mailto:learn.rahul.rai@gmail.com) and
+     say which page sent you here.
+
+
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . no cookies, no trackers . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

@@ -15,10 +15,18 @@ Live: https://learnrahulrai-ui.github.io/ml_blog/
 - **The `.html` is generated, never committed.** On every push to `main`, a GitHub Actions
   workflow (`.github/workflows/deploy.yml`) runs `python3 build.py` and publishes the result
   to GitHub Pages. You only ever commit `.txt` files; the `.html` is built in the cloud.
+- **`build.py` also generates `feed.xml` (RSS 2.0) and `sitemap.xml`** from the curated
+  listing in `txt/index.txt`. Both are git-ignored and rebuilt in CI alongside the HTML.
+- **Each page carries full `<head>` metadata** -- description, Open Graph + Twitter card
+  tags (so shared links preview cleanly), canonical URL, favicon, and an RSS link. Per-post
+  descriptions are pulled from the hand-written blurbs in `txt/index.txt`.
+- **Dark mode is automatic** via `prefers-color-scheme` (pure CSS, no toggle, no JS).
 
 ## Authoring conventions (inside a `.txt`)
 
 - First line may be `@title Some Page Title` -- used for the HTML `<title>`, then removed.
+- Optional second line `@desc One-line description` -- used for the meta description and
+  share preview. If absent, posts fall back to their `txt/index.txt` blurb.
 - Links: `[label](target.txt)` or `[label](https://...)` or `[label](mailto:a@b.c)`.
   A `.txt` target is rewritten to `.html` automatically.
 - Callout markers used in posts: `>> NOTE:`, `!! WARN:`, `** KEY:`.

@@ -14,3 +14,20 @@ pre {
 a { color: #00188f; }
 a:visited { color: #551a8b; }
 a:hover { background: #ffffcc; }
+
+/* Narrow screens: shrink the type so the 100-column frame fits better.
+   The art stays intact; overflow-x keeps anything wider scrollable. */
+@media (max-width: 600px) {
+  pre { font-size: 12px; padding: 1em 0.6em 2em; }
+}
+@media (max-width: 380px) {
+  pre { font-size: 10.5px; }
+}
+
+/* Dark mode, automatic from the reader's OS setting. Pure CSS, no toggle. */
+@media (prefers-color-scheme: dark) {
+  body { background: #101316; color: #d3d7da; }
+  a { color: #6ea8ff; }
+  a:visited { color: #c2a3ff; }
+  a:hover { background: #2a2a00; color: #ffffff; }
+}

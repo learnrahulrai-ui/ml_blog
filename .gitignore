@@ -224,3 +224,7 @@ __marimo__/
 # Only the .txt sources are committed; GitHub Actions generates the .html.
 /*.html
 /posts/*.html
+
+# Generated feed + sitemap -- also built by build.py in CI.
+/feed.xml
+/sitemap.xml
