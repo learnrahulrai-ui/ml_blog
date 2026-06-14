@@ -81,6 +81,7 @@
   ---------------------------------------
   reference   [A. Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
   reference   [B. Distance and Clustering Reference -- Rulers, Traps, and Ethics](posts/clustering-reference.txt)
+  reference   [C. LSTM From Pencil -- RNN and LSTM From Scratch, Nothing But a Pencil](posts/lstm-from-pencil.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

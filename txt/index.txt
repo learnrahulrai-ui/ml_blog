@@ -167,6 +167,15 @@
     room at all, and the part the lab skips -- the ethics of sorting PEOPLE into piles (bias,
     privacy, transparency) and what segmentation is really for.
 
+  [C. LSTM From Pencil -- RNN and LSTM From Scratch, Nothing But a Pencil](posts/lstm-from-pencil.txt)
+    reference . 2026-06-14 . companion to Chapter 10 . lstm, rnn, by-hand, kata
+    A KATA: one clean, self-contained walk through the RNN and the LSTM by pencil, made to be
+    redone on a blank sheet again and again until your hand knows it. Words into 32-number
+    rows, grid-times-row by hand, the RNN's one-memory recipe and why it FADES (a theorem),
+    then the two-memory fix -- a silent uncrushed vault A and a spoken readout B, four machines
+    (FRESH + keep/admit/show), the combine worked in real numbers (5.0 -> 4.62 -> 0.70) -- plus
+    a struggle log of every trap and a one-word end-to-end recitation. No computer, no code.
+
 
   CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS -- unsupervised learning
   ----------------------------------------------------------------------
