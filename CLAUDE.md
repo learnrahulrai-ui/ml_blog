@@ -13,10 +13,12 @@ Do NOT add infra (RSS, sitemap, dark mode, favicons, share previews, etc.)
 unless explicitly asked. Infra is already done. For any infra request: answer
 yes/no and do nothing.
 
-## Word rules (banbluff + 1950s-auditor)
-All teaching content must obey MASTER_RULES (see reports/MASTER_RULES.md).
-Key banned words in teaching path: intuition, crucial, robust, understand,
-concept (as noun), framework, iteration. Substitution table is in MASTER_RULES.
+## Word rules
+Teaching content avoids these words: intuition, crucial, robust, understand,
+concept (as noun), framework, iteration. Substitutions: intuition -> picture /
+gut feeling; crucial -> key / needed; robust -> handles outliers better;
+understand -> follow / calculate; framework -> toolbox; iteration -> pass.
+(Full audit rules live on the `audit` branch, not on main.)
 
 ## Branch
 Development branch: claude/quirky-goodall-XcgGO
