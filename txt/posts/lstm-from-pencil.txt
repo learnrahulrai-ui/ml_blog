@@ -102,8 +102,9 @@
   One pocket, looping. Word 2 sees word 1 through m_old; word 3 sees both; and so on. Order
   now survives, because m_old at word 2 already holds a trace of word 1.
 
-  How does a clerk "blend"? Each output slot is a clerk reading every input slot. Reading 3
-  word-slots into 3 new slots takes a 3-by-3 block of dials -- a grid. Same for memory:
+  How does a clerk "blend"? Each output slot is one clerk reading every input slot. So 3
+  output slots = 3 clerks side by side. Stack each clerk's row of dials, one row per clerk,
+  into a 3-by-3 block. That stacked block earns a short name: a grid. Same for memory:
 
       grid G (3 rows, 3 cols)        a row r
         [ g11 g12 g13 ]                [ r1 ]
@@ -213,7 +214,8 @@
       fresh --[ x admit ]-/
 
     >> YOUR TURN
-       A_old = 5.0, keep = 1.0, admit = 0.0. A_new? And after 90 more such words?
+       Rule (slot-by-slot): A_new = keep * A_old + admit * fresh.
+       A_old = 5.0, keep = 1.0, admit = 0.0, fresh = anything. A_new? After 90 more such words?
 
        check: A_new = 1.0*5.0 + 0.0*fresh = 5.0. Held whole. Ninety words on, still 5.0.
        Nothing crushed it. Compare Step 5, where 5.0 would have worn to nothing.
@@ -224,7 +226,7 @@
     exactly how a far-back mark stays alive.
 
 
-  ## Step 7 -- A Vault Too Big to Read, So Tame a Readout
+  ## Step 7 -- A Store Too Big to Read, So Tame a Readout
 
   Memory A now may sit at 50. Feed 50 to a clerk and its bend saturates flat -- useless. So do
   not hand A out raw. Build a tamed readout B: bend A back into band, then reveal only a
@@ -250,15 +252,24 @@
 
   ## Step 8 -- Where keep, admit, show, fresh Come From
 
-  Four rows feed Steps 6 and 7: fresh, keep, admit, show. Each is produced by its own clerk-
-  grid, and every one reads exactly two things -- this word's row, and B from last word:
+  Steps 6 and 7 forced four rows, no more, no fewer, each by a need already shown:
+
+      keep  -- how much old store to hold       (forced in Step 6)
+      admit -- how much new content to let in    (forced in Step 6)
+      show  -- how much of store to speak        (forced in Step 7)
+      fresh -- new content itself                (forced in Step 6)
+
+  Three fractions plus one content row. Where do these four come from? Each is made by its
+  own clerk-grid, and every one reads exactly two things -- this word's row, and B from last
+  word:
 
       shared inputs to all four:   word-row   and   B_old
 
   fresh carries content, which may be plus or minus, so bend it with tanh into -1..+1.
-  keep, admit, show must each be a fraction -- "how much", 0 to 1. A plain bend to 0..1 maker:
+  keep, admit, show must each be a fraction -- "how much", 0 to 1. So each needs a maker that
+  takes any number in, big or small, plus or minus, and hands back something between 0 and 1,
+  smooth across that band. That maker carries a name -- sigmoid -- and these numbers:
 
-      sigmoid, by its numbers only:
         sigmoid(0) = 0.5
         sigmoid(2) ~ 0.88
         sigmoid(-2) ~ 0.12
@@ -331,6 +342,7 @@
       B_new = [ 0.70 , -0.15 , 0.21 ]
 
     >> YOUR TURN
+       Rules (slot-by-slot): A_new = keep * A_old + admit * fresh, then B_new = show * tanh(A_new).
        One slot: A_old = 4.0, keep = 0.5, fresh = 2.0, admit = 1.0, show = 1.0,
        tanh(A_new) ~ 1.0. Find A_new, then B_new.
 
@@ -365,11 +377,20 @@
 
   ## A Word on What Was a Pick, Not a Proof
 
-  Step 5 -- forgetting -- is a result, provable with a pencil, as you did. Step 6 onward -- two
-  memories, three fractions named keep/admit/show, this exact wiring -- is a pick that happened
-  to stop forgetting. A leaner cousin ties keep and admit into one and merges A with B; it
-  reads about as well on fewer dials. Hold that move (scale-and-add a silent store, gate it
-  with dimmer knobs); treat a count of three fractions as a desk choice, not a law.
+  Step 5 -- forgetting -- is a result, provable with a pencil, as you did. A COUNT of three
+  fractions named keep/admit/show, and this exact wiring, is a pick that happened to read
+  well. A leaner cousin ties keep and admit into one and merges A with B; it reads about as
+  well on fewer dials. So treat a count of three gates as a desk choice, not a law.
+
+  But scale-and-add itself is NOT a mere pick -- it has a reason, and one more layer shows it:
+
+  DEEPER, optional (skip with no loss if calculus is new to you). In Step 5 a far mark shrank
+  because each step multiplied it by a number below 1, and many such factors below 1 drag a
+  running product to 0. In Step 6 carry is A_new = keep * A_old + admit * fresh; set keep = 1
+  and a far mark rides on with a carry factor of exactly 1, never below it. A chain of 1s
+  stays 1, so a link from word 90 back to word 1 neither dies nor blows up. That unit carry
+  factor, not luck, is why an added, uncrushed store cures Step 5's decay -- and why every
+  gated reader of this kind keeps an additive store at its core.
 
 
   ## Traps, Each as a Clash to Sit With
