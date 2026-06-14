@@ -146,3 +146,105 @@ their sensible scope, or fact errors (the "340 the" count is wrong for the
 live file). The reconstruction order is the useful piece; most of it is
 already there; the gaps are sigmoid derivation, four-machine enumeration,
 and grid-from-clerks.
+
+
+==================================================================
+AUDIT 2 RESPONSE (the "graduate math" rewrite)
+==================================================================
+
+VERDICT: mostly NO for this post. It describes a DIFFERENT artifact -- a
+graduate linear-algebra / calculus derivation -- not a fix to this one. And
+it directly contradicts Audit 1. Adopting it means rejecting Audit 1 whole.
+
+
+## THE FATAL PROBLEM: AUDIT 2 CONTRADICTS AUDIT 1
+
+  Audit 1 said: tanh, sigmoid, "theorem" are TOO ABSTRACT / too mathematical;
+    they need PHYSICAL grounding, no imported math authority.
+  Audit 2 says: DERIVE tanh from e via power series and limit proofs; prove
+    the fade with the chain rule and matrix norms; define inputs as orthogonal
+    basis vectors in R^V.
+
+  These cannot both be satisfied. One demands less math abstraction; the other
+  demands a great deal more. Picking Audit 2 throws out Audit 1 entirely.
+  Whichever auditor persona is run next will likely contradict this one too.
+  A standard must be chosen ONCE, not re-derived per audit.
+
+
+## IT VIOLATES THE BLOG'S OWN CHARTER
+
+  This blog's stated method, on every page: ban the jargon, draw it first,
+  solve by PENCIL, code last. The Charter counts cost in clerk-steps and keeps
+  every machine out of the teaching path.
+
+  Deriving e via (1 + 1/n)^n, proving lim tanh = 1 from the exponential
+  definition, and bounding ||W|| < 1 to show product-convergence is exactly
+  the heavy machinery the Charter bans. It is LESS from-scratch for this
+  audience, not more: working 1.5^100 by hand (current text) is more
+  elementary and more honest "from scratch" than invoking a power series for
+  e. Audit 2 mistakes "more formal" for "more fundamental." They are not the
+  same. A reader who needs the post does not have the power series for e.
+
+
+## A TECHNICAL ERROR IN AUDIT 2
+
+  It conflates two different decays:
+    - FORWARD activation decay: the carried signal shrinks across 90 squashes.
+      This is what the current post proves, with arithmetic (0.2 * 0.5^k).
+    - BACKWARD gradient vanishing: the chain-rule product of Jacobians shrinks.
+      This is what Audit 2's "chain rule, ||W^T|| < 1" actually describes.
+  Both are real and related, but they are NOT the same proof. The post chose
+  the forward, arithmetic version on purpose -- it needs no backprop, which the
+  post never builds. Audit 2 demands a gradient proof for a post that has no
+  gradients in it. That is a scope explosion, not a fix.
+
+
+## THE FEW REAL GRAINS
+
+  1. ONE-HOT GROUNDING (worth a plain version). "Why a row of numbers per
+     word" can be grounded by a selector vector [0 0 1 0 ...] picking one row
+     of a table -- that is cleaner than "pick 32." BUT do it in plain words: a
+     selector picks a row. Do NOT phrase it as "orthogonal basis vectors
+     isolating semantic variances" -- that smuggles in three undefined
+     abstractions ("orthogonal basis", "semantic variance", "projection")
+     to fix one. Cure worse than disease.
+
+  2. THE CONSTANT ERROR CAROUSEL is the GENUINE reason for the cell state.
+     Audit 2 is right that "engineered historical accident" undersells it: if
+     C_t = C_{t-1} + (additive), then d C_t / d C_{t-1} = 1, so the gradient
+     neither blows up nor dies -- that is precisely WHY additive memory was
+     chosen over multiplicative. This is the one substantive idea Audit 2
+     adds. But it is a CALCULUS argument; it belongs in a separate, clearly
+     flagged "deeper: the gradient view" box or a companion post for readers
+     who already have backprop -- NOT inlined into a pencil-arithmetic piece
+     whose whole premise is no calculus.
+
+  3. RESTATE-VARIABLES and ASCII-FIRST: already covered under Audit 1; no new
+     content here.
+
+
+## RECOMMENDATION
+
+  Do NOT rebuild this post per Audit 2. It would produce a different post for
+  a different reader, breaking the blog's charter and contradicting Audit 1.
+
+  Two clean options instead:
+    (a) Keep this post as the pencil/arithmetic version; apply only the 7 real
+        Audit-1 fixes. Add ONE optional "deeper: gradient view" note that
+        states the d C_t/d C_{t-1} = 1 reason in two lines for calculus
+        readers, clearly marked as optional.
+    (b) If a fully formal version is wanted, write it as a SEPARATE companion
+        ("LSTM, the gradient derivation") and link the two. Do not try to make
+        one post serve both a no-calculus and a graduate-calculus reader; that
+        is what makes writing read as slop.
+
+  Pick the audience once. The pencil reader and the R^V / chain-rule reader
+  are not the same person, and no single page wins both.
+
+
+## ONE LINE
+
+  Audit 2 is internally competent but aimed at the wrong document; it fights
+  Audit 1 and the blog's charter. Salvage exactly one idea (the constant-error
+  carousel, d C/d C = 1) as an optional gradient note; reject the rest as a
+  scope and audience change disguised as a fix.
