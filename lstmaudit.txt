@@ -248,3 +248,102 @@ it directly contradicts Audit 1. Adopting it means rejecting Audit 1 whole.
   Audit 1 and the blog's charter. Salvage exactly one idea (the constant-error
   carousel, d C/d C = 1) as an optional gradient note; reject the rest as a
   scope and audience change disguised as a fix.
+
+
+==================================================================
+AUDIT 3 RESPONSE (zero-memory: "restate every symbol before every use")
+==================================================================
+
+VERDICT: 3 cheap, real fixes. The full demand -- redefine every variable,
+operation, and axiom before EVERY use, no term carried forward -- would wreck
+the post and fail the stated goal.
+
+
+## THE CONTRADICTION STACK IS NOW THREE DEEP
+
+  Audit 1: tanh/sigmoid are too abstract -- give PHYSICAL grounding, drop math.
+  Audit 2: tanh/sigmoid must be DERIVED from e via limits and power series.
+  Audit 3: tanh/sigmoid are fine as sample values -- just REPEAT those values
+           (~0.76, ~0.88) before every use.
+
+  Three personas, three incompatible orders for one line of text. Audit 3's
+  "repeat the decimal values" directly defies Audit 2's "never give decimals,
+  derive the curve." Chasing each audit in turn is a loop with no fixed point.
+  A single standard has to be chosen and frozen; otherwise every pass demands
+  a total rebuild that the next pass condemns.
+
+
+## THE CORE MISREADING: "ZERO MEMORY" != "NO READING"
+
+  Sane zero-memory (the blog's ::news rule): do not assume the reader read a
+  DIFFERENT page; do not point forward to text not yet written; gloss a term
+  the first time it appears.
+
+  Audit 3's reading: the reader may not recall the PREVIOUS SENTENCE on the
+  SAME page; every symbol must be redefined before every use. That forbids
+  working memory itself -- which is to say, it forbids reading. Prose is
+  sequential by nature; "W is a 32x32 grid" stated once and used ten lines
+  later is normal cognition, not a failure.
+
+  Pushed to its literal end ("redefine W, U, nudge, grid-times-row, tanh,
+  element-wise multiply before every formula"), the post becomes five lines of
+  boilerplate per one line of content. That is precisely the slop Audit 1's
+  smell test exists to kill. Audit 3 and Audit 1 cancel: mechanical
+  restatement IS filler. And no HN reader -- Linus least of all -- reads a page
+  that re-defines the dot product before every equation.
+
+
+## THE REAL GRAINS (cheap, adopt)
+
+  1. FAILURE 8 -- BEST POINT IN ANY AUDIT SO FAR. A drill should carry its own
+     formula. "New A? New B?" makes the reader scroll up for the combine rule.
+     Fix: state it inline -- "Given new A = keep*old A + admit*FRESH (slot by
+     slot): old A=4.0, keep=0.5, FRESH=2.0, admit=1.0. Find new A." Self-
+     contained drills are strictly better and add almost no length. Adopt.
+
+  2. FAILURE 4/5 (light version) -- repeat the one-line tanh/sigmoid value
+     table AT the worked-number blocks that use it, so a reader does not hunt
+     upward. One extra line at two spots. Adopt.
+
+  3. FAILURE 1 (light version) -- when nolan32 / word32 reappears far from its
+     definition, a 3-word reminder ("nolan32 -- its 32-number row"). Only where
+     the gap is large. Adopt sparingly.
+
+
+## REJECT
+
+  - FAILURE 2,3,6,9,10 in full form: redefining W/U/nudge, grid-times-row,
+    element-wise multiply, and ALL physical axioms before every single use.
+    This is boilerplate that fails the smell test and the readability bar.
+  - FAILURE 9 specifically (prefix every micro-step with "We are working with
+    a pencil and paper. Words are turned into rows...") -- pure ritual text.
+  - The structural overhaul to "<=5-line atomic lessons, redefine everything,
+    STOP." That produces a flashcard deck, not an essay -- a fourth different
+    artifact, after Audit 1's "physical-axiom rebuild" and Audit 2's "graduate-
+    math rebuild." Three audits, three incompatible target documents.
+
+
+## RECOMMENDATION (applies across all three audits now)
+
+  Stop auditing-then-rebuilding. Each persona demands a full reconstruction the
+  next persona rejects. Net real fixes after three exhaustive audits:
+
+    From Audit 1: ~7 (KATA wording, two forward/cross-page refs, vault->store,
+                  derive sigmoid before naming, enumerate why three gates,
+                  clerks-before-grid).
+    From Audit 2: 1 (constant-error-carousel as an optional gradient note).
+    From Audit 3: 3 (self-contained drills, repeat value tables at point of
+                  use, local reminder for nolan32).
+
+  That is ~11 small edits total, none of which is a rebuild. Apply those.
+  Everything else is one persona's taste contradicting another's. The post's
+  audience (pencil, no calculus, plain words) is fixed by the blog charter;
+  audits that demand a different audience are out of scope by definition.
+
+
+## ONE LINE
+
+  Audit 3's one gem (drills must state their own formula) is worth taking, plus
+  two cheap repeats. Its maximal form forbids reading itself and contradicts
+  both prior audits. After three audits the honest tally is ~11 small fixes and
+  zero rebuilds; pick a single standard and stop re-litigating the rest.
