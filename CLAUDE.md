@@ -52,6 +52,15 @@ Monitor loops for deployment status.
 - Commit ONLY `.txt` (and build.py/style.css/etc. when changed). Never commit HTML.
 - Live: https://learnrahulrai-ui.github.io/ml_blog/
 
+## Claude's job is plain text content ONLY (2026-06-14)
+- Claude pushes `.txt` source files and nothing else. GitHub Actions handles
+  everything after that: build, HTML generation, deploy, feed, sitemap.
+- Do NOT run build.py, check if the site is live, verify deploy status, or
+  run any CI/CD commands. Push the text, stop. GitHub Actions takes it from there.
+- This means: no background tasks, no "wait until live" polling, no deploy
+  checks, no Monitor loops -- EVER. The NEVER background-task rule above
+  applies with double force here: the CI pipeline is not Claude's concern.
+
 ## Branch
 - Development branch: claude/quirky-goodall-XcgGO
 - Audit reports / rules branch: audit (keep all audit material there, off main)

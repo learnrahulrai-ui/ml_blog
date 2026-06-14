@@ -139,7 +139,7 @@
   Feed raw straight back as m_new and loop 100 words? Watch one slot whose memory-side dial
   run multiplies by 1.5 every word, nudge aside:
 
-      1.5 * 1.5 * ... (100 times) = 1.5^100 = a number with 17 zeros in front of a point.
+      1.5 * 1.5 * ... (100 times) = 1.5^100 ≈ 4 × 10^17 -- an 18-digit number.
 
   And a slot multiplying by 0.5 each word:
 
@@ -179,7 +179,7 @@
       after word 2:  ~0.5 * 0.2  = 0.10, then bent smaller
       after word 3:  ~0.5 * that = 0.05, smaller
       ...
-      after word 30:  0.2 * 0.5^29  =  a number with eight zeros after its point -- gone.
+      after word 30:  0.2 * 0.5^29  =  a number with nine zeros after its point -- gone.
 
       word 1 mark:  0.2  0.10  0.05  0.02  0.01  ...  ~0   (worn flat)
                      |     |     |     |     |          |
