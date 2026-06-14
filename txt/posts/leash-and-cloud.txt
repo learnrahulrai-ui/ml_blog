@@ -180,11 +180,11 @@
   SHAPE of the two groups of points, and lays down the wall between them in a single
   confident stroke.
 
-    step 1: split the study pile into sick rows and well rows
-    step 2: compute 30 averages per group -> two centres in 30-column space
-            (60 averages total: 30 per class, 2 class centres)
-    step 3: find the wall between the two centres
-    step 4: new lump -> which side of the wall? -> that is the label
+    first  split the study pile into sick rows and well rows
+    then   compute 30 averages per group -> two centres in 30-column space
+           (60 averages total: 30 per class, 2 class centres)
+    then   find the wall between the two centres
+    so     a new lump -> which side of the wall? -> that is the label
 
     well centre #----------+----------# sick centre
                            ^
@@ -225,25 +225,25 @@
         C      0.12   0.50   well (0)
         D      0.18   0.45   well (0)
 
-    Step 1 -- 60 averages (2 class means x 2 columns = 4 averages):
+    First, the 60 averages (2 class means x 2 columns = 4 averages):
 
       sick class (A, B):  mu1 = ( (0.04+0.06)/2 , (0.90+0.85)/2 ) = (0.05 , 0.875)
       well class (C, D):  mu0 = ( (0.12+0.18)/2 , (0.50+0.45)/2 ) = (0.15 , 0.475)
 
-    Step 2 -- midpoint between the two centres (the IMAGINARY point):
+    Then the midpoint between the two centres (the IMAGINARY point):
 
       midpoint = ((0.05+0.15)/2 , (0.875+0.475)/2 ) = (0.10 , 0.675)
 
-    Step 3 -- difference between centres:
+    Then the difference between centres:
 
       mu1 - mu0 = (0.05-0.15 , 0.875-0.475) = (-0.10 , 0.400)
 
-    Step 4 -- the wall NORMAL vector w (ignoring S_W for this clean round-cloud
+    Then the wall NORMAL vector w (ignoring S_W for this clean round-cloud
     picture; with equal covariances w = mu1 - mu0):
 
       w = (-0.10 , 0.400)
 
-    Step 5 -- project each person onto w and compare to the midpoint projection:
+    Finally, project each person onto w and compare to the midpoint projection:
 
       w^T midpoint = -0.10*0.10 + 0.400*0.675 = -0.01 + 0.270 = 0.260
 

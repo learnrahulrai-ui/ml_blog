@@ -160,9 +160,9 @@
   leash. Instead ROTATE: split the training pile into k folds (k=5 is common), train on
   k-1 folds, score on the left-out fold, rotate, repeat k times, average the scores.
 
-    step 1: pick a range of candidate settings
-    step 2: for each candidate, score it with k-fold cross-validation
-    step 3: pick the candidate with the best mean score
+    first  pick a range of candidate settings
+    then   for each candidate, score it with k-fold cross-validation
+    so     pick the candidate with the best mean score
 
   This is grid search. "Grid" because you can tune multiple settings at once -- a 2-D grid
   of C values crossed with penalty types, for example.

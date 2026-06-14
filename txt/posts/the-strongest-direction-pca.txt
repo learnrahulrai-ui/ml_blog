@@ -91,7 +91,7 @@
      C        14.0          4.0
      D        14.5          6.0
 
-  Step 1: standardise (put on same ruler).
+  First, standardise (put on same ruler).
 
     alcohol mean=13.75,  spread=0.65
     color   mean=5.5,    spread=1.29
@@ -101,7 +101,7 @@
     C: alcohol z = (14.0-13.75)/0.65 =  0.38,  color z = (4.0-5.5)/1.29 = -1.16
     D: alcohol z = (14.5-13.75)/0.65 =  1.15,  color z = (6.0-5.5)/1.29 =  0.39
 
-  Step 2: find the longest shadow.  In 2-walled room this means spinning a
+  Then find the longest shadow.  In 2-walled room this means spinning a
   line until the dots spread along it as far as possible.  The answer (by
   formula, not flashlight) is a weighted combination of the two columns:
 

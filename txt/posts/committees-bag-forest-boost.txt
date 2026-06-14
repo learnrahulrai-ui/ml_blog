@@ -329,14 +329,17 @@
 
   You have 300 frozen trees.  The exam pile is sealed.  True MSE = 25.
 
-  Step 1: Grade the forest on the real exam pile -> true MSE = 25 (baseline).
-  Step 2: Pick one column -- say "radius."  Shuffle its values across the 88
-          exam people.  Swap p1's radius with p7's.  p7's with p3's.  The
-          radius VALUES stay the same, but they're attached to wrong people.
-  Step 3: Feed the SCRAMBLED exam pile to the same 300 frozen trees.  Each
-          person walks each tree.  Average 300 guesses per person.  Compare
-          to real answers -> new MSE.
-  Step 4: If the new MSE jumped UP, that column mattered.
+  First, grade the forest on the real exam pile -> true MSE = 25 (baseline).
+
+  Then pick one column -- say "radius."  Shuffle its values across the 88 exam
+  people.  Swap p1's radius with p7's.  p7's with p3's.  The radius VALUES stay
+  the same, but they're attached to wrong people.
+
+  Now feed the SCRAMBLED exam pile to the same 300 frozen trees.  Each person
+  walks each tree.  Average 300 guesses per person.  Compare to real answers
+  -> new MSE.
+
+  So if the new MSE jumped UP, that column mattered.
 
   WHY DOES SCRAMBLE WORK?
 
@@ -397,13 +400,15 @@
   Scramble tells you WHICH column mattered.  Slide tells you HOW it pushes
   the guess.  The push is called a Partial Dependence Plot (PDP).
 
-  Step 1: Pick one column -- say "bmi."  Keep all other 9 columns at their
-          real values.
-  Step 2: Give EVERY person the SAME fake bmi value.  Feed to 300 frozen trees.
-          Average 300 guesses per person.  Record the average guess across
-          all 88 people.
-  Step 3: Change the fake bmi to the next value.  Repeat.
-  Step 4: Plot fake bmi (x) vs average guess (y).
+  First, pick one column -- say "bmi."  Keep all other 9 columns at their real
+  values.
+
+  Then give EVERY person the SAME fake bmi value.  Feed to 300 frozen trees.
+  Average 300 guesses per person.  Record the average guess across all 88 people.
+
+  Now change the fake bmi to the next value, and repeat.
+
+  Finally, plot fake bmi (x) vs average guess (y).
 
   A concrete tree to see how this works (simplified to 2 cuts):
 

@@ -77,13 +77,13 @@
 
   Pick a column. Say bmi. I see 331 bmi values.
 
-    STEP 1 -- sort the column, find the midpoints.
+    First, sort the column and find the midpoints.
 
       sort the 331 bmi values smallest to largest.
       between each pair of neighbours write their MIDPOINT (pairwise mean).
       331 values -> 330 midpoints.  each midpoint is a CUT to try.
 
-    STEP 2 -- for the FIRST midpoint, draw a line across the whole sheet.
+    Take the first midpoint and draw a line across the whole sheet.
 
       everyone with bmi BELOW the midpoint -> left pile
       everyone with bmi ABOVE             -> right pile
@@ -94,7 +94,7 @@
       these two means are the TWO GUESSES.  the left pile's guess = left mean.
       the right pile's guess = right mean.
 
-    STEP 3 -- measure how WRONG those guesses are.
+    Now measure how WRONG those guesses are.
 
       for EVERY person:  miss = (their answer - their pile's mean)
       square each miss.  add them ALL up.
@@ -108,13 +108,13 @@
      You are comparing 330 huge numbers and picking the smallest.  The magnitude does
      not matter -- only the ORDER.
 
-    STEP 4 -- repeat for ALL 10 columns.
+    Repeat that for all 10 columns.
 
       age: sort, 330 midpoints, 330 badness numbers -> age's champion
       bp:  sort, ...                                -> bp's champion
       ...all 10 columns
 
-    STEP 5 -- champion of champions.
+    Now pick the champion of champions.
 
       10 column-champions, each with its own badness.  all in the SAME units
       (sum of squared misses over the same 331 people), so they are FAIR to
@@ -127,12 +127,12 @@
     graded by all 331 people (a miss and a squaring apiece) = 3,300 x 331 =
     1,092,300 squarings.  The clerks have it by tea; you read one champion table.
 
-    STEP 6 -- DRAW THE LINE.
+    So draw the line.
 
       go back to the sheet.  everyone with bmi <= 0.05 goes to pile A.
       everyone above goes to pile B.
 
-    STEP 7 -- RECURSE.
+    Then recurse.
 
       inside pile A (say 131 people):
         run the ENTIRE hunt again -- sort, midpoints, badness, champion, champion
@@ -145,7 +145,7 @@
       keep cracking each new pile the same way -- until a pile is too small or
       all its answers match.  then STOP.
 
-    STEP 8 -- the final pile's guess.
+    Finally, the final pile's guess.
 
       each final pile: average its answer column -> one number.
       that is the guess for any new person who lands in it.
@@ -163,7 +163,7 @@
      C      0.04   25      97
      D      0.12   45     135
 
-  STEP 1 -- sort by bmi, find midpoints.
+  First, sort by bmi and find midpoints.
 
     sorted:   C(0.04,97)  B(0.06,121)  D(0.12,135)  A(0.18,151)
     +- between C&B -+  +- between B&D -+  +- between D&A -+
@@ -171,7 +171,7 @@
 
   3 midpoints -> 3 cuts to try.
 
-  STEP 2 -- try cut at 0.05.  Below = {C}.  Above = {B, D, A}.
+  Try the cut at 0.05.  Below = {C}.  Above = {B, D, A}.
 
     below:  one person (97) -> mean = 97  (no arithmetic needed)
     above:  121 + 135 = 256.  256 + 151 = 407.  407 / 3 = 135.666...
@@ -191,7 +191,7 @@
 
     sum = 0 + 216 + 0.5 + 234 = 450.5
 
-  STEP 3 -- try cut at 0.09.  Below = {C, B}.  Above = {D, A}.
+  Try the cut at 0.09.  Below = {C, B}.  Above = {D, A}.
 
     below:  97 + 121 = 218.  218 / 2 = 109.
     above:  135 + 151 = 286.  286 / 2 = 143.
@@ -203,7 +203,7 @@
 
     sum = 144 + 144 + 64 + 64 = 416   <- CHAMPION (smallest)
 
-  STEP 4 -- try cut at 0.15.  Below = {C, B, D}.  Above = {A}.
+  Try the cut at 0.15.  Below = {C, B, D}.  Above = {A}.
 
     below:  97 + 121 = 218.  218 + 135 = 353.  353 / 3 = 117.666...  call it 117.7.
     above:  one person (151) -> mean = 151.  (no arithmetic needed)
@@ -301,7 +301,8 @@
     !! WARN: THE CHAMPION IS LOCAL, NOT GLOBAL
        The 0.09 cut is bmi's champion.  Age's champion (40, badness 416)
        ties it exactly.  Column competition -- the champion of champions
-       -- happens only in Step 5.  A tie means someone picks arbitrarily.
+       -- happens only when the column champions race each other.  A tie
+       means someone picks arbitrarily.
 
 
   ## The Corrections I Caught
