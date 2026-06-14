@@ -1,4 +1,4 @@
-@title LSTM From Pencil: RNN and LSTM From Scratch, Nothing But a Pencil :: Rahul's ML Blog
+@title LSTM From Pencil: Built From Nothing, One Step at a Time :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -6,284 +6,422 @@
 ----------------------------------------------------------------------------------------------
 
   APPENDIX . LSTM FROM PENCIL
-  RNN and LSTM From Scratch, Nothing But a Pencil
+  Built From Nothing, One Step at a Time
   Posted: 2026-06-14 . Author: Rahul Rai . Tags: lstm, rnn, sequence-models, by-hand
   ============================================================================================
 
-  PATH . APPENDIX -- LSTM From Pencil  (companion to Chapter 10; work it any time)
-    <- back to:  [Chapter 10, Part 2: The Two-Memory Worker](the-two-memory-worker.txt)
+  PATH . APPENDIX -- LSTM From Pencil  (standalone; needs no other page)
 
-  This page is a KATA: one clean walk through the RNN and the LSTM, by pencil, that you can
-  redo on a blank sheet again and again until your hand knows it. No computer is needed at
-  any step. It assumes nothing from the chapters -- every number is built here, in front of
-  you, and recomputed where it is needed. The chapters draw the picture slowly; this page is
-  the bare recitation, the thing you reproduce from memory at a 1950s desk.
+  Goal: read a movie review -- plain words -- and stamp it liked (1) or not (0). Kit: a
+  pencil, graph paper, a few coat pockets. No computer, at any step.
 
-  The setup, Faraday-plain: a pencil, sheets of graph paper, a few pockets in your coat. A
-  pile of movie reviews, each with a tick -- liked (1) or not (0). The job: read a NEW
-  review and tick it. We will walk ONE short review, "nolan ended", all the way through.
+  How to read this page. Nothing is named before a number builds it. Every time a term first
+  shows up, a calculation right above it earned it. At each ">> YOUR TURN", cover everything
+  below that line, do it on your own paper, THEN look. If your answer fights a "WRONG TURN"
+  box, sit with that clash before reading on -- a clash you feel once you never forget.
 
+  We build, in order: a clerk, words as numbers, why order forces a memory, a one-memory
+  reader and why it FORGETS, then a two-memory reader that does not. That last reader carries
+  a name only at its very end: LSTM.
 
-  ## The Desk: Words Into Numbers
 
-  A clerk can only multiply NUMBERS. It cannot multiply the word "boring". So before any
-  machine runs, every word is turned into a row of numbers -- looked up in a dictionary that
-  holds one page per word:
+  ## Step 0 -- One Axiom: What a Clerk Does
 
-    "nolan"  ->  [ 32 numbers ]      <- its row in the dictionary (call this nolan32)
-    "ended"  ->  [ 32 numbers ]
+  A clerk does one job. Take some numbers in. Multiply each by a frozen dial. Add results.
+  Add one more fixed number, a nudge. Emit a single number out. That is all a clerk can do.
 
-  These 32 numbers per word are fixed once trained -- you flip to the word's page and copy
-  them. Why 32 and not 1? Because one number per word could only say "leans good" or "leans
-  bad", and a word like "not" leans neither way -- its whole job is to FLIP the next word.
-  Thirty-two slots give a word room to be several things at once. The width 32 is a CHOICE
-  (a knob), not a law.
+      in            dial           add      nudge        out
+      a  --------->[ x p ]\
+                           >------( + )-----[ + b ]----> one number
+      c  --------->[ x q ]/
 
-  Everything below works on these 32-number rows. To keep the page honest we will often
-  shrink 32 down to 1 or 3 numbers -- the arithmetic is identical, just shorter to write.
+  Out = a*p + c*q + b. Dials p, q and nudge b stay frozen while reading; they change only
+  between training runs, which this page never does. Everything past here is clerks, nothing
+  more.
 
+    >> YOUR TURN
+       Dials p = 2, q = -1, nudge b = 3. Inputs a = 4, c = 5. Out?
 
-  ## Part 1: The RNN, By Pencil
+       check: 2*4 + (-1)*5 + 3 = 8 - 5 + 3 = 6.
 
-  ON THE DESK -- one memory pocket and a frozen set of dials:
 
-    memory       = [ 32 numbers ]    starts ALL ZEROS
-    word-dial W  = a 32 x 32 grid     (one grid of dials for the incoming word)
-    memory-dial U= a 32 x 32 grid     (one grid of dials for the old memory)
-    nudge        = [ 32 numbers ]
+  ## Step 1 -- Words Are Not Numbers, So Hand Each Word a Row
 
-  The dials W, U, nudge are FROZEN during a read-through -- the same dials are reused at every
-  single word. That reuse is the whole idea, and it is why the textbook word is "recurrent":
-  the one dial-set comes round again every word.
+  A clerk multiplies numbers. Word "boring" is not a number. So before any clerk runs, swap
+  each word for a fixed row of numbers, copied off a word-book -- one page per word:
 
-  GRID x ROW, BY PENCIL. The one step people trip on first: you cannot multiply a 32 x 32
-  grid by a single number. A grid times a ROW of 32 works like this -- take row 1 of the
-  grid, lay it against the word's 32 numbers, multiply pair-by-pair, and ADD the 32 products
-  into ONE number. That is row 1's output. Row 2 against the same 32 -> number 2. Thirty-two
-  rows -> 32 numbers, a brand-new row. A worked two-wide example (shrinking 32 to 2):
+      "not"  --look up-->  page 4017
+                           [ 0.0 , 0.9 , -0.2 ]      <- a row of numbers
 
-    grid = [ [1, 0],      word row = [ 5, 7 ]
-             [0, 1] ]
+  Why a ROW and not a single number? Test word "not". On its own it leans neither liked nor
+  not -- its whole job is to FLIP whatever word comes next. A single number must pick one duty:
+  it can say "lean +0.3" OR "I am a flipper", never both. Two duties need two slots. So a word
+  gets several slots. This page uses 3 slots to fit a line; a real desk uses 32. Width is a
+  pick, not a law.
 
-    row 1 . [5,7] = 1x5 + 0x7 = 5
-    row 2 . [5,7] = 0x5 + 1x7 = 7      ->  output [5, 7]
+      one number per word:   can hold "lean", OR "flipper"   -- not both   (too thin)
+      a row of slots:        slot1 = lean, slot2 = flipper, slot3 = ...    (room for both)
 
-  (That grid -- ones on the diagonal -- is the "do-nothing" grid; it copies the row through.
-  A real grid has other numbers and mixes the slots.) The ADD-up of products lives INSIDE
-  each row; it is the only place anything is summed.
 
-  THE ONE-WORD RECIPE (walk left to right, SAME dials every word):
+  ## Step 2 -- One Clerk Scores One Word, But Loses Order
 
-    new memory = tanh(  W x word32   +   U x old memory   +   nudge  )
-                        \_grid x row_/   \_grid x row_/      \_ 32 _/
+  Hand a clerk a word-row, let it emit one score. Fine for one word. Now feed a whole review
+  by adding up each word's row, slot by slot, and scoring that sum. Watch two reviews:
 
-  tanh is a fixed crusher: it bends any number into the band -1 to +1. By the numbers:
-  tanh(0) = 0, tanh(1) ~ 0.76, tanh(2) ~ 0.96, tanh(5) ~ 1.0, tanh(-5) ~ -1.0. No dials, no
-  learning -- one fixed curve, applied at the end.
+      "not good"   ->  row(not) + row(good)
+      "good not"   ->  row(good) + row(not)
 
-  WALK "nolan ended":
+    >> YOUR TURN
+       Addition does not care about order: x + y equals y + x. Do both sums land on one
+       same row?
 
-    word "nolan": old memory = 0  ->  new memory = tanh( W x nolan32 + U x 0 + nudge )
-                                                  (U x 0 is all zeros -- nothing behind word 1)
-    word "ended": old memory = nolan's memory  ->  tanh( W x ended32 + U x oldmem + nudge )
+       check: yes -- identical. row(not)+row(good) = row(good)+row(not).
 
-  Same W, U, nudge both words. After the last word, the memory is a 32-number summary of the
-  whole review, with order baked in. A final S-curve clerk reads that summary -> one chance,
-  liked (1) or not (0).
+  WRONG TURN  "Fine, identical -- both reviews mean one same thing."
+    Clash: "not good" is a complaint; "good not" is noise a person would not even write. Same
+    numbers, opposite sense. A plain sum binned order, and order carried meaning.
+    So a plain sum cannot be right. Something must remember word 1 while reading word 2.
 
-    >> YOUR TURN  (two-wide, by hand)
-       old memory = [0, 0] (first word). word32 = [1, 2]. W = the do-nothing grid
-       [[1,0],[0,1]]. U = anything (old memory is zero so it drops out). nudge = [0, 0].
-       tanh(1) ~ 0.76, tanh(2) ~ 0.96. New memory?
+  That memory is forced on us. Build it next.
 
-       check your slate:
-         W x [1,2] = [1, 2] ;  U x [0,0] = [0, 0] ;  add nudge [0,0] -> [1, 2]
-         tanh each -> [0.76, 0.96].   New memory ~ [0.76, 0.96].
 
-  THE FLAW (a THEOREM, provable with a pencil). Look at what happens to the OLD memory: every
-  word it is multiplied by U AND crushed through tanh. Crush, multiply, crush, multiply -- 90
-  times over a 90-word review. A mark left by word 1 is mangled and re-squeezed ninety times,
-  worn down toward nothing -- like a pencil mark rubbed ninety times. By word 90 the worker
-  has effectively forgotten word 1. A long review's opening flip ("not ...") is lost. This
-  fading is not a bug you can tune away; it follows from crushing the one memory every step.
+  ## Step 3 -- A Carried Memory, Rewritten Each Word
 
-    RNN memory:  tanh( U x old + ... )   -> mangled + crushed each word  -> FADES
-    we want:     keep x old + add x new  -> scaled + added each word      -> SURVIVES
+  Keep a pocket holding a row of numbers -- a memory. Start it at all zeros. Read words left
+  to right. After each word, rewrite that memory from two things only: this word's row, and
+  memory as it stood before this word.
 
+      word_t (row)
+         |
+         v
+   m_old +--> [  blend this word with m_old  ] --> m_new
+     ^                                               |
+     |                                               |
+     +------------------- carry ---------------------+
 
-  ## Part 2: The LSTM, By Pencil
+  One pocket, looping. Word 2 sees word 1 through m_old; word 3 sees both; and so on. Order
+  now survives, because m_old at word 2 already holds a trace of word 1.
 
-  The cure, in one line before we build it: stop crushing the long memory as it carries.
-  Hold a memory that is only SCALED by a fraction and ADDED to -- never crushed on the way
-  through -- so word 1 can ride all the way to word 90.
+  How does a clerk "blend"? Each output slot is a clerk reading every input slot. Reading 3
+  word-slots into 3 new slots takes a 3-by-3 block of dials -- a grid. Same for memory:
 
-  ON THE DESK -- now TWO pockets:
+      grid G (3 rows, 3 cols)        a row r
+        [ g11 g12 g13 ]                [ r1 ]
+        [ g21 g22 g23 ]   applied to   [ r2 ]   gives 3 numbers
+        [ g31 g32 g33 ]                [ r3 ]
 
-    pocket A : memory A = [32]   the LONG VAULT.  Silent -- never read by any machine. Only
-                                 scaled and added. Never crushed on the carry, so it CAN grow
-                                 past 1 (it might read 5.0). Far-back marks survive here.
-    pocket B : memory B = [32]   the SPOKEN readout.  THIS is what the machines read next
-                                 word. It is a crushed, partial view of A. (Both start at 0.)
+      out slot 1 = g11*r1 + g12*r2 + g13*r3      <- row 1 of G, multiplied into r, summed
+      out slot 2 = g21*r1 + g22*r2 + g23*r3
+      out slot 3 = g31*r1 + g32*r2 + g33*r3
 
-  THE FOUR MACHINES. Four little machines run side by side. EVERY one reads the same two raw
-  things -- this word's nolan32 and memory B from last word -- and nothing else. Each has its
-  OWN two grids (one for nolan32, one for B) and its own nudge:
+  That summing of paired products -- row of G against r -- is a dot. It is one clerk per grid
+  row. A grid cannot multiply a single number; it multiplies a ROW into a new ROW.
 
-    FRESH  = tanh(    Wf x nolan32 + Uf x B + bf )    -> the new content, range -1..+1
-    keep   = sigmoid( Wk x nolan32 + Uk x B + bk )    -> 32 fractions, range 0..1
-    admit  = sigmoid( Wa x nolan32 + Ua x B + ba )    -> 32 fractions, range 0..1
-    show   = sigmoid( Ws x nolan32 + Us x B + bs )    -> 32 fractions, range 0..1
+    >> YOUR TURN
+       G = [ [1,0,0], [0,1,0], [0,0,1] ] (ones down a slant, zero elsewhere). r = [5, 7, 2].
+       Apply G to r.
 
-  ONE MACHINE -- TWO GRIDS INSIDE. Read the keep line again: nolan32 goes through grid Wk, B
-  goes through a SEPARATE grid Uk, the two outputs ADD, the nudge joins, THEN the one squash.
-  This is NOT a "word machine" feeding a "memory machine" -- both grids live inside the same
-  one machine, and the add happens before the crush. All four follow this exact shape.
+       check:
+         slot1 = 1*5 + 0*7 + 0*2 = 5
+         slot2 = 0*5 + 1*7 + 0*2 = 7
+         slot3 = 0*5 + 0*7 + 1*2 = 2     ->  [5, 7, 2], copied straight through.
+       (That slanted grid is a do-nothing grid. A real grid carries other numbers and mixes
+       slots.)
 
-  Two crushers in play:
-    tanh    -> a VALUE, can be + or -, range -1..+1
-    sigmoid -> a FRACTION, "how much", a dimmer knob from 0 to 1.  sigmoid(0) = 0.5,
-               sigmoid(2) ~ 0.88, sigmoid(-2) ~ 0.12, sigmoid(5) ~ 1.0, sigmoid(-5) ~ 0.
 
-  Use them right: FRESH gets tanh (it carries content). The three votes get sigmoid (they
-  carry a fraction). One crush each, at the end. Never tanh-then-sigmoid the same row.
+  ## Step 4 -- Why a Squash Sits at Each Step
 
-  Notice FRESH is exactly Part 1's RNN recipe -- tanh of (word + old recent + nudge) -- reused
-  whole. The LSTM does not throw the RNN away. It keeps it as ONE of four parts and wraps
-  three dimmer knobs around it. LSTM = the RNN cell + three votes.
-
-  THE COMBINE (every multiply is pair-by-pair, slot with slot -- NO summing across slots):
-
-    new A = keep x (old A)   +   admit x FRESH
-    new B = show x tanh(new A)
-
-  In words: keep scales how much of the silent vault to hold; admit scales how much new
-  content to let in; their sum is the new vault. Then show scales a tamed view of the vault
-  into the spoken readout. memory A is touched for the FIRST time right here, in the combine
-  -- no machine read it.
-
-  WORKED, REAL NUMBERS (one slot; really 32, all the same way):
+  Blend gives: word through grid Gw, memory through grid Gm, add a nudge row:
 
-    old A = 5.0    FRESH = 0.6    keep = 0.9    admit = 0.2    show = 0.7
-
-    new A = 0.9 x 5.0  +  0.2 x 0.6  =  4.5 + 0.12  =  4.62      <- held the vault, let in a touch
-    new B = 0.7 x tanh(4.62)  =  0.7 x ~1.0  =  0.70             <- tame the vault, reveal part
-
-  The vault went 5.0 -> 4.62: scaled by 0.9 and nudged up by 0.12, NEVER crushed. That is the
-  whole escape from the fade -- a far-back mark can sit at 5.0 and still be there 90 words on.
-  To SPEAK it, first tanh (4.62 -> ~1.0, tamed into -1..+1), then show (0.7) reveals 70% of
-  it -> 0.70. A is the silent vault; B is what you say out loud about it.
-
-  THREE SLOTS (each slot carries its OWN keep/admit/show -- element-wise, no summing):
-
-    old A = [ 5.0 , -2.0 , 0.3 ]      FRESH = [ 0.6 , 0.8 , -0.1 ]
-    keep  = [ 0.9 ,  0.5 , 1.0 ]      admit = [ 0.2 , 0.0 ,  0.9 ]
-    show  = [ 0.7 ,  0.2 , 1.0 ]
-
-    new A:  0.9x5.0  + 0.2x0.6  = 4.62
-            0.5x-2.0 + 0.0x0.8  = -1.00       <- slot 2: kept half, admitted nothing
-            1.0x0.3  + 0.9x-0.1 = 0.21
-    new A = [ 4.62 , -1.00 , 0.21 ]
-
-    tanh(new A) ~ [ 1.00 , -0.76 , 0.21 ]
-    new B:  0.7x1.00 = 0.70 ,  0.2x-0.76 = -0.15 ,  1.0x0.21 = 0.21
-    new B = [ 0.70 , -0.15 , 0.21 ]
-
-  Put new A in pocket A, new B in pocket B, step to the next word, SAME dials. Repeat to the
-  last word.
-
-    >> YOUR TURN  (one slot, by hand)
-       old A = 4.0, keep = 0.5, FRESH = 2.0, admit = 1.0, show = 1.0, tanh(new A) ~ 1.0.
-       New A slot? New B slot?
-
-       check your slate:
-         new A = 0.5 x 4.0 + 1.0 x 2.0 = 2.0 + 2.0 = 4.0
-         new B = 1.0 x tanh(4.0) ~ 1.0 x 1.0 = 1.0
-       Kept half the old vault and admitted all the fresh content.
-
-  THE TWO MEMORIES, PLAINLY:
-
-    A = the raw long VAULT  (4.62, uncrushed, can grow big)   -- SILENT, no machine reads it
-    B = the tamed partial READOUT of A  (0.70)                -- SPOKEN, every machine reads it
-
-  WHY KEEP A IF NO MACHINE READS IT? Because the votes are APPLIED to it. A is the treasure;
-  keep scales it, admit adds to it. The votes decide their fractions from today's word and B,
-  then reach over and act ON A. Drop A and nothing carries far.
-
-  SHOW'S DUAL ROLE. The new B that show builds lands in TWO places:
-    1. NEXT word -- all four machines read it alongside the next word's row.
-    2. LAST word -- the final clerk reads it for the liked/not verdict.
-  The B the machines read each word was MADE by show the word before. show is the valve on
-  the vault's mouth: hold silently (show low), speak only when it matters (show high).
-
-  THE FINAL B IS THE WHOLE REVIEW. Walk "nolan ended": B after word 1 has seen only "nolan";
-  B after word 2 has folded in BOTH words. The final B -- the one the clerk reads -- is the
-  last one, carrying every word, not just the opener. Each B swallows the one before it.
-
-  ENGINEERED, NOT DERIVED (a CHOICE, named out loud). The fade is a THEOREM you can prove with
-  a pencil. The EXACT wiring -- two memories, these three votes, this combine -- was ENGINEERED
-  by trial until it stopped the fade. A simpler cousin (the GRU) ties keep and admit together
-  and merges the memories; it works about as well with fewer dials. Hold the mechanism --
-  scale-and-add a silent long memory, gate it with dimmer knobs -- and treat the precise vote
-  count as a historical accident, not a law.
-
-
-  ## The Struggle Log (every snag, in one margin)
-
-  The traps that catch everyone the first few times. Each is a sentence you correct out loud.
-
-    "can't multiply a grid by one number"  -> grid x ROW: each grid-row dotted with the 32,
-                                              summed to one number; 32 rows -> 32 numbers.
-    "old A can't be 5.0 -- tanh caps it"    -> true for the RNN (crushed each word). FALSE for
-                                              A: never crushed on the carry, so it CAN read 5.0.
-    "is the combine a sum across slots?"    -> no. pair-by-pair, slot with slot. The only sum
-                                              is inside a grid-row (the dot product).
-    "a vote reads what it scales"           -> no. all four READ nolan32 + B; they are APPLIED
-                                              to different targets (keep -> A, admit -> FRESH,
-                                              show -> tanh(new A)).
-    "two memories = two copies"             -> no. A is the silent vault; B is the spoken
-                                              readout (show x tanh(A)). Different roles.
-    "why keep A if unread?"                 -> the votes are applied TO A; A feeds B. Drop it
-                                              and nothing carries far.
-    "B is a grid/matrix"                    -> no. A and B are ROWS of 32 numbers. The grids
-                                              (W, U) are the dials -- 32 x 32 each.
-    "keep = 1 minus admit"                  -> no subtraction. keep and admit are two separate
-                                              votes; both can be high at once. (The GRU ties
-                                              them; this LSTM does not.)
-    "word machine + memory machine"         -> one machine, two grids inside, added before the
-                                              one crush. Four such machines, each its own dials.
-    "show makes B once, done"               -> B is the output line: next word AND final clerk.
-    "final B = the first word's"            -> final B = whole-review summary; each B swallows
-                                              the one before it.
-    "loud content must matter most"         -> no. a big FRESH can be admitted near 0. Loudness
-                                              is the value; worth is the vote, judged apart.
-
-
-  ## One Word, End to End (the recitation)
-
-  The thing to reproduce from a blank sheet -- first word, so A and B are all zeros:
-
-    1. flip to nolan's page -> nolan32 ;  pull A (all 0), pull B (all 0)
-    2. run the four machines on (nolan32 + B):
-         FRESH = tanh( Wf x nolan32 + Uf x B + bf )
-         keep  = sigmoid( Wk x nolan32 + Uk x B + bk )
-         admit = sigmoid( Wa x nolan32 + Ua x B + ba )
-         show  = sigmoid( Ws x nolan32 + Us x B + bs )
-    3. new A = keep x A + admit x FRESH        (A used here for the first time)
-    4. new B = show x tanh(new A)
-    5. put new A, new B back in the pockets. walk to "ended". SAME dials. repeat.
-    6. last word: the final clerk reads the last B -> liked (1) or not (0).
-
-
-  ## One Line Each
-
-  RNN : one worker walks the review carrying ONE memory, rewritten-and-crushed every word
-        with the same dials -- so far-back words FADE (a theorem).
-
-  LSTM: TWO memories -- a silent uncrushed vault A and a spoken readout B; four machines
-        (FRESH + keep/admit/show) read nolan32 + B; new A = keep x A + admit x FRESH grows the
-        vault without crushing it (so far-back SURVIVES), new B = show x tanh(new A) speaks it
-        out; same dials reused every word; the last B is the whole-review summary the clerk
-        ticks. The fade is derived; the exact wiring is a choice.
+      raw = Gw applied to word  +  Gm applied to m_old  +  nudge
+
+  Feed raw straight back as m_new and loop 100 words? Watch one slot whose memory-side dial
+  run multiplies by 1.5 every word, nudge aside:
+
+      1.5 * 1.5 * ... (100 times) = 1.5^100 = a number with 17 zeros in front of a point.
+
+  And a slot multiplying by 0.5 each word:
+
+      0.5^100 = so small it is zero on any page.
+
+    >> YOUR TURN
+       Over just 10 words, a slot multiplies by 2 each word starting from 1. Value after 10?
+
+       check: 2^10 = 1024. Ten more words: past a million. It runs away.
+
+  A 100-step loop with no brake either blows up or dies. So clamp every step. Push each raw
+  number through a fixed bend that pins it into a band from -1 to +1:
+
+      tanh, by its numbers only (no rules to memorise, just read off):
+        tanh(0) = 0
+        tanh(1) ~ 0.76
+        tanh(2) ~ 0.96
+        tanh(5) ~ 1.0       (already pinned near top)
+        tanh(-5) ~ -1.0
+      big positive -> near +1 ;  big negative -> near -1 ;  zero -> 0 ;  smooth between.
+
+  A bend, fixed, no dials, applied last:
+
+      m_new = tanh(  Gw applied to word  +  Gm applied to m_old  +  nudge  )
+
+  This is a full one-memory reader. Walk "not good": word 1 sets m from zeros; word 2 blends
+  "good" with that m. Order is kept; numbers stay in band. A final clerk reads last m and
+  stamps liked or not. Done -- for short reviews.
+
+
+  ## Step 5 -- This Reader Forgets (a Result You Can Prove)
+
+  Track one slot of a mark left by word 1. Say word 1 pushes 0.2 into it. Each later word,
+  that 0.2 gets multiplied by a memory-side dial (say ~0.5) and bent by tanh, which squeezes
+  small numbers toward 0:
+
+      after word 2:  ~0.5 * 0.2  = 0.10, then bent smaller
+      after word 3:  ~0.5 * that = 0.05, smaller
+      ...
+      after word 30:  0.2 * 0.5^29  =  a number with eight zeros after its point -- gone.
+
+      word 1 mark:  0.2  0.10  0.05  0.02  0.01  ...  ~0   (worn flat)
+                     |     |     |     |     |          |
+                    w1    w2    w3    w4    w5         w30
+
+    >> YOUR TURN
+       Roughly how many halvings drive 0.2 below 0.001?
+
+       check: 0.2 -> 0.1 -> 0.05 -> 0.025 -> 0.0125 -> 0.006 -> 0.003 -> 0.0016 -> 0.0008.
+       About 8. Far inside a 90-word review. Word 1 is long dead by word 90.
+
+  So a long review that flips on its opening word ("not ... worth ... at all") loses that
+  flip. This is not a dial you can tune; it follows from crushing one memory every step. Call
+  it a proven failure, and fix its cause.
+
+
+  ## Step 6 -- Carry Without Crushing: a Second Memory
+
+  We want a word-1 mark to survive 90 steps. Multiply-and-crush kills it (Step 5). What
+  single operation lets a number ride many steps unharmed? Scale by about 1 and add a little.
+  Nothing crushed.
+
+  So introduce a second pocket, memory A, that is NEVER bent on carry. Each word it is only
+  scaled by a fraction and added to:
+
+      A_new = keep * A_old  +  admit * fresh
+
+  keep and admit are fractions from 0 to 1, one per slot. fresh is new content for this word.
+
+      A_old --[ x keep ]--\
+                           ( + ) ---> A_new
+      fresh --[ x admit ]-/
+
+    >> YOUR TURN
+       A_old = 5.0, keep = 1.0, admit = 0.0. A_new? And after 90 more such words?
+
+       check: A_new = 1.0*5.0 + 0.0*fresh = 5.0. Held whole. Ninety words on, still 5.0.
+       Nothing crushed it. Compare Step 5, where 5.0 would have worn to nothing.
+
+  WRONG TURN  "A is bounded by tanh, so it cannot exceed 1 -- 5.0 is impossible."
+    Clash: tanh bent a memory in Step 4. Memory A is built NOT to be bent on carry -- that was
+    its whole reason. No bend, no -1..+1 cap. A may read 5.0, even 50. Letting it grow is
+    exactly how a far-back mark stays alive.
+
+
+  ## Step 7 -- A Vault Too Big to Read, So Tame a Readout
+
+  Memory A now may sit at 50. Feed 50 to a clerk and its bend saturates flat -- useless. So do
+  not hand A out raw. Build a tamed readout B: bend A back into band, then reveal only a
+  fraction of it.
+
+      B_new = show * tanh(A_new)
+
+  show is a fraction 0 to 1, one per slot. tanh(50) ~ 1.0 tames size; show picks how much of
+  that to speak.
+
+      A_new --[ tanh ]--[ x show ]--> B_new
+
+  Two pockets now, each with a clear duty:
+
+      A = silent store. Never read by a clerk. Only scaled-and-added. May grow past 1.
+      B = spoken readout. What clerks read next word. A bent, partial view of A.
+
+    >> YOUR TURN
+       A_new = 4.62, show = 0.7, tanh(4.62) ~ 1.0. B_new?
+
+       check: 0.7 * 1.0 = 0.70. A holds 4.62 in silence; B says 0.70 out loud about it.
+
+
+  ## Step 8 -- Where keep, admit, show, fresh Come From
+
+  Four rows feed Steps 6 and 7: fresh, keep, admit, show. Each is produced by its own clerk-
+  grid, and every one reads exactly two things -- this word's row, and B from last word:
+
+      shared inputs to all four:   word-row   and   B_old
+
+  fresh carries content, which may be plus or minus, so bend it with tanh into -1..+1.
+  keep, admit, show must each be a fraction -- "how much", 0 to 1. A plain bend to 0..1 maker:
+
+      sigmoid, by its numbers only:
+        sigmoid(0) = 0.5
+        sigmoid(2) ~ 0.88
+        sigmoid(-2) ~ 0.12
+        sigmoid(5) ~ 1.0
+        sigmoid(-5) ~ 0.0
+      big positive -> near 1 ;  big negative -> near 0 ;  zero -> half.  A dimmer knob.
+
+  Each of four machines: word through its own word-grid, B through its own B-grid, add nudge,
+  one bend:
+
+      fresh = tanh(    Gwf.word + Gbf.B_old + nf )    -> content, -1..+1
+      keep  = sigmoid( Gwk.word + Gbk.B_old + nk )    -> fraction, 0..1
+      admit = sigmoid( Gwa.word + Gba.B_old + na )    -> fraction, 0..1
+      show  = sigmoid( Gws.word + Gbs.B_old + ns )    -> fraction, 0..1
+
+  Read one machine slowly:
+
+      word --->[ Gwk ]--\
+                         ( + )---[ + nk ]---[ sigmoid ]---> keep
+      B_old -->[ Gbk ]--/
+
+  Two grids sit INSIDE one machine -- one for word, one for B -- adding before a single bend.
+  This is not a word-machine feeding a memory-machine; it is one machine with two inputs.
+
+  WRONG TURN  "Bend it twice -- tanh then sigmoid -- to be safe."
+    Clash: tanh makes a signed value; sigmoid makes a fraction. A slot is one kind or other,
+    never both. fresh wants signed content (tanh). keep/admit/show want a fraction (sigmoid).
+    One bend each, picked by duty.
+
+
+  ## Step 9 -- Combine, in Real Numbers
+
+  Per slot, four machines hand you: fresh, keep, admit, show. Memory A and B from last word
+  sit in pockets. Two lines finish it:
+
+      A_new = keep * A_old  +  admit * fresh
+      B_new = show * tanh(A_new)
+
+      A_old --[ x keep ]--\
+                           ( + ) --> A_new --[ tanh ]--[ x show ]--> B_new
+      fresh --[ x admit ]-/                                  |
+                                                             v
+                                       B_new feeds next word's four machines,
+                                       and on last word, feeds final stamp.
+
+  One slot, real numbers:
+
+      A_old = 5.0   fresh = 0.6   keep = 0.9   admit = 0.2   show = 0.7
+
+      A_new = 0.9*5.0 + 0.2*0.6 = 4.5 + 0.12 = 4.62
+      B_new = 0.7 * tanh(4.62) = 0.7 * ~1.0 = 0.70
+
+  A went 5.0 -> 4.62: scaled by 0.9, nudged up 0.12, never bent. A mark can sit high and ride
+  on. To speak it: bend (4.62 -> ~1.0), then reveal 0.7 of it -> 0.70.
+
+  Each multiply is slot-by-slot -- slot 1 with slot 1 -- no summing across slots. Summing lives
+  only inside a grid row (Step 3). Three slots at once, each carrying its own keep/admit/show:
+
+      A_old = [ 5.0 , -2.0 , 0.3 ]    fresh = [ 0.6 , 0.8 , -0.1 ]
+      keep  = [ 0.9 ,  0.5 , 1.0 ]    admit = [ 0.2 , 0.0 ,  0.9 ]
+      show  = [ 0.7 ,  0.2 , 1.0 ]
+
+      A_new:  0.9*5.0  + 0.2*0.6  = 4.62
+              0.5*-2.0 + 0.0*0.8  = -1.00      <- slot 2: kept half, admitted nothing
+              1.0*0.3  + 0.9*-0.1 = 0.21
+      A_new = [ 4.62 , -1.00 , 0.21 ]
+
+      tanh(A_new) ~ [ 1.00 , -0.76 , 0.21 ]
+      B_new:  0.7*1.00 = 0.70 ,  0.2*-0.76 = -0.15 ,  1.0*0.21 = 0.21
+      B_new = [ 0.70 , -0.15 , 0.21 ]
+
+    >> YOUR TURN
+       One slot: A_old = 4.0, keep = 0.5, fresh = 2.0, admit = 1.0, show = 1.0,
+       tanh(A_new) ~ 1.0. Find A_new, then B_new.
+
+       check:
+         A_new = 0.5*4.0 + 1.0*2.0 = 2.0 + 2.0 = 4.0
+         B_new = 1.0 * 1.0 = 1.0
+       Kept half a long store, admitted all new content.
+
+
+  ## Step 10 -- One Word, Start to Finish
+
+  Put it in one block. First word, so A and B are zeros:
+
+      1. look up word-row.  pull A (zeros), pull B (zeros).
+      2. run four machines on (word-row + B):
+           fresh = tanh(    Gwf.word + Gbf.B + nf )
+           keep  = sigmoid( Gwk.word + Gbk.B + nk )
+           admit = sigmoid( Gwa.word + Gba.B + na )
+           show  = sigmoid( Gws.word + Gbs.B + ns )
+      3. A_new = keep * A + admit * fresh      (A touched here, first time)
+      4. B_new = show * tanh(A_new)
+      5. put A_new, B_new back. step to next word. SAME dials. repeat.
+      6. last word: final clerk reads last B -> liked (1) or not (0).
+
+  B after word 1 holds word 1 only. B after word 2 folds in words 1 and 2. Last B holds all
+  words -- a whole-review readout, not one word's. Each B swallows its forerunner.
+
+  This reader earns its name now, at its end, having been built piece by piece: a Long Short-
+  Term Memory reader -- LSTM. "Long" is store A, riding far without a bend. "Short" is readout
+  B, rebuilt every word. Nothing in that name was needed to build it; a number built each part.
+
+
+  ## A Word on What Was a Pick, Not a Proof
+
+  Step 5 -- forgetting -- is a result, provable with a pencil, as you did. Step 6 onward -- two
+  memories, three fractions named keep/admit/show, this exact wiring -- is a pick that happened
+  to stop forgetting. A leaner cousin ties keep and admit into one and merges A with B; it
+  reads about as well on fewer dials. Hold that move (scale-and-add a silent store, gate it
+  with dimmer knobs); treat a count of three fractions as a desk choice, not a law.
+
+
+  ## Traps, Each as a Clash to Sit With
+
+  Stated as a wrong line, then a clash, then a fix. Read a wrong line, find a clash yourself,
+  then check.
+
+      WRONG  "A grid times one number."
+        clash: a grid has 3 rows; one number gives one product per row -- but a row needs a
+        dot of paired numbers. fix: grid times a ROW; each grid-row dotted into it -> a row.
+
+      WRONG  "Combine sums across slots."
+        clash: that would collapse 3 slots to 1, losing per-slot keep/admit. fix: slot-by-
+        slot multiply, no cross-slot sum. Summing lives only inside a grid row.
+
+      WRONG  "A fraction reads what it scales."
+        clash: keep scales A, yet A is never read by a machine. fix: all four read word + B;
+        each is applied elsewhere -- keep to A, admit to fresh, show to tanh(A_new).
+
+      WRONG  "Two memories means two copies."
+        clash: a copy of A would also sit at 4.62; B sits at 0.70. fix: different rows,
+        different duty -- A silent store, B spoken readout.
+
+      WRONG  "Drop A; no machine reads it anyway."
+        clash: B is built from A (show * tanh(A_new)); drop A and B has no source, and
+        nothing rides far. fix: A is acted ON (keep*A, +admit*fresh); A feeds B.
+
+      WRONG  "B is a grid."
+        clash: a grid is dials (3 by 3); B changes every word and is a row of 3. fix: A and B
+        are rows; grids (Gw, Gb) are dials.
+
+      WRONG  "keep = 1 minus admit."
+        clash: no line on this page subtracts; keep and admit came from two separate
+        machines. fix: both are free fractions; both may sit high at once.
+
+      WRONG  "A loud fresh must count most."
+        clash: fresh 0.9 with admit 0.0 adds 0.0; fresh 0.2 with admit 0.95 adds 0.19. fix:
+        size is fresh; worth is admit, judged apart.
+
+      WRONG  "Final B is word 1's readout."
+        clash: B at word 2 already folded in word 2. fix: last B holds every word -- a whole-
+        review readout.
+
+
+  ## Two Lines to Carry Away
+
+  One memory, bent every word: a mark from word 1 wears to nothing by word 90. Proven, not
+  tuned.
+
+  Two memories: a silent store A, only scaled-and-added so a far mark rides far; a spoken
+  readout B = show * tanh(A); four machines (fresh + keep/admit/show) reading word + B; same
+  dials every word; last B stamps liked or not. That reader is an LSTM.
 
 
 ----------------------------------------------------------------------------------------------
