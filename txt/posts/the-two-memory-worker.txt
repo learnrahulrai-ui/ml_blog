@@ -254,6 +254,11 @@
   B is the LSTM's public face, built anew each word, always read by what comes next.
   (A is never handed to the clerk and never read by any machine -- only used in the combine.)
 
+  And the B at the end is the WHOLE review, not the first word. Walk "nolan ended": B after
+  word 1 has seen only "nolan"; B after word 2 has seen "nolan" AND "ended" folded in. The
+  final B -- the one the clerk reads -- is the last one, so it carries every word, not just
+  the opener. Each B swallows the one before it.
+
   The dial count for an LSTM worker, by hand: it is the plain worker FOUR TIMES OVER (four
   machines, each with a word-paper, a memory-paper, a nudge):
 
@@ -427,6 +432,17 @@
     No. B is a VECTOR -- 32 numbers, same shape as the word32 embedding. The DIALS are the
     matrices: 8 papers (Wf/Uf, Wk/Uk, Wa/Ua, Ws/Us), each 32x32. A and B are vectors; W and
     U are 32x32 matrices; nudges are 32-wide vectors (one per machine).
+
+  TRIPWIRE 13  "keep = 1 minus admit -- what you don't keep, you admit."
+    No. There is NO subtraction here. keep and admit are TWO separate machines, each with its
+    own dials, each landing its own 0..1 fraction. keep 0.9 and admit 0.2 can BOTH be high, or
+    both low -- the slot can hold 90% of the old AND let in 20% of the new at once. (A cousin,
+    the GRU, DOES tie them with a 1-minus; this LSTM does not.)
+
+  TRIPWIRE 14  "The final memory-B is the first word's, or one word's."
+    No. Each B folds in the one before it: B after "nolan ended" has BOTH words baked in, not
+    just "nolan". The final B the clerk reads is the whole-review summary -- the last B, which
+    swallowed every earlier B. It is not tied to any single word.
 
 
   ## The Labels, Last
