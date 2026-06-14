@@ -51,7 +51,7 @@
   = 64 x 6,830 = 437,120 cells.  One blackboard cannot hold it; the room can, but the bill
   is plain -- nearly half a million strokes just to write the sheet down once.
 
-  ## Step 1: Crush First With PCA, Then Look
+  ## You Cannot Eyeball 6,830 Walls, So Crush With PCA First
 
   You cannot eyeball a 6,830-wall room.  So reach for Part 2: PCA crushes the 6,830 columns
   down to the few strongest shadows.  Plot PC1 vs PC2 and color each dot by its (peeked)
@@ -74,7 +74,7 @@
      cluster on those few PC scores instead of all 6,830 noisy columns.  Crushing away
      the 6,000-plus weak directions throws out noise and makes the clustering steadier.
 
-  ## Step 2: The Family Tree of Samples
+  ## Now Carve the Crushed Sheet Into a Family Tree
 
   IN HAND: a sheet of 64 samples x 6,830 genes = 64 x 6,830 = 437,120 cells, crushed by
   PCA down to a few honest shadows we could plot and eyeball.  This section stops looking
@@ -95,7 +95,7 @@
   Cut the tree at a chosen height to get, say, 4 groups.  Then -- and only then -- unseal
   the type column and lay the blind groups beside the real types.
 
-  ## Step 3: Did the Blind Groups Match the Real Types?
+  ## Only Now, Unseal the Types: Did the Blind Groups Match?
 
   IN HAND: 64 samples crushed by PCA, then carved by the family tree into a handful of
   blind groups -- built from gene spread alone, with the type column still sealed.  Now,

@@ -28,6 +28,23 @@ Monitor loops for deployment status.
   handles outliers better; understand -> follow / calculate; framework ->
   toolbox; iteration -> pass.
 
+## Do NOT march the reader in numbered steps (2026-06-14)
+- No "Step 1 / Step 2 / Step 3" as section headers, and avoid the word "step"
+  unless truly needed. The brain does not think in a numbered list; it thinks in
+  a forced chain -- this is true, THEREFORE this, BUT that breaks, SO this. A step
+  number names a place in a queue; it says nothing about WHY this follows from the
+  last, so it replaces the "because" and the reader marches instead of being pulled.
+- Make each section title state the COMPULSION -- the thing that forced it into
+  being -- not its position. Carry the force across every seam with causal words:
+  "which means", "therefore", "but that breaks", "so now".
+- The brain craves an aha every few minutes, like a movie. A "Step N" header is an
+  ad break that kills the aha each time. Same disease as "the" and as naming-before-
+  building: a label arriving in place of the thing that earns it.
+- Exception: numbered lines INSIDE an explicit worked calculation or a do-this
+  recipe (where the reader must count and track) may keep numbers. Even there,
+  prefer "first / then / so".
+- This rule applies to the WHOLE blog, not just new posts.
+
 ## Build / publish pipeline (already set up -- leave it alone)
 - Source of truth = `txt/` only. `python3 build.py` generates HTML + feed.xml
   + sitemap.xml. Generated files are git-ignored.

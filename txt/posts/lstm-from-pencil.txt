@@ -1,4 +1,4 @@
-@title LSTM From Pencil: Built From Nothing, One Step at a Time :: Rahul's ML Blog
+@title LSTM From Pencil: Built From Nothing, One Number at a Time :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -6,26 +6,26 @@
 ----------------------------------------------------------------------------------------------
 
   APPENDIX . LSTM FROM PENCIL
-  Built From Nothing, One Step at a Time
+  Built From Nothing, One Number at a Time
   Posted: 2026-06-14 . Author: Rahul Rai . Tags: lstm, rnn, sequence-models, by-hand
   ============================================================================================
 
   PATH . APPENDIX -- LSTM From Pencil  (standalone; needs no other page)
 
   Goal: read a movie review -- plain words -- and stamp it liked (1) or not (0). Kit: a
-  pencil, graph paper, a few coat pockets. No computer, at any step.
+  pencil, graph paper, a few coat pockets. No computer, at any point.
 
   How to read this page. Nothing is named before a number builds it. Every time a term first
   shows up, a calculation right above it earned it. At each ">> YOUR TURN", cover everything
   below that line, do it on your own paper, THEN look. If your answer fights a "WRONG TURN"
   box, sit with that clash before reading on -- a clash you feel once you never forget.
 
-  We build, in order: a clerk, words as numbers, why order forces a memory, a one-memory
-  reader and why it FORGETS, then a two-memory reader that does not. That last reader carries
+  We build a clerk, then words as numbers, then watch order force a memory, then a one-memory
+  reader and watch it FORGET, then a two-memory reader that does not. That last reader carries
   a name only at its very end: LSTM.
 
 
-  ## Step 0 -- One Axiom: What a Clerk Does
+  ## One Axiom: What a Clerk Does
 
   A clerk does one job. Take some numbers in. Multiply each by a frozen dial. Add results.
   Add one more fixed number, a nudge. Emit a single number out. That is all a clerk can do.
@@ -45,7 +45,7 @@
        check: 2*4 + (-1)*5 + 3 = 8 - 5 + 3 = 6.
 
 
-  ## Step 1 -- Words Are Not Numbers, So Hand Each Word a Row
+  ## Words Are Not Numbers, So Hand Each Word a Row
 
   A clerk multiplies numbers. Word "boring" is not a number. So before any clerk runs, swap
   each word for a fixed row of numbers, copied off a word-book -- one page per word:
@@ -63,7 +63,7 @@
       a row of slots:        slot1 = lean, slot2 = flipper, slot3 = ...    (room for both)
 
 
-  ## Step 2 -- One Clerk Scores One Word, But Loses Order
+  ## One Clerk Scores One Word, But Loses Order
 
   Hand a clerk a word-row, let it emit one score. Fine for one word. Now feed a whole review
   by adding up each word's row, slot by slot, and scoring that sum. Watch two reviews:
@@ -85,7 +85,7 @@
   That memory is forced on us. Build it next.
 
 
-  ## Step 3 -- A Carried Memory, Rewritten Each Word
+  ## A Carried Memory, Rewritten Each Word
 
   Keep a pocket holding a row of numbers -- a memory. Start it at all zeros. Read words left
   to right. After each word, rewrite that memory from two things only: this word's row, and
@@ -130,7 +130,7 @@
        slots.)
 
 
-  ## Step 4 -- Why a Squash Sits at Each Step
+  ## Why a Squash Sits at Each Word
 
   Blend gives: word through grid Gw, memory through grid Gm, add a nudge row:
 
@@ -150,7 +150,7 @@
 
        check: 2^10 = 1024. Ten more words: past a million. It runs away.
 
-  A 100-step loop with no brake either blows up or dies. So clamp every step. Push each raw
+  A 100-word loop with no brake either blows up or dies. So clamp every word. Push each raw
   number through a fixed bend that pins it into a band from -1 to +1:
 
       tanh, by its numbers only (no rules to memorise, just read off):
@@ -170,7 +170,7 @@
   stamps liked or not. Done -- for short reviews.
 
 
-  ## Step 5 -- This Reader Forgets (a Result You Can Prove)
+  ## This Reader Forgets (a Result You Can Prove)
 
   Track one slot of a mark left by word 1. Say word 1 pushes 0.2 into it. Each later word,
   that 0.2 gets multiplied by a memory-side dial (say ~0.5) and bent by tanh, which squeezes
@@ -192,14 +192,14 @@
        About 8. Far inside a 90-word review. Word 1 is long dead by word 90.
 
   So a long review that flips on its opening word ("not ... worth ... at all") loses that
-  flip. This is not a dial you can tune; it follows from crushing one memory every step. Call
+  flip. This is not a dial you can tune; it follows from crushing one memory every word. Call
   it a proven failure, and fix its cause.
 
 
-  ## Step 6 -- Carry Without Crushing: a Second Memory
+  ## Carry Without Crushing: a Second Memory
 
-  We want a word-1 mark to survive 90 steps. Multiply-and-crush kills it (Step 5). What
-  single operation lets a number ride many steps unharmed? Scale by about 1 and add a little.
+  We want a word-1 mark to survive 90 words. Multiply-and-crush kills it -- just proved. What
+  single operation lets a number ride many words unharmed? Scale by about 1 and add a little.
   Nothing crushed.
 
   So introduce a second pocket, memory A, that is NEVER bent on carry. Each word it is only
@@ -218,15 +218,15 @@
        A_old = 5.0, keep = 1.0, admit = 0.0, fresh = anything. A_new? After 90 more such words?
 
        check: A_new = 1.0*5.0 + 0.0*fresh = 5.0. Held whole. Ninety words on, still 5.0.
-       Nothing crushed it. Compare Step 5, where 5.0 would have worn to nothing.
+       Nothing crushed it. Compare the one-memory crush above, where 5.0 would have worn to nothing.
 
   WRONG TURN  "A is bounded by tanh, so it cannot exceed 1 -- 5.0 is impossible."
-    Clash: tanh bent a memory in Step 4. Memory A is built NOT to be bent on carry -- that was
-    its whole reason. No bend, no -1..+1 cap. A may read 5.0, even 50. Letting it grow is
-    exactly how a far-back mark stays alive.
+    Clash: tanh bent a memory back when we clamped every word. Memory A is built NOT to be bent
+    on carry -- that was its whole reason. No bend, no -1..+1 cap. A may read 5.0, even 50.
+    Letting it grow is exactly how a far-back mark stays alive.
 
 
-  ## Step 7 -- A Store Too Big to Read, So Tame a Readout
+  ## A Store Too Big to Read, So Tame a Readout
 
   Memory A now may sit at 50. Feed 50 to a clerk and its bend saturates flat -- useless. So do
   not hand A out raw. Build a tamed readout B: bend A back into band, then reveal only a
@@ -250,14 +250,14 @@
        check: 0.7 * 1.0 = 0.70. A holds 4.62 in silence; B says 0.70 out loud about it.
 
 
-  ## Step 8 -- Where keep, admit, show, fresh Come From
+  ## Where keep, admit, show, fresh Come From
 
-  Steps 6 and 7 forced four rows, no more, no fewer, each by a need already shown:
+  Carry and readout forced four rows, no more, no fewer, each by a need already shown:
 
-      keep  -- how much old store to hold       (forced in Step 6)
-      admit -- how much new content to let in    (forced in Step 6)
-      show  -- how much of store to speak        (forced in Step 7)
-      fresh -- new content itself                (forced in Step 6)
+      keep  -- how much old store to hold       (forced by carry)
+      admit -- how much new content to let in    (forced by carry)
+      show  -- how much of store to speak        (forced by readout)
+      fresh -- new content itself                (forced by carry)
 
   Three fractions plus one content row. Where do these four come from? Each is made by its
   own clerk-grid, and every one reads exactly two things -- this word's row, and B from last
@@ -300,7 +300,7 @@
     One bend each, picked by duty.
 
 
-  ## Step 9 -- Combine, in Real Numbers
+  ## Combine, in Real Numbers
 
   Per slot, four machines hand you: fresh, keep, admit, show. Memory A and B from last word
   sit in pockets. Two lines finish it:
@@ -326,7 +326,8 @@
   on. To speak it: bend (4.62 -> ~1.0), then reveal 0.7 of it -> 0.70.
 
   Each multiply is slot-by-slot -- slot 1 with slot 1 -- no summing across slots. Summing lives
-  only inside a grid row (Step 3). Three slots at once, each carrying its own keep/admit/show:
+  only inside a grid row (the grid, built earlier). Three slots at once, each carrying its own
+  keep/admit/show:
 
       A_old = [ 5.0 , -2.0 , 0.3 ]    fresh = [ 0.6 , 0.8 , -0.1 ]
       keep  = [ 0.9 ,  0.5 , 1.0 ]    admit = [ 0.2 , 0.0 ,  0.9 ]
@@ -352,20 +353,20 @@
        Kept half a long store, admitted all new content.
 
 
-  ## Step 10 -- One Word, Start to Finish
+  ## One Word, Start to Finish
 
   Put it in one block. First word, so A and B are zeros:
 
-      1. look up word-row.  pull A (zeros), pull B (zeros).
-      2. run four machines on (word-row + B):
-           fresh = tanh(    Gwf.word + Gbf.B + nf )
-           keep  = sigmoid( Gwk.word + Gbk.B + nk )
-           admit = sigmoid( Gwa.word + Gba.B + na )
-           show  = sigmoid( Gws.word + Gbs.B + ns )
-      3. A_new = keep * A + admit * fresh      (A touched here, first time)
-      4. B_new = show * tanh(A_new)
-      5. put A_new, B_new back. step to next word. SAME dials. repeat.
-      6. last word: final clerk reads last B -> liked (1) or not (0).
+      first   look up word-row.  pull A (zeros), pull B (zeros).
+      then    run four machines on (word-row + B):
+                fresh = tanh(    Gwf.word + Gbf.B + nf )
+                keep  = sigmoid( Gwk.word + Gbk.B + nk )
+                admit = sigmoid( Gwa.word + Gba.B + na )
+                show  = sigmoid( Gws.word + Gbs.B + ns )
+      then    A_new = keep * A + admit * fresh      (A touched here, first time)
+      then    B_new = show * tanh(A_new)
+      then    put A_new, B_new back. move to next word. SAME dials. repeat.
+      last    final clerk reads last B -> liked (1) or not (0).
 
   B after word 1 holds word 1 only. B after word 2 folds in words 1 and 2. Last B holds all
   words -- a whole-review readout, not one word's. Each B swallows its forerunner.
@@ -377,20 +378,20 @@
 
   ## A Word on What Was a Pick, Not a Proof
 
-  Step 5 -- forgetting -- is a result, provable with a pencil, as you did. A COUNT of three
-  fractions named keep/admit/show, and this exact wiring, is a pick that happened to read
-  well. A leaner cousin ties keep and admit into one and merges A with B; it reads about as
-  well on fewer dials. So treat a count of three gates as a desk choice, not a law.
+  Forgetting is a result, provable with a pencil, as you did. A COUNT of three fractions named
+  keep/admit/show, and this exact wiring, is a pick that happened to read well. A leaner cousin
+  ties keep and admit into one and merges A with B; it reads about as well on fewer dials. So
+  treat a count of three gates as a desk choice, not a law.
 
   But scale-and-add itself is NOT a mere pick -- it has a reason, and one more layer shows it:
 
-  DEEPER, optional (skip with no loss if calculus is new to you). In Step 5 a far mark shrank
-  because each step multiplied it by a number below 1, and many such factors below 1 drag a
-  running product to 0. In Step 6 carry is A_new = keep * A_old + admit * fresh; set keep = 1
-  and a far mark rides on with a carry factor of exactly 1, never below it. A chain of 1s
+  DEEPER, optional (skip with no loss if calculus is new to you). Earlier a far mark shrank
+  because each word multiplied it by a number below 1, and many such factors below 1 drag a
+  running product to 0. In the two-memory carry, A_new = keep * A_old + admit * fresh; set keep
+  = 1 and a far mark rides on with a carry factor of exactly 1, never below it. A chain of 1s
   stays 1, so a link from word 90 back to word 1 neither dies nor blows up. That unit carry
-  factor, not luck, is why an added, uncrushed store cures Step 5's decay -- and why every
-  gated reader of this kind keeps an additive store at its core.
+  factor, not luck, is why an added, uncrushed store cures that decay -- and why every gated
+  reader of this kind keeps an additive store at its core.
 
 
   ## Traps, Each as a Clash to Sit With

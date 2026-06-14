@@ -378,7 +378,7 @@
   e^0 = 1. So 1 / (1 + 1) = 1/2 = 0.50. Exactly on the fence.
 
 
-  ## Walking One Patient Through, Step by Step
+  ## Walking One Patient Through, Start to Finish
 
   The building is complete on paper. Let me walk one patient through it by hand.
 

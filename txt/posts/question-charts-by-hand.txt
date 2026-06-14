@@ -65,12 +65,12 @@
     USE:    chart frozen -> walk each patient top -> bottom in one go  (walk only)
 
 
-  ## The Build Hunt, Step by Step
+  ## Inside the Build Hunt, Nothing Hidden
 
   IN HAND: two sheets, each chopped 75/25 -- diabetes: 442 people x 3/4 = 331.5, call
   it 331 on the study pile, 442 - 331 = 111 sealed for the exam.  Two phases kept
   apart: BUILD splits the whole crowd once; USE walks one patient through the frozen
-  chart.  This section adds: what BUILD actually does, step by step, nothing hidden.
+  chart.  This section adds: what BUILD actually does, line by line, nothing hidden.
 
   Everything below = what one line, tree_reg.fit(X_train, y_train), does inside.
   I rebuilt it from a blank sheet. No black box.

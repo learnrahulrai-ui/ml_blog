@@ -202,7 +202,7 @@
   slots is inside each machine's dial-paper, where a row of products is summed to one number.
   The voter-multiplies in the combine do NOT sum.)
 
-  One number first -- the hardest step, proved for 1 slot before all 3:
+  One number first -- the hardest part, proved for 1 slot before all 3:
 
     old A       = 5.0   (the long keep; never crushed, so it grew big)
     FRESH       = 0.6   (new content, tanh-bounded to -1..+1)
@@ -243,7 +243,7 @@
       1.0 x  0.45 = 0.45
     new memory-B = [ 0.70 , -0.15 , 0.45 ]
 
-  Put new A in pocket A, new B in pocket B, step to the next word, SAME dials. Notice memory
+  Put new A in pocket A, new B in pocket B, move to the next word, SAME dials. Notice memory
   -A's slot 1 is 4.26 -- well past 1, because it was only scaled and added, never crushed.
   THAT is the escape from the fade: a far-back mark can sit in A at 5.0 and still be there
   90 words later.
@@ -345,7 +345,7 @@
 
   How the Transformer differs from all three, in one line each:
 
-    LSTM / BiLSTM   WALK word by word. Carry pockets A and B. 4 machines each step. Votes
+    LSTM / BiLSTM   WALK word by word. Carry pockets A and B. 4 machines each word. Votes
                     decide what survives in A and what is spoken as B. A word's past lives in
                     A; its future is unknown to a plain LSTM.
 

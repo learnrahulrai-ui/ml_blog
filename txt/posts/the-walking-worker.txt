@@ -47,10 +47,10 @@
     Chapter 10 reviews are WORDS ("boring", "masterpiece") -- NOT numbers
     a factory of clerks + dials can only multiply NUMBERS, not the word "boring"
 
-  So: number the words first. Three steps -- a numbering, a length-fix, and a split.
+  So: number the words first. Three moves -- a numbering, a length-fix, and a split.
 
 
-  ## Step One: Hand Each Word a Number (Q1, Q2a-b)
+  ## Words Are Not Numbers, So Hand Each One a Number (Q1, Q2a-b)
 
   Walk every review in the pile and COUNT how often each word appears. (This is the oldest
   trick in the book -- count every word in a giant pile of text. The most-common word gets
@@ -65,7 +65,7 @@
   Now a CHOICE (Charter Law 7 -- name it as a choice, not a fact): keep only the 10,000
   most-common words. Every rarer word -- a typo, a name, weird slang seen twice in the
   whole pile -- is dumped into ONE shared bin we will call <unknown>, number 0... actually
-  we reserve 0 for "empty" (next step), so <unknown> gets its own number. The point stands:
+  we reserve 0 for "empty" (next move), so <unknown> gets its own number. The point stands:
 
     reviews in the pile        = maybe 50,000     <- ROWS of the sheet
     distinct words KEPT        = 10,000           <- a knob WE set (call it VOCAB_SIZE)
@@ -79,11 +79,11 @@
   reviews. Reviews are the rows (maybe 50,000); kept words are the vocabulary (10,000).
   Two different counts that both happen to be in the tens of thousands.
 
-  After this step, the review "boring movie the" becomes [4, 2, 1] -- three numbers, one
+  After this, the review "boring movie the" becomes [4, 2, 1] -- three numbers, one
   per word, each number just a NAME TAG pointing at a word.
 
 
-  ## Step Two: Make Every Review the Same Length (Q2c)
+  ## A Fixed Factory Needs One Length, So Pad Every Review (Q2c)
 
   IN HAND: every word now has a number (the=1, boring=4, ...); 10,000 words kept, the rest
   pooled as <unknown>. A review is now a row of word-numbers of WHATEVER length it was.
@@ -100,7 +100,7 @@
     [4, 17, 0, 0, 0, 0]      <- 2 real word-numbers, then 4 zeros
 
   The 0 means "empty slot, nothing here." That is why 0 was reserved and never handed to a
-  real word. After this step EVERY review is a line of exactly 100 numbers. Now the factory
+  real word. After this EVERY review is a line of exactly 100 numbers. Now the factory
   can eat them, all the same shape.
 
     >> YOUR TURN
@@ -112,7 +112,7 @@
          "the" x7 = [1,1,1,1,1,1,1], 7 numbers, need 5 -> chop to first 5 -> [1, 1, 1, 1, 1].
 
 
-  ## Step Three: Cut Study and Exam (Q2d)
+  ## Never Grade on Studied Cards, So Cut Study From Exam (Q2d)
 
   Same honest rule as every chapter: never grade the machine on cards it studied. Cut 80%
   to study from, seal 20% as the exam. The exam reviews are not looked at until the very
