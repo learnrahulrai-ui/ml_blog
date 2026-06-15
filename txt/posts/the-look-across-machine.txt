@@ -273,8 +273,11 @@
       head 2: DIFFERENT WANT/HAVE/GIVE grids → same moves → stick B
       glue A and B: [A ... | B ...]  → nolan's richer new stick
 
-  num_heads=2 in code. The output width stays 32 -- Keras splits the width between heads
-  (16 each for 2 heads) and glues the results back. The shape stays 100 × 32, now richer.
+  num_heads=2 in code. Each head runs its own full set of grids at key_dim width (here we set
+  key_dim = 32, so each head works at 32), then a final grid projects the glued result back to
+  32. So the sheet stays 100 × 32, now richer. (The original paper instead carves one width-32
+  into two 16-wide heads -- d_model / heads. Keras lets you set key_dim freely; this lab sets
+  it to the full 32 rather than carving.)
 
   Analogy: the BiLSTM glued two walkers facing opposite directions. Multi-head glues two
   viewpoints on word relationships.
@@ -426,7 +429,7 @@
       q10_best_model = max(q10_results, key=q10_results.get)
 
   Key names must match letter-for-letter -- the grader checks them. What to expect on IMDB:
-  walkers score roughly 0.82 -- 0.87; the transformer often reaches 0.87 -- 0.90. The gap is
+  walkers score roughly 0.82 -- 0.87; the transformer often reaches 0.87 -- 0.90. The diff is
   modest on this task. The real advantage is on longer text and larger piles, where the serial
   walk bottleneck and the fade over long distances hurt most.
 
@@ -453,9 +456,10 @@
 
   WRONG TURN  "Multi-head means the output doubles in width?"
   ─────────────────────────────────────────────────────────────────────────────────────────
-  Each head runs on a narrower slice: 2 heads on a width-32 embedding → 16 numbers per head.
-  Each head produces a 16-wide stick; the two are concatenated back to 32. Output stays
-  100 × 32. Keras handles this internally; you see num_heads=2 and get the same output shape.
+  No -- a final grid always projects the glued result back to the input width (32). With this
+  lab's key_dim=32, the two heads run at 32 each, glue to 64 inside, then that last grid brings
+  it back to 32. Output stays 100 × 32. (The original paper sizes each head at 32/2 = 16 so the
+  glue is already 32; same ending, different internal width. Either way the output is 32.)
   ─────────────────────────────────────────────────────────────────────────────────────────
 
   WRONG TURN  "n−1 matches -- a word doesn't score itself."
