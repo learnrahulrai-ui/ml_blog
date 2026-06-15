@@ -1,0 +1,202 @@
+@title Encoder or Decoder: The One Mask That Splits BERT From GPT (Chapter 11, Part 2) :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 11 . ATTENTION GROWS EYES . PART 2 OF 2
+  Encoder or Decoder: The One Mask That Splits BERT From GPT
+  Posted: 2026-06-15 . Author: Rahul Rai . Tags: bert, gpt, encoder, decoder, attention, masking
+  ============================================================================================
+
+  PATH . post 31 of 31
+    <- prev:  [Chapter 11, Part 1: The Vision Transformer](the-vision-transformer.txt)
+       next:  (end of the book so far) ->
+
+  Over the last three posts you built attention twice -- once for words (Chapter 10) and once
+  for pictures (Part 1). Both times every token looked at every other token, no blocking. That
+  freedom turns out to be a CHOICE, and flipping it splits the entire transformer world in two:
+  the family that READS and judges (BERT, and the ViT you just built) versus the family that
+  WRITES one token at a time (GPT). The whole split rides on a single change to the score grid,
+  worked here by hand. Pencil out -- this post is short, and it ties the bow.
+
+
+  ## Attention Is a Grid: Row Looks, Column Is Looked At
+
+  Strip the mechanism down to the one picture that matters now. Lay every token's score in a
+  grid: row i is the token doing the looking, column j is the token being looked at. Cell (i,j)
+  is how much token i wants to listen to token j -- the WANT-dot-HAVE match from Chapter 10,
+  before it is turned into portions.
+
+      raw scores (3 tokens):
+              j1   j2   j3
+        i1     .    .    .
+        i2     .    .    .
+        i3     .    .    .
+
+  Each ROW becomes portions adding to 1 via softmax: raise e to each score, divide by the row's
+  total. Then each token's new value is the weighted sum of every token's GIVE tag. Nothing new
+  yet -- this is Chapter 10's machine. The new question is one word: which cells are ALLOWED?
+
+
+  ## The One Switch: May a Token See the Future, or Not?
+
+  Until now, every cell was allowed -- token i could look at tokens before AND after it. That
+  has a name:
+
+      BIDIRECTIONAL -- token i may look both ways, at earlier AND later tokens.
+
+  Now block the future. Before softmax, for any column j that sits AHEAD of row i (j > i), set
+  the score to minus infinity. One fact makes this work: e raised to minus infinity is 0. So a
+  blocked cell gets exactly 0 portion after softmax -- the token hears nothing from it.
+
+      CAUSAL -- token i may look only at itself and EARLIER tokens, never ahead.
+                ("causal": a cause comes before its effect; you cannot see the future.)
+
+  Worked on 3 tokens with equal raw scores, to see the portions fall out. Block every j > i
+  (set it to -inf), then softmax each row:
+
+      raw grid            block j > i (-inf)         portions after softmax
+            j1 j2 j3              j1   j2   j3                j1   j2   j3
+      i1     .  .  .       i1     .  -inf -inf       i1      1.0   0    0
+      i2     .  .  .   →   i2     .    .  -inf   →   i2      0.5  0.5   0
+      i3     .  .  .       i3     .    .    .        i3      0.33 0.33 0.33
+
+  Token 1 listens only to token 1 (it has no past). Token 2 splits over tokens 1-2. Token 3
+  spreads over tokens 1-3. Each row's allowed cells still add to 1; the blocked cells are dead
+  weight. That single triangle of -inf is the entire difference about to split BERT from GPT.
+
+    >> YOUR TURN
+       Causal mask, 2 tokens, equal raw scores. What portions does token 1 get? Token 2?
+
+       check: token 1 sees only itself → [1.0, 0]. token 2 sees both → [0.5, 0.5].
+
+
+  ## No Block Builds a Reader; the Block Builds a Writer
+
+  Read off what each setting is FOR.
+
+  No block -- bidirectional -- builds a machine that reads a whole input at once and digests it
+  into a judgement: a label, a class, a filled blank. It does not write a new line; it judges
+  the line it was handed. That machine is an ENCODER.
+
+  The block -- causal -- builds a machine that WRITES an output one token after another. While
+  writing token i it may see only what came before, because the rest is not written yet. If it
+  could peek ahead during training it would cheat -- copy the answer instead of learning to
+  produce it -- and fail the moment it had to generate for real with no future to peek at. That
+  machine is a DECODER.
+
+      ENCODER : no mask → bidirectional → READS and judges (label, class, fill-the-blank)
+      DECODER : future mask → causal → WRITES forward (next token, then the next)
+
+
+  ## The Names: BERT Reads, GPT Writes
+
+  Two famous machines are exactly these two settings, and their names say so:
+
+      BERT = an ENCODER for words. Bidirectional, no mask. Best at judging: label a sentence,
+             fill a blank, rate a review. (BERT = Bidirectional Encoder Representations from
+             Transformers -- the B is literally "bidirectional".)
+
+      GPT  = a DECODER for words. Causal, future-masked. Best at generating: write the next
+             word, then the next, left to right. (GPT = Generative Pre-trained Transformer --
+             the G is literally "generative".)
+
+  And the ViT you built in Part 1 is a third member of the encoder family:
+
+      ViT  = an ENCODER for pictures. Bidirectional, no mask. Best at judging: name the
+             clothing kind.
+
+  The whole family on one tree:
+
+      TRANSFORMER  (tokens + attention + learned grids)
+        |
+        +-- ENCODER  -- no mask → bidirectional → READS / judges
+        |     +-- BERT  (words)
+        |     +-- ViT   (pictures)   ← you built this in Part 1
+        |
+        +-- DECODER  -- future mask → causal → WRITES / generates
+              +-- GPT   (words)      ← you did NOT build this
+
+
+  ## Where Your ViT Sits: You Built the Reader, Not the Writer
+
+  Look back at Part 1's two telling lines.
+
+  The attention line was MultiHeadAttention(...)(x, x) with NO mask. No mask means strip i
+  looked at strips before it AND after it -- bidirectional -- so it is an ENCODER.
+
+  The last line was Dense(10, softmax) -- sort the photo into 1 of 10 kinds. That is judging an
+  input that already exists, not writing a new one. A reader's job.
+
+  So you built a bidirectional encoder that reads and judges -- the BERT shape, pointed at
+  pictures instead of words. That is precisely what "ViT" means: a vision encoder. You never
+  built a GPT. A GPT would add the future-blocking triangle of -inf and write tokens one after
+  another -- nothing in the lab did that.
+
+  The four answers the lab asks for, falling straight out of the tree:
+
+      q9_bert_direction = 'bidirectional'   # BERT looks both ways
+      q9_gpt_direction  = 'causal'          # GPT looks only back
+      q9_bert_task      = 'understanding'   # BERT reads and judges
+      q9_gpt_task       = 'generation'      # GPT writes forward
+
+  (Those four strings are the grader's exact keys -- letter-for-letter.)
+
+
+  ## Traps, Each as a Clash
+
+  WRONG TURN  "The causal mask deletes the future tokens -- they are gone."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  The future tokens are still there; the mask only stops the CURRENT token from putting weight
+  on them, by zeroing those cells of its score row. Token 3 still exists and will do its own
+  looking when its turn comes -- it simply may look back at 1 and 2. Nothing is deleted; weight
+  on the not-yet-written future is set to 0.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+  WRONG TURN  "Encoder and decoder are rival designs -- you pick one and the other is wrong."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  The original 2017 transformer used BOTH at once: an encoder to read the source sentence and a
+  decoder to write the translation, the decoder also peeking at the encoder's reading (cross-
+  attention). BERT later kept the encoder half alone; GPT kept the decoder half alone. They are
+  two halves of one machine, each useful by itself -- not a right-and-wrong pair.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+  WRONG TURN  "Bidirectional is always better -- it sees more."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  Seeing more is wrong for writing. A machine that learns to generate by peeking at the word it
+  is supposed to produce learns nothing useful -- at real generation time there is no future to
+  peek at, and it collapses. For judging an input that already exists, both sides are fair game,
+  so bidirectional wins there. The task picks the setting; neither is better everywhere.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ## One Breath
+
+  Attention lays scores in a grid: row looks, column is looked at, each row softmaxed into
+  portions. One switch decides which cells are allowed. Leave them all open and a token sees both
+  ways -- bidirectional -- a reader that judges: the encoder, which is BERT for words and the
+  ViT you built for pictures. Block the future by setting every forward cell to minus infinity
+  (e^-inf = 0, so zero portion) and a token sees only the past -- causal -- a writer that
+  generates one token at a time: the decoder, which is GPT. Same attention, same grids; the
+  only difference is a triangle of -inf. You built the reader.
+
+  That closes the book so far: from guessing house prices by pencil, through trees and forests,
+  clusters, neural nets, convolution, the walking RNN and its two-memory cure, attention, the
+  vision transformer, and finally the one mask that splits every transformer into the readers
+  and the writers.
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 11 -- Attention Grows Eyes):
+    [Part 1 -- The Vision Transformer](the-vision-transformer.txt) .
+    Part 2 (this post)
+
+  See also: [Appendix E: Vision Transformer From Pencil](vit-from-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
