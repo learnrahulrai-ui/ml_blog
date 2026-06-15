@@ -10,9 +10,9 @@
   Posted: 2026-06-15 . Author: Rahul Rai . Tags: transformer, attention, nlp, sequence-models
   ============================================================================================
 
-  PATH . post 29 of 29
+  PATH . post 29 of 31
     <- prev:  [Chapter 10, Part 2: The Two-Memory Worker](the-two-memory-worker.txt)
-       next:  [Appendix D: Transformer From Pencil](transformer-from-pencil.txt) ->
+       next:  [Chapter 11, Part 1: The Vision Transformer](the-vision-transformer.txt) ->
 
   Parts 1 and 2 built two walking machines. The plain RNN read 100 word-notes in order,
   rewriting one 32-number memory at each word. By word 90, word 1's signal had been tanh-crushed
@@ -294,7 +294,8 @@
   differ even before any grids run). The Q8 code below skips explicit positional encoding --
   flagged here so you know the real machine has it. The simplified version still scores well on
   IMDB because "liked or not" depends more on which words appear than exactly where. Position
-  matters more for tasks like translation or generation.
+  matters more for tasks like translation or generation. (Chapter 11, Part 1 builds positional
+  encoding by hand, two ways -- a fixed sine/cosine wave and a learned seat-table.)
 
 
   ## 100 Sticks Need One Summary, So Average Them All

@@ -15,7 +15,7 @@
 
       Three ways back onto the path:
 
-        ->  [Start at post 1 of 28](posts/chapter1-what-ml-actually-does.txt)
+        ->  [Start at post 1 of 31](posts/chapter1-what-ml-actually-does.txt)
             Guessing House Prices, End to End. No prior knowledge needed.
 
         ->  [The full archive](archive.txt)

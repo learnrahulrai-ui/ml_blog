@@ -10,7 +10,7 @@
   Posted: 2026-06-13 . Author: Rahul Rai . Tags: lstm, bilstm, rnn, sequence-models
   ============================================================================================
 
-  PATH . post 28 of 29
+  PATH . post 28 of 31
     <- prev:  [Chapter 10, Part 1: Words Into a Machine](the-walking-worker.txt)
        next:  [Chapter 10, Part 3: The Look-Across Machine](the-look-across-machine.txt) ->
 

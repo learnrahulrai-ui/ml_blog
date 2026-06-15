@@ -1,0 +1,385 @@
+@title The Vision Transformer: A Photo Cut Into Strips That Look at Each Other (Chapter 11, Part 1) :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 11 . ATTENTION GROWS EYES . PART 1 OF 2
+  The Vision Transformer: A Photo Cut Into Strips That Look at Each Other
+  Posted: 2026-06-15 . Author: Rahul Rai . Tags: vision-transformer, attention, layernorm, cnn
+  ============================================================================================
+
+  PATH . post 30 of 31
+    <- prev:  [Chapter 10, Part 3: The Look-Across Machine](the-look-across-machine.txt)
+       next:  [Chapter 11, Part 2: Encoder or Decoder](encoder-or-decoder.txt) ->
+
+  Chapter 10 built attention for WORDS. A review became a line of word-sticks; every word
+  looked straight at every other word, no walking. Chapter 9 built a different machine for
+  PICTURES: a small magic paper slid across a photo, scoring 3x3 corners, seeing only local
+  neighbours. This post points attention at pictures instead -- and in doing so pays a debt.
+  Chapter 10, Part 3 flagged that its transformer SKIPPED positional encoding. Here we build
+  it, by hand, two different ways.
+
+  The plan: cut a photo into small square strips, hand each strip a seat-stamp so it knows
+  WHERE it sat, then let every strip look at every other strip with the same attention from
+  Chapter 10 -- now pointed inward at one photo. Two new machines join the toolbox along the
+  way: a per-strip humbler (LayerNorm) and a keep-the-original wire (the skip connection).
+  At the end, the picture transformer (ViT) races the convolution factory (CNN) from Chapter 9.
+
+  The pile: Fashion-MNIST. Each photo is 28 dots across, 28 down, one greyness number per dot
+  (0 = black, 1 = white). Each photo is one of 10 clothing kinds (T-shirt, trouser, pullover,
+  dress, coat, sandal, shirt, sneaker, bag, ankle boot). Goal: read a NEW photo, name the kind.
+  Pencil out.
+
+
+  ## A Photo Has 784 Dots, Too Many to Pin at Once -- So Cut It Into Strips
+
+  Chapter 10's attention pins every token on a board and strings every token to every other.
+  Cost grows with (number of tokens) squared. A photo has 28 x 28 = 784 dots. Treating each
+  dot as a token means 784 x 784 = 614,656 strings per photo -- wasteful, and a single dot
+  carries almost nothing on its own.
+
+  So group dots into small squares first. Cut the 28 x 28 photo into 4 x 4 squares:
+
+      28 / 4 = 7 squares across, 7 down  →  7 x 7 = 49 squares
+      each square = 4 x 4 = 16 dots, written as one flat row of 16 numbers
+
+  Call each one a STRIP. Now a photo is 49 strips, each 16 numbers -- 49 tokens, not 784.
+  49 x 49 = 2,401 strings. Far cheaper, and each strip carries a real little patch of image.
+
+  Cutting sounds trivial -- it is not. The 784 dots sit in memory as one long line, row after
+  row. To carve out a 4 x 4 square you must gather dots that are NOT next to each other in
+  that line (a square spans 4 different photo-rows). Three moves do it: rename, re-order, glue.
+
+      FOLD   reshape to (7, 4, 7, 4)   -- split "28 down" into (7 bands x 4), "28 across" the
+                                          same. No dot moves; each dot just gets a longer address:
+                                          band-down . in-square-down . band-across . in-square-across
+      SWAP   transpose to (7, 7, 4, 4) -- bring the two BAND labels together and the two
+                                          IN-SQUARE labels together, so one square's 16 dots
+                                          finally sit side by side
+      GLUE   reshape to (49, 16)       -- write each square's 16 dots as one flat row, stack 49
+
+  The SWAP is the move that matters, and the one that bites if skipped.
+
+  WRONG TURN  "Skip the swap -- just fold and glue. The dots are all there."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  Fold then glue without the swap, and a "strip" becomes a full-width horizontal slice of the
+  photo, not a 4 x 4 square. On Fashion-MNIST the top rows are background, so every such strip
+  comes out ALL BLACK -- a real bug you can see. The swap is what makes the 16 dots of one
+  square land together instead of being read straight across the whole photo. (Live-seen: the
+  patches printed all zeros until the transpose went in.)
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+  In code (b = however many photos, n = 7 squares per edge, patch_size = 4):
+
+      def extract_patches(images, patch_size):
+          b = images.shape[0]
+          n = 28 // patch_size
+          x = images.reshape(b, n, patch_size, n, patch_size)   # FOLD
+          x = x.transpose(0, 1, 3, 2, 4)                        # SWAP
+          x = x.reshape(b, n*n, patch_size*patch_size)          # GLUE
+          return x
+
+  Out: shape (b, 49, 16). One photo → 49 strips of 16 dots. (Appendix E works a tiny 4 x 4
+  photo through these three moves by hand, dot by dot.)
+
+
+  ## 16 Dots Is a Thin Description, So Re-Describe Each Strip Wider
+
+  16 raw greyness numbers say little. Pass each strip through one learned grid (a Dense paper)
+  that turns 16 numbers into 64:
+
+      Dense(64): one row holds 16 dials; lay it on the strip's 16, multiply pairwise, add → 1
+                 number. The paper has 64 such rows → 64 numbers out.
+
+  The 64 are not new facts conjured from nowhere -- they are 64 different weighted sums of the
+  same 16, parked in 64 slots, so later machines have room to pull patterns apart. Shape goes
+  (49, 16) → (49, 64). Call 64 the strip WIDTH (d_model).
+
+
+  ## Cutting Threw Away WHERE Each Strip Sat -- So Stamp the Seat Back On
+
+  Here is the debt Chapter 10 flagged. Attention looks at all strips at once, as a SET. It has
+  no idea strip 7 sat top-right and strip 40 sat bottom-left. Shuffle the 49 strips and raw
+  attention cannot tell -- yet a sleeve up top and a hem down low mean different things. Order,
+  here POSITION, is gone.
+
+  The fix: before attention, add a POSITION-STAMP to each strip -- a fixed-width row of numbers
+  unique to seat 0, seat 1, ... seat 48. Two ways to make that stamp; this lab shows both.
+
+  WAY ONE -- the fixed sine/cosine stamp (the original 2017 recipe). No learning. For seat
+  number "pos" and slot pairs i = 0, 1, 2, ...:
+
+      stamp[pos][2i]   = sin( pos / 10000^(2i/width) )
+      stamp[pos][2i+1] = cos( pos / 10000^(2i/width) )
+
+  Each slot-pair runs at its own frequency (the 10000^... term stretches the wave), so no two
+  seats get the same row. Worked by hand at width 4 (slot pairs i = 0 and i = 1):
+
+      seat 0:
+        i=0: scale = 10000^(0/4) = 1.   sin(0/1)=0,      cos(0)=1
+        i=1: scale = 10000^(2/4) = 100. sin(0/100)=0,    cos(0)=1
+        → [0, 1, 0, 1]
+
+      seat 1:
+        i=0: sin(1/1)=0.841,   cos(1)=0.540
+        i=1: sin(1/100)=0.010, cos(0.01)=1.000
+        → [0.841, 0.540, 0.010, 1.000]
+
+      seat 2:
+        i=0: sin(2)=0.909,     cos(2)=-0.416
+        i=1: sin(2/100)=0.020, cos(0.02)=1.000
+        → [0.909, -0.416, 0.020, 1.000]
+
+  Seat 0 and seat 1 differ a lot in the fast slots (i=0), barely in the slow slots (i=1) --
+  exactly the point: near seats look similar, far seats look different, and every seat is
+  unique. Add this stamp onto the strip's numbers, slot by slot.
+
+  WAY TWO -- the learned seat-table (what THIS lab's ViT actually uses). Instead of a fixed
+  wave, keep a lookup table with 49 rows (one per seat), each row 64 learned numbers, tuned by
+  training like any other dial:
+
+      positions = [0, 1, 2, ..., 48]
+      x = Add()([ x, Embedding(49, 64)(positions) ])   # pour seat-flavour onto each strip
+
+  Both ways reach the same end: a strip now carries WHERE it sat inside its own numbers. Fixed
+  sine/cosine costs no dials and stretches to lengths never trained on; the learned table is
+  simpler to wire and lets the machine pick its own position-flavour. This lab picks the
+  learned table.
+
+  WRONG TURN  "tf.range(49) gives the seats -- feed it straight in."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  tf.range(49) has shape (49,). Keras reads the first axis as the batch axis, which would lock
+  the model to exactly 49 photos at a time. Wrap it to shape (1, 49) first (tf.expand_dims) so
+  it broadcasts across any batch size. A shape bug, not a math bug -- but it stops the build.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ## Now Every Strip Looks at Every Strip -- The Same Attention, Pointed at One Photo
+
+  This is Chapter 10's attention, unchanged, aimed inward at the 49 strips of ONE photo. A
+  quick recap of the mechanism derived there: each strip makes three tags from three reused
+  grids -- WANT (what it seeks), HAVE (what it offers), GIVE (what it hands over). A strip's
+  WANT dots every strip's HAVE → match numbers → divide by √(tag width) → softmax into portions
+  → portions weight the GIVE tags, added → the strip's new numbers.
+
+  Chapter 10 followed ONE word's row. Here, write the WHOLE grid -- every strip against every
+  strip at once. Take two strips to keep the arithmetic on a page (tag width 4, so √4 = 2):
+
+      WANT          HAVE             GIVE
+      s1: [2,0,1,0]  s1: [1,0,0,0]   s1: [2,0,0,1]
+      s2: [0,0,2,0]  s2: [3,0,2,0]   s2: [0,3,1,0]
+
+  MATCH grid = every WANT dotted with every HAVE:
+
+                    · s1.HAVE   · s2.HAVE
+        s1.WANT         2           8          (2·1=2 ; 2·3+1·2=8)
+        s2.WANT         0           4          (0 ; 2·2=4)
+
+  SCALE (÷2) then SOFTMAX each ROW into portions adding to 1:
+
+        s1 row: [1, 4] → e^1=2.72, e^4=54.6 → [0.047, 0.953]
+        s2 row: [0, 2] → e^0=1.00, e^2=7.39 → [0.119, 0.881]
+
+  WEIGHTED SUM of the GIVE tags, per row:
+
+        s1_new = 0.047·[2,0,0,1] + 0.953·[0,3,1,0] = [0.094, 2.859, 0.953, 0.047]
+        s2_new = 0.119·[2,0,0,1] + 0.881·[0,3,1,0] = [0.238, 2.643, 0.881, 0.119]
+
+  Every strip now carries a weighted sum of the strips it cared about -- a sleeve-strip can
+  pull straight from a collar-strip on the far side of the photo, in one step, no sliding paper.
+  That is the whole difference from the CNN: the CNN sees only a 3x3 neighbourhood at a time;
+  attention sees the entire photo at once.
+
+  In code, with 4 heads (4 separate tag-sets run in parallel and glued, as in Chapter 10):
+
+      attn = MultiHeadAttention(num_heads=4, key_dim=16)(x, x)
+
+  key_dim=16 = the width of one head's WANT/HAVE/GIVE. Four heads, each 16 wide, glued →
+  4 x 16 = 64 = the strip width. (x, x) = the strips look at one another -- self-attention,
+  the photo attending to itself. Shape stays (49, 64).
+
+  WRONG TURN  "num_heads=4 means each strip looks for 4 things / picks 4 strips."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  A head is not a clue and not a pick. It is a full WANT/HAVE/GIVE machine running on a 16-wide
+  slice. Four heads = four such machines side by side, each catching a different kind of link
+  across the strips; their four 16-wide results glue into one 64-wide strip. Head-count (4) and
+  what-each-head-finds are different things. 4 x 16 = 64, the width -- that is the only sum.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ## Attention Can Drown the Original Strip -- So Keep the Original, Then Tame
+
+  Two new machines, both small, both fixing a real failure.
+
+  First, the original strip must not be lost. After attention, a strip is entirely a weighted
+  sum of OTHER strips -- its own content can wash out. So wire the original around the attention
+  and ADD it back on top:
+
+      x = Add()([ x_before_attention, attn ])
+
+  The original "leaps over" the attention and lands on the result -- the strip keeps what it
+  WAS plus what it BORROWED. This keep-the-original wire is the skip connection (residual). It
+  also gives later training a clean path for corrections to travel back, the same trick that
+  lets very deep stacks train at all.
+
+  Second, after adding, the 64 numbers can drift to a wild range. Tame them per strip with a
+  humbler -- but a NEW humbler, different from Chapter 8's. Chapter 8's BatchNorm looked across
+  the whole handful of 64 photos to find a middle and spread. This one, LayerNorm, looks at ONE
+  strip's own 64 numbers, alone, ignoring every other strip and photo. Worked by hand on a
+  4-number strip:
+
+      strip = [50, 60, 40, 30]
+      middle = (50+60+40+30) / 4 = 45
+      diffs from 45:        5, 15, -5, -15
+      square each:          25, 225, 25, 225
+      average the squares:  500 / 4 = 125
+      root it (spread):     √125 ≈ 11.18
+      humble each (number - 45) / 11.18:
+                            [0.45, 1.34, -0.45, -1.34]   (middle 0, spread 1)
+
+  Two learned dials per width-slot (a stretch and a shift, gamma and beta) let the machine
+  scale the humbled numbers back where useful. In the mean and variance, axis=-1 means "across
+  THIS strip's own 64 numbers" -- the last direction in the array, not across strips or across
+  the batch. keepdims=True keeps the middle as a column so the subtract aligns slot by slot. So:
+
+      x = LayerNormalization()(Add()([x, attn]))
+
+  WRONG TURN  "LayerNorm is just BatchNorm again -- both centre to 0, scatter 1."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  Same goal, different crowd. BatchNorm (Chapter 8) takes the middle and spread ACROSS the
+  batch -- many photos, one feature at a time -- so its numbers shift when the batch changes,
+  and it behaves differently at exam time. LayerNorm takes them across ONE strip's own
+  features -- this sample only, no batch -- so it is identical in training and exam, and does
+  not care how many photos ride along. That batch-independence is why transformers use it.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ## A Bench of Workers Mixes Each Strip, Then Keep-and-Tame Again
+
+  After looking around, each strip passes through a small bench of plain workers -- widen, bend,
+  narrow -- so it can recombine what it borrowed:
+
+      ff = Dense(128, activation='relu')(x)   # 64 → 128, then relu (negatives → 0)
+      ff = Dense(64)(ff)                       # 128 → 64, back home
+
+  The widen-then-narrow gives the workers room to form patterns before squeezing back to 64.
+  Then the same keep-the-original-and-tame as before:
+
+      x = LayerNormalization()(Add()([x, ff]))
+
+  Attention-block plus this bench, each wrapped in skip-and-norm, is one transformer LAYER.
+  Real machines stack many; this lab uses one, which is plenty for clothing.
+
+
+  ## 49 Strips, But One Answer -- So Fold Them Into One Summary
+
+  After the layer, the photo is still 49 strips of 64. The answer is ONE of 10 kinds. Fold the
+  49 into one 64-number summary by averaging, slot by slot (the same move Chapter 10 used to
+  collapse 100 word-sticks):
+
+      x = GlobalAveragePooling1D()(x)    # slot k of summary = average of slot k over 49 strips
+
+  Shape (49, 64) → (64,). Then a short head turns the summary into 10 scores, randomly dropping
+  some workers during practice, and softmaxes the 10 into portions adding to 1:
+
+      x = Dense(64, activation='relu')(x)
+      x = Dropout(0.3)(x)                       # zero a random 30% during practice only
+      outputs = Dense(10, activation='softmax')(x)   # 10 portions adding to 1; biggest = guess
+
+  softmax (10 portions) here, not sigmoid -- the answer is ONE of 10 kinds, not a single yes/no.
+  Chapter 8 derived softmax; this is the same 10-way version.
+
+
+  ## The Whole Vision Transformer in Code (Q6)
+
+      inputs = Input(shape=(49, 16))                       # one photo, pre-cut to 49 strips of 16
+      x = Dense(64)(inputs)                                 # re-describe each strip: 16 → 64
+      positions = tf.expand_dims(tf.range(49), 0)           # seat numbers 0..48, shape (1, 49)
+      x = Add()([x, Embedding(49, 64)(positions)])          # stamp the seat onto each strip
+      attn = MultiHeadAttention(num_heads=4, key_dim=16)(x, x)   # every strip looks at every strip
+      x = LayerNormalization()(Add()([x, attn]))            # keep original + tame (per strip)
+      ff = Dense(128, activation='relu')(x)                 # bench: widen 64 → 128
+      ff = Dense(64)(ff)                                    # bench: narrow 128 → 64
+      x = LayerNormalization()(Add()([x, ff]))              # keep original + tame again
+      x = GlobalAveragePooling1D()(x)                       # fold 49 strips → one 64-summary
+      x = Dense(64, activation='relu')(x)                   # mix the summary
+      x = Dropout(0.3)(x)                                   # drop 30% (practice only)
+      outputs = Dense(10, activation='softmax')(x)          # 10 portions → the clothing kind
+      model_vit = Model(inputs, outputs)                    # wire door to answer
+
+  Train it -- 3 passes, 64-photo handfuls, scored on the sealed exam (Q7):
+
+      patches_train = extract_patches(X_train, PATCH_SIZE)
+      patches_test  = extract_patches(X_test, PATCH_SIZE)
+      model_vit.compile(optimizer='adam',
+                        loss='sparse_categorical_crossentropy',
+                        metrics=['accuracy'])
+      history_vit = model_vit.fit(patches_train, y_train,
+                                  validation_data=(patches_test, y_test),
+                                  epochs=3, batch_size=64)
+      q7_val_acc = round(history_vit.history['val_accuracy'][-1], 3)
+
+  ★ sparse_categorical_crossentropy, not binary_crossentropy: 10 clothing kinds, not 2 thumbs.
+    "sparse" = the true answer arrives as a plain kind-number (0..9), not a 10-long one-hot row.
+
+  A few wiring bugs worth naming, each seen live:
+
+      Model(input, outputs)     -- "input" (no s) is a built-in Python thing; use "inputs".
+      Dropout(0.3)              -- with no (x), x becomes the dropout MACHINE, not the data;
+                                   write Dropout(0.3)(x).
+      MultiHeadAttention(...)(x, X)  -- capital X is undefined; both arguments are lowercase x.
+
+
+  ## The ViT Races the CNN (Q8, Q10)
+
+  Chapter 9's convolution factory -- magic papers sliding over 3x3 corners, pooling, flatten,
+  Dense -- is the natural rival. Build it (the Chapter 9 machine) and race both on the sealed
+  exam:
+
+      q10_results    = {'ViT': q7_val_acc, 'CNN': q8_val_acc}
+      q10_vit_params = model_vit.count_params()
+      q10_cnn_params = model_cnn.count_params()
+      q10_best_model = 'ViT' if q7_val_acc >= q8_val_acc else 'CNN'
+
+  What to expect: on a small pile like Fashion-MNIST the CNN usually edges or matches the ViT,
+  and the honest reason is that the CNN starts knowing something the ViT does not. A sliding
+  paper bakes in "nearby dots belong together and the same pattern can appear anywhere" -- a
+  free, true assumption about images. The ViT assumes nothing of the sort; it must LEARN which
+  strips relate, which needs more data. On giant piles the ViT's freedom from that assumption
+  starts to win. The two machines, side by side:
+
+      CNN : a small paper slides over every 3x3 corner. Sees NEIGHBOURS only (local). Comes
+            pre-wired with "nearby goes together" -- strong on small piles.
+      ViT : the photo is pre-cut into strips; each strip looks at EVERY other strip at once
+            (global). Assumes nothing about nearness -- needs more data, scales further.
+
+
+  ## One Breath
+
+  Cut a 28 x 28 photo into 49 strips of 16 dots (fold, swap, glue -- the swap is what keeps each
+  square together). Re-describe each strip 16 → 64. Stamp its seat on, so attention knows where
+  it sat (a fixed sine/cosine wave, or a learned seat-table -- this lab learns it). Let every
+  strip look at every strip (the same WANT/HAVE/GIVE attention as Chapter 10, four heads). Keep
+  the original strip and tame it (skip connection + LayerNorm, a humbler that reads one strip
+  alone, not the batch). Run a small bench, keep-and-tame again. Average the 49 strips into one
+  summary, mix it, drop 30% while practising, and softmax into 10 portions -- the biggest is the
+  guessed kind. The CNN sees neighbours; the ViT sees everything.
+
+  Next: you built a transformer -- but which KIND? One switch, the future-mask, splits the whole
+  family into BERT and GPT. That is Part 2.
+
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 11 -- Attention Grows Eyes):
+    Part 1 (this post) .
+    [Part 2 -- Encoder or Decoder: The One Mask That Splits BERT From GPT](encoder-or-decoder.txt)
+
+  See also: [Appendix E: Vision Transformer From Pencil](vit-from-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

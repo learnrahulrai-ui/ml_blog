@@ -10,7 +10,7 @@
   Posted: 2026-06-13 . Author: Rahul Rai . Tags: rnn, embedding, nlp, sequence-models
   ============================================================================================
 
-  PATH . post 27 of 29
+  PATH . post 27 of 31
     <- prev:  [Chapter 9, Part 2: The Deep Factory](the-deep-factory.txt)
        next:  [Chapter 10, Part 2: The Two-Memory Worker](the-two-memory-worker.txt) ->
 

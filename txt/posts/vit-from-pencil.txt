@@ -1,0 +1,210 @@
+@title Vision Transformer From Pencil: Strips, Seat-Stamps, and Masks by Hand :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  APPENDIX E . VISION TRANSFORMER FROM PENCIL
+  Strips, Seat-Stamps, and Masks by Hand
+  Posted: 2026-06-15 . Author: Rahul Rai . Tags: vision-transformer, layernorm, masking, kata
+  ============================================================================================
+
+  PATH . APPENDIX E -- Vision Transformer From Pencil  (standalone; no other page needed)
+
+  A KATA. Work each number on a blank sheet, cover the CHECK line until you have your own
+  answer, then compare. Repeat the whole page until your hand knows it. Five pencil-able cores
+  of the vision transformer: cut a photo into strips, stamp the seat, look across, tame one
+  strip, and block the future. Tiny sizes so the arithmetic fits; the moves are identical at
+  full size. Nothing carried in from memory.
+
+
+  ## A Photo Is a Grid of Numbers, Cut Into Square Strips
+
+  Take a tiny 4 x 4 photo (real ones are 28 x 28), one greyness number per dot:
+
+       1   2 |  3   4
+       5   6 |  7   8
+      -------+-------
+       9  10 | 11  12
+      13  14 | 15  16
+
+  Cut into 2 x 2 squares → 2 across, 2 down → 4 strips, each 4 dots. The four squares are:
+
+      top-left  : 1, 2, 5, 6        top-right : 3, 4, 7, 8
+      bot-left  : 9, 10, 13, 14     bot-right : 11, 12, 15, 16
+
+  In memory the photo is one flat line: 1,2,3,4,5,6,...,16 (row after row). A square's 4 dots
+  are NOT next to each other in that line -- a square spans two photo-rows. Three moves carve
+  them out: rename (fold), re-order (swap), glue.
+
+      FOLD   read the line as (down-band, in-square-down, across-band, in-square-across)
+      SWAP   bring the two band labels together, the two in-square labels together
+      GLUE   write each square's 4 dots as one row → 4 rows of 4
+
+  The core rule: reshape KEEPS the dots and RENAMES them (each dot just gets a longer address;
+  nothing moves). transpose KEEPS the names and REORDERS them (dots get new neighbours). Neither
+  can do the other's job -- which is why both are needed, and the FOLD must come first (you
+  cannot re-order labels that do not yet exist).
+
+  >> YOUR TURN
+     Skip the SWAP -- read the flat line straight, four dots per strip:
+     [1,2,3,4], [5,6,7,8], [9,10,13,14]... what went wrong with strip 1?
+
+     check: [1,2,3,4] is the whole TOP ROW of the photo, not a 2 x 2 square. Without the swap,
+            a strip is a full-width slice, not a square. (On a real photo whose top rows are
+            background, every such strip prints all-black -- the bug that flags a missing swap.)
+
+  With the swap, strip 1 is [1, 2, 5, 6] -- a real 2 x 2 corner. Stack the four:
+
+      [ 1,  2,  5,  6]
+      [ 3,  4,  7,  8]
+      [ 9, 10, 13, 14]
+      [11, 12, 15, 16]
+
+  >> YOUR TURN -- trace one dot
+     Dot "7" sits at row 1, col 2 (zero-indexed) in the 4 x 4 photo above.
+     FOLD splits "1 down" into (floor, desk-row) and "2 across" into (wing, desk),
+     grouping by patch size 2. What are the four labels?
+     After SWAP the order becomes (floor, wing, desk-row, desk). After GLUE?
+
+     check: row 1 = 0×2 + 1 → floor 0, desk-row 1.   col 2 = 1×2 + 0 → wing 1, desk 0.
+            SWAP: (floor=0, wing=1, desk-row=1, desk=0) -- band labels first, in-square labels last.
+            GLUE: chip = 0×2 + 1 = 1.   spot = 1×2 + 0 = 2.
+            Chip 1 = top-right square [3, 4, 7, 8]. Spot 2 = the third dot = 7. ✓
+
+
+  ## Cutting Threw Away WHERE -- So Stamp the Seat On (Sine/Cosine)
+
+  Attention looks at the four strips as a SET, with no sense of which sat where. Stamp a unique
+  seat-row onto each. The fixed recipe, for seat "pos" and slot pairs i = 0, 1, ...:
+
+      stamp[pos][2i]   = sin( pos / 10000^(2i/width) )
+      stamp[pos][2i+1] = cos( pos / 10000^(2i/width) )
+
+  Worked at width 4 (slot pairs i = 0 and i = 1; 10000^(0/4)=1, 10000^(2/4)=100):
+
+      seat 0:  sin(0)=0,      cos(0)=1   |  sin(0)=0,      cos(0)=1     → [0,     1,      0,     1    ]
+      seat 1:  sin(1)=0.841,  cos(1)=0.540 | sin(0.01)=0.010, cos(0.01)=1.000 → [0.841, 0.540, 0.010, 1.000]
+      seat 2:  sin(2)=0.909,  cos(2)=-0.416 | sin(0.02)=0.020, cos(0.02)=1.000 → [0.909, -0.416, 0.020, 1.000]
+
+  Near seats (0 and 1) look close in the slow slots, differ in the fast slots; every seat is
+  unique. Add the stamp onto the strip, slot by slot. (The Chapter 11 lab instead LEARNS a
+  seat-table -- 49 rows of tuned numbers -- reaching the same end: a strip that carries where
+  it sat.)
+
+  >> YOUR TURN
+     Seat 0's stamp is [0,1,0,1]. A strip reads [2,2,2,2]. After adding the stamp?
+
+     check: [2+0, 2+1, 2+0, 2+1] = [2, 3, 2, 3].
+
+
+  ## Every Strip Looks at Every Strip (the Grid)
+
+  Each strip makes three tags from three reused grids -- WANT (seeks), HAVE (offers), GIVE
+  (hands over). Two strips, tag width 4 (so the scale divisor is √4 = 2):
+
+      WANT          HAVE             GIVE
+      s1: [2,0,1,0]  s1: [1,0,0,0]   s1: [2,0,0,1]
+      s2: [0,0,2,0]  s2: [3,0,2,0]   s2: [0,3,1,0]
+
+  MATCH grid -- every WANT dotted with every HAVE:
+
+                    · s1.HAVE   · s2.HAVE
+        s1.WANT         2           8         (2·1=2 ; 2·3 + 1·2 = 8)
+        s2.WANT         0           4         (0 ; 2·2 = 4)
+
+  SCALE each by ÷2, then SOFTMAX each ROW into portions adding to 1:
+
+        s1: [1, 4] → e^1=2.72, e^4=54.60, total 57.32 → [0.047, 0.953]
+        s2: [0, 2] → e^0=1.00, e^2=7.39,  total 8.39  → [0.119, 0.881]
+
+  WEIGHTED SUM of the GIVE tags, per row:
+
+        s1_new = 0.047·[2,0,0,1] + 0.953·[0,3,1,0] = [0.094, 2.859, 0.953, 0.047]
+        s2_new = 0.119·[2,0,0,1] + 0.881·[0,3,1,0] = [0.238, 2.643, 0.881, 0.119]
+
+  >> YOUR TURN
+     s2's match row is [0, 4]. Scale by ÷2, then softmax. (You should get s2's portions above.)
+
+     check: ÷2 → [0, 2]. e^0=1, e^2=7.39, total 8.39 → [1/8.39, 7.39/8.39] = [0.119, 0.881].
+
+
+  ## Tame One Strip, Alone (LayerNorm)
+
+  Take ONE strip's numbers and humble them -- middle to 0, spread to 1 -- reading only this
+  strip, no other strip, no batch:
+
+      strip = [50, 60, 40, 30]
+      middle = (50+60+40+30)/4 = 45
+      diffs:        5, 15, -5, -15
+      squares:      25, 225, 25, 225
+      avg square:   500/4 = 125
+      spread = √125 ≈ 11.18
+      (number - 45) / 11.18  →  [0.45, 1.34, -0.45, -1.34]
+
+  This is LayerNorm: one row's own numbers. (Contrast BatchNorm from Chapter 8, which takes
+  the middle and spread across the whole batch of photos -- a different crowd.)
+
+  Two learned dials -- gamma (stretch) and beta (shift) -- let the machine scale the humbled
+  numbers back if that helps. In numpy:
+
+      def layer_norm(x, gamma, beta, eps=1e-6):
+          mu  = x.mean(axis=-1, keepdims=True)     # each row's middle
+          var = x.var (axis=-1, keepdims=True)      # average squared diff
+          x_n = (x - mu) / np.sqrt(var + eps)       # humble: middle 0, spread 1
+          return gamma * x_n + beta                 # stretch and shift
+
+  axis=-1 = "across this row's own numbers" (the last direction in the array -- not across rows,
+  not across the batch). keepdims=True keeps the middle shaped as a column so the subtract lines
+  up slot by slot instead of broadcasting wrong.
+
+  >> YOUR TURN
+     Strip [2, 4, 6]. Middle? Then the diffs from the middle?
+
+     check: middle (2+4+6)/3 = 4. diffs: -2, 0, +2.
+
+
+  ## Block the Future (the Causal Mask)
+
+  Lay scores in a grid: row i looks, column j is looked at. To stop a token seeing ahead, set
+  every cell with j > i to minus infinity BEFORE softmax. Since e^(-inf) = 0, that cell gets 0
+  portion. Three tokens, equal raw scores:
+
+      block j > i (-inf)         portions after softmax
+            j1   j2   j3                j1   j2   j3
+      i1     .  -inf -inf       i1      1.0   0    0
+      i2     .    .  -inf       i2      0.5  0.5   0
+      i3     .    .    .        i3      0.33 0.33 0.33
+
+  No block at all = bidirectional (every cell allowed). The triangle of -inf = causal (past
+  only). That one switch is the whole difference between a reader (encoder: BERT, ViT) and a
+  writer (decoder: GPT).
+
+  >> YOUR TURN
+     Causal mask, token 2 of 3, equal raw scores. Its three portions?
+
+     check: token 2 sees tokens 1 and 2, not 3 → [0.5, 0.5, 0].
+
+
+  ## One Recitation (Carry This Away)
+
+  Cut the photo into square strips (fold, swap, glue -- the swap keeps each square whole).
+  Stamp each strip's seat on (sine/cosine wave, or a learned table). Every strip's WANT dots
+  every strip's HAVE → ÷√width → softmax → portions → weighted sum of GIVE → each strip's new
+  numbers. Tame one strip alone (LayerNorm: middle 0, spread 1, this row only). And one switch --
+  leave the score grid open (bidirectional, a reader) or set the future to -inf (causal, a
+  writer). Strips that see everything, tamed one at a time, with or without a view of the future.
+
+
+----------------------------------------------------------------------------------------------
+  APPENDIX E . VISION TRANSFORMER FROM PENCIL
+  See also: [Chapter 11, Part 1: The Vision Transformer](the-vision-transformer.txt) .
+            [Chapter 11, Part 2: Encoder or Decoder](encoder-or-decoder.txt)
+  companion to: [Appendix D: Transformer From Pencil](transformer-from-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
