@@ -20,6 +20,13 @@
   Anything named more than five lines ago is named again. Every number is worked in front of
   you -- never "recall that...". One idea per line. A pencil and this page are the whole kit.
 
+  TOY NUMBERS, REAL RECIPE. One line of honesty up front, so nothing here misleads. The
+  RECIPE on this page -- every move, in order -- is exactly a real transformer block, nothing
+  faked or skipped. The NUMBERS are a toy: rows 4 wide instead of 512, two words instead of
+  thousands, and weight-grids picked small and clean so you can check each by eye. Where a toy
+  choice could be mistaken for the mechanism, the text says so and shows the real version
+  beside it. Trust the recipe; treat the sizes as a sketchpad.
+
   The whole machine, named once so you see the shape, then built piece by piece below:
 
       word -> numbers  ->  +position  ->  ASK/OFFER/HANDOVER  ->  scores -> shares
@@ -42,9 +49,10 @@
 
   ## Two Words, but the Next Machine Sees Them All at Once -- So Stamp WHERE Each Sat
 
-  The looker (built below) reads both word-rows simultaneously, as an unordered set. Shown
-  cat then sat, or sat then cat, it cannot tell the difference -- yet "cat sat" and "sat cat"
-  are not the same. Position is missing. So add a second row that encodes the seat itself.
+  The looker (built below) reads both word-rows simultaneously and is ORDER-BLIND until you
+  tell it where each word sat: shuffle the rows and its answer just shuffles to match, so
+  "cat sat" and "sat cat" come out the same -- yet they are not the same. Order is not lost,
+  it was simply never encoded. So add a second row that encodes the seat itself.
 
   Keep a second tiny table, one row per seat (also learned), 4 wide:
 
@@ -80,8 +88,11 @@
   One row cannot play all three parts cleanly, so make three views of each row.
 
   A view = the row pushed through a fixed grid of numbers (a "grid" = a square of weights;
-  multiplying a row by it gives a new row). Here each grid just re-orders the four slots --
-  the simplest honest grid, a permutation -- so you can check every output by eye.
+  multiplying a row by it gives a new row -- a matrix multiply, the one and only kind of
+  machine in this whole block). The real grids are dense: each output number is a weighted sum
+  of ALL four inputs. Here, as a toy, each grid simply re-orders the four slots so you can
+  check every output by eye -- but the box just below works a real dense grid beside it, so
+  you see the re-ordering is only the easy special case, not the mechanism.
 
       ASK grid:       new row = [ slot3, slot1, slot4, slot2 ] of the input
       OFFER grid:     new row = [ slot4, slot3, slot2, slot1 ] of the input   (reversed)
@@ -192,10 +203,12 @@
   ## Each Word Has Looked Around but Not Yet THOUGHT -- So Run a Tiny Two-Grid Worker
 
   cat's tamed row [1.140, 0.709, -0.431, -1.418] has gathered from sat but not reworked it.
-  Push it through a small worker: one grid widens the row, a bend zeroes the negatives, a
-  second grid brings it back. This is the feed-forward part; it works each word on its own.
+  Push it through a small worker: a grid widens the row, a bend zeroes the negatives, a second
+  grid brings it back. This is the feed-forward part -- two dense grids (the same matrix-multiply
+  machine as the ASK/OFFER/HANDOVER grids) with a bend between them, run on each word on its own.
 
-  First grid (two outputs, each a dot product of the row with a learned weight-row):
+  First grid (two outputs; each output of a matrix multiply is a dot product of the input row
+  with one learned weight-row -- multiply slot by slot, add the products):
 
       out1 = [1, -1, 0, 0] . [1.140, 0.709, -0.431, -1.418] = 1.140 - 0.709 = 0.431
       out2 = [1, 0, 0, 1] . [1.140, 0.709, -0.431, -1.418]  = 1.140 - 1.418 = -0.278
