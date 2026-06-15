@@ -1,0 +1,262 @@
+@title Transformers With Pencil: A Whole Block Worked by Hand, One Line at a Time :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . FOR HACKER NEWS
+  Transformers With Pencil: A Whole Block Worked by Hand, One Line at a Time
+  Posted: 2026-06-15 . Author: Rahul Rai . Tags: transformer, attention, by-hand, from-scratch
+  ============================================================================================
+
+  PATH . SPECIAL -- Transformers With Pencil  (standalone; no other page on this blog needed)
+
+  Every "explain the transformer" post hides the same move: it draws boxes, names them
+  Q, K, V, and waves at "attention is all you need." This page never waves. One transformer
+  block runs end to end on two words, and EVERY number is worked in front of you on paper.
+
+  Built so three readers cannot poke a hole. The kernel maintainer who wants the wiring with
+  no magic and no leftover wire. The deep-learning teacher who wants every shape and every
+  number exact. And the reader who bails at the first buzzword. If any of the three can
+  nitpick a line, the line is wrong -- tell me.
+
+  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it appears.
+  Anything named more than five lines ago is named again. Every number is worked in front of
+  you -- never "recall that...". One idea per line. A pencil and this page are the whole kit.
+
+  The whole machine, named once so you see the shape, then built piece by piece below:
+
+      word -> numbers  ->  +position  ->  ASK/OFFER/HANDOVER  ->  scores -> shares
+           ->  weighted sum  ->  add-the-original + tame  ->  small worker + tame  ->  out
+
+
+  ## A Machine Only Multiplies Numbers, and "cat" Is Not a Number -- So Hand It a Row
+
+  Take two words: cat, sat. A machine cannot multiply the letters c-a-t, so first swap each
+  word for a fixed row of numbers (a "row" = an ordered list, like [2, 1, 1, 0]).
+
+  Keep a lookup table: one row per word, learned earlier, here 4 numbers wide. Read it off:
+
+      cat -> [1, 0, 1, 0]
+      sat -> [0, 1, 1, 0]
+
+  That is all "embedding" means: a word's seat-number used to fetch its row from a table.
+  Width 4 is a toy size chosen so the arithmetic fits on paper; real ones use 512 or more.
+
+
+  ## Two Words, but the Next Machine Sees Them All at Once -- So Stamp WHERE Each Sat
+
+  The looker (built below) reads both word-rows simultaneously, as an unordered set. Shown
+  cat then sat, or sat then cat, it cannot tell the difference -- yet "cat sat" and "sat cat"
+  are not the same. Position is missing. So add a second row that encodes the seat itself.
+
+  Keep a second tiny table, one row per seat (also learned), 4 wide:
+
+      seat 0 -> [1, 1, 0, 0]
+      seat 1 -> [0, 0, 1, 1]
+
+  Add the seat-row onto the word-row, slot by slot (slot = one position in the row):
+
+      cat at seat 0:  [1,0,1,0] + [1,1,0,0] = [2, 1, 1, 0]   -> call this x_cat
+      sat at seat 1:  [0,1,1,0] + [0,0,1,1] = [0, 1, 2, 1]   -> call this x_sat
+
+  Now each row carries both WHICH word and WHERE it sat. (The famous fixed alternative skips
+  the learned table and stamps a sine/cosine wave instead -- worked in the box below -- but
+  the rest of this page uses the two clean rows above.)
+
+  THE FIXED STAMP, FOR THE SKEPTIC. The 2017 paper uses no table; it computes the stamp from
+  the seat number "pos" and the slot-pair i = 0, 1, ...:
+
+      stamp[pos][2i]   = sin( pos / 10000^(2i/width) )      stamp[pos][2i+1] = cos( same )
+
+  At width 4, seat 1 (i = 0 gives 10000^0 = 1; i = 1 gives 10000^(2/4) = 100):
+
+      sin(1/1)   = 0.841 ,  cos(1)    = 0.540 ,  sin(1/100) = 0.010 ,  cos(1/100) = 1.000
+      -> seat 1 stamp = [0.841, 0.540, 0.010, 1.000]
+
+  Same end: a unique row per seat, near seats close, far seats apart. Both ways are legal.
+
+
+  ## One Word Must Both ASK and Be ASKED -- So Make Three Views of Its Row
+
+  cat wants to look at the other words. To look, it needs to ASK a question, sat needs to
+  OFFER a label to be matched against, and sat needs something to HAND OVER once matched.
+  One row cannot play all three parts cleanly, so make three views of each row.
+
+  A view = the row pushed through a fixed grid of numbers (a "grid" = a square of weights;
+  multiplying a row by it gives a new row). Here each grid just re-orders the four slots --
+  the simplest honest grid, a permutation -- so you can check every output by eye.
+
+      ASK grid:       new row = [ slot3, slot1, slot4, slot2 ] of the input
+      OFFER grid:     new row = [ slot4, slot3, slot2, slot1 ] of the input   (reversed)
+      HANDOVER grid:  new row = [ slot2, slot3, slot4, slot1 ] of the input
+
+  These three grids hold the learned numbers; training tunes them. Apply to x_cat = [2,1,1,0]
+  and x_sat = [0,1,2,1] (a row's slots numbered 1..4 left to right):
+
+      ASK(cat)      = [1, 2, 0, 1]        ASK(sat)      = [2, 0, 1, 1]
+      OFFER(cat)    = [0, 1, 1, 2]        OFFER(sat)    = [1, 2, 1, 0]
+      HANDOVER(cat) = [1, 1, 0, 2]        HANDOVER(sat) = [1, 2, 1, 0]
+
+  Textbook names, stuck on only now: ASK = Query (Q), OFFER = Key (K), HANDOVER = Value (V).
+
+
+  ## How Much Should cat Listen to Each Word? Match Its ASK Against Every OFFER
+
+  cat now holds an ASK row; cat and sat each hold an OFFER row. Score a match by the dot
+  product: the dot product of two rows = multiply slot by slot, then add the products into
+  one number. Big number = strong match.
+
+  ASK(cat) = [1, 2, 0, 1]. Dot it against each OFFER:
+
+      cat vs OFFER(cat) = [1,2,0,1].[0,1,1,2] = 1*0 + 2*1 + 0*1 + 1*2 = 0+2+0+2 = 4
+      cat vs OFFER(sat) = [1,2,0,1].[1,2,1,0] = 1*1 + 2*2 + 0*1 + 1*0 = 1+4+0+0 = 5
+
+  So cat's raw scores are [4, 5] -- it matches sat a little harder than itself.
+
+
+  ## Raw Scores Run Any Size and Blow Up the Next Move -- So Shrink, Then Squash to Shares
+
+  Two fixes, in order. First, big dot products make the squash below saturate, so divide each
+  score by the root of the OFFER width. Width here is 4; its root is 2 (since 2 * 2 = 4).
+
+      cat scores [4, 5] / 2 = [2, 2.5]
+
+  Second, turn those into SHARES that add to 1, so they read as "how much of my attention."
+  That is softmax: raise e (= 2.718...) to each score, then divide each by the total.
+
+      e^2   = 7.389         e^2.5 = 12.182         total = 7.389 + 12.182 = 19.571
+      share on cat = 7.389 / 19.571 = 0.378        share on sat = 12.182 / 19.571 = 0.622
+
+  Check: 0.378 + 0.622 = 1.000. cat will spend 37.8% of its attention on itself, 62.2% on sat.
+
+
+  ## The Shares Decide How Much of Each Word to Pull In -- So Add the HAND-OVERS by Share
+
+  Each word offered a HANDOVER row earlier: HANDOVER(cat) = [1,1,0,2], HANDOVER(sat) = [1,2,1,0].
+  cat's new row = each HANDOVER scaled by cat's share for that word, added slot by slot:
+
+      0.378 * [1, 1, 0, 2] = [0.378, 0.378, 0.000, 0.756]
+      0.622 * [1, 2, 1, 0] = [0.622, 1.244, 0.622, 0.000]
+      add slot by slot     = [1.000, 1.622, 0.622, 0.756]   -> attention output for cat
+
+  That is the entire attention move: ASK, match every OFFER, shrink, squash to shares, pull
+  each HANDOVER in by its share. The published one-liner softmax(Q.K^T / sqrt(d)).V is exactly
+  these four numbers and nothing more.
+
+  Run the same machine from sat's seat (ASK(sat) = [2,0,1,1]): its raw scores come out [3, 3],
+  /2 = [1.5, 1.5], equal scores give equal shares [0.5, 0.5], so sat's output is the plain
+  average of the two HANDOVERs = [1.0, 1.5, 0.5, 1.0]. No word is special; the recipe is one.
+
+
+  ## Attention Can Wash the Word Away -- So Add Its Original Row Back, Then Tame the Result
+
+  cat's attention output [1.000, 1.622, 0.622, 0.756] is built entirely from HANDOVERs of
+  other words; cat's own content can vanish. So lay its ORIGINAL row (x_cat = [2,1,1,0], the
+  word-plus-position row from before) back on top, slot by slot. This add-the-original wire
+  is the residual; it also gives later training a short path for corrections to travel.
+
+      [1.000, 1.622, 0.622, 0.756] + [2, 1, 1, 0] = [3.000, 2.622, 1.622, 0.756]
+
+  After adding, the four numbers can sit at a wild scale, so TAME them: pull the row so its
+  middle is 0 and its typical distance from the middle is 1. This is LayerNorm, and it reads
+  only THIS row's own four numbers -- no other word, no batch.
+
+      middle  = (3.000 + 2.622 + 1.622 + 0.756) / 4 = 8.000 / 4 = 2.000
+      distance of each from 2.000:  1.000 , 0.622 , -0.378 , -1.244
+      square each:                  1.000 , 0.387 ,  0.143 ,  1.548   (sum = 3.078)
+      average those squares:        3.078 / 4 = 0.769
+      root it (typical distance):   sqrt(0.769) = 0.877
+      tame each = (number - 2.000) / 0.877:
+                  [1.140, 0.709, -0.431, -1.418]   <- middle now 0, typical distance now 1
+
+  Check the middle: 1.140 + 0.709 - 0.431 - 1.418 = 0.000. (Two learned dials, a stretch and
+  a shift, can rescale this afterward; they start at 1 and 0, leaving the row as is.)
+
+
+  ## Each Word Has Looked Around but Not Yet THOUGHT -- So Run a Tiny Two-Grid Worker
+
+  cat's tamed row [1.140, 0.709, -0.431, -1.418] has gathered from sat but not reworked it.
+  Push it through a small worker: one grid widens the row, a bend zeroes the negatives, a
+  second grid brings it back. This is the feed-forward part; it works each word on its own.
+
+  First grid (two outputs, each a dot product of the row with a learned weight-row):
+
+      out1 = [1, -1, 0, 0] . [1.140, 0.709, -0.431, -1.418] = 1.140 - 0.709 = 0.431
+      out2 = [1, 0, 0, 1] . [1.140, 0.709, -0.431, -1.418]  = 1.140 - 1.418 = -0.278
+
+  The bend is ReLU: keep a positive number, turn any negative into 0.
+
+      ReLU([0.431, -0.278]) = [0.431, 0.000]
+
+  Second grid maps those two back to four (again, each output is one dot product):
+
+      [1,0].[0.431,0] = 0.431    [0,1]. = 0.000    [1,1]. = 0.431    [2,0]. = 0.862
+      worker output = [0.431, 0.000, 0.431, 0.862]
+
+  Add the original back again (the row that entered this worker), then tame again -- the same
+  two moves as before, redefined: residual = add the input row on top; LayerNorm = pull the
+  row to middle 0, typical-distance 1, reading only its own four numbers.
+
+      add:    [1.140, 0.709, -0.431, -1.418] + [0.431, 0, 0.431, 0.862] = [1.571, 0.709, 0.000, -0.556]
+      middle: (1.571 + 0.709 + 0.000 - 0.556) / 4 = 1.724 / 4 = 0.431
+      dist:   1.140 , 0.278 , -0.431 , -0.987       squares: 1.300, 0.077, 0.186, 0.974 (sum 2.537)
+      avg square 2.537/4 = 0.634     root sqrt(0.634) = 0.796
+      tame = (number - 0.431) / 0.796 = [1.431, 0.349, -0.541, -1.239]
+
+  That row, [1.431, 0.349, -0.541, -1.239], is cat's output from ONE full transformer block.
+  Check the middle: 1.431 + 0.349 - 0.541 - 1.239 = 0.000. Nothing was skipped, nothing waved.
+
+
+  ## That Is One Block -- Three Honest Extras, Each in One Breath
+
+  STACK IT. The block took two 4-wide rows in and gave two 4-wide rows out -- same shape. So
+  feed its output straight into another identical block, then another. Depth is just blocks
+  in a line; GPT-style machines stack dozens. Each is exactly the arithmetic above.
+
+  RUN SEVERAL ASKS AT ONCE (multi-head). Above, cat made ONE ASK. Real machines slice the row
+  into a few pieces and run the whole ASK/OFFER/HANDOVER machine on each slice in parallel,
+  then glue the results back to one row. Four heads on a 4-wide row would be four machines on
+  1-wide slices; the count of heads and what each head catches are different things, and the
+  glued width always returns to the row width. Same recipe, run side by side.
+
+  BLANK THE FUTURE TO WRITE (the encoder/decoder switch). Above, cat could look at sat freely
+  -- a reader that judges (an encoder, e.g. BERT). To make a writer that generates one word at
+  a time (a decoder, e.g. GPT), forbid looking ahead: before the squash, set every score that
+  points at a later word to minus infinity. Since e raised to minus infinity is 0, that word
+  gets a 0 share. Three words, equal raw scores, after blanking:
+
+      word 1 sees {1}        -> shares [1.000, 0,     0    ]
+      word 2 sees {1,2}      -> shares [0.500, 0.500, 0    ]
+      word 3 sees {1,2,3}    -> shares [0.333, 0.333, 0.333]
+
+  One switch -- leave the scores open (reader, encoder) or set the future to minus infinity
+  (writer, decoder) -- is the whole architectural difference between BERT and GPT.
+
+
+  ## One Breath (Carry This Away)
+
+  Swap each word for a learned row of numbers; add a row that marks its seat. Make three views
+  of each row -- ASK, OFFER, HANDOVER. Dot each word's ASK against every OFFER for raw scores,
+  shrink by the root of the width, squash to shares that add to 1 (softmax), and pull in each
+  HANDOVER by its share -- that is attention. Add the original row back (residual) and tame it
+  to middle 0, distance 1, reading the row alone (LayerNorm). Run a tiny widen-bend-narrow
+  worker (ReLU), add-back and tame once more. Same shape out as in, so stack it; run several
+  ASKs side by side (heads); blank the future to turn the reader into a writer. cat went in as
+  [2,1,1,0] and came out as [1.431, 0.349, -0.541, -1.239] -- every number on this page, by
+  pencil, no magic, no leftover wire.
+
+
+----------------------------------------------------------------------------------------------
+  SPECIAL . TRANSFORMERS WITH PENCIL  (written for Hacker News; standalone)
+  Go deeper, same blog, same method:
+    [Chapter 10, Part 3: The Look-Across Machine](the-look-across-machine.txt) -- attention on words
+    [Chapter 11, Part 1: The Vision Transformer](the-vision-transformer.txt)  -- attention on pictures
+    [Appendix D: Transformer From Pencil](transformer-from-pencil.txt)        -- the attention KATA
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

@@ -194,6 +194,17 @@
     on two strips, LayerNorm on one row (45, √125, [0.45, 1.34, -0.45, -1.34]), and the causal
     mask triangle of -inf that splits reader from writer. YOUR TURN drills throughout. No code.
 
+  [SPECIAL. Transformers With Pencil -- A Whole Block Worked by Hand, One Line at a Time](posts/transformerforhn.txt)
+    special . 2026-06-15 . standalone . transformer, attention, from-scratch
+    Written for Hacker News, self-contained: ONE full transformer block run end to end on two
+    words (cat, sat), every number by pencil. Word -> row, position stamped on, three views
+    (ASK/OFFER/HANDOVER = Q/K/V), dot-product scores, shrink by √width, softmax to shares
+    [0.378, 0.622], weighted sum of HANDOVERs, add-the-original + LayerNorm (middle 0, distance
+    1), a widen-bend(ReLU)-narrow worker, add + tame again -- cat goes in [2,1,1,0], comes out
+    [1.431, 0.349, -0.541, -1.239]. Plus stacking, multi-head, and the minus-infinity future
+    switch that turns a reader (BERT) into a writer (GPT). Assumes zero memory; redefines every
+    term where it appears; nothing waved at.
+
 
   CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS -- unsupervised learning
   ----------------------------------------------------------------------
