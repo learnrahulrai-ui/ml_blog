@@ -42,6 +42,11 @@
       SWAP   bring the two band labels together, the two in-square labels together
       GLUE   write each square's 4 dots as one row → 4 rows of 4
 
+  The core rule: reshape KEEPS the dots and RENAMES them (each dot just gets a longer address;
+  nothing moves). transpose KEEPS the names and REORDERS them (dots get new neighbours). Neither
+  can do the other's job -- which is why both are needed, and the FOLD must come first (you
+  cannot re-order labels that do not yet exist).
+
   >> YOUR TURN
      Skip the SWAP -- read the flat line straight, four dots per strip:
      [1,2,3,4], [5,6,7,8], [9,10,13,14]... what went wrong with strip 1?
@@ -56,6 +61,17 @@
       [ 3,  4,  7,  8]
       [ 9, 10, 13, 14]
       [11, 12, 15, 16]
+
+  >> YOUR TURN -- trace one dot
+     Dot "7" sits at row 1, col 2 (zero-indexed) in the 4 x 4 photo above.
+     FOLD splits "1 down" into (floor, desk-row) and "2 across" into (wing, desk),
+     grouping by patch size 2. What are the four labels?
+     After SWAP the order becomes (floor, wing, desk-row, desk). After GLUE?
+
+     check: row 1 = 0×2 + 1 → floor 0, desk-row 1.   col 2 = 1×2 + 0 → wing 1, desk 0.
+            SWAP: (floor=0, wing=1, desk-row=1, desk=0) -- band labels first, in-square labels last.
+            GLUE: chip = 0×2 + 1 = 1.   spot = 1×2 + 0 = 2.
+            Chip 1 = top-right square [3, 4, 7, 8]. Spot 2 = the third dot = 7. ✓
 
 
   ## Cutting Threw Away WHERE -- So Stamp the Seat On (Sine/Cosine)
@@ -129,6 +145,19 @@
 
   This is LayerNorm: one row's own numbers. (Contrast BatchNorm from Chapter 8, which takes
   the middle and spread across the whole batch of photos -- a different crowd.)
+
+  Two learned dials -- gamma (stretch) and beta (shift) -- let the machine scale the humbled
+  numbers back if that helps. In numpy:
+
+      def layer_norm(x, gamma, beta, eps=1e-6):
+          mu  = x.mean(axis=-1, keepdims=True)     # each row's middle
+          var = x.var (axis=-1, keepdims=True)      # average squared diff
+          x_n = (x - mu) / np.sqrt(var + eps)       # humble: middle 0, spread 1
+          return gamma * x_n + beta                 # stretch and shift
+
+  axis=-1 = "across this row's own numbers" (the last direction in the array -- not across rows,
+  not across the batch). keepdims=True keeps the middle shaped as a column so the subtract lines
+  up slot by slot instead of broadcasting wrong.
 
   >> YOUR TURN
      Strip [2, 4, 6]. Middle? Then the diffs from the middle?
