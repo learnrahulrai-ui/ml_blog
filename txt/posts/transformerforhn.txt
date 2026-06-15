@@ -16,11 +16,6 @@
   Q, K, V, and waves at "attention is all you need." This page never waves. One transformer
   block runs end to end on two words, and EVERY number is worked in front of you on paper.
 
-  Built so three readers cannot poke a hole. The kernel maintainer who wants the wiring with
-  no magic and no leftover wire. The deep-learning teacher who wants every shape and every
-  number exact. And the reader who bails at the first buzzword. If any of the three can
-  nitpick a line, the line is wrong -- tell me.
-
   THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it appears.
   Anything named more than five lines ago is named again. Every number is worked in front of
   you -- never "recall that...". One idea per line. A pencil and this page are the whole kit.
