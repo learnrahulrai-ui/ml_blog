@@ -9,8 +9,8 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in ten chapters (twenty-eight posts),
-  meant to be read top to bottom. Each post opens with a "post N of 28" path header and a
+  This is not a pile of loose articles -- it is a short BOOK in ten chapters (twenty-nine posts),
+  meant to be read top to bottom. Each post opens with a "post N of 29" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. An appendix ties it together.
@@ -176,6 +176,16 @@
     (FRESH + keep/admit/show), the combine worked in real numbers (5.0 -> 4.62 -> 0.70) -- plus
     a struggle log of every trap and a one-word end-to-end recitation. No computer, no code.
 
+  [D. Transformer From Pencil -- Attention From Scratch, One Number at a Time](posts/transformer-from-pencil.txt)
+    reference . 2026-06-15 . companion to Chapter 10 . transformer, attention, by-hand, kata
+    A KATA: one clean, self-contained walk through the attention mechanism by pencil, made to
+    be repeated on a blank sheet until your hand knows it. Words into a dictionary, padded rows,
+    sticks from an embedding table; each word makes WANT/HAVE/GIVE from three reused grids;
+    nolan's WANT dots every HAVE → scaled by √(tag width) → softmax → portions; portions weight
+    GIVE sticks → ADD slot by slot → nolan_new = [0.094, 2.859, 0.953, 0.047] fully worked.
+    Multi-head flagged, positional-encoding gap flagged, four WRONG TURN boxes, one-breath
+    recitation at the end. No code; pencil and real numbers only.
+
 
   CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS -- unsupervised learning
   ----------------------------------------------------------------------
@@ -284,7 +294,7 @@
   -------------------------------------------------------------------
 
   [Part 1 -- Words Into a Machine: The Notepad and the Walking Worker](posts/the-walking-worker.txt)
-    post 27/28 . 2026-06-13 . part 1 of 2 . rnn, embedding, nlp, sequence-models
+    post 27/29 . 2026-06-13 . part 1 of 3 . rnn, embedding, nlp, sequence-models
     A photo was already numbers; a review is WORDS, and a factory can only multiply numbers.
     Number the 10,000 commonest words by frequency, pad every review to 100, then a NOTEPAD
     swaps each word-number for a learned 32-number note (so "boring" and "dull" drift close,
@@ -293,7 +303,7 @@
     a final S-curve clerk reads the last memory for thumbs up or down. (IMDB sentiment.)
 
   [Part 2 -- The Two-Memory Worker: How an LSTM Remembers Far-Back Words](posts/the-two-memory-worker.txt)
-    post 28/28 . 2026-06-13 . part 2 of 2 . lstm, bilstm, sequence-models
+    post 28/29 . 2026-06-13 . part 2 of 3 . lstm, bilstm, sequence-models
     The plain worker crushes its one memory every word, so word 1 fades to nothing by word 90.
     The fix, derived by hand: carry TWO memories -- a long keep (A, never crushed, free to grow
     past 1) and a spoken recent (B) -- and let three 0..1 voters decide what to keep, admit, and
@@ -301,6 +311,19 @@
     real-number combine. Then the BiLSTM reads the review both directions and glues the two
     memories, an honest four-way comparison, and a blunt note: the fade is a theorem, the exact
     wiring is an engineered choice.
+
+  [Part 3 -- The Look-Across Machine: Attention and the Transformer by Pencil](posts/the-look-across-machine.txt)
+    post 29/29 . 2026-06-15 . part 3 of 3 . transformer, attention, sequence-models
+    The walk costs two things: words run in serial (a GPU bottleneck) and far-apart words
+    connect only through a long rewrite chain that fades. The fix: lay all 100 words out at once
+    and let every word look DIRECTLY at every other, near or far, same cost, all at the same time.
+    Built by pencil for the review "nolan ended" (width 4, every number computed): each word makes
+    WANT/HAVE/GIVE tags from three reused grids; dot products score cross-word matches; scaled by
+    √(tag width) and softmaxed into portions; portions weight the GIVE sticks, added slot by slot
+    → a richer new stick per word. Two heads catch two kinds of link. Average all sticks →
+    one summary → a small plain-worker head → the tick. Full code (Q8-Q10), numpy verification,
+    four-way comparison (SimpleRNN / LSTM / BiLSTM / Transformer), and one honest flag: no walk
+    means no order -- positional encoding is what the real machine adds.
 
 
 ----------------------------------------------------------------------------------------------

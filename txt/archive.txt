@@ -73,8 +73,9 @@
 
   CHAPTER 10 -- MACHINES THAT READ WORDS (2026)
   ---------------------------------------------
-  post 27/28  [Part 1 -- Words Into a Machine: The Notepad and the Walking Worker](posts/the-walking-worker.txt)
-  post 28/28  [Part 2 -- The Two-Memory Worker: How an LSTM Remembers Far-Back Words](posts/the-two-memory-worker.txt)
+  post 27/29  [Part 1 -- Words Into a Machine: The Notepad and the Walking Worker](posts/the-walking-worker.txt)
+  post 28/29  [Part 2 -- The Two-Memory Worker: How an LSTM Remembers Far-Back Words](posts/the-two-memory-worker.txt)
+  post 29/29  [Part 3 -- The Look-Across Machine: Attention and the Transformer by Pencil](posts/the-look-across-machine.txt)
 
 
   APPENDICES -- FLIP-TO REFERENCES (2026)
@@ -82,6 +83,7 @@
   reference   [A. Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
   reference   [B. Distance and Clustering Reference -- Rulers, Traps, and Ethics](posts/clustering-reference.txt)
   reference   [C. LSTM From Pencil -- RNN and LSTM From Scratch, Nothing But a Pencil](posts/lstm-from-pencil.txt)
+  reference   [D. Transformer From Pencil -- Attention From Scratch, One Number at a Time](posts/transformer-from-pencil.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
