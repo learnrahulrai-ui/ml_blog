@@ -31,10 +31,12 @@
       DICTIONARY (ranked by count):
         the=1   movie=2   was=3   boring=4  ...  nolan=73  ...  ended=88  ...
 
-  Keep only the top 10,000. Every rarer word shares one "unknown" number. Pad or chop
-  every review to exactly 100 word-slots:
+  Keep only the top 10,000. Every rarer word shares one "unknown" number -- its OWN reserved
+  tag, separate from the padding 0. (Padding marks an empty slot; unknown marks a real but rare
+  word. They must never read as the same number, or the machine cannot tell empty from rare.)
+  Pad or chop every review to exactly 100 word-slots, padding with 0:
 
-      "nolan ended"  →  [73, 88, 0, 0, ... , 0]    98 zeros    → 100 numbers
+      "nolan ended"  →  [73, 88, 0, 0, ... , 0]    98 padding zeros    → 100 numbers
       500-word rant  →  [first 100]                 400 chopped
 
   73 is a name-tag, not a meaning. A machine that multiplied it raw would count "nolan" (73)
@@ -52,7 +54,7 @@
        The word "qxzbr" ranked 400,000th -- outside the top 10,000. What number does it get
        in the padded review row?
 
-       check: the one shared "unknown" number.
+       check: the shared "unknown" tag -- a reserved number of its own, never the padding 0.
 
   After this: "nolan ended" → SHEET 2 tall × 4 wide. Every word-slot has a stick.
 
@@ -218,14 +220,19 @@
   ## Two Heads Catch Two Kinds of Link
 
   One set of WANT/HAVE/GIVE grids learns one kind of cross-word relationship. A second set of
-  grids -- different dials -- learns another kind. Run both in parallel; glue the two new
-  sticks together:
+  grids -- different dials -- learns another kind. To run two heads WITHOUT bloating the stick,
+  make each head's tags narrower: instead of grids that read width 4 and write width 4, each
+  head's grids read the full width-4 stick but write a width-2 tag (4→2, not 4→4). Each head
+  does the full six moves in its own width-2 world and hands back a width-2 stick:
 
-      head 1: own WANT/HAVE/GIVE → full six moves → stick A
-      head 2: DIFFERENT grids → same six moves → stick B
-      glue: [A | B] → richer stick  (same total width as before)
+      head 1: own WANT/HAVE/GIVE (each 4→2) → six moves → stick A (width 2)
+      head 2: DIFFERENT grids (each 4→2) → six moves → stick B (width 2)
+      glue: [A | B] → width-4 stick -- back to the width we started with
 
-  That is num_heads=2.
+  Two width-2 sticks glue to width 4, not 8 -- the original width split two ways, then sewn back.
+  One last grid mixes the glued width-4 stick number-by-number, so the two heads' findings blend
+  instead of sitting in separate halves; that mixing grid is the output projection inside
+  MultiHeadAttention. That is num_heads=2.
 
 
   ## No Walk Means No Order -- Flagged
@@ -234,11 +241,20 @@
   look identical. The full transformer adds a position-stamp to each word's stick before
   attention runs. The simplified lab version (Q8) skips it. Flagged so you know.
 
+  Two more honest simplifications, flagged the same way. First, the 98 padding slots. In the
+  full model a PADDING-MASK sets every padding score to minus-infinity before softmax, so
+  e^(−inf)=0 hands them zero portion -- they neither pull attention nor enter the average. This
+  kata works the 2-word review "nolan ended" with no padding in play, so the mask never bites in
+  the arithmetic here; on a real 100-slot row it does the heavy lifting of keeping empty slots
+  out of every sum. Second, real models wrap attention in a keep-the-original wire and a
+  per-stick humbler (skip connection + LayerNorm, built in Chapter 11). Left out here on purpose
+  -- one layer, one short review.
+
 
   ## 100 Sticks Need One Summary -- Average Them All
 
-  After attention, every word-slot has a new stick. Tick needs ONE. Average all word-sticks
-  number-by-number:
+  After attention, every word-slot has a new stick. Tick needs ONE. Average the real word-sticks
+  number-by-number (padding slots excluded, as flagged above):
 
       word 1 = [0.0, 2.8, 0.9, 0.0]
       word 2 = [0.2, 1.0, 0.5, 0.4]
@@ -269,8 +285,9 @@
   WRONG TURN  "Which tag scores? WANT or HAVE?"
   ─────────────────────────────────────────────────────────────────────────────────────────
   WANT does the scoring: nolan's WANT dots every word's HAVE.
-  HAVE is what gets looked at. GIVE is what is taken into the weighted sum. WANT is the only
-  one in dot products.
+  HAVE is what gets looked at. GIVE is what is taken into the weighted sum. The dot is WANT
+  against HAVE -- both sit in it, WANT doing the looking; GIVE is the only tag that never enters
+  a dot product.
   ─────────────────────────────────────────────────────────────────────────────────────────
 
   WRONG TURN  "A word can't match itself -- it has no useful information about itself."
