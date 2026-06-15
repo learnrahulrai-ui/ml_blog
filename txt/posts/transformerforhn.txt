@@ -99,6 +99,25 @@
       OFFER(cat)    = [0, 1, 1, 2]        OFFER(sat)    = [1, 2, 1, 0]
       HANDOVER(cat) = [1, 1, 0, 2]        HANDOVER(sat) = [1, 2, 1, 0]
 
+  WHY THE GRIDS JUST RE-ORDER HERE. A permutation is a real weight grid -- it is the case
+  where each output number reads exactly one input slot -- chosen so you can check every row
+  by eye. A trained grid is the general case: each output is a dot product of the whole input
+  row with one learned weight-row (dot product = multiply slot by slot, add the products). To
+  show that nothing is left out, here is the ASK grid written in full, alongside a grid with
+  real mixing numbers, both applied to x_cat = [2, 1, 1, 0]:
+
+      the permutation ASK grid          a mixing ASK grid (same shape, real weights)
+      row1 = [0,0,1,0] . x = 1          row1 = [ 0.5, 0.2, 0.1, 0.0] . x = 1.0+0.2+0.1+0 = 1.3
+      row2 = [1,0,0,0] . x = 2          row2 = [-0.3, 0.4, 0.0, 0.6] . x = -0.6+0.4+0+0 = -0.2
+      row3 = [0,0,0,1] . x = 0          row3 = [ 0.1, 0.1, 0.7, 0.2] . x = 0.2+0.1+0.7+0 = 1.0
+      row4 = [0,1,0,0] . x = 1          row4 = [ 0.0, 0.5, 0.5, 0.5] . x = 0+0.5+0.5+0 = 1.0
+      -> [1, 2, 0, 1] (one slot each)   -> [1.3, -0.2, 1.0, 1.0] (every slot stirred in)
+
+  The machine is identical either way: row dot weight-row. This page uses the clean
+  permutation so the later softmax and LayerNorm stay checkable by hand; a trained machine
+  uses grids like the right-hand one, learned by rolling downhill. Nothing about the recipe
+  changes -- only whether each output reads one slot or all four.
+
   Textbook names, stuck on only now: ASK = Query (Q), OFFER = Key (K), HANDOVER = Value (V).
 
 
