@@ -5,14 +5,14 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  CHAPTER 10 . MACHINES THAT READ WORDS . PART 2 OF 2
+  CHAPTER 10 . MACHINES THAT READ WORDS . PART 2 OF 3
   The Two-Memory Worker: How an LSTM Remembers Far-Back Words
   Posted: 2026-06-13 . Author: Rahul Rai . Tags: lstm, bilstm, rnn, sequence-models
   ============================================================================================
 
-  PATH . post 28 of 28
+  PATH . post 28 of 29
     <- prev:  [Chapter 10, Part 1: Words Into a Machine](the-walking-worker.txt)
-       next:  (more coming) ->
+       next:  [Chapter 10, Part 3: The Look-Across Machine](the-look-across-machine.txt) ->
 
   Part 1 built a text-factory: a NOTEPAD turns each word into a 32-number note; ONE walking
   worker reads the 100 notes IN ORDER, rewriting a 32-number memory after every word; a
@@ -532,14 +532,15 @@
   ```
 
   Compare all four val-accuracies and pick the best (Q10) -- one number per factory, read
-  off the sealed pile. Still ahead, in a later chapter: the Transformer (attention), which
-  looks at ALL words at once and kills the ordered word-by-word walk entirely.
+  off the sealed pile. The Transformer (attention) -- which kills the walk entirely and lets
+  every word look straight at every other at once -- is Part 3 of this chapter, next.
 
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 10 -- Machines That Read Words):
     [Part 1 -- Words Into a Machine](the-walking-worker.txt) .
-    Part 2 (this post)
+    Part 2 (this post) .
+    [Part 3 -- The Look-Across Machine](the-look-across-machine.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

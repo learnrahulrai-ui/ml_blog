@@ -1,0 +1,306 @@
+@title Transformer From Pencil: Attention From Scratch, One Number at a Time :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  APPENDIX D . TRANSFORMER FROM PENCIL
+  Attention From Scratch, One Number at a Time
+  Posted: 2026-06-15 . Author: Rahul Rai . Tags: transformer, attention, by-hand, kata
+  ============================================================================================
+
+  PATH . APPENDIX D -- Transformer From Pencil  (standalone; no other page needed)
+
+  Goal: read a movie review -- plain words -- and stamp it liked (1) or not (0). Kit:
+  a pencil, scratch paper. No code, no computer.
+
+  This is a KATA. Work it on a blank sheet, cover each CHECK line until you get your own
+  answer, then compare. Repeat the whole thing when you want it to feel automatic. Every
+  number is recomputed here -- nothing carried in from memory.
+
+  Worked review: "nolan ended" (2 words). Tag width 4 throughout (real width 32 -- identical
+  moves). Nothing is named before a number earns the name.
+
+
+  ## A Machine Only Multiplies Numbers, So Words Must Become Numbers First
+
+  Walk every review in the pile. Count every word. Hand each word a number by how often it
+  appears -- most common word gets number 1. This is the DICTIONARY.
+
+      DICTIONARY (ranked by count):
+        the=1   movie=2   was=3   boring=4  ...  nolan=73  ...  ended=88  ...
+
+  Keep only the top 10,000. Every rarer word shares one "unknown" number. Pad or chop
+  every review to exactly 100 word-slots:
+
+      "nolan ended"  →  [73, 88, 0, 0, ... , 0]    98 zeros    → 100 numbers
+      500-word rant  →  [first 100]                 400 chopped
+
+  73 is a name-tag, not a meaning. A machine that multiplied it raw would count "nolan" (73)
+  as 73 times heavier than "the" (1) -- false. So swap each bare number for a LIST of numbers,
+  its STICK. The embedding table holds one stick per kept word:
+
+      embedding table (width 4 here):
+        nolan (73) →  [2, 1, 1, 0]
+        ended (88) →  [0, 1, 2, 1]
+
+  10,000 words × 4 numbers = 40,000 entries total. These start as junk and get tuned by
+  training until "boring" and "dull" drift close, "nolan" and "the" drift far.
+
+    >> YOUR TURN
+       The word "qxzbr" ranked 400,000th -- outside the top 10,000. What number does it get
+       in the padded review row?
+
+       check: the one shared "unknown" number.
+
+  After this: "nolan ended" → SHEET 2 tall × 4 wide. Every word-slot has a stick.
+
+
+  ## Walking Through 79 Rewrites Still Fades, So Look Across Instead
+
+  The older machine WALKED: word 1 writes a memory; word 2 reads that memory and rewrites it;
+  and so on for 100 words. To link "not" (word 1) to "good" (word 80), the signal rides 79
+  rewrites -- each one multiplies and crushes it a little. Far-back words fade.
+
+  The transformer removes the walk. Lay all words out at once. Let each word look STRAIGHT
+  at every other word, near or far, same cost, all at the same time:
+
+      WALK:        not → mem → 79 rewrites → good      fades; one word at a time
+      LOOK-ACROSS: not  ←──── direct ────→  good       no fade; all at once
+
+  No chain means no fade, and no chain means every word computes in parallel.
+
+
+  ## Each Word Makes Three Tags to Ask, Answer, and Give
+
+  For two words to look at each other, each needs three roles:
+
+      WANT (query) -- "what am I looking for?"       ← does the looking
+      HAVE (key)   -- "what do I offer?"             ← gets looked at
+      GIVE (value) -- "what I hand over if picked"
+
+  Each role gets its own grid of dials (a square sheet, 4×4 here). Each grid is REUSED
+  on every word in the review -- one grid set for all words.
+
+  How one tag is made. A grid row is a list of dials. Row times a stick: multiply matching
+  numbers, add → one number. All rows together → one new stick.
+
+  nolan's WANT computed by hand (made-up WANT-grid rows):
+
+      nolan's stick  = [2, 1, 1, 0]
+
+      WANT-grid row 1 = [1, 0, 0, 0]  → 1·2 + 0·1 + 0·1 + 0·0 = 2
+      WANT-grid row 2 = [0, 0, 0, 0]  → 0
+      WANT-grid row 3 = [0, 0, 1, 0]  → 0·2 + 0·1 + 1·1 + 0·0 = 1
+      WANT-grid row 4 = [0, 0, 0, 0]  → 0
+
+      nolan.WANT = [2, 0, 1, 0]
+
+  Same process (different grids) produces nolan.HAVE, nolan.GIVE, ended.WANT, ended.HAVE,
+  ended.GIVE. Values used throughout this kata (made-up, chosen so arithmetic stays short):
+
+      nolan.HAVE = [1, 0, 0, 0]    nolan.GIVE = [2, 0, 0, 1]
+      ended.HAVE = [3, 0, 2, 0]    ended.GIVE = [0, 3, 1, 0]
+
+    >> YOUR TURN
+       WANT-grid row [0, 1, 0, 0] times nolan's stick [2, 1, 1, 0] = ?
+
+       check: 0·2 + 1·1 + 0·1 + 0·0 = 1.
+
+
+  ## nolan's WANT Dots Every Word's HAVE
+
+  Dot product: lay one stick flat as a row, the other as a column, multiply matching pairs, add.
+
+      nolan.WANT = [2, 0, 1, 0]
+
+      vs nolan.HAVE = [1, 0, 0, 0]:   2·1 + 0·0 + 1·0 + 0·0 = 2
+      vs ended.HAVE = [3, 0, 2, 0]:   2·3 + 0·0 + 1·2 + 0·0 = 8
+
+      nolan's match row: [2, 8]
+
+  A word dots EVERY word, including itself. Match row has n entries (here 2), not n−1.
+
+    >> YOUR TURN
+       nolan.WANT = [2, 0, 1, 0]. Some word's HAVE = [1, 0, 1, 0]. Match = ?
+
+       check: 2·1 + 0·0 + 1·1 + 0·0 = 3.
+
+  WRONG TURN  "Two sticks of width 4 can't be dotted -- wrong shapes."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  Lay one flat: [2,0,1,0]. Stand the other as column. Multiply pairs, add → one number.
+  Two same-width sticks always dot. That is the dot product.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ## Wider Tags Bloat the Match Numbers, So Divide by √(tag width)
+
+  Width 4 → 4 products added. Width 32 → 32 products. More terms → bigger numbers by √(width).
+  That is a scale artifact. Remove it: divide each match by √(tag width).
+
+  Tag width = 4, √4 = 2:
+
+      2 / 2 = 1
+      8 / 2 = 4
+
+      nolan's scaled row: [1, 4]
+
+    >> YOUR TURN
+       Match of 10, tag width 4. Scaled = ?
+
+       check: 10 / 2 = 5.
+
+  WRONG TURN  "Divide by √(tag width) -- same as subtracting the mean and dividing by scatter?"
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  No. That was the same-ruler move (Chapter 1). Here: no mean, no scatter, no data lookup.
+  Just √(how many numbers the tag has) -- a fixed constant. √4 = 2 always.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ## Scores Are Not Fractions Yet -- Softmax Makes Them
+
+  Scaled scores [1, 4] are raw numbers. Turn them into portions adding to 1. Recipe: raise e
+  (≈ 2.718) to each score's power, divide each by the total of the raised values.
+
+      e^1 = 2.718    e^4 = 54.60    total = 57.32
+      nolan's portion:  2.718 / 57.32 = 0.047
+      ended's portion: 54.60 / 57.32 = 0.953
+      check: 0.047 + 0.953 = 1.000  ✓
+
+  nolan listens 0.953 to "ended", 0.047 to itself.
+
+    >> YOUR TURN
+       Two words, both scaled score 0. Softmax = ?
+
+       check: e^0 = 1 both. Total = 2. Each portion = 0.5.
+
+  WRONG TURN  "Softmax adds the match numbers: 2 + 8 = 10."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  Softmax raises e to each number FIRST (4 → e^4 = 54.6, not 4), then divides by the total
+  of the raised values. Nothing is added raw. Each number becomes a separate portion.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ## The Portions Weight the GIVE Sticks -- nolan's New Stick Falls Out
+
+  Multiply each word's GIVE stick by its portion, then ADD number-by-number:
+
+      nolan.GIVE = [2, 0, 0, 1]
+      ended.GIVE = [0, 3, 1, 0]
+
+      0.047 × [2, 0, 0, 1] = [0.094, 0,     0,     0.047]
+      0.953 × [0, 3, 1, 0] = [0,     2.859, 0.953, 0    ]
+      ADD:                   [0.094, 2.859, 0.953, 0.047]  ← nolan_new
+
+  nolan's new stick is mostly "ended"'s give (0.953 weight). Every word builds its own new
+  stick at the same time.
+
+    >> YOUR TURN
+       Portions (0.5, 0.5). GIVE sticks: [4, 0] and [0, 4]. Result = ?
+
+       check: 0.5·[4,0] + 0.5·[0,4] = [2,0]+[0,2] = [2,2].
+
+  WRONG TURN  "2 portions but a 4-wide result -- shouldn't it be 2 numbers wide?"
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  Portion × stick keeps the stick width: 0.953 × [0,3,1,0] is [0,2.859,0.953,0] -- still 4
+  wide. Adding two 4-wide sticks → 4-wide result. "How many words" collapses by ADDING;
+  stick width survives. (100 words × 32-wide GIVE sticks → ADD → one 32-wide stick.)
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+  The six-move formula that runs inside MultiHeadAttention:
+
+      Attention = softmax( Q · Kᵀ / √dₖ ) · V
+
+  Every symbol here is a pencil move above.
+
+
+  ## Two Heads Catch Two Kinds of Link
+
+  One set of WANT/HAVE/GIVE grids learns one kind of cross-word relationship. A second set of
+  grids -- different dials -- learns another kind. Run both in parallel; glue the two new
+  sticks together:
+
+      head 1: own WANT/HAVE/GIVE → full six moves → stick A
+      head 2: DIFFERENT grids → same six moves → stick B
+      glue: [A | B] → richer stick  (same total width as before)
+
+  That is num_heads=2.
+
+
+  ## No Walk Means No Order -- Flagged
+
+  Looking at all words at once, the machine sees a SET -- {nolan, ended} and {ended, nolan}
+  look identical. The full transformer adds a position-stamp to each word's stick before
+  attention runs. The simplified lab version (Q8) skips it. Flagged so you know.
+
+
+  ## 100 Sticks Need One Summary -- Average Them All
+
+  After attention, every word-slot has a new stick. Tick needs ONE. Average all word-sticks
+  number-by-number:
+
+      word 1 = [0.0, 2.8, 0.9, 0.0]
+      word 2 = [0.2, 1.0, 0.5, 0.4]
+      average = [0.1, 1.9, 0.7, 0.2]    (add, divide by 2)
+
+    >> YOUR TURN
+       Sticks [4, 2] and [0, 0]. Average = ?
+
+       check: (4+0)/2=2, (2+0)/2=1 → [2, 1].
+
+
+  ## A Small Head Reads the Summary and Writes the Tick
+
+      summary stick
+        → zero a random 1-in-10 (practice only)          [Dropout 0.1]
+        → 20 workers, multiply-add + nudge, relu          [Dense 20, relu]
+             relu: keep positives, zero negatives
+        → zero a random 1-in-10 again                     [Dropout 0.1]
+        → 1 worker, multiply-add + nudge, sigmoid         [Dense 1, sigmoid]
+             sigmoid: crush any number to 0..1
+             0.9 = 90% liked . 0.1 = probably not liked
+
+  Dropout fires during practice only.
+
+
+  ## Traps, Each as a Clash
+
+  WRONG TURN  "Which tag scores? WANT or HAVE?"
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  WANT does the scoring: nolan's WANT dots every word's HAVE.
+  HAVE is what gets looked at. GIVE is what is taken into the weighted sum. WANT is the only
+  one in dot products.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+  WRONG TURN  "A word can't match itself -- it has no useful information about itself."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  A word DOES match itself: nolan.WANT · nolan.HAVE = 2, which gives it a portion 0.047 in the
+  weighted sum. In longer reviews self-attention weights are often small (other words are more
+  relevant), but the match is always computed. n entries, not n−1.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ## One Recitation (Carry This Away)
+
+  Number words. Swap each for a stick (embedding table). Each word makes WANT / HAVE / GIVE
+  from three reused grids. nolan's WANT dots every HAVE → n matches → ÷ √(tag width) →
+  softmax → portions summing to 1 → weight every GIVE stick, add number-by-number → nolan's
+  new stick [0.094, 2.859, 0.953, 0.047]. Every word does this at once. Two heads, two
+  viewpoints, glued. Average 100 new sticks → one summary. Dropout → 20 relu workers →
+  Dropout → 1 sigmoid → the tick.
+
+  No walk. No memory. Every word straight at every other.
+
+
+----------------------------------------------------------------------------------------------
+  APPENDIX D . TRANSFORMER FROM PENCIL
+  See also: [Chapter 10, Part 3: The Look-Across Machine](the-look-across-machine.txt)
+  companion to: [Chapter 10, Part 1](the-walking-worker.txt) .
+               [Chapter 10, Part 2](the-two-memory-worker.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

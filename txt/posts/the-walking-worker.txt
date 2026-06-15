@@ -5,12 +5,12 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  CHAPTER 10 . MACHINES THAT READ WORDS . PART 1 OF 2
+  CHAPTER 10 . MACHINES THAT READ WORDS . PART 1 OF 3
   Words Into a Machine: The Notepad and the Walking Worker
   Posted: 2026-06-13 . Author: Rahul Rai . Tags: rnn, embedding, nlp, sequence-models
   ============================================================================================
 
-  PATH . post 27 of 28
+  PATH . post 27 of 29
     <- prev:  [Chapter 9, Part 2: The Deep Factory](the-deep-factory.txt)
        next:  [Chapter 10, Part 2: The Two-Memory Worker](the-two-memory-worker.txt) ->
 
@@ -502,7 +502,8 @@
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 10 -- Machines That Read Words):
     Part 1 (this post) .
-    [Part 2 -- The Two-Memory Worker](the-two-memory-worker.txt)
+    [Part 2 -- The Two-Memory Worker](the-two-memory-worker.txt) .
+    [Part 3 -- The Look-Across Machine](the-look-across-machine.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
