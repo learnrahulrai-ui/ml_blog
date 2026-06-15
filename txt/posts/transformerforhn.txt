@@ -19,6 +19,7 @@
   THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it appears.
   Anything named more than five lines ago is named again. Every number is worked in front of
   you -- never "recall that...". One idea per line. A pencil and this page are the whole kit.
+  Decimals are shown to three places, so a final digit may sit one off from a longer division.
 
   TOY NUMBERS, REAL RECIPE. One line of honesty up front, so nothing here misleads. The
   RECIPE on this page -- every move, in order -- is exactly a real transformer block, nothing
@@ -168,7 +169,10 @@
 
   That is the entire attention move: ASK, match every OFFER, shrink, squash to shares, pull
   each HANDOVER in by its share. The published one-liner softmax(Q.K^T / sqrt(d)).V is exactly
-  these four numbers and nothing more.
+  this, stacked for all words at once: Q.K^T is the full square of scores (here 2x2 -- cat's
+  two and sat's two), sqrt(d) is the shrink by the root of the width, softmax runs along each
+  row, and the result times V is the share-weighted sum of HANDOVERs. We walked cat's row, then
+  sat's row, one at a time; stack the two rows and you have the matrix the formula writes.
 
   Run the same machine from sat's seat (ASK(sat) = [2,0,1,1]): its raw scores come out [3, 3],
   /2 = [1.5, 1.5], equal scores give equal shares [0.5, 0.5], so sat's output is the plain
@@ -197,7 +201,10 @@
                   [1.140, 0.709, -0.431, -1.418]   <- middle now 0, typical distance now 1
 
   Check the middle: 1.140 + 0.709 - 0.431 - 1.418 = 0.000. (Two learned dials, a stretch and
-  a shift, can rescale this afterward; they start at 1 and 0, leaving the row as is.)
+  a shift, can rescale this afterward; they start at 1 and 0, leaving the row as is. Real
+  LayerNorm also adds a speck -- a tiny number like 0.00001 -- under the root before dividing,
+  so a row that happens to be all-equal, with distance 0, never divides by zero. Our rows are
+  never all-equal, so the speck changes no digit here.)
 
 
   ## Each Word Has Looked Around but Not Yet THOUGHT -- So Run a Tiny Two-Grid Worker
@@ -236,17 +243,50 @@
   Check the middle: 1.431 + 0.349 - 0.541 - 1.239 = 0.000. Nothing was skipped, nothing waved.
 
 
+  ## sat Rides the Same Recipe -- Carried All the Way Out, Nothing Hidden
+
+  A block must emit a row for EVERY word, not just cat, so run sat through the identical moves.
+  sat's attention output was [1.0, 1.5, 0.5, 1.0] (the equal-share average from earlier); its
+  original row was x_sat = [0, 1, 2, 1].
+
+      residual (add the original back):  [1.0, 1.5, 0.5, 1.0] + [0, 1, 2, 1] = [1.0, 2.5, 2.5, 2.0]
+      LayerNorm (middle 0, distance 1, this row alone):
+          middle = (1.0 + 2.5 + 2.5 + 2.0) / 4 = 8.0 / 4 = 2.0
+          distances: -1.0, 0.5, 0.5, 0.0     squares: 1.0, 0.25, 0.25, 0.0  (sum 1.5)
+          avg square 1.5/4 = 0.375    root sqrt(0.375) = 0.612
+          tame = (number - 2.0)/0.612 = [-1.633, 0.816, 0.816, 0.000]
+
+  Now sat's tiny worker (same two grids and the ReLU bend = turn any negative into 0):
+
+      out1 = [1, -1, 0, 0] . [-1.633, 0.816, 0.816, 0.000] = -1.633 - 0.816 = -2.449
+      out2 = [1, 0, 0, 1] . [-1.633, 0.816, 0.816, 0.000]  = -1.633 + 0.000 = -1.633
+      ReLU([-2.449, -1.633]) = [0.000, 0.000]   <- both negative, so the bend zeroes both
+      second grid on [0, 0] = [0.000, 0.000, 0.000, 0.000]   <- the worker hands back nothing
+
+  Here is exactly why the add-the-original wire (residual) earns its place: sat's worker output
+  is all zeros, so without the wire sat would vanish. With it, sat survives untouched:
+
+      residual: [-1.633, 0.816, 0.816, 0.000] + [0, 0, 0, 0] = [-1.633, 0.816, 0.816, 0.000]
+      LayerNorm: that row already has middle 0 and distance 1, so it passes through unchanged.
+
+  sat went in as [0, 1, 2, 1] and came out as [-1.633, 0.816, 0.816, 0.000] -- a 4-wide row,
+  the same shape cat came out as. TWO words in, TWO rows out, both worked to the last digit.
+
+
   ## That Is One Block -- Three Honest Extras, Each in One Breath
 
   STACK IT. The block took two 4-wide rows in and gave two 4-wide rows out -- same shape. So
   feed its output straight into another identical block, then another. Depth is just blocks
   in a line; GPT-style machines stack dozens. Each is exactly the arithmetic above.
 
-  RUN SEVERAL ASKS AT ONCE (multi-head). Above, cat made ONE ASK. Real machines slice the row
-  into a few pieces and run the whole ASK/OFFER/HANDOVER machine on each slice in parallel,
-  then glue the results back to one row. Four heads on a 4-wide row would be four machines on
-  1-wide slices; the count of heads and what each head catches are different things, and the
-  glued width always returns to the row width. Same recipe, run side by side.
+  RUN SEVERAL ASKS AT ONCE (multi-head). Above, cat made ONE ASK from one set of ASK/OFFER/
+  HANDOVER grids. A real machine runs several heads: each head has its OWN three learned grids
+  (not a parameterless cut of the row), each producing a narrower ASK/OFFER/HANDOVER, so head 1
+  might chase one kind of link across the words and head 2 another. Glue the heads' outputs
+  side by side back to the full row width, THEN pass the glued row through one more learned
+  grid -- the output projection -- that mixes the heads together. So multi-head is: own grids
+  per head, run in parallel, concatenate, then one final grid. Head-count and what each head
+  catches are different things; the width always returns to the row width.
 
   BLANK THE FUTURE TO WRITE (the encoder/decoder switch). Above, cat could look at sat freely
   -- a reader that judges (an encoder, e.g. BERT). To make a writer that generates one word at
@@ -258,8 +298,13 @@
       word 2 sees {1,2}      -> shares [0.500, 0.500, 0    ]
       word 3 sees {1,2,3}    -> shares [0.333, 0.333, 0.333]
 
-  One switch -- leave the scores open (reader, encoder) or set the future to minus infinity
-  (writer, decoder) -- is the whole architectural difference between BERT and GPT.
+  This one switch -- scores left open (reader, encoder) or future set to minus infinity
+  (writer, decoder) -- is the core difference inside attention. Two honest caveats so this is
+  not mistaken for the entire story: BERT and GPT also differ in how they are trained (BERT
+  fills masked-out words by looking both ways; GPT predicts the next word left to right), and
+  the original 2017 machine wired an encoder AND a decoder together for translation, with the
+  decoder also looking back at the encoder (cross-attention). The mask is the heart of the
+  split, not the whole of it.
 
 
   ## One Breath (Carry This Away)
@@ -270,9 +315,10 @@
   HANDOVER by its share -- that is attention. Add the original row back (residual) and tame it
   to middle 0, distance 1, reading the row alone (LayerNorm). Run a tiny widen-bend-narrow
   worker (ReLU), add-back and tame once more. Same shape out as in, so stack it; run several
-  ASKs side by side (heads); blank the future to turn the reader into a writer. cat went in as
-  [2,1,1,0] and came out as [1.431, 0.349, -0.541, -1.239] -- every number on this page, by
-  pencil, no magic, no leftover wire.
+  ASKs side by side, each with its own grids and a final mixing grid (heads); blank the future
+  to turn the reader into a writer. cat went in as [2,1,1,0] and came out as [1.431, 0.349,
+  -0.541, -1.239]; sat went in as [0,1,2,1] and came out as [-1.633, 0.816, 0.816, 0.000] --
+  two words in, two rows out, every number on this page, by pencil, no magic, no leftover wire.
 
 
 ----------------------------------------------------------------------------------------------
