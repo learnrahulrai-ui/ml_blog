@@ -129,6 +129,18 @@
 
      check: ÷2 → [0, 2]. e^0=1, e^2=7.39, total 8.39 → [1/8.39, 7.39/8.39] = [0.119, 0.881].
 
+  The same three moves in numpy -- the whole grid at once:
+
+      scores  = query @ key.T / np.sqrt(d_k)
+      weights = np.exp(scores) / np.exp(scores).sum(axis=-1, keepdims=True)
+      output  = weights @ value
+
+  query is (n, d_k), key is (n, d_k), so key.T is (d_k, n) and query @ key.T is (n, n) --
+  the full MATCH grid in one multiply. sum(axis=-1) adds across each ROW (one strip's match
+  numbers); keepdims=True keeps it shaped as a column so the divide lands slot by slot.
+  weights @ value is (n, n) @ (n, d_v) = (n, d_v): every strip's weighted sum of GIVE rows,
+  the whole board in one shot.
+
 
   ## Tame One Strip, Alone (LayerNorm)
 

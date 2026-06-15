@@ -33,6 +33,37 @@
   Pencil out.
 
 
+  ## The CSV Carries a Hidden Column -- Drop Both Or Every Number Is Wrong
+
+  Fashion-MNIST arrives as a CSV with one row per photo. The usual move: drop the 'label' column,
+  take the rest as pixel values. There is a trap: this dataset's CSV has a SECOND non-pixel column
+  called 'split' -- a string marking which training fold the row came from. Drop only 'label' and
+  'split' rides along among the pixel features, silently corrupting every photo.
+
+  Drop both:
+
+      X_train = train_df.drop(['label', 'split'], axis=1).values
+      X_test  = test_df.drop( ['label', 'split'], axis=1).values
+      y_train = train_df['label'].values
+      y_test  = test_df['label'].values
+
+  Then scale to [0, 1] and reshape. Here is where ViT and CNN diverge. Chapter 9's CNN needed a
+  channel dimension at the end -- 28 x 28 x 1, shape (-1, 28, 28, 1). The ViT's patch-cutter
+  does not; it reads the photo as a flat 2-D grid, shape (-1, 28, 28). The fourth slot breaks the
+  cutter's reshape, and the error surfaces late -- inside extract_patches, not at the reshape line.
+
+      X_train = X_train.reshape(-1, 28, 28) / 255.0   # ViT: 3D -- no channel dimension
+      X_test  = X_test.reshape( -1, 28, 28) / 255.0
+
+  WRONG TURN  "Use (-1, 28, 28, 1) -- matches the CNN, safer."
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  The reshape to (-1, 28, 28, 1) succeeds silently. The crash comes later, inside
+  extract_patches, where images.reshape(b, n, patch_size, n, patch_size) tries to read images
+  as 3-D (b, 28, 28) but finds 4-D (b, 28, 28, 1). Error: "cannot reshape array of size ...
+  into shape ...". Use (-1, 28, 28) and it never appears.
+  ─────────────────────────────────────────────────────────────────────────────────────────
+
+
   ## A Photo Has 784 Dots, Too Many to Pin at Once -- So Cut It Into Strips
 
   Chapter 10's attention pins every token on a board and strings every token to every other.
