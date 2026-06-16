@@ -325,6 +325,33 @@
     stump is memorising study-pile noise while harming exam performance.
 
 
+  ## So Why Keep Both: One Family Calms Jumps, the Other Fights Stubbornness
+
+  Two ways for a tree to be wrong, the same two from the depth sweep and from
+  Chapter 4's two bad drivers.  A deep tree is JUMPY -- nudge a few people and it
+  redraws itself, so it memorises this pile and panics on the next (variance).  A
+  lone stump is STUBBORN -- one question can never bend to a curved truth, so it is
+  wrong the same way on every pile (bias).  Each committee family is built against a
+  different one of these:
+
+    bagging / forest:  full deep trees, each jumpy alone, AVERAGED ->
+                       the random jumps point every which way and cancel.
+                       calms the JUMPINESS (variance).  the stubbornness, if any,
+                       survives the average untouched -- 200 trees that all lean
+                       the same wrong way still lean that way.
+
+    boosting:          stumps, each too stubborn alone, stacked IN A LINE so each
+                       patches the last one's leftover bend ->
+                       the line slowly curves to fit what one stump could not.
+                       fights the STUBBORNNESS (bias).  but a long enough line
+                       starts tracing noise, which is why the validation curve
+                       above turns back up.
+
+  So they are not rivals you pick between by taste.  Reach for bagging or a forest
+  when a single tree is wild and over-eager; reach for boosting when a shallow tree
+  is too blunt to catch the shape.  Same trees, opposite cures.
+
+
   ## Interpretation 1: Scramble (Which Column Mattered)
 
   You have 300 frozen trees.  The exam pile is sealed.  True MSE = 25.

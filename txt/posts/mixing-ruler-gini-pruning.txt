@@ -295,6 +295,13 @@
         if 5400 > alpha   -> keep the doctor   (earns its keep)
         if 5400 < alpha   -> FIRE him, merge rooms back   (not worth the tax)
 
+  !! WARN: THIS ALPHA IS ADDED ON, NOT A DENOMINATOR
+     Chapter 4's Ridge also had an alpha, but it sat in the BOTTOM of a fraction
+     (dial = top / (bottom + alpha)) and squeezed dials toward zero.  Here alpha is
+     ADDED -- a flat tax per leaf -- and it snips whole branches off.  Same letter,
+     opposite machinery: one shrinks a number, the other deletes a room.  Do not carry
+     the denominator picture across; the tax climbs, the leaf count drops.
+
   ** KEY: MAX_DEPTH IS A CEILING; CCP_ALPHA IS A TAX
      max_depth: chops ALL corridors at height N.  blunt, same haircut everywhere.
      ccp_alpha: snips weak twigs ANYWHERE, keeps strong deep branches.  smart, uneven.

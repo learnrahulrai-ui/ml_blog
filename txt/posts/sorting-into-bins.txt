@@ -161,6 +161,11 @@
      column's dial and barely moves the small one's. Put every column on the same ruler
      first -- mean 0, spread 1 -- and the step sizes become comparable.
 
+     The ruler touches the measured columns (X) ONLY -- never the answer y. y is already
+     a clean 0 or 1; it is the key you grade against, not a measurement that needs a ruler.
+     Run a mean-and-spread ruler over the 0/1 column and you smear the answer key into
+     fractions, which is why the scaler is fit and applied to X_train / X_test alone.
+
 
   ## Encoding the Labels
 
