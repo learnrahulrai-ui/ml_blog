@@ -147,8 +147,12 @@
 
   Build the tree under all three from the same sheet and the root heights line up
   single < average < complete -- the cautious worst-case rule always waits longest.
-    WARD linkage      = marry the pair that adds the LEAST extra tightness (Part 3's
-                        inertia idea) -> tends to give even, round, similar-sized groups
+    WARD linkage      = marry the pair that adds the LEAST extra spread.  "Spread" here
+                        means: inside one group, find its centre (the average dot), measure
+                        each member's squared distance to that centre, and add those up --
+                        a single number that is small when the group is a tight ball.  Ward
+                        marries the two groups whose joining grows that total the least
+                        -> tends to give even, round, similar-sized groups
 
   ** KEY: THE LINKAGE IS A REAL CHOICE, NOT A DEFAULT TO IGNORE
      Single, complete, average, and Ward can build genuinely different trees from the
