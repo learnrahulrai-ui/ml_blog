@@ -88,35 +88,37 @@
 
     person   bmi (x)   answer (y)   x - xbar   y - ybar   (x-xbar)(y-ybar)   (x-xbar)^2
     --------------------------------------------------------------------------------------
-      A       0.04        97        -0.04       -29          1.16             0.0016
-      B       0.06       121        -0.02        -5          0.10             0.0004
-      C       0.12       135         0.04         9          0.36             0.0016
-      D       0.18       151         0.10        25          2.50             0.0100
+      A       0.04        97        -0.06       -29          1.74             0.0036
+      B       0.06       121        -0.04        -5          0.20             0.0016
+      C       0.12       135         0.02         9          0.18             0.0004
+      D       0.18       151         0.08        25          2.00             0.0064
                         -----                                                --------
     xbar = (0.04+0.06+0.12+0.18)/4 = 0.40/4 = 0.10
     ybar = (97+121+135+151)/4 = 504/4 = 126
 
     "x - xbar" means: subtract the column's own average (0.10) from each person's bmi.
-    For person A: 0.04 - 0.10 = -0.04.  For B: 0.06 - 0.10 = -0.02.  And so on.
+    For person A: 0.04 - 0.10 = -0.06.  For B: 0.06 - 0.10 = -0.04.  And so on.
+    (Check: the four deviations -0.06, -0.04, 0.02, 0.08 add to 0, as deviations from
+    an average always must.)
 
     "y - ybar" means: subtract the answer's average (126) from each person's answer.
     For person A: 97 - 126 = -29.  For B: 121 - 126 = -5.  And so on.
 
     Multiply (x-xbar) by (y-ybar) for each person:
-      A: -0.04 * -29 = 1.16    (minus * minus = plus)
-      B: -0.02 * -5  = 0.10
-      C:  0.04 *  9  = 0.36
-      D:  0.10 * 25  = 2.50
-    sum = 1.16 + 0.10 + 0.36 + 2.50 = 4.12   <- this is the "top"
+      A: -0.06 * -29 = 1.74    (minus * minus = plus)
+      B: -0.04 * -5  = 0.20
+      C:  0.02 *  9  = 0.18
+      D:  0.08 * 25  = 2.00
+    sum = 1.74 + 0.20 + 0.18 + 2.00 = 4.12   <- this is the "top"
 
     Square (x-xbar) for each person:
-      A: (-0.04)^2 = -0.04 * -0.04 = 0.0016
-      B: (-0.02)^2 = -0.02 * -0.02 = 0.0004
-      C: (0.04)^2  =  0.04 *  0.04 = 0.0016
-      D: (0.10)^2  =  0.10 *  0.10 = 0.0100
-    sum = 0.0016 + 0.0004 + 0.0016 + 0.0100 = 0.0136   <- this is the "bottom"
+      A: (-0.06)^2 = -0.06 * -0.06 = 0.0036
+      B: (-0.04)^2 = -0.04 * -0.04 = 0.0016
+      C: (0.02)^2  =  0.02 *  0.02 = 0.0004
+      D: (0.08)^2  =  0.08 *  0.08 = 0.0064
+    sum = 0.0036 + 0.0016 + 0.0004 + 0.0064 = 0.0120   <- this is the "bottom"
 
-    LADDER dial = 4.12 / 0.0136 ~ 303
+    LADDER dial = 4.12 / 0.0120 ~ 343
 
   >> YOUR TURN
      One person on a one-column sheet (made-up) sits at x - xbar = 0.05 and
@@ -126,10 +128,10 @@
      piece = (x-xbar)^2 = 0.05 x 0.05 = 0.0025.  Sum the top pieces over everyone for
      the LADDER's numerator, the bottom pieces for its denominator.
 
-    That is the bmi-dial IF bmi were the ONLY column.  It is 303 because the
-    numbers here are small (0.04, 0.06, ...) and multiplying by 303 brings them
+    That is the bmi-dial IF bmi were the ONLY column.  It is 343 because the
+    numbers here are small (0.04, 0.06, ...) and multiplying by 343 brings them
     into the range of the answer (97 to 151).  The LADDER dial says "for every
-    1 unit bmi goes up, the guess goes up by 303."
+    1 unit bmi goes up, the guess goes up by 343."
 
     But this is a LIE if any other column moves together with bmi.  The real
     dial is SMALLER because the untangler (X^T X)^-1 splits the credit among
@@ -158,7 +160,7 @@
   don't fool anyone else: name it EXACT or LADDER up front.
 
 
-  IN HAND: the bmi LADDER dial, worked from top 4.12 over bottom 0.0136 ~ 303 -- the
+  IN HAND: the bmi LADDER dial, worked from top 4.12 over bottom 0.0120 ~ 343 -- the
   credit bmi grabs if it stands alone -- with the warning that the EXACT dials need the
   untangler (X^T X)^-1 to share credit among overlapping columns.  This section adds the
   eleventh number, the nudge.
