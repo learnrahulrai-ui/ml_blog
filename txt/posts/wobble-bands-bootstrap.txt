@@ -237,6 +237,34 @@
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
+  First the OOB and band arithmetic from the worked examples, hard-coded:
+
+    # chance a patient sits out a deal of n=4 with replacement
+    # each draw: prob of NOT picking them = (4-1)/4 = 3/4; all 4 draws miss = (3/4)^4
+    oob_4 = (3/4)**4                  # 81/256 = 0.316 (about 32% sit out at n=4)
+    print(round(oob_4, 3))            # 0.316
+
+    # as n grows, settles near 1/e ~= 0.368
+    oob_80 = (79/80)**80              # ~0.364 (about 37% sit out at n=80)
+    print(round(oob_80, 3))           # 0.364
+
+    # 95% band: chop 2.5% off each end of 200 sorted dial values
+    n_redeals = 200
+    chop_each_end = int(n_redeals * 0.025)   # 200 * 0.025 = 5
+    keep_count = n_redeals - 2 * chop_each_end  # 200 - 5 - 5 = 190
+    print(chop_each_end, keep_count)  # 5 190  (same count every time; trust is in WIDTH)
+
+    # two example dials -- same count (190) but very different trust
+    bmi_lower, bmi_upper = 0.42, 0.58   # tight, away from 0 -> trust it
+    s5_lower,  s5_upper  = -0.80, 0.90  # straddles 0 -> cannot trust its sign
+
+    bmi_width = bmi_upper - bmi_lower   # 0.16
+    s5_width  = s5_upper  - s5_lower    # 1.70
+    print(bmi_width, s5_width)          # 0.16 1.7  (same 190 notes; wildly different trust)
+
+  Two dials, same bootstrap count, very different widths.  The toolbox loops below re-deal
+  and grade for you:
+
   Two small loops. The first re-deals the pile 200 times and collects every dial; the band
   is just two quantiles of those. The second does the same but grades each deal on its
   left-out patients.

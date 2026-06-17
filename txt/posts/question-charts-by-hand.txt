@@ -439,6 +439,42 @@
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same work, spoken in Python.
 
+  First the 4-person cut badness from the worked example, hard-coded -- one cut per block:
+
+    # 4 people: sorted by bmi -> C(0.04,97), B(0.06,121), D(0.12,135), A(0.18,151)
+    # 3 candidate cuts at midpoints: 0.05, 0.09, 0.15
+
+    # cut at 0.05: below={C}, above={B,D,A}
+    mean_below_05 = 97                                    # one person, mean = itself
+    mean_above_05 = (121 + 135 + 151) / 3                # 135.667
+    badness_05 = ((97  - mean_below_05)**2
+               + (121 - mean_above_05)**2
+               + (135 - mean_above_05)**2
+               + (151 - mean_above_05)**2)               # 0 + 215.1 + 0.4 + 235.1 = 450.6
+    print(round(mean_above_05, 1), round(badness_05, 1)) # 135.7 450.6
+
+    # cut at 0.09: below={C,B}, above={D,A}  <- CHAMPION
+    mean_below_09 = (97 + 121) / 2    # 109
+    mean_above_09 = (135 + 151) / 2   # 143
+    badness_09 = ((97  - mean_below_09)**2 + (121 - mean_below_09)**2
+               + (135 - mean_above_09)**2 + (151 - mean_above_09)**2)
+    # = 144 + 144 + 64 + 64 = 416
+    print(mean_below_09, mean_above_09, badness_09)      # 109 143 416
+
+    # cut at 0.15: below={C,B,D}, above={A}
+    mean_below_15 = (97 + 121 + 135) / 3  # 117.667
+    mean_above_15 = 151                    # one person
+    badness_15 = ((97  - mean_below_15)**2 + (121 - mean_below_15)**2
+               + (135 - mean_below_15)**2 + (151 - mean_above_15)**2)
+    # = 427.1 + 11.1 + 300.4 + 0 = 738.6
+    print(round(mean_below_15, 1), round(badness_15, 1)) # 117.7 738.6
+
+    # champion of champions: the cut with smallest badness
+    print(min(badness_05, badness_09, badness_15))  # 416  -> bmi at 0.09 wins
+
+  Three cuts, three badness numbers, one champion.  The toolbox line below runs the same
+  hunt across all columns and all 331 people:
+
   The entire build hunt -- sort, midpoints, badness, champion, recurse -- is one line:
 
   >> NEW TO PYTHON? Each named once:

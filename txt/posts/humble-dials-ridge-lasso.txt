@@ -174,43 +174,43 @@
 
       person   bmi      answer    bmi-avg  ans-avg   (bmi-avg)*(ans-avg)  (bmi-avg)^2
       --------------------------------------------------------------------------------
-        A     0.04       97       -0.04     -31          1.24               0.0016
-        B     0.06      121       -0.02      -7          0.14               0.0004
-        C     0.12      135        0.04       7          0.28               0.0016
-        D     0.18      151        0.10      23          2.30               0.0100
-                           avg: 0.08       126           ------             -------
-                                                         top=3.96           bottom=0.0136
+        A     0.04       97       -0.06     -29          1.74               0.0036
+        B     0.06      121       -0.04      -5          0.20               0.0016
+        C     0.12      135        0.02       9          0.18               0.0004
+        D     0.18      151        0.08      25          2.00               0.0064
+                           avg: 0.10       126           ------             -------
+                                                         top=4.12           bottom=0.0120
 
-      without ridge (a=0):  dial = 3.96 / 0.0136 = 291
-      with ridge a=10:      dial = 3.96 / (0.0136 + 10) = 3.96 / 10.0136 = 0.396
-      with ridge a=100:     dial = 3.96 / (0.0136 + 100) = 3.96 / 100.0136 = 0.0396
+      without ridge (a=0):  dial = 4.12 / 0.0120 = 343
+      with ridge a=10:      dial = 4.12 / (0.0120 + 10) = 4.12 / 10.0120 = 0.411
+      with ridge a=100:     dial = 4.12 / (0.0120 + 100) = 4.12 / 100.0120 = 0.0412
 
   Read those three lines one at a time.
-  With a=0 the bottom is just 0.0136, so the dial is 3.96/0.0136 = 291 -- huge.
-  With a=10 the bottom becomes 0.0136+10 = 10.0136, so the dial is 3.96/10.0136 = 0.396.
-  That is 291/0.396 = 735 times smaller.
-  With a=100 the bottom becomes 0.0136+100 = 100.0136, so the dial is 3.96/100.0136 = 0.0396.
-  That is 291/0.0396 = 7350 times smaller.
+  With a=0 the bottom is just 0.0120, so the dial is 4.12/0.0120 = 343 -- huge.
+  With a=10 the bottom becomes 0.0120+10 = 10.0120, so the dial is 4.12/10.0120 = 0.411.
+  That is 343/0.411 = 834 times smaller.
+  With a=100 the bottom becomes 0.0120+100 = 100.0120, so the dial is 4.12/100.0120 = 0.0412.
+  That is 343/0.0412 = 8325 times smaller.
   So the bigger the a, the smaller the dial.
 
   Now the table's own arithmetic, spelled out.
-  The table uses a column average of 0.08 and an answer average of 126.
-  "bmi-avg" means bmi minus the column's own average (0.08).
-  So for person A: 0.04 - 0.08 = -0.04, and for B: 0.06 - 0.08 = -0.02, and so on.
+  The table uses a column average of 0.10 and an answer average of 126.
+  "bmi-avg" means bmi minus the column's own average (0.10).
+  So for person A: 0.04 - 0.10 = -0.06, and for B: 0.06 - 0.10 = -0.04, and so on.
   "ans-avg" means answer minus the answer's average (126).
-  So for person A: 97 - 126 = -31, and for B: 121 - 126 = -7, and so on.
+  So for person A: 97 - 126 = -29, and for B: 121 - 126 = -5, and so on.
   Multiplying those two gives the "top" piece for each person.
-  Adding up all four "top" pieces gives 1.24 + 0.14 + 0.28 + 2.30 = 3.96.
+  Adding up all four "top" pieces gives 1.74 + 0.20 + 0.18 + 2.00 = 4.12.
   Squaring each "bmi-avg" gives the "bottom" piece for each person.
-  Adding up all four "bottom" pieces gives 0.0016 + 0.0004 + 0.0016 + 0.0100 = 0.0136.
+  Adding up all four "bottom" pieces gives 0.0036 + 0.0016 + 0.0004 + 0.0064 = 0.0120.
 
   >> YOUR TURN
-     Same column (top = 3.96, bottom = 0.0136).  Set the knob to a = 1 and work the
+     Same column (top = 4.12, bottom = 0.0120).  Set the knob to a = 1 and work the
      ridge dial on the slate.
 
-     check your slate:  dial = top / (bottom + a) = 3.96 / (0.0136 + 1) = 3.96 /
-     1.0136 ~= 3.91.  Even a gentle a = 1 drags the plain dial of 291 down to about
-     3.9 -- the bump on the bottom does nearly all the work.
+     check your slate:  dial = top / (bottom + a) = 4.12 / (0.0120 + 1) = 4.12 /
+     1.0120 ~= 4.07.  Even a gentle a = 1 drags the plain dial of 343 down to about
+     4.1 -- the bump on the bottom does nearly all the work.
 
   ** KEY: RIDGE SHRINKS ALL, ZEROES NONE, AND SOLVES IN ONE SHOT
      The fine's pull dies at zero, so every dial lands small-but-alive.
@@ -409,6 +409,43 @@
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
+
+  First the Ridge dial formula from the worked example, hard-coded -- one person per line:
+
+    # Ridge dial: 4-person bmi example
+    A_bmi, A_ans = 0.04, 97
+    B_bmi, B_ans = 0.06, 121
+    C_bmi, C_ans = 0.12, 135
+    D_bmi, D_ans = 0.18, 151
+
+    bmi_avg = (A_bmi + B_bmi + C_bmi + D_bmi) / 4   # 0.10
+    ans_avg = (A_ans + B_ans + C_ans + D_ans) / 4    # 126
+    print(bmi_avg, ans_avg)  # 0.1 126
+
+    # top = sum((bmi - bmi_avg) * (ans - ans_avg))
+    top_A = (A_bmi - bmi_avg) * (A_ans - ans_avg)  # (-0.06)*(-29) = 1.74
+    top_B = (B_bmi - bmi_avg) * (B_ans - ans_avg)  # (-0.04)*(-5)  = 0.20
+    top_C = (C_bmi - bmi_avg) * (C_ans - ans_avg)  #  (0.02)*(9)   = 0.18
+    top_D = (D_bmi - bmi_avg) * (D_ans - ans_avg)  #  (0.08)*(25)  = 2.00
+    top = top_A + top_B + top_C + top_D             # 4.12
+    print(round(top,2))  # 4.12
+
+    # bottom = sum((bmi - bmi_avg)^2)
+    bot_A = (A_bmi - bmi_avg)**2   # (-0.06)^2 = 0.0036
+    bot_B = (B_bmi - bmi_avg)**2   # (-0.04)^2 = 0.0016
+    bot_C = (C_bmi - bmi_avg)**2   #  (0.02)^2 = 0.0004
+    bot_D = (D_bmi - bmi_avg)**2   #  (0.08)^2 = 0.0064
+    bottom = bot_A + bot_B + bot_C + bot_D  # 0.0120
+    print(round(bottom,4))  # 0.012
+
+    # Ridge dial = top / (bottom + a) -- watch how a shrinks the dial
+    dial_a0   = top / (bottom + 0)    # 4.12/0.012 = 343   (plain, no leash)
+    dial_a10  = top / (bottom + 10)   # 4.12/10.012 = 0.411
+    dial_a100 = top / (bottom + 100)  # 4.12/100.012 = 0.0412
+    print(round(dial_a0), round(dial_a10,3), round(dial_a100,4))  # 343 0.411 0.0412
+
+  The bigger the leash a, the smaller the dial -- but never exactly zero.  The toolbox
+  block below sweeps 50 values of a and keeps the valley:
 
   Two ready-made machines do all of this: RidgeCV and LassoCV both sweep a ladder of a's
   with the 5-slice check and keep the winner. Scale the columns first, the same as every

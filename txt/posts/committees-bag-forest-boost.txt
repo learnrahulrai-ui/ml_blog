@@ -558,6 +558,55 @@
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
+  First the bagging vote, OOB probability, and boosting leftover arithmetic, hard-coded:
+
+    # 5-tree committee vote (from "your turn")
+    vote1, vote2, vote3, vote4, vote5 = 150, 160, 140, 155, 145
+    bag_guess = (vote1 + vote2 + vote3 + vote4 + vote5) / 5  # 750/5 = 150
+    print(bag_guess)  # 150.0
+
+    # OOB: chance a patient sits out a deal of n=4 (drawn with replacement)
+    # missed in every draw = (3/4)^4 = 81/256
+    oob_n4 = (3/4)**4              # 0.316  (about 32% at n=4)
+    print(round(oob_n4, 3))        # 0.316
+
+    # for n=80, converges to 1/e ~= 0.368
+    oob_n80 = (79/80)**80          # ~0.364
+    print(round(oob_n80, 3))       # 0.364
+
+    # boosting leftover arithmetic: 4 patients, 3 stumps
+    answer_A, answer_B, answer_C, answer_D = 151, 75, 141, 121
+
+    stump1_A, stump1_B, stump1_C, stump1_D = 140, 80, 130, 130
+    left1_A = answer_A - stump1_A  # 11
+    left1_B = answer_B - stump1_B  # -5
+    left1_C = answer_C - stump1_C  # 11
+    left1_D = answer_D - stump1_D  # -9
+    print(left1_A, left1_B, left1_C, left1_D)  # 11 -5 11 -9  <- stump 2 targets these
+
+    stump2_A, stump2_B, stump2_C, stump2_D = 8, -4, 8, -7
+    left2_A = left1_A - stump2_A  # 3
+    left2_B = left1_B - stump2_B  # -1
+    left2_C = left1_C - stump2_C  # 3
+    left2_D = left1_D - stump2_D  # -2
+    print(left2_A, left2_B, left2_C, left2_D)  # 3 -1 3 -2  <- stump 3 targets these
+
+    stump3_A, stump3_B, stump3_C, stump3_D = 2, 0, 2, -2
+    left3_A = left2_A - stump3_A  # 1
+    left3_B = left2_B - stump3_B  # -1
+    left3_C = left2_C - stump3_C  # 1
+    left3_D = left2_D - stump3_D  # 0
+    print(left3_A, left3_B, left3_C, left3_D)  # 1 -1 1 0  <- leftovers shrink each round
+
+    # final guess with learning_rate=0.1 (each stump's guess scaled down)
+    lr = 0.1
+    final_A = stump1_A + lr*stump2_A + lr*stump3_A  # 140 + 0.8 + 0.2 = 141
+    final_B = stump1_B + lr*stump2_B + lr*stump3_B  # 80 + (-0.4) + 0 = 79.6
+    print(round(final_A, 1), round(final_B, 1))      # 141.0 79.6
+
+  Three committees, all visible.  The toolbox block below uses the same ideas on the
+  diabetes sheet:
+
   >> NEW TO PYTHON? Each named once:
        BaggingRegressor()           -- 200 trees, each on a bootstrap pile, averaged
        RandomForestRegressor()      -- bagging + hide columns (max_features)
