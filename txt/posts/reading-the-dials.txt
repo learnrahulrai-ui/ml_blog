@@ -262,10 +262,30 @@
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same moves, spoken in Python.
 
-  Two short snippets.
-  The first zips the column names onto the bare dials and grabs the most-negative one.
-  The second does the same AFTER putting every column on a shared ruler.
-  So the second comparison is honest rather than an accident of units.
+  First the reading by hand -- the four dials from the worked example written out, the
+  most-negative hunt, and the per-spread conversion, no loop:
+
+    # the bare row of dials, one per line, with their column names
+    disp_dial   = -0.01
+    horse_dial  = -0.04
+    weight_dial = -0.007
+    accel_dial  = +0.12
+
+    # zip names onto dials, then "drags hardest" = the MINIMUM (most negative), not the
+    # digit that looks biggest
+    dials = {"disp": disp_dial, "horse": horse_dial, "weight": weight_dial, "accel": accel_dial}
+    strongest_drag = min(dials, key=dials.get)        # 'horse' at -0.04
+    print(strongest_drag, dials[strongest_drag])      # horse -0.04
+
+    # raw dials wear each column's units; convert to the shared currency:
+    #   per-spread dial = raw dial * column spread
+    weight_per_spread = -0.005 * 800                  # -4.0 mpg per one-spread (800 lb) step
+    print(weight_per_spread)                          # -4.0
+
+  Four dials, one winner, every comparison visible. On a real fitted model you do not type
+  the dials -- they come back from the stick as a bare row (model.coef_), so you zip the
+  column names on the same way. The two snippets below do exactly the hand-steps above, once
+  raw and once after putting every column on a shared ruler so the comparison is honest:
 
   >> NEW TO PYTHON? Each named once:
        dict(zip(a, b))    -- pair two rows into a labelled shelf: name -> value
