@@ -245,13 +245,18 @@
     - Gauss-Markov, uneven miss spread -- the assumptions
     - ridge, lasso -- when columns are near-recipes of each other
 
-    1. Rule: yhat = X*beta; set dials by shrinking ||X*beta - y||^2.
-    2. Bowl-shaped mistake -> exact dials from beta = (X^T X)^-1 X^T y.
-    3. Leftovers sit at right-angles to measured columns; yhat = H*y is a flat-sheet
-       shadow.
-    4. Straight-stick rule is BLUE under Gauss-Markov; bell-curve leftovers needed only
-       for tests.
-     5. Cut the sheet (QR/SVD), don't flip it; add a bump when X^T X is flat.
+    - The rule is yhat = X*beta (a guess is a weighted sum of the measured columns plus a
+      fixed nudge); set the dials by shrinking the squared leftover ||X*beta - y||^2.
+    - That squared leftover is bowl-shaped, which means its one flat point is the global
+      bottom -- therefore the best dials drop out of the exact formula beta = (X^T X)^-1 X^T y,
+      no searching.
+    - At those dials the leftover column sits at right-angles to every measured column, so
+      the guess yhat = H*y is just the shadow of y thrown flat onto the sheet the columns span.
+    - That shadow is the lowest-spread honest flat guess (BLUE) when the Gauss-Markov terms
+      hold; the bell-curve shape of leftovers is needed only for confidence ranges and t-tests.
+    - Because forming X^T X squares the shakiness, cut the sheet directly (QR or SVD) instead
+      of flipping it; and when X^T X is flat (one column is a near-recipe of another) add a
+      small bump to the diagonal.
 
 
   ## Common Tripwires I Caught
