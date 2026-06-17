@@ -352,7 +352,7 @@
   is too blunt to catch the shape.  Same trees, opposite cures.
 
 
-  ## Interpretation 1: Scramble (Which Column Mattered)
+  ## Scramble a Column to See Which One Mattered
 
   You have 300 frozen trees.  The exam pile is sealed.  True MSE = 25.
 
@@ -422,10 +422,14 @@
      the real world."
 
 
-  ## Interpretation 2: Slide (How the Column Pushes the Guess)
+  ## Slide a Column to See How It Pushes the Guess
 
-  Scramble tells you WHICH column mattered.  Slide tells you HOW it pushes
-  the guess.  The push is called a Partial Dependence Plot (PDP).
+  Scrambling a column -- shuffling its values across people so they land on the
+  wrong rows -- told you WHICH column mattered by how much the score worsened.
+  Sliding tells you HOW the column pushes the guess: hold every other column at
+  its real value and feed the whole pile the SAME fake value for this one column,
+  then watch the average guess move as you change that fake value.  The push drawn
+  out this way is called a Partial Dependence Plot (PDP).
 
   First, pick one column -- say "bmi."  Keep all other 9 columns at their real
   values.
