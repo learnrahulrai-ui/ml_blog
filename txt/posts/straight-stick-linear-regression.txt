@@ -303,11 +303,37 @@
   ## The Code, If You Want It
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
-  section is for the day you meet one: the same steps, spoken in Python.
+  section is for the day you meet one: the same three rows, spoken in Python.
 
-  The whole pencil derivation above is what the toolbox does for you in four lines. Notice
-  there is no setting to tune and no rotating-fold hunt here -- the dials come straight from
-  the exact formula, so LinearRegression simply solves and stops.
+  First the flat-point solve by hand -- three rows, four sums, the 2x2 system, all written
+  out, no loop, so you watch w=1.5, b=0.333, and the leftovers print back:
+
+    # three rows, one column: (x, y) one per line
+    x1, y1 = 1, 2
+    x2, y2 = 2, 3
+    x3, y3 = 3, 5
+
+    # the four sums the flat-point equations need
+    sum_x  = 1 + 2 + 3            # 6
+    sum_y  = 2 + 3 + 5            # 10
+    sum_xx = 1*1 + 2*2 + 3*3      # 14
+    sum_xy = 1*2 + 2*3 + 3*5      # 23
+
+    # flat-point equations (n=3):  3*b + 6*w = 10  and  6*b + 14*w = 23
+    # eliminate b and solve the 2x2 system:
+    w = (3*sum_xy - sum_x*sum_y) / (3*sum_xx - sum_x*sum_x)   # 9/6 = 1.5  (the dial on x)
+    b = (sum_y - w*sum_x) / 3                                 # (10-9)/3 = 0.333 (the nudge)
+    print(round(w,3), round(b,3))      # 1.5 0.333
+
+    # the stick's guess at each x, and the leftover (y - guess), one line each
+    yhat1 = b + w*1;  yhat2 = b + w*2;  yhat3 = b + w*3
+    print(round(yhat1,3), round(yhat2,3), round(yhat3,3))             # 1.833 3.333 4.833
+    print(round(y1-yhat1,3), round(y2-yhat2,3), round(y3-yhat3,3))    # 0.167 -0.333 0.167
+
+  Three rows, every sum and leftover visible. The real pile is 16,512 rows of 8 columns;
+  there X^T X is a 9x9 grid you cannot invert by pencil, so the toolbox runs the IDENTICAL
+  flat-point solve (via SVD) for you. Same arithmetic, bigger grid -- no setting to tune,
+  no rotating-fold hunt, the dials drop straight out:
 
   >> NEW TO PYTHON? One new piece here:
        thing.coef_      -- a value the object stores after being fitted; sklearn marks
