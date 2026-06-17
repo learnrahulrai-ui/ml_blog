@@ -22,16 +22,22 @@
   Decimals are shown to three places, so a final digit may sit one off from a longer division.
 
   TOY NUMBERS, REAL RECIPE. One line of honesty up front, so nothing here misleads. The
-  RECIPE on this page -- every move, in order -- is exactly a real transformer block, nothing
-  faked or skipped. The NUMBERS are a toy: rows 4 wide instead of 512, two words instead of
-  thousands, and weight-grids picked small and clean so you can check each by eye. Where a toy
+  RECIPE on this page -- every move, in order -- is exactly a real GPT-style transformer block,
+  nothing faked or skipped. The NUMBERS are a toy: rows 4 wide instead of 512, two words instead
+  of thousands, and weight-grids picked small and clean so you can check each by eye. Where a toy
   choice could be mistaken for the mechanism, the text says so and shows the real version
   beside it. Trust the recipe; treat the sizes as a sketchpad.
 
   The whole machine, named once so you see the shape, then built piece by piece below:
 
-      word -> numbers  ->  +position  ->  ASK/OFFER/HANDOVER  ->  scores -> shares
-           ->  weighted sum  ->  add-the-original + tame  ->  small worker + tame  ->  out
+      word -> numbers  ->  +position  ->  tame  ->  ASK/OFFER/HANDOVER  ->  scores -> shares
+           ->  weighted sum  ->  project  ->  add-the-original
+           ->  tame  ->  small worker  ->  add-the-stream  ->  out
+
+  Four kinds of move appear in that chain. Named once here so you are not surprised later:
+  matrix multiply (row dot weight-row -- the main workhorse), LayerNorm (taming a row to
+  middle 0 and typical-distance 1), softmax (turning scores into shares that add to 1),
+  and ReLU (zeroing every negative number). Each is fully spelled out where it first runs.
 
 
   ## A Machine Only Multiplies Numbers, and "cat" Is Not a Number -- So Hand It a Row
@@ -82,48 +88,78 @@
   Same end: a unique row per seat, near seats close, far seats apart. Both ways are legal.
 
 
-  ## One Word Must Both ASK and Be ASKED -- So Make Three Views of Its Row
+  ## One Word Must Both ASK and Be ASKED -- But the Row Is on a Wild Scale, So Tame It First
 
   cat wants to look at the other words. To look, it needs to ASK a question, sat needs to
   OFFER a label to be matched against, and sat needs something to HAND OVER once matched.
-  One row cannot play all three parts cleanly, so make three views of each row.
+  Before any of that, the rows from the embedding+position step can sit at very different
+  scales -- one slot at 2, another at 0 -- which would give wildly unequal dot products.
+  So tame each row first. This taming is LayerNorm, defined fully here:
 
-  A view = the row pushed through a fixed grid of numbers (a "grid" = a square of weights;
-  multiplying a row by it gives a new row -- a matrix multiply, the one and only kind of
-  machine in this whole block). The real grids are dense: each output number is a weighted sum
-  of ALL four inputs. Here, as a toy, each grid simply re-orders the four slots so you can
-  check every output by eye -- but the box just below works a real dense grid beside it, so
-  you see the re-ordering is only the easy special case, not the mechanism.
+      LayerNorm of a row r = [r1, r2, r3, r4]:
+        middle   = (r1 + r2 + r3 + r4) / 4          <- average of the row's own slots
+        distance = sqrt( ((r1-middle)^2 + (r2-middle)^2 + (r3-middle)^2 + (r4-middle)^2) / 4 )
+        tamed    = [ (r1-middle)/distance,  (r2-middle)/distance,  ... ]
+      Result: middle is now 0; typical distance from 0 is now 1. Reads only THIS row's slots.
+
+  LayerNorm x_cat = [2, 1, 1, 0]:
+
+      middle   = (2 + 1 + 1 + 0) / 4 = 4 / 4 = 1.000
+      deviations from 1.000:  [1.000, 0.000, 0.000, -1.000]
+      squares:                [1.000, 0.000, 0.000,  1.000]   (sum = 2.000)
+      average square:          2.000 / 4 = 0.500
+      distance:                sqrt(0.500) = 0.707
+      tamed: [1.000/0.707, 0.000/0.707, 0.000/0.707, -1.000/0.707] = [1.414, 0.000, 0.000, -1.414]
+
+  Check: (1.414 + 0.000 + 0.000 - 1.414) / 4 = 0. Middle is 0. Good.
+
+  LayerNorm x_sat = [0, 1, 2, 1]:
+
+      middle   = (0 + 1 + 2 + 1) / 4 = 1.000
+      deviations: [-1.000, 0.000, 1.000, 0.000]
+      squares:    [ 1.000, 0.000, 1.000, 0.000]   (sum = 2.000)
+      avg square: 0.500       distance: 0.707
+      tamed:      [-1.414, 0.000, 1.414, 0.000]
+
+  Call these lncat = [1.414, 0.000, 0.000, -1.414]  and  lnsat = [-1.414, 0.000, 1.414, 0.000].
+  (Real LayerNorm also adds a speck -- ~0.00001 -- under the root so a flat row never divides
+  by zero. Our rows are never flat, so the speck changes no digit here.)
+
+  Now make three views of each tamed row. One row cannot play all three parts cleanly, so push
+  each tamed row through a different fixed grid of numbers. A grid = a square of weights; the
+  output slot k = the dot product of the input row with weight-row k (multiply slot by slot, add
+  the products -- that dot product is the matrix multiply). The real grids are dense: each output
+  number is a weighted sum of ALL four inputs. Here, as a toy, each grid simply re-orders the
+  four slots so you can check every output by eye -- but the box just below works a real dense
+  grid beside it.
 
       ASK grid:       new row = [ slot3, slot1, slot4, slot2 ] of the input
       OFFER grid:     new row = [ slot4, slot3, slot2, slot1 ] of the input   (reversed)
       HANDOVER grid:  new row = [ slot2, slot3, slot4, slot1 ] of the input
 
-  These three grids hold the learned numbers; training tunes them. Apply to x_cat = [2,1,1,0]
-  and x_sat = [0,1,2,1] (a row's slots numbered 1..4 left to right):
+  These three grids hold the learned numbers; training tunes them. Apply to lncat = [1.414, 0.000,
+  0.000, -1.414] and lnsat = [-1.414, 0.000, 1.414, 0.000] (a row's slots numbered 1..4 left
+  to right):
 
-      ASK(cat)      = [1, 2, 0, 1]        ASK(sat)      = [2, 0, 1, 1]
-      OFFER(cat)    = [0, 1, 1, 2]        OFFER(sat)    = [1, 2, 1, 0]
-      HANDOVER(cat) = [1, 1, 0, 2]        HANDOVER(sat) = [1, 2, 1, 0]
+      ASK(cat)      = [0.000, 1.414, -1.414, 0.000]     ASK(sat)      = [1.414, -1.414, 0.000, 0.000]
+      OFFER(cat)    = [-1.414, 0.000, 0.000, 1.414]     OFFER(sat)    = [0.000, 1.414, 0.000, -1.414]
+      HANDOVER(cat) = [0.000, 0.000, -1.414, 1.414]     HANDOVER(sat) = [0.000, 1.414, 0.000, -1.414]
 
   WHY THE GRIDS JUST RE-ORDER HERE. A permutation is a real weight grid -- it is the case
   where each output number reads exactly one input slot -- chosen so you can check every row
   by eye. A trained grid is the general case: each output is a dot product of the whole input
-  row with one learned weight-row (dot product = multiply slot by slot, add the products). To
-  show that nothing is left out, here is the ASK grid written in full, alongside a grid with
-  real mixing numbers, both applied to x_cat = [2, 1, 1, 0]:
+  row with one learned weight-row. To show that nothing is left out, here is the ASK grid
+  written in full, alongside a grid with real mixing numbers, both applied to lncat:
 
-      the permutation ASK grid          a mixing ASK grid (same shape, real weights)
-      row1 = [0,0,1,0] . x = 1          row1 = [ 0.5, 0.2, 0.1, 0.0] . x = 1.0+0.2+0.1+0 = 1.3
-      row2 = [1,0,0,0] . x = 2          row2 = [-0.3, 0.4, 0.0, 0.6] . x = -0.6+0.4+0+0 = -0.2
-      row3 = [0,0,0,1] . x = 0          row3 = [ 0.1, 0.1, 0.7, 0.2] . x = 0.2+0.1+0.7+0 = 1.0
-      row4 = [0,1,0,0] . x = 1          row4 = [ 0.0, 0.5, 0.5, 0.5] . x = 0+0.5+0.5+0 = 1.0
-      -> [1, 2, 0, 1] (one slot each)   -> [1.3, -0.2, 1.0, 1.0] (every slot stirred in)
+      the permutation ASK grid             a mixing ASK grid (same shape, real weights)
+      row1 = [0,0,1,0] . lncat = 0.000    row1 = [ 0.5, 0.2, 0.1, 0.0] . lncat = 0.5*1.414+... = 0.848
+      row2 = [1,0,0,0] . lncat = 1.414    row2 = [-0.3, 0.4, 0.0, 0.6] . lncat = -0.424+...+(-0.849)=-1.131
+      row3 = [0,0,0,1] . lncat = -1.414   row3 = [ 0.1, 0.1, 0.7, 0.2] . lncat = 0.141+0+0+(-0.283)=-0.141
+      row4 = [0,1,0,0] . lncat = 0.000    row4 = [ 0.0, 0.5, 0.5, 0.5] . lncat = 0+0+0+(-0.707)=-0.707
 
-  The machine is identical either way: row dot weight-row. This page uses the clean
-  permutation so the later softmax and LayerNorm stay checkable by hand; a trained machine
-  uses grids like the right-hand one, learned by rolling downhill. Nothing about the recipe
-  changes -- only whether each output reads one slot or all four.
+  The machine is identical either way: row dot weight-row. This page uses the clean permutation
+  so the later softmax and LayerNorm stay checkable by hand; a trained machine uses grids like
+  the right-hand one, learned by rolling downhill.
 
   Textbook names, stuck on only now: ASK = Query (Q), OFFER = Key (K), HANDOVER = Value (V).
 
@@ -134,12 +170,15 @@
   product: the dot product of two rows = multiply slot by slot, then add the products into
   one number. Big number = strong match.
 
-  ASK(cat) = [1, 2, 0, 1]. Dot it against each OFFER:
+  ASK(cat) = [0.000, 1.414, -1.414, 0.000]. Dot it against each OFFER:
 
-      cat vs OFFER(cat) = [1,2,0,1].[0,1,1,2] = 1*0 + 2*1 + 0*1 + 1*2 = 0+2+0+2 = 4
-      cat vs OFFER(sat) = [1,2,0,1].[1,2,1,0] = 1*1 + 2*2 + 0*1 + 1*0 = 1+4+0+0 = 5
+      cat vs OFFER(cat) = [0.000, 1.414, -1.414, 0.000].[-1.414, 0.000, 0.000, 1.414]
+                        = 0*(-1.414) + 1.414*0 + (-1.414)*0 + 0*1.414 = 0.000
 
-  So cat's raw scores are [4, 5] -- it matches sat a little harder than itself.
+      cat vs OFFER(sat) = [0.000, 1.414, -1.414, 0.000].[0.000, 1.414, 0.000, -1.414]
+                        = 0*0 + 1.414*1.414 + (-1.414)*0 + 0*(-1.414) = 2.000
+
+  cat's raw scores are [0.000, 2.000] -- it matches sat much harder than itself.
 
 
   ## Raw Scores Run Any Size and Blow Up the Next Move -- So Shrink, Then Squash to Shares
@@ -147,130 +186,189 @@
   Two fixes, in order. First, big dot products make the squash below saturate, so divide each
   score by the root of the OFFER width. Width here is 4; its root is 2 (since 2 * 2 = 4).
 
-      cat scores [4, 5] / 2 = [2, 2.5]
+      cat scores [0.000, 2.000] / 2 = [0.000, 1.000]
 
   Second, turn those into SHARES that add to 1, so they read as "how much of my attention."
   That is softmax: raise e (= 2.718...) to each score, then divide each by the total.
 
-      e^2   = 7.389         e^2.5 = 12.182         total = 7.389 + 12.182 = 19.571
-      share on cat = 7.389 / 19.571 = 0.378        share on sat = 12.182 / 19.571 = 0.622
+      e^0.000 = 1.000       e^1.000 = 2.718       total = 1.000 + 2.718 = 3.718
+      share on cat = 1.000 / 3.718 = 0.269         share on sat = 2.718 / 3.718 = 0.731
 
-  Check: 0.378 + 0.622 = 1.000. cat will spend 37.8% of its attention on itself, 62.2% on sat.
-
-
-  ## The Shares Decide How Much of Each Word to Pull In -- So Add the HAND-OVERS by Share
-
-  Each word offered a HANDOVER row earlier: HANDOVER(cat) = [1,1,0,2], HANDOVER(sat) = [1,2,1,0].
-  cat's new row = each HANDOVER scaled by cat's share for that word, added slot by slot:
-
-      0.378 * [1, 1, 0, 2] = [0.378, 0.378, 0.000, 0.756]
-      0.622 * [1, 2, 1, 0] = [0.622, 1.244, 0.622, 0.000]
-      add slot by slot     = [1.000, 1.622, 0.622, 0.756]   -> attention output for cat
-
-  That is the entire attention move: ASK, match every OFFER, shrink, squash to shares, pull
-  each HANDOVER in by its share. The published one-liner softmax(Q.K^T / sqrt(d)).V is exactly
-  this, stacked for all words at once: Q.K^T is the full square of scores (here 2x2 -- cat's
-  two and sat's two), sqrt(d) is the shrink by the root of the width, softmax runs along each
-  row, and the result times V is the share-weighted sum of HANDOVERs. We walked cat's row, then
-  sat's row, one at a time; stack the two rows and you have the matrix the formula writes.
-
-  Run the same machine from sat's seat (ASK(sat) = [2,0,1,1]): its raw scores come out [3, 3],
-  /2 = [1.5, 1.5], equal scores give equal shares [0.5, 0.5], so sat's output is the plain
-  average of the two HANDOVERs = [1.0, 1.5, 0.5, 1.0]. No word is special; the recipe is one.
+  Check: 0.269 + 0.731 = 1.000. cat spends 26.9% of its attention on itself, 73.1% on sat.
 
 
-  ## Attention Can Wash the Word Away -- So Add Its Original Row Back, Then Tame the Result
+  ## The Shares Decide How Much to Pull In -- Add HANDOVERs by Share, Then Project
 
-  cat's attention output [1.000, 1.622, 0.622, 0.756] is built entirely from HANDOVERs of
-  other words; cat's own content can vanish. So lay its ORIGINAL row (x_cat = [2,1,1,0], the
-  word-plus-position row from before) back on top, slot by slot. This add-the-original wire
-  is the residual; it also gives later training a short path for corrections to travel.
+  Each word offered a HANDOVER row earlier (from the tamed inputs):
+  HANDOVER(cat) = [0.000, 0.000, -1.414, 1.414], HANDOVER(sat) = [0.000, 1.414, 0.000, -1.414].
+  cat's mixed row = each HANDOVER scaled by cat's share for that word, added slot by slot:
 
-      [1.000, 1.622, 0.622, 0.756] + [2, 1, 1, 0] = [3.000, 2.622, 1.622, 0.756]
+      0.269 * [0.000, 0.000, -1.414,  1.414] = [0.000, 0.000, -0.380,  0.380]
+      0.731 * [0.000, 1.414,  0.000, -1.414] = [0.000, 1.034,  0.000, -1.034]
+      add slot by slot                       = [0.000, 1.034, -0.380, -0.654]
 
-  After adding, the four numbers can sit at a wild scale, so TAME them: pull the row so its
-  middle is 0 and its typical distance from the middle is 1. This is LayerNorm, and it reads
-  only THIS row's own four numbers -- no other word, no batch.
+  That is the share-weighted mix of HANDOVER rows. The published one-liner softmax(Q.K^T/sqrt(d)).V
+  is exactly this, stacked for all words at once: Q.K^T is the full square of scores (here 2x2),
+  sqrt(d) is the shrink by the root of the width, softmax runs along each row, and the result
+  times V is the share-weighted sum of HANDOVERs. We walked cat's row, then sat's row, one at a
+  time; stack the two rows and you have the matrix the formula writes.
 
-      middle  = (3.000 + 2.622 + 1.622 + 0.756) / 4 = 8.000 / 4 = 2.000
-      distance of each from 2.000:  1.000 , 0.622 , -0.378 , -1.244
-      square each:                  1.000 , 0.387 ,  0.143 ,  1.548   (sum = 3.078)
-      average those squares:        3.078 / 4 = 0.769
-      root it (typical distance):   sqrt(0.769) = 0.877
-      tame each = (number - 2.000) / 0.877:
-                  [1.140, 0.709, -0.431, -1.418]   <- middle now 0, typical distance now 1
+  One mandatory step before passing the result on: push it through the OUTPUT PROJECTION W_O.
+  W_O is a learned 4x4 grid (the same matrix-multiply machine as Q/K/V), required even in
+  single-head attention. In multi-head attention it mixes the outputs of all the parallel heads
+  back into one row; in single-head it still applies a final learned re-weighting. Our toy uses
+  an identity grid for W_O so the four slots pass through unchanged -- but the grid is there,
+  with its own learned weights, trained alongside Q/K/V:
 
-  Check the middle: 1.140 + 0.709 - 0.431 - 1.418 = 0.000. (Two learned dials, a stretch and
-  a shift, can rescale this afterward; they start at 1 and 0, leaving the row as is. Real
-  LayerNorm also adds a speck -- a tiny number like 0.00001 -- under the root before dividing,
-  so a row that happens to be all-equal, with distance 0, never divides by zero. Our rows are
-  never all-equal, so the speck changes no digit here.)
+      W_O row1 = [1,0,0,0] . [0.000, 1.034, -0.380, -0.654] = 0.000
+      W_O row2 = [0,1,0,0] .                               = 1.034
+      W_O row3 = [0,0,1,0] .                               = -0.380
+      W_O row4 = [0,0,0,1] .                               = -0.654
+      attention output for cat = [0.000, 1.034, -0.380, -0.654]
 
 
-  ## Each Word Has Looked Around but Not Yet THOUGHT -- So Run a Tiny Two-Grid Worker
+  ## Attention Can Wash cat Away -- So Lay the Original Row Back On Top
 
-  cat's tamed row [1.140, 0.709, -0.431, -1.418] has gathered from sat but not reworked it.
-  Push it through a small worker: a grid widens the row, a bend zeroes the negatives, a second
-  grid brings it back. This is the feed-forward part -- two dense grids (the same matrix-multiply
-  machine as the ASK/OFFER/HANDOVER grids) with a bend between them, run on each word on its own.
+  cat's attention output [0.000, 1.034, -0.380, -0.654] is built entirely from HANDOVER rows
+  of other words (applied to tamed inputs); cat's own content can vanish. Lay its ORIGINAL
+  row (x_cat = [2, 1, 1, 0], the word-plus-position row before any taming) back on top, slot
+  by slot. This add-the-original wire is the residual; it gives training a short path for
+  corrections to travel, and it guarantees that even if the attention heads contribute nothing,
+  the original signal survives.
 
-  First grid (two outputs; each output of a matrix multiply is a dot product of the input row
-  with one learned weight-row -- multiply slot by slot, add the products):
+      attention output: [0.000, 1.034, -0.380, -0.654]
+      + original x_cat: [2,     1,     1,      0     ]
+      = stream:         [2.000, 2.034,  0.620, -0.654]   <- call this stream_cat
 
-      out1 = [1, -1, 0, 0] . [1.140, 0.709, -0.431, -1.418] = 1.140 - 0.709 = 0.431
-      out2 = [1, 0, 0, 1] . [1.140, 0.709, -0.431, -1.418]  = 1.140 - 1.418 = -0.278
+  (Note: the taming -- LayerNorm -- already ran BEFORE the Q/K/V grids above, not after.
+  This is the GPT-style Pre-LayerNorm order: tame first, attend, add original back. The
+  original 2017 paper tamed AFTER the add; GPT tames BEFORE. Both recipes keep middle at 0
+  and typical-distance at 1; they differ in which value is stored in the residual stream.
+  Every number on this page follows the GPT Pre-LayerNorm order.)
 
-  The bend is ReLU: keep a positive number, turn any negative into 0.
 
-      ReLU([0.431, -0.278]) = [0.431, 0.000]
+  ## cat Has Gathered but Not Thought -- So Tame Its Stream, Then Run the Tiny Worker
 
-  Second grid maps those two back to four (again, each output is one dot product):
+  stream_cat = [2.000, 2.034, 0.620, -0.654]. The small worker that follows (two dense grids
+  with a bend) needs a clean scale to operate on, so tame stream_cat with LayerNorm before
+  handing it to the worker. LayerNorm = subtract the row's own average, divide by its typical
+  distance -- fully spelled out above; applied here to stream_cat:
 
-      [1,0].[0.431,0] = 0.431    [0,1]. = 0.000    [1,1]. = 0.431    [2,0]. = 0.862
-      worker output = [0.431, 0.000, 0.431, 0.862]
+      middle   = (2.000 + 2.034 + 0.620 - 0.654) / 4 = 4.000 / 4 = 1.000
+      deviations: [ 1.000,  1.034, -0.380, -1.654]
+      squares:    [ 1.000,  1.069,  0.144,  2.736]   (sum = 4.949)
+      avg square: 4.949 / 4 = 1.237     distance: sqrt(1.237) = 1.112
+      tamed: [1.000/1.112, 1.034/1.112, -0.380/1.112, -1.654/1.112]
+           = [0.899, 0.930, -0.342, -1.487]
 
-  Add the original back again (the row that entered this worker), then tame again -- the same
-  two moves as before, redefined: residual = add the input row on top; LayerNorm = pull the
-  row to middle 0, typical-distance 1, reading only its own four numbers.
+  Check: 0.899 + 0.930 - 0.342 - 1.487 = 0.000. Middle is 0. Good.
 
-      add:    [1.140, 0.709, -0.431, -1.418] + [0.431, 0, 0.431, 0.862] = [1.571, 0.709, 0.000, -0.556]
-      middle: (1.571 + 0.709 + 0.000 - 0.556) / 4 = 1.724 / 4 = 0.431
-      dist:   1.140 , 0.278 , -0.431 , -0.987       squares: 1.300, 0.077, 0.186, 0.974 (sum 2.537)
-      avg square 2.537/4 = 0.634     root sqrt(0.634) = 0.796
-      tame = (number - 0.431) / 0.796 = [1.431, 0.349, -0.541, -1.239]
+  Now push the tamed row [0.899, 0.930, -0.342, -1.487] through the small worker. The worker
+  is two dense grids with the ReLU bend between them. ReLU = keep a positive number as is,
+  turn any negative into 0. In a real block the first grid WIDENS the row -- standard practice
+  is to expand by four times (width 4 in, width 16 out) so the worker has more room to mix
+  before narrowing back. Our toy uses width 4 in and width 4 out to keep each dot product
+  checkable on paper; the recipe is identical whether the middle layer is 4 wide or 16.
 
-  That row, [1.431, 0.349, -0.541, -1.239], is cat's output from ONE full transformer block.
-  Check the middle: 1.431 + 0.349 - 0.541 - 1.239 = 0.000. Nothing was skipped, nothing waved.
+  First grid (four outputs; each output = one dot product with a weight-row):
+
+      row1 = [1,-1, 0, 0] . [0.899, 0.930, -0.342, -1.487] = 0.899 - 0.930            = -0.031
+      row2 = [0, 0, 1,-1] . [0.899, 0.930, -0.342, -1.487] = -0.342 + 1.487           =  1.145
+      row3 = [1, 1, 0, 0] . [0.899, 0.930, -0.342, -1.487] = 0.899 + 0.930            =  1.829
+      row4 = [0, 1, 1, 0] . [0.899, 0.930, -0.342, -1.487] = 0.930 - 0.342            =  0.588
+
+  ReLU: [−0.031 -> 0.000,  1.145 -> 1.145,  1.829 -> 1.829,  0.588 -> 0.588]
+      after ReLU: [0.000, 1.145, 1.829, 0.588]
+
+  Second grid maps those four back to four:
+
+      row1 = [0,1,0,0] . [0.000, 1.145, 1.829, 0.588] = 1.145
+      row2 = [0,0,1,0] .                              = 1.829
+      row3 = [0,0,0,1] .                              = 0.588
+      row4 = [1,0,0,0] .                              = 0.000
+      worker output = [1.145, 1.829, 0.588, 0.000]
+
+  Add stream_cat back (the residual wire again -- same idea as before: let the stream carry
+  on even if the worker changes nothing):
+
+      stream_cat:    [2.000, 2.034, 0.620, -0.654]
+      + worker out:  [1.145, 1.829, 0.588,  0.000]
+      = output:      [3.145, 3.863, 1.208, -0.654]   <- cat's row out of this block
+
+  That row, [3.145, 3.863, 1.208, -0.654], is cat's output from ONE full transformer block.
+  Nothing was skipped, nothing waved.
 
 
   ## sat Rides the Same Recipe -- Carried All the Way Out, Nothing Hidden
 
-  A block must emit a row for EVERY word, not just cat, so run sat through the identical moves.
-  sat's attention output was [1.0, 1.5, 0.5, 1.0] (the equal-share average from earlier); its
-  original row was x_sat = [0, 1, 2, 1].
+  A block must emit a row for EVERY word, not just cat, so run sat through identical moves.
 
-      residual (add the original back):  [1.0, 1.5, 0.5, 1.0] + [0, 1, 2, 1] = [1.0, 2.5, 2.5, 2.0]
-      LayerNorm (middle 0, distance 1, this row alone):
-          middle = (1.0 + 2.5 + 2.5 + 2.0) / 4 = 8.0 / 4 = 2.0
-          distances: -1.0, 0.5, 0.5, 0.0     squares: 1.0, 0.25, 0.25, 0.0  (sum 1.5)
-          avg square 1.5/4 = 0.375    root sqrt(0.375) = 0.612
-          tame = (number - 2.0)/0.612 = [-1.633, 0.816, 0.816, 0.000]
+  lnsat = [-1.414, 0.000, 1.414, 0.000] (LayerNorm of x_sat = [0,1,2,1], computed above).
+  Q/K/V already applied above:
+      ASK(sat) = [1.414, -1.414, 0.000, 0.000]
+      OFFER(sat) = [0.000, 1.414, 0.000, -1.414]
+      HANDOVER(sat) = [0.000, 1.414, 0.000, -1.414]
+  (OFFER(cat) = [-1.414, 0.000, 0.000, 1.414] and HANDOVER(cat) = [0.000, 0.000, -1.414, 1.414]
+  from above.)
 
-  Now sat's tiny worker (same two grids and the ReLU bend = turn any negative into 0):
+  sat's scores. ASK(sat) = [1.414, -1.414, 0.000, 0.000]:
 
-      out1 = [1, -1, 0, 0] . [-1.633, 0.816, 0.816, 0.000] = -1.633 - 0.816 = -2.449
-      out2 = [1, 0, 0, 1] . [-1.633, 0.816, 0.816, 0.000]  = -1.633 + 0.000 = -1.633
-      ReLU([-2.449, -1.633]) = [0.000, 0.000]   <- both negative, so the bend zeroes both
-      second grid on [0, 0] = [0.000, 0.000, 0.000, 0.000]   <- the worker hands back nothing
+      vs OFFER(cat) = [-1.414, 0.000, 0.000, 1.414]:
+          1.414*(-1.414) + (-1.414)*0 + 0*0 + 0*1.414 = -2.000
+      vs OFFER(sat) = [0.000, 1.414, 0.000, -1.414]:
+          1.414*0 + (-1.414)*1.414 + 0*0 + 0*(-1.414) = -2.000
 
-  Here is exactly why the add-the-original wire (residual) earns its place: sat's worker output
-  is all zeros, so without the wire sat would vanish. With it, sat survives untouched:
+  sat raw scores = [-2.000, -2.000], scaled by /2 = [-1.000, -1.000].
+  Softmax([-1.000, -1.000]): e^(-1) = 0.368 for both; both equal, so shares = [0.500, 0.500].
 
-      residual: [-1.633, 0.816, 0.816, 0.000] + [0, 0, 0, 0] = [-1.633, 0.816, 0.816, 0.000]
-      LayerNorm: that row already has middle 0 and distance 1, so it passes through unchanged.
+  Weighted HANDOVERs:
 
-  sat went in as [0, 1, 2, 1] and came out as [-1.633, 0.816, 0.816, 0.000] -- a 4-wide row,
-  the same shape cat came out as. TWO words in, TWO rows out, both worked to the last digit.
+      0.500 * HANDOVER(cat) = 0.500 * [0.000, 0.000, -1.414, 1.414] = [0.000, 0.000, -0.707,  0.707]
+      0.500 * HANDOVER(sat) = 0.500 * [0.000, 1.414,  0.000,-1.414] = [0.000, 0.707,  0.000, -0.707]
+      sum                                                            = [0.000, 0.707, -0.707,  0.000]
+
+  W_O (identity) passes through: attention output sat = [0.000, 0.707, -0.707, 0.000].
+
+  Residual 1 (add x_sat = [0, 1, 2, 1] back):
+
+      [0.000, 0.707, -0.707, 0.000] + [0, 1, 2, 1] = [0.000, 1.707, 1.293, 1.000]  <- stream_sat
+
+  LayerNorm stream_sat before the worker:
+
+      middle   = (0.000 + 1.707 + 1.293 + 1.000) / 4 = 4.000 / 4 = 1.000
+      deviations: [-1.000, 0.707, 0.293, 0.000]
+      squares:    [ 1.000, 0.500, 0.086, 0.000]   (sum = 1.586)
+      avg square: 1.586 / 4 = 0.397     distance: sqrt(0.397) = 0.630
+      tamed: [-1.587, 1.122, 0.465, 0.000]
+
+  Check: -1.587 + 1.122 + 0.465 + 0.000 = 0.000. Good.
+
+  sat's worker (same two grids and ReLU), input = [-1.587, 1.122, 0.465, 0.000]:
+
+      row1 = [1,-1,0,0]: -1.587 - 1.122 = -2.709  ->  ReLU  ->  0.000
+      row2 = [0, 0,1,-1]: 0.465 - 0.000 =  0.465  ->  ReLU  ->  0.465
+      row3 = [1, 1,0, 0]: -1.587 + 1.122 = -0.465 ->  ReLU  ->  0.000
+      row4 = [0, 1,1, 0]: 1.122 + 0.465 =  1.587  ->  ReLU  ->  1.587
+
+  After ReLU: [0.000, 0.465, 0.000, 1.587]
+
+  Second grid (same permutation):
+
+      row1=[0,1,0,0]: 0.465    row2=[0,0,1,0]: 0.000    row3=[0,0,0,1]: 1.587    row4=[1,0,0,0]: 0.000
+      worker output = [0.465, 0.000, 1.587, 0.000]
+
+  Here is exactly why the residual wire earns its place: even when the worker mixes the
+  tamed row heavily, the stream carries the original content forward.
+
+  Residual 2 (add stream_sat back):
+
+      stream_sat:   [0.000, 1.707, 1.293, 1.000]
+      + worker out: [0.465, 0.000, 1.587, 0.000]
+      = output:     [0.465, 1.707, 2.880, 1.000]   <- sat's row out of this block
+
+  TWO words in, TWO rows out, both worked to the last digit:
+      cat out: [3.145, 3.863, 1.208, -0.654]
+      sat out: [0.465, 1.707, 2.880, 1.000]
 
 
   ## That Is One Block -- Three Honest Extras, Each in One Breath
@@ -279,14 +377,14 @@
   feed its output straight into another identical block, then another. Depth is just blocks
   in a line; GPT-style machines stack dozens. Each is exactly the arithmetic above.
 
-  RUN SEVERAL ASKS AT ONCE (multi-head). Above, cat made ONE ASK from one set of ASK/OFFER/
-  HANDOVER grids. A real machine runs several heads: each head has its OWN three learned grids
-  (not a parameterless cut of the row), each producing a narrower ASK/OFFER/HANDOVER, so head 1
-  might chase one kind of link across the words and head 2 another. Glue the heads' outputs
-  side by side back to the full row width, THEN pass the glued row through one more learned
-  grid -- the output projection -- that mixes the heads together. So multi-head is: own grids
-  per head, run in parallel, concatenate, then one final grid. Head-count and what each head
-  catches are different things; the width always returns to the row width.
+  RUN SEVERAL ASKS AT ONCE (multi-head). Above, cat made ONE ASK from one set of Q/K/V grids.
+  A real machine runs several heads: each head has its OWN three learned grids, producing a
+  narrower Q/K/V, so head 1 might chase syntactic links and head 2 semantic ones. Glue the
+  heads' outputs side by side back to the full row width, then pass the glued row through the
+  OUTPUT PROJECTION W_O -- the same 4x4 grid we already applied in single-head -- which mixes
+  the heads together. So multi-head is: own grids per head, run in parallel, concatenate, then
+  W_O. Head-count and what each head catches are different things; the width always returns to
+  the full row width.
 
   BLANK THE FUTURE TO WRITE (the encoder/decoder switch). Above, cat could look at sat freely
   -- a reader that judges (an encoder, e.g. BERT). To make a writer that generates one word at
@@ -299,26 +397,30 @@
       word 3 sees {1,2,3}    -> shares [0.333, 0.333, 0.333]
 
   This one switch -- scores left open (reader, encoder) or future set to minus infinity
-  (writer, decoder) -- is the core difference inside attention. Two honest caveats so this is
-  not mistaken for the entire story: BERT and GPT also differ in how they are trained (BERT
-  fills masked-out words by looking both ways; GPT predicts the next word left to right), and
-  the original 2017 machine wired an encoder AND a decoder together for translation, with the
-  decoder also looking back at the encoder (cross-attention). The mask is the heart of the
-  split, not the whole of it.
+  (writer, decoder) -- is the core difference inside attention. Two honest caveats: BERT and
+  GPT also differ in training (BERT fills masked-out words by looking both ways; GPT predicts
+  the next word left to right), and the original 2017 machine wired an encoder AND a decoder
+  together for translation, with the decoder also attending to the encoder (cross-attention).
+  The mask is the heart of the split, not the whole of it.
 
 
   ## One Breath (Carry This Away)
 
-  Swap each word for a learned row of numbers; add a row that marks its seat. Make three views
-  of each row -- ASK, OFFER, HANDOVER. Dot each word's ASK against every OFFER for raw scores,
-  shrink by the root of the width, squash to shares that add to 1 (softmax), and pull in each
-  HANDOVER by its share -- that is attention. Add the original row back (residual) and tame it
-  to middle 0, distance 1, reading the row alone (LayerNorm). Run a tiny widen-bend-narrow
-  worker (ReLU), add-back and tame once more. Same shape out as in, so stack it; run several
-  ASKs side by side, each with its own grids and a final mixing grid (heads); blank the future
-  to turn the reader into a writer. cat went in as [2,1,1,0] and came out as [1.431, 0.349,
-  -0.541, -1.239]; sat went in as [0,1,2,1] and came out as [-1.633, 0.816, 0.816, 0.000] --
-  two words in, two rows out, every number on this page, by pencil, no magic, no leftover wire.
+  Swap each word for a learned row of numbers; add a row that marks its seat. Tame each row
+  to middle 0, distance 1 (LayerNorm -- subtract the row's own average, divide by its typical
+  distance). Make three views of the tamed row -- ASK, OFFER, HANDOVER -- each a matrix
+  multiply (row dot weight-row). Dot each word's ASK against every OFFER for raw scores,
+  shrink by the root of the width, squash to shares that add to 1 (softmax), pull in each
+  HANDOVER by its share -- that is attention. Project through W_O (a required learned 4x4
+  grid). Add the original pre-taming row back (residual). Tame the result again (LayerNorm),
+  run a two-grid worker with a ReLU bend between (keep positives, zero negatives), add the
+  stream back (residual again). Same shape out as in, so stack it; run several ASKs side by
+  side, each with its own grids and a shared W_O (multi-head); blank the future to turn the
+  reader into a writer.
+
+  cat went in as [2,1,1,0] and came out as [3.145, 3.863, 1.208, -0.654].
+  sat went in as [0,1,2,1] and came out as [0.465, 1.707, 2.880, 1.000].
+  Two words in, two rows out, every number on this page, by pencil, no magic, no leftover wire.
 
 
 ----------------------------------------------------------------------------------------------
