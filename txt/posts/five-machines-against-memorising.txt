@@ -156,7 +156,7 @@
   bending itself around noise?
 
 
-  ## Cure 1 -- A Tax on Big Dials (L2)
+  ## A Tax on Big Dials (L2)
 
   The first cure starts from a clue: a memorising machine needs HUGE, precise dials. To bend
   sharply around one freckle in one photo, some dial has to crank to an extreme value. A
@@ -177,7 +177,7 @@
   knob you pick, not a dial the machine learns.
 
 
-  ## Cure 2 -- Sending Clerks Home (Dropout)
+  ## Sending Clerks Home (Dropout)
 
   Chapter 7 met dropout as a coffee break. Here is the disease it cures, stated sharply,
   because it is subtler than "big dials."
@@ -203,7 +203,7 @@
   crippled each pass to learn anything.
 
 
-  ## Cure 3 -- A Fire Alarm That Stops the Clock (Early Stopping)
+  ## A Fire Alarm That Stops the Clock (Early Stopping)
 
   The first two cures change the machine. This one changes nothing about the machine -- it
   just knows when to quit.
@@ -236,7 +236,7 @@
   the alarm fires after pass 10, and the dials rewind to pass 5.
 
 
-  ## Cure 4 -- A Humbler Between Floors (Batch Normalisation)
+  ## A Humbler Between Floors (Batch Normalisation)
 
   The last cure fixes a problem you would not guess at: the floors of the network keep moving
   the goalposts on each other.
