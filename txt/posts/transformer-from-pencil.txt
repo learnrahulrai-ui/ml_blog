@@ -331,6 +331,57 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
+  ## The Numbers, in Python
+
+  Every dot product, softmax, and weighted sum above done by pencil.  Here the same numbers
+  in Python -- run it and compare each line with the post's arithmetic.
+
+    import math
+
+    # --- nolan.WANT tag from grid ---
+    nolan_stick = [2, 1, 1, 0]
+    want_row1 = [1, 0, 0, 0];  nolan_want_1 = sum(nolan_stick[k]*want_row1[k] for k in range(4))  # 2
+    want_row3 = [0, 0, 1, 0];  nolan_want_3 = sum(nolan_stick[k]*want_row3[k] for k in range(4))  # 1
+    nolan_want = [2, 0, 1, 0]   # (rows 2 and 4 are all-zero; outputs are 0)
+
+    # --- HAVE and GIVE tags (given) ---
+    nolan_have, nolan_give = [1, 0, 0, 0], [2, 0, 0, 1]
+    ended_have, ended_give = [3, 0, 2, 0], [0, 3, 1, 0]
+
+    # --- Match: nolan.WANT dotted with each HAVE ---
+    match_nolan_nolan = sum(nolan_want[k]*nolan_have[k] for k in range(4))  # 2
+    match_nolan_ended = sum(nolan_want[k]*ended_have[k] for k in range(4))  # 8
+
+    # --- Scale ÷ sqrt(tag width) ---
+    tag_width = 4
+    scale = math.sqrt(tag_width)   # 2
+    scaled_nolan = match_nolan_nolan / scale   # 1
+    scaled_ended = match_nolan_ended / scale   # 4
+
+    # --- Softmax ---
+    e1 = math.exp(scaled_nolan)   # 2.718
+    e4 = math.exp(scaled_ended)   # 54.60
+    total = e1 + e4               # 57.32
+    p_nolan = e1 / total          # 0.047
+    p_ended = e4 / total          # 0.953
+    # check: 0.047 + 0.953 = 1.000
+
+    # --- Weighted sum (nolan's new stick) ---
+    nolan_new_0 = p_nolan*nolan_give[0] + p_ended*ended_give[0]  # 0.047*2 + 0.953*0 = 0.094
+    nolan_new_1 = p_nolan*nolan_give[1] + p_ended*ended_give[1]  # 0 + 0.953*3      = 2.859
+    nolan_new_2 = p_nolan*nolan_give[2] + p_ended*ended_give[2]  # 0 + 0.953*1      = 0.953
+    nolan_new_3 = p_nolan*nolan_give[3] + p_ended*ended_give[3]  # 0.047*1 + 0       = 0.047
+    # nolan_new = [0.094, 2.859, 0.953, 0.047]
+
+    # --- Average two sticks (summary) ---
+    word1 = [0.0, 2.8, 0.9, 0.0]
+    word2 = [0.2, 1.0, 0.5, 0.4]
+    avg_0 = (word1[0] + word2[0]) / 2   # 0.1
+    avg_1 = (word1[1] + word2[1]) / 2   # 1.9
+    avg_2 = (word1[2] + word2[2]) / 2   # 0.7
+    avg_3 = (word1[3] + word2[3]) / 2   # 0.2
+
+
   ## One Recitation (Carry This Away)
 
   Number words. Swap each for a stick (embedding table). Each word makes WANT / HAVE / GIVE

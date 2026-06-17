@@ -393,6 +393,54 @@
     +------------------------------+------------------------------------------+
 
 
+  ## The Numbers, in Python
+
+  Nothing above needed a computer.  Here the hand examples are spelled out in Python
+  so you can run each one and see the same numbers the post printed.
+
+    # --- 5-fold CV: C=0.1 vs C=1.0, recall per fold ---
+    c01_fold1, c01_fold2, c01_fold3, c01_fold4, c01_fold5 = 0.92, 0.88, 0.94, 0.90, 0.86
+    c10_fold1, c10_fold2, c10_fold3, c10_fold4, c10_fold5 = 0.95, 0.90, 0.89, 0.93, 0.82
+
+    c01_avg = (c01_fold1 + c01_fold2 + c01_fold3 + c01_fold4 + c01_fold5) / 5  # 0.900
+    c10_avg = (c10_fold1 + c10_fold2 + c10_fold3 + c10_fold4 + c10_fold5) / 5  # 0.898
+    # C=0.1 wins by 0.002
+
+    # --- Grid size: 4 C-values x 3 k-values x 5 folds = 60 fits ---
+    c_choices, k_choices, folds = 4, 3, 5
+    total_fits = c_choices * k_choices * folds   # 60
+
+    # --- Fool machine on 99900-normal / 100-fraud sheet ---
+    normal_rows, fraud_rows = 99900, 100
+    fool_accuracy = normal_rows / (normal_rows + fraud_rows)  # 0.999
+    fool_recall   = 0 / fraud_rows                             # 0.0 -- catches no fraud
+
+    # --- Outlier scaling: 4 houses (500, 520, 3000, 15000) ---
+    area_A, area_B, area_C, area_D = 500, 520, 3000, 15000
+    area_min, area_max = 500, 15000
+    pinch_A = (area_A - area_min) / (area_max - area_min)   # 0.000
+    pinch_B = (area_B - area_min) / (area_max - area_min)   # 0.001
+    pinch_C = (area_C - area_min) / (area_max - area_min)   # 0.172
+    pinch_D = (area_D - area_min) / (area_max - area_min)   # 1.000
+    # normal houses A and B squished to bottom 17%; outlier D fills the far end
+
+    # --- Macro vs micro: 3-class cancer scorecard ---
+    f1_A, f1_B, f1_C = 0.89, 0.67, 0.34
+    macro_f1 = (f1_A + f1_B + f1_C) / 3   # 0.633 -- class C (10 rows) drags it down
+
+    caught_A, caught_B, caught_C = 880, 650, 4
+    alarm_A,  alarm_B,  alarm_C  = 97,  278, 9
+    missed_A, missed_B, missed_C = 120, 350, 6
+
+    total_caught = caught_A + caught_B + caught_C   # 1534
+    total_alarm  = alarm_A  + alarm_B  + alarm_C    # 384
+    total_missed = missed_A + missed_B + missed_C   # 476
+
+    micro_precision = total_caught / (total_caught + total_alarm)   # 0.800
+    micro_recall    = total_caught / (total_caught + total_missed)  # 0.763
+    # class A (1000 rows) dominates the pool; class C (10 rows) barely registers
+
+
   ## The Code, If You Want It
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last

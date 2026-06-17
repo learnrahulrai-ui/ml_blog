@@ -210,6 +210,67 @@
      check: token 2 sees tokens 1 and 2, not 3 → [0.5, 0.5, 0].
 
 
+  ## The Numbers, in Python
+
+  Five pencil cores above: cutting strips, seat-stamping, attention, LayerNorm, causal mask.
+  Here the exact numbers in Python.
+
+    import math
+
+    # --- 4x4 photo cut into 2x2 strips ---
+    photo = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]
+    # with fold+swap+glue:
+    strip_top_left  = [1, 2, 5, 6]
+    strip_top_right = [3, 4, 7, 8]
+    strip_bot_left  = [9, 10, 13, 14]
+    strip_bot_right = [11, 12, 15, 16]
+    # (without swap: strip_0 would be [1,2,3,4] -- the wrong full-width slice)
+
+    # --- Positional encoding (width=4, seats 0-2 by sine/cosine) ---
+    seat0_stamp = [math.sin(0/1), math.cos(0), math.sin(0/100), math.cos(0)]
+    # [0, 1.000, 0, 1.000]
+    seat1_stamp = [math.sin(1/1), math.cos(1), math.sin(1/100), math.cos(1/100)]
+    # [0.841, 0.540, 0.010, 1.000]
+    # strip [2,2,2,2] + seat0 stamp = [2+0, 2+1, 2+0, 2+1] = [2, 3, 2, 3]
+    strip_stamped = [2+seat0_stamp[k] for k in range(4)]   # [2, 3, 2, 3]
+
+    # --- Attention (2 strips, tag width=4, ÷sqrt(4)=÷2) ---
+    s1_want, s1_have, s1_give = [2,0,1,0], [1,0,0,0], [2,0,0,1]
+    s2_want, s2_have, s2_give = [0,0,2,0], [3,0,2,0], [0,3,1,0]
+
+    match_s1s1 = sum(s1_want[k]*s1_have[k] for k in range(4))   # 2
+    match_s1s2 = sum(s1_want[k]*s2_have[k] for k in range(4))   # 8
+    match_s2s1 = sum(s2_want[k]*s1_have[k] for k in range(4))   # 0
+    match_s2s2 = sum(s2_want[k]*s2_have[k] for k in range(4))   # 4
+
+    # scale ÷2, softmax each row
+    e1_s1, e4_s1 = math.exp(1), math.exp(4)    # 2.718, 54.60
+    p_s1 = [e1_s1/(e1_s1+e4_s1), e4_s1/(e1_s1+e4_s1)]   # [0.047, 0.953]
+    e0_s2, e2_s2 = math.exp(0), math.exp(2)    # 1.000, 7.389
+    p_s2 = [e0_s2/(e0_s2+e2_s2), e2_s2/(e0_s2+e2_s2)]   # [0.119, 0.881]
+
+    s1_new_0 = p_s1[0]*s1_give[0] + p_s1[1]*s2_give[0]  # 0.094
+    s1_new_1 = p_s1[0]*s1_give[1] + p_s1[1]*s2_give[1]  # 2.859
+    s2_new_0 = p_s2[0]*s1_give[0] + p_s2[1]*s2_give[0]  # 0.238
+    s2_new_3 = p_s2[0]*s1_give[3] + p_s2[1]*s2_give[3]  # 0.119
+
+    # --- LayerNorm on strip [50, 60, 40, 30] ---
+    vals = [50, 60, 40, 30]
+    mid = sum(vals)/4    # 45
+    diffs = [v - mid for v in vals]   # [5, 15, -5, -15]
+    spread = math.sqrt(sum(d**2 for d in diffs)/4)   # 11.18
+    humbled = [round(d/spread, 2) for d in diffs]    # [0.45, 1.34, -0.45, -1.34]
+
+    # --- Causal mask: 3 tokens, equal raw scores ---
+    # token 1 sees only itself:  e^1 / e^1 = 1.0
+    p_t1 = [1.0, 0.0, 0.0]
+    # token 2 sees tokens 1 and 2:  each e^1/(2*e^1) = 0.5
+    p_t2 = [0.5, 0.5, 0.0]
+    # token 3 sees all three:  each e^1/(3*e^1) = 0.333
+    one_third = math.exp(1) / (3*math.exp(1))   # 0.333
+    p_t3 = [one_third, one_third, one_third]
+
+
   ## One Recitation (Carry This Away)
 
   Cut the photo into square strips (fold, swap, glue -- the swap keeps each square whole).

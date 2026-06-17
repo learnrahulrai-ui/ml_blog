@@ -441,6 +441,51 @@
         review readout.
 
 
+  ## The Numbers, in Python
+
+  Every step above -- the fade, the combine, the 3-slot example -- done by pencil.
+  Here in Python so you can check each number.
+
+    import math
+
+    # --- The fade: a mark worn down over words ---
+    mark_w1 = 0.2
+    after_w2  = 0.5 * mark_w1          # 0.10
+    after_w3  = 0.5 * after_w2         # 0.05
+    after_w10 = 0.2 * (0.5 ** 9)       # 0.00039
+    after_w30 = 0.2 * (0.5 ** 29)      # ~0.0000000004  -- effectively gone
+
+    # --- One-slot combine ---
+    A_old, fresh, keep, admit, show = 5.0, 0.6, 0.9, 0.2, 0.7
+    A_new   = keep  * A_old  +  admit * fresh   # 0.9*5.0 + 0.2*0.6 = 4.62
+    tanh_A  = math.tanh(A_new)                  # ~1.00 (A grew large)
+    B_new   = show  * tanh_A                    # 0.7 * 1.0 = 0.70
+
+    # --- Loud vs quiet: worth is separate from loudness ---
+    fresh_loud,  admit_low  = 0.9, 0.0    # loud but worthless
+    fresh_quiet, admit_high = 0.2, 0.95   # quiet but needed
+    lands_loud  = fresh_loud  * admit_low    # 0.000
+    lands_quiet = fresh_quiet * admit_high   # 0.190
+
+    # --- 3-slot combine (element-wise, no summing across slots) ---
+    A1, A2, A3    = 5.0,  -2.0,  0.3
+    k1, k2, k3    = 0.9,   0.5,  1.0    # keep fractions
+    f1, f2, f3    = 0.6,   0.8, -0.1    # fresh values
+    a1, a2, a3    = 0.2,   0.0,  0.9    # admit fractions
+    s1, s2, s3    = 0.7,   0.2,  1.0    # show fractions
+
+    nA1 = k1*A1 + a1*f1   # 0.9*5.0  + 0.2*0.6  = 4.62
+    nA2 = k2*A2 + a2*f2   # 0.5*(-2) + 0.0*0.8  = -1.00
+    nA3 = k3*A3 + a3*f3   # 1.0*0.3  + 0.9*(-0.1) = 0.21
+
+    tA1, tA2, tA3 = math.tanh(nA1), math.tanh(nA2), math.tanh(nA3)
+    # ~1.00,  ~-0.76,  ~0.21
+
+    nB1 = s1 * tA1   # 0.70
+    nB2 = s2 * tA2   # -0.15
+    nB3 = s3 * tA3   # 0.21
+
+
   ## Two Lines to Carry Away
 
   One memory, bent every word: a mark from word 1 wears to nothing by word 90. Proven, not

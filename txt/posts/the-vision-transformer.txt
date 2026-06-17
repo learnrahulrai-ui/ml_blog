@@ -456,6 +456,64 @@
             (global). Assumes nothing about nearness -- needs more data, scales further.
 
 
+  ## The Numbers, in Python
+
+  Every calculation in this post -- photo cutting, positional encoding, attention, LayerNorm --
+  worked by hand above.  Here each step is spelled out in Python.
+
+    import math
+
+    # --- Photo cutting: 28x28, patch size 4 ---
+    photo_w, patch_size = 28, 4
+    bands   = photo_w // patch_size    # 7 (across and down)
+    n_strips = bands * bands            # 49
+    strip_dots = patch_size * patch_size  # 16
+
+    # --- Positional encoding (width=4, seats 0-2) ---
+    # stamp[pos][2i] = sin(pos / 10000^(2i/width)),  stamp[pos][2i+1] = cos(...)
+    # i=0: scale=1;  i=1: scale=100
+    seat0 = [math.sin(0/1),   math.cos(0/1),   math.sin(0/100),   math.cos(0/100)]
+    # [0, 1.000, 0, 1.000]
+    seat1 = [math.sin(1/1),   math.cos(1/1),   math.sin(1/100),   math.cos(1/100)]
+    # [0.841, 0.540, 0.010, 1.000]
+    seat2 = [math.sin(2/1),   math.cos(2/1),   math.sin(2/100),   math.cos(2/100)]
+    # [0.909, -0.416, 0.020, 1.000]
+
+    # --- Attention (2 strips, tag width=4, scale=2) ---
+    # WANT, HAVE, GIVE for s1 and s2
+    s1_want = [2, 0, 1, 0];  s1_have = [1, 0, 0, 0];  s1_give = [2, 0, 0, 1]
+    s2_want = [0, 0, 2, 0];  s2_have = [3, 0, 2, 0];  s2_give = [0, 3, 1, 0]
+
+    # MATCH grid: dot every WANT with every HAVE
+    m_s1_s1 = s1_want[0]*s1_have[0] + s1_want[1]*s1_have[1] + s1_want[2]*s1_have[2] + s1_want[3]*s1_have[3]  # 2
+    m_s1_s2 = s1_want[0]*s2_have[0] + s1_want[1]*s2_have[1] + s1_want[2]*s2_have[2] + s1_want[3]*s2_have[3]  # 8
+    m_s2_s1 = s2_want[0]*s1_have[0] + s2_want[1]*s1_have[1] + s2_want[2]*s1_have[2] + s2_want[3]*s1_have[3]  # 0
+    m_s2_s2 = s2_want[0]*s2_have[0] + s2_want[1]*s2_have[1] + s2_want[2]*s2_have[2] + s2_want[3]*s2_have[3]  # 4
+
+    # SCALE (÷2) then SOFTMAX each row
+    sc_s1 = [m_s1_s1/2, m_s1_s2/2]   # [1, 4]
+    sc_s2 = [m_s2_s1/2, m_s2_s2/2]   # [0, 2]
+
+    e_s1 = [math.exp(sc_s1[0]), math.exp(sc_s1[1])]   # [2.718, 54.60]
+    p_s1 = [e_s1[0]/sum(e_s1), e_s1[1]/sum(e_s1)]     # [0.047, 0.953]
+    e_s2 = [math.exp(sc_s2[0]), math.exp(sc_s2[1])]   # [1.000, 7.389]
+    p_s2 = [e_s2[0]/sum(e_s2), e_s2[1]/sum(e_s2)]     # [0.119, 0.881]
+
+    # WEIGHTED SUM of GIVE tags
+    s1_new = [p_s1[0]*s1_give[k] + p_s1[1]*s2_give[k] for k in range(4)]
+    # [0.094, 2.859, 0.953, 0.047]
+    s2_new = [p_s2[0]*s1_give[k] + p_s2[1]*s2_give[k] for k in range(4)]
+    # [0.238, 2.643, 0.881, 0.119]
+
+    # --- LayerNorm on a 4-number strip [50, 60, 40, 30] ---
+    strip = [50, 60, 40, 30]
+    middle  = sum(strip) / len(strip)   # 45
+    diffs   = [v - middle for v in strip]   # [5, 15, -5, -15]
+    avg_sq  = sum(d**2 for d in diffs) / len(diffs)   # 125
+    spread  = math.sqrt(avg_sq)   # 11.18
+    humbled = [d / spread for d in diffs]   # [0.45, 1.34, -0.45, -1.34]
+
+
   ## One Breath
 
   Cut a 28 x 28 photo into 49 strips of 16 dots (fold, swap, glue -- the swap is what keeps each

@@ -445,6 +445,55 @@
     swallowed every earlier B. It is not tied to any single word.
 
 
+  ## The Numbers, in Python
+
+  Every step above -- training cost, the combine, the dial count -- done by pencil.
+  Here the exact numbers are spelled out in Python.
+
+    import math
+
+    # --- Training cost: 40,000 reviews, grab=64, 5 loops ---
+    study_reviews, grab_size, loops = 40000, 64, 5
+    grabs_per_loop = study_reviews // grab_size   # 625
+    total_dial_turns = grabs_per_loop * loops     # 3,125
+
+    # --- Loudness is not worth: two slots compared ---
+    fresh_loud,  admit_loud  = 0.9, 0.10   # loud value, nearly zero admission
+    fresh_quiet, admit_quiet = 0.2, 0.95   # quiet value, nearly full admission
+    land_loud  = fresh_loud  * admit_loud    # 0.09  -- nearly nothing lands
+    land_quiet = fresh_quiet * admit_quiet   # 0.19  -- more lands despite smaller value
+
+    # --- One-slot combine: the core arithmetic ---
+    old_A, fresh, keep_frac, admit_frac, show_frac = 5.0, 0.6, 0.9, 0.2, 0.7
+    new_A = keep_frac * old_A  +  admit_frac * fresh   # 0.9*5.0 + 0.2*0.6 = 4.62
+    tanh_new_A = math.tanh(new_A)                       # ~1.00 (A grew large)
+    new_B = show_frac * tanh_new_A                      # 0.7 * 1.0 = 0.70
+
+    # --- 3-slot combine (element-wise, no summing) ---
+    A1, A2, A3        = 5.0, -2.0, 0.3    # memory-A slots
+    k1, k2, k3        = 0.9,  0.5, 1.0    # keep-frac slots
+    f1, f2, f3        = -0.8, 0.6, 0.2    # fresh value slots
+    a1, a2, a3        = 0.3,  0.0, 0.9    # admit-frac slots
+
+    newA1 = k1*A1 + a1*f1   # 0.9*5.0  + 0.3*(-0.8) = 4.50 - 0.24 = 4.26
+    newA2 = k2*A2 + a2*f2   # 0.5*(-2) + 0.0*0.6    = -1.00
+    newA3 = k3*A3 + a3*f3   # 1.0*0.3  + 0.9*0.2    =  0.30 + 0.18 = 0.48
+
+    s1, s2, s3 = 0.7, 0.2, 1.0   # show-frac slots
+    tA1 = math.tanh(newA1)   # ~1.00
+    tA2 = math.tanh(newA2)   # ~-0.76
+    tA3 = math.tanh(newA3)   # ~0.45
+    newB1 = s1 * tA1   # 0.70
+    newB2 = s2 * tA2   # -0.15
+    newB3 = s3 * tA3   # 0.45
+
+    # --- Dial counts ---
+    one_machine  = 32*32 + 32*32 + 32   # 2,080  (word-paper + memory-paper + nudge)
+    lstm_dials   = 4 * one_machine       # 8,320  (four little RNN cells)
+    bilstm_dials = 2 * lstm_dials        # 16,640 (two LSTMs, opposite directions)
+    final_clerk_bilstm = 64 + 1          # 65     (glued memory is 64 wide)
+
+
   ## The Labels, Last
 
     plain walking worker             SimpleRNN (vanilla recurrent layer)

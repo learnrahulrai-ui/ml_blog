@@ -404,6 +404,76 @@
   The mask is the heart of the split, not the whole of it.
 
 
+  ## The Numbers, in Python
+
+  Every matrix dot, LayerNorm, softmax, and residual add above worked on paper.  Here the
+  exact numbers in Python -- same moves, same digits.
+
+    import math
+
+    # --- Embedding + position ---
+    cat = [2, 1, 1, 0]   # word row + seat 0
+    sat = [0, 1, 2, 1]   # word row + seat 1
+
+    # --- LayerNorm helper ---
+    def lnorm(row):
+        mid = sum(row) / len(row)
+        diffs = [x - mid for x in row]
+        dist = math.sqrt(sum(d**2 for d in diffs) / len(diffs))
+        return [d / dist for d in diffs]
+
+    lncat = lnorm(cat)   # [1.414, 0.000, 0.000, -1.414]
+    lnsat = lnorm(sat)   # [-1.414, 0.000, 1.414, 0.000]
+
+    # --- Q/K/V (toy permutation grids) ---
+    # ASK = [slot3, slot1, slot4, slot2]
+    ask_cat  = [lncat[2], lncat[0], lncat[3], lncat[1]]   # [0.000, 1.414, -1.414, 0.000]
+    # OFFER = reversed
+    offer_cat = lncat[::-1]   # [-1.414, 0.000, 0.000, 1.414]
+    offer_sat = lnsat[::-1]   # [0.000, 1.414, 0.000, -1.414]
+    # HANDOVER = [slot2, slot3, slot4, slot1]
+    hcat = [lncat[1], lncat[2], lncat[3], lncat[0]]   # [0.000, 0.000, -1.414, 1.414]
+    hsat = [lnsat[1], lnsat[2], lnsat[3], lnsat[0]]   # [0.000, 1.414, 0.000, -1.414]
+
+    # --- cat's match scores ---
+    raw_cat_cat = sum(ask_cat[k]*offer_cat[k] for k in range(4))   # 0.000
+    raw_cat_sat = sum(ask_cat[k]*offer_sat[k] for k in range(4))   # 2.000
+    scaled_cc   = raw_cat_cat / math.sqrt(4)   # 0.000
+    scaled_cs   = raw_cat_sat / math.sqrt(4)   # 1.000
+
+    # --- Softmax -> shares ---
+    e0, e1  = math.exp(scaled_cc), math.exp(scaled_cs)   # 1.000, 2.718
+    total_e = e0 + e1   # 3.718
+    share_cat_cat = e0 / total_e   # 0.269
+    share_cat_sat = e1 / total_e   # 0.731
+
+    # --- Weighted HANDOVER sum for cat ---
+    attn_cat = [share_cat_cat*hcat[k] + share_cat_sat*hsat[k] for k in range(4)]
+    # [0.000, 1.034, -0.380, -0.654]
+
+    # --- Residual 1: add original cat back ---
+    stream_cat = [attn_cat[k] + cat[k] for k in range(4)]   # [2.000, 2.034, 0.620, -0.654]
+
+    # --- Second LayerNorm before worker ---
+    ln2_cat = lnorm(stream_cat)   # [0.899, 0.930, -0.342, -1.487]
+    # (middle=1.000, distance=1.112)
+
+    # --- Worker (first grid + ReLU) ---
+    w1_0 = ln2_cat[0] - ln2_cat[1]   # -0.031  -> ReLU -> 0.000
+    w1_1 = ln2_cat[2] - ln2_cat[3]   #  1.145  -> ReLU -> 1.145
+    w1_2 = ln2_cat[0] + ln2_cat[1]   #  1.829  -> ReLU -> 1.829
+    w1_3 = ln2_cat[1] + ln2_cat[2]   #  0.588  -> ReLU -> 0.588
+    after_relu = [max(0, v) for v in [w1_0, w1_1, w1_2, w1_3]]   # [0.000, 1.145, 1.829, 0.588]
+    # second grid (permutation): [slot2, slot3, slot4, slot1]
+    worker_cat = [after_relu[1], after_relu[2], after_relu[3], after_relu[0]]   # [1.145, 1.829, 0.588, 0.000]
+
+    # --- Residual 2 -> cat's final output ---
+    out_cat = [stream_cat[k] + worker_cat[k] for k in range(4)]   # [3.145, 3.863, 1.208, -0.654]
+
+    # --- sat's final output (run same recipe) ---
+    out_sat = [0.465, 1.707, 2.880, 1.000]   # verified in the post above
+
+
   ## One Breath (Carry This Away)
 
   Swap each word for a learned row of numbers; add a row that marks its seat. Tame each row

@@ -176,6 +176,38 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
+  ## The Numbers, in Python
+
+  The only calculation in this post is the causal mask turning raw scores into portions.
+  Here it is spelled out in Python, using equal raw scores of 1.0 for every allowed cell.
+
+    import math
+
+    # 3 tokens; raw score = 1.0 for every ALLOWED cell, -inf for blocked cells
+    # Token 1 sees only itself; token 2 sees tokens 1-2; token 3 sees all three.
+
+    # --- token 1 row (only cell (1,1) allowed) ---
+    raw_11 = 1.0
+    exp_11 = math.exp(raw_11)             # 2.718
+    row1_total = exp_11                   # 2.718
+    p11, p12, p13 = exp_11/row1_total, 0.0, 0.0   # [1.0, 0, 0]
+
+    # --- token 2 row (cells (2,1) and (2,2) allowed) ---
+    raw_21, raw_22 = 1.0, 1.0
+    exp_21, exp_22 = math.exp(raw_21), math.exp(raw_22)   # 2.718, 2.718
+    row2_total = exp_21 + exp_22          # 5.437
+    p21, p22, p23 = exp_21/row2_total, exp_22/row2_total, 0.0   # [0.5, 0.5, 0]
+
+    # --- token 3 row (all three cells allowed) ---
+    raw_31, raw_32, raw_33 = 1.0, 1.0, 1.0
+    exp_31 = exp_32 = exp_33 = math.exp(1.0)   # 2.718 each
+    row3_total = exp_31 + exp_32 + exp_33       # 8.155
+    p31 = p32 = p33 = exp_31 / row3_total       # 0.333 each
+
+    # Encoder (no mask): all nine cells open -> equal portions everywhere
+    # Decoder (causal):  upper triangle = 0 portions -> each row adds to 1 from left only
+
+
   ## One Breath
 
   Attention lays scores in a grid: row looks, column is looked at, each row softmaxed into

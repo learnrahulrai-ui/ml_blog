@@ -362,6 +362,54 @@
     study-score minus practice-score      the generalisation gap
 
 
+  ## The Numbers, in Python
+
+  Every dial count, softmax, tax fine, and humbling step above worked by hand.  Here they
+  are in Python so you can verify each number on your own screen.
+
+    import math
+
+    # --- Dial count: 4-room network 784->256->128->64->10 ---
+    room1 = 784 * 256 + 256    # 200,960 -- dominates the count
+    room2 = 256 * 128 + 128    # 32,896
+    room3 = 128 * 64  + 64     # 8,256
+    exit_ = 64  * 10  + 10     # 650
+    total_dials = room1 + room2 + room3 + exit_   # 242,762
+
+    # --- Softmax: 3 bins, raw scores 2, 1, 0 ---
+    score_A, score_B, score_C = 2, 1, 0
+    exp_A = math.exp(score_A)   # 7.389
+    exp_B = math.exp(score_B)   # 2.718
+    exp_C = math.exp(score_C)   # 1.000
+    total_exp = exp_A + exp_B + exp_C   # 11.107
+    chance_A = exp_A / total_exp   # 0.665
+    chance_B = exp_B / total_exp   # 0.245
+    chance_C = exp_C / total_exp   # 0.090
+    # check: 0.665 + 0.245 + 0.090 = 1.000
+
+    # --- L2 tax: big dial vs small dial (rate = 0.001) ---
+    dial_big, dial_small, rate = 50, 0.5, 0.001
+    fine_big   = dial_big**2   * rate   # 2.500   -- enormous
+    fine_small = dial_small**2 * rate   # 0.00025 -- rounding error
+
+    # --- Batch norm: 5 hand-off numbers (10, 20, 30, 40, 50) ---
+    v1, v2, v3, v4, v5 = 10, 20, 30, 40, 50
+    middle = (v1 + v2 + v3 + v4 + v5) / 5   # 30
+    d1, d2, d3, d4, d5 = v1-middle, v2-middle, v3-middle, v4-middle, v5-middle
+    # -20, -10, 0, 10, 20
+    avg_sq  = (d1**2 + d2**2 + d3**2 + d4**2 + d5**2) / 5   # 200
+    scatter = math.sqrt(avg_sq)   # 14.14
+    h1, h2, h3, h4, h5 = d1/scatter, d2/scatter, d3/scatter, d4/scatter, d5/scatter
+    # -1.41, -0.71, 0, 0.71, 1.41 -- middle 0, scatter 1
+
+    # --- Early stopping: patience=5, val-loss passes 1-8 ---
+    loss_p1, loss_p2, loss_p3 = 0.50, 0.42, 0.39   # pass 3 is the LOW
+    loss_p4, loss_p5, loss_p6 = 0.41, 0.40, 0.43   # +1, +2, +3
+    loss_p7, loss_p8          = 0.44, 0.45          # +4, +5 -> ALARM fires
+    best_loss, rewind_to = loss_p3, 3   # 0.39, pass 3
+    alarm_pass = 8   # five strikes: passes 4 through 8
+
+
   ## Code, If You Want It
 
   Nothing above needed a computer: every dial count, every wrongness step, and every cure
