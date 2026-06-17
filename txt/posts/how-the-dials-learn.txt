@@ -471,9 +471,47 @@
   Nothing above needed a computer: the chain rule, the error flows, and every slope calculation
   fit on scratch paper. This section is for the day you meet one.
 
-  Part 1 stopped at a built-but-untrained model. Here is the rest: compile it (choose the
-  manager, the wrongness ruler, and what to report), study it, and grade it once on the
-  sealed exam.
+  First the tiny network by hand -- every number from the worked example locked in, the
+  forward pass and the backward pass written line by line, no loop, no library. Run it and
+  watch p=0.802, the error -0.198, and the slopes -0.158 and -0.148 print back:
+
+    import math
+
+    # the network's numbers, locked in (one input, one hidden clerk, one output clerk)
+    x  = 0.5
+    w1, b1 = 1.0, 0.3
+    w2, b2 = 1.5, 0.2
+    y  = 1
+
+    # ---- FORWARD: hidden clerk, then output clerk ----
+    z1 = x*w1 + b1               # 0.5*1.0 + 0.3 = 0.8
+    a1 = max(0, z1)              # zero-out rule (ReLU): 0.8 is positive, kept
+    z2 = a1*w2 + b2              # 0.8*1.5 + 0.2 = 1.4
+    p  = 1/(1 + math.exp(-z2))   # S-curve: 0.802
+    L  = -math.log(p)            # loss when truth = 1: ~0.22 (0.221 by hand from p=0.802)
+    print(round(z1,3), round(a1,3), round(z2,3), round(p,3), round(L,3))
+
+    # ---- BACKWARD: error born at the output, sent left, one link at a time ----
+    err_z2   = p - y             # the miracle: (-1/p)*(p*(1-p)) collapses to p - y = -0.198
+    slope_w2 = err_z2 * a1       # x its own input a1=0.8 : -0.158
+    slope_b2 = err_z2 * 1        # a nudge moves z2 one-for-one : -0.198
+    err_a1   = err_z2 * w2       # back through the dial w2=1.5 : -0.297
+    err_z1   = err_a1 * 1        # through the OPEN gate (z1>0, slope 1) : -0.297
+    slope_w1 = err_z1 * x        # x its own input x=0.5 : -0.148
+    slope_b1 = err_z1 * 1        # -0.297
+    print(round(err_z2,3), round(slope_w2,3), round(slope_w1,3))   # -0.198 -0.158 -0.148
+
+    # ---- one downhill step, learning rate 0.1 : dial = dial - step*slope ----
+    new_w2 = w2 - 0.1*slope_w2   # 1.5 + 0.0158 = 1.5158
+    new_w1 = w1 - 0.1*slope_w1   # 1.0 + 0.0148 = 1.0148
+    print(round(new_w2,4), round(new_w1,4))
+
+  No loop: four dials, every slope visible. The real building has 641 dials over 341 patients
+  for 50 passes -- you cannot write 641 lines, so there the toolbox loops the IDENTICAL step
+  (error born at the output, sent backward, dial = dial - step*slope) for every dial at once.
+  That loop is honest: the four lines above ARE one trip through it. Here is the rest of the
+  real run -- compile it (choose the manager, the wrongness ruler, what to report), study it,
+  and grade it once on the sealed exam.
 
   >> NEW TO PYTHON? Each named once:
        model.compile(optimizer='adam')    -- hire Adam as the step manager
