@@ -14,17 +14,27 @@
     <- prev:  [Chapter 3, Part 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt)
        next:  [Chapter 4, Part 2: One Dial Is a Lie](wobble-bands-bootstrap.txt) ->
 
-  Back to guessing a number -- but this time the machine has a character flaw, and we are
-  going to fix it. In Chapter 1 the straight-stick rule set its dials to make the misses as
-  small as possible, and we let those dials spin as far as they liked. That freedom is the
-  flaw. Left off the leash, a dial will grow to a monster just to twitch through one more
-  point in the study pile -- and a machine that bends itself around every point it has seen
-  falls flat on its face the moment it meets someone new.
+  Back to guessing a number -- but this time the machine has a character flaw.
+  We are going to fix it.
 
-  This chapter is about humility, taught two ways. Part 1 puts the dials on a LEASH so none
-  of them can grow into a tyrant. Part 2 asks a harder question -- how much should you even
-  TRUST a dial? -- and answers it by faking a hundred trips to the hospital. Part 3 lifts
-  the hood and shows where the dials come from in the first place.
+  First, the picture you need, built from scratch.
+  A "straight-stick rule" is a guess made by multiplying each measurement by its own number
+  and adding the results.
+  Each of those numbers is a "dial" -- a multiplier the machine turns up or down.
+  The machine sets each dial to make its misses as small as possible.
+
+  Until now we let those dials spin as far as they liked.
+  That freedom is the flaw.
+  Left off the leash, a dial will grow to a monster just to twitch through one more point in
+  the study pile -- the patients the machine learns from.
+  Which means a machine that bends itself around every point it has seen falls flat on its
+  face the moment it meets someone new.
+
+  This chapter is about humility, taught two ways.
+  Part 1 (this post) puts the dials on a LEASH so none of them can grow into a tyrant.
+  Part 2 asks a harder question -- how much should you even TRUST a dial? -- and answers it
+  by faking a hundred trips to the hospital.
+  Part 3 lifts the hood and shows where the dials come from in the first place.
 
 
   ## A New Sheet: The Diabetes Pile
@@ -37,13 +47,19 @@
      ...                                   |   ...
     +--------------- 10 columns -----------+|  the answer
 
-  Same job as Chapter 1: read a person's measurements, guess their number -- here a disease
-  progression score taken a year later. The straight-stick rule still applies, unchanged:
+  The job: read a person's ten measurements, guess their number.
+  Here that number is a disease progression score taken a year later.
+  The straight-stick rule -- multiply each measurement by its own dial, add the results,
+  add one fixed lift -- gives the guess:
 
     guess = (dial1 * age) + (dial2 * bmi) + ... + (dial10 * s6) + nudge
 
-  The dials are still whatever makes the total squared miss smallest. Nothing new yet. What
-  is new is that we no longer trust the machine to set those dials sensibly on its own.
+  The "nudge" is that one fixed lift added at the end, the same for every patient.
+  The dials are still whatever makes the total squared miss smallest.
+  ("Squared miss" = take each miss, the answer minus the guess, and multiply it by itself,
+  so a plus miss and a minus miss cannot cancel.)
+  Nothing new yet.
+  What is new is that we no longer trust the machine to set those dials sensibly on its own.
 
 
   ## The Disease: Huge Dials That Memorise
@@ -58,22 +74,29 @@
      .  .  .  .                      .\/  \/  .
     smooth, travels well            perfect on study, WILD on anyone new
 
-  A huge dial means the machine has fallen in love with one column and is over-trusting it
-  to nail the people it has already seen. It scores beautifully on the study pile, then
-  shatters on a new patient. That is memorising, not learning -- and we met its name in
-  Chapter 2: it is the jumpy half of the stiff-vs-jumpy trade. We want to FORBID huge dials.
+  A huge dial means the machine has fallen in love with one column and is over-trusting it.
+  Which means it nails the people it has already seen.
+  So it scores beautifully on the study pile.
+  But then it shatters on a new patient.
+  That is memorising, not learning.
+  There is a name for this failure: the machine is "too jumpy."
+  A too-jumpy machine swings wildly when the data shifts even a little.
+  Its opposite is "too stiff" -- a machine so rigid it ignores real patterns.
+  Good machines sit between the two, and huge dials are the jumpy extreme.
+  So we want to FORBID huge dials.
 
 
   ## The Leash: Add a Fine
 
-  Until now the machine paid only for being wrong. Now we make it pay a second fine -- for
-  being immodest. It must drive down two things at once:
+  Until now the machine paid only for being wrong.
+  Now we make it pay a second fine -- for being immodest.
+  So it must drive down two things at once:
 
     total wrongness    +    a * (a fine for big dials)
     +- fit the data -+       +------- stay humble -------+
 
-  The letter a (the textbooks write the Greek "alpha") is a knob WE set: how hard to press
-  for humility.
+  The letter a (the textbooks write the Greek "alpha") is a knob WE set by hand.
+  It says how hard to press for humility.
 
     a = 0     no fine -- the old free-spinning machine, back to memorising
     a small   gentle squeeze
@@ -86,19 +109,24 @@
 
   ## Ridge: The Smooth Squeeze
 
-  IN HAND: the diabetes sheet -- 442 people, 10 columns, one answer -- a straight-stick
-  guess built from 10 dials + 1 nudge = 11 numbers, and a bill with two charges: total
-  wrongness plus a times a fine for big dials.  This section gives the fine its first
-  shape: the square.
+  IN HAND: the diabetes sheet -- 442 people, 10 columns, one answer.
+  The guess is the straight-stick rule: 10 dials plus 1 nudge = 11 numbers.
+  The bill has two charges: total wrongness, plus a times a fine for big dials.
+  ("a" is the knob WE set for how hard to press for humility.)
+  This section gives the fine its first shape: the square.
 
-  Ridge's fine is the SQUARE of each dial, all of them added up:
+  Ridge's fine is the SQUARE of each dial, all of them added up.
+  ("Square" = the dial multiplied by itself.)
 
     make smallest:   (add up every miss^2)   +   a * (add up every dial^2)
 
-  To feel what a square does, picture a tug-of-war over a single dial. Its usefulness pulls
-  it away from zero; the fine pulls it back toward zero. How hard does the fine pull? For a
-  square, the pull is 2*a*dial -- so as the dial gets SMALLER, the fine's grip gets weaker
-  too, fading to nothing at zero:
+  To feel what a square does, picture a tug-of-war over a single dial.
+  Its usefulness pulls it away from zero.
+  The fine pulls it back toward zero.
+  How hard does the fine pull?
+  For a square, the pull is 2*a*dial.
+  Which means as the dial gets SMALLER, the fine's grip gets weaker too.
+  So the grip fades to nothing at zero:
 
             Ridge -- a smooth bowl
      fine |  .             .
@@ -108,24 +136,39 @@
           +---------------------- dial size
                     0
 
-  So the tug-of-war settles at a dial that is SMALL but not zero. The fine drags every dial
-  inward, but near zero it runs out of strength, so no dial is ever shoved all the way to
-  exactly zero. Ridge shrinks the whole orchestra; it silences nobody.
+  So the tug-of-war settles at a dial that is SMALL but not zero.
+  The fine drags every dial inward.
+  But near zero it runs out of strength.
+  So no dial is ever shoved all the way to exactly zero.
+  Ridge shrinks the whole orchestra; it silences nobody.
 
-  And because that bowl is smooth, there is a clean one-step answer -- no searching. We
-  actually met it already, as a footnote in [Chapter 1, Part 3](straight-stick-linear-regression.txt):
-  the ridge rule beta = (X^T X + a*I)^-1 X^T y. The fine just adds a BUMP down the diagonal
-  before the solve. For one lonely dial it reads as the tidy picture:
+  And because that bowl is smooth, there is a clean one-shot answer -- no searching.
+  Write the sheet as a grid X (people down, columns across) and the answers as a column y.
+  Then the ridge rule for all the dials at once is:
+
+    dials = (X^T X + a*I)^-1 X^T y
+
+  Here X^T means X flipped on its side (rows become columns).
+  X^T X is the grid that records how every column overlaps every other column.
+  (...)^-1 means the inverse of that grid -- the "untangler" that shares credit between
+  columns that move together.
+  I is the identity grid (1's down the diagonal, 0's elsewhere).
+  So a*I just adds a BUMP of size a down the diagonal before the solve.
+  For one lonely dial that rule reads as the tidy picture:
 
     Ridge dial =  top / (bottom + a)        bigger a -> bigger bottom -> smaller dial
 
-  What are "top" and "bottom"?  Concrete numbers from the sheet:
+  What are "top" and "bottom"?  Real numbers from the sheet:
 
     top    = how the column and the answer move together
            = sum of (column value - column average) x (answer - answer average)
 
     bottom = how much the column wiggles on its own
            = sum of (column value - column average)^2
+
+  Here "column" means one measurement across all the people (say bmi).
+  "Column average" means add that column's values and divide by how many people.
+  "Answer average" means add the answers and divide by how many people.
 
     For ONE column (say bmi), ONE dial, on 4 people:
 
@@ -142,15 +185,24 @@
       with ridge a=10:      dial = 3.96 / (0.0136 + 10) = 3.96 / 10.0136 = 0.396
       with ridge a=100:     dial = 3.96 / (0.0136 + 100) = 3.96 / 100.0136 = 0.0396
 
-      a=0 gives the plain dial (huge).  a=10 crushes it 735x smaller.
-      a=100 crushes it 7350x smaller.  The bigger the a, the smaller the dial.
-      (check the crush: 0.396 x 735 = 291.06 ~ 291, and 0.0396 x 7350 = 291.06 ~ 291.)
+  Read those three lines one at a time.
+  With a=0 the bottom is just 0.0136, so the dial is 3.96/0.0136 = 291 -- huge.
+  With a=10 the bottom becomes 0.0136+10 = 10.0136, so the dial is 3.96/10.0136 = 0.396.
+  That is 291/0.396 = 735 times smaller.
+  With a=100 the bottom becomes 0.0136+100 = 100.0136, so the dial is 3.96/100.0136 = 0.0396.
+  That is 291/0.0396 = 7350 times smaller.
+  So the bigger the a, the smaller the dial.
 
-  The column-average and answer-average are computed over the 4 people.  "bmi-avg"
-  means bmi minus the column's own average (0.08).  "ans-avg" means answer minus
-  the answer's average (126).  Multiplying those two gives the "top" piece for each
-  person.  Adding up all four gives top = 3.96.  Adding up the squares gives
-  bottom = 0.0136.
+  Now the table's own arithmetic, spelled out.
+  The table uses a column average of 0.08 and an answer average of 126.
+  "bmi-avg" means bmi minus the column's own average (0.08).
+  So for person A: 0.04 - 0.08 = -0.04, and for B: 0.06 - 0.08 = -0.02, and so on.
+  "ans-avg" means answer minus the answer's average (126).
+  So for person A: 97 - 126 = -31, and for B: 121 - 126 = -7, and so on.
+  Multiplying those two gives the "top" piece for each person.
+  Adding up all four "top" pieces gives 1.24 + 0.14 + 0.28 + 2.30 = 3.96.
+  Squaring each "bmi-avg" gives the "bottom" piece for each person.
+  Adding up all four "bottom" pieces gives 0.0016 + 0.0004 + 0.0016 + 0.0100 = 0.0136.
 
   >> YOUR TURN
      Same column (top = 3.96, bottom = 0.0136).  Set the knob to a = 1 and work the
@@ -160,21 +212,25 @@
      1.0136 ~= 3.91.  Even a gentle a = 1 drags the plain dial of 291 down to about
      3.9 -- the bump on the bottom does nearly all the work.
 
-  ** KEY: RIDGE SHRINKS ALL, ZEROES NONE, AND SOLVES IN ONE STEP
-     The fine's pull dies at zero, so every dial lands small-but-alive. The bump-on-the-
-     diagonal makes the solve exact -- and, as a bonus, fixes the "tangled columns" crash
-     from Chapter 1 Part 3, because a full diagonal can always be inverted.
+  ** KEY: RIDGE SHRINKS ALL, ZEROES NONE, AND SOLVES IN ONE SHOT
+     The fine's pull dies at zero, so every dial lands small-but-alive.
+     The bump-on-the-diagonal makes the solve exact.
+     As a bonus it also cures a crash that plain least-squares can hit: when two columns
+     carry almost the same information, the untangler grid cannot be inverted and the solve
+     blows up.  Adding a*I down the diagonal always makes the grid invertible again.
 
 
   ## Lasso: The Sharp Snap
 
-  Lasso's fine is the ABSOLUTE size of each dial -- its size with the sign thrown away:
+  Lasso's fine is the ABSOLUTE size of each dial -- its size with the sign thrown away.
+  ("Absolute size" of -0.7 is 0.7; the absolute size of 0.7 is also 0.7.)
 
     make smallest:   (add up every miss^2)   +   a * (add up every |dial|)
 
-  Same tug-of-war, one key change: the fine's pull is now CONSTANT. For an absolute
-  size the pull is just a, no matter how tiny the dial gets. It does not fade near zero --
-  it keeps shoving at full strength right up to the edge:
+  Same tug-of-war, one key change: the fine's pull is now CONSTANT.
+  For an absolute size the pull is just a, no matter how tiny the dial gets.
+  So it does not fade near zero.
+  It keeps shoving at full strength right up to the edge:
 
             Lasso -- a sharp corner
      fine |  \             /
@@ -187,19 +243,22 @@
           +---------------------- dial size
                     0
 
-  Now the ending changes. Even when a dial is already tiny, the fine still pushes with full
-  strength a. If that column's usefulness cannot beat a, the dial gets driven all the way to
-  exactly zero -- and PINNED there.
+  Now the ending changes.
+  Even when a dial is already tiny, the fine still pushes with full strength a.
+  If that column's usefulness cannot beat a, the dial gets driven all the way to exactly zero.
+  And it is PINNED there.
 
     strong column (usefulness > a):  survives, just shrunk
     weak column   (usefulness < a):  SNAPPED to exactly 0 -> dropped from the sheet
 
-  So Lasso does more than shrink -- it DELETES useless columns by zeroing their dials. It
-  hands you back a shorter sheet and, with it, an answer to a question Ridge never touches:
-  which measurements actually mattered?
+  So Lasso does more than shrink -- it DELETES useless columns by zeroing their dials.
+  Which means it hands you back a shorter sheet.
+  And with it, an answer to a question Ridge never touches: which measurements actually
+  mattered?
 
-  The price of that sharp corner: there is no clean formula. You cannot solve it in one
-  step. The machine has to loop:
+  The price of that sharp corner: there is no clean formula.
+  So you cannot solve it in one shot.
+  The machine has to loop:
 
     1. start every dial at 0
     2. nudge the bmi dial -- does its usefulness beat the fine? keep it : snap to 0
@@ -209,9 +268,10 @@
   At the end you COUNT THE SURVIVORS -- the dials that did not snap to zero.
 
   ** KEY: LASSO SHRINKS, SNAPS WEAK DIALS TO ZERO, AND HAS NO FORMULA
-     Because the fine never lets up, Lasso zeroes out weak columns entirely and tells you
-     which ones earned their keep. The corner that buys that gift also costs the clean
-     solve: Lasso must loop until the dials stop moving.
+     Because the fine never lets up, Lasso zeroes out weak columns entirely.
+     So it tells you which columns earned their keep.
+     The corner that buys that gift also costs the clean solve.
+     Which means Lasso must loop until the dials stop moving.
 
 
   ## Ridge vs Lasso, Side by Side
@@ -225,18 +285,26 @@
     by hand          yes: top/(bottom+a)    no: must loop
     gives you        a humbler machine      a humbler machine PLUS a shortlist
 
-  The ONLY real difference is square versus absolute -- and that single choice decides
-  whether the fine's pull dies at zero (Ridge: settle near zero) or stays alive (Lasso:
-  snap to zero). Everything else follows from it.
+  The ONLY real difference is square versus absolute.
+  That single choice decides whether the fine's pull dies at zero or stays alive.
+  Ridge squares the dial, so the pull dies at zero, so dials settle near zero but never reach it.
+  Lasso takes the absolute size, so the pull stays alive, so weak dials snap to exactly zero.
+  Everything else follows from that one choice.
 
 
   ## Picking the Knob a -- Never Guess It
 
-  Both machines have the same knob a, and you do NOT eyeball it. You let the 5-slice check
-  from Chapter 1 do the choosing. Cut the study pile into 5 slices; cover one, build the
-  dials on the other four, guess the covered slice, write down the error; rotate until every
-  slice has been the covered one; average the five errors. That average is one value of a's
-  score. Do it for a whole ladder of a-values -- about fifty of them -- and a valley appears:
+  Both machines have the same knob a.
+  You do NOT eyeball it.
+  Instead you let a "5-slice check" do the choosing.
+  Here is that check from scratch.
+  Cut the study pile into 5 equal slices.
+  Cover one slice, build the dials on the other four, guess the covered slice, write down the
+  error.
+  Rotate until every slice has had its turn as the covered one.
+  Average the five errors.
+  That average is one a-value's score.
+  Do this for a whole ladder of a-values -- about fifty of them -- and a valley appears:
 
     error |  \                   _/     too-small a -> still memorising
           |   \_             ___/        too-big a   -> dials crushed, too stiff
@@ -244,14 +312,17 @@
           |        \__.__/               <- the valley = the best a
           +--------------------------- a (from tiny to huge)
 
-  Pick the a at the bottom of the valley. Then REBUILD the dials on the full study pile with
-  that winning a, and grade ONCE on the sealed exam pile. Same iron rule as always: never
-  pick a by peeking at the exam.
+  Pick the a at the bottom of the valley.
+  Then REBUILD the dials on the full study pile with that winning a.
+  Then grade ONCE on the sealed exam pile -- a held-back set of patients the machine never
+  touched while choosing a.
+  The iron rule: never pick a by peeking at that exam pile.
 
   >> NOTE: THE CURVES ARE THE ANSWER, NOT A PLOT
-     The lab asks you to report the error-versus-a curve for both machines. The plot is
-     optional; the numbers behind it are the point. The winning a is wherever the curve
-     bottoms out -- the valley above, turned into a row of numbers.
+     The lab asks you to report the error-versus-a curve for both machines.
+     The plot is optional; the numbers behind it are the point.
+     The winning a is wherever the curve bottoms out -- the valley above, turned into a row
+     of numbers.
 
 
   >> YOUR TURN
@@ -264,11 +335,13 @@
 
   ## Common Tripwires I Caught
 
-  These are the exact wrong pictures I had to untangle -- each one cost me
-  real time until I saw the concrete shape of the mistake:
+  These are the exact wrong pictures I had to untangle.
+  Each one cost me real time until I saw the plain shape of the mistake:
 
     TRIPWIRE 1:  25% chop vs 2.5% chop
-       WRONG: the 95% band chops 25% off each end (like Lab 1's quartiles).
+       WRONG: the 95% band chops 25% off each end (the way quartiles cut the middle 50%).
+              A quartile is a cut that splits a sorted pile into quarters; chopping 25%
+              off each end keeps only the middle half.
        RIGHT: 95% means keep the middle 95% -> chop 2.5% off each end.
               q0.025 and q0.975 (because 100% - 2.5% = 97.5%).
               For 200 values: 2.5% of 200 = 5.  Keep index 5 through 194

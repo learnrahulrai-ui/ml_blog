@@ -14,27 +14,46 @@
     <- prev:  [Sorting 2: The Trade Curve](the-trade-curve.txt)
        next:  [Sorting 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt) ->
 
-  An over-confident machine is a dangerous thing, and the S-curve machine from Part 1 --
-  one dial per column, multiply and add, squash the sum into a 0-to-1 chance -- has
-  a streak of it. It sets its dials by rolling downhill on the cross-entropy leftover
-  (the score that charges it for each lump by how confidently wrong its chance was), and
-  left to its own devices nothing stops a single dial from ballooning to 50 if that is
-  what makes the study pile fit. A dial that large means the machine has fallen for one
-  column and stopped listening to the other twenty-nine -- it aces the practice exam and
-  then freezes on a lump it has never seen. Confident, and wrong, which is the worst way
-  to be.
+  An over-confident machine is a dangerous thing.
+  The machine we use here is the S-curve machine.
+  It keeps one DIAL per input column (a dial is just a number it can turn up or down).
+  For one row it multiplies each column by its dial and adds the products into one number.
+  Call that one summed number the dial sum z.
+  Then it SQUASHES z through the sigmoid: chance = 1 / (1 + e^-z).
+  Squash here means sigmoid -- the S-shaped curve that bends any z into a 0-to-1 chance.
+  So the machine turns a row into a single chance between 0 and 1.
 
-  This post is about humbling it, two different ways. The first keeps the same machine but
-  puts it on a TIGHTER leash. The second throws the machine out entirely and tries a
-  completely different temperament -- one that never rolls downhill at all, but instead
-  steps back, looks at the SHAPE of the two groups, and draws the wall in a single stroke.
+  This machine has a streak of over-confidence.
+  It sets its dials by rolling downhill on a leftover score.
+  That score is CROSS-ENTROPY: for each lump, read off the chance the machine gave the
+  TRUE bin, then fine it by -log of that chance.
+  Which means a confident wrong chance costs a lot and a hedged chance costs little.
+  Rolling downhill means nudging each dial in the direction that lowers that score.
+  But left to itself nothing stops one dial from ballooning to 50 to make the study pile
+  fit.
+  A dial that large means the machine has fallen for one column and stopped listening to
+  the other twenty-nine.
+  So it aces the practice exam and then freezes on a lump it has never seen.
+  Confident, and wrong, which is the worst way to be.
 
-  >> NOTE: THE PART 1 BASELINE ALREADY HAS A LEASH
+  This post is about humbling it, two different ways.
+  The first keeps the same S-curve machine but puts it on a TIGHTER leash.
+  The second throws that machine out and tries a completely different temperament.
+  This second one never rolls downhill at all.
+  Instead it steps back, looks at the SHAPE of the two groups, and draws the wall in a
+  single stroke.
+
+  >> NOTE: THE PLAIN S-CURVE MACHINE ALREADY HAS A LEASH
      Worth saying up front, because it surprises people: LogisticRegression() in sklearn is
-     NOT a free machine. Its defaults are penalty='l2', C=1.0 -- so the Part 1 baseline
-     already carries an L2 leash of medium strength. This post is therefore not "no leash
-     vs leash"; it is MEDIUM LEASH (C=1.0) vs TIGHTER LEASH (C=0.1). To see a genuinely
-     unleashed machine you would have to pass penalty=None explicitly.
+     NOT a free machine.
+     A "leash" here means a price the machine pays for big dials -- this is L2, where the
+     fine is the sum of every dial squared, which pushes dials toward zero.
+     The strength of that leash is set by C, where C = 1/lambda (small C = strong leash).
+     sklearn's defaults are penalty='l2', C=1.0 -- so the plain machine already carries an
+     L2 leash of medium strength.
+     This post is therefore not "no leash vs leash".
+     It is MEDIUM LEASH (C=1.0) vs TIGHTER LEASH (C=0.1).
+     To see a genuinely unleashed machine you would have to pass penalty=None explicitly.
 
 
   ## What a Loose Leash Lets Happen
@@ -51,41 +70,55 @@
     the machine bets almost everything on one column
     -> cocky on study pile, shaky on new lumps
 
-  So the question this post really asks is: the default C=1.0 leash is fine, but what
-  happens if we pull it TIGHTER? Do the dials shrink further, and does the machine get more
-  humble?
+  So the question this post really asks: the default C=1.0 leash is fine, but what happens
+  if we pull it TIGHTER (down to C=0.1, a stronger leash)?
+  Do the dials shrink further?
+  And does the machine get more humble?
 
 
   ## A Leash on the Dials (L2 Penalty)
 
-  Add a price tag to large dials. Every extra unit of dial size costs something. The
-  machine now minimises two things at once: fit the study pile well AND keep the dials
-  small. The penalised objective is:
+  Add a price tag to large dials.
+  Every extra unit of dial size costs something.
+  Which means the machine now minimises two things at once.
+  It must fit the study pile well AND keep the dials small.
+  L2 here is the name of that price: the fine is the sum of every dial squared.
+  The penalised objective is (beta_j is the dial on column j):
 
       L_L2(beta) = L(beta) + lambda * sum_j beta_j^2
 
-  The first term is the cross-entropy from Part 1 -- the plain-fit score: for each lump,
-  take the chance the machine gave the TRUE bin, and fine it by -log of that chance, so a
-  confident wrong chance costs a lot and a hedged one costs little.  The second is the sum
-  of squared dials times a strength lambda. When lambda is large, even a small dial^2 sum gets expensive,
-  and the machine is forced to shrink everything toward zero. The gradient update picks up
-  a pull-toward-zero term:
+  The first term L(beta) is the plain-fit score, the CROSS-ENTROPY.
+  Cross-entropy means: for each lump, read the chance the machine gave the TRUE bin, then
+  fine it by -log of that chance.
+  So a confident wrong chance costs a lot and a hedged one costs little.
+  The second term is the sum of squared dials times a strength lambda.
+  lambda is just a knob: bigger lambda means a harder squeeze on the dials.
+  When lambda is large, even a small sum-of-squared-dials gets expensive.
+  Therefore the machine is forced to shrink everything toward zero.
+  The gradient (the slope that says which way to nudge each dial) picks up a pull-toward-
+  zero term:
 
       dL_L2/dbeta_j = (1/n) sum_i ( sig(z_i) - y_i ) x_ij  +  2*lambda*beta_j
 
-  The term 2*lambda*beta_j pulls every dial toward zero at every step. Result: dials spread
-  across all 30 columns instead of concentrating on one.
+  Here sig(z_i) is the squashed chance for row i and z_i is its dial sum.
+  The term 2*lambda*beta_j pulls every dial toward zero at every step.
+  So the dials spread across all 30 columns instead of concentrating on one.
 
   >> NOTE: BAYESIAN READING
      Adding a squared-dial penalty is the same as placing a zero-mean Gaussian prior on
-     each dial and maximising the posterior instead of the likelihood. The prior says "a
-     dial as large as 40 is very surprising; please explain." The data can override this
-     prior if the evidence is strong enough; otherwise the dials stay modest.
+     each dial and maximising the posterior instead of the likelihood.
+     A prior here is a belief held before seeing data; zero-mean means we expect each dial
+     to sit near zero.
+     The prior says "a dial as large as 40 is very surprising; please explain."
+     The data can override this prior if the evidence is strong enough.
+     Otherwise the dials stay modest.
 
 
   ## The C Parameter: Counter-Intuitive Direction
 
-  sklearn spells the leash strength as C, not lambda. They are reciprocals:
+  sklearn spells the leash strength as C, not lambda.
+  lambda is the fine-strength on squared dials; C is sklearn's name for its reciprocal.
+  Which means they are flipped versions of each other:
 
       C = 1 / lambda   <=>   lambda = 1 / C
 
@@ -96,21 +129,25 @@
     check each on the slate:  1/0.1 = 10;  1/1.0 = 1;  1/1000 = 0.001
 
   !! WARN: C=0.1 IS HEAVY PUNISHMENT, NOT LIGHT
-     C is the budget you give the machine to IGNORE the penalty. A small budget means
-     little room to ignore it -- a hard squeeze. A large C means a large "ignore" budget --
-     the penalty barely bites. "C small = heavy leash" is counter-intuitive until you
-     remember C = 1/lambda.
+     C is the budget you give the machine to IGNORE the penalty.
+     A small budget means little room to ignore it -- a hard squeeze.
+     A large C means a large "ignore" budget -- so the penalty barely bites.
+     "C small = heavy leash" feels backwards until you remember C = 1/lambda.
 
 
   ## Did the Dials Shrink?
 
-  IN HAND: one S-curve machine, its leftover now two-part -- plain fit plus a fine of
-  lambda times the sum of squared dials -- and the dictionary C = 1/lambda, so the tight
-  setting C = 0.1 means lambda = 1/0.1 = 10.  This section adds the receipt: proof the
-  dials actually shrank.
+  IN HAND so far: one S-curve machine (one dial per column, sum into z, squash z into a
+  chance).
+  Its leftover score is now two-part: plain fit (cross-entropy) plus a fine of lambda
+  times the sum of squared dials.
+  And the dictionary is C = 1/lambda, so the tight setting C = 0.1 means lambda = 1/0.1 =
+  10.
+  This section adds the receipt: proof the dials actually shrank.
 
   Compare the average absolute dial size for the default leash (C=1.0) against the tighter
-  leash (C=0.1): if the tighter leash is doing its job, its average dial comes out smaller.
+  leash (C=0.1).
+  If the tighter leash is doing its job, its average dial comes out smaller.
   (The two-line check is in the code at the end of the post.)
 
   A concrete 3-column example, by pencil.  Suppose only 3 columns -- x1, x2, x3 --
@@ -142,9 +179,10 @@
      27.8.  Ballooned dials cost about 36 times as much -- that is exactly the pressure
      that makes the machine shrink them.
 
-  The absolute value is needed because a +3 and a -3 cancel in a plain
-  average, making the machine look like it has no signal at all.  The
-  absolute value measures SIZE regardless of sign.
+  The absolute value (the number with its sign stripped off) is needed here.
+  Because a +3 dial and a -3 dial cancel in a plain average.
+  Which would make the machine look like it has no signal at all.
+  So we measure SIZE regardless of sign instead.
 
   >> NOTE: WHY ABSOLUTE VALUE BEFORE AVERAGING
      Dials can be positive or negative. A positive dial +3 and a negative dial -3 cancel to
@@ -161,24 +199,27 @@
     Even after scaling, a dial can grow huge if the machine
     over-trusts one column. You need both. They solve different problems.
 
-  Scaling makes the 30 input columns comparable before the machine sees them. The leash
-  limits how large any individual dial grows during the dial-setting step. Removing either
-  one leaves a different problem unsolved.
+  Scaling means putting all 30 input columns on one ruler before the machine sees them.
+  The leash limits how large any individual dial grows while the machine sets its dials.
+  So removing either one leaves a different problem unsolved.
 
 
   ## A Completely Different Machine: The Two-Cloud Wall
 
-  IN HAND: the leashed S-curve machine -- fit plus lambda times squared dials, tight
-  setting C = 0.1 (lambda = 1/0.1 = 10) -- and the receipt that its dials shrank: average
-  size (1.4 + 0.9 + 0.1)/3 = 2.4/3 = 0.80 against the default's (3.1 + 2.4 + 0.2)/3 =
-  5.7/3 = 1.90.  This section adds a second machine of the opposite temperament.
+  IN HAND so far: the leashed S-curve machine (fit plus lambda times squared dials, tight
+  setting C = 0.1, which means lambda = 1/0.1 = 10).
+  And the receipt that its dials shrank: average size (1.4 + 0.9 + 0.1)/3 = 2.4/3 = 0.80
+  against the default's (3.1 + 2.4 + 0.2)/3 = 5.7/3 = 1.90.
+  This section adds a second machine of the opposite temperament.
 
-  Everything so far kept the same machine and tightened its leash. Now we change the
-  machine itself. The S-curve machine is a fidgeter -- it inches toward the answer by trial
-  and error: adjust, check the leftover, adjust again. Linear discriminant analysis (LDA)
-  has the opposite personality. It does not fiddle at all. It stands back, studies the
-  SHAPE of the two groups of points, and lays down the wall between them in a single
-  confident stroke.
+  Everything so far kept the same machine and tightened its leash.
+  Now we change the machine itself.
+  The S-curve machine is a fidgeter -- it inches toward the answer by trial and error:
+  adjust, check the leftover, adjust again.
+  The new machine is LDA, which stands for linear discriminant analysis.
+  LDA has the opposite personality and does not fiddle at all.
+  It stands back, studies the SHAPE of the two groups of points, and lays down the wall
+  between them in a single confident stroke.
 
     first  split the study pile into sick rows and well rows
     then   compute 30 averages per group -> two centres in 30-column space
@@ -194,23 +235,35 @@
   ## Fisher's Criterion: Where to Aim the Wall
 
   A naive wall at the midpoint between the two centres works when both clouds are round.
-  Real clouds are stretched -- some directions have more spread than others, and the two
-  classes may share some of that stretch. Fisher's criterion asks: which direction w
-  maximises the RATIO of between-class spread to within-class spread?
+  But real clouds are stretched -- some directions have more spread than others.
+  And the two classes may share some of that stretch.
+  So a midpoint wall is not enough.
+  Fisher's criterion is the rule for aiming the wall well.
+  It asks: which direction w maximises the RATIO of between-class spread to within-class
+  spread?
+  Here w is the wall's NORMAL vector -- the arrow pointing straight across the wall, along
+  which we score each point.
 
       maximise  (w^T S_b w) / (w^T S_w w)
 
-  where S_b = (mu1 - mu0)(mu1 - mu0)^T (between-class scatter) and S_w = S_W (pooled
-  within-class scatter). The solution is closed-form -- no rolling downhill required:
+  Here mu0 is the centre (average point) of class 0, and mu1 is the centre of class 1.
+  S_b is the between-class scatter: S_b = (mu1 - mu0)(mu1 - mu0)^T -- how far apart the two
+  centres sit.
+  S_w (written S_W) is the pooled within-class scatter: how spread-out the points are
+  inside each class, averaged across both.
+  So Fisher wants a direction where the centres are far apart but each cloud is tight.
+  The solution is closed-form -- no rolling downhill required:
 
       w  is proportional to  S_W^-1 (mu1 - mu0)
 
-  Meaning: take the difference between the two class centres, then rotate it by the inverse
-  of the pooled within-class spread matrix. This adjusts for the tilt and shape of the
-  clouds -- if both clouds are elongated diagonally, the wall tilts to match.
+  Meaning: take the difference between the two class centres (mu1 - mu0).
+  Then rotate it by S_W^-1, the inverse of the pooled within-class spread matrix.
+  Which adjusts for the tilt and shape of the clouds.
+  So if both clouds are elongated diagonally, the wall tilts to match.
 
-  Where does the wall sit along that direction? If the two classes are equally common, it
-  sits exactly at the midpoint of the projected class means:
+  Where does the wall sit along that direction?
+  If the two classes are equally common, it sits exactly at the midpoint of the projected
+  class means:
 
       threshold = w^T (mu0 + mu1) / 2      (only when the two classes are equally common)
 
@@ -263,29 +316,43 @@
      check your slate:  w^T x = -0.10 * 0.08 + 0.400 * 0.60 = -0.008 + 0.240 = 0.232.
      0.232 < 0.260, so the lump falls on the WELL side of the wall -- called well.
 
-  But the two classes are usually NOT equally common, and that pure midpoint is a special
-  case. The full rule scores each new lump and adds a nudge for how common each class is:
+  But the two classes are usually NOT equally common.
+  So that pure midpoint is only a special case.
+  The full rule scores each new lump and adds a nudge for how common each class is:
 
       score(x) = w^T x + w0,
       w0 = -1/2 (mu0 + mu1)^T S_W^-1 (mu1 - mu0) + log(pi1 / pi0)
 
-  The first piece of w0 is the midpoint; the extra log(pi1/pi0) term slides the wall toward
-  the rarer class so the machine doesn't over-shout it. Here pi0 and pi1 are the class
-  frequencies (the priors).
+  Here w0 is the offset -- the fixed number added to w^T x that decides where the wall
+  sits.
+  pi0 and pi1 are the priors: the share of the pile in class 0 and in class 1 (they add to
+  1).
+  The first piece of w0 is the midpoint term.
+  The extra log(pi1/pi0) term slides the wall toward the rarer class.
+  So the machine doesn't over-shout the rarer class.
 
   !! WARN: THE WALL IS NOT EXACTLY HALFWAY ON IMBALANCED DATA
-     The Wisconsin sheet is roughly 63% well and 37% sick -- not equal. sklearn's
-     LinearDiscriminantAnalysis() uses EMPIRICAL priors by default (the actual class
-     frequencies), so the boundary it fits carries the log(pi1/pi0) offset and sits OFF the
-     midpoint. If you place a wall at the pure midpoint and expect to reproduce sklearn's
-     predictions, you will be off. To get the clean halfway wall, force equal priors:
+     The Wisconsin sheet is roughly 63% well and 37% sick -- not equal.
+     So here pi0 (well) = 0.63 and pi1 (sick) = 0.37, which makes log(pi1/pi0) =
+     log(0.37/0.63), a negative number, not zero.
+     sklearn's LinearDiscriminantAnalysis() uses EMPIRICAL priors by default -- meaning it
+     reads pi0 and pi1 straight off the actual class counts.
+     So the boundary it fits carries that log(pi1/pi0) offset and sits OFF the midpoint.
+     If you place a wall at the pure midpoint and expect to reproduce sklearn's
+     predictions, you will be off.
+     To get the clean halfway wall, force equal priors:
      LinearDiscriminantAnalysis(priors=[0.5, 0.5]).
 
 
   ## Generative vs Discriminative
 
-  The S-curve machine and LDA arrive at the same final form -- a linear boundary through
-  the 30-column space -- but they derive it through completely different reasoning:
+  The S-curve machine and LDA arrive at the same final form -- a straight-line wall through
+  the 30-column space.
+  But they derive it through completely different reasoning.
+  P(sick|x) below means the chance a lump is sick given its columns x.
+  P(x|sick) means the reverse: the chance of seeing those columns x if the lump were known
+  to be sick.
+  The table:
 
     Property         S-curve machine                 Two-cloud wall (LDA)
     -------------    ---------------------------     -----------------------------------
@@ -295,47 +362,59 @@
     Breaks when      columns perfectly tangled       spread assumption badly violated
     Works better     large pile, noisy columns       small pile, Gaussian columns
 
-  LDA is a GENERATIVE model: it imagines each class generates Gaussian-distributed data and
-  uses Bayes' theorem to flip to P(sick|x). Via that flip, P(sick|x) works out to
-  sig(w^T x + w0) -- the same S-curve form as logistic regression. Same decision-boundary
-  shape, different route.
+  LDA is a GENERATIVE model.
+  Generative means it imagines how each class makes its data: each class spits out points
+  in a Gaussian (bell-shaped) cloud.
+  Then it uses Bayes' theorem to flip P(x|sick) and P(sick) into P(sick|x).
+  The S-curve machine is the opposite: DISCRIMINATIVE, meaning it models P(sick|x) directly
+  and never imagines how the data was made.
+  Via that flip, LDA's P(sick|x) works out to sig(w^T x + w0).
+  sig is the sigmoid squash again, w is the wall normal, w0 is the offset.
+  So that is the same S-curve form as logistic regression.
+  Same wall shape, different route.
 
 
   ## Same Accuracy: What It Means
 
   On the Wisconsin breast cancer sheet, LDA and the S-curve machine give nearly identical
-  accuracy. Two completely different approaches, same result. That is not a coincidence:
+  accuracy.
+  Two completely different approaches, same result.
+  That is not a coincidence.
 
   ** KEY: AGREEMENT = CLEAN DATA, GENUINELY SEPARABLE CLASSES
-     When the two methods agree, the data is telling you the answer. A logistic machine
-     that maximises likelihood and an LDA that reads cloud shapes both find the same
-     dividing line because that line is clearly written in the data. If the sheet were
-     noisy or the two groups heavily overlapping, the two methods would diverge and their
-     disagreement would tell you something important: the boundary is ambiguous.
+     When the two methods agree, the data is telling you the answer.
+     The S-curve machine sets dials to make the true bins as likely as it can.
+     LDA reads the two cloud shapes instead.
+     Both find the same dividing line because that line is clearly written in the data.
+     If the sheet were noisy or the two groups heavily overlapping, the two methods would
+     diverge.
+     And that disagreement would tell you something important: the boundary is ambiguous.
 
 
   ## Why Scaling Also Matters for LDA
 
-  LDA computes S_W, the pooled within-class spread matrix. If column "area" runs in the
-  thousands while column "smoothness" runs in hundredths, the area column dominates the
-  covariance matrix -- its large numbers swamp the matrix entries and distort the
-  projection direction w. Putting every column on the same ruler before feeding LDA makes
-  S_W well-conditioned and the projection direction meaningful.
+  LDA computes S_W, the pooled within-class spread matrix (how spread the points are inside
+  each class, averaged across both classes).
+  Suppose column "area" runs in the thousands while column "smoothness" runs in hundredths.
+  Then the area column dominates that spread matrix -- its large numbers swamp the entries.
+  Which distorts the wall-normal direction w.
+  So putting every column on the same ruler before feeding LDA keeps S_W balanced.
+  And that makes the direction w meaningful.
 
-    1. The free S-curve machine lets dials grow without limit; L2 adds a squared-dial price
-       that shrinks them toward zero.
-    2. C = 1/lambda: small C (say 0.1) means large lambda (10) -- heavy squeeze.
-       Counter-intuitive.
-    3. The leash fixes dials; scaling fixed inputs. They solve different problems; need
-       both.
-    4. LDA reads the two cloud centres and their shared spread, then finds the best wall
-       in one closed-form step.
+    1. The free S-curve machine lets dials grow without limit.
+       L2 adds a squared-dial price that shrinks them toward zero.
+    2. C = 1/lambda, so small C (say 0.1) means large lambda (10) -- a heavy squeeze.
+       This direction feels backwards.
+    3. The leash fixes the dials; scaling fixes the inputs.
+       They solve different problems, so you need both.
+    4. LDA reads the two cloud centres (mu0, mu1) and their shared spread (S_W).
+       Then it finds the best wall in one closed-form shot.
     5. w prop. S_W^-1 (mu1 - mu0): the difference of centres, rotated by the inverse
        within-class spread.
-    6. LDA and the S-curve machine produce the same decision-boundary form; they derive it
-       from opposite directions -- generative vs discriminative.
-    7. When both machines agree on accuracy, the data is cleanly separable. Disagreement is
-       diagnostic.
+    6. LDA and the S-curve machine produce the same wall shape.
+       But they derive it from opposite directions -- generative vs discriminative.
+    7. When both machines agree on accuracy, the data is cleanly separable.
+       When they disagree, the boundary is ambiguous.
 
 
   ## The Code, If You Want It

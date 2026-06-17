@@ -14,15 +14,23 @@
     <- prev:  [Chapter 5, Part 3: Committees](committees-bag-forest-boost.txt)
        next:  [Chapter 6, Part 2: The Strongest Direction](the-strongest-direction-pca.txt) ->
 
-  Every post so far had an answer column to check against -- house price, car mileage,
-  sick or well, diabetes score.  This post has NO answer column at all.  Just 50 states
-  and 3 measurements.  No right answer means no "did the machine get it right?"  Instead
-  the question is: which states look like each other?  Which ones are strange?
+  Every post before this one had an answer column to check against.
+  That answer column held a house price, a car's mileage, a sick-or-well flag, or a diabetes score.
+  This post has NO answer column at all.
+  The sheet here is just 50 states and 3 measurements.
+  No answer column means you cannot ask "did the machine get it right?"
+  So the question changes.
+  The new question is: which states look like each other?
+  And: which states are strange?
 
-  The tools are simple: mean, spread, and a ruler that measures the gap between two rows.
-  The trap is also simple: one column measured in hundreds shouts louder than one measured
-  in tens, and the gap gets hijacked by the loudest column unless you put every column on
-  the SAME ruler first.
+  The tools are simple.
+  There is the mean, which is the middle value of a column (add every value, divide by how many).
+  There is the spread, which is how far the values sit from that middle.
+  There is a ruler, which measures the gap between two rows.
+  The trap is also simple.
+  One column measured in hundreds shouts louder than one measured in tens.
+  Which means the gap between two rows gets hijacked by the loudest column.
+  So you must put every column on the SAME ruler first.
 
   ## The Sheet
 
@@ -47,10 +55,13 @@
 
   ## The Middle and the Spread
 
-  For each column, compute two numbers -- the middle (mean) and the spread
-  (standard deviation).  Add up all 50 values, divide by 50 = mean.
-  For the spread: measure each value's gap from the mean, square it, average
-  the squares, take the square root.
+  For each column, compute two numbers.
+  The first is the middle, called the mean: add up all 50 values, then divide by 50.
+  The second is the spread, called the standard deviation: it says how far the values sit from the mean.
+  To get the spread, measure each value's gap from the mean.
+  Then square that gap.
+  Then average the squares.
+  Then take the square root of that average.
 
   With the full sheet in front of you (all 50 states):
 
@@ -60,47 +71,68 @@
     Assault    170.76     83.34
     UrbanPop    65.54     14.47
 
-  Assault's mean is ~171 -- twenty-two times larger than Murder's mean (170.76 / 7.79
-  ~= 21.9).  Its spread is ~83 -- also twenty times larger (83.34 / 4.36 ~= 19.1).
-  Already a warning light: Assault's numbers are much bigger.  It will dominate any
-  gap measurement unless we intervene.
+  Assault's mean is 170.76.
+  Murder's mean is 7.79.
+  Divide one by the other: 170.76 / 7.79 ~= 21.9.
+  Which means Assault's middle is about twenty-two times larger than Murder's middle.
+  Assault's spread is 83.34.
+  Murder's spread is 4.36.
+  Divide one by the other: 83.34 / 4.36 ~= 19.1.
+  Which means Assault's spread is about twenty times larger than Murder's spread.
+  This is a warning light: Assault's numbers are much bigger.
+  Therefore Assault will dominate any gap measurement unless we intervene.
 
   ## The Ruler Problem
 
-  Look at the ranges (max - min):
+  The range of a column is its biggest value minus its smallest value (max - min).
+  Look at the range of each column:
 
     Murder:    17.4 - 0.8  = 16.6
     Assault:  337 - 45     = 292
     UrbanPop:  91 - 32     =  59
 
-  Assault has the widest range by far.  When you measure "how far apart are two
-  states", the Assault gap can be up to 290 units, while the Murder gap is at most 16
-  units.  The Assault column shouts 10 times louder than Murder -- and the slate says
-  even more: 292 / 16.6 ~= 17.6.  The gap number mostly reflects Assault, not the
-  full picture.
+  Assault has the widest range by far.
+  When you measure "how far apart are two states", the Assault gap can be up to 292 units.
+  But the Murder gap is at most 16.6 units.
+  Divide the two ranges: 292 / 16.6 ~= 17.6.
+  Which means the Assault column shouts about seventeen times louder than Murder.
+  Therefore the gap number mostly reflects Assault, not the full picture.
 
   ## The Gap Between Two States: Two Rulers
 
-  IN HAND: a sheet of 50 states x 3 columns, a middle and a spread for each column,
-  and a warning: Assault's range (337 - 45 = 292) dwarfs Murder's (17.4 - 0.8 = 16.6).
-  This section adds the ruler itself -- two ways to measure the gap between two rows.
+  IN HAND: a sheet of 50 states by 3 columns.
+  In hand also: a middle (mean) and a spread (standard deviation) for each column.
+  And a warning: Assault's range is 337 - 45 = 292, which dwarfs Murder's range of 17.4 - 0.8 = 16.6.
+  This section adds the ruler itself.
+  There are two ways to measure the gap between two rows.
 
-  You have two states with three numbers each.  How far apart are they?
+  You have two states.
+  Each state has three numbers.
+  How far apart are the two states?
 
   --- STRAIGHT-LINE GAP (Euclidean distance) ---
 
+  Euclidean distance is the straight-line gap, the way a ruler laid flat measures it.
+  In the formula below, m1 and m2 are the two Murder values, a1 and a2 the two Assault values, u1 and u2 the two UrbanPop values.
+
     gap = sqrt( (m1 - m2)^2 + (a1 - a2)^2 + (u1 - u2)^2 )
 
-  Square each difference so negative and positive gaps don't cancel.  Add them.
-  Take the square root to get back to the original units.
+  Square each difference, so a negative gap and a positive gap don't cancel.
+  Then add the squares.
+  Then take the square root, to get back to the original units.
 
   --- CITY-BLOCK GAP (Manhattan distance) ---
 
+  Manhattan distance is the city-block gap.
+  The bars |...| mean absolute value: drop any minus sign and keep the size.
+
     gap = |m1 - m2| + |a1 - a2| + |u1 - u2|
 
-  No squaring.  No square root.  Just absolute differences added up.
-  Called "city-block" because it measures like walking around a grid
-  instead of cutting diagonally through the block.
+  There is no squaring.
+  There is no square root.
+  You just take the absolute differences and add them up.
+  It is called "city-block" because it measures like walking around a grid.
+  That is the opposite of cutting diagonally through the block.
 
   ## A Worked Example: Alabama vs Alaska, by Hand
 
@@ -128,22 +160,32 @@
 
     City-block gap = 40.2
 
-  The city-block gap is always larger than the straight-line gap for the same
-  two points (the diagonal is shorter than the L-shaped walk).
+  The city-block gap (40.2) is larger than the straight-line gap (28.97).
+  This holds for the same two points every time.
+  The reason: the diagonal is shorter than the L-shaped walk.
 
   >> YOUR TURN
-     Two more states (made-up):  X has Murder 6.0, Assault 200, UrbanPop 50;  Y has
-     Murder 9.0, Assault 240, UrbanPop 60.  Work BOTH gaps on the slate.
+     Two more states (made-up).
+     State X has Murder 6.0, Assault 200, UrbanPop 50.
+     State Y has Murder 9.0, Assault 240, UrbanPop 60.
+     Work BOTH gaps on the slate.
 
-     check your slate:  STRAIGHT-LINE -- gaps 6 - 9 = -3 (sq 9), 200 - 240 = -40
-     (sq 1600), 50 - 60 = -10 (sq 100);  sum 9 + 1600 + 100 = 1709;  sqrt(1709)
-     ~= 41.3.  CITY-BLOCK -- 3 + 40 + 10 = 53.  City-block (53) tops straight-line
-     (41.3), as the L-walk always does -- and Assault's 1600 drowns the other two.
+     check your slate:
+     STRAIGHT-LINE -- Murder gap 6 - 9 = -3, squared = 9.
+     Assault gap 200 - 240 = -40, squared = 1600.
+     UrbanPop gap 50 - 60 = -10, squared = 100.
+     sum 9 + 1600 + 100 = 1709.
+     sqrt(1709) ~= 41.3.
+     CITY-BLOCK -- 3 + 40 + 10 = 53.
+     City-block (53) tops straight-line (41.3), as the L-walk always does.
+     And Assault's 1600 drowns the other two.
 
   ## The Sheet of Gaps
 
-  Now repeat the straight-line gap for ALL pairs of states.  50 states -> 50x50
-  sheet where each cell holds the gap between state i and state j:
+  Now repeat the straight-line gap for ALL pairs of states.
+  There are 50 states.
+  So you get a 50x50 sheet.
+  Each cell holds the gap between state i and state j:
 
            AL     AK     AZ     AR     CA     CO    ...
     AL   [ 0    28.97  ...    ...    ...    ...   ]
@@ -157,18 +199,23 @@
     Diagonal = 0 (a state is zero distance from itself).
     Symmetric: AL-AK = AK-AL.
 
-  This sheet IS the foundation of clustering.  Every grouping method starts
-  from some version of "who is closest to whom."
+  This sheet IS the foundation of clustering.
+  Every grouping method starts from some version of "who is closest to whom."
 
   ## The Same Ruler: Standardisation
 
-  The gap between Alabama and Alaska (28.97) is heavily influenced by Assault
-  because Assault's numbers are huge (236 vs 263 = 27 gap).  The Murder gap
-  (3.2) barely registers.
+  The gap between Alabama and Alaska came out to 28.97.
+  That number is heavily influenced by Assault.
+  The reason: Assault's numbers are huge, with a gap of 236 - 263 = -27, so 27 in size.
+  The Murder gap is only 13.2 - 10.0 = 3.2, which barely registers.
 
   Fix: put every column on the SAME ruler before measuring gaps.
+  The same-ruler value is called the z-score.
+  It says how many spreads above or below the mean a raw value sits.
 
-    standardised value = (raw value - column mean) / column spread
+    standardised value (z-score) = (raw value - column mean) / column spread
+
+  The mean and spread for each column, restated here so you need nothing else:
 
     Murder:  mean=7.79,  spread=4.36
     Assault: mean=170.76, spread=83.34
@@ -186,7 +233,8 @@
     Assault z:  (263 - 170.76) / 83.34  = 92.24 / 83.34 = 1.11
     UrbanPop z: (48 - 65.54) / 14.47    = -17.54 / 14.47 = -1.21
 
-  Now every column has mean ~0 and spread ~1.  No column shouts louder.
+  Now every column has mean about 0 and spread about 1.
+  Therefore no column shouts louder than another.
 
   Standardised Alabama:
     Murder: 1.24    Assault: 0.78    UrbanPop: -0.52
@@ -207,75 +255,94 @@
 
     Fair gap = 1.06
 
-  The raw gap was 28.97.  The fair gap is 1.06.  The raw gap was dominated by
-  Assault's units (hundreds).  The fair gap treats every column equally.
+  The raw gap was 28.97.
+  The fair gap is 1.06.
+  The raw gap was dominated by Assault's units, which run into the hundreds.
+  The fair gap treats every column equally.
 
   >> YOUR TURN
-     A state (made-up) has Murder = 16.0.  Murder's mean is 7.79 and its spread is
-     4.36.  Put that one number on the same ruler.
+     A state (made-up) has Murder = 16.0.
+     Murder's mean is 7.79.
+     Murder's spread is 4.36.
+     Put that one number on the same ruler (the z-score = (raw - mean) / spread).
 
-     check your slate:  z = (16.0 - 7.79) / 4.36 = 8.21 / 4.36 ~= 1.88.  The state
-     sits about 1.88 spreads ABOVE the average murder rate -- a high-murder state,
-     now in plain ruler-units any other column can be compared against.
+     check your slate:
+     z = (16.0 - 7.79) / 4.36.
+     16.0 - 7.79 = 8.21.
+     8.21 / 4.36 ~= 1.88.
+     The state sits about 1.88 spreads ABOVE the average murder rate.
+     So it is a high-murder state.
+     And it is now in plain ruler-units, which any other column can be compared against.
 
   ## The Closest Pair
 
-  Build the 50x50 fair gap sheet (standardised distances instead of raw).
-  Find the smallest non-zero entry.
+  Build the 50x50 fair gap sheet.
+  Fair gap means the straight-line gap measured on standardised numbers, not raw numbers.
+  Now find the smallest non-zero entry in that sheet.
 
-  The two states with the smallest gap = most similar state-pair.  (Which pair?
-  That is for you to look up from the full sheet.)
+  The two states with the smallest gap are the most similar state-pair.
+  Which pair is it?
+  That is for you to look up from the full sheet.
 
   ## Ask the Closest Neighbors
 
-  For any state, you can find its k nearest neighbors -- the k states with the
-  smallest fair gaps to it.  For California's 3 nearest neighbors, your paper
-  would list the three states with the smallest standardised gaps to California.
+  For any state, you can find its k nearest neighbours.
+  The k nearest neighbours are the k states with the smallest fair gaps to it.
+  Take California, and pick k = 3.
+  Then your paper would list the three states with the smallest standardised gaps to California.
 
-  This is the same "ask the closest rows" idea from Chapter 1 (k-nearest
-  neighbours), but with NO answer column.  You just list who is nearby.
-  That is the core of unsupervised learning -- looking at neighbours without
-  a right answer to check.
+  This is the same "ask the closest rows" idea.
+  k-nearest neighbours means: to label or describe a row, look at the k rows with the smallest gaps to it.
+  Here there is NO answer column.
+  So you just list who is nearby.
+  That is the core of unsupervised learning: looking at neighbours without a right answer to check.
 
 
   ## Common Tripwires I Caught
 
     TRIPWIRE 1:  The raw distance is not "wrong," just unfair.
-       The raw Alabama-Alaska gap (28.97) is mathematically correct but
-       practically misleading -- Assault's large units dominate it.
-       Standardisation is not optional for distance-based methods.
+       The raw Alabama-Alaska gap is 28.97.
+       That number is mathematically correct.
+       But it is practically misleading, because Assault's large units dominate it.
+       Therefore standardisation is not optional for distance-based methods.
 
     TRIPWIRE 2:  ddof=0 vs ddof=1 for spread.
-       The assignment says ddof=0 (population standard deviation).
-       This matches sklearn's StandardScaler.  ddof=1 gives a slightly
-       different number (sample standard deviation) that does not match
-       the scaler.  When standardising, the formula must agree.
+       ddof is a setting that picks the spread formula.
+       The assignment says ddof=0, which is the population standard deviation.
+       This matches sklearn's StandardScaler.
+       ddof=1 gives a slightly different number, the sample standard deviation.
+       That sample number does not match the scaler.
+       So when standardising, the formula must agree.
 
     TRIPWIRE 3:  Missing index_col=0 when loading.
-       If you forget index_col=0, the state names become a regular column
-       instead of row labels.  The shape is still (50, 4) instead of (50, 3)
-       and the distance calculations include the state name column.
+       index_col=0 tells the loader that the first column holds row labels.
+       If you forget index_col=0, the state names become a regular column instead of row labels.
+       Then the shape is (50, 4) instead of (50, 3).
+       And the distance calculations wrongly include the state name column.
 
     TRIPWIRE 4:  Euclidean vs Manhattan -- both are valid, different uses.
-       Euclidean is the default but Manhattan handles outliers better
-       (no squaring means no single large gap dominates).  Neither is
-       "right" or "wrong" -- they measure different kinds of distance.
+       Euclidean is the straight-line gap, and it is the default.
+       Manhattan is the city-block gap, and it handles outliers better.
+       The reason it handles outliers better: no squaring means no single large gap dominates.
+       Neither is "right" or "wrong".
+       They measure different kinds of distance.
 
     TRIPWIRE 5:  The diagonal is zero but the minimum should not be zero.
-       When searching for the closest pair, you must exclude the diagonal
-       (state-to-self distance = 0).  Set diagonal entries to infinity
-       before searching for the minimum.
+       The diagonal of the gap sheet is the state-to-self distance, which is 0.
+       When searching for the closest pair, you must exclude the diagonal.
+       So set diagonal entries to infinity before searching for the minimum.
 
     TRIPWIRE 6:  Manhattan >= Euclidean for the same two points.
-       The straight-line diagonal is the shortest path.  City-block (walking
-       the grid) is always longer or equal.  If your Manhattan is smaller
-       than Euclidean, you made an arithmetic mistake.
+       The straight-line diagonal is the shortest path.
+       City-block, which walks the grid, is always longer or equal.
+       So if your Manhattan is smaller than Euclidean, you made an arithmetic mistake.
 
     TRIPWIRE 7:  Standardising changes the relative ordering of distances.
-       Two states that were closest in raw numbers might not be closest
-       after standardisation.  A column with large range dominated the
-       raw gap; after standardisation, a different column might matter more.
-       The ordering changes.  That is expected, not a bug.
+       Two states that were closest in raw numbers might not be closest after standardisation.
+       The reason: a column with large range dominated the raw gap.
+       After standardisation, a different column might matter more.
+       So the ordering changes.
+       That is expected, not a bug.
 
 
   ## The Labels, Last
@@ -299,8 +366,9 @@
 
   ## The Code, If You Want It
 
-  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
-  section is for the day you meet one: the same steps, spoken in Python.
+  Nothing above needed a computer -- only pencils, clerks, and patience.
+  This last section is for the day you meet one.
+  It is the same work, spoken in Python.
 
   >> NEW TO PYTHON? Each named once:
        pd.read_csv()         -- load a sheet from a .csv file

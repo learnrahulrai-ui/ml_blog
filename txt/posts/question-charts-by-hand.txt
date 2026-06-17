@@ -14,15 +14,18 @@
     <- prev:  [Chapter 4, Part 3: The Dial by Hand](the-dial-by-hand.txt)
        next:  [Chapter 5, Part 2: The Mixing Ruler](mixing-ruler-gini-pruning.txt) ->
 
-  The straight-stick rule lived by dials -- ten multipliers and a nudge. Every guess was
-  a weighted sum. This post throws away the dials entirely and builds a machine with no
-  formula, no multipliers, and no algebra. Just a sheet, a pencil, and one repeated
-  question: "what is the CLEANEST place to draw a line?"
+  A straight-stick rule guesses by a weighted sum.
+  It takes each column, multiplies it by a number (a dial), and adds.
+  This post throws away the dials entirely.
+  Which means no formula, no multipliers, no algebra.
+  Just a sheet, a pencil, and one repeated question: "what is the CLEANEST place to draw a line?"
 
-  A question chart is a stack of yes/no questions. A new patient answers them top to
-  bottom and lands in one final pile, where the guess sits waiting. The whole engine is
-  built by splitting people into ever-smaller groups until each group's answers are tight
-  enough that their average is a good guess.
+  A question chart is a stack of yes/no questions.
+  A new patient answers them top to bottom.
+  Which means the patient lands in one final pile, where the guess sits waiting.
+  The chart is built by splitting people into ever-smaller groups.
+  You keep splitting until each group's answers are tight enough.
+  Therefore that group's average is a good guess for anyone who lands in it.
 
 
   ## The Sheet: Two New Piles
@@ -42,13 +45,18 @@
      #2     20.6    17.8    132.9    ...    |    0
      ...                                   |   ...
 
-  Same job as always: chop 75/25, cover the 25%, build on the 75%, grade once.
+  Same job as always.
+  Chop the sheet 75/25 -- 75% to study from, 25% sealed away.
+  Seal the 25% (the exam pile) so the machine never sees it while building.
+  Build on the 75% (the study pile).
+  Grade once on the sealed 25%.
 
 
   ## BUILD vs USE -- Two Different Times
 
-  This is where the first confusion lives. There are two SEPARATE phases, and mixing
-  them caused me grief for an hour:
+  This is where the first confusion lives.
+  There are two SEPARATE phases.
+  Mixing them caused me grief for an hour.
 
     phase 1 . BUILD . happens ONCE on the whole study pile at once
         split 331 people into piles, pile by pile, choosing questions
@@ -58,8 +66,10 @@
         a new patient walks the finished questions top to bottom
         no splitting, no choosing -- just follow the existing signs
 
-  During BUILD, splitting and choosing are interleaved -- you cannot separate them.
-  During USE, the chart is frozen and the patient just walks through it.
+  During BUILD, splitting and choosing are interleaved.
+  Which means you cannot separate them.
+  During USE, the chart is frozen.
+  Therefore the patient just walks through it.
 
     BUILD:  choose split <-> walk one level <-> choose split <-> ...  (interleaved)
     USE:    chart frozen -> walk each patient top -> bottom in one go  (walk only)
@@ -67,13 +77,18 @@
 
   ## Inside the Build Hunt, Nothing Hidden
 
-  IN HAND: two sheets, each chopped 75/25 -- diabetes: 442 people x 3/4 = 331.5, call
-  it 331 on the study pile, 442 - 331 = 111 sealed for the exam.  Two phases kept
-  apart: BUILD splits the whole crowd once; USE walks one patient through the frozen
-  chart.  This section adds: what BUILD actually does, line by line, nothing hidden.
+  IN HAND so far: two sheets, each chopped 75/25.
+  Diabetes: 442 people x 3/4 = 331.5, call it 331 on the study pile.
+  442 - 331 = 111 sealed for the exam.
+  Two phases kept apart.
+  BUILD splits the whole crowd once.
+  USE walks one patient through the frozen chart.
+  This section adds: what BUILD actually does, line by line, nothing hidden.
 
   Everything below = what one line, tree_reg.fit(X_train, y_train), does inside.
-  I rebuilt it from a blank sheet. No black box.
+  (fit = run the whole build on the study pile.)
+  I rebuilt it from a blank sheet.
+  No black box.
 
   Pick a column. Say bmi. I see 331 bmi values.
 
@@ -99,9 +114,11 @@
       for EVERY person:  miss = (their answer - their pile's mean)
       square each miss.  add them ALL up.
 
-      that sum = this midpoint's BADNESS.  one number.
+      that sum = this midpoint's BADNESS.
+      badness = total wrongness if you draw the line here.  one number.
 
-      330 midpoints -> 330 badness numbers.  the SMALLEST = bmi's champion.
+      330 midpoints -> 330 badness numbers.
+      the SMALLEST badness = bmi's champion (its cleanest cut).
 
   !! WARN: THE SUM IS NOT AN RMSE
      There is no root, no division.  Just sum of squared misses.  A huge number.
@@ -123,9 +140,12 @@
       the SMALLEST of the 10 = the chart's FIRST question.
       (say bmi at midpoint 0.05 wins.)
 
-    Clerk bill for this FIRST question: 330 cuts x 10 columns = 3,300 cuts, each
-    graded by all 331 people (a miss and a squaring apiece) = 3,300 x 331 =
-    1,092,300 squarings.  The clerks have it by tea; you read one champion table.
+    Clerk bill for this FIRST question.
+    330 cuts x 10 columns = 3,300 cuts to try.
+    Each cut is graded by all 331 people -- a miss and a squaring apiece.
+    3,300 x 331 = 1,092,300 squarings.
+    The clerks have it by tea.
+    You read one champion table.
 
     So draw the line.
 
@@ -142,8 +162,9 @@
       inside pile B (200 people):
         same hunt.  its own champion.  a different question from pile A's.
 
-      keep cracking each new pile the same way -- until a pile is too small or
-      all its answers match.  then STOP.
+      keep cracking each new pile the same way.
+      stop when a pile is too small to split.
+      or stop when all its answers already match.
 
     Finally, the final pile's guess.
 
@@ -227,7 +248,9 @@
     0.09      416    <- smallest -> first question
     0.15      739
 
-  That is bmi's champion.  But there is also age, and age deserves its own hunt.
+  That is bmi's champion -- its cleanest cut, badness 416.
+  But there is also age.
+  And age deserves its own hunt.
 
   >> YOUR TURN
      A made-up cut splits four answers into below {100, 120} and above {150, 170}.
@@ -248,10 +271,11 @@
 
   ## Now Add Age: The Second Column
 
-  IN HAND: bmi's champion -- the cut at 0.09, badness 144 + 144 + 64 + 64 = 416,
-  beating its neighbours at 0.05 and 0.15.  But one column's champion is not yet
-  the chart's first question.  This section adds: age's own hunt, then the champion
-  of champions.
+  IN HAND so far: bmi's champion is the cut at 0.09.
+  Its badness = 144 + 144 + 64 + 64 = 416.
+  That beats its neighbour cuts at 0.05 and 0.15.
+  But one column's champion is not yet the chart's first question.
+  This section adds: age's own hunt, then the champion of champions.
 
   Sort age: 25, 35, 45, 55.  Midpoints: 30, 40, 50.
 
@@ -282,10 +306,13 @@
       bmi          0.09         416
       age            40         416
 
-  Tie at 416.  Arbitrary rule: bmi wins because it came first.
-  First question: "bmi > 0.09?"  -> below goes to one room, above to another.
+  Tie at 416.
+  Arbitrary rule: bmi wins because it came first.
+  First question: "bmi > 0.09?"
+  Below goes to one room, above to another.
 
-  Each room then runs its OWN hunt on its own people -> a different question.
+  Each room then runs its OWN hunt on its own people.
+  Therefore each room gets a different question.
 
   !! WARN: THE SUM IS NOT AN RMSE
      There is no root, no division.  Just the raw sum of squared misses.
@@ -338,9 +365,11 @@
 
   ## The Leaf -- What Sits at the Bottom
 
-  A final pile (a leaf) is not always one person.  It can hold several people with
-  identical (or nearly identical) measurements but DIFFERENT answers.  No question
-  separates them, so they sit together:
+  A leaf = a final pile at the bottom of the chart, where a guess sits.
+  A leaf is not always one person.
+  It can hold several people with nearly identical measurements but DIFFERENT answers.
+  No question separates them.
+  So they sit together:
 
     leaf with 5 people, targets {180, 120, 150, 90, 160}
     no question can split these
@@ -351,9 +380,13 @@
     leaf with 1 person, target 173
     guess = 173   <- memorised that one person
 
-  Both are the same rule: guess = mean of the leaf's answers.  One person -> average
-  of one -> itself.  Why the mean?  Because it is the single number that drives
-  sum(miss^2) to its smallest -- the same "bottom of the bowl" from Chapter 4.
+  Both are the same rule: guess = mean of the leaf's answers.
+  One person -> average of one -> itself.
+  Why the mean?
+  Because the mean is the single number that makes the total squared miss as small as it can be.
+  (miss = answer minus guess; square each miss, add them all up.)
+  Pick any other guess and that sum gets bigger.
+  So the mean sits at the very bottom of that wrongness curve.
 
 
   ## Depth: The Stiff-vs-Jumpy Dial of Trees
@@ -366,9 +399,14 @@
     exam-error:    high ---V--- high       (both ends bad)
                       sweet spot = lowest exam-error
 
-  With max_depth=None, the tree keeps slicing until every leaf holds one person --
-  perfectly memorised, panics on new data.  The DEPTH SWEEP tries each ceiling
-  [1, 2, 3, 4, 5, 6, 8, 10, None] and picks the one with lowest exam-error.
+  Depth = how many questions deep the chart goes before it hits a guess.
+  max_depth = the ceiling you set on that depth.
+  With max_depth=None, there is no ceiling.
+  So the tree keeps slicing until every leaf holds one person.
+  Which means it has memorised the study pile perfectly.
+  Therefore it panics on new data.
+  The DEPTH SWEEP tries each ceiling in the list [1, 2, 3, 4, 5, 6, 8, 10, None].
+  Then it picks the ceiling with the lowest exam-error.
 
   Two stop signs -- the tree halts at whichever fires first:
 
@@ -398,8 +436,8 @@
 
   ## The Code, If You Want It
 
-  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
-  section is for the day you meet one: the same steps, spoken in Python.
+  Nothing above needed a computer -- only pencils, clerks, and patience.
+  This last section is for the day you meet one: the same work, spoken in Python.
 
   The entire build hunt -- sort, midpoints, badness, champion, recurse -- is one line:
 

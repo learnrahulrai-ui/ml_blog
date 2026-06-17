@@ -385,13 +385,16 @@
 
   But scale-and-add itself is NOT a mere pick -- it has a reason, and one more layer shows it:
 
-  DEEPER, optional (skip with no loss if calculus is new to you). Earlier a far mark shrank
-  because each word multiplied it by a number below 1, and many such factors below 1 drag a
-  running product to 0. In the two-memory carry, A_new = keep * A_old + admit * fresh; set keep
-  = 1 and a far mark rides on with a carry factor of exactly 1, never below it. A chain of 1s
-  stays 1, so a link from word 90 back to word 1 neither dies nor blows up. That unit carry
-  factor, not luck, is why an added, uncrushed store cures that decay -- and why every gated
-  reader of this kind keeps an additive store at its core.
+  DEEPER, optional (skip with no loss if calculus is new to you).
+  Earlier a far mark shrank because each word multiplied it by a number below 1.
+  Many such factors below 1 drag a running product toward 0.
+  Now look at the two-memory carry line: A_new = keep * A_old + admit * fresh.
+  Here A is the silent store and keep is its hold-fraction (0 to 1) for this word.
+  Set keep = 1, and a far mark rides on with a carry factor of exactly 1, never below it.
+  A chain of 1s stays 1.
+  Therefore a link from word 90 back to word 1 neither dies nor blows up.
+  That unit carry factor, not luck, is why an added, uncrushed store cures the decay.
+  And it is why every gated reader of this kind keeps an additive store at its core.
 
 
   ## Traps, Each as a Clash to Sit With
@@ -412,8 +415,10 @@
         each is applied elsewhere -- keep to A, admit to fresh, show to tanh(A_new).
 
       WRONG  "Two memories means two copies."
-        clash: a copy of A would also sit at 4.62; B sits at 0.70. fix: different rows,
-        different duty -- A silent store, B spoken readout.
+        clash: store A and readout B hold different numbers, not the same number twice. In the
+        worked slot above A sat at 4.62 (scaled-and-added, never bent) while B sat at 0.70
+        (A bent by tanh, then 0.7 of it shown). A copy would put 4.62 in both. fix: different
+        rows, different duty -- A silent store, B spoken readout.
 
       WRONG  "Drop A; no machine reads it anyway."
         clash: B is built from A (show * tanh(A_new)); drop A and B has no source, and

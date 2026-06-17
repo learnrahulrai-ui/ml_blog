@@ -14,15 +14,23 @@
     <- prev:  [Grading 1: Two Rulers, MSE and R^2](grading-the-guess-mse-r2.txt)
        next:  [Sorting 1: S-Curve and Four-Box Table](sorting-into-bins.txt) ->
 
+  First, what is a dial?
+  The guesser here is the straight-stick rule.
+  It puts one number on each column of the sheet, and that number is the dial.
+  To guess one row, you multiply each column's value by its dial, add the products, then
+  add one fixed extra number called the nudge.
   So far the dials have been the machine's private business -- numbers it set for itself
-  to make good guesses. But those dials are not just machinery; they are a message. Each
-  one is the rule quietly telling you how its column pushes the answer around. Read them
-  and the black box starts talking.
+  to make good guesses.
+  But those dials are not just machinery; they are a message.
+  Each one is the rule quietly telling you how its column pushes the answer around.
+  Read them and the black box starts talking.
 
-  This post asks one innocent-looking question of a sheet of cars -- which column drags
-  miles per gallon down the hardest? -- and uses it to spring two traps that catch almost
-  everyone. One is a trick of arithmetic. The other is a trick of units, and it is the
-  kind of mistake that ends up in published papers.
+  This post asks one innocent-looking question of a sheet of cars.
+  Which column drags miles per gallon (MPG) down the hardest?
+  It uses that question to spring two traps that catch almost everyone.
+  One is a trick of arithmetic.
+  The other is a trick of units, and it is the kind of mistake that ends up in published
+  papers.
 
 
   ## One Dial Per Column
@@ -32,9 +40,11 @@
            turn this dial up by 1 unit of its column,
            the guess moves by d1 -- everything else held still
 
-  A POSITIVE dial pushes the answer up as its column grows; a NEGATIVE dial drags it down.
-  The size says how hard. So "drags mpg down hardest" means the MOST NEGATIVE dial. Easy
-  -- except the rule hands them to you with the names torn off.
+  A POSITIVE dial pushes the answer up as its column grows.
+  A NEGATIVE dial drags the answer down as its column grows.
+  The size of the dial says how hard.
+  So "drags mpg down hardest" means the MOST NEGATIVE dial.
+  Easy -- except the rule hands the dials to you with the names torn off.
 
 
   ## The Bare Row Problem
@@ -42,8 +52,10 @@
     model.coef_  ->  [ -0.01, -0.04, -0.007, +0.12 ]   numbers only, no names
     X.columns    ->  [ disp,  horse,  weight,  accel ]  names, same order
 
-  Two rows, same order, one missing its labels. Zip the names onto the dials and you have
-  a shelf you can read:
+  Two rows, same order, one missing its labels.
+  "Zip" means pair them up position by position: first name to first dial, second to
+  second, and so on.
+  Zip the names onto the dials and you have a shelf you can read:
 
     zip ->  disp  : -0.01
             horse : -0.04
@@ -60,25 +72,28 @@
     <-- most negative                      most positive -->
 
   !! WARN: -0.04 IS SMALLER THAN -0.007
-     The trap: 4 LOOKS bigger than 7, so the eye wants -0.04 to be the larger drag and
-     reaches for the biggest number. But further below zero is the SMALLER value. "Most
-     negative" is the MINIMUM, not the maximum. Here the strongest drag is horse at -0.04.
+     The trap: the digit 4 LOOKS bigger than the digit 7.
+     So the eye wants -0.04 to be the larger drag and reaches for it.
+     But further below zero is the SMALLER value.
+     So "most negative" is the MINIMUM, not the maximum.
+     Here the strongest drag is horse at -0.04.
 
-  So zip the names on, then grab the name sitting on the smallest dial -- the same
-  winner-hunt used to pick the best neighbour-count earlier in the blog. The two lines that
-  do it are at the end of the post.
+  So zip the names on, then grab the name sitting on the smallest dial.
+  This is a plain winner-hunt: scan the shelf, keep the smallest.
+  The two lines that do it are at the end of the post.
 
 
   IN HAND: a bare row of dials [-0.01, -0.04, -0.007, +0.12] with the names zipped
-  back on (disp, horse, weight, accel), and the most-negative hunt that crowns horse
-  (-0.04) the hardest drag.  This section shows that crown is counterfeit until the
-  columns share a ruler.
+  back on (disp, horse, weight, accel).
+  The most-negative hunt crowns horse (-0.04) the hardest drag.
+  This section shows that crown is counterfeit until the columns share a ruler.
 
   ## The Trap Underneath: Dials Wear Their Column's Units
 
-  Here is the deeper trap, the one the easy version walks straight into. A dial is
-  "answer-units per ONE unit of its column" -- and every column is measured on its own
-  ruler, with its own idea of how big "one unit" is:
+  Here is the deeper trap, the one the easy version walks straight into.
+  A dial is "answer-units per ONE unit of its column."
+  And every column is measured on its own ruler, with its own idea of how big "one unit"
+  is:
 
     weight dial  = mpg per   1 POUND        (pounds run 1500 ... 5000)
     horse  dial  = mpg per   1 HORSEPOWER   (horsepower runs 45 ... 230)
@@ -88,66 +103,80 @@
     the SAME real punch -- the numbers just wear different rulers.
 
   !! WARN: RAW DIALS ARE NOT COMPARABLE ACROSS COLUMNS
-     Comparing -0.007 per pound against -0.04 per horsepower is comparing prices in two
-     different currencies without the exchange rate. The bare dial that LOOKS smallest can
-     be the weakest or the strongest real drag depending only on how wide its column runs.
-     "Which drags hardest" is not honestly answerable from the raw dials alone.
+     Comparing -0.007 per pound against -0.04 per horsepower is like comparing prices in
+     two different currencies without the exchange rate.
+     The bare dial that LOOKS smallest can be the weakest or the strongest real drag.
+     It depends only on how wide its column runs.
+     So "which drags hardest" is not honestly answerable from the raw dials alone.
 
-  The fix is the same-ruler trick: replace each value x with (x - column average) / column
-  spread, so every column ends at zero average and a spread of one BEFORE setting the dials. Now every dial means
-  "mpg per one-spread step of its column" -- one shared currency -- and the most-negative
-  one is the honest strongest drag. (The code that does this is at the end of the post.)
+  The fix is the same-ruler trick.
+  "Spread" here means how widely a column's values scatter (its standard deviation).
+  Replace each value x with (x - column average) / column spread.
+  So every column ends at zero average and a spread of one BEFORE setting the dials.
+  Now every dial means "mpg per one-spread step of its column" -- one shared currency.
+  And the most-negative one is the honest strongest drag.
+  (The code that does this is at the end of the post.)
 
   >> NOTE: THIS DOESN'T CONTRADICT "OLS NEEDS NO SCALING"
-     The straight-stick rule's GUESSES and its MSE and R^2 do not care about scaling --
-     rescale a column and its dial rescales inversely, leaving the answer untouched (shown
-     in the straight-stick post). Scaling changes nothing about how well it fits. It only
-     changes whether the dials are COMPARABLE TO EACH OTHER as a measure of pull.
+     OLS (ordinary least squares) is the name for the straight-stick rule that sets its
+     dials by shrinking the squared leftover.
+     Its GUESSES and its scores (MSE, the size of the misses; R^2, the slice of the
+     answer's wobble it explains) do not care about scaling.
+     Rescale a column and its dial rescales inversely, leaving the answer untouched.
+     So scaling changes nothing about how well it fits.
+     It only changes whether the dials are COMPARABLE TO EACH OTHER as a measure of pull.
      Same-ruler is for the reading, not the fitting.
 
 
   ## And Don't Over-Trust a Single Dial
 
   ** KEY: "HOLDING THE OTHERS FIXED" CAN BE A FICTION
-     A dial means "move this column by one, hold the rest still." But displacement,
-     horsepower and weight rise together -- heavy cars tend to have big engines. When
-     columns move as a pack (collinearity), the rule cannot cleanly tell their pulls
-     apart: it can shuffle weight between their dials, so a single dial can swing wildly,
-     even flip sign, with a tiny change in the pile. Read individual dials as a story to
-     check, not a verdict to trust. Your physics hunch -- heavier car, worse mileage -- is
-     a hypothesis; the dials are evidence, and tangled columns make that evidence shaky.
+     A dial means "move this column by one, hold the rest still."
+     But displacement, horsepower and weight rise together -- heavy cars tend to have big
+     engines.
+     When columns move as a pack (the name for this is collinearity), the rule cannot
+     cleanly tell their pulls apart.
+     It can shuffle the credit between their dials.
+     So a single dial can swing wildly, even flip sign, with a tiny change in the pile.
+     Read individual dials as a story to check, not a verdict to trust.
+     Your physics hunch -- heavier car, worse mileage -- is a guess to test.
+     The dials are evidence, and tangled columns make that evidence shaky.
 
-  A concrete dial comparison, by pencil, before and after same-ruler.  Suppose 2
-  columns: weight (pounds, runs 2000-5000) and horsepower (runs 45-230):
+  A concrete dial comparison, by pencil, before and after same-ruler.
+  Suppose 2 columns: weight (pounds, runs 2000-5000) and horsepower (runs 45-230):
 
     raw dials (each in its own unit):
       weight dial = -0.007  mpg per POUND
       horse  dial = -0.04   mpg per HORSEPOWER
 
-    At a glance, -0.04 looks 6x stronger than -0.007.  But is it?
+    At a glance, the digit 4 makes -0.04 look 6x stronger than -0.007.  But is it?
 
     The dial says "per ONE unit of its column."  A step of "1 pound" is tiny;
-    a step of "1 horsepower" is large.  To compare, rescale both columns to
-    spread=1, then refit:
+    a step of "1 horsepower" is large.  To compare, rescale both columns so
+    each has a spread of 1, then refit:
 
-    after same-ruler (StandardScaler):
+    after same-ruler (every column rescaled to spread 1):
       weight dial = -3.2   mpg per ONE-SPREAD of weight
       horse  dial = -2.1   mpg per ONE-SPREAD of horsepower
 
-    Now the comparison is fair: weight (-3.2) pulls harder than horse (-2.1)
-    per equal-sized step of each column.  The raw dials reversed the ranking.
+    Now the comparison is fair.
+    Weight (-3.2) is further below zero than horse (-2.1).
+    So weight pulls harder per equal-sized step of each column.
+    The raw dials had reversed the ranking.
 
-    weight column spread (sd) ~= 1000 pounds.  One-spread step of weight
-    changes the guess by -3.2 mpg.  One-spread step of horsepower changes it
-    by -2.1 mpg.  Same currency, honest comparison.
+    The weight column's spread is about 1000 pounds.
+    One-spread step of weight (about 1000 pounds) changes the guess by -3.2 mpg.
+    One-spread step of horsepower changes it by -2.1 mpg.
+    Same currency, honest comparison.
 
   >> YOUR TURN
      A weight dial reads -0.005 mpg per pound (made-up), and weight's spread is 800
      pounds.  Convert it to the shared currency: mpg per one-spread step.
 
-     check your slate:  per-spread dial = raw dial x column spread = -0.005 x 800 =
-     -4.0.  One typical-sized step in weight (800 pounds) drops the guess by 4 mpg --
-     the honest pull, now comparable to any other column's per-spread dial.
+     check your slate: the per-spread dial = raw dial x column spread.
+     So -0.005 x 800 = -4.0.
+     One typical-sized step in weight (800 pounds) drops the guess by 4 mpg.
+     That is the honest pull, now comparable to any other column's per-spread dial.
 
 
   ## Pencil It
@@ -165,13 +194,14 @@
      A different shelf (made-up), already on a shared ruler:  cyl +0.05, disp -0.02,
      horse -0.06, accel +0.09.  Name the strongest drag.
 
-     check your slate:  scan for the lowest -- +0.05, -0.02, -0.06, +0.09.  The
-     smallest (furthest below zero) is -0.06 = horse.  Most-negative is a MIN: the
-     digit 6 looks small, but -0.06 sits lower than -0.02, so horse drags hardest.
+     check your slate:  scan for the lowest -- +0.05, -0.02, -0.06, +0.09.
+     The smallest (furthest below zero) is -0.06 = horse.
+     Most-negative is a MIN.
+     The digit 6 looks small, but -0.06 sits lower than -0.02, so horse drags hardest.
 
-  Finding that strongest drag is the cheapest step in the whole blog: d dials need
-  d - 1 comparisons -- just 3 for these four.  No room of clerks; one clerk crowns
-  the winner before the kettle boils.
+  Finding that strongest drag is the cheapest move in the whole blog.
+  With d dials you need d - 1 comparisons -- just 3 for these four.
+  No room of clerks; one clerk crowns the winner before the kettle boils.
 
     1. Each column keeps one dial: + pushes the answer up, - drags it down; size is
        strength.
@@ -229,12 +259,13 @@
 
   ## The Code, If You Want It
 
-  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
-  section is for the day you meet one: the same steps, spoken in Python.
+  Nothing above needed a computer -- only pencils, clerks, and patience.
+  This last section is for the day you meet one: the same moves, spoken in Python.
 
-  Two short snippets. The first zips the column names onto the bare dials and grabs the
-  most-negative one. The second does the same AFTER putting every column on a shared ruler,
-  so the comparison is honest rather than an accident of units.
+  Two short snippets.
+  The first zips the column names onto the bare dials and grabs the most-negative one.
+  The second does the same AFTER putting every column on a shared ruler.
+  So the second comparison is honest rather than an accident of units.
 
   >> NEW TO PYTHON? Each named once:
        dict(zip(a, b))    -- pair two rows into a labelled shelf: name -> value

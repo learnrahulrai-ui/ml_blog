@@ -14,17 +14,28 @@
     <- prev:  [House Prices 1: Guessing Prices End to End](chapter1-what-ml-actually-does.txt)
        next:  [House Prices 3: The Straight-Stick Rule](straight-stick-linear-regression.txt) ->
 
-  Here is the oldest trick in the book, and one you already use every day: to guess
-  something about a stranger, look at the people most like them. Want to know what a house
-  is worth? Find the houses most similar and see what they sold for. That is the whole
-  idea, and it barely needs a machine.
+  Here is the oldest trick in the book, and one you already use every day.
+  To guess something about a stranger, look at the people most like them.
+  Want to know what a house is worth?
+  Find the houses most similar and see what they sold for.
+  That is the whole idea, and it barely needs a machine.
+
+  First, set the scene from scratch, since this post stands alone.
+  We have a sheet of California neighbourhoods.
+  Each row has measured columns (rooms, income, age, population) and one right-answer column (price in $100,000s).
+  We split the rows: a working pile (rows with answers we keep) and a hidden pile (answers withheld until the final check).
+  The working pile is the 80% we build from; the hidden pile is the locked-away 20%.
 
   The ask-closest rule guesses by averaging the k closest working-pile right-answers.
-  Nothing is built ahead of time -- the whole pile is kept on a shelf and looked up each
-  time. Three honest steps -- measure the gap, pick the closest, average their answers.
-  But two quiet details decide whether it works at all: put every column on the same
-  ruler, and choose k with care. Get those wrong and the rule falls apart; get them right
-  and it is hard to beat.
+  Here k is the count of neighbours we ask.
+  Nothing is built ahead of time.
+  The whole pile is kept on a shelf and looked up each time.
+  The rule has three honest moves: measure the gap, pick the closest, average their answers.
+  But two quiet details decide whether it works at all.
+  First: put every column on the same ruler.
+  Second: choose k with care.
+  Get those wrong and the rule falls apart.
+  Get them right and it is hard to beat.
 
 
   ## Working Pile and Hidden Pile

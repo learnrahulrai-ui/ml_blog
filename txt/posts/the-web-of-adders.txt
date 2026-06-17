@@ -31,14 +31,19 @@
   malignant or benign. She wants a machine that studies those 569 cases and then makes the
   call on patient 570 -- before the biopsy comes back.
 
-  The simplest machine that does this is one room of clerks. Each of the thirty measurements
-  gets multiplied by its own DIAL -- and a dial is just a number the machine will learn,
-  saying how much that one measurement counts toward the verdict. The thirty products are
-  added into a single running total. That total can come out any size, positive or negative,
-  so a final step squeezes it into a probability between 0 and 1 (a 0.8 reads as "80% chance
-  malignant"). That squeeze is not obvious and it is not magic: I derive it by hand later in
-  this post, in the section "Squashing Any Score Into a Probability." For now, take it on
-  credit -- a total goes in, a probability comes out.
+  The simplest machine that does this is one room of clerks.
+  Each of the thirty measurements gets multiplied by its own DIAL.
+  A dial is just a number the machine will learn.
+  The dial says how much that one measurement counts toward the verdict.
+  The thirty products are then added into a single running total.
+  That total can come out any size, positive or negative.
+  So a final move squeezes it into a probability between 0 and 1.
+  A probability is a number from 0 to 1 reading as a percent chance: a 0.8 reads as "80%
+  chance malignant."
+  That squeeze is not obvious and it is not magic.
+  I derive it by hand later in this post, in the section "Squashing Any Score Into a
+  Probability."
+  For now, take it on credit: a total goes in, a probability comes out.
 
   Trained on the Wisconsin Breast Cancer dataset (the one I used -- you can load it with
   sklearn.datasets.load_breast_cancer()) this one-room machine often lands around 95%
@@ -76,46 +81,62 @@
   measurements to the answer, by studying examples where we already know the answer.
 
   The rule we are going to find is a building full of clerks, working in groups we will call
-  ROOMS. A room is nothing more than a bunch of clerks working side by side at the same stage
-  -- the word "room" is just a name for one row of them. Every clerk in a room takes the
-  numbers handed to it, multiplies each by its own personal dial, adds a fixed NUDGE (a nudge
-  is one more number the machine learns -- added on at the very end to shift the clerk's
-  result up or down), and writes down a single number.
+  ROOMS.
+  A room is nothing more than a bunch of clerks working side by side at the same stage.
+  The word "room" is just a name for one row of them.
+  Every clerk in a room takes the numbers handed to it.
+  It multiplies each by its own personal DIAL -- a dial being a number the machine learns,
+  saying how much that incoming number counts.
+  Then it adds a fixed NUDGE -- a nudge being one more number the machine learns, added on at
+  the very end to shift the clerk's result up or down.
+  Then it writes down a single number.
 
   Here is the part that trips people up, so let me be exact about who hands what to whom.
-  Clerks hand numbers to CLERKS, not to rooms -- "room" is only the grouping. Each clerk in a
-  room writes ONE number, and hands a copy of that number to EVERY clerk in the next room. So
-  the clerks in Room 1 read the thirty raw measurements; each Room-1 clerk writes one number;
-  every clerk in Room 2 reads all of Room-1's written numbers; and so on down the line. Stack
-  three such rooms and you have a neural network -- the simplest kind.
+  Clerks hand numbers to CLERKS, not to rooms -- "room" is only the grouping.
+  Each clerk in a room writes ONE number.
+  It hands a copy of that number to EVERY clerk in the next room.
+  So the clerks in Room 1 read the thirty raw measurements.
+  Each Room-1 clerk writes one number.
+  Every clerk in Room 2 reads all of Room-1's written numbers.
+  And so on down the line.
+  Stack three such rooms and you have a neural network -- the simplest kind.
 
-  Why clerks? Because that is all the machine does: arithmetic. No gut feeling, no mystical
-  pattern recognition -- just multiply, add, BEND (force any negative running total up to
-  zero -- a trick we need shortly and explain in full in "Bending Scores at Zero"), and
-  repeat. Understanding it at the arithmetic level means you can debug it at the arithmetic
-  level, which is a skill you will use constantly.
+  Why clerks?
+  Because that is all the machine does: arithmetic.
+  No gut feeling, no mystical pattern recognition.
+  Just multiply, add, BEND, and repeat.
+  BEND means force any negative running total up to zero -- a trick we need shortly and
+  explain in full in "Bending Scores at Zero."
+  Following it at the arithmetic level means you can debug it at the arithmetic level.
+  That is a skill you will use constantly.
 
 
   ## Splitting Evidence Into Three Honest Piles
 
-  Before touching any measurements, cut the 569 patients into three piles. This is the
-  first thing to do and the most important rule to follow: never let the machine study
-  from the same pile you use to grade it.
+  Before touching any measurements, cut the 569 patients into three piles.
+  This is the first thing to do.
+  It carries the most important rule to follow: never let the machine study from the same
+  pile you use to grade it.
 
-  Why three piles, not two. First, one word we will lean on hard: a KNOB is a setting YOU
-  choose by hand before the machine starts learning -- exactly like the dial on a washing
-  machine, where you pick "cottons, 40 degrees, fast spin" before you press start. A knob is
-  not the same as a dial. The machine learns its own dials by itself, turning them as it
-  studies; but the knobs are yours to set, and the machine never touches them.
+  Why three piles, not two?
+  First, one word we will lean on hard: a KNOB.
+  A knob is a setting YOU choose by hand before the machine starts learning.
+  It is exactly like the dial on a washing machine, where you pick "cottons, 40 degrees, fast
+  spin" before you press start.
+  A knob is not the same as a dial.
+  A dial is a number the machine learns by itself, turning it as it studies.
+  But the knobs are yours to set, and the machine never touches them.
 
-  A one-room machine has only a knob or two to pick. Our building has many: how many rooms,
-  how many clerks per room, how many passes of study, how aggressively to silence lazy
-  clerks. If we pick all those knobs while peeking at the sealed exam, we are quietly shaping
-  the building to pass that one specific exam -- and the grade stops measuring how well the
-  building handles new patients.
+  A one-room machine has only a knob or two to pick.
+  Our building has many: how many rooms, how many clerks per room, how many passes of study,
+  how aggressively to silence lazy clerks.
+  If we pick all those knobs while peeking at the sealed exam, we are quietly shaping the
+  building to pass that one specific exam.
+  Which means the grade stops measuring how well the building handles new patients.
 
-  So: a second pile, a PRACTICE pile, used freely during tuning. The sealed exam is touched
-  exactly once, at the very end, and its score is the honest report.
+  So we add a second pile, a PRACTICE pile, used freely during tuning.
+  The sealed exam is then touched exactly once, at the very end.
+  Its score is the honest report.
 
   The recipe, with real arithmetic on our 569 patients:
 
@@ -159,34 +180,41 @@
 
   ## Putting Every Column on One Ruler
 
-  Look at two columns: radius (about 7 to 28) and smoothness (about 0.05 to 0.16). Radius
-  numbers are roughly 200 times larger than smoothness numbers.
+  Look at two columns: radius (about 7 to 28) and smoothness (about 0.05 to 0.16).
+  Radius numbers are roughly 200 times larger than smoothness numbers.
 
   When a clerk multiplies both by a dial, the radius dial must stay small to compensate for
-  those large numbers, and the smoothness dial must grow large to compensate for those tiny
-  ones. The machine spends its effort managing the scale gap rather than finding which
-  measurements matter. The smaller column struggles to get heard during the early going,
-  and the dials take far longer to settle. To be precise: scaling does not delete the small
-  feature -- the network can still learn from it -- but unscaled inputs make the optimiser's
-  job dramatically harder and slower.
+  those large numbers.
+  And the smoothness dial must grow large to compensate for those tiny ones.
+  So the machine spends its effort managing the scale gap rather than finding which
+  measurements matter.
+  The smaller column struggles to get heard during the early going.
+  And the dials take far longer to settle.
+  To be precise: scaling does not delete the small feature -- the network can still learn
+  from it.
+  But unscaled inputs make the learning job dramatically harder and slower.
 
   The fix is to put every column on the same ruler:
 
       humbled value = (raw value - study mean) / study spread
 
-  where "study mean" is the average of that column across the 341 study patients, and
-  "study spread" is how much that column varies (the standard deviation). After this,
-  every column has average 0 and spread 1. The radius dial and smoothness dial now multiply
-  numbers of similar size.
+  Here "study mean" is the average of that column across the 341 study patients.
+  And "study spread" is how much that column varies, the standard deviation -- the typical
+  distance of a value from the average.
+  After this, every column has average 0 and spread 1.
+  So the radius dial and smoothness dial now multiply numbers of similar size.
 
   The rule that must not be broken: compute the mean and spread ONLY from the 341 study
-  patients, then apply that same ruler to all three piles.
+  patients.
+  Then apply that same ruler to all three piles.
 
-  Why only the study pile? Because the exam pile is supposed to be patients the machine has
-  never seen. If we compute the mean across all 569 patients -- including the exam pile --
-  the exam patients' values have shaped the ruler. The transformation applied to the exam
-  pile is no longer blind: it was calibrated to the exam pile's own numbers. Subtle, but a
-  real form of cheating.
+  Why only the study pile?
+  Because the exam pile is supposed to be patients the machine has never seen.
+  If we compute the mean across all 569 patients -- including the exam pile -- the exam
+  patients' values have shaped the ruler.
+  Then the transformation applied to the exam pile is no longer blind: it was calibrated to
+  the exam pile's own numbers.
+  Subtle, but a real form of cheating.
 
   A concrete example. The study pile has mean 15.0 and spread 2.0 for the radius column.
   A practice-pile patient has raw radius 17.0:
@@ -205,11 +233,17 @@
 
   ## Building a Room of Clerks
 
-  A single room has this shape. Say it has 16 clerks and each patient has 30 measurements.
-  Every clerk connects to ALL 30 measurements. Each connection has a dial (a number the
-  machine will learn). Each clerk also has one fixed nudge. Each clerk multiplies each
-  incoming measurement by its dial, adds the thirty products, adds its nudge, and outputs
-  one number:
+  A single room has this shape.
+  Say it has 16 clerks and each patient has 30 measurements.
+  Every clerk connects to ALL 30 measurements.
+  Each connection has a dial -- a number the machine will learn, saying how much that
+  measurement counts.
+  Each clerk also has one fixed nudge -- a number the machine learns, added at the end to
+  shift the result up or down.
+  Each clerk multiplies each incoming measurement by its dial.
+  It adds the thirty products.
+  It adds its nudge.
+  It outputs one number:
 
       raw score = (m1 x dial_1) + (m2 x dial_2) + ... + (m30 x dial_30) + nudge
 
@@ -247,8 +281,9 @@
   480 multiplications + 480 additions = 960 steps. The zero-out rule will bend negatives.
   This section shows what happens when two plain rooms are stacked without that bend.
 
-  Now stack two rooms. Room 1 feeds 16 numbers to Room 2, which has 8 clerks. Each Room 2
-  clerk connects to all 16 inputs from Room 1.
+  Now stack two rooms.
+  Room 1 feeds 16 numbers to Room 2, which has 8 clerks.
+  Each Room 2 clerk connects to all 16 inputs from Room 1.
 
   If both rooms do nothing but multiply and add, something quietly catastrophic happens.
 
@@ -261,18 +296,23 @@
        = (m1 x w1 x v) + (m2 x w2 x v)
 
   That final expression is exactly what a SINGLE clerk would compute with combined dials
-  (w1 x v) and (w2 x v). Two rooms of arithmetic collapsed into one. Add a third room, a
-  hundredth -- same thing. The product of any number of dial grids is still just one dial
-  grid. Stack a hundred plain rooms and they are arithmetically identical to a single room.
+  (w1 x v) and (w2 x v).
+  So two rooms of arithmetic collapsed into one.
+  Add a third room, a hundredth -- same thing.
+  The product of any number of dial grids is still just one dial grid.
+  Stack a hundred plain rooms and they are arithmetically identical to a single room.
 
-  Read this carefully, because the precise statement matters: stacking plain LINEAR rooms --
-  rooms that only multiply and add -- collapses into a single linear transformation. It is
-  not that "more layers are useless." It is that more layers are useless WITHOUT something
-  non-linear between them. That something is the next section.
+  Read this carefully, because the precise statement matters.
+  Stacking plain LINEAR rooms -- rooms that only multiply and add -- collapses into a single
+  linear transformation.
+  A linear transformation is one built only from multiplying and adding, with no bends.
+  It is not that "more layers are useless."
+  It is that more layers are useless WITHOUT something non-linear between them.
+  That something is the next section.
 
-  The fix must be a rule that cannot be absorbed into a dial multiplication. Multiplying by
-  a dial always produces a smooth straight line through the origin. We need a BEND -- a sharp
-  corner no multiplication can reproduce.
+  The fix must be a rule that cannot be absorbed into a dial multiplication.
+  Multiplying by a dial always produces a smooth straight line through the origin.
+  So we need a BEND -- a sharp corner no multiplication can reproduce.
 
 
   ## Bending Scores at Zero
@@ -289,21 +329,26 @@
       score =  0.0  ->  write 0   (the boundary counts as non-negative)
 
   This rule is called ReLU in the literature (Rectified Linear Unit -- more on names at the
-  end). I will call it the zero-out rule until then.
+  end).
+  I will call it the zero-out rule until then.
 
-  Why does this fix the collapse? The zero-out rule has a sharp corner at zero: flat below,
-  diagonal above. No multiplication can produce that corner. The collapse argument required
-  every step to be a multiplication; insert the zero-out rule and the argument breaks.
+  Why does this fix the collapse?
+  The zero-out rule has a sharp corner at zero: flat below, diagonal above.
+  No multiplication can produce that corner.
+  The collapse argument required every step to be a multiplication.
+  So insert the zero-out rule and the argument breaks.
 
-  A clean way to see it: take Z = -3 and scale it. Multiplication gives -3 x 2 = -6. But
-  zero-out then multiplication gives max(0, -3) x 2 = 0, not -6. The zero-out rule changed
-  the value in a way no dial can undo.
+  A clean way to see it: take Z = -3 and scale it.
+  Multiplication gives -3 x 2 = -6.
+  But zero-out then multiplication gives max(0, -3) x 2 = 0, not -6.
+  So the zero-out rule changed the value in a way no dial can undo.
 
-  One failure mode worth knowing. If a clerk's raw score is negative for EVERY study patient,
-  that clerk always outputs zero. The next room never hears from it; the clerk is "dead." If
-  all 16 clerks in Room 1 die at once, the building is blind. I caused this once by setting
-  every starting dial to the same large negative value. Frameworks default to small random
-  dials specifically to avoid it.
+  One failure mode worth knowing.
+  If a clerk's raw score is negative for EVERY study patient, that clerk always outputs zero.
+  Then the next room never hears from it; the clerk is "dead."
+  If all 16 clerks in Room 1 die at once, the building is blind.
+  I caused this once by setting every starting dial to the same large negative value.
+  The standard toolboxes default to small random dials specifically to avoid it.
 
   Try this: four scores come out of Room 1: [3.1, -0.2, 0.0, -5.8]. Apply the zero-out rule.
 
@@ -314,19 +359,24 @@
 
   ## Squashing Any Score Into a Probability
 
-  Room 1 bends its outputs and passes them on; Room 2 does the same; the final lonely clerk
-  adds everything with its dials and nudge and produces one raw score -- any real number.
+  Room 1 bends its outputs and passes them on.
+  Room 2 does the same.
+  The final lonely clerk adds everything with its dials and nudge and produces one raw score Z
+  -- any real number, the running total before any squashing.
 
-  But the doctor wants a PROBABILITY between 0 and 1. The zero-out rule will not do it -- it
-  still allows any positive number. We need something that approaches 1 as the score grows
-  and 0 as it drops.
+  But the doctor wants a PROBABILITY between 0 and 1.
+  The zero-out rule will not do it -- it still allows any positive number.
+  We need something that approaches 1 as the score grows and 0 as it drops.
 
-  The obvious first try, 1 / |Z|, fails twice: it explodes at Z = 0 (division by zero), and
-  it gives the same answer for Z = 100 and Z = -100 -- one screaming malignant, one screaming
-  benign, both mapped to the same probability. Useless.
+  The obvious first try, 1 / |Z|, fails twice.
+  It explodes at Z = 0 (division by zero).
+  And it gives the same answer for Z = 100 and Z = -100 -- one screaming malignant, one
+  screaming benign, both mapped to the same probability.
+  Useless.
 
-  Here is an approach that works. Instead of the probability p directly, think about the
-  ODDS: chance of malignant divided by chance of not.
+  Here is an approach that works.
+  Instead of the probability p directly, think about the ODDS: chance of malignant divided by
+  chance of not.
 
       p = 0.75 (75% malignant): odds = 0.75 / 0.25 = 3
       p = 0.50 (even money):     odds = 0.50 / 0.50 = 1
@@ -334,9 +384,11 @@
 
   Odds run from 0 to infinity as p runs from 0 to 1 -- a nicer range.
 
-  Now one modelling choice: assume each +1 step in the raw score Z multiplies the odds by a
-  fixed amount. Call it e (the natural base, about 2.718). This is a decision, not a law --
-  it happens to make the learning calculus in Part 2 clean. So:
+  Now one modelling choice.
+  Assume each +1 rise in the raw score Z multiplies the odds by a fixed amount.
+  Call that amount e (the natural base, about 2.718).
+  This is a decision, not a law -- it happens to make the learning calculus in Part 2 clean.
+  So:
 
       odds = e^Z
       p / (1 - p) = e^Z
@@ -366,10 +418,13 @@
       e^(-(-4)) = e^4 ≈ 54.6.
       p = 1 / (1 + 54.6) ≈ 0.018      (strongly benign)
 
-  As Z grows, p approaches 1; as Z shrinks, p approaches 0; at Z = 0, exactly 0.50. No
-  division by zero. A large positive and a large negative give opposite probabilities, as
-  they should. This squasher is applied ONLY to the final clerk's output -- never between
-  inner rooms, where the zero-out rule does the work.
+  As Z grows, p approaches 1.
+  As Z shrinks, p approaches 0.
+  At Z = 0, exactly 0.50.
+  No division by zero.
+  A large positive and a large negative give opposite probabilities, as they should.
+  This squasher is applied ONLY to the final clerk's output -- never between inner rooms,
+  where the zero-out rule does the work.
 
   Try the squasher for Z = 0 yourself. The formula is 1 / (1 + e^(-Z)). At Z = 0, e^(-0) = ?
 
@@ -382,11 +437,16 @@
 
   The building is complete on paper. Let me walk one patient through it by hand.
 
-  I will use a toy building: 2 measurements, 2 clerks in Room 1, 1 final clerk. A real
-  building has 30 measurements and 16 clerks in Room 1 -- the arithmetic is identical, just
-  more rows. The toy keeps the numbers on one page.
+  I will use a toy building: 2 measurements, 2 clerks in Room 1, 1 final clerk.
+  A real building has 30 measurements and 16 clerks in Room 1.
+  The arithmetic is identical, just more rows.
+  The toy keeps the numbers on one page.
 
-  Patient on the desk. Two humbled measurements: [0.5, -1.2]. True answer: 1 (malignant).
+  Patient on the desk.
+  Two humbled measurements: [0.5, -1.2].
+  Humbled means each measurement has had the study average subtracted and been divided by the
+  study spread, landing it near average 0 and spread 1.
+  True answer: 1 (malignant).
 
   ROOM 1 has 2 clerks.
     Clerk 1: dials [2.0, 1.0], nudge 0.1.
@@ -413,12 +473,18 @@
     -1.3 < 0  ->  write 0
     Paper entering Room 2: [0, 0]
 
-  Both clerks went negative; both became zero. This is the dead-clerk situation live. Room 2
-  receives all zeros. The building is not broken -- the final clerk's nudge still carries a
-  signal -- but this patient was erased by Room 1. If it happened to every patient we would
-  have a real problem; here it happens to this one patient with these specific random dials.
-  After studying (Part 2), the dials adjust so patients get non-zero signals through. We are
-  only watching the first forward pass.
+  Both clerks went negative; both became zero.
+  This is the dead-clerk situation live -- every clerk in the room outputting zero, so the
+  next room hears nothing from them.
+  Room 2 receives all zeros.
+  The building is not broken -- the final clerk's nudge still carries a signal.
+  But this patient was erased by Room 1.
+  If it happened to every patient we would have a real problem.
+  Here it happens to this one patient with these specific random dials.
+  After studying (covered in the next post), the dials adjust so patients get non-zero
+  signals through.
+  We are only watching the first forward pass -- one walk of the numbers from input to guess,
+  with the dials held fixed.
 
   --- Final clerk ---
       Room 2 has 1 clerk: dials [3.0, -2.0], nudge 0.5.
@@ -433,9 +499,10 @@
     e^0.5 is sqrt(e). e ≈ 2.718.  1.649 x 1.649 ≈ 2.719, so e^0.5 ≈ 1.649, e^(-0.5) ≈ 0.607.
     1 + 0.607 = 1.607.   1 / 1.607 ≈ 0.622.
 
-  Building's verdict: 0.622, or about 62.2% chance malignant. True answer: 1. Leaning the
-  right way -- just not confidently yet. After studying (Part 2), the verdict on this kind
-  of patient will sharpen.
+  Building's verdict: 0.622, or about 62.2% chance malignant.
+  True answer: 1.
+  Leaning the right way -- just not confidently yet.
+  After studying (covered in the next post), the verdict on this kind of patient will sharpen.
 
   --- Your turn ---
 
@@ -464,17 +531,22 @@
   gave [0, 0]; final clerk raw score 0.5; S-curve gave p = 0.622.
   This section measures the wrongness of guessing 0.622 when the truth is 1.
 
-  We have a guess (0.622) and a true answer (1). We need to measure the wrongness -- both to
-  report it and, in Part 2, to know which way to turn the dials.
+  We have a guess (0.622) and a true answer (1).
+  We need to measure the wrongness -- both to report it and, in the next post, to know which
+  way to turn the dials.
 
-  The obvious ruler -- square the difference -- treats probabilities like plain numbers and
-  undersells confident wrong answers. A machine that says 0.001 (99.9% sure benign) on a
-  malignant patient should be punished far more than one that says 0.4. Squaring barely
-  separates them: (0.001 - 1)^2 ≈ 0.998 versus (0.4 - 1)^2 = 0.36 -- a factor of three, when
-  the first is a catastrophe and the second is a near-miss.
+  The obvious ruler -- square the difference -- treats probabilities like plain numbers.
+  And it undersells confident wrong answers.
+  A machine that says 0.001 (99.9% sure benign) on a malignant patient should be punished far
+  more than one that says 0.4.
+  But squaring barely separates them: (0.001 - 1)^2 ≈ 0.998 versus (0.4 - 1)^2 = 0.36.
+  That is a factor of three, when the first is a catastrophe and the second is a near-miss.
 
   What we want: a wrongness that grows without limit as the machine gets more confident in
-  the wrong direction. The natural logarithm does exactly this.
+  the wrong direction.
+  The natural logarithm does exactly this.
+  The natural logarithm of a number, written ln, is the power you must raise e (about 2.718)
+  to in order to reach that number.
 
   When the true answer is 1: loss = -ln(guess).
 
@@ -483,14 +555,17 @@
     guess = 0.100:  loss = -ln(0.100) ≈ 2.303   (badly wrong)
     guess = 0.001:  loss = -ln(0.001) ≈ 6.908   (catastrophic)
 
-  For our patient (guess 0.622, true 1). I know ln(0.5) = -0.693 and ln(1.0) = 0. A finer
-  anchor: ln(0.6) ≈ -0.511, and 0.622 is just above 0.6, so ln(0.622) ≈ -0.475.
-  loss = -(-0.475) = 0.475. (The exact value is 0.4748 -- my hand estimate is good to three
-  places. I am estimating logs by anchoring between values I know; do not mistake these for
-  exact figures.)
+  For our patient (guess 0.622, true 1).
+  I know ln(0.5) = -0.693 and ln(1.0) = 0.
+  A finer anchor: ln(0.6) ≈ -0.511.
+  And 0.622 is just above 0.6, so ln(0.622) ≈ -0.475.
+  loss = -ln(0.622) = -(-0.475) = 0.475.
+  (The exact value is 0.4748 -- my hand estimate is good to three places.
+  I am estimating logs by anchoring between values I know; do not mistake these for exact
+  figures.)
 
-  When the true answer is 0, the formula flips: loss = -ln(1 - guess), punishing high
-  guesses on benign patients.
+  When the true answer is 0, the formula flips: loss = -ln(1 - guess).
+  This punishes high guesses on benign patients.
 
   Try this: a benign patient (true 0). Building guesses 0.30. Loss?
 
@@ -501,10 +576,11 @@
   patient -- correct direction, wrong confidence, moderate loss.
 
   The full wrongness across all 341 study patients is the average of these individual losses.
-  As the dials improve, this average falls. Watching it fall -- alongside the separate
-  practice-pile loss -- is how we know the building is learning.
+  As the dials improve, this average falls.
+  Watching it fall -- alongside the separate practice-pile loss -- is how we know the building
+  is learning.
 
-  And HOW the dials change to make that loss fall is the whole of Part 2.
+  And HOW the dials change to make that loss fall is the whole of the next post.
 
 
   ## Standard Names for Part 1
@@ -537,8 +613,8 @@
   This section is for the day you meet one.
 
   Here is the forward half in Python: load, split, scale, build, and the by-hand forward
-  pass in code so you can check the 0.622 we computed above. The training call lives in
-  Part 2.
+  pass in code so you can check the 0.622 we computed above.
+  The training call lives in the next post.
 
   >> NEW TO PYTHON? Each function named once:
        load_breast_cancer()              -- the 569-patient, 30-measurement dataset

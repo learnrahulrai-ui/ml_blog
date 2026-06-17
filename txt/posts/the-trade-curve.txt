@@ -14,39 +14,71 @@
     <- prev:  [Sorting 1: S-Curve and Four-Box Table](sorting-into-bins.txt)
        next:  [Sorting 3: Leash and Cloud](leash-and-cloud.txt) ->
 
-  Every score in the last post quietly agreed on one thing: draw the line at 0.5. But who
-  said 0.5? It is just one opinion about where "probably well" ends and "probably sick"
-  begins -- and it is an opinion you are free to overrule.
+  Here is the setup, from scratch.
+  A machine reads a lump from a breast scan.
+  The machine puts out a chance-score: a number from 0 to 1.
+  It builds that number by adding up weighted dials, then squashing the sum into the 0-to-1
+  range with an S-shaped squash.
+  0 means "almost surely well".
+  1 means "almost surely sick".
+  To turn that score into a yes/no call you draw a line on the 0-to-1 scale.
+  That line is the cutoff (also called the threshold).
+  Above the line the machine says "sick"; below it the machine says "well".
 
-  Reach out and slide that line. Push it left and the machine turns anxious, crying "sick"
-  at the faintest shadow -- it catches more real cases, but startles more healthy people
-  with false alarms. Push it right and the machine turns stoic, holding its tongue until
-  it is almost certain -- fewer false alarms, but more real cases slip quietly out the
-  door. Nowhere on that line is there a free lunch: every spot you pick is a different
-  bargain struck between lives and money. The trade curve is what you get when you stop
-  arguing over a single spot and lay all the bargains out side by side, in one picture.
+  A common habit is to draw the line at 0.5.
+  Several common scores -- the ones that count right and wrong calls -- assume that 0.5 line.
+  But who said 0.5?
+  It is just one opinion about where "probably well" ends and "probably sick" begins.
+  Therefore it is an opinion you are free to overrule.
+
+  Reach out and slide that line.
+  Push it left and the machine turns anxious, crying "sick" at the faintest shadow.
+  Which means it catches more real cases.
+  But that startles more healthy people with false alarms.
+  Push it right and the machine turns stoic, holding its tongue until it is almost certain.
+  Which means fewer false alarms.
+  But that lets more real cases slip quietly out the door.
+  So nowhere on that line is there a free lunch.
+  Every spot you pick is a different bargain struck between lives and money.
+  The trade curve is what you get when you stop arguing over a single spot.
+  It lays all the bargains out side by side, in one picture.
 
 
-  IN HAND: machine gives each lump a score 0-to-1; draw a line (the cutoff) somewhere on
-  that scale. Four boxes: CAUGHT (truly sick, called sick), FALSE ALARM (truly well, called
-  sick), MISSED (truly sick, called well), CLEARED (truly well, called well).
+  IN HAND: the machine gives each lump a chance-score from 0 to 1.
+  You draw a line (the cutoff) somewhere on that scale.
+  Above the line the machine calls "sick"; below the line it calls "well".
+  Every lump now lands in one of four boxes, set by truth-vs-call.
+  CAUGHT (truly sick, called sick) -- the standard name is TP, true positive.
+  FALSE ALARM (truly well, called sick) -- the standard name is FP, false positive.
+  MISSED (truly sick, called well) -- the standard name is FN, false negative.
+  CLEARED (truly well, called well) -- the standard name is TN, true negative.
   This section measures the two rates those boxes produce as the cutoff slides.
 
-  ## Two Rates
+  ## Two Rates The Boxes Force Out
 
-  At any fixed cutoff, the four boxes yield two fractions:
+  At any fixed cutoff, the four boxes yield two fractions.
+  The first is the catch-rate, written TPR (true positive rate).
+  It is the share of truly sick lumps the machine caught.
 
     catch-rate   (TPR) = CAUGHT / all truly sick   ^ good
+
+  The second is the false-alarm rate, written FPR (false positive rate).
+  It is the share of truly well lumps the machine wrongly called sick.
+
     false-alarm  (FPR) = ALARM  / all truly well   v good
 
-  Formally (Y = true verdict: 1 sick, 0 well; yhat = machine's called verdict):
+  Written out with symbols: Y is the true verdict (1 sick, 0 well).
+  yhat is the machine's called verdict.
+  t is the cutoff.
+  TP, FP, FN, TN are the counts in the four boxes (CAUGHT, ALARM, MISSED, CLEAR).
 
       TPR(t) = P(yhat=1 | Y=1) = TP(t) / (TP(t) + FN(t))
       FPR(t) = P(yhat=1 | Y=0) = FP(t) / (FP(t) + TN(t))
 
-  TPR is the same as recall. FPR is the fraction of healthy lumps that get misread as
-  sick. Moving the cutoff shifts both at once -- they cannot be improved together without
-  limit.
+  TPR is the same thing as recall: caught sick over all truly sick.
+  FPR is the fraction of healthy lumps that get misread as sick.
+  Moving the cutoff shifts both at once.
+  Therefore they cannot be improved together without limit.
 
 
   ## Sliding the Cutoff
@@ -64,14 +96,22 @@
 
     -> a TRADE: cannot raise catches without raising false alarms
 
-  There is no cutoff that maximises TPR while holding FPR at zero -- unless the machine
-  perfectly separates the two groups. What exists is a continuous family of deals.
+  Recall TPR is the catch-rate (caught sick over all truly sick) and FPR is the false-alarm
+  rate (well lumps wrongly called sick over all truly well).
+  There is no cutoff that maximises TPR while holding FPR at zero.
+  The one exception is a machine that perfectly separates the two groups.
+  So what exists instead is a continuous family of deals.
 
 
   ## Drawing All the Deals at Once
 
-  Sweep the cutoff from 1 down to 0. At each position, compute (FPR, TPR) and drop a dot at
-  those coordinates. Connect the dots: that is the trade curve, or ROC curve.
+  Sweep the cutoff from 1 down to 0.
+  At each cutoff position, compute the false-alarm rate FPR and the catch-rate TPR.
+  FPR is well lumps wrongly called sick over all truly well.
+  TPR is sick lumps caught over all truly sick.
+  Drop a dot at the coordinates (FPR, TPR).
+  Connect the dots.
+  That joined line is the trade curve, also called the ROC curve.
 
     TPR (catch-rate, lives saved)
      1 | * <- perfect machine (catch all, alarm none)
@@ -85,9 +125,13 @@
     perfect machine: hugs the top-left corner
     coin flip: follows the diagonal
 
-  The curve is defined by t: {(FPR(t), TPR(t)) : t in [0, 1]}. As t -> 0, everyone is
-  called sick -> TPR=1, FPR=1 (top-right). As t -> 1, everyone is called well -> TPR=0,
-  FPR=0 (bottom-left).
+  The curve is the set of dots traced as the cutoff t runs over 0 to 1: {(FPR(t), TPR(t))}.
+  As t -> 0, the line sits at the bottom, so everyone scores above it and is called sick.
+  Which means every sick lump is caught (TPR=1) and every well lump is alarmed (FPR=1).
+  That puts the dot at the top-right corner.
+  As t -> 1, the line sits at the top, so everyone scores below it and is called well.
+  Which means no sick lump is caught (TPR=0) and no well lump is alarmed (FPR=0).
+  That puts the dot at the bottom-left corner.
 
   A concrete 6-person exam pile, by pencil:
 
@@ -135,27 +179,36 @@
      trade curve at (0.333, 0.75) -- three sick in four caught, one well in three
      falsely alarmed.
 
-  Count the sweep in clerk-steps: n lumps give n + 1 cutoff positions, and each
-  position re-tallies the four boxes over all n lumps.  On the Wisconsin exam of 569
-  lumps that is 570 x 569 = 324,330 comparisons to draw the whole curve -- a morning
-  for the clerks, an afternoon's nap for the kettle.
+  Count the work of one sweep.
+  With n lumps you get n + 1 cutoff positions (one above the top score, one below each score).
+  At each position you re-tally the four boxes over all n lumps.
+  So the total comparisons are (n + 1) x n.
+  The Wisconsin breast-scan exam has n = 569 lumps.
+  Therefore (569 + 1) x 569 = 570 x 569 = 324,330 comparisons to draw the whole curve.
+  That is a morning for the clerks, an afternoon's nap for the kettle.
 
 
   ## The Area Under the Curve
 
-  IN HAND: a 6-person exam swept through 6 cutoffs into (FPR, TPR) pairs that climbed
-  the left edge -- (0,0.333), (0,0.667), (0,1.0) -- then bent right along the top.
+  IN HAND: a 6-person exam swept through cutoffs into (FPR, TPR) dots.
+  FPR is the false-alarm rate (well lumps wrongly called sick over all truly well).
+  TPR is the catch-rate (sick lumps caught over all truly sick).
+  Those dots climbed the left edge -- (0,0.333), (0,0.667), (0,1.0) -- then bent right.
   This section crushes that whole staircase into one number.
 
-  The whole curve collapses into one number: the area under it, AUC. A perfect machine
-  that hugs the top-left corner has area 1.0. A coin flip that follows the diagonal has
-  area 0.5. A machine whose scores are systematically backwards has area below 0.5.
+  The whole curve collapses into one number: the area under it, called AUC (area under curve).
+  A perfect machine hugs the top-left corner, so its area is 1.0.
+  A coin flip follows the diagonal, so its area is 0.5.
+  A machine whose scores run backwards drops below the diagonal, so its area is below 0.5.
 
     AUC = 1.0   perfect -- no overlap between sick and well scores
     AUC = 0.5   useless -- sick and well scores interleaved randomly
     AUC < 0.5   backwards -- sick scores lower than well scores
 
-  AUC is computed from the curve points by the trapezoidal rule.
+  AUC is computed from the curve dots by the trapezoidal rule.
+  The trapezoidal rule means: between two neighbouring dots, the strip of area is a trapezoid.
+  Its area is its width times its average height: (FPR gap) x (the two TPR heights averaged).
+  Add up every strip and you have the whole area under the curve.
 
   >> YOUR TURN
      Two neighbouring ROC dots (made-up): (FPR 0.2, TPR 0.6) then (FPR 0.5, TPR 0.9).
@@ -164,8 +217,9 @@
      check your slate:  width = 0.5 - 0.2 = 0.3;  average height = (0.6 + 0.9)/2 =
      1.5/2 = 0.75;  strip = 0.3 x 0.75 = 0.225.  Add up every such strip across the
      sweep and you have the whole area under the curve.
-  From the 6-cutoff
-  sweep above, by pencil:
+
+  Now do that for the real 6-cutoff sweep above, by pencil.
+  Each row takes one FPR-gap times the average of the two TPR heights:
 
       drop       FPR      TPR     (FPR_next - FPR) x (TPR_next + TPR) / 2
       ----------------------------------------------------------------------
@@ -178,21 +232,25 @@
        --
        total AUC = 0.000 + 0.000 + 0.000 + 0.333 + 0.333 + 0.333 = 1.000
 
-  The AUC is 1.0 -- a perfect ranking.  Indeed the machine sorted all 3 sick chances
-  (0.97, 0.88, 0.72) above all 3 well chances (0.45, 0.22, 0.11).  For ANY cutoff
-  between 0.72 and 0.45, the machine catches all sick and alarms none.
+  The AUC is 1.0, which means a perfect ranking.
+  Indeed the machine sorted all 3 sick chances (0.97, 0.88, 0.72) above all 3 well chances
+  (0.45, 0.22, 0.11).
+  So for ANY cutoff between 0.72 and 0.45, the machine catches all sick and alarms none.
 
 
   ## What AUC Actually Measures
 
-  Areas under curves are easy to compute and hard to feel. So here is the same number
-  told as a tiny story you can actually picture -- a result that goes by the name
-  pick-higher reading:
+  Areas under curves are easy to compute and hard to feel.
+  So here is the same number told as a tiny story you can picture.
+  This story goes by the name pick-higher reading.
+  Here x+ means a sick lump and x- means a well lump; score(.) is the machine's chance-score:
 
       AUC = P( score(x+) > score(x-) )
 
-  Pick one sick lump at random and one well lump at random. What is the probability that
-  the machine gave the sick lump a higher chance-score than the well lump? That is AUC.
+  Pick one sick lump at random and one well lump at random.
+  Ask: what is the chance the machine gave the sick lump a higher chance-score than the well
+  lump?
+  That chance is the AUC.
 
     GOOD machine -- scores:
       well lumps ->  ####                       (all low)
@@ -204,38 +262,59 @@
       sick lumps ->  #  # #   #  #  #
       -> roughly half the time sick scores below well -> AUC ~= 0.5
 
-  AUC = 0.97 means: take a random sick lump and a random well lump; 97 times out of 100
-  the machine scored the sick lump higher. It answers "how cleanly do the two groups
-  separate?" without committing to any one cutoff.
+  Read AUC = 0.97 like this.
+  Take a random sick lump and a random well lump.
+  97 times out of 100 the machine scored the sick lump higher than the well lump.
+  So AUC answers "how cleanly do the two groups separate?"
+  And it answers without committing to any one cutoff.
 
   ** KEY: AUC IS CUTOFF-INDEPENDENT
-     The four scores from Part 1 -- accuracy, recall, precision, F1 -- all answer "how
-     good is this machine at threshold 0.5?" AUC answers "how good is this machine's
-     RANKING of sick chances above well chances, everywhere, always?" It is the right score
-     when you want to compare two machines before deciding where to set the cutoff.
+     Recall the four box-counts at a fixed cutoff: CAUGHT (truly sick, called sick),
+     ALARM (truly well, called sick), MISSED (truly sick, called well), CLEAR (truly well,
+     called well).
+     Four common scores are built from those counts, and each one assumes a single fixed
+     cutoff (the usual 0.5):
+       accuracy  = (CAUGHT + CLEAR) / everyone           -- share of all calls that were right
+       recall    = CAUGHT / (CAUGHT + MISSED)            -- share of truly sick that were caught
+       precision = CAUGHT / (CAUGHT + ALARM)             -- share of sick-calls that were right
+       F1        = 2 x precision x recall / (precision + recall)  -- the blend of the two
+     All four answer "how good is this machine at one chosen cutoff?"
+     But that pins you to one cutoff.
+     AUC instead answers "how good is this machine's RANKING of sick chances above well
+     chances, everywhere, at every cutoff at once?"
+     So it is the right score when you want to compare two machines before deciding where
+     to set the cutoff.
 
 
   ## Why You Need Chances, Not Labels
 
-  The ROC sweep needs a continuous score to sweep through. predict returns only 0 or 1 --
-  two unique scores, two dots, a useless curve. predict_proba returns the raw chance
-  output before any cutoff, giving a different number for every row.
+  The ROC sweep needs a continuous score to slide the cutoff through.
+  predict is a function that returns only the final 0/1 call per row.
+  Two unique values means two dots, which means a useless curve.
+  predict_proba is a function that returns the raw chance-score (the 0-to-1 number) before
+  any cutoff is applied.
+  That gives a different number for every row.
+  So the sweep has something to slide through.
 
     predict(X_test_scaled)        -> [1, 0, 1, 1, 0, ...]   (0 or 1 only)
     predict_proba(X_test_scaled)  -> [[0.03, 0.97],          (well-chance, sick-chance)
                                        [0.81, 0.19],           per row
                                        ...]
 
-  predict_proba returns two columns per row: column 0 is the well-chance P(B), column 1 is
-  the sick-chance P(M). For the ROC curve you want the sick-chance -- column 1 -- and the
-  code that sweeps it into a curve is at the end of the post.
+  predict_proba returns two columns per row.
+  Column 0 is the well-chance, written P(B) (B = benign = well).
+  Column 1 is the sick-chance, written P(M) (M = malignant = sick).
+  The two add to 1.
+  For the ROC curve you want the sick-chance, which is column 1.
+  The code that sweeps it into a curve is at the end of the post.
 
 
   ## Plotting It
 
-  When you plot it (code at the end), the grey 45-degree diagonal is the reference: a
-  machine that assigns random scores sits right on it. Any curve above the diagonal beats
-  random, and the further it bulges toward the top-left corner, the cleaner the separation.
+  When you plot it (code at the end), the grey 45-degree diagonal is the reference line.
+  A machine that assigns random scores sits right on that diagonal.
+  So any curve above the diagonal beats random guessing.
+  And the further it bulges toward the top-left corner, the cleaner the separation.
 
 
   ## Practical Reading
@@ -246,21 +325,24 @@
     AUC ~= 0.50   no signal at all; the 30 columns carry no information about the bin
 
   >> NOTE: THE TRADE CURVE AND AUC DO NOT PICK A CUTOFF FOR YOU
-     They tell you how well-separated the two groups are. The choice of cutoff -- how much
-     ALARM is acceptable to buy a given catch-rate -- is a clinical or business decision.
+     They tell you how well-separated the two groups are.
+     But the choice of cutoff is a clinical or business decision.
+     That choice is how much false-alarm (well lumps called sick) you accept to buy a given
+     catch-rate (sick lumps caught over all truly sick).
      In cancer screening, a doctor reading a curve of AUC 0.97 might pick the cutoff that
-     gives 99% recall even if FPR climbs to 15%. The curve shows the available deals; the
-     doctor picks one.
+     gives 99% recall even if the false-alarm rate climbs to 15%.
+     So the curve shows the available deals; the doctor picks one.
 
 
   ## The Code, If You Want It
 
-  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
-  section is for the day you meet one: the same steps, spoken in Python.
+  Nothing above needed a computer -- only pencils, clerks, and patience.
+  This last section is for the day you meet a computer: the same work, spoken in Python.
 
-  The ROC sweep needs a continuous score, not a 0/1 label -- so grab predict_proba's
-  column 1 (the sick-chance) and feed it to roc_curve. Then plot the curve against the
-  diagonal.
+  The ROC sweep needs a continuous chance-score, not a 0/1 label.
+  So grab predict_proba's column 1, which is the sick-chance (the 0-to-1 number).
+  Feed it to roc_curve.
+  Then plot the curve against the diagonal.
 
   >> NEW TO PYTHON? Each named once:
        array[:, 1]        -- take column 1 from every row (slicing a 2-D array)
@@ -272,9 +354,12 @@
     roc_auc = auc(fpr, tpr)
 
   !! WARN: COLUMN 0 FLIPS THE CURVE BELOW THE DIAGONAL
-     If you pass column 0 (well-chances), sick lumps score LOW and well lumps score HIGH --
-     the ranking is backwards. The ROC curve dips below the diagonal and AUC < 0.5. The
-     machine looks worse than a coin flip. Always use column 1.
+     Column 0 is the well-chance; column 1 is the sick-chance.
+     If you pass column 0 by mistake, sick lumps score LOW and well lumps score HIGH.
+     Which means the ranking is backwards.
+     So the ROC curve dips below the diagonal and AUC falls below 0.5.
+     Then the machine looks worse than a coin flip.
+     Always use column 1.
 
   And the plot -- the curve, plus the grey diagonal for reference:
 

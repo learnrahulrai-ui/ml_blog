@@ -14,24 +14,37 @@
     <- prev:  [Chapter 5, Part 1: Question Charts by Hand](question-charts-by-hand.txt)
        next:  [Chapter 5, Part 3: Committees](committees-bag-forest-boost.txt) ->
 
-  Part 1 built the question chart for a NUMBER answer.  Each cut's badness was the sum of
-  squared misses around the pile means -- a formula that made sense because the answer was
-  a number you could average.  Now the answer is yes/no -- sick or well, 0 or 1 -- and
-  averaging stops making sense.  You cannot take the mean of {yes, yes, no}.
+  A question chart is a stack of yes/no questions.
+  A patient walks them top to bottom and lands in a final pile (a leaf), where the guess waits.
+  The chart is built by splitting the crowd into ever-cleaner piles.
+  At each split the chart scores every possible cut by a BADNESS number and keeps the smallest.
+  For a NUMBER answer the badness was the sum of squared misses around each pile's mean.
+  (miss = answer minus the pile mean; square each, add them up.)
+  That made sense because a number can be averaged.
+  Now the answer is yes/no -- sick or well, 0 or 1.
+  Therefore averaging stops making sense.
+  You cannot take the mean of {yes, yes, no}.
 
-  So the badness ruler must change.  The new ruler counts how MIXED each side is (how many
-  yes vs how many no), and the chart picks the cut that leaves the sides LEAST mixed.
-  That ruler is Gini impurity, and this post derives it by hand from four counts.
+  So the badness ruler must change.
+  The new ruler counts how MIXED each side is -- how many yes vs how many no.
+  Then the chart picks the cut that leaves the sides LEAST mixed.
+  That ruler is Gini impurity.
+  This post derives Gini by hand from four counts.
 
-  The second half of this post solves a different problem: even a good tree grows too bushy
-  and memorises noise.  Pruning snips the weak branches after the fact, and the alpha tax
-  decides which branches to fire.
+  The second half of this post solves a different problem.
+  Even a good tree grows too bushy and memorises noise.
+  Pruning snips the weak branches after the fact.
+  An alpha tax (a charge per leaf) decides which branches to fire.
 
 
   ## The Classification Tree: One Change at the Bottom
 
-  The build hunt is IDENTICAL to Part 1 -- sort, midpoints, champion, champion of
-  champions, recurse.  Two tiny things change:
+  The build hunt is the SAME shape as for a number answer.
+  Sort each column, try every midpoint as a cut, score each cut's badness, keep the smallest.
+  That smallest-badness cut is the column's champion.
+  Race the column champions; the best of them is the champion of champions -- this room's question.
+  Then recurse into each new pile.
+  Two tiny things change:
 
     NUMBER tree (Part 1):
       each final pile -> AVERAGE of the answers -> one number guess
@@ -86,8 +99,8 @@
 
     (25/25 - 17/25 = 8/25.  8 / 25 = 0.32, since 25 * 0.32 = 8.)
 
-  Then combine the two sides into one badness number, weighted by
-  how many people are on each side.
+  Then combine the two sides into one badness number.
+  Weight each side by how many people are on it.
 
     below has 4 people out of 9 total  -> weight = 4/9
     above has 5 people out of 9 total  -> weight = 5/9
@@ -114,17 +127,19 @@
     half-half:            0.5     <- worst possible
     this cut:             0.344   <- somewhere in between
 
-    each Gini costs only a handful of strokes, but the hunt is wide: 330 cuts x 10
-    columns = 3,300 Gini numbers at THIS node alone, and a tree grows many nodes --
-    clerk-work that stacks up fast as the chart deepens.
-    each of the 330 cuts -> one number
-    smallest number = this column's champion (the cleanest split)
+    each Gini costs only a handful of strokes.
+    but the hunt is wide.
+    330 cuts x 10 columns = 3,300 Gini numbers at THIS node (room) alone.
+    and a tree grows many rooms.
+    so the clerk-work stacks up fast as the chart deepens.
+    each of the 330 cuts in a column -> one Gini number.
+    smallest Gini in that column = the column's champion (its cleanest split).
 
 
   ## A Real Cancer Cut: Radius and Texture
 
-  The earlier example used abstract "yes" and "no."  Here is the same ruler
-  tied to the actual cancer sheet the lab works with.
+  The earlier example used abstract "yes" and "no."
+  Here is the same ruler tied to the actual cancer sheet the lab works with.
 
   Four lumps, two measurements (radius and texture), one answer:
 
@@ -155,7 +170,8 @@
 
     Weighted GINI = 0.75 x 0.444 + 0.25 x 0 = 0.333
 
-  Champion for radius: cut > 12 (GINI = 0).  Now try texture.
+  Champion for radius: cut > 12, weighted GINI = 0 (perfectly clean).
+  Now try texture.
 
   Cut texture > 0.12:
 
@@ -174,16 +190,21 @@
       radius    > 12        0           <- champion
       texture   > 0.12      0.333
 
-  First question: "radius > 12?"  -> pure sick piles and pure well piles.
-  Then each pure pile stops (GINI = 0, nothing left to clean).
+  First question: "radius > 12?"
+  Which gives pure sick piles and pure well piles.
+  Then each pure pile stops, because GINI = 0 means nothing is left to clean.
 
-  The abstract "3 yes, 1 no" from earlier is the same math -- just wrapped
-  in real column names from the cancer lab the machine actually touches.
+  The abstract "3 yes, 1 no" from earlier is the same math.
+  It is just wrapped in real column names from the cancer lab the machine actually touches.
 
 
-  IN HAND: a cut turned 4 counts into one mixed-ness number -- below 3 yes 1 no gave
-  0.375, above 1 yes 4 no gave 0.32, weighted into 0.344 -- where 0 is pure and 0.5 is
-  half-half.  This section shows that 1 - p^2 - q^2 is no magic spell.
+  IN HAND so far: a cut turned 4 counts into one mixed-ness number.
+  Below side 3 yes 1 no gave 0.375.
+  Above side 1 yes 4 no gave 0.32.
+  Weighted together they gave 0.344.
+  On this ruler 0 is pure (no mixing) and 0.5 is half-half (worst mixing).
+  This section shows that the formula 1 - p^2 - q^2 is no magic spell.
+  (p = share of yes, q = share of no, on one side.)
 
   >> YOUR TURN
      A cut drops the parent's mixing from 0.48 down to a weighted-children 0.30 (both
@@ -195,13 +216,17 @@
 
   ## Why That Formula Is Not Astrology
 
-  The formula 1 - p^2 - q^2 looks pulled from thin air.  It isn't.  It counts
-  something you can see with your hands.
+  The formula 1 - p^2 - q^2 looks pulled from thin air.
+  It isn't.
+  It counts something you can see with your hands.
+  (p = share of yes, q = share of no, on one side.)
 
   Gini = the chance two random grabs from a side DISAGREE.
 
-  Using the below side: 3 yes, 1 no (4 people).  You reach into the pile,
-  grab one person (write down yes or no), PUT THEM BACK, grab another.
+  Use the below side: 3 yes, 1 no (4 people).
+  Reach into the pile, grab one person, write down yes or no.
+  PUT THEM BACK.
+  Grab another.
 
     Chance BOTH yes?
 
@@ -228,8 +253,9 @@
 
       1 - 5/8 = 3/8 = 0.375
 
-    That 0.375 is the Gini for this side.  No formula pulled from thin air --
-    just counting what happens when you grab two people from the pile.
+    That 0.375 is the Gini for this side.
+    No formula pulled from thin air.
+    Just counting what happens when you grab two people from the pile.
 
   Check the edges:
 
@@ -240,9 +266,13 @@
       both yes = 2/4 * 2/4 = 4/16.  both no = 2/4 * 2/4 = 4/16.  match = 8/16 = 1/2.
       differ = 1 - 1/2 = 1/2 = 0.5.  OK.
 
-  Gini is the DEFAULT ruler because it is fast (no logarithms).  The other option
-  -- entropy (cross-entropy) -- uses a log instead of squares and often gives the
-  same champion.  sklearn's default is criterion='gini' for speed.
+  Gini is the DEFAULT ruler because it is fast -- no logarithms, just multiply and subtract.
+  The other option is entropy (also called cross-entropy).
+  Entropy uses a log instead of squares.
+  Entropy often gives the same champion as Gini.
+  But a log is slow to compute.
+  So sklearn's default is criterion='gini' for speed.
+  (criterion = which mixing ruler the tree scores cuts with.)
 
     criterion='gini'     -> 1 - p^2 - q^2     fast (multiply and subtract)
     criterion='entropy'  -> -p log p - q log q slow (log is expensive)
@@ -250,7 +280,8 @@
 
   ## Information Gain: The Drop
 
-  A cut's worth is how much it DROPS the mixing from parent to children:
+  Information gain = how much a cut DROPS the mixing from parent to children.
+  (parent = the room before the cut; children = the two piles after it.)
 
     gain = Gini(parent) - weighted_Gini(children)
 
@@ -258,30 +289,38 @@
     after cut:  left 0.375, right 0.32, weighted = 0.344
     gain = 0.49 - 0.344 = 0.146
 
-  Higher gain = cleaner split.  The champion is the cut with the HIGHEST gain -- same
-  as picking the LOWEST weighted Gini, just measured from the other direction.
+  Higher gain = cleaner split.
+  The champion is the cut with the HIGHEST gain.
+  That is the same as picking the LOWEST weighted Gini.
+  It is just measured from the other direction.
 
 
   ## Stratify: Keep the Mix Even
 
-  The cancer sheet is ~63% well, ~37% sick.  A plain random split might deal 71% well
-  into the exam pile by luck -- unfair.  stratify=y_cls forces both piles to mirror the
-  whole sheet's ratio:
+  The cancer sheet is ~63% well, ~37% sick.
+  A plain random split might deal 71% well into the exam pile by luck.
+  Which is unfair -- the exam pile no longer looks like the whole sheet.
+  stratify=y_cls forces both piles to mirror the whole sheet's ratio.
+  (stratify = split each class separately so the ratio is preserved.)
 
     plain split (luck):          stratify split (forced):
     study  60% well              study  63% well   <- same as whole
     exam   71% well  <- skewed   exam   63% well   <- same as whole
 
-  One flag in the split call.  No new idea -- just insurance against a lopsided deal.
+  One flag in the split call.
+  No new idea -- just insurance against a lopsided deal.
 
 
   ## Pruning: The Alpha Tax
 
-  A full-grown tree memorises every quirk.  The exam error is high.  Instead of capping
-  depth (a blunt ceiling), pruning SNIPS weak branches after the tree is fully grown.
+  A full-grown tree memorises every quirk.
+  Which means its exam error is high.
+  One fix is to cap depth -- but a depth cap is a blunt ceiling, the same haircut everywhere.
+  Pruning instead SNIPS weak branches after the tree is fully grown.
 
-  The idea: charge a TAX per end-room (leaf).  A branch survives only if the wrongness
-  it removes is worth more than the tax:
+  The idea: charge a TAX per end-room (leaf).
+  A leaf = a final pile at the bottom of the tree, where a guess sits.
+  A branch survives only if the wrongness it removes is worth more than the tax:
 
     chart's total cost  =  (total wrongness on study people)  +  alpha x (number of leaves)
                            +-- fit the data ---+                 +--- stay humble ---+
@@ -296,11 +335,16 @@
         if 5400 < alpha   -> FIRE him, merge rooms back   (not worth the tax)
 
   !! WARN: THIS ALPHA IS ADDED ON, NOT A DENOMINATOR
-     Chapter 4's Ridge also had an alpha, but it sat in the BOTTOM of a fraction
-     (dial = top / (bottom + alpha)) and squeezed dials toward zero.  Here alpha is
-     ADDED -- a flat tax per leaf -- and it snips whole branches off.  Same letter,
-     opposite machinery: one shrinks a number, the other deletes a room.  Do not carry
-     the denominator picture across; the tax climbs, the leaf count drops.
+     A straight-stick rule called Ridge also had an alpha.
+     Ridge guesses by a weighted sum, one dial (multiplier) per column.
+     Ridge's alpha sat in the BOTTOM of a fraction, roughly dial = top / (bottom + alpha).
+     So a bigger Ridge alpha squeezed every dial toward zero.
+     Here alpha is ADDED instead -- a flat tax per leaf.
+     So a bigger alpha here snips whole branches off.
+     Same letter, opposite machinery.
+     One shrinks a number; the other deletes a room.
+     Do not carry the denominator picture across.
+     As the tax climbs, the leaf count drops.
 
   ** KEY: MAX_DEPTH IS A CEILING; CCP_ALPHA IS A TAX
      max_depth: chops ALL corridors at height N.  blunt, same haircut everywhere.

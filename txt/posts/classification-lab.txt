@@ -13,21 +13,26 @@
   PATH . APPENDIX -- Classification Reference  (companion to Chapter 3; read any time)
     <- back to:  [Chapter 3, Part 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt)
 
-  This is the appendix to Chapter 3 (Sorting Into Bins). Unlike the chapters -- which draw
-  each idea by hand first and keep the code at the end -- this is a flip-to reference, so
-  concept and code sit side by side for quick lookup. It gathers the key classification
-  ideas, from the four-part chapter and the Coursera assignment, into ten tight sections.
-  Read the chapter first; come back here when you need to look something up. Plain language
-  first, standard labels at the very bottom.
+  This is a flip-to reference on sorting things into bins.
+  Sorting into bins means a yes/no machine.
+  It reads a row of numbers and shouts one of two labels, like "sick" or "well".
+  Unlike a walk-through lesson, this page sits idea and code side by side for quick lookup.
+  It gathers the key classification ideas into ten tight sections.
+  This page assumes you remember nothing from anywhere else.
+  Every term is built from scratch where it appears.
+  Plain language first, standard labels at the very bottom.
 
 
   ## 1. Why Cross-Entropy, Not MSE
 
-  The straight-stick rule (linear regression) minimises squared leftovers: if the guess is
-  2.3 and the truth is 2.0, the leftover is (2.3-2.0)^2 = 0.09. Fine for sliding numbers.
-  For a bin-sorter the truth is 0 or 1 and the guess is a chance between 0 and 1. Squared
-  distance is the wrong ruler here -- it punishes a wrong answer by the same amount whether
-  the machine was nearly right or bone-backwards.
+  Linear regression is the straight-stick rule: it fits a line to predict a sliding number.
+  It scores itself by squared leftovers.
+  A leftover is guess minus truth.
+  If the guess is 2.3 and the truth is 2.0, the leftover squared is (2.3-2.0)^2 = 0.3^2 = 0.09.
+  That ruler is fine for sliding numbers.
+  But a bin-sorter is different: its truth is 0 or 1, and its guess is a chance between 0 and 1.
+  So squared distance is the wrong ruler here.
+  It punishes a wrong answer by the same amount whether the machine was nearly right or bone-backwards.
 
   Cross-entropy (log-loss) punishes backwards confidence exponentially:
 
@@ -52,9 +57,12 @@
      hedge costs about 0.69 -- more than the confident-right 0.01, far less than the
      confident-wrong 4.6.  Hedging is punished gently;  being sure and wrong is not.
 
-  The machine is penalised hardest for being CONFIDENT and WRONG. MSE would score the last
-  case as (0.99-0)^2 = 0.99 x 0.99 = 0.9801, call it 0.98 -- large but bounded. Log-loss
-  drives toward infinity, so the gradient always points away from confident wrong answers.
+  The machine is penalised hardest for being CONFIDENT and WRONG.
+  MSE means mean squared error: average the squared leftovers.
+  MSE would score that last case (truly well, machine says 0.99) as (0.99-0)^2 = 0.99 x 0.99 = 0.9801, call it 0.98.
+  That is large but bounded -- it can never grow past 1.
+  Log-loss drives toward infinity instead.
+  Which means the gradient (the downhill slope the machine slides on) always points away from confident wrong answers.
 
   ** KEY: USE LOG-LOSS FOR CLASSIFICATION, MSE FOR REGRESSION
      sklearn's LogisticRegression minimises log-loss by default. MSE has no ceiling on a
@@ -63,17 +71,22 @@
 
   ## 2. The Leash: L2 Regularisation and the C Parameter
 
-  The default LogisticRegression() in sklearn is NOT a free machine -- it carries a leash
-  built in:
+  sklearn is the standard Python machine-learning library.
+  LogisticRegression is its yes/no machine; its dials are the numbers it tunes to fit the data.
+  The default LogisticRegression() in sklearn is NOT a free machine.
+  It carries a leash built in:
 
       penalty='l2',  C=1.0   (the sklearn default)
 
-  The leash adds a term to the loss that punishes large dials:
+  The leash adds a term to the loss that punishes large dials.
+  log-loss is the classification score from section 1: it drives confident-wrong guesses toward infinity.
+  beta_j is one dial of the machine; sum(beta_j^2) adds up the squares of all the dials.
 
       total cost = log-loss + (1/C) * sum(beta_j^2)
 
-  C is the inverse of the leash tightness. Small C = tight leash = dials squeezed toward
-  zero. Large C = loose leash = dials can grow freely.
+  C is the inverse of the leash tightness.
+  Small C means a tight leash, which means dials squeezed toward zero.
+  Large C means a loose leash, which means dials can grow freely.
 
     C = 0.01   very tight -- dials squeezed hard, machine forced simple
     C = 0.1    tight
@@ -98,38 +111,52 @@
 
       LogisticRegression(penalty=None)
 
-  Adding L2 helps when the training pile is small relative to the number of columns, or
-  when columns are correlated and dials can swing wildly without a check.
+  L2 is the squeeze named above: the penalty that adds (1/C) * sum(beta^2) to the cost.
+  Adding L2 helps when the training pile is small relative to the number of columns.
+  It also helps when columns are correlated.
+  Correlated columns let dials swing wildly without a check, and the squeeze stops that.
 
 
   ## 3. A Second Sorter: Linear Discriminant Analysis
 
-  Logistic regression learns a boundary by gradient descent on log-loss. LDA takes a
-  different road: it assumes each class is a cloud of points drawn from a Gaussian with a
-  shared shape (covariance), computes the mean centre of each cloud, and places the boundary
-  where the two clouds are equally likely to have produced a new point.
+  Logistic regression learns its boundary by gradient descent on log-loss.
+  Gradient descent means rolling the dials downhill on the cost a little at a time.
+  LDA stands for Linear Discriminant Analysis, and it takes a different road.
+  It assumes each class is a cloud of points drawn from a Gaussian.
+  A Gaussian is a bell-shaped scatter; its shape is its covariance, the matrix of spreads and tilts.
+  LDA assumes both clouds share one shape.
+  Then it computes the mean centre of each cloud.
+  So it places the boundary where the two clouds are equally likely to have produced a new point.
 
     logistic regression  -- learns boundary from data; no cloud-shape assumption
     LDA                  -- assumes Gaussian clouds, equal shape; boundary from cloud means
 
-  The boundary LDA draws is a LINEAR wall -- the same kind as logistic regression -- but
-  computed analytically, not by gradient descent. The wall normal direction is:
+  The boundary LDA draws is a LINEAR wall -- a straight divider, the same kind logistic regression draws.
+  But LDA computes it analytically (by a direct formula), not by rolling downhill.
+  The wall normal direction (the direction the wall faces) is:
 
       w = S_W^-1 * (mu1 - mu0)
 
-  where S_W is the within-class scatter (pooled covariance) and mu0, mu1 are the two class
-  mean vectors. The wall is placed at:
+  S_W is the within-class scatter: the two clouds' shared spread-and-tilt, pooled into one matrix.
+  S_W^-1 is its inverse, the matrix that un-stretches that spread.
+  mu0 and mu1 are the two class mean vectors: the centre point of class 0 and the centre point of class 1.
+  The wall is placed at:
 
       w0 = -1/2 * (mu0+mu1)^T * S_W^-1 * (mu1-mu0) + log(pi1/pi0)
 
-  The log(pi1/pi0) term is the LOG-PRIOR: if the sick pile is smaller (pi1 < pi0), the
-  wall shifts toward the sick cloud -- the machine is already sceptical about sick cases.
+  pi0 and pi1 are the priors: the share of all rows that are class 0 and the share that are class 1.
+  log(pi1/pi0) is the LOG-PRIOR term.
+  If the sick pile is smaller, then pi1 < pi0, so this term is negative.
+  Which means the wall shifts toward the sick cloud.
+  So the machine is already sceptical about sick cases.
 
   >> NOTE: EQUAL PRIORS PUTS THE WALL AT THE MIDPOINT
-     If pi0 = pi1 = 0.5, the log-prior term vanishes and the wall sits exactly halfway
-     between the two cloud centres. sklearn's default uses EMPIRICAL priors (class
-     frequencies in the training data). Wisconsin data is ~63% benign, so the wall shifts
-     off the midpoint.
+     The priors pi0, pi1 are the shares of each class.
+     If pi0 = pi1 = 0.5, then pi1/pi0 = 1 and log(1) = 0, so the log-prior term vanishes.
+     Which means the wall sits exactly halfway between the two cloud centres.
+     sklearn's default uses EMPIRICAL priors instead -- the class frequencies counted in the training data.
+     A common breast-tumour dataset (the Wisconsin set) is about 63% benign.
+     So the priors are unequal, and the wall shifts off the midpoint.
 
       lda     = LinearDiscriminantAnalysis()               # empirical priors, shifted wall
       lda_mid = LinearDiscriminantAnalysis(priors=[0.5,0.5])  # equal priors, midpoint wall
@@ -145,9 +172,11 @@
     settings (hyperparams) -- set BY YOU before training; the machine never touches them
                               e.g. C in LogisticRegression, n_neighbors in KNN
 
-  A setting controls HOW the machine learns, not WHAT it learns. You cannot find the best
-  setting by watching the training pile -- the machine can always overfit if you give it
-  enough slack. You find it by watching a HELD-OUT pile (validation fold).
+  A setting controls HOW the machine learns, not WHAT it learns.
+  You cannot find the best setting by watching the training pile.
+  The machine can always overfit if you give it enough slack.
+  Overfit means memorise the training rows instead of learning the real pattern.
+  So you find the best setting by watching a HELD-OUT pile -- rows kept aside, called a validation fold.
 
     dials    ->  machine finds them   (by gradient descent, or analytically)
     settings ->  YOU find them        (by grid search over a validation set)
@@ -155,10 +184,15 @@
 
   ## 5. The Grid Hunt: Finding the Best Setting
 
-  You want the best C. Candidates: [0.01, 0.1, 1, 10]. Do NOT just try each on the
-  training pile -- the machine memorised that pile and will look better the looser the
-  leash. Instead ROTATE: split the training pile into k folds (k=5 is common), train on
-  k-1 folds, score on the left-out fold, rotate, repeat k times, average the scores.
+  You want the best C, the leash setting from section 2 -- small C squeezes the dials, large C frees them.
+  Candidates to try: [0.01, 0.1, 1, 10].
+  Do NOT just try each on the training pile.
+  The machine memorised that pile, so it will look better the looser the leash.
+  Instead ROTATE the data.
+  Split the training pile into k equal folds (k=5 is common).
+  Train on k-1 of the folds, then score on the one left-out fold.
+  Rotate so a different fold is left out, and repeat k times.
+  So you average the k scores into one number per candidate.
 
     first  pick a range of candidate settings
     then   for each candidate, score it with k-fold cross-validation
@@ -183,22 +217,30 @@
           gs = GridSearchCV(pipe, param_grid, cv=5, scoring='recall')
           gs.fit(X_train, y_train)    # pass RAW X_train here, not pre-scaled
 
-  Three things you must specify: (1) the range and spacing of candidates, (2) how many
-  folds to rotate (k), (3) which score to optimise (recall? F1? AUC?).
+  Three things you must specify.
+  First, the range and spacing of candidates.
+  Then, how many folds to rotate (k).
+  And, which score to optimise -- recall, F1, or AUC, all defined in the sections below.
 
 
   ## 6. Pinch-to-Fit: Min-Max Scaling
 
-  StandardScaler shifts each column to mean 0, spread 1. Min-max scaling squeezes each
-  column into the range [0, 1] instead:
+  StandardScaler shifts each column to mean 0, spread 1.
+  Mean 0 means subtract the average; spread 1 means divide by the standard deviation.
+  Min-max scaling squeezes each column into the range [0, 1] instead:
 
       x_scaled = (x - min(x)) / (max(x) - min(x))
 
-  Every column is "pinched" to fit between 0 and 1, keeping the distribution shape but
-  compressing the range.
+  min(x) is the smallest value in the column; max(x) is the largest.
+  Every column is "pinched" to fit between 0 and 1.
+  This keeps the distribution shape but compresses the range.
 
     raw:      [ 100,  200,  400,  800 ]
-    min=100, max=800, range=700
+    min = 100, max = 800, range = max - min = 800 - 100 = 700
+    (100-100)/700 = 0/700   = 0.00
+    (200-100)/700 = 100/700 = 0.14
+    (400-100)/700 = 300/700 = 0.43
+    (800-100)/700 = 700/700 = 1.00
     scaled:   [ 0.0,  0.14, 0.43, 1.0 ]
 
   !! WARN: ONE OUTLIER SQUASHES EVERYTHING ELSE
@@ -213,8 +255,11 @@
 
   ## 7. The Lives-vs-Money Trade: Precision and Recall in Business
 
-  Precision and recall pull in opposite directions. The business context decides which to
-  favour.
+  CAUGHT means a sick case the machine correctly shouted sick.
+  MISSED means a sick case the machine wrongly called well.
+  ALARM means a well case the machine wrongly shouted sick.
+  Precision and recall pull in opposite directions.
+  The business situation decides which to favour.
 
     recall    = CAUGHT / (CAUGHT + MISSED)   -- share of truly sick cases found
     precision = CAUGHT / (CAUGHT + ALARM)    -- share of sick shouts that were real
@@ -234,9 +279,11 @@
       ALARM  = good transaction blocked = customer complaint
       -> tune recall first, set a floor on precision
 
-  Raising the cutoff (more sure before shouting sick) raises precision and drops recall.
-  Lowering the cutoff raises recall and drops precision. F1 is the harmonic mean of the
-  two -- it collapses toward zero if EITHER one is near zero.
+  The cutoff is the chance above which the machine shouts sick.
+  Raising the cutoff means more sure before shouting sick, which raises precision and drops recall.
+  Lowering the cutoff raises recall and drops precision.
+  F1 is the harmonic mean of precision and recall: F1 = 2 * precision * recall / (precision + recall).
+  Which means F1 collapses toward zero if EITHER one is near zero.
 
   >> NOTE: USE F-BETA TO TILT THE TRADE
      F1 weights precision and recall equally. F-beta with beta > 1 weights recall more
@@ -245,26 +292,34 @@
 
   ## 8. The Trade Curve Revisited: When AUC Misleads
 
-  The trade curve (ROC curve) sweeps the cutoff from 1 to 0 and plots (FPR, TPR) at each
-  step. AUC is the area under that curve: 1.0 = perfect, 0.5 = coin flip.
+  The trade curve, standard name ROC curve, sweeps the cutoff from 1 down to 0.
+  The cutoff is the chance above which the machine shouts sick.
+  At each cutoff it plots a point (FPR, TPR).
+  TPR is the true-positive rate = CAUGHT / all truly sick (the recall).
+  FPR is the false-positive rate = ALARM / all truly well, where ALARM is a well case wrongly shouted sick.
+  AUC is the area under that curve.
+  AUC = 1.0 means perfect; AUC = 0.5 means coin flip.
 
-  AUC is cutoff-independent and answers "how cleanly do the two groups separate?" It is the
-  right score to COMPARE two machines before deciding where to set the cutoff.
+  AUC does not depend on where you set the cutoff.
+  It answers one question: how cleanly do the two groups separate?
+  So it is the right score to COMPARE two machines before deciding where to set the cutoff.
 
-  But AUC has a blind spot: it uses FPR = ALARM / all truly well as its x-axis. When the
-  well pile is huge (a rare-disease screen: 1 sick per 100 well), FPR has a large
-  denominator and stays small even when there are many alarms. The ROC curve looks
-  optimistic. Precision -- CAUGHT / (CAUGHT + ALARM) -- tells a different story: most
-  "sick" shouts are wrong.
+  But AUC has a blind spot.
+  Its x-axis is FPR = ALARM / all truly well.
+  When the well pile is huge -- say a rare-disease screen with 1 sick per 100 well -- that denominator is large.
+  So FPR stays small even when there are many alarms.
+  Which means the ROC curve looks optimistic.
+  Precision = CAUGHT / (CAUGHT + ALARM) tells a different story: most "sick" shouts are wrong.
 
   For SKEWED PILES, the Precision-Recall curve tells the truth:
 
     x-axis = RECALL     (how many sick cases found)
     y-axis = PRECISION  (of the sick shouts, how many were real)
 
-  The PR curve ignores the true-negative count entirely, so it cannot be flattered by a
-  large well pile. High area under the PR curve means: the machine finds sick cases AND its
-  sick shouts are reliable.
+  A true negative is a well case correctly called well.
+  The PR curve ignores the true-negative count entirely.
+  So it cannot be flattered by a large well pile.
+  High area under the PR curve means the machine finds sick cases AND its sick shouts are reliable.
 
   ** KEY: USE ROC/AUC FOR BALANCED CLASSES; USE PR CURVE FOR SKEWED CLASSES
      A machine with AUC 0.95 can have precision 0.10 on a 1:100 sick-to-well pile.
@@ -273,9 +328,10 @@
 
   ## 9. Skewed Piles: What Goes Wrong and How to Fix It
 
-  Skewed (imbalanced) classes are the norm in real classification tasks:
-  fraud (< 1% positive), rare disease (few % positive), churn (10-20% positive).
-
+  Skewed classes, also called imbalanced classes, means one label is far rarer than the other.
+  This is the norm in real classification tasks.
+  Fraud is under 1% positive; rare disease is a few % positive; churn is 10-20% positive.
+  Accuracy means the share of all rows the machine labelled correctly.
   When the sick pile is tiny, accuracy flatters the lazy machine:
 
     pile: 95 well, 5 sick
@@ -296,14 +352,15 @@
       -> internally scales the log-loss contribution of each class by
          n_samples / (n_classes * n_samples_per_class)
 
-  The machine sees each rare-class mistake as proportionally more costly, so it stops
-  defaulting to the common class.
+  The machine sees each rare-class mistake as proportionally more costly.
+  So it stops defaulting to the common class.
 
 
   ## 10. Counting Across Classes: Macro, Micro, Weighted
 
-  When there are more than two bins -- say, tumour types A, B, C -- you get one precision
-  and one recall per class. Three ways to collapse to a single number:
+  When there are more than two bins -- say tumour types A, B, C -- you get one precision and one recall per class.
+  Precision is the share of a class's shouts that were right; recall is the share of a class's true members found.
+  Three ways collapse those per-class numbers into a single number:
 
     MACRO:    compute the metric per class, average with EQUAL WEIGHT
               -> every class counts the same, rare and common alike
@@ -320,12 +377,14 @@
     recall:     0.90      0.60      0.30
     count:        80        15         5
 
-    macro    = (0.90 + 0.60 + 0.30) / 3             = 0.60
-    weighted = (0.90*80 + 0.60*15 + 0.30*5) / 100  = 0.82
-    micro    = (all TP) / (all TP + all FN)         ~= 0.84  (dominated by class A)
+    macro    = (0.90 + 0.60 + 0.30) / 3 = 1.80 / 3 = 0.60
+    weighted: 0.90*80 = 72 ; 0.60*15 = 9 ; 0.30*5 = 1.5 ; sum = 82.5 ; /100 = 0.82
+    micro    = (all TP) / (all TP + all FN) ~= 0.84  (dominated by class A)
 
-  macro treats a 5-sample class the same as an 80-sample class. Use it when all classes
-  matter equally. Use weighted when you care more about getting the big classes right.
+  TP means true positives (members found); FN means false negatives (members missed).
+  macro treats a 5-sample class the same as an 80-sample class.
+  Use macro when all classes matter equally.
+  Use weighted when you care more about getting the big classes right.
   Use micro when total correct counts are what matters.
 
   !! WARN: classification_report DOES NOT PRINT "micro avg"

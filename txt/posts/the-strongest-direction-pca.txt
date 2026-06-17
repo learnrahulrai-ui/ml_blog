@@ -14,16 +14,27 @@
     <- prev:  [Chapter 6, Part 1: Looking at a Sheet With No Answers](eda-and-distance.txt)
        next:  [Chapter 6, Part 3: Grouping by Nearest Centre](grouping-by-nearest-centre.txt) ->
 
-  Part 1 measured gaps between states with 3 columns.  Three columns is easy -- you can
-  imagine three rulers at right angles.  But what if you have 13 columns?  Or 100?  You
-  cannot draw a 13-wall room on flat paper.  The dots live in a space too many-walled to
-  picture.
+  Say each row is a thing and each column is a number measured on it.
+  The gap between two rows is the straight-line (Euclidean) distance.
+  To get it: subtract the two rows column by column.
+  Then square each difference.
+  Then add the squares.
+  Then take the square root.
+  With 3 columns this is easy.
+  Three columns means three rulers at right angles, which you can picture.
+  But what if you have 13 columns?
+  Or 100?
+  You cannot draw a 13-wall room on flat paper.
+  Which means the dots live in a space too many-walled to picture.
 
   PCA (Principal Component Analysis) is the trick that CRUSHES that many-wall room down
-  to a flat page while keeping the shape of the dots.  The idea is simple: shine a
-  flashlight on the cloud of dots from different angles.  The shadow that casts the
-  LONGEST spread is the first "principal component."  The next-longest shadow, at a right
-  angle to the first, is the second.  Crush to those two shadows and draw what you see.
+  to a flat page.
+  It keeps the shape of the dots while doing so.
+  The idea is simple.
+  Shine a flashlight on the cloud of dots from different angles.
+  The shadow that casts the LONGEST spread is the first "principal component."
+  The next-longest shadow, at a right angle to the first, is the second.
+  So crush to those two shadows and draw what you see.
 
   ## The Sheet
 
@@ -40,20 +51,32 @@
        3       13.16      2.36      2.67   ...   1185.0
       ...       ...       ...        ...   ...     ...
 
-  Look at the columns.  Alcohol is ~13.  Proline is ~1000.  Ash is ~2.  The ruler problem
-  is even worse here -- a column measured in thousands will dominate a column measured in
-  single digits, simply because its raw gaps are bigger, not because it matters more.  First step: standardise every column
-  to mean=0, spread=1.  Same ruler for all 13.
+  Look at the columns.
+  Alcohol is ~13.
+  Proline is ~1000.
+  Ash is ~2.
+  A column measured in thousands will dominate a column measured in single digits.
+  This happens because its raw gaps are bigger, not because it matters more.
+  So the fix is to standardise every column first.
+  To standardise a value: standardised value = (raw value - column mean) / column spread.
+  Here column mean is the average of that column, and column spread is its standard deviation (how far values sit from that average on average).
+  This puts every column on mean 0, spread 1.
+  Which means no column shouts louder than another.
+  The result is the same ruler for all 13.
 
-  Count the standardising in clerk-steps: 178 wines x 13 columns = 2,314 numbers, each
-  costing one subtract and one divide = 2 strokes, so 2,314 x 2 = 4,628 strokes before
-  PCA even begins.  Then one PC score per wine costs 13 multiplies + 12 adds = 25
-  strokes, and all 178 wines on one component run 178 x 25 = 4,450 strokes.  A room of
-  clerks clears the whole crush by lunch; you would still be sharpening your pencil.
+  Now count the standardising in clerk-strokes.
+  178 wines x 13 columns = 2,314 numbers to standardise.
+  Each number costs one subtract and one divide = 2 strokes.
+  So 2,314 x 2 = 4,628 strokes before PCA even begins.
+  Then one PC score per wine costs 13 multiplies + 12 adds = 25 strokes.
+  So all 178 wines on one component run 178 x 25 = 4,450 strokes.
+  A room of clerks clears the whole crush by lunch.
+  You would still be sharpening your pencil.
 
   ## The Core Metaphor: Flashlight and Shadows
 
-  Imagine each wine is a dot floating in a 13-wall room.  You cannot draw this room.
+  Imagine each wine is a dot floating in a 13-wall room.
+  You cannot draw this room.
   But you CAN shine a flashlight through it and trace the shadow on the wall.
 
     |  flashlight  |
@@ -64,25 +87,29 @@
     ----------------
     shadow on the wall
 
-  The shadow flattens the 13 walls into 1 line.  The dots that were far apart in
-  the room land far apart on the shadow.  The dots that were close land close.
+  The shadow flattens the 13 walls into 1 line.
+  The dots that were far apart in the room land far apart on the shadow.
+  The dots that were close land close.
 
-  Rotate the flashlight.  The shadow gets longer or shorter.  The LONGEST shadow
-  -- the one that spreads the dots out the most -- is the **first principal
-  component (PC1)**.  The direction that gives this longest shadow is the single
-  most informative way to look at the data.
+  Rotate the flashlight.
+  The shadow gets longer or shorter.
+  The LONGEST shadow is the one that spreads the dots out the most.
+  That longest-shadow direction is the **first principal component (PC1)**.
+  A principal component is a direction through the cloud; the shadow of the dots onto it is what you keep.
+  So PC1, the longest shadow, is the single most informative way to look at the data.
 
-  Rotate 90 degrees from PC1.  The next-longest shadow at that right angle is
-  **PC2**.
+  Now rotate 90 degrees from PC1.
+  The next-longest shadow at that right angle is **PC2**, the second principal component.
 
-  Now you have two shadows (PC1 and PC2) at right angles.  Plot dot at
-  (PC1 coordinate, PC2 coordinate) for each wine.  That dot on flat paper
-  captures MORE of the original structure than any other two-number summary.
+  Now you have two shadows (PC1 and PC2) at right angles.
+  Plot each wine at (its PC1 coordinate, its PC2 coordinate).
+  That dot on flat paper captures MORE of the original structure than any other two-number summary.
 
   ## A 2-Wall Worked Example (Not 13, So You Can See It)
 
-  Take 2 measurements (alcohol, color_intensity) for 4 wines so you can draw
-  the room on paper and see the shadow with your own eyes.
+  Take 2 measurements (alcohol, color_intensity) for 4 wines.
+  Two measurements means you can draw the room on paper.
+  Which means you can see the shadow with your own eyes.
 
     wine    alcohol    color_intensity
     -----   -------    ---------------
@@ -91,7 +118,10 @@
      C        14.0          4.0
      D        14.5          6.0
 
-  First, standardise (put on same ruler).
+  First, standardise each column.
+  Standardise means: standardised value (the z-score) = (raw value - column mean) / column spread.
+  This puts both columns on mean 0, spread 1, so neither shouts louder.
+  The column mean is the average of the column; the column spread is its standard deviation.
 
     alcohol mean=13.75,  spread=0.65
     color   mean=5.5,    spread=1.29
@@ -101,21 +131,27 @@
     C: alcohol z = (14.0-13.75)/0.65 =  0.38,  color z = (4.0-5.5)/1.29 = -1.16
     D: alcohol z = (14.5-13.75)/0.65 =  1.15,  color z = (6.0-5.5)/1.29 =  0.39
 
-  Then find the longest shadow.  In 2-walled room this means spinning a
-  line until the dots spread along it as far as possible.  The answer (by
-  formula, not flashlight) is a weighted combination of the two columns:
+  Then find the longest shadow.
+  In a 2-walled room this means spinning a line until the dots spread along it as far as possible.
+  The answer comes by formula, not by actually spinning a flashlight.
+  The answer is a weighted combination of the two columns:
 
     PC1 = 0.71 * alcohol_z + 0.71 * color_z
 
-  This is a RECIPE: take 0.71 parts of alcohol score, add 0.71 parts of color
-  score.  The resulting number is each wine's PC1 coordinate.
+  This is a RECIPE.
+  Take 0.71 parts of the alcohol z-score.
+  Add 0.71 parts of the color z-score.
+  The two weights, 0.71 and 0.71, are called the loadings: how much of each column goes into the PC.
+  The resulting number is that wine's PC1 coordinate, also called its PC1 score.
 
     A: 0.71 * (-1.15) + 0.71 * (-0.39) = -0.82 + -0.28 = -1.09
     B: 0.71 * (-0.38) + 0.71 * (1.16)  = -0.27 +  0.82 =  0.55
     C: 0.71 * (0.38)  + 0.71 * (-1.16) =  0.27 + -0.82 = -0.55
     D: 0.71 * (1.15)  + 0.71 * (0.39)  =  0.82 +  0.28 =  1.09
 
-  PC1 spreads from -1.09 to +1.09.  PC2 is the next shadow at a right angle:
+  PC1 spreads from -1.09 to +1.09.
+  PC2 is the next shadow at a right angle to PC1.
+  It has its own recipe (its own loadings):
 
     PC2 = -0.71 * alcohol_z + 0.71 * color_z
 
@@ -140,26 +176,42 @@
          -----+----+----+----
            -1.0  -0.5   0   0.5  1.0
 
-  The dots spread more along PC1 than PC2.  PC1 captures the stronger pattern.
+  The dots spread more along PC1 than PC2.
+  Which means PC1 captures the stronger pattern.
 
   >> YOUR TURN
-     A fifth wine E (made-up) lands at alcohol_z = 1.0 and color_z = 1.0.  Work its
-     PC1 and PC2 from the two recipes above.
+     A fifth wine E (made-up) lands at alcohol_z = 1.0 and color_z = 1.0.
+     Work its PC1 and PC2 from the two recipes above.
+     PC1 recipe: PC1 = 0.71 * alcohol_z + 0.71 * color_z.
+     PC2 recipe: PC2 = -0.71 * alcohol_z + 0.71 * color_z.
 
      check your slate:  PC1 = 0.71 * 1.0 + 0.71 * 1.0 = 0.71 + 0.71 = 1.42;
-     PC2 = -0.71 * 1.0 + 0.71 * 1.0 = -0.71 + 0.71 = 0.  E sits far out along PC1
-     and dead centre on PC2 -- a wine the strongest shadow finds extreme.
+     PC2 = -0.71 * 1.0 + 0.71 * 1.0 = -0.71 + 0.71 = 0.
+     E sits far out along PC1 and dead centre on PC2.
+     So E is a wine the strongest shadow finds extreme.
 
   ## How Much Does Each Shadow Capture?
 
-  IN HAND: four wines put on the same ruler, then a recipe PC1 = 0.71*alcohol_z +
-  0.71*color_z that spread them from -1.09 to +1.09, and PC2 at a right angle.  This
-  section asks how much of the total spread each shadow actually caught.
+  IN HAND so far: four wines put on the same ruler (mean 0, spread 1 per column).
+  Then a recipe PC1 = 0.71 * alcohol_z + 0.71 * color_z that spread them from -1.09 to +1.09.
+  Then PC2 = -0.71 * alcohol_z + 0.71 * color_z at a right angle.
+  The four PC1 scores were -1.09, 0.55, -0.55, 1.09.
+  The four PC2 scores were 0.54, 1.09, -1.09, -0.54.
+  This section asks how much of the total spread each shadow actually caught.
 
-  PC1 explained fraction = variance_of_PC1_scores / (variance_of_PC1 + variance_of_PC2)
+  First define variance.
+  Variance is the average of the squared distances from the mean.
+  It measures how spread out a set of numbers is.
+  Here the mean of every PC score set is 0, because the data was centred.
+  So variance = mean of the squared scores.
 
-  We already have the PC scores.  Variance = mean of squared values (mean is 0 by
-  construction since the data was centred):
+  The kept fraction (also called explained variance ratio) for a PC is:
+  that PC's variance divided by the total variance of all PCs.
+
+    PC1 explained fraction = variance_of_PC1_scores / (variance_of_PC1 + variance_of_PC2)
+
+  We already have the PC scores.
+  Variance = mean of squared values, since the mean is 0:
 
     PC1 scores: -1.09,  0.55,  -0.55,  1.09
     PC1 variance = (1.09^2 + 0.55^2 + 0.55^2 + 1.09^2) / 4
@@ -176,26 +228,29 @@
     PC1 fraction = 0.75 / 1.49 = 0.50  (50%)
     PC2 fraction = 0.74 / 1.49 = 0.50  (50%)
 
-  With only 2 original columns, each PC naturally carries about half.  The fractions
-  get interesting when you have 13 columns and the first shadow eats 36% while the
-  12th shadow carries 1%.
+  With only 2 original columns, each PC naturally carries about half.
+  The fractions get interesting when you have 13 columns.
+  Then the first shadow can eat 36% while the 12th shadow carries 1%.
 
-  With 2 original columns, each PC carries about half the information.  With
-  the real 13-column wine data, PC1 carries ~36%, PC2 carries ~19%, and the
-  rest scatters across PCs 3-13.
+  With the real 13-column wine data, PC1 carries ~36%.
+  PC2 carries ~19%.
+  The rest scatters across PCs 3-13.
 
   ## Why Kept + Lost Always Adds Back to the Same Total
 
-  Here is the lock that makes the fraction trustworthy.  Take one dot and the line
-  it casts its shadow on.  Draw three lengths:
+  Here is the lock that makes the fraction trustworthy.
+  Take one dot and the line it casts its shadow on.
+  Draw three lengths:
 
   >> YOUR TURN (do this one after reading the three lengths just below)
-     A dot's shadow on the line is 4 long, and its perp (the walk off the line to
-     the dot) is 3 long.  How long is the stick from the origin to the dot?
+     A dot's shadow on the line is 4 long.
+     Its perp (the walk off the line to the dot) is 3 long.
+     How long is the stick from the origin to the dot?
 
      check your slate:  stick^2 = shadow^2 + perp^2 = 4*4 + 3*3 = 16 + 9 = 25, so
-     stick = sqrt(25) = 5.  The 3-4-5 triangle: kept (shadow) and lost (perp) always
-     square back to the same fixed stick.
+     stick = sqrt(25) = 5.
+     This is the 3-4-5 triangle.
+     The kept length (shadow) and the lost length (perp) always square back to the same fixed stick.
 
     stick    = straight line from the middle (origin) to the dot
     shadow   = how far the dot's shadow lands along the line  (KEPT)
@@ -208,21 +263,25 @@
     -+---+-------- the line
      middle  shadow (along the line)
 
-  Those three make a right angle, so Pythagoras locks them:
+  Those three make a right angle.
+  So Pythagoras locks them:
 
     stick^2  =  shadow^2  +  perp^2
 
-  The stick was fixed the moment you measured the dot -- spinning the line never
-  changes it.  Spinning only shuffles the split between shadow and perp.  Add this
-  over all the dots:
+  The stick was fixed the moment you measured the dot.
+  Spinning the line never changes it.
+  Spinning only shuffles the split between shadow and perp.
+  Now add this over all the dots:
 
     sum of stick^2  =  sum of shadow^2  +  sum of perp^2
     (what the dots ARE)  (what the drawing KEEPS)  (what flattening LOSES)
 
-  The left side never moves.  So the line that KEEPS the most (biggest sum of
-  shadow^2) is automatically the line that LOSES the least (smallest sum of perp^2).
-  Most-kept and least-lost are the same line seen from two sides -- which is why PC1,
-  the longest-shadow direction, is also the smallest-reconstruction-error direction.
+  The left side never moves.
+  So the line that KEEPS the most has the biggest sum of shadow^2.
+  And that same line LOSES the least, the smallest sum of perp^2.
+  Most-kept and least-lost are the same line seen from two sides.
+  Which is why PC1, the longest-shadow direction, is also the smallest-reconstruction-error direction.
+  (Reconstruction is rebuilding the dots from the shadow; its error is the leftover perp.)
   And the kept fraction is just:
 
     kept fraction  =  sum of shadow^2  /  sum of stick^2
@@ -238,26 +297,31 @@
     PC5:  5%   cumulative: 78%
     PC6:  4%   cumulative: 82%  <- past 80%
 
-  With 5 PCs you have ~78%.  With 6 PCs you have ~82%.  Most of the structure
-  is captured in the first 5 or 6 shadows.  The remaining 7 PCs carry mostly
-  noise.
+  With 5 PCs you have ~78%.
+  With 6 PCs you have ~82%.
+  So most of the structure is captured in the first 5 or 6 shadows.
+  The remaining 7 PCs carry mostly noise.
 
   ## The Recipe (Loadings)
 
-  Each PC is a RECIPE -- how much of each original column goes into it.
+  Each PC is a RECIPE.
+  The recipe says how much of each original column goes into it.
 
     PC1 = 0.14 * alcohol + 0.16 * malic_acid + ... + 0.32 * proline
 
-  The numbers (loadings) tell you which columns the PC leans on.  A high loading
-  means that column is important for that PC.  For PC1 on the wine data, the
-  highest loading is often on proline or flavanoids -- these columns vary the
-  most and drive the longest shadow.
+  Those weight numbers are the loadings.
+  A loading is how much of one column goes into one PC.
+  The loadings tell you which columns the PC leans on.
+  A high loading means that column matters a lot for that PC.
+  For PC1 on the wine data, the highest loading is often on proline or flavanoids.
+  These columns vary the most, so they drive the longest shadow.
 
   ## The Scores (Transform)
 
-  Every wine gets a PC1 score and a PC2 score.  These are the coordinates you
-  plot.  The original 13 columns are crushed into 2 numbers -- 1 dot on a flat
-  page.
+  Every wine gets a PC1 score and a PC2 score.
+  A score is the wine's coordinate along one PC, computed by running that PC's recipe.
+  These two scores are the coordinates you plot.
+  So the original 13 columns are crushed into 2 numbers, which is 1 dot on a flat page.
 
     wine    PC1       PC2
     -----   ------    ------
@@ -268,37 +332,42 @@
     178    -2.41      0.78
 
   The scatter plot of PC1 vs PC2 shows the cloud of wines crushed to 2D.
-  Each dot is one wine.  Dots close together = chemically similar wines.
+  Each dot is one wine.
+  Dots close together mean chemically similar wines.
 
   ## Blowing It Back Up (Reconstruction)
 
-  If you take only PC1 and PC2 scores and multiply back by the loadings,
-  you get a BLURRY version of the original 13 columns -- blurry because
-  you threw away PCs 3-13.
+  Reconstruction means rebuilding the original columns from the kept scores.
+  To do it: take only PC1 and PC2 scores and multiply each back by its loadings.
+  This gives a BLURRY version of the original 13 columns.
+  It is blurry because you threw away PCs 3-13.
 
     original alcohol = 14.23
     reconstructed (2 PCs) ~= 13.85   (off by ~0.4)
 
-  The more PCs you keep, the less blur:
+  The more PCs you keep, the less blur.
+  The blur is measured by MSE, the mean squared error.
+  MSE is the average of the squared gaps between original and rebuilt values.
 
     keep 2 PCs:  MSE ~ 0.45
     keep 5 PCs:  MSE ~ 0.19
     keep all 13: MSE = 0.00 (perfect, but pointless)
 
-  Now line those numbers up against the kept fractions from earlier:
+  Now line those numbers up against the kept fractions from earlier.
+  The kept fraction is the share of total spread the kept PCs hold.
 
     keep 2 PCs:  kept ~ 55%  ->  lost ~ 45%  ->  MSE ~ 0.45
     keep 5 PCs:  kept ~ 80%  ->  lost ~ 20%  ->  MSE ~ 0.19
 
-  Not a coincidence.  On standardised data the reconstruction MSE IS the
-  thrown-away fraction -- the same kept + lost = fixed total from the
-  stick-shadow-perp section, read from the lost side.  You never need to
-  run the reconstruction to know its error: 1 minus the kept fraction
-  already told you.
+  This is not a coincidence.
+  On standardised data the reconstruction MSE IS the thrown-away fraction.
+  This is the same kept + lost = fixed total from the stick-shadow-perp section, read from the lost side.
+  So you never need to run the reconstruction to know its error.
+  1 minus the kept fraction already told you.
 
-  Reconstruction error measures "how much structure was lost" when you
-  crushed the room.  Your goal is to lose as little as possible while
-  still being able to draw the picture on flat paper.
+  Reconstruction error measures how much structure was lost when you crushed the room.
+  Your goal is to lose as little as possible.
+  And still be able to draw the picture on flat paper.
 
 
   ## Common Tripwires I Caught

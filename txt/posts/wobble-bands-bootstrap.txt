@@ -14,23 +14,35 @@
     <- prev:  [Chapter 4, Part 1: The Leash](humble-dials-ridge-lasso.txt)
        next:  [Chapter 4, Part 3: The Dial by Hand](the-dial-by-hand.txt) ->
 
-  Part 1 made the dials humble. This post makes them HONEST -- and the honesty stings,
-  because the first thing it admits is that a single dial value, reported on its own, is a
+  First, the picture you need, built from scratch.
+  A "dial" is a multiplier the machine attaches to one measurement.
+  The guess is each measurement times its dial, all added up, plus one fixed lift.
+  The machine picks each dial to make its misses as small as it can.
+
+  An earlier post made those dials humble by fining the machine for big dials.
+  This post makes them HONEST.
+  And the honesty stings.
+  Because the first thing it admits is that a single dial value, reported on its own, is a
   small lie.
 
-  Here is the lie. The machine studies my patients and announces a bmi-dial of 0.52. It
-  says it flatly, with a straight face, as if 0.52 were carved in stone. But I only had
-  THESE eighty-odd patients. Walk into the hospital on a different morning, scoop up eighty
-  DIFFERENT patients, and the dial comes out 0.44, or 0.58, or who knows. So what is 0.52
-  really worth? The number alone will not say. We need to know how much it would jump around
-  if the world had dealt us a slightly different crowd.
+  Here is the lie.
+  The machine studies my patients and announces a bmi-dial of 0.52.
+  It says 0.52 flatly, as if it were carved in stone.
+  But I only had THESE eighty-odd patients.
+  Walk into the hospital on a different morning, scoop up eighty DIFFERENT patients, and the
+  dial comes out 0.44, or 0.58, or who knows.
+  So what is 0.52 really worth?
+  The number alone will not say.
+  We need to know how much it would jump around if the world had dealt us a slightly
+  different crowd.
 
 
   ## I Cannot Visit the Hospital 200 Times
 
-  The honest fix would be to gather two hundred fresh crowds and watch the dial dance. I
-  cannot do that -- I have one pile of patients and that is all. So I FAKE it. I build new
-  crowds out of the pile I already own, by re-dealing it WITH REPEATS:
+  The honest fix would be to gather two hundred fresh crowds and watch the dial dance.
+  I cannot do that -- I have one pile of patients and that is all.
+  So I FAKE it.
+  I build new crowds out of the pile I already own, by re-dealing it WITH REPEATS:
 
     pull a patient, write them down, PUT THEM BACK in the bag
     do this until the fake pile is the same size as the real one
@@ -38,14 +50,18 @@
     rebuild the dials on this fake pile
     repeat the whole performance 200 times -> 200 versions of every dial
 
-  Count the price in clerk-steps: the straight-stick rule did ONE full dial-solve;  the
-  bootstrap does 200 of them, one per fake pile of the same 442 people.  200 complete
-  solves where there was one -- trivial for a room of tireless clerks, unthinkable for
-  a single pencil, which is the whole reason this trick waited for a crowd to share it.
+  Count the price.
+  The straight-stick rule -- each measurement times its dial, added up -- did ONE full
+  dial-solve.
+  The bootstrap does 200 of them, one per fake pile of the same 442 people.
+  That is 200 complete solves where there was one.
+  Trivial for a room of tireless clerks, unthinkable for a single pencil.
+  Which is the whole reason this trick waited for a crowd to share it.
 
-  This trick has a name we will earn at the end: the bootstrap. The whole engine is "put
-  them back." Drawing with replacement is what makes each fake pile genuinely different from
-  the last, and that difference is what mimics walking into the hospital on a new day.
+  This trick has a name we will earn at the end: the bootstrap.
+  The whole engine is "put them back."
+  Drawing with replacement is what makes each fake pile genuinely different from the last.
+  And that difference is what mimics walking into the hospital on a new day.
 
   WHY is the trick allowed?  Name the one assumption it leans on.  A fresh crowd would
   be drawn from the world of all possible patients -- a bag I cannot reach.  The pile I

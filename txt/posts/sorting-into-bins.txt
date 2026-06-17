@@ -14,40 +14,60 @@
     <- prev:  [Grading 2: Reading the Dials](reading-the-dials.txt)
        next:  [Sorting 2: The Trade Curve](the-trade-curve.txt) ->
 
-  Every post so far ended with a number: a house worth 2.8, a car that does 18 to the
-  gallon. This one ends with something heavier -- a verdict. Picture the room. A doctor
-  has photographed the cells from a breast lump and measured thirty things about them:
-  size, texture, smoothness. The question on the table is not "how malignant?" It is the
-  one that keeps people up at night: malignant, OR NOT? Two bins. One answer. And a
-  wrong answer that can cost a life.
+  A machine that predicts a price answers with a sliding number.
+  A house worth 2.8.
+  A car that does 18 miles to the gallon.
+  This post answers with something heavier -- a verdict.
+  Picture the room.
+  A doctor has photographed the cells from a breast lump.
+  The doctor measured thirty things about them: size, texture, smoothness.
+  The question on the table is not "how malignant?"
+  It is the one that keeps people up at night: malignant, OR NOT?
+  Two bins.
+  One answer.
+  And a wrong answer that can cost a life.
 
-  The machine still does what it always did -- it brews a sliding number inside. But that
-  number can no longer just be read aloud. It has to be bent into a chance, then chopped
-  into a label, and from here on every choice we make is haunted by which kind of mistake
+  The machine still brews a sliding number inside.
+  But that number can no longer just be read aloud.
+  It has to be bent into a chance.
+  Then that chance has to be chopped into a label.
+  And from here on every choice we make is haunted by which kind of mistake
   we can least afford to make.
 
 
   ## From Number to Bin
 
-    previous posts (number):   ----------*------>   answer = 2.83
+    a number machine:   ----------*------>   answer = 2.83
 
-    this post (bin):           [ B = well ]  [ M = sick ]   answer = ONE box
+    a bin machine:      [ B = well ]  [ M = sick ]   answer = ONE box
 
-  The dial-adding machine can only produce a sliding number. To land in one of two bins it
-  needs two more steps: a SQUASH that bends any number into the range 0-1 (so it reads as a
-  chance), and a CUTOFF that chops that chance into a label.
+  A dial is a weight the machine multiplies each measured column by.
+  The dial-adding machine multiplies each column by its dial, then adds the results.
+  That gives one sliding number.
+  But a sliding number is not a bin.
+  So the machine needs two more things.
+  It needs a SQUASH that bends any number into the range 0 to 1, so it reads as a chance.
+  Then it needs a CUTOFF that chops that chance into a label.
 
     columns -> *dials -> add -> SQUASH -> chance 0-1 -> CUTOFF -> [B] or [M]
 
 
   ## The Squash Curve
 
-  The squash curve has an S-shape. Any real number goes in; a chance between 0 and 1 comes
-  out. The formula:
+  The squash is a function that takes any number and returns a chance between 0 and 1.
+  Its graph has an S-shape, so call it the S-curve.
+  Its standard name is the sigmoid; sigmoid just means S-shaped.
+  Any real number goes in.
+  A chance between 0 and 1 comes out.
+  The formula, writing sig for the squash:
 
       sig(z) = 1 / (1 + e^-z)
 
-  where z is the dial sum: z = b0 + x1*b1 + x2*b2 + ... + x30*b30.
+  Here z is the dial sum: z = b0 + x1*b1 + x2*b2 + ... + x30*b30.
+  Each x is a measured column.
+  Each b is its dial, the weight that column is multiplied by.
+  b0 is a plain starting number with no column, called the offset.
+  The letter e is a fixed math constant, about 2.718.
 
   Where does that formula come from?  It is not astrology -- derive it from ODDS.
   Odds = chance for, divided by chance against:
@@ -74,9 +94,11 @@
 
     chance        = 1 / (1/e^z + 1)  =  1 / (1 + e^-z)        <- the squash curve
 
-  So the S-curve is nothing but "dial sum sets the odds, odds walked back to a
-  chance."  Check the ends: z huge -> e^-z tiny -> chance near 1.  z hugely
-  negative -> e^-z huge -> chance near 0.  z = 0 -> 1/(1+1) = 0.5, even money.
+  So the S-curve is nothing but "dial sum sets the odds, odds walked back to a chance."
+  Check the ends.
+  z huge -> e^-z tiny -> chance near 1.
+  z hugely negative -> e^-z huge -> chance near 0.
+  z = 0 -> 1 / (1 + 1) = 0.5, even money.
 
   A concrete 4-person worked example, by pencil.  Suppose we have only ONE column
   (bmi) and 4 people:
@@ -115,75 +137,118 @@
      ~= 0.142.  Below the 0.5 cutoff, E is called well -- about a 14-in-100 chance
      of sick.
 
-  At the default cutoff of 0.5: if the chance is >= 0.5, call sick; below 0.5, call well.
-  Patient A (chance 0.500) is exactly at the fence -- essentially 50/50.  Patients B, C, D
-  are called well.  The machine also does something deeper: the linear sum z before the
-  squash is the LOG-ODDS (the natural log of the odds, where odds = chance-sick divided by
-  chance-well):
+  A cutoff is the chance value where you switch the label.
+  The default cutoff is 0.5.
+  If the chance is 0.5 or more, call sick.
+  If the chance is below 0.5, call well.
+  Patient A has chance 0.500, exactly at the fence -- essentially 50/50.
+  Patients B, C, D have chances 0.354, 0.083, 0.015, all below 0.5, so all called well.
+
+  The dial sum z before the squash has its own name: the LOG-ODDS.
+  Log-odds means the natural log of the odds.
+  Odds here = chance-sick divided by chance-well.
+  Natural log means log to base e, the inverse of e^z.
+  Writing beta for the whole list of dials, and x for the list of columns:
 
       log( P(sick|x) / P(well|x) ) = b0 + x^T beta
 
-  Each dial beta_j is the change in log-odds per one-unit step in its column, holding the
-  other 29 fixed.  For person A, log-odds = 0 means P(sick) = P(well) = 0.5.
+  P(sick|x) reads "chance of sick given the columns x"; P(well|x) is chance of well.
+  x^T beta is shorthand for x1*b1 + x2*b2 + ... + x30*b30, the dial sum without b0.
+  Each dial beta_j is the change in log-odds per one-unit move in its column,
+  with the other 29 columns held fixed.
+  For person A the dial sum was z = 0, so log-odds = 0.
+  Log-odds 0 means odds = 1, which means P(sick) = P(well) = 0.5.
 
 
   ## Setting the Dials: What the Machine Minimises
 
-  In the straight-stick rule the machine minimised squared leftovers (MSE). Here the
-  answer is a label (0 or 1), so squared distance is the wrong ruler. Instead the machine
-  maximises the likelihood of the observed labels, which is the same as minimising a
-  CROSS-ENTROPY leftover:
+  A machine that predicts a number scores itself by squared leftovers.
+  A leftover is the gap between the truth and the guess.
+  Squared leftovers means: take each gap, square it, add them up; this is called MSE,
+  the mean squared error.
+  That ruler fits a number answer.
+  But here the answer is a label, 0 or 1, not a number.
+  So squared distance is the wrong ruler.
+  Instead the machine maximises the likelihood of the observed labels.
+  Likelihood means how probable the real labels are under the machine's chances.
+  Maximising that is the same as minimising a CROSS-ENTROPY leftover.
+  Cross-entropy is a score that punishes a confident wrong chance very hard.
+  Writing y for the true label (0 or 1) and n for the number of lumps:
 
       L(beta) = -(1/n) sum [ y*log sig(z) + (1-y)*log(1-sig(z)) ]
 
-  For a lump that is truly sick (y=1): if the machine outputs chance ~= 1, log(~1) ~= 0 --
-  small leftover. If it outputs chance ~= 0 on a sick lump, log of near-zero drops to
-  bottomless -- enormous leftover. The leftover punishes confidence in the wrong direction. There is no
-  closed-form minimiser; the dials are found by rolling downhill through the gradient:
+  Take a lump that is truly sick, so y = 1.
+  If the machine outputs chance near 1, then log(near 1) is near 0 -- a small leftover.
+  If it outputs chance near 0 on that sick lump, then log of near-zero drops to bottomless.
+  That is an enormous leftover.
+  So the leftover punishes confidence in the wrong direction.
+
+  There is no formula that hands you the best dials in one shot.
+  So the dials are found by rolling downhill through the gradient.
+  The gradient is the list of slopes telling each dial which way lowers the leftover.
 
     gradient of L w.r.t. beta:   (1/n) X^T ( sig(X*beta) - y )
 
     each step:  beta <- beta - a * gradient   (a = step size)
 
-  Count the clerk-steps for ONE downhill step.  Per lump: 30 multiplies and 30 adds
-  for the dial sum z, one squash and one subtraction, then 30 multiplies and 30 adds
-  for the gradient -- call it 125 strokes.  The Wisconsin sheet holds 569 lumps, so
-  one step costs 569 x 125 = 71,125 strokes, and a thousand steps run near 71 million.
+  Here X is the whole table of columns, and a is the step size, how far each move goes.
+  Each move nudges every dial a little against its slope, lowering the leftover.
+
+  Count the clerk-strokes for ONE downhill move.
+  Per lump: 30 multiplies and 30 adds for the dial sum z.
+  Then one squash and one subtraction.
+  Then 30 multiplies and 30 adds for the gradient -- call it 125 strokes.
+  The Wisconsin sheet holds 569 lumps.
+  So one move costs 569 x 125 = 71,125 strokes.
+  And a thousand moves run near 1000 x 71,125 = 71 million strokes.
   That is why the clerks, not you, hold the pencils here.
 
-  In code it is the same two-step as before -- make an empty machine, show it the study
-  pile -- and that code waits at the end of the post.
+  In code this is two lines.
+  One line makes an empty machine.
+  One line shows it the study pile so it rolls the dials downhill.
+  That code waits at the end of the post.
 
   >> NOTE: WHY SCALED INPUTS?
-     The gradient update moves every dial by the same step size times its column's values.
-     A column measured in thousands (area ~= 1000) takes dial steps 1000x larger than one
-     measured in hundredths (smoothness ~= 0.1). The machine lurches around the large
-     column's dial and barely moves the small one's. Put every column on the same ruler
-     first -- mean 0, spread 1 -- and the step sizes become comparable.
+     The downhill move changes every dial by the step size times its column's values.
+     A column measured in thousands (area ~= 1000) takes dial moves 1000x larger
+     than one measured in hundredths (smoothness ~= 0.1).
+     So the machine lurches around the large column's dial.
+     And it barely moves the small column's dial.
+     Put every column on the same ruler first -- mean 0, spread 1.
+     Then the move sizes become comparable.
 
-     The ruler touches the measured columns (X) ONLY -- never the answer y. y is already
-     a clean 0 or 1; it is the key you grade against, not a measurement that needs a ruler.
-     Run a mean-and-spread ruler over the 0/1 column and you smear the answer key into
-     fractions, which is why the scaler is fit and applied to X_train / X_test alone.
+     Scaling means: shift each column so its average is 0, then divide so its spread is 1.
+     The ruler touches the measured columns X ONLY -- never the answer y.
+     y is already a clean 0 or 1.
+     y is the key you grade against, not a measurement that needs a ruler.
+     Run a mean-and-spread ruler over the 0/1 column and you smear the answer key
+     into fractions.
+     So the scaler is fit and applied to X_train and X_test alone.
 
 
   ## Encoding the Labels
 
-  A machine eats numbers, but the sheet holds letters: M (malignant) and B (benign). The
-  translation is a shelf: M->1, B->0. The bin you are HUNTING gets the 1 -- here that is
-  the sick lump, because recall, precision, and every score in this post count the sick
-  detections. (The one-line shelf that does this M->1, B->0 swap is in the code at the end,
-  along with a warning about running it twice.)
+  A machine eats numbers.
+  But the sheet holds letters: M for malignant, B for benign.
+  Malignant means the sick lump; benign means the well lump.
+  The translation is a shelf: M->1, B->0.
+  The bin you are HUNTING gets the 1.
+  Here the hunted bin is the sick lump.
+  That is because every score in this post counts the sick detections.
+  Recall counts them, precision counts them, F1 counts them; those scores are defined below.
+  The one-line shelf that does this M->1, B->0 swap is in the code at the end,
+  along with a warning about running it twice.
 
 
   ## The Four-Box Table
 
-  IN HAND: a machine that adds 30 dialed columns into z, squashes z into a chance
-  (z = 0 gives 1 / (1 + 1) = 0.5, even money), and chops at a cutoff of 0.5; labels
-  on the shelf, M->1, B->0.  This section adds: a table counting the four ways a
-  verdict can land.
+  IN HAND so far: a machine that adds 30 dialed columns into a number z.
+  It squashes z into a chance with sig(z) = 1 / (1 + e^-z); z = 0 gives 0.5, even money.
+  It chops that chance at a cutoff of 0.5: chance 0.5 or more is sick, below 0.5 is well.
+  Labels sit on the shelf M->1, B->0, so 1 means sick and 0 means well.
+  This section adds a table counting the four ways a verdict can land.
 
-  Every exam lump lands in exactly one of four boxes based on truth and guess:
+  Every exam lump lands in exactly one of four boxes, set by truth and guess:
 
                    guess SICK(1)    guess WELL(0)
     truth SICK(1)  CAUGHT         | MISSED         <- deadly if large
@@ -210,15 +275,35 @@
     truth SICK     2 (CAUGHT)     0 (MISSED)      <- 2 truly sick
     truth WELL     1 (ALARM)      1 (CLEAR)        <- 2 truly well
 
+  Name the four boxes once.
+  CAUGHT = truly sick and guessed sick (the win).
+  MISSED = truly sick but guessed well (the deadly miss).
+  ALARM  = truly well but guessed sick (the false alarm).
+  CLEAR  = truly well and guessed well (the other win).
+
+  Now four scores, each defined the first time, then computed from these counts.
+
+  Accuracy = share of all guesses that were right = (CAUGHT + CLEAR) / everyone.
+
     accuracy  = (2 + 1) / 4 = 3/4 = 0.75
+
+  Recall = of the truly sick, the share the machine caught = CAUGHT / (CAUGHT + MISSED).
+
     recall    = 2 / (2 + 0) = 2/2 = 1.00   (caught every sick person)
+
+  Precision = of those it called sick, the share that really were = CAUGHT / (CAUGHT + ALARM).
+
     precision = 2 / (2 + 1) = 2/3 = 0.67   (but 1 healthy person was alarmed)
+
+  F1 = one score that blends precision and recall = 2*precision*recall / (precision + recall).
+
     F1        = 2*0.67*1.00 / (0.67 + 1.00) = 1.34 / 1.67 = 0.80
 
-    The machine caught 2/2 sick people (recall=1.00) but at the cost of 1 false
-    alarm (precision=0.67).  The four-box table shows EXACTLY which mistake
-    happened: look at the bottom-left box (ALARM) and you see the cost in plain
-    light, not buried inside a single percentage.
+    The machine caught 2 of 2 sick people, so recall = 1.00.
+    But it raised 1 false alarm, so precision = 0.67.
+    The four-box table shows EXACTLY which mistake happened.
+    Look at the bottom-left box, ALARM, and you see the cost in plain light.
+    It is not buried inside a single percentage.
 
   >> YOUR TURN
      A bigger exam pile (made-up): 10 lumps land as CAUGHT 4, MISSED 1, ALARM 2,
@@ -229,123 +314,168 @@
      4/6 ~= 0.67;  F1 = 2 * 0.80 * 0.67 / (0.80 + 0.67) = 1.072 / 1.47 ~= 0.73.
      This machine let 1 sick lump walk out the door -- recall 0.80 says so first.
 
-  CAUGHT is the ideal: a sick lump correctly flagged. MISSED is the catastrophe: cancer
-  goes home untreated. ALARM is the waste: a healthy person gets a scare and an
-  unnecessary biopsy. CLEAR is the other good outcome. Drawing this table from the guesses
-  -- and the easy-to-miss gotcha about which way round sklearn wants the arguments -- is in
-  the code at the end.
+  CAUGHT is the ideal: a sick lump correctly flagged.
+  MISSED is the catastrophe: cancer goes home untreated.
+  ALARM is the waste: a healthy person gets a scare and an unnecessary biopsy.
+  CLEAR is the other good outcome: a well lump correctly left alone.
+  Drawing this table from the guesses is in the code at the end.
+  So is the easy-to-miss gotcha about which way round sklearn wants the arguments.
 
 
   ## Four Scores, Four Angles
 
-  IN HAND: a four-box table; on the 4-lump pile the boxes held CAUGHT 2, MISSED 0,
-  ALARM 1, CLEAR 1 -- 2 + 0 + 1 + 1 = 4, every lump counted once.  This section
-  adds: four scores, each reading a different slice of those boxes.
+  IN HAND so far: a four-box table.
+  On the 4-lump pile the boxes held CAUGHT 2, MISSED 0, ALARM 1, CLEAR 1.
+  Check the total: 2 + 0 + 1 + 1 = 4, every lump counted once.
+  This section adds four scores, each reading a different slice of those boxes.
 
-  No single score summarises what a bin-sorter actually does. The four scores each look at
-  a different slice of the four-box table:
+  No single score summarises what a bin-sorter actually does.
+  So use four scores, each reading a different slice of the four-box table.
+  Each is repeated here so you need not scroll back:
 
-    accuracy  = (CAUGHT + CLEAR) / everyone
-    recall    =  CAUGHT / (CAUGHT + MISSED)      <- top row: share of sick caught
-    precision =  CAUGHT / (CAUGHT + ALARM)       <- left col: when we cry sick, real sick?
-    F1        =  2 * precision * recall / (precision + recall)
+    accuracy  = (CAUGHT + CLEAR) / everyone        <- share of all guesses that were right
+    recall    =  CAUGHT / (CAUGHT + MISSED)        <- top row: share of sick caught
+    precision =  CAUGHT / (CAUGHT + ALARM)         <- left col: when we cry sick, real sick?
+    F1        =  2 * precision * recall / (precision + recall)   <- blend of the two
+
+  The standard names for the four boxes use TP, FP, FN, TN.
+  TP = true positive = CAUGHT = truly sick, guessed sick.
+  FP = false positive = ALARM = truly well, guessed sick.
+  FN = false negative = MISSED = truly sick, guessed well.
+  TN = true negative = CLEAR = truly well, guessed well.
+  P stands for precision and R for recall in the F1 line below; n is the number of lumps.
 
     Score       Formula (counts)        Punishes
     ---------   ---------------------   ----------------------------
     accuracy    (TP + TN) / n           any wrong answer equally
     recall      TP / (TP + FN)          MISSED (deadly)
     precision   TP / (TP + FP)          ALARM (wasteful)
-    F1          2PR / (P + R)           either metric being low
+    F1          2PR / (P + R)           either score being low
 
-  All four come straight from the four-box counts; the code that reads them off is at the
-  end of the post.
+  All four come straight from the four-box counts.
+  The code that reads them off is at the end of the post.
 
 
   ## Why Accuracy Alone Lies
 
-  Now the most important paragraph in the post. The Wisconsin sheet has roughly 63%
-  benign lumps. So a machine that learns nothing whatsoever -- no dials, no squash, just
-  one lazy constant shout of "well, well, well" -- walks away with 63% accuracy. On paper
-  it looks like it is passing. In the exam room it is a catastrophe: it never once catches
-  a sick person. Accuracy counted every box the same, so a MISSED cancer weighed exactly
-  as much as a needless ALARM. But those two mistakes are not equal, and pretending they
-  are is how people get hurt.
+  Now the most important paragraph in the post.
+  Recall: accuracy = share of all guesses that were right = (CAUGHT + CLEAR) / everyone.
+  The Wisconsin sheet has roughly 63% benign lumps, that is 63% well.
+  So picture a machine that learns nothing whatsoever -- no dials, no squash.
+  It just shouts one lazy constant: "well, well, well".
+  It is right on every well lump, which is 63% of the pile.
+  So it walks away with 63% accuracy.
+  On paper it looks like it is passing.
+  In the exam room it is a catastrophe.
+  It never once catches a sick person.
+  Accuracy counted every box the same.
+  So a MISSED cancer weighed exactly as much as a needless ALARM.
+  But those two mistakes are not equal.
+  And pretending they are is how people get hurt.
 
-    fool machine: predict B for everything
+    fool machine: predict B (well) for everything
     accuracy  = 0.63   <- looks decent
-    recall    = 0.00   <- catches nobody
-    precision = N/A    <- never shouts sick, no CAUGHT, undefined
+    recall    = 0.00   <- catches nobody (CAUGHT = 0, so 0 / total sick = 0)
+    precision = N/A    <- never shouts sick, no CAUGHT and no ALARM, so 0/0, undefined
 
   ** KEY: IN CANCER SCREENING, RECALL IS THE NORTH STAR
-     Missing a sick person is the catastrophe. You can tolerate some ALARM (extra biopsies
-     cost money, not lives). So the first score to check is recall -- how large a share of
-     the sick lumps does the machine catch? Accuracy tells you nothing about which mistake
-     you are making.
+     Recall = of the truly sick, the share the machine caught = CAUGHT / (CAUGHT + MISSED).
+     Missing a sick person is the catastrophe.
+     You can tolerate some ALARM, since extra biopsies cost money, not lives.
+     So the first score to check is recall.
+     It tells you how large a share of the sick lumps the machine catches.
+     Accuracy tells you nothing about which mistake you are making.
 
 
   ## Common Tripwires I Caught
 
-  These are the exact wrong pictures that cost me real time.  Each one
-  stopped me cold until I drew the concrete shape of the mistake:
+  These are the exact wrong pictures that cost me real time.
+  Each one stopped me cold until I drew the concrete shape of the mistake.
+  A few names below belong to later posts; each is defined right where it appears,
+  so nothing here needs another post.
 
     TRIPWIRE 1:  Extra brackets around the scaler input -> 3D error
        WRONG: scaler.fit([X_train])
        RIGHT: scaler.fit(X_train)
        The error says "Found array with dim 3. StandardScaler expected <= 2."
-       Wrapping X_train in [ ] adds a third layer.  The scaler expects a
-       2D table (rows x columns), not a 2D table inside a list.
+       Wrapping X_train in [ ] adds a third layer.
+       The scaler expects a 2D table, rows by columns.
+       It does not expect a 2D table inside a list.
 
-    TRIPWIRE 2:  Running Stage 2 twice -> map fails -> NaN -> crash
+    TRIPWIRE 2:  Running the label-swap cell twice -> map fails -> NaN -> crash
        WRONG: run the M->1, B->0 cell a second time.
        RIGHT: restart the kernel and run all cells top-to-bottom once.
-       First run: 'M' 'B' 'M' -> map works -> 1 0 1 (int64)
-       Second run: 1 0 1 -> map finds no 'M' or 'B' -> NaN -> float -> crash.
+       First run: 'M' 'B' 'M' -> map works -> 1 0 1 (whole numbers).
+       Second run: 1 0 1 -> map finds no 'M' or 'B' -> NaN.
+       NaN means "not a number", an empty marker.
+       NaN poisons every later step.
        There is no shortcut after NaN has landed.
 
     TRIPWIRE 3:  Predicting on raw X instead of scaled X
        WRONG: log_reg.predict(X_test)
        RIGHT: log_reg.predict(X_test_scaled)
-       The machine set its dials on scaled numbers.  Raw numbers send
-       it into a different space -- the dials misfire.
+       Scaled means each column shifted to average 0 and spread 1.
+       The machine set its dials on scaled numbers.
+       Raw numbers send it into a different space.
+       So the dials misfire.
 
     TRIPWIRE 4:  confusion_matrix order -- truth first, guess second
        WRONG: confusion_matrix(y_pred, y_test)
        RIGHT: confusion_matrix(y_test, y_pred)
-       sklearn always wants: tool(truth, guess) -- same order as
-       accuracy_score, recall_score, etc.  Swapping flips the grid.
+       sklearn always wants the truth first and the guess second.
+       That is the same order as accuracy_score and recall_score.
+       Swapping the two flips the grid.
 
     TRIPWIRE 5:  predict_proba column 0 vs column 1
        WRONG: y_proba = model.predict_proba(...)[:, 0]
        RIGHT: y_proba = model.predict_proba(...)[:, 1]
-       Column 0 = P(well).  Column 1 = P(sick) -- the one you want.
-       Using column 0 makes sick people score LOW and well people HIGH,
-       flipping the ROC curve below the diagonal and AUC < 0.5.
+       Column 0 = P(well), the chance of well.
+       Column 1 = P(sick), the chance of sick -- the one you want.
+       Using column 0 makes sick people score LOW and well people HIGH.
+       The ROC curve is the plot of true-positive rate against false-positive rate
+       as you slide the cutoff; AUC is the area under that curve, from 0 to 1, where
+       higher is better and 0.5 is coin-flip.
+       Flipping the columns drops the ROC curve below the diagonal, so AUC falls below 0.5.
 
     TRIPWIRE 6:  C=0.1 is heavy punishment, not light
-       WRONG: C small = light leash (sounds like "small = mild")
-       RIGHT: C = 1/lambda.  Small C -> large lambda -> heavy squeeze.
-       C=0.1 -> lambda=10, a tight leash.  C=1000 -> lambda=0.001, nearly free.
+       WRONG: C small = light leash (sounds like "small = mild").
+       RIGHT: lambda is the strength of the penalty that shrinks the dials toward 0.
+       C is sklearn's knob for that penalty, and C = 1/lambda.
+       So small C means large lambda, which means a heavy squeeze.
+       C = 0.1 -> lambda = 10, a tight leash.
+       C = 1000 -> lambda = 0.001, nearly free.
 
     TRIPWIRE 7:  Scaling and L2 are not the same thing
        WRONG: "I scaled the columns, so the dials are already under control."
-       RIGHT: Scaling fixes the INPUTS (columns on one ruler).  L2 fixes the
-       DIALS (no single dial dominates).  Even after scaling, a dial can grow
-       huge if the machine over-trusts one column.  Both are needed.
+       RIGHT: L2 is the penalty that adds the sum of the squared dials to the leftover,
+       which pushes every dial toward 0 so no single one dominates.
+       Scaling fixes the INPUTS, putting columns on one ruler.
+       L2 fixes the DIALS, keeping no single dial from dominating.
+       Even after scaling, a dial can grow huge if the machine over-trusts one column.
+       So both are needed.
 
     TRIPWIRE 8:  predict vs predict_proba
        WRONG: use predict for the ROC curve (gives only 0 and 1).
        RIGHT: use predict_proba (gives the raw chance before any cutoff).
-       predict gives two unique values -> ROC curve has two dots -> useless.
+       The ROC curve is the plot of true-positive rate against false-positive rate
+       as the cutoff slides.
+       predict gives two unique values -> the ROC curve has two dots -> useless.
        predict_proba gives a different number per row -> the full sweep.
 
 
   ## F1: Why the Harmonic Mean
 
-  F1 is the harmonic mean of precision and recall, not the arithmetic mean. The harmonic
-  mean is dominated by whichever value is smaller. If recall = 0.98 but precision = 0.10,
-  the arithmetic average is 0.54 (looks okay); the harmonic mean F1 = 0.18 (correctly
-  punishes the terrible precision). F1 collapses toward zero when either score is near
-  zero -- you cannot paper over one bad score with one great score.
+  Recall the two scores F1 blends.
+  Precision = of those it called sick, the share that really were.
+  Recall = of the truly sick, the share it caught.
+  F1 is the harmonic mean of precision and recall, not the plain average.
+  The plain average, the arithmetic mean, adds two numbers and halves them.
+  The harmonic mean is pulled down hard by whichever value is smaller.
+  Take recall = 0.98 but precision = 0.10.
+  The plain average is (0.10 + 0.98) / 2 = 0.54, which looks okay.
+  The harmonic mean F1 = 0.18, which correctly punishes the terrible precision.
+  So F1 collapses toward zero when either score is near zero.
+  You cannot paper over one bad score with one great score.
 
     F1 = 2 * P * R / (P + R)
 
@@ -356,11 +486,14 @@
 
   ## The Code, If You Want It
 
-  Nothing above needed a computer -- only pencils, clerks, and patience.  This last
-  section is for the day you meet one: the same steps, spoken in Python.
+  Nothing above needed a computer -- only pencils, clerks, and patience.
+  This last section is for the day you meet a computer: the same work, spoken in Python.
 
-  Four short steps, start to finish: turn the M/B letters into 1/0, fit the S-curve machine
-  on scaled inputs, build the four-box table, then read the four scores off it.
+  Start to finish, the work has four short parts.
+  First, turn the M/B letters into 1/0.
+  Then fit the S-curve machine on scaled inputs.
+  Then build the four-box table.
+  Then read the four scores off it.
 
   >> NEW TO PYTHON? Each named once:
        df['col']          -- pull one named column out of a table (a pandas DataFrame)
@@ -374,10 +507,12 @@
     y = df['diagnosis']                # 0 or 1
 
   !! WARN: RUN THE MAP CELL ONLY ONCE
-     If you run the encoding cell a second time, the column already holds 0 and 1. The map
-     searches for 'M' and 'B' -- finds nothing -- returns all NaN. NaN is a float; every
-     downstream step breaks. Fix: restart the kernel and run top-to-bottom once. There is
-     no shortcut after the NaN has landed.
+     Run the encoding cell a second time and the column already holds 0 and 1.
+     The map searches for 'M' and 'B', finds nothing, and returns all NaN.
+     NaN means "not a number", an empty marker.
+     Every later step breaks on NaN.
+     Fix: restart the kernel and run top-to-bottom once.
+     There is no shortcut after the NaN has landed.
 
   Fit the machine on scaled inputs:
 
@@ -393,9 +528,10 @@
                   [ MISSED CAUGHT ]]   <- truth sick  (row 1)
 
   !! WARN: TRUTH FIRST, GUESS SECOND
-     sklearn's confusion_matrix, accuracy_score, recall_score, and precision_score all
-     want (truth, guess) in that order. Swapping them flips rows and columns and
-     misassigns every count.
+     sklearn's confusion_matrix, accuracy_score, recall_score, and precision_score
+     all want the truth first and the guess second.
+     Swapping them flips rows and columns.
+     So it misassigns every count.
 
   Read the four scores off it:
 

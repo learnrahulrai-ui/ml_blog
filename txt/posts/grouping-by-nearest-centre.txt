@@ -14,15 +14,25 @@
     <- prev:  [Chapter 6, Part 2: The Strongest Direction (PCA)](the-strongest-direction-pca.txt)
        next:  [Chapter 6, Part 4: The Family Tree](the-family-tree-clustering.txt) ->
 
-  Part 1 measured the gap between every pair of rows.  Part 2 crushed many columns down
-  to a flat page.  Neither one actually GROUPED anything -- they just measured and drew.
-  This post does the grouping.  Still no answer column: nobody tells us which states or
-  wines belong together.  We have to carve the cloud of dots into K piles ourselves, using
-  nothing but the straight-line gap from Part 1.
+  Every row is a list of numbers.
+  The straight-line gap between two rows is one number that says how far apart they sit.
+  To get it: subtract the two rows column by column.
+  Square each of those differences.
+  Add the squares.
+  Take the square root of that sum.
+  That square root is the straight-line (Euclidean) gap.
 
-  K-means is the simplest grouping machine there is, and the whole thing is two moves
-  repeated until nothing changes: ASSIGN every dot to its nearest centre, then MOVE each
-  centre to the middle of the dots that chose it.  That is it.  Two moves, on a loop.
+  This post does the grouping.
+  There is no answer column: nobody tells us which rows belong together.
+  So we have to carve the cloud of dots into K piles ourselves.
+  We carve it using nothing but that straight-line gap.
+
+  K-means is the simplest grouping machine there is.
+  The whole thing is two moves repeated until nothing changes.
+  MOVE 1 -- ASSIGN every dot to its nearest centre.
+  MOVE 2 -- MOVE each centre to the middle of the dots that chose it.
+  That is it.
+  Two moves, on a loop.
 
   ## The Job
 
@@ -33,38 +43,49 @@
        * *      *  *           ->          [ * * ]   and   [ * * ]   (K = 2 piles)
      *      *  *                          tight pile      tight pile
 
-  You choose K up front -- "I want 3 groups."  The machine does not invent K; it only
-  finds the best K piles once you name the number.  Picking K well is its own problem,
-  and we get to it at the end.
+  You choose K up front -- "I want 3 groups."
+  The machine does not invent K.
+  It only finds the best K piles once you name the number.
+  Picking K well is its own problem.
+  We get to it at the end.
 
   ## The Two Moves
 
-  Start by dropping K centres anywhere (pick K random dots to be the first centres).
+  A centre is one point that stands for a pile.
+  Start by dropping K centres anywhere.
+  To drop them, pick K random dots and call them the first centres.
   Then loop:
 
     MOVE 1 -- ASSIGN.  For every dot, measure its straight-line gap to all K centres.
+              The straight-line gap subtracts column by column, squares, adds, roots.
               The dot joins the pile of its NEAREST centre.
 
-    MOVE 2 -- UPDATE.  For each pile, find the middle (the mean of its dots, column by
-              column).  That mean becomes the pile's new centre.
+    MOVE 2 -- UPDATE.  For each pile, find the middle: the mean of its dots, column
+              by column.  The mean of a list adds the values and divides by how many
+              there are.  That mean becomes the pile's new centre.
 
     repeat ASSIGN, then UPDATE, then ASSIGN, then UPDATE ...
     STOP when no dot changes pile (the centres stop moving)
 
-  Each loop can only make the piles tighter or leave them the same -- never worse.  So it
-  always settles.  The settling point is the answer.
+  Each loop can only make the piles tighter or leave them the same.
+  It never makes them worse.
+  Therefore it always settles.
+  The settling point is the answer.
 
-  Why can UPDATE never make things worse?  Because the mean IS the spot that makes its
-  own pile's squared gaps smallest -- that is what a mean does.  Moving the centre to
-  the mean either lowers the pile's tightness or leaves it alone; it cannot raise it.
-  (A quiz likes to claim "the update step increases the within-group sum of squares" --
-  that is exactly backwards.)
+  Why can UPDATE never make things worse?
+  The mean of a pile is the one spot that makes that pile's squared gaps smallest.
+  That is what a mean does.
+  So moving the centre to the mean either lowers the pile's tightness or leaves it alone.
+  It cannot raise it.
+  (A quiz likes to claim "the update step increases the within-group sum of squares."
+  That is exactly backwards.)
 
   >> NOTE: COMPARE SQUARED GAPS -- SKIP THE SQUARE ROOT
-     ASSIGN only asks WHICH centre is nearest, never HOW FAR.  If gap A-squared is
-     smaller than gap B-squared, then gap A is smaller than gap B -- squaring keeps
-     the order.  So the machine compares squared gaps directly and never takes a
-     root.  Same winner, less arithmetic.
+     ASSIGN only asks WHICH centre is nearest, never HOW FAR.
+     If gap A-squared is smaller than gap B-squared, then gap A is smaller than gap B.
+     Squaring keeps the order.
+     So the machine compares squared gaps directly and never takes a root.
+     Same winner, less arithmetic.
 
   ## A Worked Example, by Hand
 
@@ -92,7 +113,8 @@
 
     Final piles:  {1, 2, 3}  and  {10, 11, 12}.  Centres 2 and 11.
 
-  The machine found the two obvious clumps on its own, with no answer key.
+  The machine found the two obvious clumps on its own.
+  It used no answer key.
 
   >> YOUR TURN
      A seventh dot walks in at 5.  The settled centres are 2 and 11.  Which pile does
@@ -108,15 +130,21 @@
   loop; the settled centres are mean(1,2,3) = 6/3 = 2 and mean(10,11,12) = 33/3 = 11.
   This section adds: one number that says how GOOD that grouping is.
 
-  How good is a grouping?  Measure how tight the piles are.  For every dot, take its
-  squared gap to its OWN centre, and add them all up:
+  How good is a grouping?
+  Measure how tight the piles are.
+  For every dot, take its squared gap to its OWN centre.
+  Then add them all up.
+  Tightness is this total, and its standard name is inertia.
 
     tightness = sum over all dots of (gap from dot to its centre)^2
 
     small tightness = dots hug their centres = tight, good piles
     big tightness   = dots sprawl far from their centres = loose, poor piles
 
-  Foot it on the six dots.  Pile A first, centre mean(1,2,3) = 6/3 = 2:
+  Foot it on the six dots.
+  Pile A first.
+  Pile A holds dots {1, 2, 3}.
+  Its centre is mean(1,2,3) = 6/3 = 2:
 
     dot    gap to centre 2    squared
     -----------------------------------
@@ -133,23 +161,32 @@
      12 - 11 = 1, squared 1;  pile B sum = 1 + 0 + 1 = 2.  Whole grouping:
      2 + 2 = 4.  Four is the number the two moves were driving down all along.
 
-  K-means is just the machine that drives this one number as low as it can, by the two
-  moves on a loop.  This is the same "bottom of the bowl" idea from Chapter 1 -- squared
-  misses, pushed to their smallest -- only now the "miss" is a dot's gap from its centre,
-  and there is no answer column anywhere.
+  K-means is just the machine that drives this one number as low as it can.
+  It drives it down by the two moves on a loop.
+  The number is the total of squared gaps from dots to their centres.
+  Recall the six dots {1,2,3} and {10,11,12} settle at 2 + 2 = 4.
+  The machine pushes that total of squared gaps to its smallest reachable value.
+  Here the "miss" being squared is a dot's gap from its centre.
+  There is no answer column anywhere.
 
   ## The Catch: Where You Drop the First Centres Matters
 
-  K-means settles, but it can settle into a BAD grouping if the starting centres were
-  unlucky.  It finds a low point, not always the LOWEST point.
+  K-means always settles.
+  But it can settle into a BAD grouping if the starting centres were unlucky.
+  It finds a low point.
+  It does not always find the LOWEST point.
 
     unlucky start:  two centres land inside the same clump
                     -> the machine splits one real clump in half and merges two others
                     -> it settles, but the piles are wrong
 
-  The fix is cheap: run the whole thing several times from different random starts, and
-  keep the run with the smallest tightness.  The toolbox does this for you (n_init), and
-  a smarter starting trick (k-means++) spreads the first centres far apart on purpose.
+  The fix is cheap.
+  Run the whole thing several times from different random starts.
+  Keep the run with the smallest tightness.
+  The total of squared gaps from dots to their own centres is that tightness.
+  The toolbox does this for you; the setting is named n_init.
+  There is also a smarter starting trick named k-means++.
+  K-means++ spreads the first centres far apart on purpose, so an unlucky start is rarer.
 
   ## Choosing K: The Elbow
 
@@ -158,8 +195,10 @@
   unlucky start can trap the machine in a poor low spot.  This section adds: how to
   choose K itself.
 
-  You picked K by hand -- but which K?  Run K-means for K = 1, 2, 3, 4, 5, ... and plot
-  the tightness for each:
+  You picked K by hand.
+  But which K?
+  Run K-means for K = 1, 2, 3, 4, 5, ... and plot the tightness for each.
+  Tightness is the total of squared gaps from dots to their own centres.
 
     tightness |*
               | \
@@ -170,20 +209,27 @@
               +------------------------- K
                 1   2   3   4   5   6
 
-  Tightness always drops as K grows (more centres -> dots sit closer to one).  At K = the
-  number of real clumps, the drop suddenly flattens -- adding more centres barely helps.
-  That bend is the ELBOW, and it is your best guess at the true number of groups.
+  Tightness always drops as K grows.
+  More centres means each dot can sit closer to one.
+  At K equal to the number of real clumps, the drop suddenly flattens.
+  Adding more centres past that point barely helps.
+  That bend in the curve is the ELBOW.
+  The elbow is your best guess at the true number of groups.
 
   >> NOTE: THE ELBOW IS A JUDGEMENT CALL, NOT A FORMULA
-     There is no equation that spits out "K = 3."  You look at the bend and decide.
-     Sometimes the bend is sharp and obvious; sometimes it is a gentle curve with no
-     clear corner, and reasonable people pick different K.  That is honest -- with no
-     answer column, there is no single right number of groups.
+     There is no equation that spits out "K = 3."
+     You look at the bend and decide.
+     Sometimes the bend is sharp and obvious.
+     Sometimes it is a gentle curve with no clear corner.
+     Then reasonable people pick different K.
+     That is honest: with no answer column, there is no single right number of groups.
 
-     If "big vs small by eye" feels like astrology, there is a judgement-free trick:
-     lay a ruler from the FIRST dot of the curve to the LAST dot, then measure how far
-     each dot sags below that ruler.  The dot with the BIGGEST sag is the elbow.  The
-     two endpoints always sag zero, so the answer is forced to sit somewhere in between.
+     If "big vs small by eye" feels like astrology, there is a judgement-free trick.
+     Lay a ruler from the FIRST dot of the curve to the LAST dot.
+     Then measure how far each dot sags below that ruler.
+     The dot with the BIGGEST sag is the elbow.
+     The two endpoints always sag zero.
+     So the answer is forced to sit somewhere in between.
 
   ## A Second Ruler: How Well Does Each Dot Fit Its Pile?
 
@@ -191,15 +237,21 @@
   dots foot to 2 + 2 = 4), and an elbow to squint at on the tightness curve.  This
   section adds: a second ruler, read per dot, with a peak instead of a bend.
 
-  The elbow reads ONE number for the whole grouping (total tightness) and asks you to
-  eyeball a bend.  There is a second, sharper question you can ask of EVERY single dot:
+  The elbow reads ONE number for the whole grouping: total tightness.
+  Total tightness is the sum of squared gaps from dots to their own centres.
+  The elbow then asks you to eyeball a bend.
+  There is a second, sharper question you can ask of EVERY single dot.
 
     "Are you snug in your own pile -- or would the pile next door fit you better?"
 
-  For one dot, compute two averages:
+  For one dot, compute two averages.
+  The straight-line gap here subtracts column by column, squares, adds, roots.
 
     a = average gap from this dot to its OWN pile-mates        (how far from home)
     b = average gap from this dot to the NEAREST OTHER pile    (how far to next door)
+
+  Then form the fit score from a and b.
+  The fit score's standard name is the silhouette.
 
     fit score = (b - a) / whichever of a, b is bigger
 
@@ -207,7 +259,8 @@
     near  0   ->  home and next door are the same distance.  on the fence.
     negative  ->  next door is CLOSER than home.  this dot is in the WRONG pile.
 
-  By hand, on the six dots from before ({1,2,3} and {10,11,12}):
+  By hand, on the six dots from before.
+  The two piles are {1,2,3} and {10,11,12}:
 
     dot 1:  a = avg gap to {2,3}        = (1 + 2) / 2        = 1.5
             b = avg gap to {10,11,12}   = (9 + 10 + 11) / 3  = 10
@@ -217,7 +270,9 @@
             b = avg gap to {10,11,12}   = (7 + 8 + 9) / 3    = 8
             fit = (8 - 1.5) / 8    = 0.81      <- the pile's edge dot, still snug
 
-  Average the fit score over ALL dots and you get one number for the whole grouping.
+  Average the fit score over ALL dots.
+  That average is one number for the whole grouping.
+  Its standard name is the mean silhouette score.
   Now run K-means for K = 2, 3, 4, 5 ... and plot that average:
 
     avg fit |        *
@@ -228,8 +283,9 @@
             +--------------------- K
                2    3    4    5
 
-  No bend to squint at -- you just pick the K with the HIGHEST peak.  A clean
-  maximum instead of a fuzzy corner.
+  No bend to squint at.
+  You just pick the K with the HIGHEST peak.
+  A clean maximum instead of a fuzzy corner.
 
   ** KEY: TWO RULERS, SAME QUESTION, PICK DIFFERENTLY
      The elbow reads TIGHTNESS (squared gaps to centres) and you hunt a BEND.
@@ -238,18 +294,23 @@
      and the peak is the easier read.  When both agree on K, trust it.
 
   >> NOTE: THE FIT SCORE STARTS AT K = 2, NOT K = 1
-     With one pile there is no "next door" -- b does not exist, so the score is
-     undefined.  The elbow curve can start at K = 1; the fit-score curve cannot.
+     With one pile there is no "next door."
+     So b does not exist.
+     Therefore the score is undefined.
+     The elbow curve can start at K = 1.
+     The fit-score curve cannot.
      That is why the loop below runs K = 2 upward.
 
-  One more read the fit score gives for free: average it PER PILE, not just overall.
+  One more read the fit score gives for free.
+  Average it PER PILE, not just overall.
   A whole pile averaging near 0 means that entire pile straddles the border with its
-  neighbour -- two piles drawn where the data holds one.
+  neighbour.
+  That is two piles drawn where the data holds one.
 
   ## What Makes ANY Grouper Good
 
-  Before the tripwires, the yardstick that outlives K-means.  Whatever grouping
-  machine you ever meet, it is judged on the same short list:
+  Before the tripwires, here is the yardstick that outlives K-means.
+  Whatever grouping machine you ever meet, it is judged on the same short list:
 
     within a pile:    look-alikes hugging          -> want gaps SMALL
     between piles:    piles far from each other    -> want gaps BIG
@@ -257,11 +318,15 @@
     bonus:            still runs when the sheet holds a million dots
     never:            depends on an answer column -- there isn't one
 
-  K-means scores well on the million-dots line and fails the bent-crowds line: one
-  gap-to-centre treats every pile as a round, same-size blob.  Crowds shaped like
-  ribbons or crescents get butchered.  The family tree (Part 4, single linkage) chains
-  along bent shapes; there are also machines that fit each pile a lean-and-stretch
-  recipe (Gaussian mixtures) instead of a single centre.
+  K-means scores well on the million-dots line.
+  K-means fails the bent-crowds line.
+  One gap-to-centre treats every pile as a round, same-size blob.
+  So crowds shaped like ribbons or crescents get butchered.
+  A different machine builds a family tree: it joins the two nearest dots, then the
+  next nearest, growing piles by closeness, so it chains along bent shapes.
+  That machine is covered in Part 4 (single linkage), linked below.
+  There are also machines that fit each pile a lean-and-stretch recipe instead of a
+  single centre; these are called Gaussian mixtures.
 
 
   ## Common Tripwires I Caught

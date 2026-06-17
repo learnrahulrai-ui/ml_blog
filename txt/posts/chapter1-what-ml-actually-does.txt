@@ -13,16 +13,20 @@
   PATH . post 1 of 31  (you are at the start -- read top to bottom)
        next:  [House Prices 2: Ask the Closest Rows](neighbor-machine-knn.txt) ->
 
-  Welcome -- this is where the blog begins, and it asks nothing of you but curiosity
-  and a pencil. No prior knowledge, no jargon you have not earned, no hand-waving past
-  the hard parts.
+  Welcome -- this is where the blog begins.
+  It asks nothing of you but curiosity and a pencil.
+  No prior knowledge.
+  No jargon you have not earned.
+  No hand-waving past the hard parts.
 
-  Here is the promise. By the end of this single post you will have built -- by hand, on
-  a real sheet of California house prices -- a machine that guesses the price of a house
-  it has never seen. Not a toy version. The same machinery the textbooks dress up in
-  Greek letters, except we build it first and name it last. Parts 2 and 3
-  then take the two rules apart screw by screw. For now, stand back and see the whole
-  thing at once.
+  Here is the promise.
+  By the end of this single post you will have built a machine that guesses the price of a house it has never seen.
+  You build it by hand, on a real sheet of California house prices.
+  It is not a toy version.
+  It is the same machinery the textbooks dress up in Greek letters.
+  The difference here is that we build it first and name it last.
+  Two later posts then take the two rules apart screw by screw.
+  For now, stand back and see the whole thing at once.
 
   ** KEY: THE 1950 CONTRACT
      Pretend it is 1950.  Print these pages.  Pencils, graph paper, a blackboard --
@@ -51,11 +55,16 @@
      3.8    2.1    42    3.2    890    |   0.9
     +--------- 8 measured columns ----+|  the answer
 
-  20,640 rows. Each row is one California neighbourhood. 8 measured columns. One
-  right-answer column: median house price in $100,000s. The job sounds simple and hides
-  the whole game: build a rule that guesses the right answer for a row it has NEVER seen
-  -- not a row it already studied. Anyone can memorise answers they have been shown. The
-  trick is being right about the houses you have not.
+  The sheet has 20,640 rows.
+  Each row is one California neighbourhood.
+  Each row has 8 measured columns -- things like rooms and income.
+  Each row also has one right-answer column: median house price in $100,000s.
+  So a price of 1.4 means $140,000.
+  The job sounds simple and hides the whole game.
+  The job: build a rule that guesses the right answer for a row it has NEVER seen.
+  That means a row it never studied, not a row it already memorised.
+  Anyone can memorise answers they have been shown.
+  The trick is being right about the houses you have not seen.
 
   !! WARN: .shape IS A PAIR, NOT A PRODUCT
      df.shape returns (n_rows, n_cols) in that fixed order -- (20640, 9) -- never their
@@ -69,18 +78,28 @@
      working pile (80%)   hidden pile (20%)
                           ^ locked away -- read once, at the very end
 
-  Before touching anything else, do the one thing every honest guesser does first: set
-  aside a random 20% of rows and lock them in a drawer. Their right answers must not
-  touch any decision -- not the rule, not any setting, not even how the numbers are
-  prepared. They exist for a single honest check, taken once, at the very end.
+  Before touching anything else, do the one thing every honest guesser does first.
+  Set aside a random 20% of rows and lock them in a drawer.
+  Call this locked-away 20% the hidden pile.
+  Call the other 80% the working pile -- the rows you build the rule from.
+  The hidden pile's right answers must not touch any decision.
+  They must not touch the rule.
+  They must not touch any setting.
+  They must not even touch how the numbers are prepared.
+  They exist for a single honest check, taken once, at the very end.
 
-  Why be so strict? The reason is mechanical, not moral. Any rule checked on the same
-  rows it was built from reports a flattering, false-low mistake -- like grading your own
-  exam with the answer key open. The ask-closest rule at k=1 (a rule we build a few
-  sections down: guess by copying the answer of the single most similar row) makes ZERO
-  mistakes on its own working pile -- every row's most similar row is ITSELF, so it copies
-  its own answer -- and then stumbles on new rows. The drawer is the only number that does
-  not lie.
+  Why be so strict?
+  The reason is mechanical, not moral.
+  Any rule checked on the same rows it was built from reports a flattering, false-low mistake.
+  That is like grading your own exam with the answer key open.
+  Take the ask-closest rule at k=1 as a witness.
+  The ask-closest rule guesses by copying the answer of the most similar working-pile row.
+  Here k=1 means copy the answer of the single most similar row.
+  On its own working pile this rule makes ZERO mistakes.
+  That is because every row's most similar row is ITSELF.
+  So it copies its own true answer every time.
+  But that rule then stumbles on new rows.
+  Which means the drawer is the only number that does not lie.
 
   ** KEY: SHUFFLE FIRST
      Rows often arrive sorted by district. Shuffle with a fixed starting point so the
@@ -90,9 +109,12 @@
 
   ## Rule 1 -- Ask the Closest Rows
 
-  IN HAND: a sheet of 20,640 rows -- 8 measured columns plus one right-answer column
-  (price).  Cut 80/20: working pile = 20,640 x 8/10 = 16,512 rows on the desk; hidden
-  pile = 20,640 - 16,512 = 4,128 rows locked in the drawer.  Now the first guessing rule.
+  IN HAND: a sheet of 20,640 rows.
+  Each row has 8 measured columns plus one right-answer column (price).
+  Cut the rows 80/20 into a working pile and a hidden pile.
+  Working pile = 20,640 x 8/10 = 16,512 rows on the desk.
+  Hidden pile = 20,640 - 16,512 = 4,128 rows locked in the drawer.
+  Now the first guessing rule.
 
     new row ?
         |
@@ -104,13 +126,21 @@
 
       gap(a, b) = sqrt( sum_j (a_j - b_j)^2 )
 
-  One honest IOU, named out loud: this formula is handed to you here, not derived.
-  WHY square-then-root measures distance (it is the ruler-on-graph-paper distance,
-  by Pythagoras) and what goes wrong with it when columns wear different units is
-  exactly Part 2's first job.  For this post, watch it work on small numbers:
+  Read the symbols in that line.
+  a is the new row; b is a working-pile row.
+  a_j is the number in column j of the new row; b_j is the number in column j of the working row.
+  sum_j means add over every column j.
+  So the gap subtracts the two rows column by column, squares each difference, adds them, and takes the square root.
 
-  A concrete 2-column example, by pencil.  New row has (rooms=4, income=3).  Compare
-  to one working row (rooms=5, income=3):
+  One honest IOU, named out loud: this formula is handed to you here, not derived.
+  WHY square-then-root measures distance is its own job for a later post.
+  The short reason: it is the ruler-on-graph-paper distance, by Pythagoras.
+  What goes wrong when columns wear different units is also a later post's job.
+  For this post, watch the formula work on small numbers.
+
+  Here is a 2-column example, by pencil.
+  The new row has (rooms=4, income=3).
+  Compare it to one working row (rooms=5, income=3).
 
     column     a_j (new)   b_j (work)   gap_j = a_j - b_j   gap_j^2
     -----------------------------------------------------------------
@@ -130,9 +160,12 @@
 
     gap = sqrt(52) ~ 7.21
 
-    The first working row (gap=1) is much closer than the second (gap=7.21).
-    If k=1, the guess is the first row's price.  If k=3, we average the 3
-    smallest-gap rows' prices.
+    The first working row has gap=1.
+    The second working row has gap=7.21.
+    So the first row is much closer than the second.
+    k is the count of neighbours we ask.
+    If k=1, the guess is the single closest row's price.
+    If k=3, we average the 3 smallest-gap rows' prices.
 
   >> YOUR TURN (one clerk, one slate)
      Same new row (rooms=4, income=3).  A third working row sits at (rooms=4,
@@ -142,28 +175,44 @@
      sum 0 + 16 = 16;  gap = sqrt(16) = 4.  Of the three working rows the closest
      is still the first (1 < 4 < 7.21) -- at k=1 the guess is that row's price.
 
-  This rule barely deserves the name "machine" -- it builds nothing ahead of time. It
-  just keeps the whole working pile on a shelf and, when a new house walks in, finds the
-  ones most like it and averages what they sold for. The one knob to set by hand is k:
-  how many neighbours to ask. Small k -> too jumpy; large k -> too stiff. The full
-  derivation, and how to find the sweet spot, is in [Part 2](neighbor-machine-knn.txt).
+  This rule barely deserves the name "machine".
+  It builds nothing ahead of time.
+  It just keeps the whole working pile on a shelf.
+  When a new house walks in, it finds the rows most like it.
+  Then it averages what those rows sold for.
+  The one knob to set by hand is k, the count of neighbours to ask.
+  Small k makes the rule too jumpy.
+  Large k makes the rule too stiff.
+  The full derivation, and how to find the sweet spot, is in [Part 2](neighbor-machine-knn.txt).
 
-  Count the clerk-steps for ONE guess, all 8 columns this time: per working row, 8
-  subtractions, 8 squarings, 7 additions, 1 root = 24 strokes; times 16,512 working
-  rows = 16,512 x 24 = 396,288 strokes -- call it four hundred thousand pencil strokes
-  for a single new house.  A room of clerks does it by lunch, but remember the bill:
-  it comes due every time another house walks in.
+  Count the clerk-steps for ONE guess, using all 8 columns this time.
+  Per working row: 8 subtractions, 8 squarings, 7 additions, 1 root.
+  That is 8 + 8 + 7 + 1 = 24 strokes per working row.
+  There are 16,512 working rows.
+  So one guess costs 16,512 x 24 = 396,288 strokes.
+  That is about four hundred thousand pencil strokes for a single new house.
+  A room of clerks does it by lunch.
+  But remember the bill: it comes due every time another house walks in.
 
 
   ## Measuring How Wrong: RMSE
 
-  A guesser is only as good as its misses are small -- so before trusting any rule we
-  need an honest way to size up how wrong it is. Leftover for one row: r_i = y_i - yhat_i
-  (right answer minus guess).
+  A guesser is only as good as its misses are small.
+  So before trusting any rule we need an honest way to size up how wrong it is.
+  Define the leftover for one row.
+  Leftover r_i = y_i - yhat_i.
+  Here y_i is the row's true answer and yhat_i is the rule's guess for that row.
+  So the leftover is right answer minus guess.
 
       RMSE = sqrt( (1/n) sum_i r_i^2 )
 
-  A concrete 4-person worked example, by pencil:
+  Read the symbols.
+  RMSE stands for root-mean-square-error.
+  n is the count of rows being scored.
+  sum_i means add over every row i.
+  So RMSE squares each leftover, averages the squares, then takes the square root.
+
+  Here is a 4-person worked example, by pencil.
 
     person   truth y    guess yhat    miss r     r^2
     --------------------------------------------------
@@ -176,9 +225,12 @@
     mean r^2 = 0.23 / 4 = 0.0575
     RMSE = sqrt(0.0575) ~ 0.24
 
-    Typical miss: about $24,000.  The bar to beat is the FOOL who always shouts the
-    average.  Work the fool out on the same 4 people.  His one guess: average y =
-    (1.4+2.8+0.9+3.5)/4 = 8.6/4 = 2.15, shouted four times:
+    RMSE = 0.24 is in units of $100,000s, so the typical miss is about $24,000.
+    The bar to beat is the FOOL who always shouts the average.
+    The fool ignores the columns and guesses the average price every time.
+    Work the fool out on the same 4 people.
+    His one guess is the average y = (1.4+2.8+0.9+3.5)/4 = 8.6/4 = 2.15.
+    He shouts that 2.15 four times:
 
     person   truth y    fool's guess    miss r     r^2
     ----------------------------------------------------
@@ -190,11 +242,16 @@
 
     mean r^2 = 4.37 / 4 = 1.0925        fool's RMSE = sqrt(1.0925) ~ 1.05
 
-    Notice what we just computed: squared gaps from the average, averaged, rooted --
-    that is the SPREAD of the truth column itself.  The fool's RMSE and std(y) are
-    the same recipe; they cannot help but be the same number.  (Set the clerks on the
-    full 20,640-row column with these exact steps and the fool lands near 0.97.)
-    Our rule at RMSE = 0.24 beats the fool four times over.
+    Notice what we just computed for the fool.
+    We took squared gaps from the average, averaged them, then rooted.
+    That recipe is the SPREAD of the truth column itself.
+    Spread of a column is written std(y), the standard deviation of y.
+    So the fool's RMSE and std(y) are the same recipe.
+    Which means they cannot help but be the same number.
+    Set the clerks on the full 20,640-row column with these exact steps and the fool lands near 0.97.
+    Our rule scored RMSE = 0.24.
+    The fool scored RMSE = 1.05.
+    So 1.05 / 0.24 ~ 4, meaning our rule beats the fool about four times over.
 
   >> YOUR TURN
      Person E walks in: truth 2.0, our rule guesses 2.4.  Add him to OUR table
@@ -205,34 +262,47 @@
      guess dragged the typical miss from $24,000 up to $28,000 -- squaring makes big
      misses shout.
 
-  RMSE punishes large single misses more heavily than the plain average of absolute
-  leftovers, MAE = mean|r_i|.  Check: person B missed by -0.3, squared to 0.09.
-  A single double-sized miss of -0.6 would square to 0.36 -- four times the weight.
+  RMSE punishes large single misses more heavily than a plain average of leftover sizes.
+  That plain average is MAE = mean|r_i|, the mean of the leftover sizes ignoring sign.
+  Check why RMSE punishes big misses harder.
+  Person B missed by -0.3, which squares to 0.3 x 0.3 = 0.09.
+  A double-sized miss of -0.6 squares to 0.6 x 0.6 = 0.36.
+  And 0.36 / 0.09 = 4, so doubling the miss gives it four times the weight.
 
 
   ## Rule 2 -- The Straight-Stick Rule
 
-  IN HAND: one guessing rule (ask-closest: measure gaps, average the k nearest answers)
-  and one honest ruler (RMSE: miss -> square -> mean -> root).  Now a second rule of the
-  opposite temperament.
+  IN HAND: one guessing rule and one honest ruler.
+  The rule is ask-closest: measure gaps, then average the k nearest answers.
+  The ruler is RMSE: take each miss, square it, average, then root.
+  Now a second rule of the opposite temperament.
 
     d+1 dials:  [nudge b0,  dial1 b1,  dial2 b2, ...]
 
     guess = b0 + b1*(rooms) + b2*(income) + ...
           = X*beta   (one dot-product per row)
 
-  The second rule is the opposite temperament. Where the ask-closest rule hoards every
-  row, this one squeezes the whole working pile into just d+1 dials, throws the pile away,
-  and from then on each guess is a single dot-product. The dials are not searched for --
-  they drop out of an exact formula. Full derivation in
-  [Part 3](straight-stick-linear-regression.txt).
+  Read the symbols.
+  d is the count of measured columns, so there is one dial per column plus one nudge, giving d+1 dials.
+  b0 is the fixed nudge added to every guess.
+  b1, b2, ... are the dials, one weight per column.
+  X*beta is a shorthand: multiply each column by its dial and add, for one row at a time.
+  Where the ask-closest rule hoards every row, this rule squeezes the whole working pile into just d+1 dials.
+  Then it throws the pile away.
+  From then on each guess is a single weighted sum.
+  The dials are not searched for.
+  They drop out of an exact formula.
+  Full derivation in [Part 3](straight-stick-linear-regression.txt).
 
 
   ## Picking Settings Without Peeking at the Hidden Pile
 
-  IN HAND: two rules (ask-closest with its knob k; straight-stick with its d+1 dials),
-  one ruler (RMSE), and one drawer that must stay shut.  Left to do: pick k -- without
-  the drawer.
+  IN HAND: two rules, one ruler, and one drawer that must stay shut.
+  The first rule is ask-closest, with its knob k (the count of neighbours).
+  The second rule is straight-stick, with its d+1 dials (one weight per column plus a nudge).
+  The ruler is RMSE: take each miss, square it, average, then root.
+  The drawer is the hidden pile, the locked-away 20% we never peek at until the end.
+  Left to do: pick k without the drawer.
 
     working pile split into 5 chunks:  A  B  C  D  E
 
@@ -243,31 +313,38 @@
     round 5  .    .    .    .   [#]   -> mistake5
                                average -> honest estimate
 
-  Each round, one chunk grades the rule built on the other four. Rotate until every chunk
-  has graded once. Average the five mistakes. This gives an honest estimate without ever
-  touching the hidden pile.
+  Each round, one chunk grades the rule built on the other four.
+  Rotate until every chunk has graded exactly once.
+  That gives five mistake numbers, one per round.
+  Average those five mistakes.
+  This gives an honest estimate without ever touching the hidden pile.
 
   !! WARN: PREPARE NUMBERS INSIDE EACH ROUND
-     Any step that learns from the numbers (an average, a spread) must be done on each
+     Any prep that learns from the numbers (an average, a spread) must be done on each
      round's building portion only. Doing it on the whole working pile before splitting
-     leaks grading-chunk numbers into the build step. A bound pipeline enforces this
-     automatically (Part 2).
+     leaks grading-chunk numbers into the build. A bound pipeline (a chain that relearns
+     the prep each round) enforces this automatically; Part 2 shows the chain.
 
-  That single discipline -- never let the drawer influence a choice -- is the spine the
-  whole blog hangs on. Procedure: pick settings using rotating folds on the working pile
-  -> refit the winner on all of the working pile -> read the hidden pile ONCE -> report
-  that number, and live with it.
+  That single discipline is the spine the whole blog hangs on.
+  The discipline: never let the drawer (the hidden pile) influence a choice.
+  Here is the order of work.
+  First, pick settings using rotating folds on the working pile.
+  Then refit the winner on all of the working pile.
+  Then read the hidden pile ONCE.
+  Then report that number, and live with it.
 
   >> NOTE: ISN'T CHECKING THE HIDDEN PILE PEEKING?
-     No -- using it to pick among rules is peeking; using it ONCE to report the chosen
-     rule's mistake is exactly what it is for. A gap between the rotating-fold estimate
-     and the hidden-pile mistake means the rule memorised the working pile a little.
+     No. Using the hidden pile to pick among rules is peeking.
+     Using it ONCE to report the chosen rule's mistake is exactly what it is for.
+     A gap between the rotating-fold estimate and the hidden-pile mistake means the rule
+     memorised the working pile a little.
 
 
   ## The Whole Blog in Six Lines
 
-  Everything above, boiled down to six lines. Pin them somewhere; every later post is one
-  of these lines, slowed down and worked out in full.
+  Here is everything above, boiled down to six lines.
+  Pin them somewhere.
+  Every later post is one of these lines, slowed down and worked out in full.
 
     1. Find a rule that guesses right on rows never seen; measure on the hidden pile only.
     2. Ask-closest rule -- store the pile, look it up; put columns on the same ruler;
@@ -310,9 +387,11 @@
 
   ## The Labels, Last
 
-  Now -- and only now that you have built the thing -- here are the proper names. Every
-  post on this blog ends this way: plain words on the left, the textbook term on the
-  right. Practice it first; the label is just a handle to carry it by.
+  Now that you have built the thing, here are the proper names.
+  Every post on this blog ends this way.
+  Plain words sit on the left; the textbook term sits on the right.
+  Practice the plain idea first.
+  The label is just a handle to carry it by.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

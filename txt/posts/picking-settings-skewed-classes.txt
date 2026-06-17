@@ -14,25 +14,36 @@
     <- prev:  [Sorting 3: Leash and Cloud](leash-and-cloud.txt)
        next:  [Chapter 4, Part 1: The Leash (Ridge & Lasso)](humble-dials-ridge-lasso.txt) ->
 
-  So far the world has been tidy: one sheet of breast lumps, one clean yes-or-no question,
-  two groups of roughly equal size. Real problems are rarely so polite. This closing post
-  drags the series out into the messy world and arms you for four things it will throw at
-  you.
+  So far the world has been tidy.
+  One sheet of breast lumps, one clean yes-or-no question, two groups of roughly equal size.
+  Real problems are rarely so polite.
+  So this closing post drags the series out into the messy world.
+  It arms you for four things that world will throw at you.
 
-  How do you tune a machine's settings without cheating by peeking at the exam? What do
-  you do when one bin outnumbers the other ninety-nine to one and your proud 99% accuracy
-  turns out to be worthless? Which ruler do you trust when an outlier wanders in? And how
-  do you grade a machine that is sorting into not two bins but ten? Answer these and you
-  have left the textbook behind and stepped onto the workshop floor.
+  First: how do you tune a machine's settings without cheating by peeking at the exam?
+  Tuning means choosing the numbers you set by hand before training, like the leash strength.
+  The exam is the pile of rows you hold back to grade the final machine, never used for tuning.
+  Second: what do you do when one bin outnumbers the other ninety-nine to one?
+  There a proud 99% accuracy turns out to be worthless.
+  Accuracy = the fraction of all rows the machine labels correctly.
+  Third: which ruler do you trust when an outlier wanders in?
+  A ruler here means a formula that rescales a column so columns of different sizes compare fairly.
+  Fourth: how do you grade a machine that is sorting into not two bins but ten?
+  Answer these and you have left the textbook behind and stepped onto the workshop floor.
 
 
   ## Settings I Pick By Hand (Hyperparameters)
 
-  Some numbers inside a machine are set by rolling downhill on the leftover -- the dials
-  beta in the S-curve machine. Others are decided BEFORE training starts and are never
-  touched by the leftover: the leash strength C, the neighbour-count k, the depth of a
-  decision tree. These are settings you pick by hand. The machine cannot tune them for
-  itself because the leftover doesn't flow back through them.
+  Some numbers inside a machine are set by rolling downhill on the leftover.
+  The leftover means the error the machine measures on each pass and tries to shrink.
+  Those self-tuned numbers are the dials, written beta, inside the S-curve machine.
+  But other numbers are decided BEFORE training starts and are never touched by the leftover.
+  These are the leash strength C, the neighbour-count k, the depth of a decision tree.
+  C controls how hard the machine is held back from over-confidence; a small C pulls harder.
+  k is how many nearby rows a neighbour-vote machine asks before deciding.
+  Such numbers are settings you pick by hand.
+  The standard label for a setting you pick by hand is hyperparameter.
+  The machine cannot tune them for itself, because the leftover doesn't flow back through them.
 
     dials (beta):   tuned by the machine as it trains   <- the machine adjusts these
     settings:       chosen by you before training starts <- the machine never sees these
@@ -45,11 +56,17 @@
 
   ## The Grid Hunt
 
-  You have several settings, each with several candidate values. A grid lists every
-  combination. You try each one and measure how well it does -- but you must not use the
-  sealed exam pile to measure. The fix is rotating folds: split the study pile into, say, 5
-  equal strips; for each combination, train on 4 strips, score on the 5th, rotate which
-  strip is left out, repeat, then average the 5 scores.
+  You have several settings, each with several candidate values.
+  A grid lists every combination of those values.
+  You try each combination and measure how well it does.
+  But you must not use the sealed exam pile to measure.
+  The exam pile is the rows held back, opened only once at the very end to grade the machine.
+  So the fix is rotating folds, also called k-fold cross-validation.
+  This means: split the study pile into, say, 5 equal strips.
+  The study pile is everything except the sealed exam pile.
+  For each combination, train on 4 strips and score on the 5th.
+  Then rotate which strip is left out and repeat, so each strip is the scored one once.
+  Then average the 5 scores into one reading for that combination.
 
     grid for C and k:
     +-------+----+----+----+
@@ -62,18 +79,21 @@
 
   Three things go into making a grid hunt trustworthy:
 
-    1. The range and spacing of each setting. If C should be 0.01 the grid must include
-       0.01; a grid of {1, 10, 100} misses it entirely. Both the candidate values and how
-       finely you space them are decisions you make up front.
-    2. Rotating folds (cross-validation) to measure each combination reliably. A single
-       train/score split might be lucky or unlucky. Rotating over 5 strips gives 5
-       independent readings and averages out that luck.
-    3. A scoring rule that matches the actual goal: accuracy if all mistakes cost the same;
-       recall if missing sick people is catastrophic; F1 if both false alarms and misses
-       matter.
+    1. The range and spacing of each setting must be chosen up front.
+       If C should be 0.01 the grid must include 0.01.
+       A grid of {1, 10, 100} misses 0.01 entirely, so the best value can never be found.
+       Both the candidate values and how finely you space them are decisions you make up front.
+    2. Rotating folds (cross-validation) measure each combination reliably.
+       A single train/score split might be lucky or unlucky.
+       Rotating over 5 strips gives 5 independent readings and averages out that luck.
+    3. A scoring rule must match the actual goal.
+       Use accuracy if all mistakes cost the same; accuracy = fraction of rows labelled right.
+       Use recall if missing sick people is catastrophic; recall = fraction of truly-sick rows caught.
+       Use F1 if both false alarms and misses matter; F1 blends precision and recall into one number.
 
-  A concrete 5-fold example for C=0.1 vs C=1.0, by pencil.  Study pile has
-  100 lumps.  Split into 5 strips of 20 each.
+  A concrete 5-fold example for C=0.1 vs C=1.0, by pencil.
+  Recall here is the fraction of truly-sick rows the machine catches.
+  The study pile has 100 lumps, split into 5 strips of 20 each.
 
     strip   C=0.1 recall   C=1.0 recall
     ---------------------------------------
@@ -104,26 +124,35 @@
   that code is at the end of the post, and it carries one subtle trap worth stating now:
 
   !! WARN: BUILD THE RULER INSIDE EACH FOLD, NOT BEFORE THE HUNT
-     A subtle leak: if you scale all of X_train ONCE up front and then pass that pre-scaled
-     pile to GridSearchCV, every validation strip has already helped shape the ruler (its
-     mean and spread). The strip you score on has leaked into the scaling, so the fold
-     scores come out optimistic -- even though the final exam pile (X_test) is still
-     sealed. The fix is to put the scaler INSIDE a Pipeline and pass raw X_train: now the
-     ruler is rebuilt from each fold's 4 training strips only, and the held-out strip is
-     measured by a ruler it never touched. Same peeking rule from Part 1, one level deeper.
+     A subtle leak hides here.
+     The ruler means the rescaling formula, built from a column's mean and spread.
+     Suppose you scale all of X_train ONCE up front, then pass that pre-scaled pile in.
+     Then every validation strip has already helped shape the ruler's mean and spread.
+     Which means the strip you score on has leaked into the scaling.
+     Therefore the fold scores come out optimistic -- even though the exam pile (X_test) is still sealed.
+     The fix is to put the scaler INSIDE a Pipeline and pass raw X_train.
+     Now the ruler is rebuilt from each fold's 4 training strips only.
+     So the held-out strip is measured by a ruler it never touched.
+     This is the same no-peeking rule that governs the whole series: build the ruler from
+     study data only, never from the sealed exam pile -- here applied one level deeper,
+     inside each fold.
 
   >> NOTE: THE EXAM PILE IS STILL SEALED
-     GridSearchCV only ever touches the study pile (X_train). The exam pile (X_test) is
-     opened exactly once at the very end to report the final score. If you tune settings on
-     the exam pile, you are leaking future information and the final score is optimistic --
-     the machine has already peeked.
+     GridSearchCV only ever touches the study pile (X_train).
+     The exam pile (X_test) is opened exactly once at the very end to report the final score.
+     But if you tune settings on the exam pile, you are leaking future information.
+     Therefore the final score comes out optimistic -- the machine has already peeked.
 
 
   ## Two Kinds of Same-Ruler
 
-  Parts 1-3 used the standard ruler: shift each column to mean 0, divide by its spread.
-  There is a second popular ruler -- pinch-to-fit -- that squishes every column's values to
-  sit strictly between 0 and 1.
+  The series so far has leaned on the standard ruler.
+  The standard ruler shifts each column to mean 0, then divides by its spread.
+  In symbols: x~ = (x - mean) / spread, which centres a column at 0 with spread about 1.
+  Its standard label is standard scaling, or StandardScaler.
+  But there is a second popular ruler, which we will call pinch-to-fit.
+  Pinch-to-fit squishes every column's values to sit strictly between 0 and 1.
+  Its standard label is min-max scaling, or MinMaxScaler.
 
     standard ruler:  x~ = (x - mean) / spread        -> centred at 0, spread ~= 1
     pinch-to-fit:    x~ = (x - min)  / (max - min)   -> bounded in [0, 1]
@@ -150,14 +179,20 @@
       3000  -> -0.29
       15000 ->  1.67       <- outlier: unusual but doesn't crush others
 
-  For the same-ruler rule (build from study only, apply to both), the same peeking logic
-  applies: compute min, max (or mean, spread) from the study pile only.
+  One rule binds both rulers: build the ruler from the study pile only, then apply it to both piles.
+  The study pile is everything except the sealed exam pile.
+  So compute min and max (for pinch-to-fit), or mean and spread (for the standard ruler), from the study pile only.
+  Therefore the exam pile never helps shape the ruler that grades it.
 
 
   ## When ALARM Matters More Than MISSED
 
-  Part 1 argued that in cancer screening, recall is the north star because a MISSED sick
-  person is catastrophic. In other settings, the ALARM is the catastrophe.
+  First, two words for the two kinds of mistake.
+  A MISSED is a truly-sick row the machine wrongly calls clear (the standard label is false negative).
+  An ALARM is a truly-clear row the machine wrongly calls sick (the standard label is false positive).
+  In cancer screening, recall is the north star, because a MISSED sick person is catastrophic.
+  Recall = caught sick rows / all truly-sick rows, so it falls when MISSED rises.
+  But in other settings, the ALARM is the catastrophe instead.
 
     precision v when ALARM is large   <- false positives pile up
     recall    v when MISSED is large  <- false negatives pile up
@@ -168,23 +203,29 @@
     fraud detection:   MISSED = fraud slips through -> loss -> recall matters
 
   ** KEY: PRECISION REDUCES ALARMS; RECALL REDUCES MISSES
-     Choosing which to prioritise is a business or clinical decision, not a machine
-     decision. The machine gives you a curve of deals (the trade curve from Part 2); you
-     pick the deal that matches what each kind of mistake actually costs.
+     Precision = caught sick rows / all rows the machine calls sick, so it falls when ALARM rises.
+     Choosing which to prioritise is a business or clinical decision, not a machine decision.
+     The machine gives you a curve of deals.
+     That curve is a sweep of the cutoff: at each cutoff it plots catch-rate against false-alarm-rate.
+     So you pick the deal on that curve that matches what each kind of mistake actually costs.
 
-  In fraud detection, MISSED = a fraudulent transaction slips through and the business
-  absorbs the loss. ALARM = a legitimate transaction is blocked and the customer is
-  frustrated. For most fraud systems the financial loss of a missed fraud is worse than the
-  friction of a blocked legitimate purchase, so recall is the primary score -- but both
-  matter, and precision-recall curves (next) show the exact deal between them.
+  In fraud detection, MISSED means a fraudulent transaction slips through and the business absorbs the loss.
+  ALARM means a legitimate transaction is blocked and the customer is frustrated.
+  For most fraud systems the financial loss of a missed fraud is worse than the friction of a blocked purchase.
+  Therefore recall is the primary score.
+  But both kinds of mistake matter.
+  So the precision-recall curve (next) shows the exact deal between them.
 
 
   ## Skewed Piles and the Precision-Recall Curve
 
-  The breast lump sheet leaned 63% well to 37% sick -- tilted, but you could still stand on
-  it. Now imagine the floor pitched almost vertical. A real fraud sheet might run 99.9%
-  honest and 0.1% crooked. That is a SKEWED pile, and on ground this steep the ordinary
-  scores quietly start lying to you.
+  The breast lump sheet leaned 63% well to 37% sick.
+  That is tilted, but you could still stand on it.
+  Now imagine the floor pitched almost vertical.
+  A real fraud sheet might run 99.9% honest and 0.1% crooked.
+  That is a SKEWED pile, meaning one class vastly outnumbers the other.
+  Its standard label is class imbalance.
+  And on ground this steep the ordinary scores quietly start lying to you.
 
     skewed fraud sheet: 100000 rows
       99900  normal transactions   (class 0)
@@ -194,10 +235,20 @@
       accuracy = 99900 / 100000 = 99.9%   <- looks extraordinary
       recall   = 0 / 100 = 0.0%           <- catches no fraud at all
 
-  The ROC curve (trade curve) also has a problem with skewed piles. FPR divides ALARM by
-  all truly-normal rows -- that denominator is 99900. Even if the machine raises 2000 false
-  alarms, FPR = 2000/99900 = 0.02, which looks small and makes the ROC curve bulge
-  optimistically. The 2000 blocked customers are invisible in that fraction.
+  The trade curve that sweeps the cutoff also goes by the name ROC curve.
+  ROC plots catch-rate (recall) on the Y-axis against false-alarm-rate (FPR) on the X-axis.
+  But the ROC curve has a problem with skewed piles.
+  FPR means false-alarm-rate = ALARM / all truly-normal rows.
+  In the fraud sheet that denominator is 99900, because 99900 rows are truly normal.
+  So even if the machine raises 2000 false alarms, FPR = 2000/99900 = 0.02.
+  Which looks small and makes the ROC curve bulge optimistically.
+  Therefore the 2000 blocked customers are invisible in that tiny fraction.
+
+  Every prediction lands in one of four boxes, named in plain words and by standard label:
+    CAUGHT = truly-sick row, called sick   (true positive, TP)
+    ALARM  = truly-clear row, called sick   (false positive, FP)
+    MISSED = truly-sick row, called clear   (false negative, FN)
+    CLEAR  = truly-clear row, called clear   (true negative, TN)
 
     ROC curve is blind to class imbalance because:
     FPR = ALARM / (ALARM + CLEAR)   <- denominator is huge; ALARM looks tiny
@@ -206,10 +257,13 @@
     precision = CAUGHT / (CAUGHT + ALARM)  <- no TN in sight; focuses on the sick pile
     recall    = CAUGHT / (CAUGHT + MISSED) <- also ignores TN
 
-  The precision-recall curve sweeps the same cutoff as the trade curve but plots precision
-  on the Y-axis and recall on the X-axis. A perfect machine hugs the top-right corner (high
-  precision AND high recall). A flat line near precision = (fraction of sick in the sheet)
-  is the baseline -- the always-shout-sick fool.
+  The precision-recall curve sweeps the same cutoff as the ROC curve.
+  But it plots precision on the Y-axis and recall on the X-axis.
+  Precision = caught sick rows / all rows called sick.
+  Recall = caught sick rows / all truly-sick rows.
+  A perfect machine hugs the top-right corner: high precision AND high recall together.
+  A flat line near precision = (fraction of sick in the sheet) is the baseline.
+  That baseline is the always-shout-sick fool, which calls every row sick.
 
     precision
      1 | # <- perfect (catch all, zero false alarms)
@@ -222,27 +276,36 @@
     area under precision-recall curve -> average precision (AP)
 
   ** KEY: USE PRECISION-RECALL CURVES WHEN THE PILE IS SKEWED
-     When one class is rare (fraud, disease in a healthy population, defects on a line),
-     the precision-recall curve is more informative than the ROC curve because it does not
-     use the true-negative count at all. The ROC curve's FPR is diluted by the massive well
-     pile; the precision-recall curve ignores that pile entirely.
+     Sometimes one class is rare -- fraud, disease in a healthy population, defects on a line.
+     Then the precision-recall curve tells you more than the ROC curve.
+     The reason: the precision-recall curve does not use the true-negative count (CLEAR) at all.
+     The ROC curve's FPR is diluted by the massive normal pile in its denominator.
+     But the precision-recall curve ignores that pile entirely.
 
-  Computing that curve, and its area (the average precision), is three lines -- waiting in
-  the code at the end of the post.
+  Computing that curve, and its area the average precision (AP), is three lines.
+  That code is waiting at the end of the post.
 
 
   ## Scoring With Three or More Bins
 
-  Cancer has subtypes. Handwritten digits have ten classes. Sentiment has three: positive,
-  neutral, negative. Now there are multiple bins and one machine must sort into all of
-  them. The four-box table expands into a K x K grid (one row and column per class). Each
-  class gets its own precision, recall, and F1. The question becomes: how do you average
-  those K scores into one number?
+  Cancer has subtypes.
+  Handwritten digits have ten classes.
+  Sentiment has three: positive, neutral, negative.
+  So now there are multiple bins and one machine must sort into all of them.
+  Earlier each prediction fell into one of four boxes (CAUGHT, ALARM, MISSED, CLEAR).
+  With K classes that four-box table expands into a K x K grid, one row and column per class.
+  Therefore each class gets its own precision, recall, and F1.
+  Precision = caught rows of a class / all rows called that class.
+  Recall = caught rows of a class / all rows truly of that class.
+  F1 blends those two into one number for that class.
+  The question becomes: how do you average those K scores into one number?
 
 
-  IN HAND: a three-class scorecard -- type A F1 0.89, type B 0.67, type C 0.34 -- with
-  class C holding only 10 rows against the others' 1000.  This section asks how to roll
-  three F1 numbers into one, and shows the two answers disagree on purpose.
+  IN HAND: a three-class scorecard.
+  Type A scores F1 0.89, type B 0.67, type C 0.34.
+  Class C holds only 10 rows against the others' 1000.
+  This section asks how to roll three F1 numbers into one.
+  And it shows the two answers disagree on purpose.
 
   ## Two Averaging Rules
 

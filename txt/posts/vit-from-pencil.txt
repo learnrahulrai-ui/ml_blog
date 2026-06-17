@@ -88,10 +88,13 @@
       seat 1:  sin(1)=0.841,  cos(1)=0.540 | sin(0.01)=0.010, cos(0.01)=1.000 → [0.841, 0.540, 0.010, 1.000]
       seat 2:  sin(2)=0.909,  cos(2)=-0.416 | sin(0.02)=0.020, cos(0.02)=1.000 → [0.909, -0.416, 0.020, 1.000]
 
-  Near seats (0 and 1) look close in the slow slots, differ in the fast slots; every seat is
-  unique. Add the stamp onto the strip, slot by slot. (The Chapter 11 lab instead LEARNS a
-  seat-table -- 49 rows of tuned numbers -- reaching the same end: a strip that carries where
-  it sat.)
+  Near seats (0 and 1) look close in the slow slots but differ in the fast slots.
+  Therefore every seat gets a unique stamp.
+  Add the stamp onto the strip, slot by slot.
+
+  This sine/cosine recipe is one way to make seat-stamps; it computes them with a fixed formula.
+  Another way is to LEARN a seat-table: one tuned row of numbers per seat, adjusted during training.
+  Both reach the same end -- a strip that carries where it sat.
 
   >> YOUR TURN
      Seat 0's stamp is [0,1,0,1]. A strip reads [2,2,2,2]. After adding the stamp?
@@ -101,8 +104,11 @@
 
   ## Every Strip Looks at Every Strip (the Grid)
 
-  Each strip makes three tags from three reused grids -- WANT (seeks), HAVE (offers), GIVE
-  (hands over). Two strips, tag width 4 (so the scale divisor is √4 = 2):
+  Each strip makes three tags from three reused grids.
+  WANT (called the query) is what a strip looks for.
+  HAVE (called the key) is what a strip offers to be looked at.
+  GIVE (called the value) is what a strip hands over if it gets picked.
+  Two strips, tag width 4, so the scale divisor is √(tag width) = √4 = 2:
 
       WANT          HAVE             GIVE
       s1: [2,0,1,0]  s1: [1,0,0,0]   s1: [2,0,0,1]
@@ -114,7 +120,8 @@
         s1.WANT         2           8         (2·1=2 ; 2·3 + 1·2 = 8)
         s2.WANT         0           4         (0 ; 2·2 = 4)
 
-  SCALE each by ÷2, then SOFTMAX each ROW into portions adding to 1:
+  SCALE each by ÷2, then SOFTMAX each ROW into portions adding to 1.
+  SOFTMAX recipe: raise e (≈ 2.718) to each number, then divide each by the total of those raised values.
 
         s1: [1, 4] → e^1=2.72, e^4=54.60, total 57.32 → [0.047, 0.953]
         s2: [0, 2] → e^0=1.00, e^2=7.39,  total 8.39  → [0.119, 0.881]
@@ -155,8 +162,9 @@
       spread = √125 ≈ 11.18
       (number - 45) / 11.18  →  [0.45, 1.34, -0.45, -1.34]
 
-  This is LayerNorm: one row's own numbers. (Contrast BatchNorm from Chapter 8, which takes
-  the middle and spread across the whole batch of photos -- a different crowd.)
+  This move is called LayerNorm: it humbles using one row's own numbers and nothing else.
+  A different move, BatchNorm, takes the middle and spread across the whole batch of photos.
+  Which means BatchNorm reads many photos at once, while LayerNorm reads only this one strip.
 
   Two learned dials -- gamma (stretch) and beta (shift) -- let the machine scale the humbled
   numbers back if that helps. In numpy:
@@ -179,9 +187,12 @@
 
   ## Block the Future (the Causal Mask)
 
-  Lay scores in a grid: row i looks, column j is looked at. To stop a token seeing ahead, set
-  every cell with j > i to minus infinity BEFORE softmax. Since e^(-inf) = 0, that cell gets 0
-  portion. Three tokens, equal raw scores:
+  A token here is one item in the sequence -- one strip, or one word -- in the order it sits.
+  Lay the match scores in a grid: row i is the token doing the looking, column j is the token looked at.
+  To stop token i from seeing a later token, set every cell with j > i to minus infinity, BEFORE softmax.
+  Softmax raises e (≈ 2.718) to each score, and e^(−inf) = 0.
+  Therefore every blocked cell gets 0 portion -- a future token contributes nothing.
+  Three tokens, equal raw scores:
 
       block j > i (-inf)         portions after softmax
             j1   j2   j3                j1   j2   j3

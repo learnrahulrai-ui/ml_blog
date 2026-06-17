@@ -61,9 +61,14 @@
 
   ## Walking Through 79 Rewrites Still Fades, So Look Across Instead
 
-  The older machine WALKED: word 1 writes a memory; word 2 reads that memory and rewrites it;
-  and so on for 100 words. To link "not" (word 1) to "good" (word 80), the signal rides 79
-  rewrites -- each one multiplies and crushes it a little. Far-back words fade.
+  One older way to read a sentence WALKS it.
+  A WALK means: keep one pocket of numbers called a memory.
+  Word 1 writes that memory.
+  Word 2 reads that memory, then rewrites it.
+  This repeats, one word at a time, for all 100 words.
+  To link "not" (word 1) to "good" (word 80), the signal must ride 79 rewrites.
+  Each rewrite multiplies the signal by some number and crushes it a little.
+  Therefore far-back words fade by the time the walk reaches the end.
 
   The transformer removes the walk. Lay all words out at once. Let each word look STRAIGHT
   at every other word, near or far, same cost, all at the same time:
@@ -155,8 +160,11 @@
 
   WRONG TURN  "Divide by √(tag width) -- same as subtracting the mean and dividing by scatter?"
   ─────────────────────────────────────────────────────────────────────────────────────────
-  No. That was the same-ruler move (Chapter 1). Here: no mean, no scatter, no data lookup.
-  Just √(how many numbers the tag has) -- a fixed constant. √4 = 2 always.
+  No. Subtracting a mean and dividing by scatter reads your data: it finds the middle of the
+  actual numbers and how far they spread, then re-centres them. That is a different move.
+  Here there is no mean, no scatter, no looking at the numbers at all.
+  You divide only by √(how many numbers the tag holds) -- a fixed constant set by the width.
+  Tag width is 4, so √4 = 2, always, no matter what the numbers are.
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
@@ -210,11 +218,17 @@
   stick width survives. (100 words × 32-wide GIVE sticks → ADD → one 32-wide stick.)
   ─────────────────────────────────────────────────────────────────────────────────────────
 
-  The six-move formula that runs inside MultiHeadAttention:
+  The whole run as one formula:
 
       Attention = softmax( Q · Kᵀ / √dₖ ) · V
 
-  Every symbol here is a pencil move above.
+  Every symbol here is a pencil move done above.
+  Q is the stack of WANT tags (what each word looks for).
+  K is the stack of HAVE tags (what each word offers); Kᵀ stands the HAVE tags up as columns to dot.
+  Q · Kᵀ is every WANT dotted with every HAVE -- the match numbers.
+  √dₖ is the square root of the tag width, the fixed divisor that removes the scale artifact.
+  softmax turns the scaled matches into portions that add to 1.
+  V is the stack of GIVE tags (what each word hands over); multiplying by V is the weighted sum.
 
 
   ## Two Heads Catch Two Kinds of Link
@@ -229,32 +243,51 @@
       head 2: DIFFERENT grids (each 4→2) → six moves → stick B (width 2)
       glue: [A | B] → width-4 stick -- back to the width we started with
 
-  Two width-2 sticks glue to width 4, not 8 -- the original width split two ways, then sewn back.
-  One last grid mixes the glued width-4 stick number-by-number, so the two heads' findings blend
-  instead of sitting in separate halves; that mixing grid is the output projection inside
-  MultiHeadAttention. That is num_heads=2.
+  Two width-2 sticks glue to width 4, not 8.
+  This is the original width-4 split two ways, then sewn back.
+  But glued halves still sit side by side, untouched by each other.
+  So one last grid mixes the glued width-4 stick number-by-number.
+  Which means the two heads' findings blend instead of staying in separate halves.
+  That mixing grid is the output projection inside MultiHeadAttention.
+  Running two head-sets like this is what num_heads=2 means.
 
 
   ## No Walk Means No Order -- Flagged
 
-  Looking at all words at once, the machine sees a SET -- {nolan, ended} and {ended, nolan}
-  look identical. The full transformer adds a position-stamp to each word's stick before
-  attention runs. The simplified lab version (Q8) skips it. Flagged so you know.
+  Looking at all words at once, the machine sees a SET.
+  A SET has no order, so {nolan, ended} and {ended, nolan} look identical to it.
+  The full transformer fixes this by adding a position-stamp to each word's stick before
+  attention runs.
+  A position-stamp is a fixed row of numbers unique to slot 1, slot 2, and so on.
+  Adding it lets a word's stick carry where the word sat.
+  This short worked example skips that stamp on purpose, to keep the arithmetic clean.
+  Flagged so you know it is missing here.
 
-  Two more honest simplifications, flagged the same way. First, the 98 padding slots. In the
-  full model a PADDING-MASK sets every padding score to minus-infinity before softmax, so
-  e^(−inf)=0 hands them zero portion -- they neither pull attention nor enter the average. This
-  kata works the 2-word review "nolan ended" with no padding in play, so the mask never bites in
-  the arithmetic here; on a real 100-slot row it does the heavy lifting of keeping empty slots
-  out of every sum. Second, real models wrap attention in a keep-the-original wire and a
-  per-stick humbler (skip connection + LayerNorm, built in Chapter 11). Left out here on purpose
-  -- one layer, one short review.
+  Two more honest simplifications, flagged the same way.
+
+  First, the 98 padding slots.
+  Padding slots are the empty slots filled with 0 when a review is shorter than 100 words.
+  In the full model a PADDING-MASK sets every padding slot's score to minus-infinity before softmax.
+  Softmax raises e to each score, and e^(−inf)=0, so every padding slot gets zero portion.
+  Therefore padding slots neither pull attention nor enter the average.
+  This worked example uses the 2-word review "nolan ended" with no padding in play.
+  So the mask never bites in the arithmetic here.
+  On a real 100-slot row it does the heavy lifting of keeping empty slots out of every sum.
+
+  Second, real models wrap attention in two extra moves left out here.
+  One is a keep-the-original wire: add the stick that went IN back onto the stick that came OUT,
+  so the original is never lost (this is called a skip connection).
+  The other is a per-stick humbler: take one stick's own numbers, shift their middle to 0 and
+  their spread to 1 (this is called LayerNorm).
+  Both are left out on purpose -- this is one layer, one short review.
 
 
   ## 100 Sticks Need One Summary -- Average Them All
 
-  After attention, every word-slot has a new stick. Tick needs ONE. Average the real word-sticks
-  number-by-number (padding slots excluded, as flagged above):
+  After attention, every word-slot has a new stick.
+  The final yes/no tick needs ONE stick, not 100.
+  So average the real word-sticks number-by-number.
+  Padding slots (the empty 0-filled slots) are left out of this average, since they hold no word.
 
       word 1 = [0.0, 2.8, 0.9, 0.0]
       word 2 = [0.2, 1.0, 0.5, 0.4]
