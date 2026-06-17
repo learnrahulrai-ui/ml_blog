@@ -288,10 +288,34 @@
   ## The Code, If You Want It
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
-  section is for the day you meet one: the same steps, spoken in Python.
+  section is for the day you meet one: the same rows, spoken in Python.
 
-  Everything above was pencil and pictures. Here is the same machine in Python, using the
-  scikit-learn toolbox -- two snippets: the rule itself, and the hunt for the best k.
+  First the rule by hand -- no loop, every gap on its own line, exactly the worked example,
+  so you watch the gaps and the guess 2.83 print back:
+
+    # the gap rule on two rows (new row at (3, 2, 5, 4)) -- subtract, square, add, root
+    gap_A = ((3-4)**2 + (2-2)**2 + (5-6)**2 + (4-3)**2) ** 0.5   # sqrt(3)   = 1.73
+    gap_B = ((3-8)**2 + (2-9)**2 + (5-1)**2 + (4-9)**2) ** 0.5   # sqrt(115) = 10.72
+    print(round(gap_A,2), round(gap_B,2))     # 1.73 10.72  -> A is the closer neighbour
+
+    # ask the 3 closest, one column (income). Working pile, five (income, price) rows:
+    #   (5.6, 3.4) (4.0, 2.7) (3.8, 2.4) (2.5, 1.5) (7.3, 3.5)
+    # new row at income 5.0 -- gap to each row, one line each (|5.0 - income|)
+    g1 = abs(5.0 - 5.6)    # 0.6  -> price 3.4   (closest)
+    g2 = abs(5.0 - 4.0)    # 1.0  -> price 2.7   (2nd)
+    g3 = abs(5.0 - 3.8)    # 1.2  -> price 2.4   (3rd)
+    g4 = abs(5.0 - 2.5)    # 2.5  -> price 1.5
+    g5 = abs(5.0 - 7.3)    # 2.3  -> price 3.5
+    print(round(g1,1), round(g2,1), round(g3,1), round(g4,1), round(g5,1))   # 0.6 1.0 1.2 2.5 2.3
+
+    # k=3: average the prices of the three smallest gaps (g1, g2, g3)
+    guess = (3.4 + 2.7 + 2.4) / 3     # 8.5 / 3 = 2.83
+    print(round(guess, 2))            # 2.83
+
+  Five rows, five gaps, all visible. The real California pile is 20,640 rows of 8 columns,
+  and picking the closest there means measuring against every stored row on every guess --
+  you cannot hand-type that, so the toolbox below loops the identical gap-and-average for
+  you (and learns the same-ruler constants on the working pile only):
 
   >> NEW TO PYTHON? Each piece below, named once:
        from X import Y    -- fetch a ready-made tool named Y out of toolbox X
