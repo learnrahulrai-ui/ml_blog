@@ -489,6 +489,42 @@
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet a computer: the same work, spoken in Python.
 
+  First the S-curve and four-box scores from the worked examples, hard-coded, one person per
+  line so you watch every number arrive:
+
+    import math
+
+    # S-curve for 4 people: b0 = 1.2, b1 = -30 (the one-bmi-column example)
+    bmi_A, bmi_B, bmi_C, bmi_D = 0.04, 0.06, 0.12, 0.18
+    z_A = 1.2 + (-30)*bmi_A  # 0.0
+    z_B = 1.2 + (-30)*bmi_B  # -0.6
+    z_C = 1.2 + (-30)*bmi_C  # -2.4
+    z_D = 1.2 + (-30)*bmi_D  # -4.2
+
+    sig_A = 1/(1 + math.exp(-z_A))  # 0.500  (z=0 -> even money)
+    sig_B = 1/(1 + math.exp(-z_B))  # 0.354
+    sig_C = 1/(1 + math.exp(-z_C))  # 0.083
+    sig_D = 1/(1 + math.exp(-z_D))  # 0.015
+    print(round(sig_A,3), round(sig_B,3), round(sig_C,3), round(sig_D,3))  # 0.5 0.354 0.083 0.015
+
+    # four-box counts from the 4-lump example (chances 0.92, 0.63, 0.78, 0.11; cutoff 0.5)
+    CAUGHT, MISSED, ALARM, CLEAR = 2, 0, 1, 1
+
+    accuracy  = (CAUGHT + CLEAR) / (CAUGHT + MISSED + ALARM + CLEAR)  # 0.75
+    recall    = CAUGHT / (CAUGHT + MISSED)    # 1.0  (caught all truly sick)
+    precision = CAUGHT / (CAUGHT + ALARM)     # 0.667  (one false alarm)
+    F1        = 2*precision*recall / (precision + recall)  # 0.800
+    print(round(accuracy,2), round(recall,2), round(precision,3), round(F1,3))  # 0.75 1.0 0.667 0.8
+
+    # harmonic mean punishes one bad score; arithmetic mean hides it
+    P, R = 0.10, 0.98
+    arithmetic_mean = (P + R) / 2             # 0.54  (looks ok)
+    harmonic_mean   = 2*P*R / (P + R)         # 0.181 (exposes the terrible precision)
+    print(round(arithmetic_mean,2), round(harmonic_mean,3))  # 0.54 0.181
+
+  Four people, four boxes, four scores -- all visible.  The toolbox block below uses the
+  same steps on the full Wisconsin sheet:
+
   Start to finish, the work has four short parts.
   First, turn the M/B letters into 1/0.
   Then fit the S-curve machine on scaled inputs.

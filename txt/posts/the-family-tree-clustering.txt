@@ -300,6 +300,42 @@
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
+  First the 4-dot worked example, hard-coded -- every pairwise gap then every wedding:
+
+    # 4 dots on one ruler: 1, 2, 6, 8
+
+    # all 6 pairwise gaps (absolute difference on 1 dimension)
+    gap_1_2 = abs(1-2)   # 1
+    gap_1_6 = abs(1-6)   # 5
+    gap_1_8 = abs(1-8)   # 7
+    gap_2_6 = abs(2-6)   # 4
+    gap_2_8 = abs(2-8)   # 6
+    gap_6_8 = abs(6-8)   # 2
+    print(gap_1_2, gap_1_6, gap_1_8, gap_2_6, gap_2_8, gap_6_8)  # 1 5 7 4 6 2
+
+    # WEDDING 1: closest pair = {1} and {2}, married at height 1
+    wedding_1 = gap_1_2   # 1
+
+    # WEDDING 2: remaining {6} and {8} are closest, married at height 2
+    wedding_2 = gap_6_8   # 2
+
+    # WEDDING 3: {1,2} vs {6,8} -- cross-pair gaps from the distance sheet
+    # complete linkage = farthest cross-pair
+    complete_3 = max(gap_1_6, gap_1_8, gap_2_6, gap_2_8)   # max(5,7,4,6) = 7
+    # single  linkage = nearest cross-pair
+    single_3   = min(gap_1_6, gap_1_8, gap_2_6, gap_2_8)   # min(5,7,4,6) = 4
+    # average linkage = mean of all cross-pairs
+    average_3  = (gap_1_6 + gap_1_8 + gap_2_6 + gap_2_8) / 4  # (5+7+4+6)/4 = 5.5
+
+    print(complete_3, single_3, average_3)   # 7 4 5.5
+    # single < average < complete -- cautious complete linkage always waits longest
+
+    # wedding diary: three rows, heights only grow
+    print(wedding_1, wedding_2, complete_3)  # 1 2 7
+
+  All 6 gaps on one page, three weddings, three linkage rules compared.  The toolbox block
+  below builds the full 50-state family tree:
+
   >> NEW TO PYTHON? Each named once:
        linkage(X, method=...)        -- build the whole family tree (the weddings)
        dendrogram(Z)                 -- draw the tree

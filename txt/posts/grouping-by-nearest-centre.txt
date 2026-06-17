@@ -423,6 +423,45 @@
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
+  First the 6-dot example from the worked section, hard-coded -- one dot per line so
+  every assign, update, tightness, and silhouette number lands visibly:
+
+    # dots: 1, 2, 3 (pile A) and 10, 11, 12 (pile B);  K=2;  starting centres: 2 and 10
+
+    # ROUND 1 -- ASSIGN: gap from each dot to each centre (squared -- order preserved)
+    sq_1_c2, sq_1_c10 = (1-2)**2, (1-10)**2   # 1, 81 -> pile A (centre 2)
+    sq_3_c2, sq_3_c10 = (3-2)**2, (3-10)**2   # 1, 49 -> pile A
+    sq_10_c2, sq_10_c10 = (10-2)**2, (10-10)**2  # 64, 0 -> pile B (centre 10)
+    print(sq_1_c2, sq_1_c10, sq_3_c2, sq_3_c10)   # 1 81 1 49
+
+    # ROUND 1 -- UPDATE: new centres = mean of each pile
+    centre_A = (1+2+3)/3    # 2.0
+    centre_B = (10+11+12)/3  # 11.0
+    print(centre_A, centre_B)   # 2.0 11.0
+
+    # ROUND 2 -- ASSIGN: same piles, nobody switched -> STOP
+
+    # TIGHTNESS (inertia): squared gap from each dot to its own centre
+    tight_A = (1-2)**2 + (2-2)**2 + (3-2)**2    # 1 + 0 + 1 = 2
+    tight_B = (10-11)**2 + (11-11)**2 + (12-11)**2  # 1 + 0 + 1 = 2
+    total_tight = tight_A + tight_B              # 4
+    print(tight_A, tight_B, total_tight)  # 2 2 4
+
+    # SILHOUETTE for dot 1: a = avg gap to own pile-mates; b = avg gap to other pile
+    a_1 = (abs(1-2) + abs(1-3)) / 2                    # (1+2)/2 = 1.5
+    b_1 = (abs(1-10) + abs(1-11) + abs(1-12)) / 3      # (9+10+11)/3 = 10
+    fit_1 = (b_1 - a_1) / max(a_1, b_1)                # (10-1.5)/10 = 0.85
+    print(round(a_1,1), round(b_1,1), round(fit_1,2))  # 1.5 10.0 0.85
+
+    # SILHOUETTE for dot 3: edge of pile A
+    a_3 = (abs(3-1) + abs(3-2)) / 2                    # (2+1)/2 = 1.5
+    b_3 = (abs(3-10) + abs(3-11) + abs(3-12)) / 3      # (7+8+9)/3 = 8
+    fit_3 = (b_3 - a_3) / max(a_3, b_3)                # (8-1.5)/8 = 0.8125
+    print(round(a_3,1), round(b_3,1), round(fit_3,2))  # 1.5 8.0 0.81
+
+  Six dots, two piles, tightness 4, both edge dots snug.  The toolbox block below runs
+  the same two moves on the full 50-state sheet:
+
   >> NEW TO PYTHON? Each named once:
        KMeans(n_clusters=K)   -- the grouping machine, K piles
        .fit(X)                -- run the two moves on a loop until settled

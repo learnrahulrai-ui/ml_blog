@@ -370,6 +370,48 @@
   This last section is for the day you meet one.
   It is the same work, spoken in Python.
 
+  First the Alabama-Alaska gaps from the worked example, hard-coded:
+
+    import math
+
+    # Alabama and Alaska, raw measurements
+    al_murder, al_assault, al_urbanpop = 13.2, 236, 58
+    ak_murder, ak_assault, ak_urbanpop = 10.0, 263, 48
+
+    # straight-line (Euclidean) gap -- raw, unfair
+    euclid_raw = math.sqrt((al_murder-ak_murder)**2 + (al_assault-ak_assault)**2 + (al_urbanpop-ak_urbanpop)**2)
+    # sqrt(3.2^2 + 27^2 + 10^2) = sqrt(10.24 + 729 + 100) = sqrt(839.24) = 28.97
+    print(round(euclid_raw, 2))   # 28.97
+
+    # city-block (Manhattan) gap -- raw, unfair
+    manhattan_raw = abs(al_murder-ak_murder) + abs(al_assault-ak_assault) + abs(al_urbanpop-ak_urbanpop)
+    # 3.2 + 27 + 10 = 40.2
+    print(round(manhattan_raw, 1))   # 40.2  (city-block always >= straight-line)
+
+    # standardise: z = (raw - mean) / spread  (means and spreads from the full 50-state sheet)
+    murder_mean,   murder_spread   = 7.79,  4.36
+    assault_mean,  assault_spread  = 170.76, 83.34
+    urbanpop_mean, urbanpop_spread = 65.54, 14.47
+
+    al_m_z = (al_murder  - murder_mean)   / murder_spread    # (13.2-7.79)/4.36 = 1.24
+    al_a_z = (al_assault - assault_mean)  / assault_spread   # (236-170.76)/83.34 = 0.78
+    al_u_z = (al_urbanpop- urbanpop_mean) / urbanpop_spread  # (58-65.54)/14.47 = -0.52
+
+    ak_m_z = (ak_murder  - murder_mean)   / murder_spread    # (10-7.79)/4.36 = 0.51
+    ak_a_z = (ak_assault - assault_mean)  / assault_spread   # (263-170.76)/83.34 = 1.11
+    ak_u_z = (ak_urbanpop- urbanpop_mean) / urbanpop_spread  # (48-65.54)/14.47 = -1.21
+
+    print(round(al_m_z,2), round(al_a_z,2), round(al_u_z,2))   # 1.24  0.78 -0.52
+    print(round(ak_m_z,2), round(ak_a_z,2), round(ak_u_z,2))   # 0.51  1.11 -1.21
+
+    # fair gap -- straight-line on standardised numbers
+    euclid_fair = math.sqrt((al_m_z-ak_m_z)**2 + (al_a_z-ak_a_z)**2 + (al_u_z-ak_u_z)**2)
+    # sqrt(0.73^2 + 0.33^2 + 0.69^2) = sqrt(0.53+0.11+0.48) = sqrt(1.12) = 1.06
+    print(round(euclid_fair, 2))   # 1.06  (fair: each column gets equal voice)
+
+  Two states, two gaps (raw and fair), every column on its own line.  The toolbox block
+  below runs the same calculation on all 50 pairs:
+
   >> NEW TO PYTHON? Each named once:
        pd.read_csv()         -- load a sheet from a .csv file
        df.shape              -- (rows, columns)
