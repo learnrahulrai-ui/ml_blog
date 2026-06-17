@@ -367,7 +367,7 @@
     - This precise structure is not sacred -- it is one solution that happened to work.
 
   So: the PROBLEM (the fade) is a theorem you can prove with a pencil. The SOLUTION'S exact
-  shape is a CHOICE among many that work (Charter Law 7). Hold the mechanism -- scale-and-add
+  shape is a CHOICE among many that work. Hold the mechanism -- scale-and-add
   a long memory, gate it with dimmer knobs -- and treat the precise count of voters as a
   historical accident, not a law.
 
