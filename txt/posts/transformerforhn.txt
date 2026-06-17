@@ -152,10 +152,10 @@
   written in full, alongside a grid with real mixing numbers, both applied to lncat:
 
       the permutation ASK grid             a mixing ASK grid (same shape, real weights)
-      row1 = [0,0,1,0] . lncat = 0.000    row1 = [ 0.5, 0.2, 0.1, 0.0] . lncat = 0.5*1.414+... = 0.848
-      row2 = [1,0,0,0] . lncat = 1.414    row2 = [-0.3, 0.4, 0.0, 0.6] . lncat = -0.424+...+(-0.849)=-1.131
+      row1 = [0,0,1,0] . lncat = 0.000    row1 = [ 0.5, 0.2, 0.1, 0.0] . lncat = 0.707+0+0+0     = 0.707
+      row2 = [1,0,0,0] . lncat = 1.414    row2 = [-0.3, 0.4, 0.0, 0.6] . lncat = -0.424+0+0+(-0.848)=-1.272
       row3 = [0,0,0,1] . lncat = -1.414   row3 = [ 0.1, 0.1, 0.7, 0.2] . lncat = 0.141+0+0+(-0.283)=-0.141
-      row4 = [0,1,0,0] . lncat = 0.000    row4 = [ 0.0, 0.5, 0.5, 0.5] . lncat = 0+0+0+(-0.707)=-0.707
+      row4 = [0,1,0,0] . lncat = 0.000    row4 = [ 0.0, 0.5, 0.5, 0.5] . lncat = 0+0+0+(-0.707)  =-0.707
 
   The machine is identical either way: row dot weight-row. This page uses the clean permutation
   so the later softmax and LayerNorm stay checkable by hand; a trained machine uses grids like

@@ -113,10 +113,10 @@
 
     wine    alcohol    color_intensity
     -----   -------    ---------------
-     A        13.0          5.0
-     B        13.5          7.0
-     C        14.0          4.0
-     D        14.5          6.0
+     A        13.0          4.0
+     B        13.5          6.0
+     C        14.0          5.0
+     D        14.5          7.0
 
   First, standardise each column.
   Standardise means: standardised value (the z-score) = (raw value - column mean) / column spread.
@@ -126,10 +126,14 @@
     alcohol mean=13.75,  spread=0.65
     color   mean=5.5,    spread=1.29
 
-    A: alcohol z = (13.0-13.75)/0.65 = -1.15,  color z = (5.0-5.5)/1.29 = -0.39
-    B: alcohol z = (13.5-13.75)/0.65 = -0.38,  color z = (7.0-5.5)/1.29 =  1.16
-    C: alcohol z = (14.0-13.75)/0.65 =  0.38,  color z = (4.0-5.5)/1.29 = -1.16
-    D: alcohol z = (14.5-13.75)/0.65 =  1.15,  color z = (6.0-5.5)/1.29 =  0.39
+    A: alcohol z = (13.0-13.75)/0.65 = -1.15,  color z = (4.0-5.5)/1.29 = -1.16
+    B: alcohol z = (13.5-13.75)/0.65 = -0.38,  color z = (6.0-5.5)/1.29 =  0.39
+    C: alcohol z = (14.0-13.75)/0.65 =  0.38,  color z = (5.0-5.5)/1.29 = -0.39
+    D: alcohol z = (14.5-13.75)/0.65 =  1.15,  color z = (7.0-5.5)/1.29 =  1.16
+
+  Notice the two columns mostly rise and fall together: the wine low in alcohol (A) also
+  runs low in colour, the high one (D) runs high in both.  That shared rise is exactly what
+  gives PCA a clear diagonal to catch -- the longest shadow lies along that diagonal.
 
   Then find the longest shadow.
   In a 2-walled room this means spinning a line until the dots spread along it as far as possible.
@@ -144,39 +148,36 @@
   The two weights, 0.71 and 0.71, are called the loadings: how much of each column goes into the PC.
   The resulting number is that wine's PC1 coordinate, also called its PC1 score.
 
-    A: 0.71 * (-1.15) + 0.71 * (-0.39) = -0.82 + -0.28 = -1.09
-    B: 0.71 * (-0.38) + 0.71 * (1.16)  = -0.27 +  0.82 =  0.55
-    C: 0.71 * (0.38)  + 0.71 * (-1.16) =  0.27 + -0.82 = -0.55
-    D: 0.71 * (1.15)  + 0.71 * (0.39)  =  0.82 +  0.28 =  1.09
+    A: 0.71 * (-1.15) + 0.71 * (-1.16) = -0.82 + -0.82 = -1.64
+    B: 0.71 * (-0.38) + 0.71 * (0.39)  = -0.27 +  0.28 =  0.01
+    C: 0.71 * (0.38)  + 0.71 * (-0.39) =  0.27 + -0.28 = -0.01
+    D: 0.71 * (1.15)  + 0.71 * (1.16)  =  0.82 +  0.82 =  1.64
 
-  PC1 spreads from -1.09 to +1.09.
+  PC1 spreads from -1.64 to +1.64.
   PC2 is the next shadow at a right angle to PC1.
   It has its own recipe (its own loadings):
 
     PC2 = -0.71 * alcohol_z + 0.71 * color_z
 
-    A: -0.71 * (-1.15) + 0.71 * (-0.39) = 0.82 + -0.28 = 0.54
-    B: -0.71 * (-0.38) + 0.71 * (1.16)  = 0.27 +  0.82 = 1.09
-    C: -0.71 * (0.38)  + 0.71 * (-1.16) = -0.27 + -0.82 = -1.09
-    D: -0.71 * (1.15)  + 0.71 * (0.39)  = -0.82 +  0.28 = -0.54
+    A: -0.71 * (-1.15) + 0.71 * (-1.16) =  0.82 + -0.82 =  0.00
+    B: -0.71 * (-0.38) + 0.71 * (0.39)  =  0.27 +  0.28 =  0.55
+    C: -0.71 * (0.38)  + 0.71 * (-0.39) = -0.27 + -0.28 = -0.55
+    D: -0.71 * (1.15)  + 0.71 * (1.16)  = -0.82 +  0.82 =  0.00
 
   Plot each wine at (PC1, PC2):
 
     PC2 ^
-     1.0 |                B
-        |
-     0.5 |    A
-        |
-     0.0 -----------------------> PC1
-        |
-    -0.5 |                D
-        |
-    -1.0 |    C
-        |
-         -----+----+----+----
-           -1.0  -0.5   0   0.5  1.0
+     0.5 |              B
+         |
+     0.0 A----------------------------D--> PC1
+         |              C
+    -0.5 |
+         +-----+-----+-----+-----+-----+
+           -1.5  -0.75   0   0.75  1.5
 
-  The dots spread more along PC1 than PC2.
+  A and D sit far apart along PC1 (at -1.64 and +1.64) but dead on the PC2 line.
+  B and C barely move along PC1 yet split apart on PC2.
+  The dots spread far more along PC1 than PC2.
   Which means PC1 captures the stronger pattern.
 
   >> YOUR TURN
@@ -193,10 +194,10 @@
   ## How Much Does Each Shadow Capture?
 
   IN HAND so far: four wines put on the same ruler (mean 0, spread 1 per column).
-  Then a recipe PC1 = 0.71 * alcohol_z + 0.71 * color_z that spread them from -1.09 to +1.09.
+  Then a recipe PC1 = 0.71 * alcohol_z + 0.71 * color_z that spread them from -1.64 to +1.64.
   Then PC2 = -0.71 * alcohol_z + 0.71 * color_z at a right angle.
-  The four PC1 scores were -1.09, 0.55, -0.55, 1.09.
-  The four PC2 scores were 0.54, 1.09, -1.09, -0.54.
+  The four PC1 scores were -1.64, 0.01, -0.01, 1.64.
+  The four PC2 scores were 0.00, 0.55, -0.55, 0.00.
   This section asks how much of the total spread each shadow actually caught.
 
   First define variance.
@@ -213,23 +214,25 @@
   We already have the PC scores.
   Variance = mean of squared values, since the mean is 0:
 
-    PC1 scores: -1.09,  0.55,  -0.55,  1.09
-    PC1 variance = (1.09^2 + 0.55^2 + 0.55^2 + 1.09^2) / 4
-                 = (1.19 + 0.30 + 0.30 + 1.19) / 4
-                 = 2.98 / 4  = 0.75
+    PC1 scores: -1.64,  0.01,  -0.01,  1.64
+    PC1 variance = (1.64^2 + 0.01^2 + 0.01^2 + 1.64^2) / 4
+                 = (2.69 + 0.00 + 0.00 + 2.69) / 4
+                 = 5.38 / 4  = 1.35
 
-    PC2 scores:  0.54,  1.09,  -1.09,  -0.54
-    PC2 variance = (0.54^2 + 1.09^2 + 1.09^2 + 0.54^2) / 4
-                 = (0.29 + 1.19 + 1.19 + 0.29) / 4
-                 = 2.96 / 4  = 0.74
+    PC2 scores:  0.00,  0.55,  -0.55,  0.00
+    PC2 variance = (0.00^2 + 0.55^2 + 0.55^2 + 0.00^2) / 4
+                 = (0.00 + 0.30 + 0.30 + 0.00) / 4
+                 = 0.60 / 4  = 0.15
 
-    total = 0.75 + 0.74 = 1.49
+    total = 1.35 + 0.15 = 1.50
 
-    PC1 fraction = 0.75 / 1.49 = 0.50  (50%)
-    PC2 fraction = 0.74 / 1.49 = 0.50  (50%)
+    PC1 fraction = 1.35 / 1.50 = 0.90  (90%)
+    PC2 fraction = 0.15 / 1.50 = 0.10  (10%)
 
-  With only 2 original columns, each PC naturally carries about half.
-  The fractions get interesting when you have 13 columns.
+  PC1 carries about 90% here, PC2 only 10% -- because the two columns rise and fall
+  together (they correlate), so most of the spread lies along the one diagonal PC1 catches.
+  Had the two columns been unrelated, each PC would carry about half instead.
+  The fractions get even more lopsided when you have 13 columns.
   Then the first shadow can eat 36% while the 12th shadow carries 1%.
 
   With the real 13-column wine data, PC1 carries ~36%.
