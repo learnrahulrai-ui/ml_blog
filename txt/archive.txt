@@ -91,6 +91,7 @@
   reference   [C. LSTM From Pencil -- RNN and LSTM From Scratch, Nothing But a Pencil](posts/lstm-from-pencil.txt)
   reference   [D. Transformer From Pencil -- Attention From Scratch, One Number at a Time](posts/transformer-from-pencil.txt)
   reference   [E. Vision Transformer From Pencil -- Strips, Seat-Stamps, and Masks by Hand](posts/vit-from-pencil.txt)
+  reference   [F. Cheapest Walk: UCS and A* From Pencil -- Every Round Worked Out by Hand](posts/cheapest-walk-ucs-astar.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

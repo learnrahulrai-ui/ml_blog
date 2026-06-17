@@ -194,6 +194,15 @@
     on two strips, LayerNorm on one row (45, √125, [0.45, 1.34, -0.45, -1.34]), and the causal
     mask triangle of -inf that splits reader from writer. YOUR TURN drills throughout. No code.
 
+  [F. Cheapest Walk: UCS and A* From Pencil -- Every Round Worked Out by Hand](posts/cheapest-walk-ucs-astar.txt)
+    reference . 2026-06-17 . standalone . search, ucs, a-star, by-hand, pathfinding
+    A KATA: uniform-cost search and A* built from nothing -- a small town map (S, A, B, C, G),
+    three papers on your desk (pile/heap, tab/dict, breadcrumb), the full 6-round UCS walk with
+    every offer and discard shown, and the proof that the cheapest-unsettled pop is final (roads
+    ≥ 0, therefore any alternative costs more). A* changes exactly one thing: the pile sorts by
+    cost + straight-line under-guess, while the tab and returned cost stay cost alone. YOUR TURN
+    drills at three points. Real numbers throughout; hard-coded Python at the end.
+
   [SPECIAL. Transformers With Pencil -- A Whole Block Worked by Hand, One Line at a Time](posts/transformerforhn.txt)
     special . 2026-06-15 . standalone . transformer, attention, from-scratch
     Written for Hacker News, self-contained: ONE full transformer block run end to end on two
