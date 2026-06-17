@@ -375,27 +375,42 @@
     ANSWERER. WANT, HAVE, and GIVE all come from the same word-sticks -- the sentence looking
     at itself.
 
-  Run the attention math yourself with numpy (matches the pencil exactly, under one second):
+  Run the attention math yourself -- no numpy, no loop, every move on its own line, exactly
+  as on the pencil paper. Two words, so two matches, two shares, four slots: all written out.
 
-      import numpy as np
+      import math
 
-      nolan_want = np.array([2, 0, 1, 0])
-      nolan_have = np.array([1, 0, 0, 0]);  ended_have = np.array([3, 0, 2, 0])
-      nolan_give = np.array([2, 0, 0, 1]);  ended_give = np.array([0, 3, 1, 0])
+      # nolan's WANT, and each word's HAVE and GIVE (hard-coded from the pencil)
+      nolan_want = [2, 0, 1, 0]
+      nolan_have = [1, 0, 0, 0];   ended_have = [3, 0, 2, 0]
+      nolan_give = [2, 0, 0, 1];   ended_give = [0, 3, 1, 0]
 
-      matches = np.array([nolan_want @ nolan_have,    # 2
-                          nolan_want @ ended_have])   # 8    → [2, 8]
+      # MATCH = dot product (multiply slot by slot, add) -- both matches written out
+      match_nolan = 2*1 + 0*0 + 1*0 + 0*0          # 2
+      match_ended = 2*3 + 0*0 + 1*2 + 0*0          # 8
 
-      scaled = matches / np.sqrt(4)                   # [1.0, 4.0]
+      # SCALE: divide each by sqrt(tag width) = sqrt(4) = 2
+      scaled_nolan = match_nolan / 2               # 1.0
+      scaled_ended = match_ended / 2               # 4.0
 
-      e      = np.exp(scaled)                         # [2.718, 54.60]
-      fracs  = e / e.sum()                            # [0.047, 0.953]
+      # SOFTMAX: raise e to each, divide each by the total
+      e_nolan = math.exp(scaled_nolan)             # 2.718
+      e_ended = math.exp(scaled_ended)             # 54.60
+      total   = e_nolan + e_ended                  # 57.32
+      share_nolan = round(e_nolan / total, 3)      # 0.047
+      share_ended = round(e_ended / total, 3)      # 0.953
+      print(share_nolan, share_ended)              # 0.047 0.953
 
-      gives     = np.vstack([nolan_give, ended_give]) # shape 2 × 4
-      nolan_new = fracs @ gives                       # [0.094, 2.859, 0.953, 0.047]
+      # WEIGHTED SUM of the GIVE sticks, one slot at a time (4 slots, written out)
+      slot1 = share_nolan*2 + share_ended*0        # 0.094
+      slot2 = share_nolan*0 + share_ended*3        # 2.859
+      slot3 = share_nolan*0 + share_ended*1        # 0.953
+      slot4 = share_nolan*1 + share_ended*0        # 0.047
+      print([slot1, slot2, slot3, slot4])          # [0.094, 2.859, 0.953, 0.047]
 
-  Every number that prints matches the pencil paper above. Change a dial value and re-run
-  to feel the machine respond.
+  Every number that prints matches the pencil paper above. The real lab runs 100 words of
+  width 32, so the toolbox above (MultiHeadAttention) loops the identical match-scale-softmax-
+  weight over every word pair for you -- the four-slot block here is one cell of that loop.
 
 
   ## Five Passes, Then the Four-Way Contest (Q9, Q10)
