@@ -26,8 +26,12 @@
 
   Strip the mechanism down to the one picture that matters now. Lay every token's score in a
   grid: row i is the token doing the looking, column j is the token being looked at. Cell (i,j)
-  is how much token i wants to listen to token j -- the WANT-dot-HAVE match from Chapter 10,
-  before it is turned into portions.
+  is how much token i wants to listen to token j. Where does that number come from? Each token
+  carries two small tags built from its values: a WANT tag (what it is looking for) and a HAVE
+  tag (what it offers). The score in cell (i,j) is the dot product of token i's WANT with token
+  j's HAVE -- multiply the tags slot by slot and add -- a single number that is large when what
+  i wants lines up with what j has. That raw match is what fills the grid, before it is turned
+  into portions.
 
       raw scores (3 tokens):
               j1   j2   j3
