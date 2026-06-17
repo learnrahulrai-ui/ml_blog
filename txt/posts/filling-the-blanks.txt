@@ -154,10 +154,10 @@
   Before trusting any machine, I tried to fill a blank by hand.  Person 7 rated 5
   movies; his cell at movie m is blank.  The recipe:
 
-    1. rank everyone by closeness to person 7 -- over the movies BOTH rated, take
-       the differences, and average their sizes into one closeness number
-    2. walk down the ranking; stop at the FIRST person who actually RATED movie m
-    3. copy that person's humbled VALUE into person 7's blank
+    First, rank everyone by closeness to person 7 -- over the movies BOTH rated, take
+    the differences, and average their sizes into one closeness number.
+    Then walk down the ranking and stop at the FIRST person who actually RATED movie m.
+    So that person's humbled VALUE is what you copy into person 7's blank.
 
   One catch the recipe must dodge: trust whole-row closeness over one lucky shared
   movie.
