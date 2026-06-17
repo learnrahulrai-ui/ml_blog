@@ -232,8 +232,34 @@
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
-  The toolbox hides all of this behind one line; the by-hand version is two. Worth running
-  both once, to see they agree -- and to see the LADDER disagree the moment columns overlap.
+  First the LADDER by hand -- the four people from the worked example, each term on its own
+  line, no loop, so you watch top 4.12, bottom 0.0120, and dial 343 print back:
+
+    # the four people: (bmi, answer), one per line
+    A_x, A_y = 0.04,  97
+    B_x, B_y = 0.06, 121
+    C_x, C_y = 0.12, 135
+    D_x, D_y = 0.18, 151
+
+    xbar = (0.04 + 0.06 + 0.12 + 0.18) / 4     # 0.10  (the bmi column's own average)
+    ybar = (97 + 121 + 135 + 151) / 4          # 126   (the answer's average)
+
+    # TOP = sum of (x - xbar)(y - ybar), one term per person
+    top = ((0.04-0.10)*(97-126) + (0.06-0.10)*(121-126)
+         + (0.12-0.10)*(135-126) + (0.18-0.10)*(151-126))      # 4.12
+
+    # BOTTOM = sum of (x - xbar)^2, one term per person
+    bottom = ((0.04-0.10)**2 + (0.06-0.10)**2
+            + (0.12-0.10)**2 + (0.18-0.10)**2)                 # 0.0120
+
+    ladder_dial = top / bottom
+    print(round(top,2), round(bottom,4), round(ladder_dial))   # 4.12 0.012 343
+
+  That is the bmi dial IF bmi stood alone. The EXACT dials need the untangler (X^T X)^-1 to
+  share credit across overlapping columns -- and across ten columns and hundreds of rows you
+  cannot do that inverse by pencil. THIS is where the toolbox is honest: the line below does
+  the flat-bottom solve for all ten dials at once. Run it beside the LADDER and watch them
+  disagree the moment columns overlap.
 
   >> NEW TO PYTHON? Each named once:
        Xc, y               -- Xc = X_train_scaled (zero-mean columns); y = y_train
