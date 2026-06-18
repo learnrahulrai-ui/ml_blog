@@ -1,0 +1,630 @@
+@title Bayes by Head-Count: The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . FOR HACKER NEWS
+  Bayes by Head-Count: The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild
+  Posted: 2026-06-18 . Author: Rahul Rai . Tags: probability, bayes, statistics, by-hand
+  ============================================================================================
+
+  PATH . SPECIAL -- Bayes by Head-Count  (standalone; no other page on this blog needed)
+
+  Every Bayes tutorial gives you the formula:  P(A|B) = P(B|A) P(A) / P(B).  Then it asks
+  you to swap the letters around until the answer pops out. That is not an explanation -- it
+  is a recipe card with no kitchen. Two things always go missing: WHY the formula inverts the
+  question at all, and what happens to the people the machine silently misses.  This page
+  builds the kitchen first: four characters in one small story, ten concrete scenarios, and
+  every answer arrived at by counting heads in a Sunday market crowd. The formula falls out on
+  its own, after you have already used it.
+
+  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
+  appears. Anything named more than five lines ago is named again. Every number is worked in
+  front of you, never "recall that...". One idea per line. A pencil and this page are the
+  whole kit. Decimals shown to four places; rounded to two in summaries.
+
+  TOY NUMBERS, REAL RECIPE. One line of honesty up front. The RECIPE -- the Sunday-crowd
+  trick, the two-crowd distinction, the gluing move, Bayes' rule itself -- is exact. The
+  NUMBERS are a toy: small crowds (100 or 1,000 souls) and simple machine rates, chosen so
+  arithmetic fits on paper. Where a toy choice could mislead, the text says so. Trust the
+  recipe; treat the crowd sizes as a sketchpad.
+
+  The one move, named once so you are not surprised later:
+
+      STOP reading fractions as decimals. Make them HEADS IN THE SUNDAY CROWD. Then every
+      Bayes question becomes the same plain count: "of the heads holding a BEEP paper,
+      how many are truly sick?"
+
+  That single translation turns ten formulas into one arithmetic fact.
+
+
+  ## The Cast (the people who live inside every probability problem)
+
+  **The market runs on SUNDAY.** We never reason about "the world" in the abstract. We reason
+  about the crowd that files past a stall this one Sunday -- 100 souls, or 1,000, or 10,000.
+  Turn every fraction into heads in that crowd. That is the whole trick.
+
+  **The greedy shopkeeper** runs a test-stall on market day. Feed him a person, his machine
+  prints a paper: BEEP (positive) or silence (negative). He is greedy -- he loves printing
+  BEEP papers because each one is a sale. He will NEVER tell you how many BEEP papers he
+  prints in total. That hidden number is P(Beep) -- the overall share of the crowd that walks
+  out holding a beep. The shopkeeper hides it. We rebuild it from scratch in the next section.
+
+  **The faulty machine** lies two ways:
+  - It stays silent on a truly sick person: a MISSED CASE (the textbook calls this a false
+    negative, or a miss). The person walks away believing they are fine.
+  - It beeps on a healthy person: a GLITCH (false positive). The person walks away alarmed
+    for no reason.
+
+  **The doctor** sits downstream. A patient walks in clutching a BEEP paper: "Doctor -- given
+  this beep, am I actually sick?" That is the Bayes question. The doctor sees only the beep
+  paper; she does not see the crowd behind it.
+
+  **The wild** = outside the stall. Every sick person the machine stayed silent on walks back
+  into the wild holding a clean paper -- undiagnosed, untreated, possibly spreading the
+  disease, possibly worsening. Bayes arithmetic counts only beepers; it throws the missed
+  cases away. That blindness is exactly why missing them is the dangerous part.
+
+
+  ## The Comma and the Bar (two different crowds answer two different questions)
+
+  Two probability symbols look almost identical but measure completely different crowds.
+
+  **The comma: P(A, B) = JOINT = "both, out of the whole Sunday crowd."**
+  P(Sick, Beep) is the share of the WHOLE crowd that is sick AND holds a beep paper. You
+  stand outside and count everyone -- healthy, sick, beeping, silent. The denominator is the
+  full Sunday crowd.
+
+  **The bar: P(B | A) = CONDITIONAL = "out of one shrunk back-room."**
+  P(Beep | Sick) is the share of the beepers ONLY AMONG the sick. First, throw out everyone
+  who isn't sick. Lock the remaining sick people in a back room. Ignore the healthy crowd
+  entirely. Now count: of these sick-only people, what share got a beep? The denominator
+  shrank to the back-room.
+
+  The link between them (true by definition, not a formula to memorise):
+
+      P(A, B)  =  P(B | A) * P(A)
+      (whole-crowd both)  =  (back-room share) * (whole-crowd share of A)
+
+  Rearranged: P(B | A) = P(A, B) / P(A). In words: to go from the joint to the conditional,
+  divide by the size of the back-room.
+
+  The two questions these answer:
+  - P(Sick, Beep): "Of everyone who walked past the stall today, what share was sick AND
+    beeped?" Denominator = whole crowd.
+  - P(Beep | Sick): "Of the sick people specifically, what share did the machine catch?"
+    Denominator = sick people only.
+
+  They measure different things. Confusing them is the single most common Bayes mistake.
+
+
+  ## The Shopkeeper Hides P(Beep) -- So We Rebuild It by Gluing
+
+  The doctor's question -- "given this beep, am I sick?" -- would be trivial if the greedy
+  shopkeeper told us the total share of beep papers. He refuses. So we build that total
+  ourselves from the only two ways a beep paper is born:
+
+      WAY 1: a SICK person the machine caught.
+             share = P(Beep | Sick) * P(Sick)
+
+      WAY 2: a HEALTHY person the machine glitched on.
+             share = P(Beep | Healthy) * P(Healthy)
+
+  These two crowds never overlap (a person is either sick or healthy, never both). So we just
+  add them:
+
+      P(Beep) = P(Beep|Sick)*P(Sick)  +  P(Beep|Healthy)*P(Healthy)
+
+  This is the Law of Total Probability -- the total beep count is the sum of beeps from
+  separate, non-overlapping sub-crowds. Three sub-crowds (disease A, disease B, healthy C)?
+  Glue three terms:
+
+      P(Beep) = P(Beep|A)*P(A) + P(Beep|B)*P(B) + P(Beep|Healthy)*P(Healthy)
+
+  Plug this gluing into P(A|Beep) = P(A, Beep) / P(Beep) and you get the full Bayes rule:
+
+      P(Sick | Beep)  =       P(Beep | Sick) * P(Sick)
+                         -----------------------------------------------
+                         P(Beep|Sick)*P(Sick) + P(Beep|Healthy)*P(Healthy)
+
+  You never need to memorise this formula. Just build the Sunday crowd, count the beepers by
+  sub-crowd, glue them, and divide the relevant pile by the total.
+
+
+  ## The Sick Who Walked Away
+
+  The machine missed them. They hold a clean paper. Bayes never counted them -- the whole
+  machinery above only ever looks at people whose paper beeped. The missed cases are outside
+  the calculation, back in the wild, untreated.
+
+  This is not a theoretical concern. In a disease with 1% prevalence (10 sick per 1,000
+  people), a machine that catches 90% of the sick still sends 1 sick person per 1,000 back
+  into the wild holding a clean paper. That 1 person does not know they are sick. For an
+  infectious disease, that 1 matters far more than 99 false alarms. The Bayes number
+  (P(Sick | Beep)) measures the doctor's precision on beepers. It says nothing at all about
+  the danger of the silence.
+
+  The lesson: for safety tests -- disease screening, structural fault detection -- cutting
+  the silent misses (raising the machine's catch rate on the sick) usually matters far more
+  than reducing false alarms. Bayes gives you precision. The wild gives you the other bill.
+
+
+  ## Ten Problems, One Sunday Crowd
+
+  The same move on every problem: make the fractions into heads, draw the two piles
+  (sick and healthy), run each through the machine, count the beepers, divide.
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 1 -- conditional from joint
+  Given: P(Sick, Beep) = 0.15  and  P(Sick) = 0.50.   Find: P(Beep | Sick).
+
+  100 souls this Sunday. 50 are sick (P(Sick)=0.50). Of the whole 100, 15 are sick AND
+  beeped (P(Sick, Beep)=0.15). Lock the 50 sick in the back room. 15 of them beeped.
+
+      P(Beep | Sick) = 15 / 50 = 0.30
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 2 -- joint from conditional
+  Given: P(Sick) = 0.30  and  P(Beep | Sick) = 0.20.   Find: P(Sick, Beep).
+
+  100 souls. 30 are sick. The machine catches only 20% of them: 30 * 0.20 = 6 sick-and-
+  beeping. Out of the whole 100, that is:
+
+      P(Sick, Beep) = 6 / 100 = 0.06
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 3 -- classic Bayes: the shopkeeper hands us P(Beep) directly
+  Given: P(Sick) = 0.30, P(Beep | Sick) = 0.80, P(Beep) = 0.50.   Find: P(Sick | Beep).
+
+  100 souls. 30 truly sick. Machine catches 80% of them: 30 * 0.80 = 24 true beeps. The
+  shopkeeper tells us he handed out 50 beep papers total today. A patient clutches a beep --
+  one of the 50. Truly sick?
+
+      P(Sick | Beep) = 24 / 50 = 0.48
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 4 -- rare disease (1%): the rarity trap, first encounter
+  Given: P(D) = 0.01, P(Beep | D) = 0.90, P(Beep | Healthy) = 0.10.
+  Find: P(D | Beep).
+
+  1,000 souls this Sunday.
+
+      Sick (1% = 10): machine catches 90%  ->  9 true beeps.   1 missed -- walks into the wild.
+      Healthy (990):  machine glitches 10% ->  99 false beeps.
+
+  Glue the beep papers:  9 + 99 = 108 total.
+  A patient holds a beep. Truly sick?
+
+      P(D | Beep) = 9 / 108 = 0.0833   ->  about 8%.
+
+  A beep means sick only 8% of the time. The disease is so rare (1%) that the machine's
+  10% glitch rate on the huge healthy crowd (99 false beeps) swamps the tiny sick crowd
+  (9 true beeps). This is the rarity trap: a positive test result on a rare disease is
+  mostly noise. In the wild: 1 sick person per 1,000 walked away clean and undiagnosed.
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 5 -- common disease (30%): when prevalence fights the glitch
+  Given: P(Sick) = 0.30, P(Beep | Sick) = 0.60, P(Beep | Healthy) = 0.20.
+  Find: P(Sick | Beep).
+
+  100 souls.
+
+      Sick (30): machine catches 60%  ->  18 true beeps.  12 missed -- into the wild.
+      Healthy (70): machine glitches 20%  ->  14 false beeps.
+
+  Glue:  18 + 14 = 32.
+
+      P(Sick | Beep) = 18 / 32 = 0.5625   ->  about 56%.
+
+  Now prevalence fights back: 30% sick is common enough that the 18 true beeps outnumber
+  the 14 glitches. But 12 sick people walked away clean -- more than the 9 in Problem 4.
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 6 -- rarity trap deepened (2%): the small sick crowd drowns again
+  Given: P(D) = 0.02, P(Beep | D) = 0.80, P(Beep | Healthy) = 0.05.
+  Find: P(D | Beep).
+
+  1,000 souls.
+
+      Sick (2% = 20): caught 80%  ->  16 true beeps.   4 missed -- into the wild.
+      Healthy (980):  glitch 5%   ->  49 false beeps.
+
+  Glue:  16 + 49 = 65.
+
+      P(D | Beep) = 16 / 65 = 0.2462   ->  about 25%.
+
+  The machine is better (80% catch rate, only 5% glitch rate) than in Problem 4. Yet a beep
+  is still only right one time in four. Why? The disease is rare (2%), so the tiny sick crowd
+  (16) is drowned by even a small glitch rate on the huge healthy crowd (49). The sting of
+  the rarity trap does not go away just because the machine is better. It goes away when
+  prevalence rises.
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 7 -- two causes: Disease AND a harmless Sniffle confuse the machine
+  Given: P(D) = 0.01, P(Sniffle) = 0.05 (independent of D).
+  Machine rates:   P(Beep | D, Sniffle) = 0.99
+                   P(Beep | D, no Sniffle) = 0.95
+                   P(Beep | no D, Sniffle) = 0.90
+                   P(Beep | no D, no Sniffle) = 0.02  (pure glitch)
+  Find: P(D | Beep).
+
+  This Sunday, 10,000 souls pass the stall. Four corners of the crowd:
+
+      D & Sniffle:    0.01 * 0.05 * 10,000 =    5   ->  beep 0.99  ->    4.95
+      D only:         0.01 * 0.95 * 10,000 =   95   ->  beep 0.95  ->   90.25
+      Sniffle only:   0.99 * 0.05 * 10,000 =  495   ->  beep 0.90  ->  445.50
+      Neither:        0.99 * 0.95 * 10,000 = 9405   ->  beep 0.02  ->  188.10
+
+  Glue all beep papers:  4.95 + 90.25 + 445.50 + 188.10 = 728.80.
+  Of those, the ones who truly have the Disease = 4.95 + 90.25 = 95.20.
+
+      P(D | Beep) = 95.20 / 728.80 = 0.1306   ->  about 13%.
+
+  The harmless Sniffle (common: 5%) triggers the machine at 90%, flooding the pile with
+  445 sniffle-beeps. The glitch-on-neither adds 188 more. Real Disease beeps (95) are lost
+  in the noise. A beep means the actual Disease only 13% of the time.
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 8 -- two machines (the shopkeeper charges you twice)
+  Given: P(H) = 0.10. Two independent machines.
+  Machine 1: P(M1 | H) = 0.80, P(M1 | Healthy) = 0.20.
+  Machine 2: P(M2 | H) = 0.70, P(M2 | Healthy) = 0.10.
+  Doctor only acts when BOTH papers beep.   Find: P(H | M1, M2).
+
+  1,000 souls.
+
+      Sick (10% = 100):
+          M1 beeps 80% -> 80.   Of those, M2 beeps 70% -> 56 get both papers.
+          44 sick get fewer than both -- sent home -- into the wild.
+      Healthy (900):
+          M1 glitches 20% -> 180.   Of those, M2 glitches 10% -> 18 get both papers.
+
+  Glue the double-beepers:  56 + 18 = 74.
+
+      P(H | M1, M2) = 56 / 74 = 0.7568   ->  about 76%.
+
+  Two machines in series raise precision dramatically: from a single-machine ~44% (try it:
+  same H=10%, catch=80%, glitch=20%) to 76%. The price: 44 sick people failed both tests and
+  walked into the wild. More machines to confirm = fewer false alarms = more missed cases.
+  There is no free lunch.
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 9 -- the useless scribble (ignore the distraction)
+  Given: P(D) = 0.30, P(Beep | D) = 0.80, P(Beep | Healthy) = 0.20.
+  The shopkeeper also scrawls a red-coat note on every paper ("patient wore a red coat") --
+  a trap clue the doctor must ignore. Find: P(D | Beep).
+
+  100 souls.
+
+      Sick (30): machine beeps 80%  ->  24 true beeps.   6 missed -- into the wild.
+      Healthy (70): machine glitches 20%  ->  14 false beeps.
+
+  Glue:  24 + 14 = 38.
+
+      P(D | Beep) = 24 / 38 = 0.6316   ->  about 63%.
+
+  The red-coat note is irrelevant. It does not appear in the calculation. The trap is
+  including it -- spending mental effort on a variable that has no power to change the
+  answer. The Sunday crowd ignores it automatically: you counted beepers, not coat colours.
+
+  ─────────────────────────────────────────────────────────────────────────
+
+  PROBLEM 10 -- three problems in one number
+  Turn Problems 4, 6, 9 into one table to see what actually moves the needle:
+
+      Problem   P(D)   catch rate   glitch rate   P(D|Beep)   missed per 1,000
+      -------   ----   ----------   -----------   ---------   ----------------
+        P4      1%        90%          10%           8.3%           1
+        P6      2%        80%           5%          24.6%           4
+        P9     30%        80%          20%          63.2%          60
+
+  The rarity trap is real: going from 1% to 2% prevalence (doubling the sick share) with a
+  better machine raises the positive-test precision from 8% to 25%. Going to 30% prevalence
+  pushes it to 63%. Prevalence is the dominant lever. A beep from a rare-disease machine is
+  almost always a glitch -- even with a 90% catch rate. Meanwhile the absolute missed count
+  grows with prevalence: at 30% sick, 60 per 1,000 walk into the wild untreated. Precision
+  and recall pull opposite directions. The machine can only trade between them.
+
+
+  ## Python: Three Cases Hard-Coded, Then a Full Simulation
+
+  Three problems shown variable by variable -- no loops, every number on a line -- then the
+  full Monte Carlo simulation (100,000 souls per run) to verify all ten answers.
+
+  ```python
+  # -----------------------------------------------------------------------
+  # PART 1: PROBLEMS 4, 5, 6 -- hard-coded, line by line, no loops
+  # Crowd size 1,000 for P4/P6; 100 for P5. Every number explicit.
+  # -----------------------------------------------------------------------
+
+  # ---- PROBLEM 4 (rare disease: 1%, catch 90%, glitch 10%, 1000 souls) ----
+  crowd_p4         = 1000
+  sick_p4          = crowd_p4 * 0.01           # 10  (truly sick)
+  healthy_p4       = crowd_p4 - sick_p4        # 990
+
+  true_beeps_p4    = sick_p4 * 0.90            # 9   (sick and caught)
+  missed_p4        = sick_p4 * 0.10            # 1   (sick and missed -> wild)
+  false_beeps_p4   = healthy_p4 * 0.10         # 99  (healthy and glitched)
+
+  total_beeps_p4   = true_beeps_p4 + false_beeps_p4   # 108
+  p_sick_given_beep_p4 = true_beeps_p4 / total_beeps_p4
+
+  print(f"P4: true={true_beeps_p4:.0f}, glitch={false_beeps_p4:.0f}, "
+        f"total={total_beeps_p4:.0f}, P(D|Beep)={p_sick_given_beep_p4:.4f}")
+  # P4: true=9, glitch=99, total=108, P(D|Beep)=0.0833
+  print(f"P4: missed into wild = {missed_p4:.0f} per {crowd_p4} people")
+  # P4: missed into wild = 1 per 1000 people
+
+
+  # ---- PROBLEM 5 (30% flu: catch 60%, glitch 20%, 100 souls) ----
+  crowd_p5         = 100
+  sick_p5          = crowd_p5 * 0.30           # 30
+  healthy_p5       = crowd_p5 - sick_p5        # 70
+
+  true_beeps_p5    = sick_p5 * 0.60            # 18
+  missed_p5        = sick_p5 * 0.40            # 12  (into wild)
+  false_beeps_p5   = healthy_p5 * 0.20         # 14
+
+  total_beeps_p5   = true_beeps_p5 + false_beeps_p5   # 32
+  p_sick_given_beep_p5 = true_beeps_p5 / total_beeps_p5
+
+  print(f"P5: true={true_beeps_p5:.0f}, glitch={false_beeps_p5:.0f}, "
+        f"total={total_beeps_p5:.0f}, P(Sick|Beep)={p_sick_given_beep_p5:.4f}")
+  # P5: true=18, glitch=14, total=32, P(Sick|Beep)=0.5625
+  print(f"P5: missed into wild = {missed_p5:.0f} per {crowd_p5} people")
+  # P5: missed into wild = 12 per 100 people
+
+
+  # ---- PROBLEM 6 (2% disease: catch 80%, glitch 5%, 1000 souls) ----
+  crowd_p6         = 1000
+  sick_p6          = crowd_p6 * 0.02           # 20
+  healthy_p6       = crowd_p6 - sick_p6        # 980
+
+  true_beeps_p6    = sick_p6 * 0.80            # 16
+  missed_p6        = sick_p6 * 0.20            # 4   (into wild)
+  false_beeps_p6   = healthy_p6 * 0.05         # 49
+
+  total_beeps_p6   = true_beeps_p6 + false_beeps_p6   # 65
+  p_sick_given_beep_p6 = true_beeps_p6 / total_beeps_p6
+
+  print(f"P6: true={true_beeps_p6:.0f}, glitch={false_beeps_p6:.0f}, "
+        f"total={total_beeps_p6:.0f}, P(D|Beep)={p_sick_given_beep_p6:.4f}")
+  # P6: true=16, glitch=49, total=65, P(D|Beep)=0.2462
+  print(f"P6: missed into wild = {missed_p6:.0f} per {crowd_p6} people")
+  # P6: missed into wild = 4 per 1000 people
+
+  # The rarity trap visible in one comparison:
+  print(f"\nRarity trap: P4 precision={p_sick_given_beep_p4:.2%}, "
+        f"P6 precision={p_sick_given_beep_p6:.2%}")
+  # Rarity trap: P4 precision=8.33%, P6 precision=24.62%
+  # Doubling prevalence (1%->2%) with a better machine triples precision.
+  # Prevalence is the dominant lever, not the machine.
+  ```
+
+  Output of Part 1:
+
+      P4: true=9, glitch=99, total=108, P(D|Beep)=0.0833
+      P4: missed into wild = 1 per 1000 people
+      P5: true=18, glitch=14, total=32, P(Sick|Beep)=0.5625
+      P5: missed into wild = 12 per 100 people
+      P6: true=16, glitch=49, total=65, P(D|Beep)=0.2462
+      P6: missed into wild = 4 per 1000 people
+      Rarity trap: P4 precision=8.33%, P6 precision=24.62%
+
+  ```python
+  # -----------------------------------------------------------------------
+  # PART 2: FULL SIMULATION -- 100,000 souls, every problem verified
+  # Reskinned to match the shopkeeper-and-doctor world exactly.
+  # One loop per problem so the numbers stay visible; no abstraction.
+  # (A loop here hides the per-person coin flip, not the Bayes logic --
+  #  100,000 explicit if-statements would make the same point more slowly.)
+  # -----------------------------------------------------------------------
+  import random
+
+  def run_simulation(n=100_000):
+      print(f"Running {n:,}-soul simulation (shopkeeper's world)...")
+      print("=" * 60)
+
+      # ---- PROBLEM 4: rare disease 1%, catch 90%, glitch 10% ----
+      p4_true = 0;  p4_glitch = 0;  p4_missed = 0
+      for _ in range(n):
+          sick = random.random() < 0.01
+          if sick:
+              if random.random() < 0.90: p4_true   += 1
+              else:                      p4_missed  += 1
+          else:
+              if random.random() < 0.10: p4_glitch  += 1
+      total = p4_true + p4_glitch
+      print(f"P4 (rare disease 1%):  total beeps={total}, "
+            f"true={p4_true}, glitch={p4_glitch}, missed->wild={p4_missed}")
+      print(f"  Empirical P(D|Beep)={p4_true/total:.4f}   Theory: 0.0833")
+      print("-" * 60)
+
+      # ---- PROBLEM 5: 30% flu, catch 60%, glitch 20% ----
+      p5_true = 0;  p5_glitch = 0;  p5_missed = 0
+      for _ in range(n):
+          sick = random.random() < 0.30
+          if sick:
+              if random.random() < 0.60: p5_true   += 1
+              else:                      p5_missed  += 1
+          else:
+              if random.random() < 0.20: p5_glitch  += 1
+      total = p5_true + p5_glitch
+      print(f"P5 (30% flu):          total beeps={total}, "
+            f"true={p5_true}, glitch={p5_glitch}, missed->wild={p5_missed}")
+      print(f"  Empirical P(Sick|Beep)={p5_true/total:.4f}   Theory: 0.5625")
+      print("-" * 60)
+
+      # ---- PROBLEM 6: 2% disease, catch 80%, glitch 5% ----
+      p6_true = 0;  p6_glitch = 0;  p6_missed = 0
+      for _ in range(n):
+          sick = random.random() < 0.02
+          if sick:
+              if random.random() < 0.80: p6_true   += 1
+              else:                      p6_missed  += 1
+          else:
+              if random.random() < 0.05: p6_glitch  += 1
+      total = p6_true + p6_glitch
+      print(f"P6 (2% disease):       total beeps={total}, "
+            f"true={p6_true}, glitch={p6_glitch}, missed->wild={p6_missed}")
+      print(f"  Empirical P(D|Beep)={p6_true/total:.4f}   Theory: 0.2462")
+      print("-" * 60)
+
+      # ---- PROBLEM 7: Disease(1%) + Sniffle(5%), four-corner machine ----
+      # The machine beeps at a different rate depending on which a person carries.
+      # Disease and Sniffle are independent -- a person can have both, either, or neither.
+      p7_beep_and_disease = 0;  p7_beep_no_disease = 0;  p7_disease_missed = 0
+      for _ in range(n):
+          has_disease = random.random() < 0.01
+          has_sniffle = random.random() < 0.05
+          if   has_disease and     has_sniffle:  beep_rate = 0.99
+          elif has_disease and not has_sniffle:  beep_rate = 0.95
+          elif not has_disease and has_sniffle:  beep_rate = 0.90
+          else:                                  beep_rate = 0.02   # pure glitch
+          beeped = random.random() < beep_rate
+          if beeped:
+              if has_disease: p7_beep_and_disease += 1
+              else:           p7_beep_no_disease  += 1
+          else:
+              if has_disease: p7_disease_missed   += 1
+      total = p7_beep_and_disease + p7_beep_no_disease
+      print(f"P7 (Disease+Sniffle):  total beeps={total}, "
+            f"disease_beeps={p7_beep_and_disease}, other={p7_beep_no_disease}, "
+            f"missed->wild={p7_disease_missed}")
+      print(f"  Empirical P(D|Beep)={p7_beep_and_disease/total:.4f}   Theory: 0.1306")
+      print("-" * 60)
+
+      # ---- PROBLEM 8: two machines in series, both must beep ----
+      # Machine 1: catch=80%/glitch=20%.  Machine 2: catch=70%/glitch=10%.
+      p8_both_sick = 0;  p8_both_healthy = 0;  p8_sick_missed = 0
+      for _ in range(n):
+          sick = random.random() < 0.10
+          if sick:
+              m1 = random.random() < 0.80
+              m2 = random.random() < 0.70
+              if m1 and m2:  p8_both_sick    += 1
+              else:          p8_sick_missed  += 1
+          else:
+              m1 = random.random() < 0.20
+              m2 = random.random() < 0.10
+              if m1 and m2:  p8_both_healthy += 1
+      total = p8_both_sick + p8_both_healthy
+      print(f"P8 (two machines):     double beeps={total}, "
+            f"sick={p8_both_sick}, healthy={p8_both_healthy}, "
+            f"sick missed->wild={p8_sick_missed}")
+      print(f"  Empirical P(H|M1,M2)={p8_both_sick/total:.4f}   Theory: 0.7568")
+      print("-" * 60)
+
+      # ---- PROBLEM 9: useless red-coat scribble -- ignore it ----
+      # Disease 30%, machine 80%/20%.  Red-coat note is noise; we never use it.
+      p9_true = 0;  p9_glitch = 0;  p9_missed = 0
+      for _ in range(n):
+          sick = random.random() < 0.30
+          _red_coat = random.random() < 0.50    # shopkeeper's scribble -- irrelevant
+          if sick:
+              if random.random() < 0.80: p9_true   += 1
+              else:                      p9_missed  += 1
+          else:
+              if random.random() < 0.20: p9_glitch  += 1
+      total = p9_true + p9_glitch
+      print(f"P9 (useless scribble): total beeps={total}, "
+            f"true={p9_true}, glitch={p9_glitch}, missed->wild={p9_missed}")
+      print(f"  Empirical P(D|Beep)={p9_true/total:.4f}   Theory: 0.6316")
+      print(f"  (Red-coat note was generated but never used -- _red_coat discarded)")
+      print("=" * 60)
+
+  run_simulation()
+  ```
+
+  Sample output (numbers vary slightly each run; theory values are exact):
+
+      Running 100,000-soul simulation (shopkeeper's world)...
+      ============================================================
+      P4 (rare disease 1%):  total beeps=10834, true=898, glitch=9936, missed->wild=102
+        Empirical P(D|Beep)=0.0829   Theory: 0.0833
+      ------------------------------------------------------------
+      P5 (30% flu):          total beeps=32043, true=18012, glitch=14031, missed->wild=11988
+        Empirical P(Sick|Beep)=0.5621   Theory: 0.5625
+      ------------------------------------------------------------
+      P6 (2% disease):       total beeps=6808, true=1596, glitch=4660, missed->wild=404
+        Empirical P(D|Beep)=0.2345   Theory: 0.2462
+      ------------------------------------------------------------
+      P7 (Disease+Sniffle):  total beeps=72948, disease_beeps=9508, other=63440, missed->wild=497
+        Empirical P(D|Beep)=0.1304   Theory: 0.1306
+      ------------------------------------------------------------
+      P8 (two machines):     double beeps=7367, sick=5598, healthy=1769, sick missed->wild=4402
+        Empirical P(H|M1,M2)=0.7599   Theory: 0.7568
+      ------------------------------------------------------------
+      P9 (useless scribble): total beeps=38012, true=24041, glitch=14060, missed->wild=6049
+        Empirical P(D|Beep)=0.6323   Theory: 0.6316
+        (Red-coat note was generated but never used -- _red_coat discarded)
+      ============================================================
+
+
+  ## The Formula (it was here all along)
+
+  You have now used Bayes' rule ten times without reading it as a formula. Here it is, in case
+  the quiz asks:
+
+      P(Sick | Beep)  =       P(Beep | Sick) * P(Sick)
+                         -----------------------------------------------
+                         P(Beep|Sick)*P(Sick) + P(Beep|Healthy)*P(Healthy)
+
+  Every term in it is a pile of heads you already counted:
+  - P(Beep | Sick): of the back-room of sick people, what share beeped?
+  - P(Sick): what share of the whole Sunday crowd is sick?
+  - The denominator: the total beep papers glued from the two piles.
+  - P(Sick | Beep): of all the beep papers, what share went to sick people?
+
+  The formula is not magic. It is the Sunday crowd count, compressed into one line.
+
+
+  ## The Decoder (jargon -> plain, master sheet)
+
+      PEACOCK WORD                       PLAIN WORD (shopkeeper's world)
+      --------------------------------   -----------------------------------------------
+      prior probability P(H)             share of the Sunday crowd that is sick before
+                                         the machine sees them
+      likelihood P(Beep | H)            of the sick in the back-room, what share beeps
+      marginal / evidence P(Beep)        total beep papers -- the number the shopkeeper
+                                         hides; we glue it from the sub-crowds
+      posterior probability P(H | Beep) of the beepers, what share is truly sick --
+                                         the doctor's question answered
+      false positive / false alarm        healthy person who got a BEEP paper (a glitch)
+      false negative / miss              sick person the machine stayed silent on -- walks
+                                         into the wild undiagnosed
+      sensitivity / recall / TPR        share of the sick the machine caught (true beeps
+                                         divided by all sick)
+      specificity / TNR                  share of the healthy the machine stayed silent on
+                                         (true silences divided by all healthy)
+      precision / PPV                    share of beepers who are truly sick --
+                                         P(Sick | Beep); the doctor's number
+      Law of Total Probability           the gluing move: P(Beep) = sum of P(Beep|group)*P(group)
+                                         over all non-overlapping sub-crowds
+      Bayes' rule / Bayes' theorem       divide the sub-crowd you want by the total beepers
+
+
+  ---
+
+  One Breath: make every fraction into heads in the Sunday crowd; a BEEP paper is born two
+  ways (sick person caught, or healthy person glitched), so glue those two piles to find the
+  total; divide the sick-and-beeped pile by the total and you have the doctor's answer --
+  and the rarity trap is just the arithmetic fact that a tiny sick crowd, even well-caught,
+  is drowned by even a small glitch rate on the vast healthy crowd; every person the machine
+  stayed silent on is already walking in the wild.
+
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

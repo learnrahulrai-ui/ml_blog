@@ -95,6 +95,7 @@
   special     [SPECIAL. Genetic Algorithm From Scratch -- Optimising With No Gradient](posts/genetic-algorithm-from-scratch.txt)
   special     [SPECIAL. Informed Search Jargon -- One Machine, Three Slips, Every Word Debunked](posts/informed-search-jargon.txt)
   special     [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
+  special     [SPECIAL. Bayes by Head-Count -- The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild](posts/bayes-shopkeeper.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

@@ -232,6 +232,22 @@
     stick. Good heuristic traits vs the fakes. Full decoder sheet. Working Python with
     hard-coded round-by-round variables.
 
+  [SPECIAL. Bayes by Head-Count -- The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild](posts/bayes-shopkeeper.txt)
+    special . 2026-06-18 . standalone . probability, bayes, statistics, by-hand
+    Written for Hacker News, self-contained: Bayes' theorem built from a Sunday market crowd
+    rather than a formula. Four characters: the greedy shopkeeper (hides P(Beep)), his faulty
+    machine (lies two ways: false positive / false negative), the doctor (asks "given this beep,
+    am I sick?"), and the wild (the missed cases who walked away undiagnosed). The one move: turn
+    every fraction into heads in the crowd; then every Bayes question is "of the heads holding a
+    BEEP paper, how many are truly sick?" Ten problems worked by head-count: joint vs conditional
+    (comma vs bar), Law of Total Probability as a gluing move, rare-disease rarity trap (1%
+    disease + 10% glitch = 8% precision despite 90% catch rate), two-cause machine (Disease +
+    harmless Sniffle floods the pile), two machines in series (precision 76% but 44 sick per 100
+    walk away), useless red-coat distractor. Rarity trap table shows prevalence is the dominant
+    lever. Python: three problems hard-coded line by line + full reskinned 100k-soul simulation
+    verifying all ten answers. Full decoder sheet (prior/likelihood/posterior/sensitivity/PPV).
+    Assumes zero background; every term defined where it appears.
+
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
     special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand
     Written for Hacker News, self-contained: why five agent types are a LADDER (each rung =
