@@ -15,7 +15,7 @@
   Every pathfinding post draws a maze with coloured arrows, names f = g + h, and waves at
   "admissibility." This page never waves. One town, five places. Every single pop and offer
   shown with its arithmetic. The proof that the cheapest pop is already final, worked out with
-  numbers, not hand-waved. And A* as the one-line change to UCS that it really is -- run on
+  numbers, not hand-waved. And A* as the few-line change to UCS that it really is -- run on
   the same map, every pop shown, the exact moment it wins demonstrated.
 
   THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
@@ -471,12 +471,12 @@
   }
 
   def ucs(graph, start, goal):
-      q      = [(0, start)]        # (g, place)
-      states = {start: 0}
-      prev   = {start: None}
-      sealed = set()
-      while q:
-          cost, place = heapq.heappop(q)
+      pile     = [(0, start)]      # the pile: (g, place) slips
+      states   = {start: 0}        # the tab: cheapest cost per place
+      previous = {start: None}     # the breadcrumb: predecessor per place
+      sealed   = set()
+      while pile:
+          cost, place = heapq.heappop(pile)
           if place in sealed: continue
           if place == goal:   break
           sealed.add(place)
@@ -484,23 +484,25 @@
               if nbr in sealed: continue
               new = cost + road
               if nbr not in states or new < states[nbr]:
-                  states[nbr] = new
-                  prev[nbr]   = place
-                  heapq.heappush(q, (new, nbr))
+                  states[nbr]   = new
+                  previous[nbr] = place
+                  heapq.heappush(pile, (new, nbr))
+      if goal not in states:                       # goal never reached
+          return None, math.inf
       path, node = [], goal
-      while node: path.append(node); node = prev[node]
+      while node is not None: path.append(node); node = previous[node]
       return list(reversed(path)), states[goal]
 
   pos = {'S':(0,0), 'A':(1,0), 'B':(1,1), 'C':(2,1), 'G':(2,3)}  # honest map: road >= straight line
 
   def astar(graph, start, goal, pos):
       def h(p): return math.sqrt((pos[goal][1]-pos[p][1])**2+(pos[goal][0]-pos[p][0])**2)
-      q      = [(h(start), 0, start)]   # (f, g, place)
-      states = {start: 0}
-      prev   = {start: None}
-      sealed = set()
-      while q:
-          _, cost, place = heapq.heappop(q)
+      pile     = [(h(start), 0, start)]   # the pile: (f, g, place) slips, sorted by f
+      states   = {start: 0}               # the tab: cheapest g per place (NOT f)
+      previous = {start: None}            # the breadcrumb: predecessor per place
+      sealed   = set()
+      while pile:
+          _, cost, place = heapq.heappop(pile)
           if place in sealed: continue
           if place == goal:   break
           sealed.add(place)
@@ -508,11 +510,13 @@
               if nbr in sealed: continue
               new = cost + road
               if nbr not in states or new < states[nbr]:
-                  states[nbr] = new
-                  prev[nbr]   = place
-                  heapq.heappush(q, (new + h(nbr), new, nbr))
+                  states[nbr]   = new
+                  previous[nbr] = place
+                  heapq.heappush(pile, (new + h(nbr), new, nbr))
+      if goal not in states:
+          return None, math.inf
       path, node = [], goal
-      while node: path.append(node); node = prev[node]
+      while node is not None: path.append(node); node = previous[node]
       return list(reversed(path)), states[goal]
 
   ucs_path, ucs_cost   = ucs(graph, 'S', 'G')    # ['S','A','B','C','G'], 5
