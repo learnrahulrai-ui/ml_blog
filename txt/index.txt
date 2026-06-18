@@ -218,6 +218,35 @@
     explained, and working heapq code for both. Assumes zero background; every term defined
     where it appears.
 
+  [SPECIAL. Informed Search Jargon -- One Machine, Three Slips, Every Word Debunked](posts/informed-search-jargon.txt)
+    special . 2026-06-18 . standalone . search, a-star, heuristics, ucs, greedy, by-hand
+    Written for Hacker News, self-contained: the jargon companion to the UCS/A* post. One
+    machine (a cheapest-pile), three slips (g for UCS, h for greedy, g+h for A*), and the
+    exact reason each differs from the others -- walked on a 4-node toy town (S, A, B, G;
+    two paths: S->A->G=101 and S->B->G=20). Greedy picks S->A->G=101 (fooled because h(A)=1
+    "looks" close while the 100-toll road behind it goes unnoticed); A* picks S->B->G=20
+    (g corrects the lie the moment A* walks the toll). Admissibility debunked: the guess never
+    lies HIGH (underestimating is safe; overestimating is the only flaw). Consistency as the
+    triangle rule worked by hand (h(n) <= c + h(n')). Three ways a search blows optimality
+    (never finishes / not chasing cheapest / map shifts). A*'s fat-ring memory vs DFS's thin
+    stick. Good heuristic traits vs the fakes. Full decoder sheet. Working Python with
+    hard-coded round-by-round variables.
+
+  [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
+    special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand
+    Written for Hacker News, self-contained: why five agent types are a LADDER (each rung =
+    the rung below + exactly one new power) rather than a taxonomy. Rung 1 (twitch/simple
+    reflex): wiring table, breaks at sealed box -- mouse hides, cat wanders off (no memory).
+    Rung 2 (diary/model-based): adds memory, beats hidden mouse, breaks at juke -- diary
+    remembers old direction, cat charges wrong way. Rung 3 (sketchpad/goal-based): adds
+    planning, beats juke, breaks at black-and-white -- two catching plans look identical,
+    no way to rank safe vs deadly. Rung 4 (scorecard/utility): adds happiness scores (+100
+    catch, -50 trap, -1/step), beats ranking; expected utility worked (0.80*100+0.20*(-5)=79.0
+    vs 0.60*100+0.40*(-5)=58.0); breaks at frozen model and math exploding. Rung 5 (learning):
+    adds updatable dials (belief 0.70 -> 0.56 -> 0.45 -> 0.36 over three left-chases); breaks
+    at cold start and raw speed ceiling. Three laws. Pattern table. Full decoder. Python: five
+    separate blocks, hard-coded rounds, each rung succeeds then hits its wall.
+
   [SPECIAL. Transformers With Pencil -- A Whole Block Worked by Hand, One Line at a Time](posts/transformerforhn.txt)
     special . 2026-06-15 . standalone . transformer, attention, from-scratch
     Written for Hacker News, self-contained: ONE full transformer block run end to end on two

@@ -1,0 +1,511 @@
+@title One Machine, Three Slips: Informed Search Jargon From Scratch :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . FOR HACKER NEWS
+  One Machine, Three Slips: Informed Search Jargon From Scratch
+  Posted: 2026-06-18 . Author: Rahul Rai . Tags: search, a-star, heuristics, ucs, greedy, by-hand
+  ============================================================================================
+
+  PATH . SPECIAL -- Informed Search Jargon  (standalone; no other page on this blog needed)
+
+  Every "A* explained" post gives you a box labelled f = g + h, names the three letters, and
+  says "A* is optimal if the heuristic is admissible." Then it draws a pretty grid with coloured
+  arrows and calls that an explanation. Two things that post always skips: (1) showing WHY the
+  formula f = g + h beats h alone -- on a tiny map, with arithmetic, so the moment the formula
+  earns its own existence is visible; (2) explaining what "admissible" actually forbids and why
+  that one rule makes or breaks optimality. This page shows both, start to finish, with numbers.
+
+  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
+  appears. Anything named more than five lines ago is named again. Every number is worked in
+  front of you, never "recall that...". One idea per line. A pencil and this page are the whole
+  kit. Decimals shown to three places.
+
+  TOY TOWN, REAL RECIPE. One line of honesty up front. The RECIPE -- one machine, three ways to
+  label slips, the proof admissibility makes A* optimal -- is exact. The TOWN is a toy: four
+  nodes, four roads, numbers chosen so arithmetic fits on paper and the moment greedy gets fooled
+  is impossible to miss. Where a toy choice could mislead about the method, the text says so.
+  Trust the recipe; treat the numbers as a sketchpad.
+
+  The big secret, named once here so you are not surprised later:
+
+      ONE MACHINE -- a cheapest-pile (a heap that always pops the slip with the smallest number).
+      THREE SLIPS  -- the only difference between UCS, greedy, and A* is what number you write.
+                      UCS writes g. Greedy writes h. A* writes g + h. That is the whole field.
+
+  Four things named here so you are not surprised:
+  - g (cost-so-far):        the tolls on roads already walked to get here. Real money, already spent.
+  - h (the guess):          a cheap estimate of the toll still left to reach the goal from here.
+  - g + h (full estimate):  spent so far + guessed still to go. The number that steers A*.
+  - f (evaluation):         another name for g + h. The same thing. The textbook uses f; this page
+                            uses g + h so the arithmetic stays visible.
+
+
+  ## The Town (the picture everything lives in)
+
+  Four places in a small town. Roads between them. Each road has a cost.
+
+      (S)──1──(A)
+       │         \
+       10        100
+       │            \
+      (B)──10───(G)
+
+      S = START   -- where you stand now
+      A, B        = other places in town
+      G = GOAL    -- where you want to be
+      numbers on roads = the COST of walking that road
+
+  Two paths reach G:
+
+      S -> A -> G   costs  1 + 100 = 101
+      S -> B -> G   costs  10 + 10 = 20     <- the CHEAP one
+
+  "Optimal" means returning the 20 path, not the 101 path. A search that "performs optimally"
+  is one that hands you the cheap answer, not merely any answer.
+
+  Jargon parked here: "place" = node. "Road" = edge. "Road cost" = step cost. "Map" = search
+  space / state space. "Open a place" = expand a node. "Path cost" = the total tolls added up.
+
+  Guesses (heuristics) for this town -- how far each place seems to be from G:
+
+      h(A) = 1     h(B) = 10     h(G) = 0
+      (h at the goal is always 0 -- no distance left once you have arrived)
+
+
+  ## The Only Three Numbers That Matter
+
+  Stand at some place. Three numbers describe it.
+
+  **g = cost-so-far.** The tolls on roads you have already walked to get here. Real money spent.
+  Your odometer.
+
+      stood at A after walking S->A :   g = 1
+      stood at B after walking S->B :   g = 10
+
+  **h = the guess.** A cheap estimate of the toll still left to reach G from here. Not measured --
+  guessed. Often the straight-line distance on a real map. The textbook calls it "the heuristic."
+  It is just the guess. (It can be wrong. The section on "admissible" below is entirely about how
+  wrong it is allowed to be.)
+
+      guess sheet for this town:    h(A) = 1      h(B) = 10      h(G) = 0
+
+  **g + h = the whole-trip estimate.** How dear the full trip looks if you travel through this
+  place: spent so far plus guessed-still-to-go.
+
+      through A:   g + h = 1 + 1   = 2
+      through B:   g + h = 10 + 10 = 20
+
+  The one trap to burn in: you STEER with g + h, but the answer you REPORT is g alone. The guess
+  h is a steering wheel. You never pay the guess. (g + h says which road to try next. g says what
+  it actually cost.)
+
+
+  ## One Machine, Three Characters
+
+  The machine never changes: a cheapest-pile -- a heap that always hands you the place with the
+  smallest number written on its slip. You offer places to the heap by writing a number on a slip
+  and pushing it in. You pop the smallest.
+
+  The only difference between the three famous searches is which number you write on the slip:
+
+      CHARACTER     number on the slip     guided?     finds the cheapest?
+      -----------   -------------------    -------     -------------------
+      UCS           g        (spent)        NO (blind)  YES  (always)
+      greedy        h        (guess)        YES         NO   (easily fooled)
+      A*            g + h    (spent+guess)  YES         YES  (if the guess is honest)
+
+  "Guided" means the search carries a guess (h) about how far the goal is. A search with no guess
+  is "uninformed" (blind). A search with a guess is "informed" (guided). The only line between
+  them is whether h appears on the slip.
+
+
+  ## Greedy Gets Fooled -- Walked by Hand
+
+  Greedy writes only h on the slip. It never looks at what it already paid.
+
+  Open S (the start). Two roads out. Write h on a slip for each:
+
+      A: slip = h(A) = 1
+      B: slip = h(B) = 10
+      Pile has: A(1), B(10).  Pop the smallest: A.
+
+  At A. One road out: A -> G, cost 100. Write h(G) = 0 on G's slip:
+
+      G: slip = h(G) = 0
+      Pile has: G(0), B(10).  Pop the smallest: G.
+
+  Greedy arrives at G. What did it truly pay?
+
+      g at G = cost from S to A (= 1) + cost from A to G (= 100) = 101
+
+  101. The expensive path. Greedy chose A because h(A) = 1 looked close. It never noticed the
+  100-toll road sitting between A and G. The guess said "A is 1 away from the goal." The truth
+  was "A is 100 away from the goal." The guess was wildly wrong -- and greedy had no cost-so-far
+  to catch the lie.
+
+  > Greedy trusts the look of closeness. The look was a lie.
+
+
+  ## A* Does Not Get Fooled -- Walked by Hand
+
+  A* writes g + h on the slip. The toll already paid is always part of the number.
+
+  Open S. Two roads out. Compute g + h for each:
+
+      A: g = 0 + 1 = 1,   h = 1,   slip = g + h = 1 + 1 = 2
+      B: g = 0 + 10 = 10, h = 10,  slip = g + h = 10 + 10 = 20
+      Pile has: A(2), B(20).  Pop the smallest: A (same choice as greedy so far).
+
+  At A (g = 1 spent). One road out: A -> G, cost 100. Compute g + h for G via A:
+
+      G via A: g = 1 + 100 = 101,  h = 0,  slip = 101 + 0 = 101
+      Pile has: B(20), G_via_A(101).  Pop the smallest: B.
+
+  B's slip is 20. G's slip is 101. A* does NOT pop G yet. It pops B, because a trip through B
+  looks far cheaper than a trip through A to G. That is g + h doing its job: the 100-toll road
+  from A to G inflated G's slip from 0 to 101 the moment A* walked that toll.
+
+  At B (g = 10 spent). One road out: B -> G, cost 10. Compute g + h for G via B:
+
+      G via B: g = 10 + 10 = 20,  h = 0,  slip = 20 + 0 = 20
+      G_via_A still in pile with slip 101. New slip 20 < 101. Replace it.
+      Pile has: G_via_B(20), G_via_A_stale(101).  Pop the smallest: G_via_B.
+
+  G_via_B pops with g = 20. That is the true cost. Path: S -> B -> G = 20.
+
+  Compare: greedy = 101. A* = 20. Difference: 81 tolls saved.
+
+  > A* added the toll it had already paid, so the 100-toll trap from A showed up the moment A*
+  > looked through A. That is why g + h beats h alone: h steers; g corrects the lie.
+
+
+  ## "Admissible" -- The Guess Never Lies HIGH
+
+  A guess is admissible when it never says the goal is FARTHER than it truly is. It may say
+  less than the truth (underestimate) or exactly the truth. Never more. Honest-or-modest, never
+  boastful.
+
+      Suppose the TRUE toll still left from some place to the goal is 7.
+          admissible guesses:   0, 3, 5, 7          (none is bigger than 7)   OK
+          lying-high guesses:   8, 12               (claims farther than real) DANGER
+
+  Why "never lie high" is the whole ballgame for A*: A* trusts the guess to decide what to
+  skip. If a guess overstates a place's remaining toll, A* thinks "too far, skip it" -- and may
+  skip the very road that was actually cheapest. Therefore:
+
+      guess never lies high (admissible)  ->  A* always finds the cheapest path  (optimal)
+      guess lies high       (inadmissible)->  A* can return a dearer path         (not optimal)
+
+  **The trap the quiz always dangles:** "a heuristic that consistently underestimates -- is that
+  bad?" NO. Underestimating (guess too LOW) keeps A* optimal. The flaw is always OVERestimating.
+  Underestimating can only make A* over-explore a little -- it never makes it skip the cheap road.
+
+  **The laziest honest guess: h = 0.** Zero never lies high. A* with h = 0 writes g + 0 = g on
+  every slip -- which is UCS. UCS is still optimal. (Greedy with h = 0 writes 0 on every slip --
+  every place looks equally close -- nothing to steer by -- rudderless. Not the same thing.)
+
+  **Worked on this town.** Check admissibility for our h values:
+
+      h(A) = 1.  True toll left from A to G = 100.   1 <= 100  OK (very modest -- leaves a lot of room)
+      h(B) = 10. True toll left from B to G = 10.    10 <= 10  OK (exactly tight)
+      h(G) = 0.  True toll left at G = 0.             0 <= 0   OK
+
+
+  ## "Consistent" -- The Triangle Rule
+
+  A guess is consistent when it never drops by more than the road you actually walk. Walk one road
+  from place n to neighbour n', toll c. The guess at n must be no bigger than (that toll) +
+  (the guess at n'):
+
+      h(n)  <=  c(n, n')  +  h(n')
+      guess     road toll     guess at neighbour
+
+  This is the triangle inequality: one side of a triangle (n, n', goal) cannot be longer than the
+  other two combined.
+
+  Worked by hand:
+
+      road n -> n' costs c = 3.   h(n') = 4.
+      Consistency demands:  h(n)  <=  3 + 4  =  7.
+
+      h(n) = 6  ->  6 <= 7   consistent  (shed 2 of "guess" over a road worth 3 -- fine)
+      h(n) = 9  ->  9 > 7    INconsistent (claims to shed 5 of "guess" over a road worth only 3 -- impossible)
+
+  Two facts worth keeping:
+  (1) Consistent implies admissible -- consistent is the stronger promise. A consistent guess is
+      automatically honest.
+  (2) With a consistent guess, once A* seals a place (locks its cheapest cost), it never has to
+      reopen it. No rework. That is the payoff of consistency: efficiency.
+
+
+  ## Three Ways a Search Blows It
+
+  "Optimal" means returns the cheapest path. "Complete" means returns a path if one exists.
+
+  A search loses the cheapest path when at least one of three things breaks:
+
+      1. IT NEVER FINISHES -- so no answer at all, cheapest or not.
+           - loops in the map with no handler -> goes round forever
+           - runs out of memory -> can't hold enough places to explore
+
+      2. IT IS NOT CHASING CHEAPEST -- it finishes, but on a dearer path.
+           - A* fed a guess that lies high (inadmissible) -> misled off the bargain
+           - greedy ignores cost-so-far entirely; h = 0 in greedy leaves nothing to steer by
+
+      3. THE GROUND SHIFTS -- the map changes mid-search (a "dynamic" world),
+           so the cheap path it just found is already stale.
+
+  Any quiz "failure" fits one of these three buckets. Multiple answers can be correct at once --
+  failing the cheapest path has nothing to do with heuristics alone: running forever and a moving
+  map kill it just as dead.
+
+
+  ## A* Eats Memory -- Why, and vs Depth-First
+
+  To always jump to the globally cheapest place, A* must remember the whole frontier of
+  half-explored places at once -- the cheapest-pile plus the tab of best costs. A fat ring.
+
+      A* (remembers a FAT RING):              DFS depth-first (remembers a THIN STICK):
+
+            . o o o o .                                 S
+          o o o(rim)o o o    <- holds MANY places        \
+            o o o o o o        waiting at once            A
+              o o o                                        \
+                                                           B  <- holds ONE path down,
+                                                            \    then backs up
+                                                             C
+
+  A* keeps the rim so it can pick the cheapest anywhere -> lots of memory. The price it pays for
+  optimality.
+
+  DFS dives straight down one path, remembering only that one stick, then backs up and tries
+  another -> tiny memory. But it can plunge down a dear or wrong branch and is not optimal.
+
+  The question "A*'s big disadvantage vs DFS in resources?" has one answer: memory. A* stores
+  the spreading frontier of paths. Not bandwidth, not backtracking -- memory.
+
+
+  ## What Makes a Guess Good (and What Doesn't)
+
+  A good guess is:
+
+      ADMISSIBLE  -- never lies high.           (A* stays optimal.)             essential
+      CONSISTENT  -- obeys the triangle rule.   (no reopening; efficient)       strong
+      CHEAP       -- quick to work out.         (a slow guess costs more than it saves)
+      TIGHT       -- close to the truth.        (nearer to real -> fewer places opened)
+
+  The fake traits the quiz dangles:
+
+      "computationally expensive" -- backwards. A slow-to-compute guess wastes the time saved.
+      "relies on random guesses"  -- random = noise = no steering at all.
+      "accurate over all paths"   -- not required. It only needs to never lie high. Perfect
+                                     accuracy is a bonus, not the ask.
+      "computed in constant time" -- nice, but NOT essential. Cheap is the real ask.
+
+  Slogan: a good guess is honest (admissible), smooth (consistent), and cheap. Boastful, random,
+  or slow guesses are the bad ones.
+
+
+  ## The Decoder (jargon -> plain, master sheet)
+
+      THE PEACOCK WORD                         WHAT IT ACTUALLY MEANS
+      --------------------------------------   -------------------------------------------------
+      node                                     a place in the town
+      edge / step cost                         a road / its toll
+      search space / state space               the whole town (places + roads)
+      expand / explore a node                  walk up to a place and look at its roads
+      path cost / g                            cost-so-far -- tolls already paid
+      heuristic / heuristic value / h          the guess -- estimated toll still left to the goal
+      evaluation function / f                  g + h -- the whole-trip estimate through a place
+      admissible                               the guess never lies HIGH (never overestimates)
+      inadmissible                             the guess CAN lie high (overestimates)
+      underestimate                            guess too low -- honest/safe (still admissible)
+      overestimate                             guess too high -- the dangerous one
+      consistent / monotone                    triangle rule: h(n) <= road(n,n') + h(n')
+      uninformed search                        blind -- no guess (UCS, DFS, BFS)
+      informed search                          guided -- carries a guess (A*, greedy)
+      uniform-cost search (UCS)                cheapest-pile sorted by g alone (blind, optimal)
+      greedy best-first                        sorted by h alone (guided, easily fooled)
+      A* search                                sorted by g + h (guided, optimal if guess is honest)
+      optimal                                  returns the CHEAPEST path
+      complete                                 returns a path if one exists
+      dynamic environment                      the map changes while you search
+      computationally intractable              the sums take too long or need too much room
+
+
+  ## Python: Two Searches, One Town, by Hand
+
+  The town from the walk above. Three blocks: greedy, A*, and an admissibility checker.
+  Hard-coded round by round -- no loops hiding the decisions.
+
+  ```python
+  # -----------------------------------------------------------------------
+  # THE TOWN
+  # Roads: S-A (cost 1), S-B (cost 10), A-G (cost 100), B-G (cost 10)
+  # Guesses: h(A)=1  h(B)=10  h(G)=0
+  # Two paths: S->A->G costs 101 (expensive). S->B->G costs 20 (cheap).
+  # -----------------------------------------------------------------------
+
+  road_S_to_A = 1
+  road_S_to_B = 10
+  road_A_to_G = 100
+  road_B_to_G = 10
+
+  h_A = 1
+  h_B = 10
+  h_G = 0
+
+  # =======================================================================
+  # CASE 1: GREEDY (slip = h only)
+  # Greedy asks: which place looks closest to the goal right now?
+  # It never looks at what it already paid (g is nowhere on the slip).
+  # =======================================================================
+  print("=== CASE 1: GREEDY (slip = h only) ===")
+
+  # Round 1: start at S. Open S: offer A and B.
+  # Greedy writes ONLY the guess h on the slip. Paid-so-far is ignored.
+  slip_A_greedy = h_A    # = 1
+  slip_B_greedy = h_B    # = 10
+  greedy_pick_r1 = "A"   # 1 < 10
+  print(f"Round 1: pile = A({slip_A_greedy}), B({slip_B_greedy})  ->  pop {greedy_pick_r1}")
+  # Round 1: pile = A(1), B(10)  ->  pop A
+
+  # Round 2: at A. One road out: A->G, cost 100.
+  # Greedy writes h(G)=0 on G's slip. It ignores the 100-toll road it just chose.
+  g_at_A = road_S_to_A                    # = 1  (paid, but greedy ignores it)
+  slip_G_greedy = h_G                     # = 0  (greedy slip = h only)
+  greedy_pick_r2 = "G"                    # only thing in pile
+  print(f"Round 2: at A (g={g_at_A}, ignored). Offer G({slip_G_greedy})  ->  pop {greedy_pick_r2}")
+  # Round 2: at A (g=1, ignored). Offer G(0)  ->  pop G
+
+  # Greedy result: arrive at G via A.
+  greedy_true_cost = road_S_to_A + road_A_to_G    # = 1 + 100 = 101
+  print(f"Greedy true cost paid: {road_S_to_A} + {road_A_to_G} = {greedy_true_cost}")
+  print(f"Greedy was FOOLED. h(A)=1 looked close; A->G actually costs {road_A_to_G}.")
+  # Greedy true cost paid: 1 + 100 = 101
+
+
+  # =======================================================================
+  # CASE 2: A* (slip = g + h)
+  # A* asks: what does the full trip look like (spent + guess)?
+  # The toll already paid is always part of the slip number.
+  # =======================================================================
+  print("\n=== CASE 2: A* (slip = g + h) ===")
+
+  # Round 1: start at S (g = 0 so far). Open S: offer A and B.
+  g_S = 0
+  g_A_from_S = g_S + road_S_to_A    # = 0 + 1 = 1
+  g_B_from_S = g_S + road_S_to_B    # = 0 + 10 = 10
+
+  slip_A_astar = g_A_from_S + h_A   # = 1 + 1 = 2
+  slip_B_astar = g_B_from_S + h_B   # = 10 + 10 = 20
+
+  astar_pick_r1 = "A"    # 2 < 20
+  print(f"Round 1: offer A({slip_A_astar}), B({slip_B_astar})  ->  pop {astar_pick_r1}")
+  # Round 1: offer A(2), B(20)  ->  pop A
+
+  # Round 2: at A (g = 1 paid). One road out: A->G, cost 100.
+  g_at_A_astar = g_A_from_S                  # = 1
+  g_G_via_A    = g_at_A_astar + road_A_to_G  # = 1 + 100 = 101
+  slip_G_via_A = g_G_via_A + h_G             # = 101 + 0 = 101
+  print(f"Round 2: at A (g={g_at_A_astar}). Offer G via A: g={g_G_via_A}, slip={slip_G_via_A}.")
+  print(f"  Pile: B({slip_B_astar}), G_via_A({slip_G_via_A}).  Pop: B (smaller).")
+  # A* sees that reaching G through A costs 101. B's slip is 20. B wins.
+
+  # Round 3: at B (g = 10 paid). One road out: B->G, cost 10.
+  g_at_B_astar = g_B_from_S                  # = 10
+  g_G_via_B    = g_at_B_astar + road_B_to_G  # = 10 + 10 = 20
+  slip_G_via_B = g_G_via_B + h_G             # = 20 + 0 = 20
+  print(f"Round 3: at B (g={g_at_B_astar}). Offer G via B: g={g_G_via_B}, slip={slip_G_via_B}.")
+  print(f"  G_via_A in pile with slip={slip_G_via_A}. New slip={slip_G_via_B} < old -> replace.")
+  print(f"  Pile: G_via_B({slip_G_via_B}), G_via_A_stale({slip_G_via_A}).  Pop: G_via_B.")
+
+  # Round 4: pop G_via_B. It is the goal. Report g (the true cost, not g+h).
+  astar_true_cost = g_G_via_B   # = 20   (report g, not g+h -- h was steering, not payment)
+  print(f"Round 4: pop G. True cost = g = {astar_true_cost}. Path: S -> B -> G.")
+  print(f"\nSummary: Greedy={greedy_true_cost}. A*={astar_true_cost}. A* saves {greedy_true_cost - astar_true_cost}.")
+  # Summary: Greedy=101. A*=20. A* saves 81.
+
+
+  # =======================================================================
+  # CASE 3: ADMISSIBILITY CHECK
+  # A guess is admissible if it never says the goal is farther than it is.
+  # Formally: h(place) <= true_cheapest_cost_from_place_to_goal.
+  # =======================================================================
+  print("\n=== CASE 3: ADMISSIBILITY CHECK ===")
+
+  # True cheapest costs to G from each place:
+  true_A_to_G = road_A_to_G      # = 100  (only one road from A: A->G)
+  true_B_to_G = road_B_to_G      # = 10   (only one road from B: B->G)
+  true_G_to_G = 0                # = 0    (already at the goal)
+
+  # Our heuristic guesses:
+  print(f"h(A)={h_A}  vs  true cost A->G = {true_A_to_G}:  admissible = {h_A <= true_A_to_G}")
+  print(f"h(B)={h_B}  vs  true cost B->G = {true_B_to_G}:  admissible = {h_B <= true_B_to_G}")
+  print(f"h(G)={h_G}  vs  true cost G->G = {true_G_to_G}:  admissible = {h_G <= true_G_to_G}")
+  # h(A)=1   vs  true cost A->G = 100:  admissible = True  (very modest -- wildly underestimates)
+  # h(B)=10  vs  true cost B->G = 10:   admissible = True  (exactly tight -- best possible)
+  # h(G)=0   vs  true cost G->G = 0:    admissible = True
+
+  # Now show what a lying-high guess does to A*.
+  h_A_lying = 150   # claims 150 toll left from A, but true remaining cost is only 100. LIES HIGH.
+  slip_A_lying = g_A_from_S + h_A_lying    # = 1 + 150 = 151
+  slip_B_check = g_B_from_S + h_B          # = 10 + 10 = 20
+  print(f"\nLying-high h(A)={h_A_lying}: A*'s slip for A = {g_A_from_S} + {h_A_lying} = {slip_A_lying}")
+  print(f"B's slip is still {slip_B_check}.")
+  print(f"A* skips A entirely (slip {slip_A_lying} >> {slip_B_check}).")
+  print("In this town that leads to the right answer by coincidence (B is cheaper anyway).")
+  print("But if the cheap path had been S->A->G with cost 2, lying high would hide it.")
+  # h(A)=150 puffs up A's slip from 2 to 151, so A* never goes back to check A even
+  # when A is on the truly cheapest route.
+  ```
+
+  Output of the three blocks:
+
+      === CASE 1: GREEDY (slip = h only) ===
+      Round 1: pile = A(1), B(10)  ->  pop A
+      Round 2: at A (g=1, ignored). Offer G(0)  ->  pop G
+      Greedy true cost paid: 1 + 100 = 101
+      Greedy was FOOLED. h(A)=1 looked close; A->G actually costs 100.
+
+      === CASE 2: A* (slip = g + h) ===
+      Round 1: offer A(2), B(20)  ->  pop A
+      Round 2: at A (g=1). Offer G via A: g=101, slip=101.
+        Pile: B(20), G_via_A(101).  Pop: B (smaller).
+      Round 3: at B (g=10). Offer G via B: g=20, slip=20.
+        G_via_A in pile with slip=101. New slip=20 < old -> replace.
+        Pile: G_via_B(20), G_via_A_stale(101).  Pop: G_via_B.
+      Round 4: pop G. True cost = g = 20. Path: S -> B -> G.
+      Summary: Greedy=101. A*=20. A* saves 81.
+
+      === CASE 3: ADMISSIBILITY CHECK ===
+      h(A)=1   vs  true cost A->G = 100:  admissible = True
+      h(B)=10  vs  true cost B->G = 10:   admissible = True
+      h(G)=0   vs  true cost G->G = 0:    admissible = True
+      Lying-high h(A)=150: A*'s slip for A = 1 + 150 = 151
+      B's slip is still 20.
+      A* skips A entirely (slip 151 >> 20).
+      In this town that leads to the right answer by coincidence (B is cheaper anyway).
+      But if the cheap path had been S->A->G with cost 2, lying high would hide it.
+
+  ---
+
+  Companion post: [Cheapest Walk: UCS and A*, Every Pop Shown](cheapest-walk-ucs-astar.txt) runs
+  the full algorithm mechanics on a larger map (five nodes, six pops) with code you can run.
+  This page is the concept layer -- the words -- for that code layer. Same machine. Same slips.
+
+  ---
+
+  One Breath: one cheapest-pile machine runs all three searches -- write g on the slip for UCS
+  (blind, always optimal), write h for greedy (steers fast but runs a 101-toll road when a 20
+  road waited), write g + h for A* (h steers while g corrects the lie, and as long as h never
+  lies high, the cheapest path always surfaces).
+
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

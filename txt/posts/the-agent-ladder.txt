@@ -1,0 +1,516 @@
+@title The Agent Ladder: Five Cats, One New Power Each :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . FOR HACKER NEWS
+  The Agent Ladder: Five Cats, One New Power Each
+  Posted: 2026-06-18 . Author: Rahul Rai . Tags: ai-agents, planning, utility, learning, by-hand
+  ============================================================================================
+
+  PATH . SPECIAL -- The Agent Ladder  (standalone; no other page on this blog needed)
+
+  Every AI textbook gives you a taxonomy: five agent names, five bullet-point features, a table.
+  "Simple reflex uses condition-action rules. Model-based has internal state. Goal-based has
+  goals." Then it drills you on definitions. The one thing it never answers: WHY is memory not
+  enough to plan? Why is planning not enough to rank outcomes? Why does learning still fail when
+  the mouse is just faster? This page answers all three, rung by rung, in the same room. A cat.
+  A mouse. One corridor. The room never changes -- only the cat's brain does.
+
+  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
+  appears. Anything named more than five lines ago is named again. Every number is worked in
+  front of you. One idea per line. A pencil and this page are the whole kit.
+
+  TOY ROOM, REAL LADDER. The room -- a cat chasing a mouse in a short corridor -- is a toy:
+  five cells, one cat, one mouse. The LADDER is real: each of the five rungs adds exactly one
+  power to the cat's brain, and that one power kills a specific failure the rung below couldn't
+  beat. Where a toy choice could be mistaken for the method, the text says so. Trust the ladder;
+  treat the room as a sketchpad.
+
+  The whole ladder, named once so you see the shape, then built rung by rung below:
+
+      RUNG 1 (twitch)    -- wiring table: what the eyes catch right now -> one fixed action
+      RUNG 2 (diary)     -- + a memory that survives after the eyes go blank
+      RUNG 3 (sketchpad) -- + a goal, and trying moves in imagination before the paws move
+      RUNG 4 (scorecard) -- + a happiness score on outcomes (and best expected score under odds)
+      RUNG 5 (learning)  -- + scores and world-model are no longer frozen; updated by feedback
+
+  Three laws hold the whole ladder together. Read them once before the rungs:
+
+      LAW 1 -- One power at a time. Each rung = the rung below it + exactly ONE new power.
+               That is the only thing that changes going up.
+
+      LAW 2 -- A power is real only if you can name the failure it kills -- a failure you can
+               set up and watch happen. No nameable, stageable failure killed -> not a real
+               power, just a label.
+
+      LAW 3 -- A smarter cat is in the SAME room. Upgrading the brain does NOT change the
+               walls, the mouse, or the rules. The room holds four properties that never
+               change: (1) partially observable -- cat cannot see through walls; (2) stochastic
+               -- mouse moves unpredictably; (3) sequential -- a move now changes what comes
+               next; (4) multi-agent -- two players, the mouse actively escapes.
+
+
+  ## The Room
+
+  A corridor of five cells:
+
+      positions :  0   1   2   3   4
+      start     :  C   .   .   .   M     (cat at 0, mouse at 4)
+
+  Vision: the cat sees only ONE cell to its left and ONE to its right (range = 1). Anything
+  beyond that is hidden. (This is "partially observable" -- the cat does not know the full board.)
+
+  The mouse moves one step per round, any direction or none. (This is "stochastic" -- the cat
+  cannot know the mouse's next step with certainty.)
+
+  A move now changes which cells are reachable next round. (This is "sequential.")
+
+  The mouse is a player trying to escape, not a passive object. (This is "multi-agent.")
+
+  These four properties hold on every rung of the ladder. Adding a bigger brain does NOT move
+  the walls or calm the mouse.
+
+
+  ## Rung 1 -- the Twitch Cat (sees NOW, nothing else)
+
+  The twitch cat has exactly ONE tool: a wiring table. Each row is an IF-THEN rule: if this is
+  what the eyes catch right now, do this action. No record of a moment ago. No guess about a
+  moment ahead.
+
+      what the eyes catch right now     ->    action
+      --------------------------------        ------
+      mouse is one step to the right    ->    step right
+      mouse is one step to the left     ->    step left
+      nothing in sight                   ->    wander (random step)
+
+  The textbook calls this a "simple reflex agent." This page calls it "twitch cat" because the
+  name describes the mechanism: pure reaction to the present instant.
+
+  **The sealed-box failure.** Cat at cell 2. Mouse at cell 3 -- one step away, visible. Cat
+  steps right and arrives at 3. The mouse ducks behind the wall and moves to cell 0. The cat's
+  eyes now say "nothing in sight":
+
+      Round 1: cat at 2, mouse at 3.  Mouse is visible (distance = 1).  Action: step right.
+      Round 2: cat at 3, mouse at 0.  Mouse hid behind wall.  Eyes say: nothing in sight.  Wanders.
+
+  The mouse is alive at cell 0, one room away. But the wiring table has no row for "mouse was
+  here a moment ago." The instant the mouse leaves the cat's eyes, it leaves the cat's world.
+  The chase ends.
+
+  > Root cause: no memory. A past fact cannot fire a present rule if there is nowhere to keep it.
+
+
+  ## Rung 2 -- the Diary Cat (+ memory)
+
+  One new power over the twitch cat: a DIARY -- a written note that survives after the eyes go
+  blank. The diary holds facts:
+
+      "mouse was at cell 3, two rounds ago"
+      "mouse last moved right"
+      "I have visited cell 2 three rounds in a row"
+
+  The rule table now reads from the DIARY as well as the eyes:
+
+      eyes + diary say                              ->    action
+      ------------------------------------------         ------
+      can't see mouse + diary: last moved right     ->    keep going right (follow the old trace)
+      diary: visited this cell 3 rounds running     ->    try the other direction (stop looping)
+
+  The textbook calls this a "model-based reflex agent." The diary is the "internal state" -- a
+  model of what was true, surviving past the moment the eyes reported it.
+
+  Kills the sealed-box failure: the cat chases the ghost of the mouse even when it can't see it.
+  Kills blind loops: the diary notices the repeated cell and redirects.
+
+  **The juke failure.** Mouse runs right (diary writes: "last direction = right"), ducks behind
+  a box, then CHANGES direction and bolts left. The diary cat charges right, straight into empty
+  space, while the mouse escapes left:
+
+      Round 1: cat at 1, mouse at 2.  Visible.  Diary writes: direction = right.  Cat steps right.
+      Round 2: cat at 2, mouse at 4.  Mouse moved right again.  Diary: direction = right.  Cat steps right.
+      Round 3: cat at 3, mouse at 0.  Mouse JUKED left -- now behind the cat.  Eyes blank.
+               Diary still says "right." Cat charges right. Mouse is at 0, fleeing the other way.
+
+  The diary is a record of the past. "Mouse went right" was true three rounds ago. It is not
+  true now. The diary cannot imagine what the mouse will do next -- only remember what it did.
+
+  > Root cause: memory records what happened. It cannot simulate what will happen.
+
+
+  ## Rung 3 -- the Sketchpad Cat (+ goal + planning)
+
+  One new power: a GOAL ("catch the mouse") and a SKETCHPAD -- the ability to try moves in
+  imagination before the paws move. The cat plays out short chains of "if I go here, the mouse
+  is probably there, then..." and picks the chain that ends in a catch.
+
+  The textbook calls this a "goal-based agent." The sketchpad is what earns the name: the cat
+  runs a small film reel of possible futures before committing.
+
+  Kills the juke: the cat simulates "if I cut across to cell 0 now, the mouse cannot escape
+  left" and takes the intercept route instead of chasing the tail.
+
+  Kills blind loops: the sketchpad says "I was at cell 2 two rounds ago -- going back leads
+  nowhere -- skip that branch."
+
+  **The black-and-white failure.** The sketchpad only asks: does this chain end in a catch?
+  A plan that catches the mouse in 5 steps scores EQUAL to one that catches it in 500 steps.
+  A route that avoids a bear trap and a route that walks through one both read as "catch = yes"
+  if they end in a catch. No way to prefer one over the other:
+
+      Plan A: right, right, cut corner -> catches mouse in 5 steps.   Sketchpad: CATCH (yes)
+      Plan B: right, into bear trap, hobble -> catches mouse in 40 steps.  Sketchpad: CATCH (yes)
+
+  Both say yes. The cat cannot choose. The sketchpad has no number to pin to "5 steps and safe"
+  versus "40 steps and a trap." It reads the binary outcome, nothing else.
+
+  > Root cause: a yes-or-no label on an outcome cannot rank outcomes against each other.
+
+
+  ## Rung 4 -- the Scorecard Cat (+ utility)
+
+  One new power: a HAPPINESS SCORE pinned to each outcome. The textbook calls this a "utility
+  function." It is just a number per outcome -- no biology, no philosophy, just arithmetic.
+
+      outcome                  score
+      ---------------------    -----
+      catch the mouse          +100
+      each wasted round          -1
+      step into a bear trap      -50
+      reach a dead end            -5
+
+  Now the cat can rank plans:
+
+      Plan A: catch in  5 steps, no trap  ->  100 + (5 * -1) +    0  =  +95     <- best
+      Plan B: catch in 40 steps, one trap ->  100 + (40 * -1) + (-50) =  +10
+      Plan C: catch in  6 steps, no trap  ->  100 + (6 * -1) +    0  =  +94
+
+  Plan A wins. The black-and-white failure is dead.
+
+  When the world is uncertain -- the cat does not know which way the mouse will move -- the cat
+  scores on EXPECTED VALUE. Expected value means: multiply each outcome's score by its likelihood,
+  add the products, pick the highest sum. (Likelihood means a number between 0 and 1 saying how
+  probable that outcome is. Likelihoods of all outcomes must add to 1.)
+
+      Option 1 (chase right): 80% chance of catching (score +100), 20% chance of missing (score -5)
+      expected score = 0.80 * 100 + 0.20 * (-5) = 80.0 - 1.0 = 79.0
+
+      Option 2 (cut across):  60% chance of catching (score +100), 40% chance of missing (score -5)
+      expected score = 0.60 * 100 + 0.40 * (-5) = 60.0 - 2.0 = 58.0
+
+  Chase right has the higher expected score (79.0 > 58.0). Pick it. The textbook calls this
+  "maximising expected utility."
+
+  **Two failures the scorecard cannot fix.** The scores and the world model -- the hand-coded
+  guess about how the mouse moves -- are frozen at build time. If the hand got the numbers wrong,
+  every score is wrong. And if the world has many possible futures, computing expected scores for
+  all branches takes too long -- the cat freezes mid-calculation while the mouse escapes. The
+  textbook calls this "computationally intractable."
+
+  > Root cause: the scorecard and the world model are frozen -- and can be wrong, or too slow.
+
+
+  ## Rung 5 -- the Learning Cat (+ updatable models)
+
+  One new power: after each chase, a FEEDBACK SIGNAL arrives -- caught the mouse (reward +),
+  wasted rounds or hit a wall (penalty -). The cat uses that signal to nudge its own dials. The
+  scores and the world model are no longer frozen.
+
+  After a chase in which the cat predicted the mouse would go right (80% confidence) and the
+  mouse went left every single time:
+
+      chase 1 -> mouse went left -> penalty.  Belief: "right" nudges down from 0.80 to 0.56.
+      chase 2 -> mouse went left -> penalty.  Belief nudges from 0.56 to 0.45.
+      chase 3 -> mouse went left -> penalty.  Belief nudges from 0.45 to 0.36.
+
+  After enough chases the belief settles near the truth. The frozen-wrong-assumption failure is
+  dead. The slow-math failure is dead too: the learning cat builds SHORTCUTS -- patterns like
+  "in this exact configuration, always cut left" -- so it stops recomputing from scratch every
+  round.
+
+  **What learning still cannot fix.** The first few chases are terrible: the cat flails by
+  trial and error until the dials settle. This is the "cold start" problem. And no amount of dial
+  tuning changes the hard physics of the room: if the mouse can run faster than the cat's maximum
+  speed, no adjustment of the world model bridges that gap.
+
+  > Root cause of the limits: learning needs time, and it cannot rewrite physics.
+
+
+  ## The Pattern (say it back to yourself)
+
+      RUNG   new power               kills                           then breaks at
+      ----   --------------------    ----------------------------    ----------------------------
+       1     wiring table            -- (the floor)                  hidden mouse, blind loops
+       2     diary (memory)          hidden mouse, blind loops       juke (wrong direction)
+       3     sketchpad (planning)    juke, intercept                 can't rank good vs dangerous
+       4     scorecard (utility)     can't rank, risk, odds          frozen model, math too slow
+       5     learning (dials)        frozen model, slow math         cold start, raw speed ceiling
+
+  A power earns its rung only by the failure it removes. Removing one failure uncovers the next,
+  which forces the next rung. A ladder, not a bag of personalities.
+
+  And through all five rungs (Law 3): the room never changed. Partially observable. Stochastic
+  mouse. Sequential moves. Two players. Only the brain changed; the world did not.
+
+
+  ## The Jargon Decoder
+
+      our plain word                       ->  textbook name
+      ---------------------------------        ------------------------------------------
+      twitch cat / wiring table            ->  simple reflex agent / condition-action rules
+      what the eyes catch right now        ->  a percept
+      diary (notes that outlast the eyes)  ->  internal state / "model"
+      diary cat                            ->  model-based reflex agent
+      can't see the whole room             ->  partially observable environment
+      mouse is unpredictable               ->  stochastic (non-deterministic)
+      chase over many rounds               ->  sequential task (not episodic)
+      two players                          ->  multi-agent environment
+      goal + sketchpad / film reel         ->  goal-based agent / planning
+      happiness score                      ->  utility function
+      best expected score                  ->  maximising expected utility
+      scorecard cat                        ->  utility-based agent
+      reward + penalty, nudge dials        ->  learning agent / reward signal
+      math too slow / needs too much room  ->  computationally intractable
+      cold start                           ->  exploration phase / cold-start problem
+
+
+  ## Python: Five Cats, One Corridor, by Hand
+
+  The corridor has five cells (0 through 4). Cat starts at 0. Mouse starts at 4. Vision range:
+  one cell. Each rung is a separate block. Hard-coded rounds -- no loops hiding the decisions --
+  so you can watch each rung work and then hit its wall.
+
+  ```python
+  # -------------------------------------------------------------------------
+  # THE ROOM
+  # Five-cell corridor: positions 0, 1, 2, 3, 4
+  # Vision range: cat sees only 1 cell left and 1 cell right (range = 1)
+  # -------------------------------------------------------------------------
+
+  def can_see(cat_pos, mouse_pos, vision_range=1):
+      return abs(cat_pos - mouse_pos) <= vision_range
+
+
+  # =========================================================================
+  # RUNG 1 -- TWITCH CAT (simple reflex)
+  # Rule: if mouse visible -> step toward it. Else -> wander (stay put in toy).
+  # =========================================================================
+  print("=== RUNG 1: TWITCH CAT ===")
+
+  # Round 1: cat at 2, mouse at 3 -- one step away, visible.
+  cat_r1 = 2;   mouse_r1 = 3
+  sees_r1 = can_see(cat_r1, mouse_r1)     # True (distance 1)
+  action_r1 = "step right" if sees_r1 else "wander"
+  cat_after_r1 = cat_r1 + 1              # cat moves to 3
+  print(f"Round 1: cat={cat_r1}, mouse={mouse_r1}, sees={sees_r1}  ->  {action_r1}")
+  # Round 1: cat=2, mouse=3, sees=True  ->  step right
+
+  # Round 2: cat arrived at 3. Mouse ducks behind wall and moves to 0.
+  cat_r2 = cat_after_r1;   mouse_r2 = 0  # mouse hid!
+  sees_r2 = can_see(cat_r2, mouse_r2)    # False (distance 3)
+  action_r2 = "step right" if sees_r2 else "wander"
+  print(f"Round 2: cat={cat_r2}, mouse={mouse_r2}, sees={sees_r2}  ->  {action_r2}")
+  # Round 2: cat=3, mouse=0, sees=False  ->  WANDERS
+  print("Twitch cat failure: mouse hid, cat abandoned the chase. No memory.")
+
+
+  # =========================================================================
+  # RUNG 2 -- DIARY CAT (+ memory)
+  # New: diary holds the last-known direction of the mouse.
+  # If mouse invisible -> follow last-known direction from the diary.
+  # =========================================================================
+  print("\n=== RUNG 2: DIARY CAT ===")
+
+  diary_dir = None  # nothing written yet
+
+  # Round 1: cat at 1, mouse at 2. Visible. Diary writes down direction.
+  cat_d1 = 1;   mouse_d1 = 2
+  sees_d1 = can_see(cat_d1, mouse_d1)           # True
+  diary_dir = "right" if mouse_d1 > cat_d1 else "left"
+  action_d1 = f"step {diary_dir}"
+  cat_after_d1 = cat_d1 + 1                     # cat moves to 2
+  print(f"Round 1: cat={cat_d1}, mouse={mouse_d1}, sees={sees_d1}, diary={diary_dir}  ->  {action_d1}")
+  # Round 1: cat=1, mouse=2, sees=True, diary=right  ->  step right
+
+  # Round 2: cat at 2, mouse at 4 (moved right again). Still visible.
+  cat_d2 = cat_after_d1;   mouse_d2 = 4
+  sees_d2 = can_see(cat_d2, mouse_d2)           # False (distance 2)
+  action_d2 = f"step {diary_dir} (from diary)"  # eyes blank; diary fires
+  cat_after_d2 = cat_d2 + 1                     # follows diary to 3
+  print(f"Round 2: cat={cat_d2}, mouse={mouse_d2}, sees={sees_d2}, diary={diary_dir}  ->  {action_d2}")
+  # Round 2: cat=2, mouse=4, sees=False, diary=right  ->  step right (from diary). Still chasing!
+
+  # Round 3: cat at 3. Mouse JUKED -- was going right, now bolts LEFT to position 0.
+  cat_d3 = cat_after_d2;   mouse_d3 = 0         # juke!
+  sees_d3 = can_see(cat_d3, mouse_d3)           # False (distance 3)
+  action_d3 = f"step {diary_dir} (from diary)"  # diary still says right -- wrong direction
+  cat_after_d3 = cat_d3 + 1                     # charges right to 4
+  print(f"Round 3: cat={cat_d3}, mouse={mouse_d3}, sees={sees_d3}, diary={diary_dir}  ->  {action_d3}")
+  # Round 3: cat=3, mouse=0, sees=False, diary=right  ->  step right (from diary). WRONG WAY.
+  print("Diary cat failure: mouse juked, diary held old direction, cat ran the wrong way.")
+
+
+  # =========================================================================
+  # RUNG 3 -- SKETCHPAD CAT (+ goal + planning)
+  # New: simulates two candidate plans, picks the one that catches the mouse.
+  # Shows the black-and-white failure: two catching plans look identical.
+  # =========================================================================
+  print("\n=== RUNG 3: SKETCHPAD CAT ===")
+
+  cat_sk = 2;   mouse_sk_predicted = 4
+
+  # Two plans; each plan is a pair of steps (+1 = right, -1 = left)
+  plan_A_step1 = +1;  plan_A_step2 = +1   # right, right  -> 2+1+1 = 4
+  plan_B_step1 = -1;  plan_B_step2 = -1   # left,  left   -> 2-1-1 = 0
+
+  pos_after_plan_A = cat_sk + plan_A_step1 + plan_A_step2  # = 4
+  pos_after_plan_B = cat_sk + plan_B_step1 + plan_B_step2  # = 0
+
+  plan_A_catches = (pos_after_plan_A == mouse_sk_predicted)  # True
+  plan_B_catches = (pos_after_plan_B == mouse_sk_predicted)  # False
+
+  print(f"cat={cat_sk}, mouse predicted at={mouse_sk_predicted}")
+  print(f"  Plan A (right,right): lands at {pos_after_plan_A}, catches={plan_A_catches}")
+  print(f"  Plan B (left, left ): lands at {pos_after_plan_B}, catches={plan_B_catches}")
+  print(f"  Sketchpad picks Plan A (catches=True beats catches=False).")
+
+  # Black-and-white failure: two plans both catch.
+  plan_C_catches = True;  plan_C_steps = 2;  plan_C_trap = False
+  plan_D_catches = True;  plan_D_steps = 6;  plan_D_trap = True
+  print("\nBlack-and-white failure:")
+  print(f"  Plan C: catches={plan_C_catches}, steps={plan_C_steps}, trap={plan_C_trap}")
+  print(f"  Plan D: catches={plan_D_catches}, steps={plan_D_steps}, trap={plan_D_trap}")
+  print(f"  Sketchpad sees: catches=True, catches=True. Cannot choose. Plans identical to it.")
+
+
+  # =========================================================================
+  # RUNG 4 -- SCORECARD CAT (+ utility)
+  # New: scores each outcome. Picks the highest score.
+  # Also shows expected value under uncertainty.
+  # =========================================================================
+  print("\n=== RUNG 4: SCORECARD CAT ===")
+
+  score_catch    = 100
+  score_trap     = -50
+  score_per_step = -1
+
+  # Plan C: catch in 2 steps, no trap
+  score_plan_C = score_catch + (plan_C_steps * score_per_step) + (score_trap if plan_C_trap else 0)
+  # = 100 + (2 * -1) + 0 = 98
+
+  # Plan D: catch in 6 steps, one trap
+  score_plan_D = score_catch + (plan_D_steps * score_per_step) + (score_trap if plan_D_trap else 0)
+  # = 100 + (6 * -1) + (-50) = 44
+
+  print(f"Plan C score: {score_catch} + ({plan_C_steps} * {score_per_step}) + 0 = {score_plan_C}")
+  print(f"Plan D score: {score_catch} + ({plan_D_steps} * {score_per_step}) + {score_trap} = {score_plan_D}")
+  print(f"Scorecard picks: {'C' if score_plan_C > score_plan_D else 'D'}  (score {max(score_plan_C, score_plan_D)})")
+  # Scorecard picks: C (score 98)
+
+  # Expected value when uncertain about the mouse's direction
+  p_mouse_right = 0.80;  reward_catch = score_catch    # = 100
+  p_mouse_left  = 0.20;  reward_miss  = -5             # wasted turn plus lost ground
+
+  expected_chase_right = p_mouse_right * reward_catch + p_mouse_left * reward_miss
+  # = 0.80 * 100 + 0.20 * (-5) = 80 - 1 = 79
+
+  p_cut = 0.60;  p_cut_miss = 0.40
+  expected_cut_across = p_cut * reward_catch + p_cut_miss * reward_miss
+  # = 0.60 * 100 + 0.40 * (-5) = 60 - 2 = 58
+
+  print(f"\nExpected score (chase right): {p_mouse_right}*{reward_catch} + {p_mouse_left}*{reward_miss} = {expected_chase_right:.1f}")
+  print(f"Expected score (cut across):  {p_cut}*{reward_catch} + {p_cut_miss}*{reward_miss} = {expected_cut_across:.1f}")
+  print(f"Scorecard picks: chase right ({expected_chase_right:.1f} > {expected_cut_across:.1f})")
+  # Expected score (chase right): 79.0
+  # Expected score (cut across):  58.0
+  # Scorecard picks: chase right
+
+
+  # =========================================================================
+  # RUNG 5 -- LEARNING CAT (+ updatable models)
+  # New: after each chase, a reward/penalty signal nudges the belief.
+  # Starts with a wrong assumption; watch it correct over three chases.
+  # =========================================================================
+  print("\n=== RUNG 5: LEARNING CAT ===")
+
+  # Starting belief: mouse goes right 70% of the time (hand-coded assumption; actually wrong).
+  belief = 0.70
+  lr = 0.20   # learning rate -- how much each chase nudges the belief (0.20 = moderate)
+
+  # Chase 1: mouse went LEFT. Outcome = 0 (0 = left, 1 = right).
+  outcome_1 = 0
+  belief = belief + lr * (outcome_1 - belief)
+  # = 0.70 + 0.20 * (0 - 0.70) = 0.70 - 0.14 = 0.56
+  print(f"After chase 1 (mouse went left):  belief mouse-goes-right = {belief:.2f}")
+
+  # Chase 2: mouse went LEFT again.
+  outcome_2 = 0
+  belief = belief + lr * (outcome_2 - belief)
+  # = 0.56 + 0.20 * (0 - 0.56) = 0.56 - 0.112 = 0.448
+  print(f"After chase 2 (mouse went left):  belief mouse-goes-right = {belief:.2f}")
+
+  # Chase 3: mouse went LEFT a third time.
+  outcome_3 = 0
+  belief = belief + lr * (outcome_3 - belief)
+  # = 0.448 + 0.20 * (0 - 0.448) = 0.448 - 0.0896 = 0.358
+  print(f"After chase 3 (mouse went left):  belief mouse-goes-right = {belief:.2f}")
+
+  print(f"\nStarted at 0.70. After three left-only chases: {belief:.2f}.")
+  print("The frozen wrong assumption is correcting. It needs more chases to settle near 0.")
+  print("Cold start: the first few chases are wasted -- the belief is miles from the truth.")
+  ```
+
+  Output of the five blocks:
+
+      === RUNG 1: TWITCH CAT ===
+      Round 1: cat=2, mouse=3, sees=True  ->  step right
+      Round 2: cat=3, mouse=0, sees=False  ->  wander
+      Twitch cat failure: mouse hid, cat abandoned the chase. No memory.
+
+      === RUNG 2: DIARY CAT ===
+      Round 1: cat=1, mouse=2, sees=True, diary=right  ->  step right
+      Round 2: cat=2, mouse=4, sees=False, diary=right  ->  step right (from diary)
+      Round 3: cat=3, mouse=0, sees=False, diary=right  ->  step right (from diary)
+      Diary cat failure: mouse juked, diary held old direction, cat ran the wrong way.
+
+      === RUNG 3: SKETCHPAD CAT ===
+      cat=2, mouse predicted at=4
+        Plan A (right,right): lands at 4, catches=True
+        Plan B (left, left ): lands at 0, catches=False
+        Sketchpad picks Plan A (catches=True beats catches=False).
+      Black-and-white failure:
+        Plan C: catches=True, steps=2, trap=False
+        Plan D: catches=True, steps=6, trap=True
+        Sketchpad sees: catches=True, catches=True. Cannot choose. Plans identical to it.
+
+      === RUNG 4: SCORECARD CAT ===
+      Plan C score: 100 + (2 * -1) + 0 = 98
+      Plan D score: 100 + (6 * -1) + -50 = 44
+      Scorecard picks: C  (score 98)
+      Expected score (chase right): 0.8*100 + 0.2*-5 = 79.0
+      Expected score (cut across):  0.6*100 + 0.4*-5 = 58.0
+      Scorecard picks: chase right (79.0 > 58.0)
+
+      === RUNG 5: LEARNING CAT ===
+      After chase 1 (mouse went left):  belief mouse-goes-right = 0.56
+      After chase 2 (mouse went left):  belief mouse-goes-right = 0.45
+      After chase 3 (mouse went left):  belief mouse-goes-right = 0.36
+      Started at 0.70. After three left-only chases: 0.36.
+      The frozen wrong assumption is correcting. It needs more chases to settle near 0.
+      Cold start: the first few chases are wasted -- the belief is miles from the truth.
+
+
+  ---
+
+  One Breath: a cat that only reacts abandons any mouse it can't see; give it a diary and it
+  chases blind but runs the wrong way when the mouse jukes; add a sketchpad and it anticipates,
+  but can't rank a safe route over a deadly one; add a scorecard and it ranks, but freezes on
+  big maps or trusts a hand-coded wrong model; let it learn and the model updates -- but the
+  first chases are hopeless, and no dial can outrun a physically faster mouse.
+
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

@@ -93,6 +93,8 @@
   reference   [E. Vision Transformer From Pencil -- Strips, Seat-Stamps, and Masks by Hand](posts/vit-from-pencil.txt)
   special     [SPECIAL. Cheapest Walk: UCS and A* -- Every Pop Shown, the Proof Included](posts/cheapest-walk-ucs-astar.txt)
   special     [SPECIAL. Genetic Algorithm From Scratch -- Optimising With No Gradient](posts/genetic-algorithm-from-scratch.txt)
+  special     [SPECIAL. Informed Search Jargon -- One Machine, Three Slips, Every Word Debunked](posts/informed-search-jargon.txt)
+  special     [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
