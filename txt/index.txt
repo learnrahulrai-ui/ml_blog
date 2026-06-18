@@ -199,7 +199,7 @@
     Written for Hacker News, self-contained: the full UCS walk (6 pops) on a 5-node town map
     (S, A, B, C, G), every offer and discard shown with arithmetic; then the same map in A*
     with positions assigned to nodes and every f=g+h worked out, demonstrating the exact pop
-    A* saves over UCS (stale B never surfaces because G's f=5.00 beats B's f=6.83). Proof that
+    A* saves over UCS (stale B never surfaces because G's f=5.00 beats B's f=6.24). Proof that
     the cheapest pop is final (any alternative costs ≥ c + 0 = c), the admissibility argument
     (h ≤ true remaining cost, always), honest note that UCS IS Dijkstra's, lazy deletion
     explained, and working heapq code for both. Assumes zero background; every term defined

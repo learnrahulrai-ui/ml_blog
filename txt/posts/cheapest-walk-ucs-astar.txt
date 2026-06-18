@@ -178,14 +178,19 @@
   **The tab killed the circle.** When A offered S back, 1+1=2 lost to states[S]=0. No
   "visited" set needed. The tab already holds the cheapest cost to every sealed place; any
   offer to a sealed place will always lose, because the sealed place was finalized when it
-  was the global cheapest and nothing can be cheaper than that. The tab is the circle-breaker,
-  built in, for free.
+  was the global cheapest and -- since every road is ≥ 0 -- nothing can be cheaper than that.
+  The tab plus the non-negative roads are the circle-breaker, built in, for free. (Drop the
+  non-negative condition and this stops working: a place's tab could keep improving forever
+  around a negative loop. The tab breaks circles only because no road ever lowers a total.)
 
   **Stale slips ride harmlessly.** When A found B for cost 2, the old (4,B) slip was already
   sitting on the pile. It couldn't be removed -- heaps have no per-item delete. So it rode
   along, three more pops later surfaced as round 5, saw B in the sealed set, and died.
-  One extra discard is the full price of not having a decrease-key operation. In practice
-  this is called "lazy deletion" and it's how every real UCS/Dijkstra/A* implementation works.
+  One extra discard was the price HERE; in general it's one stale pop per superseded slip, so
+  a place reached cheaper k times leaves k−1 ghosts on the pile. That is the price of not
+  having a decrease-key operation. In practice this is called "lazy deletion" and it's how
+  most real UCS/Dijkstra/A* implementations work (the alternative, an indexed heap with
+  decrease-key, trades the ghosts for bookkeeping).
 
 
   ## Why the Cheapest Pop Is Already Final (The Proof, With Numbers)
@@ -205,8 +210,13 @@
 
   **The floor the whole argument stands on:** roads must cost ≥ 0. If a road has negative
   cost, walking it subtracts from the total. Then a route through a more expensive place could
-  end up cheaper after the negative road, and the proof collapses. UCS with any negative road
-  returns the wrong answer. Bellman-Ford handles negative roads, at higher cost.
+  end up cheaper after the negative road, and the step "≥ c + 0 ≥ c" breaks. UCS is no longer
+  guaranteed correct -- it CAN seal a place at a cost a later negative road would have beaten.
+  (It doesn't fail on every graph with a negative road -- some happen to come out right -- but
+  the guarantee is gone, which is all you need to stop trusting it.) Worse, on THIS map every
+  road is two-way, so a single negative road is a negative two-cycle you can loop forever for
+  unboundedly negative cost -- there is no shortest path to find at all. For directed graphs
+  with negative edges but no negative cycle, Bellman-Ford handles it, at higher cost.
 
   This correctness argument is due to Dijkstra (1959) and is also why "this IS Dijkstra's
   algorithm" -- see the honest note at the end.
@@ -232,51 +242,66 @@
   order doesn't matter for the value -- but get the mapping right deliberately: a place is
   (row, col), not (x, y).
 
-  Assign positions to the five nodes:
+  Here is the one thing you cannot fake: the straight-line guess is only a safe under-count
+  if the map is HONEST -- if every road is at least as long as the straight line between its
+  two ends. A crow-flies guess can only be a lower bound on road cost when roads don't take
+  shortcuts the crow can't. So assign positions where every road's length ≤ its painted cost:
 
-      S = (0, 0)    A = (0, 2)    B = (2, 2)    C = (4, 2)    G = (4, 4)
+      S = (0, 0)    A = (1, 0)    B = (1, 1)    C = (2, 1)    G = (2, 3)
 
-  h values to G = (4, 4):
+  Check the honesty -- each road's straight-line length vs its cost:
 
-      h(S) = sqrt( (4-0)^2 + (4-0)^2 ) = sqrt(32)  ≈ 5.66
-      h(A) = sqrt( (4-2)^2 + (4-0)^2 ) = sqrt(20)  ≈ 4.47
-      h(B) = sqrt( (4-2)^2 + (4-2)^2 ) = sqrt(8)   ≈ 2.83
-      h(C) = sqrt( (4-2)^2 + (4-4)^2 ) = sqrt(4)   = 2.00
+      S-A: length 1.00 ≤ cost 1     A-B: length 1.00 ≤ cost 1     B-C: length 1.00 ≤ cost 1
+      C-G: length 2.00 ≤ cost 2     S-B: length 1.41 ≤ cost 4     A-C: length 1.41 ≤ cost 5
+      B-G: length 2.24 ≤ cost 8
+
+  Every road is at least as long as its crow-flies line. (The first attempt at this section
+  used flashier coordinates -- and they LIED: a road of cost 1 spanned a straight-line gap of
+  2, so the guess overshot and the under-count proof below would have been false. The numbers
+  here are honest by construction.)
+
+  h values to G = (2, 3):
+
+      h(S) = sqrt( (3-0)^2 + (2-0)^2 ) = sqrt(13)  ≈ 3.61
+      h(A) = sqrt( (3-0)^2 + (2-1)^2 ) = sqrt(10)  ≈ 3.16
+      h(B) = sqrt( (3-1)^2 + (2-1)^2 ) = sqrt(5)   ≈ 2.24
+      h(C) = sqrt( (3-1)^2 + (2-2)^2 ) = sqrt(4)   = 2.00
       h(G) = 0
 
-  Each h ≤ the true cheapest road to G from that place: h is an under-count (proved below),
-  which is what makes A* safe.
+  Cross-check against the true cheapest road costs to G (S=5, A=4, B=3, C=2): every h is ≤
+  its true cost (3.61≤5, 3.16≤4, 2.24≤3, 2.00≤2). Each h is a genuine under-count -- which,
+  proved below, is exactly what makes A* safe.
 
 
   ## The Full A* Walk (Five Pops -- One Fewer Than UCS)
 
   ```
-    start:  pile = [(5.66, 0, S)]   states = {S:0}   prev = {S:None}   sealed = {}
+    start:  pile = [(3.61, 0, S)]   states = {S:0}   prev = {S:None}   sealed = {}
 
-    POP (5.66, 0, S)   S not sealed.  S ≠ goal.  seal S.  offer from S:
-      A: g=0+1=1,  f=1+4.47=5.47  A not in states  → states[A]=1, prev[A]=S, push (5.47,1,A)
-      B: g=0+4=4,  f=4+2.83=6.83  B not in states  → states[B]=4, prev[B]=S, push (6.83,4,B)
-      pile: (5.47,1,A) (6.83,4,B)
+    POP (3.61, 0, S)   S not sealed.  S ≠ goal.  seal S.  offer from S:
+      A: g=0+1=1,  f=1+3.16=4.16  A not in states  → states[A]=1, prev[A]=S, push (4.16,1,A)
+      B: g=0+4=4,  f=4+2.24=6.24  B not in states  → states[B]=4, prev[B]=S, push (6.24,4,B)
+      pile: (4.16,1,A) (6.24,4,B)
 
-    POP (5.47, 1, A)   A not sealed.  A ≠ goal.  seal A.  offer from A:
-      S: g=1+1=2, f=2+5.66=7.66.  states[S]=0. skip.
-      B: g=1+1=2, f=2+2.83=4.83.  states[B]=4. 2<4  → REPLACE: states[B]=2, prev[B]=A,
-                                                                  push (4.83,2,B)
+    POP (4.16, 1, A)   A not sealed.  A ≠ goal.  seal A.  offer from A:
+      S: g=1+1=2, f=2+3.61=5.61.  states[S]=0. skip.
+      B: g=1+1=2, f=2+2.24=4.24.  states[B]=4. 2<4  → REPLACE: states[B]=2, prev[B]=A,
+                                                                  push (4.24,2,B)
       C: g=1+5=6, f=6+2.00=8.00.  C not in states  → states[C]=6, prev[C]=A, push (8.00,6,C)
-      pile: (4.83,2,B) (6.83,4,B)stale (8.00,6,C)
+      pile: (4.24,2,B) (6.24,4,B)stale (8.00,6,C)
 
-    POP (4.83, 2, B)   B not sealed.  B ≠ goal.  seal B.  offer from B:
+    POP (4.24, 2, B)   B not sealed.  B ≠ goal.  seal B.  offer from B:
       S: skip.   A: skip.
       C: g=2+1=3, f=3+2.00=5.00.  states[C]=6. 3<6  → REPLACE: states[C]=3, prev[C]=B,
                                                                   push (5.00,3,C)
       G: g=2+8=10, f=10+0=10.00.  G not in states  → states[G]=10, prev[G]=B, push (10.00,10,G)
-      pile: (5.00,3,C) (6.83,4,B)stale (8.00,6,C)stale (10.00,10,G)
+      pile: (5.00,3,C) (6.24,4,B)stale (8.00,6,C)stale (10.00,10,G)
 
     POP (5.00, 3, C)   C not sealed.  C ≠ goal.  seal C.  offer from C:
       A: skip.   B: skip.
       G: g=3+2=5, f=5+0=5.00.  states[G]=10. 5<10  → REPLACE: states[G]=5, prev[G]=C,
                                                                push (5.00,5,G)
-      pile: (5.00,5,G) (6.83,4,B)stale (8.00,6,C)stale (10.00,10,G)stale
+      pile: (5.00,5,G) (6.24,4,B)stale (8.00,6,C)stale (10.00,10,G)stale
 
     POP (5.00, 5, G)   G not sealed.  G IS the goal → STOP.
   ```
@@ -284,9 +309,9 @@
   Same path: [S, A, B, C, G]. Same cost: 5.
 
   Five pops total. UCS needed six (the stale (4,B) was pop 5 in UCS, wasting a round).
-  Here the stale (6.83,4,B) is still on the pile when G pops -- it was never reached.
-  Why? After sealing C, the pile held (5.00,5,G) and (6.83,4,B)stale. UCS would sort these
-  by g: 4 < 5, so stale B would pop first. A* sorted by f: 5.00 < 6.83, so G popped first.
+  Here the stale (6.24,4,B) is still on the pile when G pops -- it was never reached.
+  Why? After sealing C, the pile held (5.00,5,G) and (6.24,4,B)stale. UCS would sort these
+  by g: 4 < 5, so stale B would pop first. A* sorted by f: 5.00 < 6.24, so G popped first.
   The heuristic pushed G ahead of the stale copy. That is the whole A* win on this map --
   one saved discard -- but on a grid with thousands of nodes the savings compound across
   hundreds of pops.
@@ -295,22 +320,31 @@
   ## The Guess Is an Under-Count -- Which Is Why A* Returns the Same Answer as UCS
 
   The heuristic h(place) is admissible if it never overcounts the true remaining cost:
-  h(place) ≤ true cheapest road cost from place to G, always. Euclidean distance is admissible
-  because a straight line is the shortest possible path. No road route can be shorter than the
-  crow-flies line; roads can only be equal or longer. So h ≤ true remaining cost, always.
+  h(place) ≤ true cheapest road cost from place to G, always. Here is the careful version
+  of the claim, because it is easy to get wrong: Euclidean distance is admissible ONLY when
+  every road costs at least its straight-line length. That is the honesty condition checked
+  when the coordinates were assigned. Under it, the cheapest road from any place to G is a
+  sequence of road costs, each ≥ its own straight-line leg, so the whole road sum ≥ the
+  straight line from place to G -- which is exactly h. So h ≤ true remaining cost. If road
+  costs do NOT dominate straight-line lengths (a cheap road across a wide gap), Euclidean
+  distance can overshoot and is NOT admissible -- it is not magic, it is a consequence of the
+  map being honest.
 
   Why admissibility matters: if h ever overcounted (h(X) > true cost X→G), it could make a
-  slip for X look more expensive than it really is, pushing X down the pile past slips that
-  would be beaten by X's true f-value. The true cheapest path might surface late or never.
-  An admissible h can't do this -- it undersells, so it can only pull slips EARLIER, not
-  later. A* seals the same correct answer as UCS, in fewer pops.
+  slip for X look more expensive than it really is, pushing X down the pile past slips on a
+  worse path. A* could then pop the goal by a dearer route before X's cheaper route ever
+  surfaces, seal it, and return that dearer answer -- the optimality guarantee is gone. An
+  admissible h can't do this -- it undersells, so it can only pull slips EARLIER, never bury
+  the cheapest one. A* seals the same correct answer as UCS, in fewer pops.
 
-  The other h property worth naming: **consistent** (also called monotone). h is consistent
-  if for every road P→Q of cost c: h(P) ≤ c + h(Q). Euclidean distance satisfies this
-  (triangle inequality). A consistent h is also admissible, and it means the sealed set
-  never needs revisiting: once sealed, a place's g is final. In practice: if your heuristic
-  is euclidean distance, you have both. If you write a custom h, check admissibility first,
-  consistency second.
+  The stronger h property worth naming: **consistent** (also called monotone). h is
+  consistent if for every road P→Q of cost c: h(P) ≤ c + h(Q). On an honest map Euclidean
+  distance satisfies this by the triangle inequality (h(P) ≤ straight-line P→Q ≤ c, plus
+  h(Q)). Consistency implies admissibility, and it is the property that lets graph-search A*
+  trust the sealed set: with a consistent h, once a place is sealed its g is final and never
+  needs revisiting. (With a merely-admissible-but-inconsistent h, textbook A* may need to
+  reopen sealed nodes.) In practice: an honest-map Euclidean h gives you both. If you write a
+  custom h, check admissibility first, consistency second.
 
 
   ## Honest Extras (Three Short)
@@ -326,7 +360,11 @@
   cheapest unsealed place to be final. Negative edges break this: a place penned at cost 5
   might later be reached for cost 5 + (-3) = 2 via a negative road, which would have beaten
   the sealed cost. Bellman-Ford handles this by relaxing every edge |V|−1 times; it's slower
-  (O(VE) vs O(E log V) for Dijkstra) but correct with negatives. The tradeoff is exact.
+  (O(VE) vs O(E log V) for Dijkstra) but correct on directed graphs with negative edges --
+  provided there is no negative cycle, which makes "shortest path" meaningless for anyone.
+  (On the binary-heap with lazy deletion shown here the heap can hold up to E entries, so the
+  literal bound is O(E log E); but log E ≤ 2 log V for any graph, so it collapses to the
+  usual O(E log V).)
 
   **Why the tab and the pile hold the same fact at birth but are different tools.** Both
   start holding one cost-0 entry for S. After one pop they diverge: the pile grows by adding
@@ -383,39 +421,39 @@
   # UCS round 6: pop G (cost 5) → GOAL
   final_cost_ucs = tab_g          # 5
 
-  # A* straight-line h values to G=(4,4)
+  # A* straight-line h values to G=(2,3); coords picked so every road >= its straight line
   import math
-  s_pos, a_pos, b_pos, c_pos, g_pos = (0,0), (0,2), (2,2), (4,2), (4,4)
+  s_pos, a_pos, b_pos, c_pos, g_pos = (0,0), (1,0), (1,1), (2,1), (2,3)
 
   def h(place_pos, goal_pos):
       return math.sqrt((goal_pos[1]-place_pos[1])**2 + (goal_pos[0]-place_pos[0])**2)
 
-  h_s = h(s_pos, g_pos)   # 5.66
-  h_a = h(a_pos, g_pos)   # 4.47
-  h_b = h(b_pos, g_pos)   # 2.83
-  h_c = h(c_pos, g_pos)   # 2.00
+  h_s = h(s_pos, g_pos)   # 3.61  (true cost to G = 5, so 3.61 <= 5: admissible)
+  h_a = h(a_pos, g_pos)   # 3.16  (true 4)
+  h_b = h(b_pos, g_pos)   # 2.24  (true 3)
+  h_c = h(c_pos, g_pos)   # 2.00  (true 2)
   h_g = h(g_pos, g_pos)   # 0.00
 
   # A* f-values (what goes into the pile to sort it)
-  # round 1: pop S (f=5.66, g=0) → offer A and B
-  f_a_r1 = 1 + h_a        # 5.47  (pile entry for A)
-  f_b_r1 = 4 + h_b        # 6.83  (pile entry for B)
+  # round 1: pop S (f=3.61, g=0) → offer A and B
+  f_a_r1 = 1 + h_a        # 4.16  (pile entry for A)
+  f_b_r1 = 4 + h_b        # 6.24  (pile entry for B)
 
-  # round 2: pop A (f=5.47, g=1) → B cheaper
-  f_b_r2 = 2 + h_b        # 4.83  (replaces 6.83)
+  # round 2: pop A (f=4.16, g=1) → B cheaper
+  f_b_r2 = 2 + h_b        # 4.24  (replaces 6.24)
   f_c_r2 = 6 + h_c        # 8.00
 
-  # round 3: pop B (f=4.83, g=2) → C and G offered
+  # round 3: pop B (f=4.24, g=2) → C and G offered
   f_c_r3 = 3 + h_c        # 5.00  (replaces 8.00)
   f_g_r3 = 10 + h_g       # 10.00
 
   # round 4: pop C (f=5.00, g=3) → G offered cheaper
   f_g_r4 = 5 + h_g        # 5.00  (replaces 10.00)
 
-  # round 5: cheapest f in pile = (5.00,5,G) < (6.83,4,B)stale → G pops first!
+  # round 5: cheapest f in pile = (5.00,5,G) < (6.24,4,B)stale → G pops first!
   # UCS would pop stale B here (g=4 < g=5). A* skips it.
-  f_g_final       = f_g_r4    # 5.00  ← wins the sort over stale B's 6.83
-  f_b_stale       = f_b_r1    # 6.83  ← never popped; G won first
+  f_g_final       = f_g_r4    # 5.00  ← wins the sort over stale B's 6.24
+  f_b_stale       = f_b_r1    # 6.24  ← never popped; G won first
   final_cost_astar = 5         # same answer as UCS, one fewer pop
   ```
 
@@ -453,7 +491,7 @@
       while node: path.append(node); node = prev[node]
       return list(reversed(path)), states[goal]
 
-  pos = {'S':(0,0), 'A':(0,2), 'B':(2,2), 'C':(4,2), 'G':(4,4)}
+  pos = {'S':(0,0), 'A':(1,0), 'B':(1,1), 'C':(2,1), 'G':(2,3)}  # honest map: road >= straight line
 
   def astar(graph, start, goal, pos):
       def h(p): return math.sqrt((pos[goal][1]-pos[p][1])**2+(pos[goal][0]-pos[p][0])**2)
