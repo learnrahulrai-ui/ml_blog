@@ -1,0 +1,360 @@
+@title Genetic Algorithm From Scratch: Optimising With No Gradient, Every Number Shown :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . FOR HACKER NEWS
+  Genetic Algorithm From Scratch: Optimising With No Gradient, Every Number Shown
+  Posted: 2026-06-18 . Author: Rahul Rai . Tags: genetic-algorithm, optimisation, evolution, by-hand
+  ============================================================================================
+
+  PATH . SPECIAL -- Genetic Algorithm From Scratch  (standalone; no other page on this blog needed)
+
+  Every "genetic algorithm" post drowns in biology: chromosomes, alleles, survival of the
+  fittest, a stock photo of DNA. Then it shows a code dump and calls the metaphor an
+  explanation. This page never leans on the metaphor. One tiny hunt runs end to end, and
+  EVERY number -- the error, the breeding chance, the cut, the tweak -- is worked in front of
+  you on paper. The one genuinely strange thing about this method survives the arithmetic:
+  it climbs to the answer with NO gradient, no per-slot feedback, nothing but a single
+  "how wrong" number per guess and the freedom to let bad guesses die.
+
+  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
+  appears. Anything named more than five lines ago is named again. Every number is worked in
+  front of you, never "recall that...". One idea per line. A pencil and this page are the
+  whole kit. Decimals shown to three places.
+
+  TOY NUMBERS, REAL RECIPE. One line of honesty up front. The RECIPE -- score, flip, share,
+  pick, cut, tweak, replace -- is exactly a real genetic algorithm, nothing faked or skipped.
+  The NUMBERS are a toy: a secret of 4 slots instead of hundreds, a population of 4 guesses
+  instead of thousands, and parents chosen so the first generation lands the answer cleanly so
+  you can check it by eye. Where a toy choice could be mistaken for the method, the text says
+  so. Trust the recipe; treat the sizes as a sketchpad.
+
+  The whole machine, named once so you see the shape, then built piece by piece below:
+
+      score each guess (how wrong)  ->  flip to goodness (small error = big)  ->  share to 1
+           ->  spin a weighted wheel twice (two parents)  ->  cut at one point, glue
+           ->  maybe resample one slot  ->  one baby; repeat to a full new population
+           ->  the babies replace everyone  ->  re-score  ->  repeat until a baby is perfect
+
+  Four moves do all the work, named once here so you are not surprised later: scoring (one
+  number per guess, the total gap from the secret), the breeding share (turning scores into
+  chances that add to one), crossover (cutting two parents at one point and gluing the pieces),
+  and mutation (resampling a single slot on a coin flip). Each is fully spelled out where it
+  first runs.
+
+
+  ## A Machine Only Compares Numbers, and the Cupcake Was Never the Point
+
+  There is a secret row of numbers you are hunting. In the full task it is 8 numbers; here,
+  to fit on paper, it is 4, each between 1 and 4:
+
+      target = [1, 3, 2, 1]
+
+  A guess is any row of 4 numbers in the same range, e.g. [2, 1, 2, 1]. You hold a whole
+  POPULATION of guesses -- a list of rows. The real run holds thousands; here it holds four:
+
+      guess 1 = [1, 3, 2, 4]
+      guess 2 = [1, 3, 4, 4]
+      guess 3 = [2, 1, 2, 1]
+      guess 4 = [4, 4, 4, 4]
+
+  The aim: produce a guess that equals the target slot by slot. The textbook calls a slot a
+  "gene" and a row a "chromosome", but those names carry biology you do not need. The machine
+  sees four numbers against four numbers. Nothing else is in the room.
+
+
+  ## One Number Tells You How Wrong, Never Which Slot -- So the Search Is Blind
+
+  Score a guess by how far it sits from the target. On each slot take the gap -- the size of
+  the difference, ignoring sign, since being too high by 3 is as wrong as too low by 3 -- and
+  add the gaps up. Call that total the SIN of the guess (the lesson's word; it just means
+  "total wrongness"). Worked for guess 1 against target = [1, 3, 2, 1]:
+
+      slot 1:  |1 - 1| = 0
+      slot 2:  |3 - 3| = 0
+      slot 3:  |2 - 2| = 0
+      slot 4:  |4 - 1| = 3
+      sin = 0 + 0 + 0 + 3 = 3
+
+  All four guesses, the same way:
+
+      guess 1 = [1, 3, 2, 4]   sin = 0 + 0 + 0 + 3 = 3
+      guess 2 = [1, 3, 4, 4]   sin = 0 + 0 + 2 + 3 = 5
+      guess 3 = [2, 1, 2, 1]   sin = 1 + 2 + 0 + 0 = 3
+      guess 4 = [4, 4, 4, 4]   sin = 3 + 1 + 2 + 3 = 9
+
+  Now negate, so that bigger means better and a perfect guess sits at the top:
+
+      score = -sin
+      guess 1: -3    guess 2: -5    guess 3: -3    guess 4: -9
+
+  A perfect guess has sin 0, so score 0 -- the largest any score can be. Every real guess
+  scores below zero.
+
+  Here is the move that makes this method strange, and worth your attention: the score is ONE
+  number. It says guess 4 is bad. It does NOT say which of guess 4's slots is the problem. The
+  search never gets a per-slot correction, never a direction to step in. Gradient descent --
+  the method behind most of machine learning -- lives on exactly that per-parameter direction;
+  it always knows which way to nudge each dial. This method is handed no such thing. It knows
+  only a ranking: this guess is worse than that one. Everything below is how a blind ranking,
+  plus the freedom to let losers die, is enough.
+
+
+  ## Raw Error Scores Breed Backwards -- So Flip to Goodness, Then Share Out to One
+
+  You want each guess to breed in proportion to how good it is. So you need a chance for each
+  guess, and the chances must (a) be bigger for smaller sin, (b) never go negative -- a chance
+  cannot be below zero, and (c) add to one across the population, so they read as "this guess's
+  slice of all breeding."
+
+  The two ways that feel right and are both wrong, shown with the sins 3, 5, 3, 9:
+
+      Divide the sins by their total. Then sin 9 (the worst guess) gets the FATTEST slice and
+      sin 3 (a good guess) gets a sliver. Backwards -- the garbage breeds most.
+
+      Try one-minus-the-sin. Then 1 - 9 = -8: a negative chance, which is not a chance at all.
+
+  So flip first, into a positive GOODNESS, then share. A flip that works: subtract every score
+  from the worst score in the population (equally: biggest sin minus this sin). The worst score
+  here is -9 (guess 4):
+
+      goodness = score - (worst score) = score - (-9) = score + 9
+      guess 1:  -3 + 9 = 6
+      guess 2:  -5 + 9 = 4
+      guess 3:  -3 + 9 = 6
+      guess 4:  -9 + 9 = 0
+
+  Small sin now means big goodness, and nothing is negative. Share each by the total goodness
+  so the whole set adds to one:
+
+      total goodness = 6 + 4 + 6 + 0 = 16
+      chance 1 = 6 / 16 = 0.375
+      chance 2 = 4 / 16 = 0.250
+      chance 3 = 6 / 16 = 0.375
+      chance 4 = 0 / 16 = 0.000
+
+  Check: 0.375 + 0.250 + 0.375 + 0.000 = 1.000. Good.
+
+  Note guess 4's chance is exactly 0. The worst guess in the population breeds never -- it dies
+  this generation. That is the flip doing its job: the floor of the population is pinned to
+  zero chance. (One honest wrinkle this flip has: if every guess tied on sin, all goodness
+  would be 0 and the total would be 0 -- a divide-by-zero. The shapes 1/(1+sin) or e^(-sin),
+  mentioned again at the end, dodge that; the subtract-the-worst shape is the cleanest to work
+  by hand, so it is the one used here.)
+
+
+  ## You Cannot Pick the Best Two and Stop -- So Spin a Weighted Wheel, Twice, With Replacement
+
+  The temptation is to take the top two guesses and breed only them. That throws away the rest
+  of the population's numbers and collapses the hunt onto two rows fast. Instead, pick parents
+  from the WHOLE population at random, weighted by the chances just built, and pick WITH
+  REPLACEMENT -- the same guess may be drawn twice, and that is fine.
+
+  Picture the chances laid end to end on a number line from 0 to 1, each guess owning a slice
+  as wide as its chance:
+
+      guess 1 owns [0.000, 0.375)
+      guess 2 owns [0.375, 0.625)
+      guess 3 owns [0.625, 1.000)
+      guess 4 owns nothing (width 0)
+
+  To pick a parent, roll a random number in [0, 1) and see whose slice it lands in:
+
+      roll 0.20  ->  below 0.375  ->  guess 1
+      roll 0.55  ->  in [0.375, 0.625)  ->  guess 2
+      roll 0.90  ->  in [0.625, 1.000)  ->  guess 3
+
+  "Breeds often" is not about duplicates in the population -- it is about slice WIDTH over many
+  rolls. A guess owning a wide slice gets landed on again and again across the generation; a
+  sliver gets landed on rarely; guess 4, owning nothing, never. Roll the wheel twice and you
+  have two parents. Say the wheel hands you guess 1 and guess 3.
+
+
+  ## No One Knows Which Halves Are Good -- So Cut Blind at One Point and Let Dying Choose
+
+  You have two parents:
+
+      parent 1 = guess 1 = [1, 3, 2, 4]
+      parent 2 = guess 3 = [2, 1, 2, 1]
+
+  Crossover makes a baby by cutting both parents at the SAME single point and gluing parent 1's
+  front to parent 2's back. The cut point is one random number k, chosen from 1 to (length − 1)
+  -- here 1 to 3. Never 0 and never the full length: k = 0 or k = 4 would copy one parent whole,
+  no mixing. The baby is parent1[:k] (the first k slots of parent 1) followed by parent2[k:]
+  (slots k onward of parent 2), so its length is k + (4 − k) = 4, unchanged. Worked at k = 3:
+
+      parent 1 = [1, 3, 2, | 4]        front three slots: [1, 3, 2]
+      parent 2 = [2, 1, 2, | 1]        back one slot:     [1]
+      baby     = [1, 3, 2] + [1] = [1, 3, 2, 1]
+
+  Score the baby: against target = [1, 3, 2, 1], every slot matches, sin = 0. The baby IS the
+  target. (Honesty: the parents and the cut were chosen so this lands in one generation, for a
+  clean check by eye. A real run takes many generations of this, the population drifting toward
+  the target as bad combinations die out.)
+
+  The blind part, named plainly: you did NOT choose to keep parent 1's good front and parent 2's
+  good back. You cut at a RANDOM k and kept whatever fell on each side. The single sin score
+  hid which slots were good, so the cut could not aim. What makes the good baby survive is not a
+  clever cut -- it is that next generation it will out-breed worse babies, and the worse ones
+  will get zero or near-zero chances and die. The dying does the choosing. The cut is blind.
+
+
+  ## A Pile That Only Breeds Will Freeze -- So Resample One Slot on a Coin
+
+  Crossover only shuffles numbers already present in the population. If no guess anywhere holds
+  a 3 in slot 2, no amount of cutting and gluing will ever produce one, and the hunt stalls
+  short of the target forever. Mutation is the fresh blood that prevents that freeze.
+
+  After a baby is made, flip a weighted coin: it comes up "change" with a fixed small
+  probability -- here 0.2 (so two times in ten). If it comes up change, pick one random slot
+  and resample its number freshly in the legal range 1 to 4. If not, leave the baby alone.
+  Both branches, on the baby [1, 3, 2, 1]:
+
+      coin = 0.15  ->  0.15 < 0.2, fires  ->  pick slot 2, resample to (say) 2  ->  [1, 2, 2, 1]
+      coin = 0.85  ->  0.85 < 0.2 is false, no change  ->  [1, 3, 2, 1] unchanged
+
+  Exactly one slot moves when the coin fires, never more -- a small jiggle, not a reroll of the
+  whole guess. Too large a probability and the population never settles; too small and it can
+  freeze. In our worked thread the coin came up 0.85, so the baby stayed [1, 3, 2, 1] -- still
+  the target.
+
+
+  ## The Babies Replace Everyone -- So the Good Numbers Survive, Not the Good Guesses
+
+  Repeat the wheel-cut-tweak until you have built a whole new population the same size as the
+  old one -- four babies here, thousands in the real run. Then throw away ALL the old guesses
+  and keep ONLY the babies. This is the part people resist: the good guesses from this
+  generation do not survive as themselves. Their NUMBERS survive, carried into babies by the
+  wheel favouring them as parents. The guess as an object is gone; its slots live on in its
+  children. (One guess is usually copied off to the side untouched -- the best-ever seen -- so
+  a lucky perfect guess is never lost to an unlucky tweak. That single saved guess is where the
+  final answer is read from.)
+
+  Then re-score the new population and go again. Across generations the average sin falls, the
+  wheel keeps favouring the closer guesses, mutation keeps trickling in slots no parent had,
+  and eventually a baby scores sin 0 -- equals the secret. Here, the very first generation
+  already produced [1, 3, 2, 1], so the hunt stops: it found the target.
+
+  Nothing in that loop ever computed a correction. No guess looked at its sin and fixed a slot.
+  Improvement came entirely from three blind forces: better guesses breeding more often,
+  worse guesses dying, and random single-slot jiggles. That is evolution -- the idea is
+  Darwin's (natural selection, 1859); turning it into this code loop is John Holland's (1970s).
+
+
+  ## The Numbers, in Python
+
+  Every score, flip, share, cut, and coin above worked on paper. Here the exact numbers in
+  Python -- same moves, same digits. A guess is a plain list (so the cut can glue two pieces);
+  the target is a numpy array (so the gap subtracts slot by slot).
+
+  ```python
+  import numpy as np
+
+  target = np.array([1, 3, 2, 1])          # the secret (real run: 8 numbers)
+
+  # --- the score: one number, total gap, negated ---
+  def recipe_success(state):
+      total_gap = np.sum(np.abs(np.array(state) - target))   # |guess - target| per slot, summed
+      return -int(total_gap)                                 # negate: closer = bigger, perfect = 0
+
+  pop = [[1, 3, 2, 4], [1, 3, 4, 4], [2, 1, 2, 1], [4, 4, 4, 4]]
+  scores = [recipe_success(g) for g in pop]   # [-3, -5, -3, -9]
+
+  class Problem:
+      def __init__(self, population, objective_function, mutation_probability,
+                   fitness_goal, gene_min=1, gene_max=4, rng=None):
+          self.population           = population               # plain storage, no cleverness
+          self.objective_function   = objective_function
+          self.mutation_probability = mutation_probability
+          self.fitness_goal         = fitness_goal
+          self.gene_min, self.gene_max = gene_min, gene_max
+          self.rng = np.random.default_rng() if rng is None else rng
+
+      # --- the breeding share: flip to positive goodness, then divide to 1 ---
+      def fitness(self):
+          scores   = [self.objective_function(m) for m in self.population]  # [-3,-5,-3,-9]
+          worst    = min(scores)                                            # -9
+          goodness = [s - worst for s in scores]                           # [6, 4, 6, 0]
+          total    = sum(goodness)                                         # 16
+          return [g / total for g in goodness]                            # [.375,.25,.375,0]
+
+      # --- the cut: one random point, front of p1 + back of p2 ---
+      def reproduce(self, parent1, parent2):
+          k = int(self.rng.integers(1, len(parent1)))    # 1..len-1  (never a pure copy)
+          return parent1[:k] + parent2[k:]               # length stays the same
+
+      # --- the tweak: on a coin, resample exactly one slot ---
+      def mutate(self, child):
+          if self.rng.random() < self.mutation_probability:               # the coin
+              slot = int(self.rng.integers(0, len(child)))                 # one slot
+              child[slot] = int(self.rng.integers(self.gene_min, self.gene_max + 1))
+          return child
+
+  prob   = Problem(pop, recipe_success, 0.2, fitness_goal=0)
+  chances = prob.fitness()                  # [0.375, 0.25, 0.375, 0.0]  -> sums to 1.0
+
+  # selection by cumulative slices (what the driver does, twice, with replacement)
+  cum = np.cumsum(chances)                  # [0.375, 0.625, 1.0, 1.0]
+  # roll 0.20 -> guess 1 ; roll 0.55 -> guess 2 ; roll 0.90 -> guess 3
+
+  baby = prob.reproduce(pop[0], pop[2])     # k=3 -> [1,3,2] + [1] = [1,3,2,1]
+  recipe_success(baby)                      # 0  -> equals the target
+  ```
+
+
+  ## Honest Extras (Three Short)
+
+  NO GRADIENT, AND THAT IS THE WHOLE POINT. Gradient descent needs the score to be smooth and
+  differentiable, so it can read a per-parameter slope and step downhill. This method needs
+  neither. It needs only to RANK two guesses -- "is this one less wrong than that one?" -- which
+  is why it reaches problems where no slope exists: tuning where you can score an outcome but
+  cannot differentiate it, layouts, schedules, game strategies. The price of needing no
+  gradient is paid in throughput: it learns from a coarse ranking, so it needs many guesses and
+  many generations where gradient descent, when it applies, takes a far straighter line.
+
+  THE FLIP HAS OTHER LEGAL SHAPES. Subtracting the worst score is the cleanest by hand, but it
+  pins the worst guess to a 0 chance and divides by zero if every guess ties. Two shapes avoid
+  both: 1 / (1 + sin) (smaller sin -> larger, always positive, never zero) and e^(-sin) (the
+  softmax-style flip, the same exponential weighting used to turn scores into shares elsewhere
+  in machine learning). All three share out to one after dividing by their total; pick by taste
+  and edge cases, not by correctness.
+
+  WHY WITH-REPLACEMENT, WEIGHTED, AND NOT JUST THE TOP TWO. Breeding only the best two is
+  greedy: it discards the rest of the gene pool and converges onto two rows so fast the
+  population loses the variety mutation can only slowly rebuild -- it gets stuck on the first
+  decent answer it finds. Weighted-with-replacement keeps weaker guesses occasionally breeding,
+  so a slot that is rare today but needed tomorrow survives in the pool. The wheel favours the
+  fit without exterminating everyone else in one generation.
+
+
+  ## One Breath (Carry This Away)
+
+  Score every guess by its total gap from the secret and negate it (closer = bigger); flip the
+  scores into positive goodness so a small gap is a big number (subtract the worst score, or
+  1/(1+gap), or e^(-gap)), then divide by the total so the goodnesses add to one; spin that
+  weighted wheel twice, with replacement, for two parents; cut both at one random point and glue
+  parent-one's front to parent-two's back; on a small-chance coin, resample a single slot;
+  build a full new population this way and let it REPLACE the old one; repeat until a baby's gap
+  is zero. No guess ever fixes itself -- there is no gradient, no per-slot correction, only a
+  blind ranking plus the freedom to let the worst die. That blind loop is a genetic algorithm:
+  Darwin's idea, Holland's code.
+
+  Secret [1, 3, 2, 1], four guesses in; one generation of score-flip-share-pick-cut-tweak; a
+  baby comes out [1, 3, 2, 1]. Every number on this page, by pencil, no metaphor doing the work.
+
+
+----------------------------------------------------------------------------------------------
+  SPECIAL . GENETIC ALGORITHM FROM SCRATCH  (written for Hacker News; standalone)
+  Go deeper, same blog, same method:
+    [Cheapest Walk: UCS and A* -- Every Pop Shown](cheapest-walk-ucs-astar.txt) -- search by hand
+    [Transformers With Pencil -- A Whole Block Worked by Hand](transformerforhn.txt) -- attention
+    [How the Dials Learn](how-the-dials-learn.txt) -- gradient descent, the method this one needs none of
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

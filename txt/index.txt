@@ -194,6 +194,19 @@
     on two strips, LayerNorm on one row (45, √125, [0.45, 1.34, -0.45, -1.34]), and the causal
     mask triangle of -inf that splits reader from writer. YOUR TURN drills throughout. No code.
 
+  [SPECIAL. Genetic Algorithm From Scratch -- Optimising With No Gradient, Every Number Shown](posts/genetic-algorithm-from-scratch.txt)
+    special . 2026-06-18 . standalone . genetic-algorithm, optimisation, evolution, by-hand
+    Written for Hacker News, self-contained: a genetic algorithm built from nothing on a toy
+    hunt -- secret [1,3,2,1], a population of 4 guesses -- with every number worked. The score
+    as one blind "how wrong" number (total gap, negated); the flip-and-share trap (dividing raw
+    errors breeds the worst, 1-x goes negative, so subtract the worst score then divide to sum 1
+    -> chances 0.375/0.25/0.375/0); weighted-with-replacement wheel selection by cumulative
+    slices; one-point crossover (cut g1xg3 at k=3 -> [1,3,2,1], the target) shown to be BLIND;
+    single-slot mutation on a coin; babies replacing the whole population. The framing insight:
+    it optimises with NO gradient, only a ranking plus letting losers die. Honest notes on the
+    gradient-free tradeoff, legal flip-shapes (1/(1+sin), e^-sin), and why not just the top two.
+    Working numpy code. Assumes zero background; every term defined where it appears.
+
   [SPECIAL. Cheapest Walk: UCS and A* -- Every Pop Shown, the Proof Included](posts/cheapest-walk-ucs-astar.txt)
     special . 2026-06-17 . standalone . search, ucs, a-star, dijkstra, by-hand
     Written for Hacker News, self-contained: the full UCS walk (6 pops) on a 5-node town map
