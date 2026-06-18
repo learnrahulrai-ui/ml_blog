@@ -194,14 +194,16 @@
     on two strips, LayerNorm on one row (45, √125, [0.45, 1.34, -0.45, -1.34]), and the causal
     mask triangle of -inf that splits reader from writer. YOUR TURN drills throughout. No code.
 
-  [F. Cheapest Walk: UCS and A* From Pencil -- Every Round Worked Out by Hand](posts/cheapest-walk-ucs-astar.txt)
-    reference . 2026-06-17 . standalone . search, ucs, a-star, by-hand, pathfinding
-    A KATA: uniform-cost search and A* built from nothing -- a small town map (S, A, B, C, G),
-    three papers on your desk (pile/heap, tab/dict, breadcrumb), the full 6-round UCS walk with
-    every offer and discard shown, and the proof that the cheapest-unsettled pop is final (roads
-    ≥ 0, therefore any alternative costs more). A* changes exactly one thing: the pile sorts by
-    cost + straight-line under-guess, while the tab and returned cost stay cost alone. YOUR TURN
-    drills at three points. Real numbers throughout; hard-coded Python at the end.
+  [SPECIAL. Cheapest Walk: UCS and A* -- Every Pop Shown, the Proof Included](posts/cheapest-walk-ucs-astar.txt)
+    special . 2026-06-17 . standalone . search, ucs, a-star, dijkstra, by-hand
+    Written for Hacker News, self-contained: the full UCS walk (6 pops) on a 5-node town map
+    (S, A, B, C, G), every offer and discard shown with arithmetic; then the same map in A*
+    with positions assigned to nodes and every f=g+h worked out, demonstrating the exact pop
+    A* saves over UCS (stale B never surfaces because G's f=5.00 beats B's f=6.83). Proof that
+    the cheapest pop is final (any alternative costs ≥ c + 0 = c), the admissibility argument
+    (h ≤ true remaining cost, always), honest note that UCS IS Dijkstra's, lazy deletion
+    explained, and working heapq code for both. Assumes zero background; every term defined
+    where it appears.
 
   [SPECIAL. Transformers With Pencil -- A Whole Block Worked by Hand, One Line at a Time](posts/transformerforhn.txt)
     special . 2026-06-15 . standalone . transformer, attention, from-scratch

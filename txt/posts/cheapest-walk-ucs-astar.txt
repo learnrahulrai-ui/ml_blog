@@ -1,342 +1,509 @@
-@title Cheapest Walk: UCS and A*, Built From Scratch, One Number at a Time :: Rahul's ML Blog
+@title Cheapest Walk: UCS and A*, Built From Nothing, Every Pop Shown :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  APPENDIX F . CHEAPEST WALK: UCS AND A* FROM PENCIL
-  Uniform-Cost Search and A* -- every round worked out by hand
-  Posted: 2026-06-17 . Author: Rahul Rai . Tags: search, ucs, a-star, by-hand, pathfinding
+  SPECIAL . FOR HACKER NEWS
+  Cheapest Walk: UCS and A*, Built From Nothing, Every Pop Shown
+  Posted: 2026-06-17 . Author: Rahul Rai . Tags: search, ucs, a-star, dijkstra, by-hand
   ============================================================================================
 
-  PATH . APPENDIX F -- Cheapest Walk: UCS and A*  (standalone; no other page needed)
+  PATH . SPECIAL -- Cheapest Walk: UCS and A*  (standalone; no other page on this blog needed)
 
-  Goal: find the cheapest walk across a small town -- not the fewest roads, the cheapest.
-  Kit: a pencil, paper. No code until the very end.
+  Every pathfinding post draws a maze with coloured arrows, names f = g + h, and waves at
+  "admissibility." This page never waves. One town, five places. Every single pop and offer
+  shown with its arithmetic. The proof that the cheapest pop is already final, worked out with
+  numbers, not hand-waved. And A* as the one-line change to UCS that it really is -- run on
+  the same map, every pop shown, the exact moment it wins demonstrated.
 
-  This is a KATA. At each ">> YOUR TURN", cover everything below it, get your own answer
-  first, then compare. Every number is computed here -- nothing carried in from memory.
+  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
+  appears. Anything named more than five lines ago is named again. Every number is worked in
+  front of you, never "recall that...". One idea per line. A pencil and this page are the
+  whole kit. Decimals shown to two places; a final digit may sit one off from a longer division.
+
+  TOY MAP, REAL RECIPE. One line of honesty up front, so nothing misleads. The RECIPE --
+  every move, in order -- is exactly Uniform-Cost Search and A* as Dijkstra, Russell, and
+  Norvig wrote them. The MAP is a toy: five letter-nodes, a handful of roads with small costs,
+  chosen so every number fits on paper. Where a toy choice could mislead about the method,
+  the text says so. Trust the recipe; treat the map as a sketchpad.
+
+  The whole method, named once so you see the shape, then built piece by piece below:
+
+      map + costs  ->  pile (heap)  ->  pop cheapest  ->  stale? toss  ->  goal? stop
+           ->  seal  ->  offer each unsealed neighbour  ->  add if new, replace if cheaper
+           ->  write tab + breadcrumb  ->  repeat
+
+  Three data structures sit on your desk throughout. Named once here so you are not surprised:
+  the pile (a min-heap of slips), the tab (a dict of cheapest costs found so far), and the
+  breadcrumb (a dict of predecessors, used to reconstruct the path at the end). Each is fully
+  spelled out where it first appears below.
 
 
-  ## The Town: A Map With Costs Painted on Every Road
+  ## A Machine That Adds Costs -- and "S→B" Is Not a Number
 
-  Five places: S (start), A, B, C, G (goal). Every road has a cost painted on it.
-  Both directions cost the same.
+  A town has five places: S (start), A, B, C, G (goal). Every road has a cost painted on it
+  in horses -- how dear it is to walk that road. Roads run both ways at the same cost.
 
-      leaves S :  A(1)  B(4)
-      leaves A :  S(1)  B(1)  C(5)
-      leaves B :  S(4)  A(1)  C(1)  G(8)
-      leaves C :  A(5)  B(1)  G(2)
-      leaves G :  C(2)  B(8)
+      leaves S :  A(1)   B(4)
+      leaves A :  S(1)   B(1)   C(5)
+      leaves B :  S(4)   A(1)   C(1)   G(8)
+      leaves C :  A(5)   B(1)   G(2)
+      leaves G :  C(2)   B(8)
 
       start = S      goal = G
 
-  We want the cheapest total cost to walk from S to G.
+  In code this is a dict of dicts: `graph['B'] = {'S': 4, 'A': 1, 'C': 1, 'G': 8}`. Nothing
+  else. The map never changes. Every confusion that comes later traces back to forgetting this.
+
+  The goal: find the walk from S to G whose road-costs add to the smallest total. Not the
+  walk with the fewest roads -- the walk with the cheapest SUM.
 
 
-  ## Fewer Roads Is Not Cheaper, Therefore You Cannot Commit to a Road
+  ## Fewest Roads Is Not Cheapest -- Therefore You Cannot Commit to a Road
 
-  Look at the two ways to reach B. The direct road S→B costs 4. The detour S→A→B costs
-  1 + 1 = 2. Fewer roads costs MORE. That breaks the obvious approach: you cannot just
-  take the cheapest first road and hope, because a dear first road might open a cheaper
-  path that you haven't seen yet.
+  Two ways to reach B. Direct: S→B costs 4. Via A: S→A costs 1, then A→B costs 1, total 2.
+  Two roads beats one road, 2 < 4. Fewer roads is more expensive here.
 
-  So you can never commit to a full path early. You have to keep ALL your options open
-  until you can PROVE a place is final -- and that proof only comes at one specific moment.
-  Which means you need a way to track partial routes, compare them, and close the cheapest
-  one at the right time.
+  That kills the obvious strategy: take the cheapest first road and follow it. A dear opening
+  road might reveal a cheaper continuation later. You cannot commit to any path early, because
+  you don't yet know what roads open up ahead.
 
-    >> YOUR TURN
-       Three roads leave S: S→X costs 10, S→Y costs 3, S→Z costs 7. Without looking further,
-       which place do you know is cheapest to reach from S?
-
-       Check: Y, at cost 3. It has only one road in from S, so no detour can beat it.
-       X and Z might still be beaten by paths through Y. You can only be sure about Y.
+  Which means you must keep ALL partial routes alive until you can PROVE a place is final.
+  That proof only arrives at one specific moment -- spelled out below -- and it relies on the
+  costs being ≥ 0. That condition matters; it's the floor the whole argument stands on.
 
 
-  ## The Three Papers Force the Method Into Being
+  ## Three Papers On Your Desk Force Themselves Into Being
 
-  You need to compare partial routes. That forces three records on your desk:
+  If you can't commit, you need a running record. Three pieces of paper appear on your desk
+  not by choice but by necessity:
 
-  1. **The pile** (`q`) -- a heap of (cost-so-far, place) slips. You always pull the
-     **cheapest** slip off the top. A heap keeps the smallest on top automatically.
-     Each slip says: "I found this place for this cost-so-far."
+  **The pile** (call it `q`). A heap -- a list kept so the cheapest item always sits on top.
+  Each item on the pile is a slip: (cost-so-far, place). The pile holds every frontier
+  candidate you haven't decided about yet. Heap means: heapq in Python; every push and pop
+  keeps the smallest on top automatically.
 
-  2. **The tab** (`states`) -- a dict {place: cheapest cost-so-far found}. Each place
-     has ONE number: the cheapest route to it found so far. When you find a cheaper route,
-     you overwrite. This is your running record of how cheaply you've reached everything.
+  **The tab** (call it `states`). A dict `{place: cheapest cost-so-far found to reach it}`.
+  When you find a cheaper route to a place, you overwrite the old cost. One number per place,
+  always the smallest seen so far. Separate from the pile: the pile holds (cost, place) PAIRS
+  you pop; the tab holds ONE cost PER PLACE you look up. Never blur them.
 
-  3. **The breadcrumb** (`previous`) -- a dict {place: who I came from on its cheapest
-     arrival}. Walk it backward at the end to recover the path. Start's breadcrumb is None.
+  **The breadcrumb** (call it `previous`). A dict `{place: predecessor}`. When place P gets
+  a new cheapest route, you write `previous[P] = wherever that cheaper route came from`.
+  At the end, walk it backward: G→C→B→A→S→(None) and you've recovered the path.
 
-  At birth: you're standing on S for free. So the pile holds one slip, the tab holds one
-  entry, and S has no predecessor:
+  At birth, you're already standing on S for free. No road was walked to reach it. So:
 
-      q        = [ (0, S) ]
-      states   = { S: 0 }
-      previous = { S: None }
+      q        = [ (0, S) ]        pile holds one slip: cost 0, at S
+      states   = { S: 0 }         tab says S reached for 0
+      previous = { S: None }      S has no predecessor (the chain stops here)
+      sealed   = { }              nothing finalized yet
 
-  Note: `states` is NOT empty at birth. Empty would mean "I've reached nothing." But you're
-  standing on S right now, so S is reached for cost 0.
-
-  The pile and the tab hold the same fact at birth, but they are DIFFERENT tools:
-  - `q` you POP (to get the cheapest pair).
-  - `states` you LOOK UP BY PLACE (to get a cost, or to check if a place is in it).
-  Never blur them.
+  `states` is NOT empty at birth. Empty would mean "I've reached nothing." But you're
+  standing on S right now, so S is reached for 0.
 
 
   ## The Wheel: Pull, Discard or Stop or Open
 
-  Pull the cheapest slip (cost, place) off the pile. Three cases:
+  Pull the cheapest slip (cost, place) off the pile. Three cases, in order:
 
-    - **Already sealed?**  Discard and pull again.  (Stale copy -- explained below.)
-    - **Is it the goal?**  Stop. Walk breadcrumbs back. Done.
-    - **Else:**  Seal this place. Then for each road leaving it, compute:
+    Already sealed?  →  Discard. Pull again.  (A stale copy -- explained right after the walk.)
+    Is it the goal?  →  Stop. Walk breadcrumbs back from G to S.
+    Else:            →  Seal this place. Then, for every road leaving it:
 
-          new = cost + road-cost
+        new = cost + road-cost
 
-      For each un-sealed neighbour:
-        - Not in the tab yet    → add: push (new, neighbour), write tab, set breadcrumb.
-        - In tab, new is cheaper → replace: push (new, neighbour), lower tab, update breadcrumb.
-        - In tab, new is ≥ tab  → offer loses, do nothing.
+      For each neighbour on that road:
+        skip if neighbour is already sealed
+        neighbour not in tab yet         → ADD:     push (new, nbr), tab[nbr]=new, prev[nbr]=place
+        nbr in tab and new < tab[nbr]    → REPLACE: push (new, nbr), tab[nbr]=new, prev[nbr]=place
+        nbr in tab and new ≥ tab[nbr]    → offer loses, do nothing
 
-  "Add" and "replace" both push a NEW slip. You never edit the pile -- heaps have no eraser.
-  The old pricier slip stays on the pile and gets tossed the moment it surfaces: the sealed
-  check kills it. Popped many times, sealed exactly once.
+  Both ADD and REPLACE push a NEW slip onto the pile. You never edit a slip already on the
+  pile -- heaps have no eraser. The old pricier slip stays, rides until it surfaces, sees its
+  place is already sealed, and gets tossed. Popped many times; sealed exactly once.
 
 
-  ## The Walk, Every Round Shown
+  ## The Full UCS Walk (Six Pops, Every Offer Shown)
 
   ```
-    start:  q = [(0,S)]   states = {S:0}   previous = {S:None}   sealed = {}
+    start:  q=[(0,S)]  states={S:0}  previous={S:None}  sealed={}
 
-    PULL (0, S)   not goal.  seal S.  offer S's neighbours:
-       A: new = 0+1 = 1.  A not in tab  → tab A=1,  crumb A=S,  push (1,A)
-       B: new = 0+4 = 4.  B not in tab  → tab B=4,  crumb B=S,  push (4,B)
-       pile: (1,A) (4,B)
+    POP (0, S)   S not in sealed.  S ≠ goal.  seal S.  offer roads from S:
+      A: new = 0+1 = 1.  A not in states  → ADD:  states[A]=1, prev[A]=S, push (1,A)
+      B: new = 0+4 = 4.  B not in states  → ADD:  states[B]=4, prev[B]=S, push (4,B)
+      pile after: (1,A) (4,B)
 
-    PULL (1, A)   not goal.  seal A.  offer A's neighbours:
-       S: new = 1+1 = 2.  tab S=0 -- 2 ≥ 0 → skip
-       B: new = 1+1 = 2.  tab B=4 -- 2 < 4 → replace: tab B=2, crumb B=A, push (2,B)
-       C: new = 1+5 = 6.  C not in tab → tab C=6, crumb C=A, push (6,C)
-       pile: (2,B) (4,B)OLD (6,C)
+    POP (1, A)   A not sealed.  A ≠ goal.  seal A.  offer roads from A:
+      S: new = 1+1 = 2.  states[S]=0.  2 ≥ 0  → offer loses, skip
+      B: new = 1+1 = 2.  states[B]=4.  2 < 4  → REPLACE: states[B]=2, prev[B]=A, push (2,B)
+      C: new = 1+5 = 6.  C not in states  → ADD: states[C]=6, prev[C]=A, push (6,C)
+      pile after: (2,B) (4,B)stale (6,C)
 
-    PULL (2, B)   not goal.  seal B.  offer B's neighbours:
-       S: skip (tab S=0 < 6)   A: skip (tab A=1 < 3)
-       C: new = 2+1 = 3.  tab C=6 -- 3 < 6 → replace: tab C=3, crumb C=B, push (3,C)
-       G: new = 2+8 = 10.  G not in tab → tab G=10, crumb G=B, push (10,G)
-       pile: (3,C) (4,B)OLD (6,C)OLD (10,G)
+    POP (2, B)   B not sealed.  B ≠ goal.  seal B.  offer roads from B:
+      S: new = 2+4 = 6.  states[S]=0.  skip.    A: new = 2+1 = 3.  states[A]=1.  skip.
+      C: new = 2+1 = 3.  states[C]=6.  3 < 6  → REPLACE: states[C]=3, prev[C]=B, push (3,C)
+      G: new = 2+8 = 10. G not in states  → ADD: states[G]=10, prev[G]=B, push (10,G)
+      pile after: (3,C) (4,B)stale (6,C)stale (10,G)
 
-    PULL (3, C)   not goal.  seal C.  offer C's neighbours:
-       A: skip (tab A=1 < 8)   B: skip (tab B=2 < 4)
-       G: new = 3+2 = 5.  tab G=10 -- 5 < 10 → replace: tab G=5, crumb G=C, push (5,G)
-       pile: (4,B)OLD (5,G) (6,C)OLD (10,G)OLD
+    POP (3, C)   C not sealed.  C ≠ goal.  seal C.  offer roads from C:
+      A: new = 3+5 = 8.  states[A]=1.  skip.    B: new = 3+1 = 4.  states[B]=2.  skip.
+      G: new = 3+2 = 5.  states[G]=10. 5 < 10 → REPLACE: states[G]=5, prev[G]=C, push (5,G)
+      pile after: (4,B)stale (5,G) (6,C)stale (10,G)stale
 
-    PULL (4, B)   B is already sealed → STALE.  Discard.  Pull again.
+    POP (4, B)   B IS in sealed → STALE.  Discard.  Pull again.
 
-    PULL (5, G)   G is the goal → STOP.
+    POP (5, G)   G not sealed.  G IS the goal → STOP.
   ```
 
-  Walk the breadcrumbs back:
+  Walk breadcrumbs back from G:
 
-      G ← C   (previous[G] = C)
-      C ← B   (previous[C] = B)
-      B ← A   (previous[B] = A)
-      A ← S   (previous[A] = S)
-      S ← •   (previous[S] = None → stop)
+      G  ← C  (prev[G] = C)
+      C  ← B  (prev[C] = B)
+      B  ← A  (prev[B] = A)
+      A  ← S  (prev[A] = S)
+      S  ← •  (prev[S] = None  →  stop)
 
   Path = [S, A, B, C, G].   Cost = states[G] = 5.
 
-    >> YOUR TURN
-       After sealing A (round 2), what are the contents of the tab for S, A, B, C?
-
-       Check:  S=0, A=1, B=2, C=6.
-       S never changed (nothing beat its 0). A sealed at 1. B dropped from 4 to 2 when
-       A offered it a cheaper route. C entered the tab for the first time at 6.
+  The cheapest walk is not S→B→G (cost 4+8=12, two roads). Not S→B→C→G (4+1+2=7). It is
+  S→A→B→C→G (1+1+1+2=5). The method found it by keeping all options alive and closing the
+  cheapest box in each round.
 
 
-  ## Two Things That Just Happened, Worth Naming
+  ## Two Things the Walk Just Did, Worth Naming
 
-  **The tab kills circles.** When A offered S back (1+1=2), the tab already said S=0.
-  Since 2 ≥ 0, the offer lost. You never needed a separate "visited" list -- the tab stops
-  backward walks on its own, because you already have the cheaper cost to every sealed place.
+  **The tab killed the circle.** When A offered S back, 1+1=2 lost to states[S]=0. No
+  "visited" set needed. The tab already holds the cheapest cost to every sealed place; any
+  offer to a sealed place will always lose, because the sealed place was finalized when it
+  was the global cheapest and nothing can be cheaper than that. The tab is the circle-breaker,
+  built in, for free.
 
-  **Stale slips ride harmlessly.** When A found B for cost 2, you pushed (2,B) but the old
-  (4,B) was still sitting on the pile. It rode there until round 5, then surfaced, saw B
-  was already sealed, and died. The only cost is one extra discard. You seal exactly once.
-
-
-  ## Why the Cheapest Pull Is Final (Not Just a Guess)
-
-  When you pull the cheapest unsealed slip, why is that cost already final?
-
-  Say X is the cheapest unsealed place, at cost c. Any other route to X must first pass
-  through some OTHER unsealed place -- call it Y. But Y is unsealed, so reach(Y) ≥ c
-  (that's what "cheapest unsealed" means). To then get from Y to X costs at least 0 more.
-  So any route via Y costs ≥ c + 0 = c. Nothing can be cheaper.
-
-  Numbers: X sits at cost 90 (the cheapest unsealed). There is a path through Y where
-  reach(Y) = 100. The walk S...Y then Y→X costs at least 100 + 0 = 100. Already over
-  budget. No last-hop bargain can fix that -- you pay 100 just to stand on Y.
-
-  **The one condition:** roads must cost ≥ 0. A negative road subtracts from the total,
-  which could make a route through a more expensive place end up cheaper. With negative
-  roads, this whole argument collapses. UCS only works when every cost is ≥ 0.
+  **Stale slips ride harmlessly.** When A found B for cost 2, the old (4,B) slip was already
+  sitting on the pile. It couldn't be removed -- heaps have no per-item delete. So it rode
+  along, three more pops later surfaced as round 5, saw B in the sealed set, and died.
+  One extra discard is the full price of not having a decrease-key operation. In practice
+  this is called "lazy deletion" and it's how every real UCS/Dijkstra/A* implementation works.
 
 
-  ## A*: The Same Wheel, With One Change to the Pile
+  ## Why the Cheapest Pop Is Already Final (The Proof, With Numbers)
 
-  UCS pulls the place with the cheapest cost-so-far. A* changes **one thing**: it pulls
-  the place with the cheapest cost-so-far **plus a straight-line guess of how far the goal
-  still is**. The guess tilts the pile toward places heading at the goal, so you pull fewer
-  slips before G surfaces.
+  Pop X off the pile. X is the cheapest unsealed place; its current cost is c. Why is c final?
+  Why can no future route to X be cheaper?
 
-  The straight-line ruler is the crow-flies distance, ignoring roads:
+  Any route to X that doesn't go through X directly must pass through some other unsealed
+  place first -- call it Y. Y is unsealed, so states[Y] ≥ c (that's what "cheapest unsealed"
+  means -- everything else costs at least as much). To then walk from Y to X costs a road ≥ 0.
+  So the total via Y is ≥ c + 0 = c. Exactly c, at best. No improvement.
 
-      guess = sqrt( (column gap)² + (row gap)² )
+  With numbers from the walk: after sealing S and A, G first appeared at cost 10 (via B).
+  Was it safe to leave G alone and seal C first? C was the cheapest unsealed place at cost 3.
+  Any other route to C passes through an unsealed place costing ≥ 3, plus a road ≥ 0: total
+  ≥ 3. C is final at 3. And from C, G dropped to 5 -- cheaper than the original 10.
 
-  A place is written (row, col). So column gap = goal_col − place_col, row gap = goal_row − place_row.
+  **The floor the whole argument stands on:** roads must cost ≥ 0. If a road has negative
+  cost, walking it subtracts from the total. Then a route through a more expensive place could
+  end up cheaper after the negative road, and the proof collapses. UCS with any negative road
+  returns the wrong answer. Bellman-Ford handles negative roads, at higher cost.
 
-  Example: place (0, 0), goal (3, 4).
-
-      column gap = 4 − 0 = 4
-      row gap    = 3 − 0 = 3
-      guess      = sqrt( 4² + 3² ) = sqrt( 16 + 9 ) = sqrt( 25 ) = 5
-
-    >> YOUR TURN
-       Place P = (1, 1). Goal G = (4, 5). What is the straight-line guess?
-
-       Check: column gap = 5−1 = 4, row gap = 4−1 = 3.
-       guess = sqrt( 4² + 3² ) = sqrt( 16 + 9 ) = 5.
-
-  In A*, every slip on the pile carries THREE numbers: (f, g, place) where
-  f = g + guess (for sorting), g = true cost-so-far (for spending and returning).
-
-  The tab, the relax test, and whatever you return at the end all use g alone.
-  The guess lives only in the pile's sort order. It never touches the money.
+  This correctness argument is due to Dijkstra (1959) and is also why "this IS Dijkstra's
+  algorithm" -- see the honest note at the end.
 
 
-  ## The Guess Is an Under-Count, Which Is Why A* Cannot Lie
+  ## A*: The Same Wheel, One Change
 
-  The crow-flies distance can never beat the road distance -- a straight line is the
-  shortest possible path between two points, and any road path must be at least as long.
-  So guess ≤ real remaining cost, always.
+  UCS orders the pile by g alone (g = cost-so-far). A* orders it by f = g + h, where h is a
+  straight-line guess of how far the goal still is. The guess tilts the pile toward goal-
+  directed places. The wheel, the tab, the breadcrumbs, the sealed set: all identical. Only
+  the number you push onto the pile changes.
 
-  That means: if the guess says "5 more to go," the actual road cost is ≥ 5. The guess
-  never overclaims. Which means it can never make a worse path look better than the true
-  cheapest path. A* returns the same answer as UCS -- same cheapest path, same cost --
-  it just seals fewer boxes on the way there, because it ignores places that are clearly
-  going the wrong direction.
+  Each slip on the pile carries THREE numbers: (f, g, place). f = g + h sorts the pile; g
+  is the true cost spent; place is where. The tab, the offer test, and whatever you return at
+  the end all use g alone. The guess ONLY affects which slip pops first. It never touches the
+  money.
 
-  A heuristic with this property (never an overcount) is called **admissible**. Euclidean
-  distance is admissible. An inadmissible heuristic could overshoot, hide the true best
-  path, and return the wrong answer.
+  The straight-line guess -- ignoring the roads, measuring crow-flies -- is:
+
+      h(place) = sqrt( (goal_col - place_col)^2 + (goal_row - place_row)^2 )
+
+  A place is written (row, col). Column gap first, row gap second. Both are squared so the
+  order doesn't matter for the value -- but get the mapping right deliberately: a place is
+  (row, col), not (x, y).
+
+  Assign positions to the five nodes:
+
+      S = (0, 0)    A = (0, 2)    B = (2, 2)    C = (4, 2)    G = (4, 4)
+
+  h values to G = (4, 4):
+
+      h(S) = sqrt( (4-0)^2 + (4-0)^2 ) = sqrt(32)  ≈ 5.66
+      h(A) = sqrt( (4-2)^2 + (4-0)^2 ) = sqrt(20)  ≈ 4.47
+      h(B) = sqrt( (4-2)^2 + (4-2)^2 ) = sqrt(8)   ≈ 2.83
+      h(C) = sqrt( (4-2)^2 + (4-4)^2 ) = sqrt(4)   = 2.00
+      h(G) = 0
+
+  Each h ≤ the true cheapest road to G from that place: h is an under-count (proved below),
+  which is what makes A* safe.
 
 
-  ## Four Traps
+  ## The Full A* Walk (Five Pops -- One Fewer Than UCS)
 
-  **Fewer roads ≠ cheaper.** Feels obvious once you see it, but the reflex to count hops
-  is strong. Always compare total accumulated cost, not the number of roads.
+  ```
+    start:  pile = [(5.66, 0, S)]   states = {S:0}   prev = {S:None}   sealed = {}
 
-  **Test the goal when you PULL, not when you first see it.** The first time G appears
-  as a neighbour it arrives by whatever route happened to reach it first -- which may not
-  be cheapest. Stop only when G pops off the pile as the cheapest unsealed place. Earlier
-  slips for G may still be sitting on the pile when a cheaper one surfaces.
+    POP (5.66, 0, S)   S not sealed.  S ≠ goal.  seal S.  offer from S:
+      A: g=0+1=1,  f=1+4.47=5.47  A not in states  → states[A]=1, prev[A]=S, push (5.47,1,A)
+      B: g=0+4=4,  f=4+2.83=6.83  B not in states  → states[B]=4, prev[B]=S, push (6.83,4,B)
+      pile: (5.47,1,A) (6.83,4,B)
 
-  **A*: cost-so-far and cost+guess are for different jobs.** The pile sorts by f = g + guess
-  so goal-directed places surface early. The tab, the offer test, and the returned path cost
-  use g alone. If you let the guess leak into the tab, your returned cost will be too high.
+    POP (5.47, 1, A)   A not sealed.  A ≠ goal.  seal A.  offer from A:
+      S: g=1+1=2, f=2+5.66=7.66.  states[S]=0. skip.
+      B: g=1+1=2, f=2+2.83=4.83.  states[B]=4. 2<4  → REPLACE: states[B]=2, prev[B]=A,
+                                                                  push (4.83,2,B)
+      C: g=1+5=6, f=6+2.00=8.00.  C not in states  → states[C]=6, prev[C]=A, push (8.00,6,C)
+      pile: (4.83,2,B) (6.83,4,B)stale (8.00,6,C)
 
-  **Breadcrumb and tab move together.** Whenever a place gets a cheaper tab entry, rewrite
-  its breadcrumb too. If you forget, the path you trace backward will not match the cheap
-  cost -- you'll read the wrong parent.
+    POP (4.83, 2, B)   B not sealed.  B ≠ goal.  seal B.  offer from B:
+      S: skip.   A: skip.
+      C: g=2+1=3, f=3+2.00=5.00.  states[C]=6. 3<6  → REPLACE: states[C]=3, prev[C]=B,
+                                                                  push (5.00,3,C)
+      G: g=2+8=10, f=10+0=10.00.  G not in states  → states[G]=10, prev[G]=B, push (10.00,10,G)
+      pile: (5.00,3,C) (6.83,4,B)stale (8.00,6,C)stale (10.00,10,G)
+
+    POP (5.00, 3, C)   C not sealed.  C ≠ goal.  seal C.  offer from C:
+      A: skip.   B: skip.
+      G: g=3+2=5, f=5+0=5.00.  states[G]=10. 5<10  → REPLACE: states[G]=5, prev[G]=C,
+                                                               push (5.00,5,G)
+      pile: (5.00,5,G) (6.83,4,B)stale (8.00,6,C)stale (10.00,10,G)stale
+
+    POP (5.00, 5, G)   G not sealed.  G IS the goal → STOP.
+  ```
+
+  Same path: [S, A, B, C, G]. Same cost: 5.
+
+  Five pops total. UCS needed six (the stale (4,B) was pop 5 in UCS, wasting a round).
+  Here the stale (6.83,4,B) is still on the pile when G pops -- it was never reached.
+  Why? After sealing C, the pile held (5.00,5,G) and (6.83,4,B)stale. UCS would sort these
+  by g: 4 < 5, so stale B would pop first. A* sorted by f: 5.00 < 6.83, so G popped first.
+  The heuristic pushed G ahead of the stale copy. That is the whole A* win on this map --
+  one saved discard -- but on a grid with thousands of nodes the savings compound across
+  hundreds of pops.
+
+
+  ## The Guess Is an Under-Count -- Which Is Why A* Returns the Same Answer as UCS
+
+  The heuristic h(place) is admissible if it never overcounts the true remaining cost:
+  h(place) ≤ true cheapest road cost from place to G, always. Euclidean distance is admissible
+  because a straight line is the shortest possible path. No road route can be shorter than the
+  crow-flies line; roads can only be equal or longer. So h ≤ true remaining cost, always.
+
+  Why admissibility matters: if h ever overcounted (h(X) > true cost X→G), it could make a
+  slip for X look more expensive than it really is, pushing X down the pile past slips that
+  would be beaten by X's true f-value. The true cheapest path might surface late or never.
+  An admissible h can't do this -- it undersells, so it can only pull slips EARLIER, not
+  later. A* seals the same correct answer as UCS, in fewer pops.
+
+  The other h property worth naming: **consistent** (also called monotone). h is consistent
+  if for every road P→Q of cost c: h(P) ≤ c + h(Q). Euclidean distance satisfies this
+  (triangle inequality). A consistent h is also admissible, and it means the sealed set
+  never needs revisiting: once sealed, a place's g is final. In practice: if your heuristic
+  is euclidean distance, you have both. If you write a custom h, check admissibility first,
+  consistency second.
+
+
+  ## Honest Extras (Three Short)
+
+  **UCS IS Dijkstra's algorithm.** Edsger Dijkstra published this exact method in 1959 for
+  finding shortest paths in graphs with non-negative edge weights. UCS is the AI textbook
+  name (Russell & Norvig). Dijkstra is the CS algorithms name. Same algorithm, same data
+  structures, same correctness proof. If you knew Dijkstra's but had not seen UCS: you already
+  knew this. If you knew UCS but not Dijkstra's: now you do. The algorithm has one name on
+  every graph theory exam and a different name on every AI midterm.
+
+  **Why Bellman-Ford instead of UCS for negative edges.** The proof above requires the
+  cheapest unsealed place to be final. Negative edges break this: a place penned at cost 5
+  might later be reached for cost 5 + (-3) = 2 via a negative road, which would have beaten
+  the sealed cost. Bellman-Ford handles this by relaxing every edge |V|−1 times; it's slower
+  (O(VE) vs O(E log V) for Dijkstra) but correct with negatives. The tradeoff is exact.
+
+  **Why the tab and the pile hold the same fact at birth but are different tools.** Both
+  start holding one cost-0 entry for S. After one pop they diverge: the pile grows by adding
+  slips for A and B; the tab grows by adding entries for A and B. But the pile holds PAIRS
+  (cost, place) you retrieve by popping cheapest. The tab holds ONE number per place you
+  look up by name. Confusing them -- e.g. using the pile to check if a place has been reached,
+  or using the tab to get the cheapest pair -- is the single most common first-implementation
+  bug. The pile answers "what should I explore next?"; the tab answers "what is the cheapest
+  cost to place P?"
 
 
   ## The Numbers, in Python
 
+  Round-by-round, the same numbers from the walk above, as named variables:
+
   ```python
-  # --- town: cost of each road ---
+  # --- town road costs ---
   s_to_a, s_to_b = 1, 4
-  a_to_b, a_to_c = 1, 5
-  b_to_c, b_to_g = 1, 8
-  c_to_g         = 2
+  a_to_s, a_to_b, a_to_c = 1, 1, 5
+  b_to_s, b_to_a, b_to_c, b_to_g = 4, 1, 1, 8
+  c_to_a, c_to_b, c_to_g = 5, 1, 2
+  g_to_c, g_to_b = 2, 8
 
-  # --- round 1: pull (0, S), offer A and B ---
-  cost_s   = 0
-  offer_a_r1 = cost_s + s_to_a       # 1  (A not in tab → add)
-  offer_b_r1 = cost_s + s_to_b       # 4  (B not in tab → add)
-  tab_a, tab_b = offer_a_r1, offer_b_r1   # tab: A=1, B=4
+  # UCS round 1: pop S (cost 0)
+  cost_s = 0
+  new_a_r1 = cost_s + s_to_a     # 1  (A not in tab → ADD)
+  new_b_r1 = cost_s + s_to_b     # 4  (B not in tab → ADD)
+  tab_a, tab_b = new_a_r1, new_b_r1   # tab: A=1, B=4
 
-  # --- round 2: pull (1, A), cheaper path to B ---
-  cost_a      = tab_a                # 1
-  offer_s_r2  = cost_a + s_to_a     # 2  (tab S=0, 2 >= 0 → skip)
-  offer_b_r2  = cost_a + a_to_b     # 2  (2 < tab 4 → replace)
-  offer_c_r2  = cost_a + a_to_c     # 6  (C not in tab → add)
-  tab_b       = offer_b_r2          # 2  (was 4, now 2)
-  tab_c       = offer_c_r2          # 6
+  # UCS round 2: pop A (cost 1)
+  cost_a = tab_a                  # 1
+  new_s_r2 = cost_a + a_to_s     # 2  (tab S=0, 2 ≥ 0 → skip)
+  new_b_r2 = cost_a + a_to_b     # 2  (2 < tab B=4 → REPLACE)
+  new_c_r2 = cost_a + a_to_c     # 6  (C not in tab → ADD)
+  tab_b    = new_b_r2             # 2  (was 4)
+  tab_c    = new_c_r2             # 6
 
-  # --- round 3: pull (2, B), cheaper path to C, G first seen ---
-  cost_b      = tab_b               # 2
-  offer_c_r3  = cost_b + b_to_c    # 3  (3 < tab 6 → replace)
-  offer_g_r3  = cost_b + b_to_g    # 10  (G not in tab → add)
-  tab_c       = offer_c_r3         # 3  (was 6, now 3)
-  tab_g       = offer_g_r3         # 10
+  # UCS round 3: pop B (cost 2)
+  cost_b    = tab_b               # 2
+  new_c_r3  = cost_b + b_to_c    # 3  (3 < tab C=6 → REPLACE)
+  new_g_r3  = cost_b + b_to_g    # 10 (G not in tab → ADD)
+  tab_c     = new_c_r3            # 3  (was 6)
+  tab_g     = new_g_r3            # 10
 
-  # --- round 4: pull (3, C), cheaper path to G ---
-  cost_c      = tab_c              # 3
-  offer_g_r4  = cost_c + c_to_g   # 5  (5 < tab 10 → replace)
-  tab_g       = offer_g_r4        # 5  (was 10, now 5)
+  # UCS round 4: pop C (cost 3)
+  cost_c   = tab_c                # 3
+  new_g_r4 = cost_c + c_to_g     # 5  (5 < tab G=10 → REPLACE)
+  tab_g    = new_g_r4             # 5  (was 10)
 
-  # --- round 5: pull (4, B) → stale ---
-  stale_slip_cost = 4              # the slip says 4
-  sealed_cost_b   = 2             # but B was sealed at 2 → 4 != 2 → toss
+  # UCS round 5: pop (4, B) → stale: B sealed at 2, slip says 4
+  stale_b_slip = 4
+  b_sealed_at  = 2                # 4 ≠ 2 → toss
 
-  # --- round 6: pull (5, G) → goal ---
-  final_cost = tab_g              # 5  path: S → A → B → C → G
+  # UCS round 6: pop G (cost 5) → GOAL
+  final_cost_ucs = tab_g          # 5
 
-  # --- A* straight-line guesses ---
+  # A* straight-line h values to G=(4,4)
   import math
-  # example from the lesson: (0,0) to goal (3,4)
-  col_gap_1  = 4 - 0              # 4
-  row_gap_1  = 3 - 0              # 3
-  guess_1    = math.sqrt(col_gap_1**2 + row_gap_1**2)   # 5.0
+  s_pos, a_pos, b_pos, c_pos, g_pos = (0,0), (0,2), (2,2), (4,2), (4,4)
 
-  # your turn answer: (1,1) to (4,5)
-  col_gap_2  = 5 - 1              # 4
-  row_gap_2  = 4 - 1              # 3
-  guess_2    = math.sqrt(col_gap_2**2 + row_gap_2**2)   # 5.0
+  def h(place_pos, goal_pos):
+      return math.sqrt((goal_pos[1]-place_pos[1])**2 + (goal_pos[0]-place_pos[0])**2)
 
-  # A* pile entry format: (f, g, place)
-  # here: cost_a=1, guess from A to G (rough), f = 1 + guess
-  g_a  = 1
-  h_a  = math.sqrt((4-0)**2 + (2-0)**2)   # pretend A=(0,0), G=(2,4): 4.47
-  f_a  = g_a + h_a                         # 5.47  (pile sorts by this)
-  # tab still stores only g_a = 1  (the guess never enters the tab)
+  h_s = h(s_pos, g_pos)   # 5.66
+  h_a = h(a_pos, g_pos)   # 4.47
+  h_b = h(b_pos, g_pos)   # 2.83
+  h_c = h(c_pos, g_pos)   # 2.00
+  h_g = h(g_pos, g_pos)   # 0.00
 
-  # proof sketch: cheapest unsealed at cost 90, path via Y costs reach_Y + road
-  reach_x_direct = 90
-  reach_y         = 100
-  road_y_to_x     = 3
-  cost_x_via_y    = reach_y + road_y_to_x  # 103  (> 90 → direct route wins)
+  # A* f-values (what goes into the pile to sort it)
+  # round 1: pop S (f=5.66, g=0) → offer A and B
+  f_a_r1 = 1 + h_a        # 5.47  (pile entry for A)
+  f_b_r1 = 4 + h_b        # 6.83  (pile entry for B)
+
+  # round 2: pop A (f=5.47, g=1) → B cheaper
+  f_b_r2 = 2 + h_b        # 4.83  (replaces 6.83)
+  f_c_r2 = 6 + h_c        # 8.00
+
+  # round 3: pop B (f=4.83, g=2) → C and G offered
+  f_c_r3 = 3 + h_c        # 5.00  (replaces 8.00)
+  f_g_r3 = 10 + h_g       # 10.00
+
+  # round 4: pop C (f=5.00, g=3) → G offered cheaper
+  f_g_r4 = 5 + h_g        # 5.00  (replaces 10.00)
+
+  # round 5: cheapest f in pile = (5.00,5,G) < (6.83,4,B)stale → G pops first!
+  # UCS would pop stale B here (g=4 < g=5). A* skips it.
+  f_g_final       = f_g_r4    # 5.00  ← wins the sort over stale B's 6.83
+  f_b_stale       = f_b_r1    # 6.83  ← never popped; G won first
+  final_cost_astar = 5         # same answer as UCS, one fewer pop
+  ```
+
+  Working heapq implementation -- the recipe above, directly:
+
+  ```python
+  import heapq, math
+
+  graph = {
+      'S': {'A': 1, 'B': 4},
+      'A': {'S': 1, 'B': 1, 'C': 5},
+      'B': {'S': 4, 'A': 1, 'C': 1, 'G': 8},
+      'C': {'A': 5, 'B': 1, 'G': 2},
+      'G': {'C': 2, 'B': 8},
+  }
+
+  def ucs(graph, start, goal):
+      q      = [(0, start)]        # (g, place)
+      states = {start: 0}
+      prev   = {start: None}
+      sealed = set()
+      while q:
+          cost, place = heapq.heappop(q)
+          if place in sealed: continue
+          if place == goal:   break
+          sealed.add(place)
+          for nbr, road in graph[place].items():
+              if nbr in sealed: continue
+              new = cost + road
+              if nbr not in states or new < states[nbr]:
+                  states[nbr] = new
+                  prev[nbr]   = place
+                  heapq.heappush(q, (new, nbr))
+      path, node = [], goal
+      while node: path.append(node); node = prev[node]
+      return list(reversed(path)), states[goal]
+
+  pos = {'S':(0,0), 'A':(0,2), 'B':(2,2), 'C':(4,2), 'G':(4,4)}
+
+  def astar(graph, start, goal, pos):
+      def h(p): return math.sqrt((pos[goal][1]-pos[p][1])**2+(pos[goal][0]-pos[p][0])**2)
+      q      = [(h(start), 0, start)]   # (f, g, place)
+      states = {start: 0}
+      prev   = {start: None}
+      sealed = set()
+      while q:
+          _, cost, place = heapq.heappop(q)
+          if place in sealed: continue
+          if place == goal:   break
+          sealed.add(place)
+          for nbr, road in graph[place].items():
+              if nbr in sealed: continue
+              new = cost + road
+              if nbr not in states or new < states[nbr]:
+                  states[nbr] = new
+                  prev[nbr]   = place
+                  heapq.heappush(q, (new + h(nbr), new, nbr))
+      path, node = [], goal
+      while node: path.append(node); node = prev[node]
+      return list(reversed(path)), states[goal]
+
+  ucs_path, ucs_cost   = ucs(graph, 'S', 'G')    # ['S','A','B','C','G'], 5
+  astar_path, astar_cost = astar(graph, 'S', 'G', pos)  # ['S','A','B','C','G'], 5
   ```
 
 
-  ## One Breath
+  ## One Breath (Carry This Away)
 
-  Keep a pile (heap of (cost, place)), a tab (cheapest cost to each place), and breadcrumbs
-  (who I came from); pull the cheapest, discard if already sealed, stop if it's the goal,
-  else seal it and offer every un-sealed neighbour cost + road -- add if new, replace if
-  cheaper; proven safe because cheapest unsealed plus road ≥ 0 cannot be undercut. A* is
-  the same wheel, but the pile sorts by cost + a straight-line under-guess, while the
-  tab and the returned cost stay cost alone.
+  Keep a pile (min-heap of slips), a tab (cheapest cost per place), and breadcrumbs; pop the
+  cheapest, discard if already sealed, stop if it's the goal, else seal it and offer every
+  unsealed neighbour cost+road: add if new, replace if cheaper, ignore if not; safe because
+  the cheapest unsealed place's cost can't be undercut -- any alternative passes through an
+  unsealed place costing ≥ that, plus a road ≥ 0. The tab kills backward walks by itself,
+  no visited-set needed; stale slips die on pop via lazy deletion. A* is the same wheel with
+  the pile sorted by g + straight-line h instead of g alone, while the tab and returned cost
+  stay g; admissible h (h ≤ true remaining cost, always) guarantees the same answer, in fewer
+  pops. UCS and Dijkstra's algorithm are the same thing with different name tags.
+
+  On this map: UCS found [S,A,B,C,G] cost 5 in 6 pops (5 seals + 1 stale discard).
+  A* found the same path and cost in 5 pops (5 seals, stale B never reached the top).
 
 
 ----------------------------------------------------------------------------------------------
-  APPENDIX F . CHEAPEST WALK: UCS AND A* FROM PENCIL
-  See also: [LSTM From Pencil: Built From Nothing](lstm-from-pencil.txt) .
-            [Transformer From Pencil: Attention From Scratch](transformer-from-pencil.txt) .
-            [Vision Transformer From Pencil](vit-from-pencil.txt)
+  SPECIAL . CHEAPEST WALK: UCS AND A*  (written for Hacker News; standalone)
+  Go deeper, same blog, same method:
+    [LSTM From Pencil -- RNN and LSTM From Scratch, Nothing But a Pencil](lstm-from-pencil.txt)
+    [Transformer From Pencil -- Attention From Scratch, One Number at a Time](transformer-from-pencil.txt)
+    [Transformers With Pencil -- A Whole Block Worked by Hand](transformerforhn.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
