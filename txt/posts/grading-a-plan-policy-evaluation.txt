@@ -14,11 +14,13 @@
 
   Every reinforcement-learning post hands you the Bellman equation -- V(s) = R(s) + g * V(next)
   -- names it after a dead mathematician, and says "now just iterate until it converges." Two
-  things that post always skips. First: WHY starting every value at 0 -- a flat lie -- ever
-  crawls to the right answer. That smells like astrology: begin wrong, end right, no reason
-  given. Second: WHY the discount g (the 0.9) is not a "care less about tomorrow" mood knob but
-  the one thing that forces a finite answer to exist at all. This page shows both, digit by
-  digit, with a pencil. The formula appears at the end, after you have already used it.
+  things most posts skip. First: WHY starting every value at 0 -- a flat lie -- ever crawls to
+  the right answer. That smells like astrology: begin wrong, end right, no reason given. Second:
+  WHY the discount g (the 0.9) is not a "care less about tomorrow" mood knob but, for a flight
+  that might never land, the thing that keeps the point-total finite at all. (If every flight is
+  guaranteed to land in a bounded number of moves, you do not strictly need it -- more on that
+  caveat when we hit it.) This page shows both, digit by digit, with a pencil. The formula
+  appears at the end, after you have already used it.
 
   THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
   appears. Anything named more than five lines ago is named again. Every number is worked in
@@ -39,7 +41,7 @@
       A worth leans on its neighbour's worth, which leans on ITS neighbour's worth -- a circle.
       You cannot write a bare number for any spot up front. So you LIE: write 0 everywhere,
       then lay the rule down over the table again and again. The lie heals. The truth climbs
-      out from one painted anchor, one spot per pass, until nothing moves.
+      out from one painted anchor, a spot at a time, until nothing moves.
 
   That single trick turns a circular formula into plain arithmetic you can check by hand.
 
@@ -113,18 +115,38 @@
   needs the worth of ITS next, and on it goes. A worth leans on another worth, which leans on
   another. You cannot just write `worth = <number>` for an air spot -- the number you need is
   one you do not have yet. That circle is the whole obstacle. Your gut is right to balk: there
-  is no formula that spits out the answer in one shot.
+  is no formula that spits out the answer in one shot WITH A PENCIL.
+
+  (One honest aside, so a sharp reader is not misled: the circle is a set of linear equations,
+  and a set of linear equations CAN be solved in one shot -- by matrix algebra, inverting
+  (I - 0.9 * P). That is a real method, not pencil work, and it scales badly: a million spots is
+  a million-by-million matrix. The walk below is what you actually do by hand and what scales,
+  so that is what we build. "No one-shot formula" means none you run down a column with a
+  pencil -- not none in all of mathematics.)
 
 
   ## Breaking the Circle -- the WALK, and Starting From a Lie
 
   New word, defined by a picture:
 
-      A WALK = run your finger down the list of spots, top to bottom, ONE time, writing each
+      A WALK = run your finger over the list of spots ONCE, in some fixed order, writing each
                spot's worth from the law above -- using whatever the table holds RIGHT NOW,
                even if that neighbour's worth is still a lie.
 
-  (Picture a shopping list: one finger-trip down it = one walk. Down it again = a second walk.)
+  (Picture a shopping list: one finger-trip over it = one walk. Over it again = a second walk.)
+  The ORDER is a free choice -- top-to-bottom, bottom-to-top, any fixed sweep. We use top-to-
+  bottom in the heal trace just below because it FORCES the worst case (stale reads) so you can
+  watch the lie heal slowly; later, for the full grid, we flip to bottom-to-top because it is
+  faster. Same answer either way; only the walk-count changes. (Why it changes is the next note.)
+
+  One choice hiding in "whatever the table holds RIGHT NOW," named so it is not smuggled: when
+  we write a spot we read its neighbour's value AS FRESH AS THE TABLE HOLDS -- including a value
+  written EARLIER THIS SAME WALK, not only last walk's. Reading in place like this has a name,
+  Gauss-Seidel; reading only last walk's frozen copy is the other name, Jacobi. Both settle to
+  the same answer. We use Gauss-Seidel, and it is exactly why -- with the right walk direction --
+  the truth can jump a whole spot per walk instead of crawling. So "one spot per walk" below is
+  a property of THIS reading order, not a law of the algorithm: walk the stack the other way and
+  the same truth would take more walks to climb.
 
   The recipe in full:
 
@@ -132,8 +154,9 @@
       do a walk. do another. do another.
       stop when a walk moves nothing.
 
-  That is it. There is NO line that checks "is the neighbour ready," no junk-detector, no
-  convergence test beyond "did anything move." Just the two-line law, laid down again and again.
+  That is it. There is NO line that checks "is the neighbour ready," no junk-detector. The only
+  thing ever measured is "did this walk move anything," and that is the stop rule, nothing finer.
+  Just the two-line law, laid down again and again.
 
 
   ## Why Starting From a Lie Still Lands on the Truth (the heart, with numbers)
@@ -195,9 +218,12 @@
       M leans on G  -> M becomes correct one walk later (walk 2).
       T leans on M  -> T becomes correct one walk after that (walk 3).
 
-  The truth climbs ONE spot per walk, out from the anchor. The painted +5 cannot lie, and the
-  rule drags the next spot to it, then the next. As tall as the stack is, that is how many walks
-  the truth needs to reach the top. Then it freezes.
+  The truth climbs ONE spot per walk, out from the anchor -- because we read in place (Gauss-
+  Seidel) AND walk top-to-bottom so each spot is written just after the one it leans on. Walk
+  bottom-to-top instead and the climb is slower; the "one spot per walk" is a gift of this
+  order, not a law. The painted +5 cannot lie, and the rule drags the next spot to it, then the
+  next. As tall as the stack is, that is how many walks the truth needs to reach the top. Then
+  it freezes.
 
   > We do not start from a lie and hope. We start from a lie sitting next to ONE painted truth,
   > and plain multiplication drags every spot to that truth, one spot closer per pass.
@@ -244,7 +270,14 @@
   1 + 1 + 1 + ... = infinity. The worth is -infinity. The walks NEVER settle -- THAT would be
   the junk-forever you feared. So the 0.9 < 1 is not a mood ("value the future a little less").
   It is the floor that forbids an infinite bounce from summing to nothing-finite. The shrink is
-  what makes an answer EXIST. That is its real job, and almost no tutorial says so.
+  what makes an answer EXIST -- and that is its real job, more often taught as a taste-knob than
+  as the thing keeping the sum finite.
+
+  The honest fence around that claim: this only bites when the flight can go on forever, like
+  this bounce. If every flight is guaranteed to LAND in a bounded number of moves (an "episodic"
+  world -- think a game that always ends), the sum is already finite and you can set the shrink
+  to 1 with no trouble. The shrink earns its keep precisely in the never-landing case; that is
+  the case almost every real problem is, and the case the bounce above makes concrete.
 
 
   ## When to Stop -- delta and theta
@@ -254,21 +287,31 @@
       delta = the biggest move any spot made on a walk = the largest (new minus old), sign dropped.
       theta = a tiny line, e.g. 0.00000001 -- "near enough."
 
-      stop rule:  when delta < theta, nothing moved more than a hair -> the table obeys the law
-                  everywhere -> the worths have settled -> STOP.
+      stop rule:  when delta < theta, no spot moved more than a hair this walk -> the worths are
+                  within a hair of obeying the law -> STOP.
+
+  Say what delta < theta does and does NOT mean, exactly. It does NOT mean the table obeys the
+  law perfectly -- you can sit a hair below the true value on every spot and still pass. It
+  means the LAST walk barely nudged anything, and here is why that bounds your error: each walk
+  multiplies whatever error is left by 0.9 (the same shrink). Errors shrink geometrically, so a
+  walk that moves less than theta means what is left to move is on the order of theta too. Pick
+  theta small enough and "barely moved" and "basically correct" become the same thing for any
+  use you have. That geometric squeeze -- error times 0.9 every walk -- is the whole guarantee
+  that the walks land at all; it has a fancy name (a contraction), but the 0.9 is all of it.
 
   A safety cap on the number of walks is just a seatbelt so a bug cannot loop forever. The real
   stop is delta < theta.
 
 
-  ## There Are NO Special Checks -- the Settling Is EMERGENT
+  ## The Only Check Is "Did Anything Move" -- the Settling Is EMERGENT
 
   This is the part that feels too small to work. There is no code that spots junk, waits for a
-  neighbour, or measures "convergence." The whole engine is the two-line law, laid down again
-  and again, with the delta-vs-theta stop. The healing above and the finite bounce are
-  CONSEQUENCES of repeating a "+ and *0.9" rule -- they are written nowhere. The code looks too
-  simple to deserve the result, and that is correct: the work lives in the REPETITION and the
-  0.9, not in any clever check.
+  neighbour, or certifies a single spot is "correct." There is exactly ONE measurement in the
+  whole engine -- delta, the biggest move this walk -- and it is used only to decide when to
+  stop, never to fix or gate a value. The healing above and the finite bounce are CONSEQUENCES
+  of repeating a "+ and *0.9" rule -- nowhere is either one coded. The code looks too simple to
+  deserve the result, and that is correct: the work lives in the REPETITION and the 0.9 (the
+  geometric squeeze of the last section), not in any clever check.
 
 
   ## A Full Table, Filled by Hand -- and What It Reveals
@@ -277,7 +320,9 @@
   are (x, y, height), each of x, y, height in {0,1,2}. The runway is the middle ground spot
   (1,1,0) -> +5. Every other ground spot is dirt -> -2. The plan: always nudge DOWN. So an air
   spot (x, y, height) leans on the spot one below it, (x, y, height-1). Walk each stack bottom
-  to top, so the spot below is already written this same walk.
+  to top -- the FAST order for down-arrows, since the spot below is already written this same
+  walk (the opposite of Case 1 below, where we walked top-to-bottom on purpose to drag the heal
+  out slowly so you could watch it). Same answer either way; only the number of walks differs.
 
   The stack ABOVE the runway -- sitting (1,1,0)=+5, (1,1,1), (1,1,2):
 
@@ -314,21 +359,29 @@
       terminal state                           a ground spot -- touching it ends the flight
       discount factor / gamma                  the shrink (0.9) -- a future worth counts 0.9 per move
       transition / result(s, a)                where the arrow lands you next
-      Bellman equation                         the one law: worth = reward + shrink * worth(next)
+      Bellman equation                         the one law; here in its deterministic form
+                                               worth = reward + shrink * worth(next). General
+                                               form sums over chance next-spots (see footnote)
       policy evaluation                        the whole job: fill every spot's worth for a fixed plan
       iterative policy evaluation              do it by walks -- start at 0, lay the law down, repeat
       sweep / iteration                        one walk down the list of spots
       convergence                              the walks stopped moving -- delta fell below theta
       delta                                    biggest worth-move on a walk
       theta                                    the "near enough" line that ends the walks
-      bootstrapping (RL sense)                 a worth leaning on another (still-settling) worth
+      bootstrapping (RL sense)                 writing a worth from another worth-ESTIMATE (the
+                                               table's current number) instead of from a finished
+                                               full count of real points -- here, leaning on the
+                                               neighbour's table entry, settled or not
 
 
-  ## Python: the Settling, by Hand, Three Ways
+  ## Python: the Settling, by Hand, Four Ways
 
-  Three blocks. The first two are hard-coded spot by spot -- no loops hiding the decisions, so
-  you can check every digit against the walks above. The third is the real engine; the one
-  honest place a loop earns its keep is flagged in plain words.
+  Four blocks. The first two are hard-coded spot by spot -- no loops hiding the decisions, so
+  you can check every digit against the walks above. The third is the real engine on the tiny
+  stack. The fourth runs that SAME engine over the whole 27-spot grid, so the skeptic who wants
+  more than three spots can watch the by-hand table fall out of real code. Every loop that
+  appears is flagged in plain words: it lists positions or repeats the law -- it never hides a
+  decision.
 
   ```python
   # -----------------------------------------------------------------------
@@ -439,9 +492,63 @@
           print(f"settled after {walk} walks:  T={worth['T']:.4f}  M={worth['M']:.4f}  G={worth['G']:.1f}")
           break
   # settled after 4 walks:  T=3.8600  M=4.4000  G=5.0
+  # (the VALUES reached truth on walk 3, same as the hand-trace; walk 4 is the confirming
+  #  pass that moves nothing and trips delta < theta. the stop rule always costs one extra
+  #  walk to NOTICE it has settled.)
+
+  # =======================================================================
+  # CASE 4: THE FULL 27-SPOT GRID -- same engine, no longer a toy stack.
+  # The world is (x, y, height), each of x,y,height in {0,1,2} -> 27 spots.
+  # Runway = (1,1,0) -> +5. Every other ground spot (height 0) -> dirt -2.
+  # Plan = always nudge DOWN: an air spot (x,y,h) leans on (x,y,h-1).
+  # We flip to BOTTOM-TO-TOP order here: write the ground first, then the
+  # spot above it reads a value already true THIS walk -> the whole grid
+  # settles in one fill-walk (plus one confirm walk to notice).
+  # =======================================================================
+  print("\n=== CASE 4: the full 27-spot grid ===")
+
+  # The two LOOPS below only LIST positions -- they hide no decision. Listing
+  # 27 coordinates by hand would be 27 identical lines; the loop is the honest
+  # short-hand for "every (x,y,height)". The painted facts and the one law are
+  # still hard-coded, exactly as in the cases above.
+  heights = (0, 1, 2)
+  cols    = [(x, y) for x in (0, 1, 2) for y in (0, 1, 2)]   # the 9 ground columns
+
+  def painted_points(x, y):                 # ground only: runway vs dirt, hard-coded
+      return RUNWAY if (x, y) == (1, 1) else DIRT
+
+  worth = {}                                # the table, keyed by (x,y,height); the lie is "absent"
+  for (x, y) in cols:
+      for h in heights:
+          worth[(x, y, h)] = 0.0            # start every spot at 0 -- the same deliberate lie
+
+  theta = 1e-8
+  for walk in range(1, 1000):
+      delta = 0.0
+      for h in heights:                     # BOTTOM-TO-TOP: ground (h=0) first, then up
+          for (x, y) in cols:
+              old = worth[(x, y, h)]
+              if h == 0:
+                  worth[(x, y, h)] = painted_points(x, y)        # ground: painted, no lookup
+              else:
+                  worth[(x, y, h)] = FUEL + SHRINK * worth[(x, y, h - 1)]  # the one law, down-arrow
+              delta = max(delta, abs(worth[(x, y, h)] - old))
+      if delta < theta:
+          print(f"settled after {walk} walks")
+          break
+
+  # read three columns out of the finished table -- the runway column and two dirt columns.
+  for (x, y) in [(1, 1), (0, 0), (2, 2)]:
+      h0, h1, h2 = worth[(x,y,0)], worth[(x,y,1)], worth[(x,y,2)]
+      tag = "RUNWAY column" if (x, y) == (1, 1) else "dirt column  "
+      print(f"  {tag} ({x},{y},*):  {h0:.1f} , {h1:.4f} , {h2:.4f}")
+  # settled after 2 walks
+  #   RUNWAY column (1,1,*):  5.0 , 4.4000 , 3.8600   <- matches the by-hand table exactly
+  #   dirt column   (0,0,*): -2.0 , -1.9000 , -1.8100
+  #   dirt column   (2,2,*): -2.0 , -1.9000 , -1.8100
   ```
 
-  Output of the three blocks:
+  Output of the four blocks:
 
       === CASE 1: the lie heals (top-down, forced stale reads) ===
       walk 1:  T=-0.1000   M=-0.1000   G=5.0
@@ -460,6 +567,17 @@
 
       === CASE 3: the real engine on the runway stack ===
       settled after 4 walks:  T=3.8600  M=4.4000  G=5.0
+
+      === CASE 4: the full 27-spot grid ===
+      settled after 2 walks
+        RUNWAY column (1,1,*):  5.0 , 4.4000 , 3.8600
+        dirt column   (0,0,*): -2.0 , -1.9000 , -1.8100
+        dirt column   (2,2,*): -2.0 , -1.9000 , -1.8100
+
+  Note the walk-counts: Case 3 took 4 walks (top-to-bottom, the deliberately slow order that
+  drags the heal out one spot at a time); Case 4 took 2 (bottom-to-top, ground written before
+  the spot leaning on it, so the whole grid fills in a single pass plus one to notice). Same law,
+  same answer -- only the sweep direction moved, and that is the whole of the difference.
 
   > THE ONE HONEST FOOTNOTE (named again, loudly). The air law here reads ONE next-spot:
   > `FUEL + 0.9 * worth(next)`. Real policy evaluation lets the arrow land on several next-spots
@@ -484,10 +602,11 @@
   One Breath: a spot's worth is the points the drone collects from here obeying the arrows;
   the worth of an air spot leans on its neighbour's worth (a circle), so you start every spot
   at a lie of 0 and lay down `-0.1 + 0.9 * worth(next)` again and again -- the painted ground is
-  a fixed anchor the truth climbs out from, one spot per walk; even a ground-less forever-bounce
-  settles, to -1, because the 0.9 shrink turns an endless sum into a finite one, which is the
-  real reason the discount exists; there is no convergence check anywhere, only the law repeated
-  until nothing moves.
+  a fixed anchor the truth climbs out from (one spot per walk in this top-to-bottom, read-in-
+  place order -- a gift of the order, not a law); even a ground-less forever-bounce settles, to
+  -1, because the 0.9 shrink turns an endless sum into a finite one, which is why the discount
+  matters once a flight might never land; and the only thing the engine ever measures is whether
+  the last walk moved anything -- that single delta is the stop rule, not a per-spot check.
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
