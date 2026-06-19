@@ -129,11 +129,15 @@
 
   New word, defined by a picture:
 
-      A WALK = run your finger down the list of spots, top to bottom, ONE time, writing each
+      A WALK = run your finger over the list of spots ONCE, in some fixed order, writing each
                spot's worth from the law above -- using whatever the table holds RIGHT NOW,
                even if that neighbour's worth is still a lie.
 
-  (Picture a shopping list: one finger-trip down it = one walk. Down it again = a second walk.)
+  (Picture a shopping list: one finger-trip over it = one walk. Over it again = a second walk.)
+  The ORDER is a free choice -- top-to-bottom, bottom-to-top, any fixed sweep. We use top-to-
+  bottom in the heal trace just below because it FORCES the worst case (stale reads) so you can
+  watch the lie heal slowly; later, for the full grid, we flip to bottom-to-top because it is
+  faster. Same answer either way; only the walk-count changes. (Why it changes is the next note.)
 
   One choice hiding in "whatever the table holds RIGHT NOW," named so it is not smuggled: when
   we write a spot we read its neighbour's value AS FRESH AS THE TABLE HOLDS -- including a value
@@ -370,11 +374,14 @@
                                                neighbour's table entry, settled or not
 
 
-  ## Python: the Settling, by Hand, Three Ways
+  ## Python: the Settling, by Hand, Four Ways
 
-  Three blocks. The first two are hard-coded spot by spot -- no loops hiding the decisions, so
-  you can check every digit against the walks above. The third is the real engine; the one
-  honest place a loop earns its keep is flagged in plain words.
+  Four blocks. The first two are hard-coded spot by spot -- no loops hiding the decisions, so
+  you can check every digit against the walks above. The third is the real engine on the tiny
+  stack. The fourth runs that SAME engine over the whole 27-spot grid, so the skeptic who wants
+  more than three spots can watch the by-hand table fall out of real code. Every loop that
+  appears is flagged in plain words: it lists positions or repeats the law -- it never hides a
+  decision.
 
   ```python
   # -----------------------------------------------------------------------
@@ -488,9 +495,60 @@
   # (the VALUES reached truth on walk 3, same as the hand-trace; walk 4 is the confirming
   #  pass that moves nothing and trips delta < theta. the stop rule always costs one extra
   #  walk to NOTICE it has settled.)
+
+  # =======================================================================
+  # CASE 4: THE FULL 27-SPOT GRID -- same engine, no longer a toy stack.
+  # The world is (x, y, height), each of x,y,height in {0,1,2} -> 27 spots.
+  # Runway = (1,1,0) -> +5. Every other ground spot (height 0) -> dirt -2.
+  # Plan = always nudge DOWN: an air spot (x,y,h) leans on (x,y,h-1).
+  # We flip to BOTTOM-TO-TOP order here: write the ground first, then the
+  # spot above it reads a value already true THIS walk -> the whole grid
+  # settles in one fill-walk (plus one confirm walk to notice).
+  # =======================================================================
+  print("\n=== CASE 4: the full 27-spot grid ===")
+
+  # The two LOOPS below only LIST positions -- they hide no decision. Listing
+  # 27 coordinates by hand would be 27 identical lines; the loop is the honest
+  # short-hand for "every (x,y,height)". The painted facts and the one law are
+  # still hard-coded, exactly as in the cases above.
+  heights = (0, 1, 2)
+  cols    = [(x, y) for x in (0, 1, 2) for y in (0, 1, 2)]   # the 9 ground columns
+
+  def painted_points(x, y):                 # ground only: runway vs dirt, hard-coded
+      return RUNWAY if (x, y) == (1, 1) else DIRT
+
+  worth = {}                                # the table, keyed by (x,y,height); the lie is "absent"
+  for (x, y) in cols:
+      for h in heights:
+          worth[(x, y, h)] = 0.0            # start every spot at 0 -- the same deliberate lie
+
+  theta = 1e-8
+  for walk in range(1, 1000):
+      delta = 0.0
+      for h in heights:                     # BOTTOM-TO-TOP: ground (h=0) first, then up
+          for (x, y) in cols:
+              old = worth[(x, y, h)]
+              if h == 0:
+                  worth[(x, y, h)] = painted_points(x, y)        # ground: painted, no lookup
+              else:
+                  worth[(x, y, h)] = FUEL + SHRINK * worth[(x, y, h - 1)]  # the one law, down-arrow
+              delta = max(delta, abs(worth[(x, y, h)] - old))
+      if delta < theta:
+          print(f"settled after {walk} walks")
+          break
+
+  # read three columns out of the finished table -- the runway column and two dirt columns.
+  for (x, y) in [(1, 1), (0, 0), (2, 2)]:
+      h0, h1, h2 = worth[(x,y,0)], worth[(x,y,1)], worth[(x,y,2)]
+      tag = "RUNWAY column" if (x, y) == (1, 1) else "dirt column  "
+      print(f"  {tag} ({x},{y},*):  {h0:.1f} , {h1:.4f} , {h2:.4f}")
+  # settled after 2 walks
+  #   RUNWAY column (1,1,*):  5.0 , 4.4000 , 3.8600   <- matches the by-hand table exactly
+  #   dirt column   (0,0,*): -2.0 , -1.9000 , -1.8100
+  #   dirt column   (2,2,*): -2.0 , -1.9000 , -1.8100
   ```
 
-  Output of the three blocks:
+  Output of the four blocks:
 
       === CASE 1: the lie heals (top-down, forced stale reads) ===
       walk 1:  T=-0.1000   M=-0.1000   G=5.0
@@ -509,6 +567,17 @@
 
       === CASE 3: the real engine on the runway stack ===
       settled after 4 walks:  T=3.8600  M=4.4000  G=5.0
+
+      === CASE 4: the full 27-spot grid ===
+      settled after 2 walks
+        RUNWAY column (1,1,*):  5.0 , 4.4000 , 3.8600
+        dirt column   (0,0,*): -2.0 , -1.9000 , -1.8100
+        dirt column   (2,2,*): -2.0 , -1.9000 , -1.8100
+
+  Note the walk-counts: Case 3 took 4 walks (top-to-bottom, the deliberately slow order that
+  drags the heal out one spot at a time); Case 4 took 2 (bottom-to-top, ground written before
+  the spot leaning on it, so the whole grid fills in a single pass plus one to notice). Same law,
+  same answer -- only the sweep direction moved, and that is the whole of the difference.
 
   > THE ONE HONEST FOOTNOTE (named again, loudly). The air law here reads ONE next-spot:
   > `FUEL + 0.9 * worth(next)`. Real policy evaluation lets the arrow land on several next-spots
