@@ -472,10 +472,12 @@
 
   ---
 
-  Companion posts: [Cheapest Walk: UCS and A*](cheapest-walk-ucs-astar.txt) and
-  [The Agent Ladder](the-agent-ladder.txt) build the search-and-agents side of the same family.
-  This page is the "grade a fixed plan" piece: no choosing, just scoring -- the quiet half that
-  every "and then it learns" post skips over.
+  Next, the other half: [Finding the Best Plan by Pencil](finding-the-best-plan-policy-iteration.txt)
+  takes the worth table you just learned to fill and uses it to RE-AIM the arrows -- peek every
+  nudge, keep the winner, repeat until the plan freezes on the best one. This page is the "grade
+  a fixed plan" piece: no choosing, just scoring. That one does the choosing.
+  [Cheapest Walk: UCS and A*](cheapest-walk-ucs-astar.txt) and
+  [The Agent Ladder](the-agent-ladder.txt) build the search-and-agents corners of the same family.
 
   ---
 

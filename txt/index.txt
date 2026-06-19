@@ -272,6 +272,25 @@
     one-arrow `next` is the real method's probability-weighted sum collapsed to one term.
     Assumes zero background; every term defined where it appears.
 
+  [SPECIAL. Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
+    special . 2026-06-19 . standalone . reinforcement-learning, policy-iteration, policy-improvement, by-hand
+    Written for Hacker News, self-contained: the companion to "Grading a Plan" -- now you are handed
+    NO plan and finding the best arrows IS the job (policy iteration). The world redrawn (drone,
+    runway +5, dirt -2, fuel -0.1, shrink 0.9) and the GRADE step folded into one box. Why we now
+    need all six nudges (grading only ever read one). The IMPROVE move: at an air spot, peek every
+    nudge with the same air-law -- score = -0.1 + 0.9*worth(where it lands) -- and re-aim the arrow
+    at the biggest peek (the textbook's Q(s,a) and argmax). The loop: seed any dumb plan, grade,
+    improve, repeat until the arrows freeze -- with the two layers of repeating (inner settle vs
+    outer plan-swap) untangled. Worked by hand: seed always-Left (air settles to -1), improve (1,1,1)
+    -> D scores 4.4, regrade, improve (0,1,1) -> E scores 3.86; the good arrows spread out from the
+    runway one ring per pass. The proof a frozen plan is OPTIMAL, not merely tired: improve never
+    worsens (the old arrow is one of the peeks), finitely many plans, and a frozen plan is its own
+    best reply -- a fixed point that cannot be beaten. Python: the six peeks hard-coded by hand, the
+    one-ring spread, then the whole grade-improve loop with an honest note on the single place a loop
+    is the lesson -- and a loud footnote that the toy's certain landing is the real method's
+    probability-weighted average collapsed to one term. Assumes zero background; every term defined
+    where it appears.
+
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
     special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand
     Written for Hacker News, self-contained: why five agent types are a LADDER (each rung =
