@@ -233,19 +233,43 @@
     hard-coded round-by-round variables.
 
   [SPECIAL. Bayes by Head-Count -- The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild](posts/bayes-shopkeeper.txt)
-    special . 2026-06-18 . standalone . probability, bayes, statistics, by-hand
-    Written for Hacker News, self-contained: Bayes' theorem built from a Sunday market crowd
-    rather than a formula. Four characters: the greedy shopkeeper (hides P(Beep)), his faulty
-    machine (lies two ways: false positive / false negative), the doctor (asks "given this beep,
-    am I sick?"), and the wild (the missed cases who walked away undiagnosed). The one move: turn
-    every fraction into heads in the crowd; then every Bayes question is "of the heads holding a
-    BEEP paper, how many are truly sick?" Ten problems worked by head-count: joint vs conditional
-    (comma vs bar), Law of Total Probability as a gluing move, rare-disease rarity trap (1%
-    disease + 10% glitch = 8% precision despite 90% catch rate), two-cause machine (Disease +
-    harmless Sniffle floods the pile), two machines in series (precision 76% but 44 sick per 100
-    walk away), useless red-coat distractor. Rarity trap table shows prevalence is the dominant
-    lever. Python: three problems hard-coded line by line + full reskinned 100k-soul simulation
-    verifying all ten answers. Full decoder sheet (prior/likelihood/posterior/sensitivity/PPV).
+    special . 2026-06-19 . standalone . probability, bayes, statistics, by-hand
+    Written for Hacker News, self-contained: Bayes' theorem built from one hospital corridor
+    rather than a formula. A patient feels unwell; the doctor writes a referral and sends them
+    down the corridor to the greedy shopkeeper, who runs a faulty test machine -- each BEEP is a
+    sale, so he hides the total count (that hidden total is P(Beep)). The machine lies two ways
+    (a miss = false negative -> the patient walks home into the wild undiagnosed; a glitch =
+    false positive -> a healthy patient comes back alarmed). The doctor asks "given this BEEP
+    paper, how sick is this patient?" The one move: turn every fraction into PATIENTS IN THIS
+    GROUP; then every Bayes question is "of the patients who came back with a BEEP paper, how many
+    are truly sick?" Ten VISITS worked by head-count: joint vs conditional (comma = whole group,
+    bar = back-room only), Law of Total Probability as gluing two beep-piles, the rarity trap (1%
+    disease + 10% glitch = 8.3% precision despite a 90% catch rate), a two-cause machine (Disease
+    + harmless Sniffle floods the pile), two machines in series (precision 76% but more sick
+    missed), a useless red-coat distractor the doctor must learn to ignore. The honest split:
+    Bayes answers the doctor's question (given a beep, how sick?), NOT the public-health question
+    (how many did we miss?). Python: visits hard-coded line by line + a full simulation whose
+    variable names match the story. Full decoder sheet (prior/likelihood/posterior/sensitivity/PPV).
+    Assumes zero background; every term defined where it appears.
+
+  [SPECIAL. Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
+    special . 2026-06-19 . standalone . reinforcement-learning, policy-evaluation, bellman, by-hand
+    Written for Hacker News, self-contained: policy evaluation (the Bellman equation) built from
+    a drone over enemy ground -- a runway (+5), dirt (-2), fuel (-0.1 a move), and a fixed plan of
+    arrows. Grading the plan = filling in the WORTH of every spot (points collected from here on,
+    obeying the arrows). The one law in two lines: a ground spot's worth is its painted points
+    (no lookup -- a fixed anchor); an air spot's worth is -0.1 + 0.9*worth(next). The circle: a
+    worth leans on a neighbour's worth, so there is no one-shot formula. The fix: start every spot
+    at a lie of 0 and lay the law down again and again (a WALK). Why the lie heals, digit by digit:
+    the "+" lays a solid -0.1 layer every pass, the painted ground is an anchor, and the truth
+    climbs one spot per walk (0 -> -0.1 -> -0.19 -> 3.86, frozen). The hard case -- a ground-less
+    forever-bounce A<->B -- still settles, to -1, and the geometric series 1+0.9+0.9^2+... = 10 is
+    derived from scratch to prove WHY the discount exists: drop the 0.9 and the sum is infinite and
+    nothing settles, so the shrink is the floor that makes an answer EXIST, not a "care less" knob.
+    delta/theta stop rule; the settling is emergent (no convergence check anywhere). Python: the
+    heal and the bounce hard-coded walk by walk, plus the real engine with one honest note on the
+    single place a loop is the lesson, not a hiding spot -- and a loud footnote that the toy's
+    one-arrow `next` is the real method's probability-weighted sum collapsed to one term.
     Assumes zero background; every term defined where it appears.
 
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
