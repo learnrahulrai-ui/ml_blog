@@ -34,6 +34,17 @@
   worked review: "nolan ended" -- two words. Stick width 4 (real: 32). The recipe is exact;
   the numbers are the toy.
 
+  THE PROBLEM, DRAWN:
+
+      PILE OF REVIEWS (each hand-labelled)               MACHINE         VERDICT
+      "the nolan film ended beautifully"  ----------->  [Transformer] -> 1 (liked)
+      "boring and a total waste of time"  ----------->  [Transformer] -> 0 (hated)
+      "not good at all , skip it"         ----------->  [Transformer] -> ???
+
+  The machine reads ALL words at once -- no walking, no memory carried forward.
+  To do that, every word must first become a number. Then a stick. Then all sticks look
+  at each other simultaneously. Only then does the verdict come out.
+
 
   ## Words Are Not Numbers -- the Front End (same as the walking machine)
 
@@ -41,24 +52,43 @@
 
   MOVE 1: count every word across the pile, rank by frequency, hand each a number.
 
-      the=1   movie=2   was=3  ...  nolan=73  ...  ended=88  ...
+      DICTIONARY (10,000 most-common words):
+          the=1   movie=2   was=3  ...  nolan=73  ...  ended=88  ...
 
-  Keep the top 10,000. Every rarer word shares one "unknown" slot. (10,000 = VOCAB_SIZE =
-  how many distinct words are kept, not how many reviews, not how many words per review.)
+      10,000 = VOCAB_SIZE = how many distinct words are kept, not how many reviews,
+      not how many words per review.
 
   MOVE 2: force every review to 100 slots. Short: fill the end with zeros. Long: chop.
 
-      "nolan ended" -> [73, 88, 0, 0, ..., 0]   (100 slots, 98 zeros)
+      "nolan ended"  ->  slot-number row:
 
-  MOVE 3: swap each slot-number for a STICK -- a fixed-width list of numbers looked up from
-  a table. The table holds one stick per kept word. Width 4 here (real: 32).
+      +----+----+---+---+-----+---+
+      | 73 | 88 | 0 | 0 | ... | 0 |
+      +----+----+---+---+-----+---+
+        ^    ^   ^             ^
+       nolan end padding...  padding  (100 slots total, 98 zeros)
 
-      THE EMBEDDING TABLE:
-        word 73 (nolan) -> [ 2, 1, 1, 0 ]   <- nolan's stick
-        word 88 (ended) -> [ 0, 1, 2, 1 ]   <- ended's stick
+  MOVE 3: swap each slot-number for a STICK -- a fixed-width list of numbers looked up
+  from a table. The table holds one stick per kept word. Width 4 here (real: 32).
 
-  Stick-numbers start as junk; training tunes them. Now every word is a stick, not a bare
-  number. The review is a SHEET: 100 rows (one per slot), each row a 4-wide stick.
+      EMBEDDING TABLE LOOKUP:
+
+          SLOT NUMBER      TABLE ROW          STICK (4 wide)
+               73     ->   row 73        ->   [ 2, 1, 1, 0 ]   <- nolan's stick
+               88     ->   row 88        ->   [ 0, 1, 2, 1 ]   <- ended's stick
+                0     ->   row 0         ->   [ 0, 0, 0, 0 ]   <- padding
+
+  Stick-numbers start as junk; training tunes them. The review is now a SHEET:
+
+      THE SHEET for "nolan ended" (100 rows, each 4 wide):
+
+          row  1:  [ 2, 1, 1, 0 ]   <- nolan
+          row  2:  [ 0, 1, 2, 1 ]   <- ended
+          row  3:  [ 0, 0, 0, 0 ]   <- padding
+          ...
+          row 100: [ 0, 0, 0, 0 ]   <- padding
+
+      This sheet is what the attention step reads. ALL rows at the same time.
 
 
   ## Why the Walking Machine Fades -- and Why We Drop It
@@ -67,101 +97,126 @@
   tanh-crushed and rewritten at every word. In an 80-word review, a signal from word 1 must
   survive 79 such rewrites. It does not -- it fades to nearly zero before reaching word 80.
 
-  The Transformer does not walk. It lays all words out at once -- the whole sheet of sticks
-  -- and lets every word look STRAIGHT at every other word, near or far, same cost.
+  The Transformer does not walk. It lays all words out at once and lets every word look
+  STRAIGHT at every other word, near or far, same cost.
 
-      WALK:         nolan -> memory rewrite -> ... 79 rewrites ... -> ended   (fades)
-      LOOK-ACROSS:  nolan <---------- direct, zero rewrites ----------> ended (no fade)
+      WALK (RNN) -- nolan must travel through every word to reach ended:
 
-  The price of "no walking" is paid elsewhere: the machine must be told word ORDER explicitly
-  (since looking at all words at once loses position). More on that at the end.
+          nolan -> [rewrite] -> [rewrite] -> ... 79 rewrites ... -> ended
+          signal from nolan fades with each rewrite. Nearly zero at word 80.
+
+      LOOK-ACROSS (Transformer) -- nolan looks directly at ended:
+
+          nolan <=====================================> ended   (direct, zero rewrites)
+          nolan <=====================================> word 3  (same cost)
+          nolan <=====================================> word 80 (same cost)
+
+          ALL pairs look at each other simultaneously. No fade. No carrying.
+
+  The price of "no walking" is paid elsewhere: the machine must be told word ORDER
+  explicitly. More on that at the end.
 
 
   ## Why Three Sticks -- Want, Have, Give
 
-  Each word starts as one stick (its embedding). Attention gives every word THREE new sticks:
+  Each word arrives as one stick (its embedding). Attention turns it into THREE sticks:
 
-      WANT (query) : "what am I looking for?"       -- does the looking
-      HAVE (key)   : "what do I offer to lookers?"  -- gets looked at
-      GIVE (value) : "what I hand over if picked"   -- gets taken by the winner
+      EACH WORD GETS THREE ROLES:
 
-  Why three? One stick cannot serve all three roles at once. A word might be relevant as a
-  target (HAVE is high) without being a good source of content (GIVE is low). A word might
-  be a strong looker (WANT is directed) without being a strong target. Separating the three
-  jobs into three sticks lets each be tuned independently.
+          nolan's embedding: [2, 1, 1, 0]
+                 |
+                 +---> WANT-grid --> nolan.WANT = [2, 0, 1, 0]  "what am I looking for?"
+                 |
+                 +---> HAVE-grid --> nolan.HAVE = [1, 0, 0, 0]  "what do I offer to lookers?"
+                 |
+                 +---> GIVE-grid --> nolan.GIVE = [2, 0, 0, 1]  "what I hand over if picked"
 
-  How a new stick is made from the old one -- a GRID (a matrix) times the embedding:
+      Same three grids are reused on EVERY word. One set of grids serves all 100 words.
 
-      A grid is a table of numbers, one row per output number. Each row is a list of dials.
-      A row "times" the stick: multiply each dial against the matching stick number, add all
-      products -> ONE number. Do that for every row -> a NEW stick.
+  Why three? One stick cannot serve all three roles at once. A word might be a strong target
+  (high HAVE) without being a good source of content (low GIVE). Separating the three jobs
+  into three sticks lets each be tuned independently by training.
 
-  Example: nolan's embedding = [2, 1, 1, 0]. The WANT-grid:
+  HOW A STICK IS MADE FROM A GRID -- a GRID (matrix) times the embedding:
 
-      WANT-grid:
-        row 1 = [1, 0, 0, 0]  ->  1*2 + 0*1 + 0*1 + 0*0  =  2
-        row 2 = [0, 0, 0, 0]  ->  0
-        row 3 = [0, 0, 1, 0]  ->  0*2 + 0*1 + 1*1 + 0*0  =  1
-        row 4 = [0, 0, 0, 0]  ->  0
-      nolan.WANT = [2, 0, 1, 0]
+      A grid = a table of numbers, one row per output number.
+      One row "times" the stick: multiply each grid-number against the matching
+      stick-number, add all products -> ONE number. Repeat for every row -> a NEW stick.
 
-  The SAME three grids are reused on every word (nolan, ended, every zero-slot). One set of
-  grids serves all. This reuse is what makes the machine work at any review length.
+      WORKED EXAMPLE -- nolan.WANT from the WANT-grid:
+
+          WANT-grid (4 rows x 4 cols)  x  nolan.embed [2,1,1,0]  =  nolan.WANT
+
+          row 1: [1, 0, 0, 0]  ->  1*2 + 0*1 + 0*1 + 0*0  =  2
+          row 2: [0, 0, 0, 0]  ->  0
+          row 3: [0, 0, 1, 0]  ->  0*2 + 0*1 + 1*1 + 0*0  =  1
+          row 4: [0, 0, 0, 0]  ->  0
+
+          nolan.WANT = [2, 0, 1, 0]
+
+  The HAVE and GIVE sticks are produced the same way, each with their own grid.
 
 
   ## The Match -- nolan's WANT Dots Every Word's HAVE
 
   To score how much nolan cares about a word, take nolan's WANT stick and that word's HAVE
-  stick and DOT them: multiply matching numbers pairwise, add all products -> ONE number.
-  Both sticks are the same width (4), so they line up exactly. One word per score.
+  stick and DOT them.
 
-  Made-up HAVE sticks for this example (what the HAVE-grid would produce):
+  DOT PRODUCT: multiply matching numbers pairwise, add all products -> ONE match score.
 
-      nolan.HAVE = [1, 0, 0, 0]
-      ended.HAVE = [3, 0, 2, 0]
+      MATCH SCORES for nolan (nolan.WANT = [2, 0, 1, 0]):
 
-  nolan dots its WANT against EVERY word's HAVE, including itself:
+          nolan.WANT . nolan.HAVE:    nolan.HAVE = [1, 0, 0, 0]
+              2*1 + 0*0 + 1*0 + 0*0 = 2     <- nolan matches itself a little
 
-      nolan.WANT . nolan.HAVE = 2*1 + 0*0 + 1*0 + 0*0 = 2
-      nolan.WANT . ended.HAVE = 2*3 + 0*0 + 1*2 + 0*0 = 6 + 2 = 8
+          nolan.WANT . ended.HAVE:    ended.HAVE = [3, 0, 2, 0]
+              2*3 + 0*0 + 1*2 + 0*0 = 6+2 = 8   <- nolan cares much more about ended
 
-  nolan's match row: [ nolan->nolan = 2 ,  nolan->ended = 8 ]
+          nolan's match row: [ nolan->nolan = 2 ,  nolan->ended = 8 ]
 
-  Two numbers, one per word. ("n words, including self" -- a word always dots itself too.)
-  Higher number = nolan cares more about that word.
+      One score per word. Higher = nolan cares more about that word.
+      (Every word dots against EVERY other word, including itself -- n words -> n scores.)
 
 
   ## Scale -- Divide by the Square Root of the Stick Width
 
-  Wider sticks produce larger dot sums (more numbers added). To stop match scores from
-  growing just because the sticks are wide, divide each by the square root of the width.
-  Here stick width = 4, so the divisor = sqrt(4) = 2.
+  Wider sticks produce larger dot sums (more products added). The divisor keeps scores
+  from growing just because the sticks are wide.
 
-      2 / 2 = 1
-      8 / 2 = 4
+      stick width = 4
+      divisor     = sqrt(4) = 2
 
-  Match row after scaling: [1, 4].
+      BEFORE SCALING:  [2, 8]
+                              ÷ 2     ÷ 2
+      AFTER  SCALING:  [1, 4]
 
-  The divisor is sqrt(stick width) -- a fixed number (sqrt(4)=2, real sqrt(32)~=5.66).
-  It is NOT "standard deviation" or any statistic of the data -- just the square root of
-  how many numbers the stick has.
+  The divisor is sqrt(stick width) -- a fixed number. Not a data statistic.
+  (Real stick width = 32; divisor = sqrt(32) ~= 5.66.)
 
 
   ## Softmax -- Turn Scores Into Fractions That Add to 1
 
   We want "how much to listen to each word" as fractions -- so they can weight the GIVE
-  sticks by exactly how much to take from each. Recipe, built from scratch:
+  sticks by exactly how much to take from each.
 
-      blow each score up by e (e ~= 2.718, the growth number), then divide each
-      by the total of the blown-up numbers.
+  SOFTMAX RECIPE (built from scratch, nothing recalled):
 
-  Applied to [1, 4]:
+      blow each score up by e (e ~= 2.718, the growth number),
+      then divide each by the TOTAL of all blown-up scores.
 
-      blow up:   e^1 = 2.718 ,  e^4 = 54.60
-      total:     2.718 + 54.60 = 57.32
-      fractions: nolan = 2.718 / 57.32 = 0.047
-                 ended = 54.60 / 57.32 = 0.953
-      check:     0.047 + 0.953 = 1.000  <- must add to 1
+  APPLIED TO [1, 4]:
+
+      SCORES       BLOW UP BY e              DIVIDE BY TOTAL
+      ------       ----------------          -------------------
+      1      -->   e^1 = 2.718
+      4      -->   e^4 = 54.60
+                         ------
+                   total = 57.32
+
+      fracs:   2.718 / 57.32 = 0.047   <- listen 4.7% to nolan (self)
+              54.60  / 57.32 = 0.953   <- listen 95.3% to ended
+
+      check:   0.047 + 0.953 = 1.000   <- must always add to exactly 1
 
   nolan listens 0.953 to "ended" and 0.047 to itself. The exponential makes the bigger
   score win decisively: 4 vs 1 -> 0.953 vs 0.047, not 0.8 vs 0.2. That sharpening is
@@ -170,67 +225,94 @@
 
   ## Weighted Sum -- Build nolan's New Stick From the GIVE Sticks
 
-  Use the fractions to mix the GIVE sticks. Multiply each word's GIVE stick by its fraction,
-  then ADD the results number by number -> ONE new stick of the same width.
+  Use the fractions to mix the GIVE sticks:
 
-  Made-up GIVE sticks:
+      FRACTIONS:      0.047            0.953
+      GIVE STICKS:    nolan.GIVE       ended.GIVE
+                      [2, 0, 0, 1]     [0, 3, 1, 0]
 
-      nolan.GIVE = [2, 0, 0, 1]
-      ended.GIVE = [0, 3, 1, 0]
+      WEIGHTED SUM (multiply each GIVE stick by its fraction, then add number-by-number):
 
-  Weighted sum:
+          0.047 * [2, 0, 0, 1]  =  [0.094, 0,     0,     0.047]
+          0.953 * [0, 3, 1, 0]  =  [0,     2.859, 0.953, 0    ]
+                                   --------------------------------
+          nolan_new              =  [0.094, 2.859, 0.953, 0.047]
 
-      0.047 * [2, 0, 0, 1] = [0.094, 0,     0,     0.047]
-      0.953 * [0, 3, 1, 0] = [0,     2.859, 0.953, 0    ]
-      ADD (number by number):
-      nolan_new             = [0.094, 2.859, 0.953, 0.047]
+  nolan's new stick is MOSTLY "ended"'s give (0.953 weight). It listened to ended.
 
-  nolan's new stick is mostly "ended"'s give (0.953 weight). It listened to ended.
-
-  The key size question answered: we had 2 fractions. nolan ends with a 4-wide stick,
-  not a 2-number list. The 2 fractions WEIGHT 2 give-sticks (each 4 wide); adding the
-  weighted sticks number by number keeps the width 4. The "how many words" dimension
-  collapses by adding; the stick width survives. At real scale: 100 fractions weight 100
-  give-sticks of width 32 -> add -> one 32-wide stick per word.
+  SIZE CHECK -- so you are not confused:
+  We had 2 fractions (one per word). nolan ends with a 4-wide stick, NOT a 2-number list.
+  The 2 fractions WEIGHT 2 give-sticks (each 4 wide); adding the weighted sticks
+  number-by-number keeps the width 4. The "how many words" dimension collapses by adding;
+  the stick width survives. At real scale: 100 fractions weight 100 give-sticks of width 32
+  -> add -> one 32-wide stick per word.
 
   Every word does this same computation -- look across all words, score, soften, take --
-  all at once. The sheet goes in; a new sheet of the same shape comes out, each row now
+  ALL AT ONCE. The sheet goes in; a new sheet of the same shape comes out, each row now
   enriched with information from every other row.
 
 
   ## Two Teams -- Multi-Head Attention
 
   One set of three grids (want/have/give) catches one kind of link. Run TWO sets side by
-  side, each with its own three grids, each producing its own new stick; then glue them:
+  side:
 
-      team 1: its own want/have/give grids -> look-across -> stick A  (4 wide)
-      team 2: different want/have/give grids -> look-across -> stick B (4 wide)
-      glue:   [A ... | B ...]  -> nolan's richer new stick  (8 wide)
+      MULTI-HEAD ATTENTION (2 heads):
 
-  Two teams = "2 heads." The lab uses num_heads=2, key_dim=32 -- two teams, each with
-  sticks of width 32. The "key_dim" is the width of the want/have/give sticks per team.
+          THE SHEET (100 rows x 4 wide)
+               |
+               +---------> team 1  (own WANT/HAVE/GIVE grids)
+               |                   -> look-across on all 100 words
+               |                   -> enriched sheet A  (100 rows x 4 wide)
+               |
+               +---------> team 2  (different WANT/HAVE/GIVE grids)
+                                   -> look-across on all 100 words
+                                   -> enriched sheet B  (100 rows x 4 wide)
+
+          GLUE A and B side by side:
+               -> enriched sheet  (100 rows x 8 wide)
+
+  Two teams = "2 heads." The lab uses num_heads=2, key_dim=32 -- two teams, each producing
+  sticks of width 32. "key_dim" is the width of the WANT/HAVE/GIVE sticks per team.
 
 
   ## Position -- the Price of Not Walking
 
   Because every word is looked at all-at-once, the raw attention step cannot tell "nolan
-  ended" from "ended nolan" -- order is invisible when you look everywhere at once. A full
-  Transformer adds a POSITION MARK to each word's stick before the attention step: a fixed
-  pattern of numbers encoding slot 1, slot 2, etc. (sine and cosine at different frequencies).
-  Our lab uses a simplified version that skips the explicit position mark -- flagged so you
-  know the full machine has it.
+  ended" from "ended nolan" -- order is invisible when you look everywhere at once.
+
+      POSITION MARK: a fixed pattern of numbers encoding slot 1, slot 2, etc. is ADDED
+      to each word's stick BEFORE the attention step.
+
+      slot 1 (nolan):  [2,1,1,0] + [pos_1] -> [2.84, 1.54, 1.00, 1.00]  (example)
+      slot 2 (ended):  [0,1,2,1] + [pos_2] -> [0.91, 1.84, 2.00, 0.99]  (example)
+
+      The position mark uses sine and cosine waves at different frequencies.
+      This is POSITIONAL ENCODING.
+
+  Our lab uses a simplified version that skips the explicit position mark -- flagged here
+  so you know the full machine has it.
 
 
   ## Collapsing 100 Sticks to One Summary
 
-  After attention, there are 100 new sticks (one per word-slot). The verdict needs ONE stick.
-  Average all word-sticks number by number -> one summary stick.
+  After attention, there are 100 new sticks (one per word-slot). The verdict needs ONE.
 
-      word 1 stick = [0.0, 2.8, 0.9, 0.0]
-      word 2 stick = [0.2, 1.0, 0.5, 0.4]
-      average      = [0.1, 1.9, 0.7, 0.2]   (add the two, divide by 2)
+      COLLAPSE: average all 100 word-sticks, number by number -> one summary stick.
 
-  The walking machine took its LAST memory as the summary; here we average all words.
+          enriched sheet (100 rows x 4 wide):
+          row 1:   [0.094, 2.859, 0.953, 0.047]   <- nolan, after attending
+          row 2:   [0.2,   1.0,   0.5,   0.4  ]   <- ended, after attending
+          rows 3-100: [0, 0, 0, 0] (padding rows, mostly silent)
+          ...
+
+          AVERAGE each column:
+          col 1: (0.094 + 0.2 + 0 + ... + 0) / 100 = 0.003
+          col 2: (2.859 + 1.0 + 0 + ... + 0) / 100 = 0.039
+          ...
+          summary stick = [0.003, 0.039, ...]   (one 4-wide stick)
+
+  The walking machine took its LAST memory as the summary. Here we average all words.
   Same end goal: one stick for the verdict.
 
 
@@ -238,14 +320,27 @@
 
   Feed the summary stick through plain workers to a single tick:
 
-      summary stick
-        -> zero a random 1-in-10 of the numbers (only while practising)   [Dropout 0.1]
-        -> 20 workers, each: multiply-add + nudge, then keep positives     [Dense 20, relu]
-        -> zero a random 1-in-10 again                                     [Dropout 0.1]
-        -> 1 worker: multiply-add + nudge, then sigmoid (crush to 0..1)    [Dense 1, sigmoid]
-           0.9 = 90% chance liked.  0.1 = probably not.
+      VERDICT PIPELINE:
 
-  relu = keep positives, zero negatives. sigmoid = crush any number to 0..1 (a probability).
+          summary stick  [4 wide]
+               |
+               v
+          Dropout(0.1)  <- zero a random 1-in-10 of the numbers (practice only)
+               |
+               v
+          Dense(20, relu)  <- 20 workers. Each: multiply-add + nudge, keep positives.
+               |
+               v
+          Dropout(0.1)  <- zero a random 1-in-10 again (practice only)
+               |
+               v
+          Dense(1, sigmoid)  <- 1 worker: multiply-add + nudge, crush to 0..1
+               |
+               v
+          0.9 = 90% chance liked.  0.1 = probably not.
+
+  relu = keep positives, zero negatives.
+  sigmoid = crush any number to 0..1 (a probability).
   Dropout (zero-a-random-tenth) = forced independence, only during practice, off at exam.
 
 
@@ -287,7 +382,6 @@
   VOCAB_SIZE    = 10000   # kept words
   MAX_LEN       = 100     # slots per review
   EMBEDDING_DIM = 32      # real width (32); pencil uses 4
-  FUEL          = -0.1    # not used here; for reference only
 
   # =======================================================================
   # CASE 1: ATTENTION BY HAND -- numpy, width 4.
@@ -363,7 +457,6 @@
   # =======================================================================
   print("\n=== CASE 3: the full transformer (described, not trained) ===")
 
-  # The whole model in 8 lines:
   full_model = """
   from tensorflow.keras.layers import (Input, Embedding, MultiHeadAttention,
                                         GlobalAveragePooling1D, Dropout, Dense)

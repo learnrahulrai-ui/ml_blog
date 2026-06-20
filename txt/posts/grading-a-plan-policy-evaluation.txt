@@ -61,6 +61,29 @@
 
   These are PAINTED FACTS. +5, -2, -0.1, 0.9 -- handed to you, fixed, never argued with.
 
+  THE WORLD, DRAWN (3 wide x 3 tall; the plan arrows all point DOWN):
+
+      height 2  [ air ]  [ air ]  [ air ]    <- drone starts here, pays fuel each move
+                   |        |        |
+                   v        v        v           (arrows = the fixed plan we are grading)
+      height 1  [ air ]  [ air ]  [ air ]
+                   |        |        |
+                   v        v        v
+      height 0  [DIRT]  [RUNWY]  [DIRT]     <- ground: touching ends the flight
+                  -2      +5      -2
+
+      (9 columns total in the full 3x3 grid; the runway is the centre ground spot)
+
+  A SINGLE STACK (the column directly above the runway, used as the worked example):
+
+            height 2:  T  (top air spot)      <- arrow points down to M
+                       |
+                       v
+            height 1:  M  (middle air spot)   <- arrow points down to G
+                       |
+                       v
+            height 0:  G  (ground = runway)   = +5  (painted, no lookup)
+
   Jargon parked here, to be ignored until the decoder at the end: a spot = a "state". The plan
   = the "policy". A spot's worth = its "value" V(s). Painted points = the "reward". The shrink
   = the "discount factor", written gamma. Touching the ground = a "terminal state".
@@ -74,6 +97,17 @@
   Worth is NOT the raw physical points the drone walks away with. It is the DISCOUNTED sum: a
   reward collected k moves from now counts as 0.9^k of itself -- shrunk once per move into the
   future. So a +5 collected two moves away counts as 0.9^2 * 5 = 4.05, not 5.
+
+  DISCOUNTING ILLUSTRATED -- the same +5 seen from different distances:
+
+      distance   shrink factor   discounted value
+         0       0.9^0 = 1.00    1.00 * 5 = 5.00   (you are standing on the runway)
+         1       0.9^1 = 0.90    0.90 * 5 = 4.50   (one move away)
+         2       0.9^2 = 0.81    0.81 * 5 = 4.05   (two moves away = spot T)
+         3       0.9^3 = 0.73    0.73 * 5 = 3.65   (three moves away)
+
+  The drone physically walks away with -0.1 - 0.1 + 5 = 4.8 raw points from spot T.
+  The discounted WORTH at T is 3.86. The gap is the discount eating into future rewards.
 
   Work it out for the runway stack (T at top, M middle, G ground, arrows pointing DOWN):
 
@@ -244,9 +278,18 @@
   ## The Harder Case: a Forever-Bounce With NO Ground at All
 
   "Fine," you say, "it heals because there is a +5 anchor to climb to. What if the drone never
-  lands?" Good -- that is the case that looks impossible. Two air spots, A and B, arrows
-  pointing at each OTHER forever. The drone bounces A, B, A, B... and never touches ground.
-  No anchor anywhere. Both start at 0.
+  lands?" Good -- that is the case that looks impossible.
+
+  THE BOUNCE, DRAWN:
+
+         spot A  <----+
+            |         |
+            |  arrow  |  arrow
+            v         |
+         spot B  -----+
+
+  Two air spots, A and B, arrows pointing at each OTHER forever. The drone bounces A, B, A,
+  B... and never touches ground. No anchor anywhere. Both start at 0.
 
       WALK 1   A = -0.1 + 0.9*(0)        = -0.1
                B = -0.1 + 0.9*(-0.1)     = -0.19

@@ -59,6 +59,25 @@
 
   Painted facts: +5, -2, -0.1, 0.9 -- handed to you, fixed.
 
+  THE WORLD, DRAWN (3x3 ground, 3 heights; top view and side view):
+
+      TOP VIEW (height 0 = ground):            SIDE VIEW (centre column, y=1):
+
+      DIRT  DIRT  DIRT                          height 2:  [ air   ]    <- drone in the air
+      DIRT  RUNWY DIRT    <- runway centre       height 1:  [ air   ]
+      DIRT  DIRT  DIRT                          height 0:  [RUNWAY ]  = +5  (ground, ends flight)
+      x: 0    1    2
+                                                  A nudge D takes the drone one height lower.
+                                                  Six nudges: N S E W (sideways) + U D (vertical).
+
+  THE SIX NUDGES from spot (x, y, height):
+
+      N -> (x,   y+1, height)   S -> (x,   y-1, height)
+      E -> (x+1, y,   height)   W -> (x-1, y,   height)
+      U -> (x,   y,   height+1) D -> (x,   y,   height-1)
+
+      A nudge that leaves the box: the drone stays put. (Wall.)
+
   Two notebooks, the only paper we keep:
 
       the PLAN   = a notebook, spot -> one arrow (which nudge to make here). The thing we build.
@@ -105,13 +124,22 @@
   ## The Improve Move -- Peek the Six, Keep the Winner
 
   Stand on an air spot. You hold a worth for every spot (from the grade). You want this spot's
-  BEST arrow. Do not solve anything. PEEK each nudge and score it with the very same air-law you
-  already know -- fuel now, plus the shrunk worth of where that nudge lands:
+  BEST arrow. Do not solve anything. PEEK each nudge and score it:
 
       score(nudge) = -0.1 + 0.9 * worth(the spot that nudge lands on)
                      |fuel|       |0.9 times a number read from the WORTH notebook|
 
-  Six nudges, six scores. Re-aim the arrow at the biggest. That is the entire improve move:
+  Six nudges, six scores. Re-aim the arrow at the biggest. That is the entire improve move.
+
+  THE PEEK, DRAWN (standing at spot S, six directions, one score each):
+
+                         U -> worth(above) * 0.9 - 0.1
+                         ^
+              W -> worth  <-- [  S  ] -->  E -> worth
+                         v
+                         D -> worth(below) * 0.9 - 0.1
+
+      (N and S go into/out of the page -- same calculation, different neighbour worth)
 
       best arrow here = the nudge with the largest score
 
@@ -129,6 +157,24 @@
   No worths exist before a plan exists, and no smart plan exists before worths exist -- another
   circle. Break it the same way grading broke its circle: start from a lie. Scribble ANY plan
   (a nudge in the air, "stay put" on the ground). Garbage is fine; it gets fixed.
+
+  THE LOOP, DRAWN:
+
+      START: scribble ANY plan (e.g. "always go Left")
+            |
+            v
+      GRADE: fill every spot's worth under this plan
+            (start worths at 0, lay the Bellman law down again and again until settled)
+            |
+            v
+      IMPROVE: at every air spot, peek all 6 nudges, re-aim the arrow at the winner
+            |
+            v
+      Any arrow moved?
+        YES --->  go back to GRADE (plan changed; old worths are now wrong; rebuild them)
+        NO  --->  STOP. the plan is frozen. the frozen plan is the best.
+
+  In code:
 
       seed a dumb plan
       GRADE it          -> fresh worths for every spot (start those worths at 0, settle them)
@@ -171,6 +217,31 @@
       others -> air = -1       :   score = -0.1 + 0.9*( -1  ) = -1.0
 
   The winner is E. The arrow at (0,1,1) flips toward (1,1,1). Another arrow moved -- keep going.
+
+  HOW THE ARROWS SPREAD (top view, height 1 layer, in this toy):
+
+      PASS 0 -- dumb seed "always Left" (W) everywhere:
+        W  W  W
+        W  W  W       all arrows wrong; worth of every air spot = -1
+        W  W  W
+
+      PASS 1 -- improve; only the spot directly above the runway (centre) finds D is better:
+        W  W  W
+        W  D  W       centre arrow flips W -> D (toward runway below it)
+        W  W  W
+        (1 arrow moved)
+
+      PASS 2 -- grade again; the ring around the centre now sees E or N or S toward D is best:
+        W  D  W
+        E  D  W       neighbours of the centre flip toward it
+        W  D  W
+        (4 arrows moved)
+
+      PASS 3 -- outer ring follows:
+        E  D  W or S
+        E  D  W
+        E  D  W or N
+        (more arrows flip; eventually all point toward the runway column, then down)
 
   See the shape in THIS toy. Pass one fixed the spot touching the runway. Pass two fixed the
   spot touching THAT. In this environment -- one prize, uniform fuel, no slipping -- the good
