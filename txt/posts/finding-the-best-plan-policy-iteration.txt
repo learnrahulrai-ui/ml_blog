@@ -38,8 +38,9 @@
 
       To better a plan at a spot, do not solve anything. Just PEEK down each nudge -- "if I went
       THIS way, what would the spot I land on be worth?" -- and re-aim the arrow at the best
-      peek. Grade the new plan, peek again, and repeat. The good arrows spread out from the
-      runway one ring per pass, then stop. A plan that survives a peek untouched is the best.
+      peek. Grade the new plan, peek again, and repeat. In this toy the good arrows happen to
+      spread outward from the runway one ring per pass, then stop. A plan that survives a full
+      peek untouched is provably the best.
 
 
   ## The World (redrawn here so the companion post is not needed)
@@ -80,7 +81,9 @@
 
   One fact from that post we lean on hard below: grade the column straight above the runway and
   you get +5 at the pad, then -0.1 + 0.9*5 = 4.4 one up, then -0.1 + 0.9*4.4 = 3.86 two up.
-  Worth is biggest right over the pad and shrinks with height. Hold that picture.
+  In this toy, worth is biggest right over the pad and shrinks with height above it. (That is a
+  property of this particular map -- one prize, one path, no competing rewards.) Hold that
+  picture for the worked example below.
 
 
   ## Why We Now Need All Six Nudges (the grading post only ever read one)
@@ -169,10 +172,13 @@
 
   The winner is E. The arrow at (0,1,1) flips toward (1,1,1). Another arrow moved -- keep going.
 
-  See the shape. Pass one fixed the spot touching the runway. Pass two fixed the spot touching
-  THAT. The good arrows spread outward from the runway, one ring per pass, each ring pointing the
-  short way to the ring already fixed. When a whole pass re-aims nothing -- every spot already
-  points the short way home -- the plan has frozen. That frozen plan is the answer.
+  See the shape in THIS toy. Pass one fixed the spot touching the runway. Pass two fixed the
+  spot touching THAT. In this environment -- one prize, uniform fuel, no slipping -- the good
+  arrows happen to spread outward from the runway one ring per pass, each ring pointing the
+  short way to the ring already fixed. This is a property of the map, not a law of policy
+  iteration: in a more complex MDP multiple distant states can flip at once, and improvements
+  need not move in neat rings. When a whole pass re-aims nothing -- the frozen condition --
+  that is the universal signal. That frozen plan is the answer.
 
 
   ## Why a Frozen Plan Is THE BEST (derived, not declared)
@@ -182,25 +188,33 @@
 
       (a) IMPROVE never makes a plan worse. At any spot, the arrow the plan ALREADY had is one
           of the nudges the peek looks at. The winner scores at least as high as the incumbent.
-          So the new plan is better-or-equal to the old one, spot by spot. Never a step down.
+          So the new plan is at least as good as the old one at every spot. Never a step down.
 
-      (b) There are only finitely many plans (a fixed handful of arrows, raised to the number of
-          air spots -- a big number, but finite). A process that only ever climbs or holds, and
-          can never revisit a worse plan, must eventually stop climbing. It cannot loop.
+      (b) Each improve step either finds a strictly better plan OR finds none (frozen). It cannot
+          produce a plan that is merely "equal but different" and keep going -- any arrow that
+          moved means at least one spot is now strictly better served, so the new plan is
+          genuinely distinct from the old. There are only finitely many deterministic plans
+          (one arrow per air spot, finite choices each). A sequence that is strictly improving
+          over a finite set cannot cycle and cannot run forever. It must stop.
 
-      (c) When it stops, here is what "stopped" MEANS: at every spot, the arrow already there
-          beats all the other nudges, judged against worths that came FROM this very plan. The
-          plan is its own best reply. A plan that cannot be improved even by a full peek, using
-          its own worths, is by definition the best plan. Nothing else can score higher.
+      (c) When it stops, here is what "stopped" means: at every spot, the arrow already there
+          beats all the other nudges, judged against worths that came FROM this very plan. A plan
+          that is greedy with respect to its own value function -- its own best reply -- satisfies
+          the Bellman optimality conditions. The Policy Improvement Theorem (a real proof, not a
+          definition) guarantees that such a plan is optimal: no other plan can score higher. The
+          plan is not optimal because we declare it so; it is optimal because satisfying those
+          conditions is what optimality means, and the theorem proves the two are the same thing.
 
   So freezing is not exhaustion -- it is a fixed point. The plan answers its own question and
   wins. That is the proof, and it is why the loop is guaranteed to land on the optimal plan
   rather than wander.
 
-  Why the best plan looks the way it does -- head toward the pad-column, then drop: worth is
-  biggest right over the runway and shrinks with distance, so at any spot the winning peek is
-  the nudge that cuts the distance to the pad-column; once you are over the pad, the winning
-  peek is D. The math hands back exactly the plan a human would draw.
+  Why the best plan looks the way it does IN THIS TOY -- head toward the pad-column, then drop:
+  in this environment, with one prize and uniform fuel cost, worth happens to be biggest right
+  over the runway and shrink with distance from it, so the winning peek at any spot is the
+  nudge that cuts the distance to the pad-column. (In a world with prizes scattered elsewhere or
+  stochastic slipping, the worth table and the best plan can look completely different.) Here the
+  math hands back exactly the plan a human would draw for this map.
 
 
   ## The Decoder (jargon -> plain, master sheet)
@@ -211,7 +225,9 @@
       action / a                               a nudge -- N S E W U D (or "stay put" on the ground)
       policy / pi                              the plan -- one arrow per spot
       value / V(s)                             a spot's worth under the current plan
-      reward / R(s)                            the painted points at a spot (+5 / -2 / -0.1)
+      reward / R(s)                            in this toy: painted points at the state reached
+                                               (+5 / -2 / -0.1). General RL attaches rewards to
+                                               transitions R(s,a,s') or R(s,a), not bare states.
       discount / gamma                         the shrink (0.9) -- a future worth counts 0.9 per move
       transition / result(s, a)                where a nudge lands you
       deterministic transition                 a nudge lands for sure (no slipping) -- our toy
@@ -371,10 +387,10 @@
 
   One Breath: with no plan handed to you, seed any plan, GRADE it (fill every spot's worth), then
   IMPROVE each air spot by peeking every nudge -- `-0.1 + 0.9 * worth(where it lands)` -- and
-  re-aiming the arrow at the biggest peek; grade and improve again and the good arrows spread out
-  from the runway one ring per pass, until a pass re-aims nothing; that frozen plan is its own
-  best reply against its own worths, and a plan that cannot be improved even by a full peek is,
-  by definition, the best one -- so the loop is guaranteed to land on it, not merely tire out.
+  re-aiming the arrow at the biggest peek; grade and improve again until a pass re-aims nothing;
+  that frozen plan is greedy with respect to its own value function, and the Policy Improvement
+  Theorem proves that any such plan is optimal -- not by definition, but because satisfying the
+  Bellman optimality conditions is what optimality means, and freezing is exactly how you reach it.
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
