@@ -62,9 +62,12 @@ Monitor loops for deployment status.
   applies with double force here: the CI pipeline is not Claude's concern.
 
 ## Branch
-- Development branch: claude/quirky-goodall-XcgGO
-- Audit reports / rules branch: audit (keep all audit material there, off main)
-- Never push to a different branch without explicit permission.
+- `main` -- the only branch Claude ever touches. Live blog. GitHub Pages deploys from here.
+- `audit` -- orphan branch (no shared history with main). Contains ONLY `reports/`.
+  Anyone can fork it, drop a `.audit` file in `reports/`, push back. Claude never commits here.
+  When Rahul asks Claude to apply audits, Claude reads `reports/` on the audit branch and
+  fixes `main`. The audit branch is never deployed.
+- Never push to a branch other than `main` without explicit permission.
 - Never create a PR unless the user explicitly asks.
 
 ## Open content work
