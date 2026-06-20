@@ -36,6 +36,14 @@
   We need to know how much it would jump around if the world had dealt us a slightly
   different crowd.
 
+  ** KEY: THE ONE UNIVERSE TRAP -- how to fake 200 experiments from one dataset
+     To know your error margin, you need to run the experiment 1,000 times.
+     But you only have money and data for one run.
+     THE FIX: the Bootstrap. Treat your one dataset as if it were the entire universe.
+     Draw samples WITH REPLACEMENT from your own pile -- the same row can appear twice.
+     Each fake pile gives a slightly different dial. Collect 200 dials.
+     The spread of those 200 dials accurately simulates what would happen if you had
+     drawn 200 fresh crowds from the real world. It feels circular, but the math holds.
 
   ## I Cannot Visit the Hospital 200 Times
 

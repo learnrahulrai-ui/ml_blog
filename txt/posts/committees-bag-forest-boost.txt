@@ -22,9 +22,27 @@
 
   Three committees, in order of cleverness:
 
-    bagging       = deal 200 piles WITH REPEATS, build 200 trees, AVERAGE
-    random forest = bagging + HIDE COLUMNS at each cut
-    boosting      = a LINE of fixers, each one repairs the last one's leftovers
+    BAGGING (Parallel, full trees):
+      pile-1 -> tree-1 \
+      pile-2 -> tree-2 --> AVERAGE
+      pile-3 -> tree-3 /
+
+    RANDOM FOREST (Parallel + hide columns at each cut):
+      pile-1 -> tree-1 (sees bmi, age only)   \
+      pile-2 -> tree-2 (sees bp, s5 only)      --> AVERAGE
+      pile-3 -> tree-3 (sees bmi, bp only)    /
+
+    BOOSTING (Line of fixers, tiny stumps):
+      stump-1 --> stump-2 (fixes stump-1's leftovers) --> stump-3 --> ... --> SUM
+
+  ** KEY: THE ECHO CHAMBER TRAP -- why 100 identical trees do not help
+     If every tree reads the same full dataset and uses the same split rule,
+     all 100 trees make the exact same mistake at the exact same time.
+     A committee of 100 clones is no smarter than 1 clone.
+     THE FIX: Random Forest. Blindfold each tree -- force it to see only a random
+     subset of the columns and a random bag of the rows. Now each tree makes
+     DIFFERENT mistakes. When they vote, the unique mistakes cancel out,
+     and only what all trees agree on (the truth) survives.
 
   Each builds on the previous.  The ideas are small.  The power is in the pile-up.
 

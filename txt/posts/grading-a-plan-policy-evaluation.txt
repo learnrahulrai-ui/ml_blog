@@ -36,6 +36,15 @@
   loudly, in the box at the end -- so the one place we hide a sum behind a single arrow is never
   smuggled past you. Trust the recipe; treat the rest as a sketchpad.
 
+  ** KEY: THE HALL OF MIRRORS TRAP -- why you cannot just calculate worths directly
+     Spot A's worth depends on spot B's worth. Spot B's worth depends on spot A's worth.
+     Worth(A) = reward + Worth(B).  Worth(B) = reward + Worth(A).
+     The equations loop back on each other. You cannot solve them in a straight line.
+     THE FIX: lie first. Set every worth to 0. Sweep across all spots, updating each
+     one from its neighbours using the formula. Sweep again. The numbers settle toward
+     the true values -- the same truth the loop equation would give if you could solve it.
+     The lie heals itself, one sweep at a time.
+
   The one move, named here so you are not surprised later:
 
       A worth leans on its neighbour's worth, which leans on ITS neighbour's worth -- a circle.

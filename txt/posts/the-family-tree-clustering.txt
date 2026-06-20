@@ -24,6 +24,17 @@
   time, until everyone is in one giant family.  Then you read the tree and cut it wherever
   you like -- and the height of your cut decides how many groups you get.
 
+  ** KEY: THE CHAIN LINK TRAP -- what "distance between two groups" even means
+     Once you marry two countries into a group, how do you measure that group's distance
+     to a third country? They are not a point anymore -- they are a shapeless blob.
+     Option A (single-linkage): measure the two CLOSEST border towns.
+       Two countries that share a border look very close, even if their centres are far.
+     Option B (complete-linkage): measure the two FARTHEST coastal tips.
+       Biased toward large compact groups; small elongated clusters look far from everything.
+     Option C (average-linkage): average all pairwise distances.
+       A compromise that tends to find round, equally-sized clusters.
+     The linkage rule you pick changes which groups form. There is no single right answer.
+
   ## The Sheet (Same as Part 1)
 
     50 states, 3 measurements (Murder, Assault, UrbanPop).  No answer column.

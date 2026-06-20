@@ -31,6 +31,15 @@
   writes ONE score, (2) the shrink boss halves the sheet by keeping the loudest of each 2x2.
   Everything else is rebuilt here.
 
+  ** KEY: THE LINEAR PRISON TRAP -- why the bend after each layer is not optional
+     Suppose every layer only multiplies: layer-1 = 2*x, layer-2 = 3*(2*x) = 6*x.
+     A fifty-layer factory with no bends is still just one giant multiplier.
+     You added fifty rooms and gained nothing.
+     THE FIX: after every layer, bend the output (ReLU -- crush negatives to 0).
+     Bends stacked on bends create curves; curves on curves create complex shapes.
+     Without the bend the network is physically incapable of learning non-linear patterns.
+     With it, depth gives real power.
+
   Pencil and scratch paper out. Both new tools get real arithmetic.
 
 

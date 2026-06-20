@@ -23,6 +23,16 @@
   empty -- nobody watches everything.  Fill a blank well and you can say "you, who has not
   seen this film, will probably rate it 4.5 stars" -- a recommendation.
 
+  ** KEY: THE ZERO GRAVITY TRAP -- why you cannot ignore blank cells, and cannot fill them with zero
+     If you delete every row with a blank, you throw away most of the data.
+     (A user who rated 3 out of 1,700 films has 1,697 blank cells -- delete the row and
+     you lose that user entirely.)
+     If you fill blanks with 0, you tell the machine this user gave the movie 0 stars --
+     which is a real rating, not a missing one.
+     PARADOX: doing nothing destroys the data. Doing the obvious thing (zero) lies to the machine.
+     THE FIX: imputation. Estimate the blank by asking the row's nearest neighbours what THEY
+     scored that column. A calculated best guess beats zero and beats deletion.
+
   ## The Sheet Full of Holes
 
            Matrix  Titanic  Alien  Notebook  Rambo

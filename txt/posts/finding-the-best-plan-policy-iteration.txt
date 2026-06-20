@@ -34,6 +34,16 @@
   That collapse is the toy, named again loudly at the end. Trust the recipe; treat the rest as
   a sketchpad.
 
+  ** KEY: THE INFINITE REGRET TRAP -- how to judge a move whose reward comes 10 steps later
+     You move a pawn to E4. Ten moves later, you win.
+     Was E4 good, or did you just get lucky?
+     The immediate reward for E4 is 0. You cannot judge it by that.
+     THE FIX: Bellman's idea. Work backwards from the end.
+     Calculate the worth of the final winning state. Let that worth bleed one step back
+     to the state before it, then one step further back, and so on.
+     E4's worth = the maximum worth of whatever states it can reach.
+     The future "pays" the move that led to it, even when that move happened 10 steps ago.
+
   The one move, named here so you are not surprised later:
 
       To better a plan at a spot, do not solve anything. Just PEEK down each nudge -- "if I went

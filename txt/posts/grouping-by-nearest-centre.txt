@@ -34,6 +34,15 @@
   That is it.
   Two moves, on a loop.
 
+  ** KEY: THE FROZEN CENTRE TRAP -- why the chicken-and-egg is not a problem
+     The two moves seem circular: to assign dots you need centres, but to find
+     centres you need to know which dots belong together. Where do you start?
+     THE FIX: guess. Drop K centres anywhere at random.
+     The first assignment is rough -- but it gives good enough centres to improve.
+     Each loop can only lower the total gap from each dot to its centre, never raise it.
+     The loop converges because it is always walking downhill. It stops when neither
+     move changes anything. The starting guess is wrong but the loop fixes it.
+
   ## The Job
 
     a cloud of dots (rows), and a number K you pick

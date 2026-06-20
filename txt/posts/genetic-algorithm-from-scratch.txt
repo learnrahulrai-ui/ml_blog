@@ -20,6 +20,14 @@
   it climbs to the answer with NO gradient, no per-slot feedback, nothing but a single
   "how wrong" number per guess and the freedom to let bad guesses die.
 
+  ** KEY: THE INCEST TRAP -- why picking only the best creates a stuck population
+     If you only breed the 2 highest-scoring solutions, their children are nearly identical.
+     In 5 generations the entire population is clones of one small corner of the search space.
+     The machine found a local hill and stopped. The mountain next door goes unexplored.
+     THE FIX: mutation and diverse selection. After breeding, randomly flip some genes.
+     Also pick parents by tournament (best of 3 random candidates), not just top-2 overall.
+     That guarantees some diversity survives. Diversity is what lets the search escape the hill.
+
   THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
   appears. Anything named more than five lines ago is named again. Every number is worked in
   front of you, never "recall that...". One idea per line. A pencil and this page are the

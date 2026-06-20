@@ -1,4 +1,4 @@
-@title The Two-Memory Worker: How an LSTM Remembers Far-Back Words (RNNs by Hand, Part 2) :: Rahul's ML Blog
+﻿@title The Two-Memory Worker: How an LSTM Remembers Far-Back Words (RNNs by Hand, Part 2) :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -28,6 +28,15 @@
   Many wirings work about equally; a simpler cousin (the GRU) is nearly as good. I will flag
   this again where it matters. We build it by hand anyway, because the mechanism is the
   lesson.
+
+  ** KEY: THE SPLIT BRAIN TRAP -- why one memory channel is not enough
+     If you only have one memory state, every new word partially overwrites the old one.
+     You need to remember the subject from 20 words back while reading the verb now.
+     But the verb wipes out part of the subject's trace. Context fades.
+     THE FIX: two channels. Short-term memory (h) carries what just arrived --
+     it changes with every word. Long-term memory (c) is a conveyor belt -- it only
+     changes when the forget gate explicitly opens a trapdoor to dump old content.
+     New information and old context travel on separate wires and do not fight.
 
   Pencil out. Pocket A, pocket B, and a row of clerks.
 

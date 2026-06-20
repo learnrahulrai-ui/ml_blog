@@ -31,6 +31,16 @@
   Fourth: how do you grade a machine that is sorting into not two bins but ten?
   Answer these and you have left the textbook behind and stepped onto the workshop floor.
 
+  ** KEY: THE DROP IN THE OCEAN TRAP -- why ROC looks great when the machine is terrible
+     Fraud pile: 99,900 honest transactions, 100 thieves.
+     The machine blocks 2,000 honest people (false alarms).
+     False alarm rate = 2,000 / 99,900 = 0.02. Just 2%.
+     The ROC curve bulges near the top. Looks like a great machine.
+     But you just enraged 2,000 innocent customers to catch at most 100 thieves.
+     THE FIX: use the Precision-Recall curve on skewed piles.
+     Precision = truly caught / all blocked = 100 / (100 + 2000) = 4.7%.
+     That number forces you to see the cost. ROC hid it by dividing by the vast honest pile.
+
 
   ## Settings I Pick By Hand (Hyperparameters)
 

@@ -32,6 +32,15 @@
   The other is a trick of units, and it is the kind of mistake that ends up in published
   papers.
 
+  ** KEY: THE TANGLED WIRES PARADOX -- why reading one dial in isolation is a lie
+     Suppose dial A = +5. Does that mean column A pushes the answer up hard?
+     Not necessarily. Suppose column A and column B are highly correlated (near identical).
+     The machine may set dial A = +5 and dial B = -4 because they fight each other to
+     cancel out noise -- their individual values are meaningless but their SUM is stable.
+     Reading dial A alone says "+5, huge positive effect." The truth is "we don't know."
+     THE FIX: only compare dials after putting every column on the same ruler
+     (same spread), or use regularisation to untangle the correlated columns first.
+
 
   ## One Dial Per Column
 

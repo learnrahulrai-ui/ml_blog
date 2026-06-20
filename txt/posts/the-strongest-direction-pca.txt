@@ -36,6 +36,16 @@
   The next-longest shadow, at a right angle to the first, is the second.
   So crush to those two shadows and draw what you see.
 
+  ** KEY: THE FLAT SHADOW PARADOX -- why you must pick the right direction to crush
+     Imagine compressing a 3D object to 2D. If you look straight down from above,
+     you see a flat square -- all the height is gone. If you look from the side,
+     you see the full profile.
+     THE PARADOX: you MUST throw away one dimension. But throwing away the wrong
+     direction destroys the data.
+     THE FIX: PCA spins the data cloud until its shadow is as WIDE and SPREAD as
+     possible. The direction with the most spread (variance) preserves the most truth.
+     That direction is the first principal component. Crush along that axis.
+
   ## The Sheet
 
     alcohol, malic_acid, ash, alcalinity_of_ash, magnesium, total_phenols,

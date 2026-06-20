@@ -34,6 +34,14 @@
   Then we walk one review through the middle floor by hand, one word at a time, until a
   running memory falls out the end.
 
+  ** KEY: THE PARALYZED WALKER TRAP -- why pure greed never finds the best path
+     Suppose the agent always picks the action with the highest known reward.
+     It finds a $5 reward early and spends every step collecting it -- forever.
+     The $100 reward in the next room is never discovered. Greed locks you in.
+     THE FIX: epsilon-greedy. Force the agent to take a random action 10% of the time.
+     That 10% chaos is the ONLY mechanism that can discover unknown rewards.
+     Once the $100 room is found by a random step, the agent learns to go there.
+
   Pencil and scratch paper out. Every number here is recomputed where it is needed.
 
 

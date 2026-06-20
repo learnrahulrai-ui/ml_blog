@@ -25,6 +25,14 @@
   exact formula. No searching, no luck. This post derives that formula by hand on three
   rows, then shows it is the very same arithmetic the toolbox runs on sixteen thousand.
 
+  ** KEY: THE BOTTOM OF THE BOWL PARADOX -- why the best dials come from setting slope to zero
+     You could try every possible dial value and pick the one with the smallest total miss.
+     But "every possible" is infinite -- the dial could be 1.0, 1.001, 1.0001, ...
+     THE KEY INSIGHT: the total-miss bowl has exactly one lowest point, and at that point
+     the slope is exactly zero. You do not hunt by trial and error. You just solve:
+     "at what dial value is the slope zero?" -- algebra gives you the exact answer.
+     No searching, no luck. The formula you derive IS the bottom of the bowl.
+
 
   ## The Rule
 

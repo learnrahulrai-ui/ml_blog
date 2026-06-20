@@ -40,6 +40,16 @@
   breadcrumb (a dict of predecessors, used to reconstruct the path at the end). Each is fully
   spelled out where it first appears below.
 
+  ** KEY: THE BLIND MAZE TRAP -- why a cost-only search wastes time in the wrong direction
+     Uniform cost search spreads like a puddle: it explores every road with equal cost
+     before committing to any direction. It WILL find the cheapest path -- but it
+     explores the entire map outward in a ring, including all the roads leading away
+     from the goal, before it reaches the goal.
+     THE FIX: A*. Add a compass (h) that estimates the remaining cost to the goal.
+     Each slip on the pile gets scored as cost-so-far + compass-estimate.
+     The puddle now pushes harder in the direction the compass says is promising.
+     It still finds the optimal path (as long as the compass never overestimates).
+
 
   ## A Machine That Adds Costs -- and "S→B" Is Not a Number
 

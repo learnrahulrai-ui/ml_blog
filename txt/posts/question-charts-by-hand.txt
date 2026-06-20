@@ -27,6 +27,17 @@
   You keep splitting until each group's answers are tight enough.
   Therefore that group's average is a good guess for anyone who lands in it.
 
+  ** KEY: THE ENDLESS INTERROGATION TRAP -- when to stop asking questions
+     If you keep asking yes/no questions, eventually every bucket has exactly 1 person.
+     At that point you have built a "perfect" decision tree -- every bucket is pure.
+     But you just built a filing cabinet that memorised the study pile.
+     It will fail on the next patient. Ask it about someone it never studied
+     and it has no answer -- it only knows the 442 people it drilled on.
+     THE FIX: stop early. Forbid the tree from growing past a certain depth,
+     or forbid buckets with fewer than 10 people. Force it to generalise.
+     Pruning does the same thing after the tree is fully grown: it trims back
+     branches that do not earn their keep on the hidden pile.
+
 
   ## The Sheet: Two New Piles
 

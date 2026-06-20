@@ -19,6 +19,17 @@
   every other word -- no carrying, no fade. That is attention. The Transformer is what you get
   when you stack this on top of a plain classifier.
 
+  ** KEY: THE FORGOTTEN PRONOUN TRAP -- why a word's meaning depends on the whole sentence
+     "The animal didn't cross the street because it was too tired."
+     "The animal didn't cross the street because it was too wide."
+     The word "it" is identical in both sentences. But "it" means "animal" in the first
+     and "street" in the second. A machine that reads one word at a time with no cross-word
+     connections cannot distinguish these -- "it" maps to the same fixed representation.
+     THE FIX: self-attention. Force "it" to score every other word in the sentence,
+     then blend their representations in proportion to those scores.
+     "It" in sentence 1 blends mostly with "animal". In sentence 2, mostly with "street".
+     The same word gets a different meaning depending on context.
+
   Every attention tutorial either waves its hands ("each word attends to relevant words!") or
   buries you in matrix equations. Neither tells you the three things most worth knowing:
   (1) why each word needs THREE sticks (want, have, give) rather than one;

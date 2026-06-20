@@ -34,6 +34,22 @@
   And from here on every choice we make is haunted by which kind of mistake
   we can least afford to make.
 
+  ** KEY: THE INFINITE RULER TRAP -- why a straight stick cannot predict chances
+     Try a straight line: chance = 0.2 + 0.1 * (age).
+     A 50-year-old gets chance = 0.2 + 5.0 = 5.2.  That is 520%.
+     A straight stick reaches infinity. A chance cannot go above 1 or below 0.
+     THE FIX: the S-curve (sigmoid). It crushes any number down into 0-to-1.
+     No matter how high the dial sum goes, the curve flattens against the ceiling.
+
+  ** KEY: THE LAZY DOCTOR PARADOX -- why accuracy alone is a deadly trap
+     Suppose 99 out of 100 lumps are benign.
+     A lazy doctor who never looks at the scan and shouts "WELL!" to everyone:
+       accuracy = 99 out of 100 = 99%.  The hospital board gives him a medal.
+       Meanwhile the 1 sick patient is sent home to die.
+     THE FIX: measure RECALL -- what fraction of the truly sick did you catch?
+       lazy doctor: caught 0 out of 1.  Recall = 0%.  He is fired immediately.
+     Accuracy hides catastrophe when one bin outnumbers the other.
+
 
   ## From Number to Bin
 

@@ -26,6 +26,14 @@
   groups blind, and ONLY at the end do we peek at the labels to ask: did the machine's
   blind groups line up with the real cancer types?  That peek is a check, never an input.
 
+  ** KEY: THE DIMENSIONALITY CRUSH TRAP -- how to see 6,830 dimensions on a flat page
+     A human eye can only see 3 dimensions. You cannot plot 6,830 gene measurements.
+     PCA compresses the data: find the 2 directions that spread the dots most widely,
+     and project everything down onto those 2 axes.
+     6,830-dimensional cancer cells become 2D dots -- and when you plot them,
+     leukemia cells cluster apart from melanoma cells. The structure was already there;
+     you just could not see it until PCA flattened the room to a page.
+
   ## The Sheet: Wide, Not Tall
 
     NCI60 -- 64 cell-line samples, ~6,830 gene measurements each

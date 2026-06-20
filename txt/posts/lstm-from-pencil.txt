@@ -25,6 +25,16 @@
   a name only at its very end: LSTM.
 
 
+  ** KEY: THE AMNESIA TRAP -- why plain memory overwrites what came before
+     An RNN reads word 1, stores it in memory. Reads word 2 -- the memory is updated
+     by multiplying and adding the new word. Word 1's trace is mixed in, but weakened.
+     By word 100, word 1's signal has been multiplied 99 times by numbers less than 1.
+     It is gone. The machine forgot the beginning of the sentence.
+     THE FIX: the LSTM's conveyor belt. Build a highway straight through the cell.
+     Old memory flows along it untouched unless the forget gate explicitly opens a
+     trapdoor to dump it. New information is added (not multiplied) onto the belt.
+     Addition preserves gradients; the beginning of the sentence stays alive.
+
   ## One Axiom: What a Clerk Does
 
   A clerk does one job. Take some numbers in. Multiply each by a frozen dial. Add results.

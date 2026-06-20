@@ -18,6 +18,14 @@
   strip, and block the future. Tiny sizes so the arithmetic fits; the moves are identical at
   full size. Nothing carried in from memory.
 
+  ** KEY: THE PATCHWORK TRAP -- why you cannot let every pixel attend to every other pixel
+     A 224x224 photo has 50,176 pixels.
+     If every pixel attends to every other pixel, that is 50,176 x 50,176 = 2.5 BILLION
+     score calculations per attention layer. Too expensive to run.
+     THE FIX: patching. Cut the photo into 16x16 squares. Flatten each square into one
+     token. A 224x224 photo becomes 196 tokens. Attention over 196 tokens is fast.
+     Each token describes one region -- enough local information, no pixel-level explosion.
+
 
   ## A Photo Is a Grid of Numbers, Cut Into Square Strips
 

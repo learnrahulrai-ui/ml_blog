@@ -66,6 +66,17 @@
   Anyone can memorise answers they have been shown.
   The trick is being right about the houses you have not seen.
 
+  ** KEY: THE CANCEL-OUT TRAP -- why squaring the miss is not optional
+     Suppose you average the raw misses to see how wrong a guesser is.
+     House A: truth 120, guess 100  -> miss = +20
+     House B: truth  80, guess 100  -> miss = -20
+     Raw average miss = (+20 + -20) / 2 = 0.
+     The guesser looks perfect -- zero average miss -- but it was off by 20 both times.
+     The plus and minus cancelled and hid the truth.
+     The fix: SQUARE every miss before averaging. (+20)^2 = 400. (-20)^2 = 400.
+     Average squared miss = 400. The error is exposed. Squaring kills the sign.
+     This is why MSE (mean squared error) squares first.
+
   !! WARN: .shape IS A PAIR, NOT A PRODUCT
      df.shape returns (n_rows, n_cols) in that fixed order -- (20640, 9) -- never their
      product.

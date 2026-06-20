@@ -46,6 +46,17 @@
   the S-curve p = 1 / (1 + e^(-Z)) (at the exit). The loss when the true answer is 1 is
   -ln(p). That is the whole forward machine. Now we run it backward.
 
+  ** KEY: THE BLINDFOLDED MOUNTAIN CLIMBER -- why step size is the hardest dial to set
+     You are blindfolded on a hillside. You want the lowest valley.
+     You can only feel the slope directly under your boots.
+     If you take a giant leap each time, you may jump clean over the valley and land
+     higher on the far side. If you take a microscopic step, you will never reach the bottom.
+     THE FIX: gradient descent -- read the slope, step downhill by a fraction of that slope.
+     As the ground levels out near the valley, the slope shrinks, so the steps automatically
+     get smaller. You slow down as you approach the bottom.
+     The fraction (learning rate) still needs to be chosen by hand -- too big: oscillation.
+     Too small: takes forever. This is the hardest hyperparameter in deep learning.
+
 
   ## Why Brute Force Will Not Do
 
