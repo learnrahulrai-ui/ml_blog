@@ -98,6 +98,8 @@
   special     [SPECIAL. Bayes by Head-Count -- The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild](posts/bayes-shopkeeper.txt)
   special     [SPECIAL. Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth (Policy Evaluation)](posts/grading-a-plan-policy-evaluation.txt)
   special     [SPECIAL. Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway (Policy Iteration)](posts/finding-the-best-plan-policy-iteration.txt)
+  special     [SPECIAL. The Walking Machine and the Vault -- RNN and LSTM by Pencil](posts/rnn-lstm-by-pencil.txt)
+  special     [SPECIAL. Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

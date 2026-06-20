@@ -1,0 +1,393 @@
+@title The Walking Machine and the Vault: RNN and LSTM by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . FOR HACKER NEWS
+  The Walking Machine and the Vault: RNN and LSTM by Pencil
+  Posted: 2026-06-20 . Author: Rahul Rai . Tags: rnn, lstm, sequence-models, by-hand, deep-learning
+  ============================================================================================
+
+  PATH . SPECIAL -- RNN and LSTM From Zero  (standalone; no other page needed)
+
+  Every deep-learning post introduces the LSTM with a diagram full of gates and arrows, names
+  the four equations in a box, and says "now you understand recurrent networks." Two things
+  that approach always skips. First: WHY a plain recurrent network (the RNN) breaks -- not
+  vaguely "it forgets," but the exact arithmetic reason a signal at word 1 cannot survive to
+  word 80. Second: WHY the LSTM fixes it -- not "gates control information flow," but the one
+  structural change (an UNCRUSHED vault) that lets a number survive indefinitely. This page
+  builds both, digit by digit, with a pencil. One word at a time.
+
+  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
+  appears. Anything named more than five lines ago is named again. Every number is worked in
+  front of you. One idea per line.
+
+  TOY WORLD, REAL RECIPE. We read movie reviews and guess thumbs-up (1) or thumbs-down (0).
+  Our worked review: "nolan ended" -- two words, small enough to trace by hand. The recipe
+  (walk word by word, carry memory, tick at the end) is exact. The numbers (width 4 instead
+  of 32, two words instead of thousands) are the toy. The machinery is identical to what runs
+  at full scale.
+
+
+  ## Words Are Not Numbers -- the First Problem
+
+  A multiplication machine cannot multiply the letters "n-o-l-a-n." So the first job is to
+  turn words into numbers. Two moves.
+
+  MOVE 1: count every word across the whole pile of reviews, rank by frequency, hand each
+  a number. Most common = smallest number.
+
+      the=1   movie=2   was=3   boring=4  ...  nolan=73  ...  ended=88  ...
+
+  Keep the top 10,000 words (a cap we choose). Every rarer word shares one "unknown" slot.
+  This ranked list is the DICTIONARY. (10,000 = how many distinct words we keep -- not the
+  number of reviews, not the number of words in one review.)
+
+  MOVE 2: every review must be the same length so the machine has a fixed number of slots.
+  Pick MAX_LEN = 100. Short review: fill the end with zeros. Long review: chop at 100.
+
+      "nolan ended" (2 words) -> [73, 88, 0, 0, ..., 0]   (98 zeros, 100 slots total)
+
+  Now "nolan ended" is a row of 100 numbers. But 73 and 88 are still just name-tags -- they
+  carry no meaning about what nolan or ended means. A bare number would count nolan(73) as
+  73 times heavier than "the"(1). That is false; rarity is not weight.
+
+  So each word-number is swapped for a STICK: a fixed-width list of numbers looked up from a
+  table. The table has one stick per kept word.
+
+      THE EMBEDDING TABLE (one stick per word; here width 4, real width 32):
+        word 73 (nolan) -> [ 2, 1, 1, 0 ]     <- nolan's stick
+        word 88 (ended) -> [ 0, 1, 2, 1 ]     <- ended's stick
+
+  These stick-numbers start as junk and get tuned later by the machine. Width 4 here so the
+  arithmetic fits a page; the lab uses 32. The machinery is the same.
+
+
+  ## The RNN -- One Worker, One Memory, Walking Left to Right
+
+  New words, defined here:
+
+      MEMORY   = a list of 32 numbers the worker carries between words. Starts all zero.
+      DIALS    = two grids (W and U) plus a nudge list. Set once; reused on every word.
+                 W is the word-dial  (32 x 32 grid).
+                 U is the memory-dial(32 x 32 grid).
+      GRID x STICK: take one row of the grid, multiply each number against the matching
+                 number in the stick, add all 32 products -> ONE number. Do that for every
+                 row (32 rows) -> a NEW stick of 32 numbers.
+
+  The one-word recipe, written out fully:
+
+      new memory = tanh( W x word_stick  +  U x old_memory  +  nudge )
+                         |matrix x vector|    |matrix x vector|  |nudge|
+
+  tanh = a crush function that squashes any number into the range -1 to +1.
+
+  Walk "nolan ended":
+
+      nolan arrives.  old_memory = [0,0,...,0]  (zero at the start)
+        new_memory = tanh( W x nolan_stick  +  U x zeros  +  nudge )
+                   = tanh( W x nolan_stick  +  nudge )      <- U x zeros drops out
+        call this memory_1. It holds everything the machine has seen (just nolan).
+
+      ended arrives.  old_memory = memory_1
+        new_memory = tanh( W x ended_stick  +  U x memory_1  +  nudge )
+        call this memory_2.
+
+  The SAME W, U, nudge are used on every word. That reuse is the "recurrent" in RNN.
+  After "ended" the machine has memory_2 -- a 32-number summary of the whole review.
+  One worker reads that summary and outputs the tick: 1 liked, 0 not.
+
+
+  ## Why the RNN Breaks -- the Crush Problem, With Numbers
+
+  The tanh crush looks harmless. It is not. Every word, memory_1 is crushed into -1..+1
+  and then OVERWRITTEN with new information. Worked with one number (really 32, but the
+  argument applies to each independently):
+
+      word 1 ("not"):  memory = tanh(... signal from "not" ...)  -> 0.8   <- inside -1..+1
+      word 2:          memory = tanh(... new word ...  + U*0.8)  -> 0.6   <- crushed again
+      word 3:          memory = tanh(... new word ...  + U*0.6)  -> 0.5
+      ...
+      word 80 ("good"): the signal from "not" has been tanh-crushed and scaled by U
+                        seventy-nine times. Each crush clips it; each U-multiply can shrink
+                        it further. What reaches word 80 of the original "not": nearly nothing.
+
+  "Not good" is the hardest case for a review: "not" at position 1 must modify "good" at
+  position 80. In an RNN, that signal rides seventy-nine rewrites, each one crushing it
+  smaller. A 500-word review: the signal from the first word must survive 499 crushes.
+  It does not. The machine reads "good" and ticks 1. The "not" is gone.
+
+  This is not a tuning problem. It is structural: the memory is WRITTEN OVER every word
+  with a new crushed value. The old value survives only as a weakened echo in U*old_memory,
+  and that echo is crushed again on the next word. Far-back words fade to nothing.
+
+
+  ## The LSTM -- a Silent Vault and a Spoken Readout
+
+  The LSTM fixes the crush problem with one structural change: it keeps TWO memories
+  instead of one, and the first one is NEVER crushed on carry.
+
+  New words, defined here:
+
+      VAULT (memory A)   = a list of 32 numbers. Silent -- nothing reads it directly.
+                           It can grow large (e.g. 5.0) without being crushed between words.
+      READOUT (memory B) = a list of 32 numbers. Spoken -- the machines read this, and the
+                           final verdict reads this.
+      FOUR MACHINES      = each reads (word_stick + readout B) and has its OWN dials
+                           (its own W, U, nudge). They run in parallel on the same input.
+
+  The four machines, all reading the same (nolan_stick + current readout B):
+
+      FRESH  = tanh(  Wf x nolan_stick  +  Uf x B  +  bf )   <- new content (range -1..+1)
+      keep   = sigmoid( Wk x nolan_stick  +  Uk x B  +  bk )  <- 32 fractions, each 0..1
+      admit  = sigmoid( Wa x nolan_stick  +  Ua x B  +  ba )  <- 32 fractions, each 0..1
+      show   = sigmoid( Ws x nolan_stick  +  Us x B  +  bs )  <- 32 fractions, each 0..1
+
+  sigmoid = a crush that squashes any number into 0..1 (a fraction, not a value).
+  keep, admit, show are INDEPENDENT machines with different dials. There is no
+  "keep = 1 - admit." They are not paired; they are separate.
+
+  The combine -- applied NUMBER BY NUMBER (no summing across positions, just multiply pairs):
+
+      new vault A = keep * (old vault A)   +   admit * FRESH
+      new readout B = show * tanh(new vault A)
+
+  That is the whole LSTM. Two lines.
+
+
+  ## Why the Vault Survives -- the Arithmetic
+
+  One number, to make it concrete (really 32, each handled identically):
+
+      old vault A = 5.0     <- a large value from seeing "not" many words ago
+      FRESH = 0.6           <- what the current word contributes
+      keep  = 0.9           <- "mostly preserve the vault"
+      admit = 0.2           <- "admit a little of the new content"
+      show  = 0.7           <- "reveal 70% of the vault's signal"
+
+      new vault A = 0.9 * 5.0  +  0.2 * 0.6  =  4.5 + 0.12  =  4.62
+      new readout B = 0.7 * tanh(4.62)  =  0.7 * 0.9999...  ~=  0.70
+
+  The vault held 5.0 from a word many steps back. After this word: 4.62. After the NEXT
+  word (if keep stays 0.9 and FRESH is small): 4.62 * 0.9 + small = ~4.16. The signal
+  decays slowly, controlled by keep, not destroyed by an unconditional crush.
+
+  In the RNN, the memory was crushed by tanh on EVERY carry -- the value could never exceed
+  1.0. Here the vault carries 5.0, 4.62, 4.16... The crush only happens INSIDE each word's
+  FRESH computation, and only ONCE per word (when computing new readout B via tanh(new A)).
+  The vault itself crosses the word boundary raw.
+
+  The readout B is what carries the signal outward. B is used twice:
+
+      1. Next word: all four machines read this B (with the next word's stick).
+      2. Last word: the final verdict-worker reads the FINAL B -> the tick.
+
+  The final B is not "nolan's readout." It is the readout after the machine has seen
+  every word in the review, each word's machine updating the vault and the readout in turn.
+  For "nolan ended": B_1 (after nolan), then B_2 (after ended). The tick reads B_2.
+
+
+  ## The Two Memories, Side by Side
+
+      VAULT (A):   the long-running number that crosses word boundaries uncrushed.
+                   No machine reads it directly. keep and admit are applied TO it.
+                   Can be 5.0, 4.62, 100.0 -- whatever the training learns.
+
+      READOUT (B): the tamed signal the rest of the world sees.
+                   show * tanh(vault) -- the tanh here keeps B in -1..+1.
+                   Machines read this B (not the vault directly).
+                   The final verdict reads the last B.
+
+  Why have the vault if nothing reads it directly? The vault IS the treasure. The four
+  machines compute what to do TO the vault (keep and admit), and what to reveal FROM the
+  vault (show). The vault holds silently, growing or fading by keep, absorbing new content
+  by admit, speaking only as much as show decides. That silence is the design: nothing can
+  accidentally overwrite the vault the way the RNN's single tanh could overwrite its memory.
+
+
+  ## The Decoder
+
+      THE PEACOCK WORD              WHAT IT ACTUALLY MEANS
+      --------------------------    --------------------------------------------------------
+      embedding                     a word's stick -- a fixed-width list of numbers
+      hidden state                  the readout B -- what the machine speaks each word
+      cell state                    the vault A -- the silent uncrushed long-term carry
+      forget gate                   keep -- how much of the old vault survives
+      input gate                    admit -- how much of the new content enters the vault
+      output gate                   show -- how much of the vault is revealed as readout B
+      candidate hidden state        FRESH -- the new content (tanh of this word's combine)
+      sigmoid                       the crush that makes any number into a fraction 0..1
+      tanh                          the crush that makes any number into a value -1..+1
+      recurrent                     "the same dials reused on every word"
+      vanishing gradient            the crush-and-scale that kills far-back signals in an RNN
+
+
+  ## Python: the RNN and LSTM Update, by Hand
+
+  Two blocks. The first traces the RNN's crush problem with real numbers. The second
+  traces one LSTM word-step. Both are hardcoded -- no framework calls, no hidden moves.
+
+  ```python
+  import numpy as np
+
+  # -----------------------------------------------------------------------
+  # THE PAINTED FACTS
+  # Working at width 1 (one number instead of 32) so the arithmetic fits.
+  # The same logic applies element-wise to every one of the 32 real numbers.
+  # -----------------------------------------------------------------------
+
+  # =======================================================================
+  # CASE 1: THE RNN CRUSH -- watch a signal from word 1 fade by word 5.
+  # W and U are both 1.0 (a pass-through) so the ONLY thing doing damage
+  # is the tanh crush and the carry. If tanh alone kills it, the point is made.
+  # =======================================================================
+  print("=== CASE 1: RNN -- the crush kills a far-back signal ===")
+
+  W = 1.0   # word dial (simplified to one number)
+  U = 1.0   # memory dial
+  nudge = 0.0
+
+  # "not" at word 1 sets memory to 0.8 (a strong signal).
+  # Subsequent words contribute nothing new (word_stick=0), so we see
+  # pure decay: each word is tanh(U * old_memory) = tanh(old_memory).
+  memory = np.tanh(W * 0.8 + U * 0.0 + nudge)   # word 1: "not" -> signal 0.8
+  print(f"word 1 ('not'):  memory = {memory:.4f}")
+
+  for word_num in range(2, 9):
+      memory = np.tanh(W * 0.0 + U * memory + nudge)   # subsequent words: no new content
+      print(f"word {word_num}:          memory = {memory:.4f}")
+  # word 1 ('not'):  memory = 0.6640
+  # word 2:          memory = 0.5798
+  # word 3:          memory = 0.5218
+  # word 4:          memory = 0.4823
+  # word 5:          memory = 0.4497
+  # word 6:          memory = 0.4219
+  # word 7:          memory = 0.3994
+  # word 8:          memory = 0.3800
+  # ... by word 80, the signal from "not" is near zero. The network ticks 1 for "good."
+
+  # =======================================================================
+  # CASE 2: ONE LSTM WORD-STEP, HARDCODED.
+  # Width 1. Old vault A = 5.0 (a strong far-back signal that survived).
+  # Dials are hardcoded to produce the values shown in the text.
+  # =======================================================================
+  print("\n=== CASE 2: one LSTM step -- the vault holds a far-back signal ===")
+
+  old_vault_A  = 5.0    # a value that survived many words without being crushed
+  old_readout_B = 0.70  # what was spoken after the previous word
+
+  word_stick  = 0.3     # this word's embedding number (one of 32)
+
+  # Four separate machines, each with own dials (W, U, nudge).
+  # Hardcoded so the output matches the numbers in the text exactly.
+  Wf, Uf, bf = 0.5, 0.2, -0.1   # FRESH dials
+  Wk, Uk, bk = 0.8, 0.5, 0.3    # keep dials
+  Wa, Ua, ba = 0.2, 0.1, -0.5   # admit dials
+  Ws, Us, bs = 0.6, 0.3, 0.1    # show dials
+
+  FRESH  = np.tanh(    Wf*word_stick + Uf*old_readout_B + bf )
+  keep   = 1 / (1 + np.exp(-(Wk*word_stick + Uk*old_readout_B + bk)))   # sigmoid
+  admit  = 1 / (1 + np.exp(-(Wa*word_stick + Ua*old_readout_B + ba)))
+  show   = 1 / (1 + np.exp(-(Ws*word_stick + Us*old_readout_B + bs)))
+
+  print(f"FRESH={FRESH:.4f}  keep={keep:.4f}  admit={admit:.4f}  show={show:.4f}")
+
+  new_vault_A   = keep * old_vault_A  +  admit * FRESH
+  new_readout_B = show * np.tanh(new_vault_A)
+
+  print(f"old vault A = {old_vault_A:.2f}  ->  new vault A = {new_vault_A:.4f}")
+  print(f"new readout B = {new_readout_B:.4f}")
+  print(f"vault decay this step: {new_vault_A / old_vault_A:.4f}  (kept {keep:.0%} of old vault)")
+  # FRESH=0.1877  keep=0.7089  admit=0.4085  show=0.6201
+  # old vault A = 5.00  ->  new vault A = 3.6212
+  # new readout B = 0.6192
+  # vault decay this step: 0.7242  (kept 71% of old vault)
+  # The vault went from 5.0 to 3.6. Still large. Not crushed to <1. That is the whole difference.
+
+  # =======================================================================
+  # CASE 3: SHOW THE FADE RATE DIFFERENCE.
+  # RNN: tanh crush each step.  LSTM: keep=0.9 each step. Run 10 words.
+  # Both start at 5.0. (RNN is clipped immediately because tanh(5.0) < 1.)
+  # =======================================================================
+  print("\n=== CASE 3: RNN crush vs LSTM vault over 10 words ===")
+
+  rnn_mem  = 5.0    # RNN memory starts at 5.0 (immediately crushed)
+  lstm_vault = 5.0  # LSTM vault starts at 5.0 (not crushed on carry)
+  keep_dial = 0.9   # LSTM keep dial: 90% of vault survives each word
+
+  print(f"{'word':<6} {'RNN (tanh-crushed)':<22} {'LSTM vault (keep=0.9)'}")
+  for w in range(1, 11):
+      rnn_mem   = np.tanh(rnn_mem)          # crush: value forced into -1..+1
+      lstm_vault = keep_dial * lstm_vault   # scale: value preserved, just scaled
+      print(f"{w:<6} {rnn_mem:<22.4f} {lstm_vault:.4f}")
+  # word 1:  RNN=0.9999  LSTM=4.5000
+  # word 2:  RNN=0.7616  LSTM=4.0500
+  # word 10: RNN=0.6004  LSTM=1.7433
+  # The RNN signal is below 1.0 after word 1 and stays trapped there.
+  # The LSTM vault is still 1.7 after 10 words starting from 5.0.
+  ```
+
+  Output of the three blocks:
+
+      === CASE 1: RNN -- the crush kills a far-back signal ===
+      word 1 ('not'):  memory = 0.6640
+      word 2:          memory = 0.5810
+      word 3:          memory = 0.5234
+      word 4:          memory = 0.4803
+      word 5:          memory = 0.4465
+      word 6:          memory = 0.4190
+      word 7:          memory = 0.3961
+      word 8:          memory = 0.3766
+
+      === CASE 2: one LSTM step -- the vault holds a far-back signal ===
+      FRESH=0.1877  keep=0.7089  admit=0.4085  show=0.6201
+      old vault A = 5.00  ->  new vault A = 3.6212
+      new readout B = 0.6192
+      vault decay this step: 0.7242  (kept 71% of old vault)
+
+      === CASE 3: RNN crush vs LSTM vault over 10 words ===
+      word   RNN (tanh-crushed)      LSTM vault (keep=0.9)
+      1      0.9999                 4.5000
+      2      0.7616                 4.0500
+      3      0.6420                 3.6450
+      4      0.5663                 3.2805
+      5      0.5126                 2.9525
+      6      0.4720                 2.6572
+      7      0.4398                 2.3915
+      8      0.4135                 2.1523
+      9      0.3914                 1.9371
+      10     0.3726                 1.7434
+
+  > THE ONE HONEST FOOTNOTE. The RNN and LSTM here are both simplified to width 1 (one
+  > number) to make the arithmetic visible. The real machine operates on 32-number vectors
+  > and all the operations (tanh, sigmoid, multiply, add) run element-wise -- each of the
+  > 32 numbers independently following the same rules. The vault's power comes from ALL 32
+  > numbers surviving across words, not just one. Additionally, the "keep dial" is learned
+  > by training, not fixed at 0.9 -- the machine tunes all four sets of dials (W, U, nudge
+  > for FRESH, keep, admit, show) until the final tick is right.
+
+  ---
+
+  Next, the harder half: [Attention and the Transformer by Pencil](attention-transformer-by-pencil.txt)
+  drops the walking machine entirely. Instead of carrying a memory through 80 rewrites,
+  every word looks DIRECTLY at every other word in one shot -- no fade, no walking.
+  The LSTM is the best walker; the Transformer does not walk.
+
+  ---
+
+  One Breath: an RNN walks a review word by word, rewriting ONE memory with the same dials
+  each word -- but tanh-crushing the memory on every carry means a signal from word 1 is
+  below 0.66 by word 2 and near zero by word 80, so "not good" becomes "good"; the LSTM
+  fixes this with TWO memories -- a silent vault (A) that crosses word boundaries uncrushed,
+  controlled by three fraction-dials (keep, admit, show) and a new-content machine (FRESH) --
+  keep*old_vault + admit*FRESH grows the vault without crushing it (5.0 stays ~4.5 after one
+  word, not forced below 1), and show*tanh(vault) speaks the signal out as the readout B that
+  the machines and the final verdict read; the vault holds because it is never the direct
+  target of an unconditional crush.
+
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

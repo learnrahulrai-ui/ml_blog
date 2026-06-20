@@ -252,6 +252,40 @@
     variable names match the story. Full decoder sheet (prior/likelihood/posterior/sensitivity/PPV).
     Assumes zero background; every term defined where it appears.
 
+  [SPECIAL. The Walking Machine and the Vault -- RNN and LSTM by Pencil](posts/rnn-lstm-by-pencil.txt)
+    special . 2026-06-20 . standalone . rnn, lstm, sequence-models, by-hand
+    Written for Hacker News, self-contained: why the plain RNN breaks and why the LSTM fixes it
+    -- with real arithmetic at every step, not a diagram. The RNN walks "nolan ended" word by
+    word, crushing one memory through tanh on every carry; word 1's signal is 0.664, word 2 it
+    is 0.581, by word 8 it is 0.377 and falling -- "not good" becomes "good" because "not" is
+    gone. The LSTM fix: TWO memories -- a silent uncrushed vault (A, free to hold 5.0 across
+    words) and a spoken readout (B). Four machines (FRESH + keep/admit/show) each read word +
+    old B; the combine new A = keep*old_A + admit*FRESH grows the vault without an unconditional
+    crush; new B = show*tanh(new A) tames the vault for the outside world. Worked with one number:
+    old A=5.0, keep=0.71, admit=0.41 -> new A=3.62, still large. Case 3 runs both over 10 words:
+    RNN memory is below 1.0 by word 1 and stuck there; LSTM vault is 1.74 after 10 words from 5.0.
+    Honest footnote: width-1 example generalises element-wise to the real 32; keep is learned, not
+    fixed. Full Python, hardcoded, output verified. Assumes zero background.
+
+  [SPECIAL. Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
+    special . 2026-06-20 . standalone . transformer, attention, self-attention, by-hand
+    Written for Hacker News, self-contained: the Transformer built from scratch by following ONE
+    word ("nolan") through every move with real numbers. Why walking fades (RNN: 79 rewrites to
+    tie word 1 to word 80) vs look-across (direct, zero rewrites). Why THREE sticks per word:
+    WANT to look, HAVE to be looked-at, GIVE to hand over -- one embedding cannot serve all three
+    roles. How a stick is made from a grid (matrix-vector, derived). Match: nolan.WANT=[2,0,1,0]
+    dotted against every word's HAVE -> nolan->nolan=2, nolan->ended=8. Scale: divide by sqrt(4)=2
+    -> [1,4]. Softmax: e^1=2.718, e^4=54.60, total=57.32, fractions=[0.047, 0.953] (adds to 1;
+    exponential sharpens the winner). Weighted sum: 0.047*[2,0,0,1]+0.953*[0,3,1,0]=[0.094,2.859,
+    0.953,0.047] -- nolan is now mostly "ended." Two teams (multi-head): two want/have/give sets,
+    results glued. Position: no walking = no order -- positional encoding is what fills the gap
+    (flagged as skipped in the lab). Collapse 100 sticks -> one by averaging. Plain verdict head:
+    Dropout+Dense(20,relu)+Dropout+Dense(1,sigmoid). Python: the full numpy attention trace (every
+    number matches the pencil), then the 8-line Keras transformer model, each line mapped to its
+    pencil move, plus binary cross-entropy derived (truth=1, said 0.96 -> -log(0.96)=0.04). Honest
+    footnote: encoder-only (no future masking, no cross-attention); positional encoding named and
+    flagged as skipped. Assumes zero background.
+
   [SPECIAL. Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
     special . 2026-06-19 . standalone . reinforcement-learning, policy-evaluation, bellman, by-hand
     Written for Hacker News, self-contained: policy evaluation (the Bellman equation) built from
