@@ -206,6 +206,26 @@
 
   ## A Completely Different Machine: The Two-Cloud Wall
 
+  The problem this machine solves, drawn before the words:
+
+    two groups of dots in 2-column space (column A vs column B):
+
+         column B
+         |   . . .
+         |  . SICK .           cloud of sick dots
+         |   . . .
+         |                |
+         |          WELL  |  <- wall between the two clouds
+         |        . . . . |
+         |       . WELL . |   cloud of well dots
+         |        . . . . |
+         +----------------------------> column A
+
+    LDA finds the direction that MAXIMISES the gap between the two cloud centres
+    while MINIMISING how much the clouds spread in that direction.
+    Then it plants the wall perpendicular to that direction.
+    Score any new lump on that direction; which side it falls on is the label.
+
   IN HAND so far: the leashed S-curve machine (fit plus lambda times squared dials, tight
   setting C = 0.1, which means lambda = 1/0.1 = 10).
   And the receipt that its dials shrank: average size (1.4 + 0.9 + 0.1)/3 = 2.4/3 = 0.80

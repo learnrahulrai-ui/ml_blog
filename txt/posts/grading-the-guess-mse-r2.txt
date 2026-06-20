@@ -36,6 +36,21 @@
   One tells you how big the misses are.
   The other tells you whether you have beaten the village idiot.
 
+  The problem, drawn once before the words:
+
+    car 1:   guess = 20 mpg,   real = 18 mpg,   miss = +2   <- too high by 2
+    car 2:   guess = 16 mpg,   real = 15 mpg,   miss = +1
+    car 3:   guess = 12 mpg,   real = 14 mpg,   miss = -2   <- too low by 2
+
+    ruler 1 (MSE):  how big are the misses?
+    ruler 2 (R^2):  are you better than the single dumbest guess (the average)?
+
+    dumb baseline: ignore everything, guess the average MPG every time
+    good machine: misses LESS than the dumb baseline
+    R^2 = 0 means "as dumb as the baseline"
+    R^2 = 1 means "perfect"
+    R^2 < 0 means "worse than the baseline -- something has gone badly wrong"
+
 
   ## Same Stick, New Sheet
 
