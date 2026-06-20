@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 31 posts: 11 chapters + appendices, in reading order.
+  ALL POSTS -- a book in 32+ posts: 12 chapters + appendices, in reading order.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
@@ -96,10 +96,14 @@
   special     [SPECIAL. Informed Search Jargon -- One Machine, Three Slips, Every Word Debunked](posts/informed-search-jargon.txt)
   special     [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
   special     [SPECIAL. Bayes by Head-Count -- The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild](posts/bayes-shopkeeper.txt)
-  special     [SPECIAL. Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth (Policy Evaluation)](posts/grading-a-plan-policy-evaluation.txt)
-  special     [SPECIAL. Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway (Policy Iteration)](posts/finding-the-best-plan-policy-iteration.txt)
   special     [SPECIAL. The Walking Machine and the Vault -- RNN and LSTM by Pencil](posts/rnn-lstm-by-pencil.txt)
   special     [SPECIAL. Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
+
+
+  CHAPTER 12 -- REINFORCEMENT LEARNING (2026)
+  --------------------------------------------
+  post 32+/32+  [Part 1 -- Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth (Policy Evaluation)](posts/grading-a-plan-policy-evaluation.txt)
+  post 33+/32+  [Part 2 -- Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway (Policy Iteration)](posts/finding-the-best-plan-policy-iteration.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
