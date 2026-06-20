@@ -69,20 +69,32 @@
   ## What "Grade the Plan" Even Means -- the WORTH of a Spot
 
   Someone hands you the PLAN (the arrows). You are NOT asked to improve it. You are asked one
-  thing, for every spot:
+  thing, for every spot: what is this spot's WORTH?
 
-      if the drone starts on this spot and obeys the arrows to the very end,
-      how many points does it walk away with?
+  Worth is NOT the raw physical points the drone walks away with. It is the DISCOUNTED sum: a
+  reward collected k moves from now counts as 0.9^k of itself -- shrunk once per move into the
+  future. So a +5 collected two moves away counts as 0.9^2 * 5 = 4.05, not 5.
 
-  That number is the spot's WORTH. Fill in the worth of every spot and you have graded the
-  plan -- a good plan scores high worths, a bad plan scores low ones. That is the whole job.
-  Nothing here invents arrows or picks a better path. It only SCORES the arrows you were given.
+  Work it out for the runway stack (T at top, M middle, G ground, arrows pointing DOWN):
+
+      worth(T)  =  -0.1              (fuel, NOW, shrunk 0.9^0 = 1)
+                +  0.9 * (-0.1)      (fuel at M, one move away, shrunk once)
+                +  0.9^2 * (+5)      (runway at G, two moves away, shrunk twice)
+               =  -0.1 - 0.09 + 4.05  =  3.86
+
+  The drone physically walks away with  -0.1 - 0.1 + 5 = 4.8 raw points. The worth is 3.86
+  discounted points. The gap (4.8 - 3.86 = 0.94) is not points lost in the world; it is the
+  discount eating into future rewards in the METRIC we chose. Worth measures how good a spot is
+  by the discounted yardstick; that yardstick is what makes the circular Bellman equation below
+  consistent. Fill in the worth of every spot and you have graded the plan -- a good plan scores
+  high worths, a bad plan scores low ones. That is the whole job. Nothing here invents arrows or
+  picks a better path. It only SCORES the arrows you were given, on the discounted scale.
 
 
   ## The One Law (derived, not declared)
 
-  A spot's worth = the points the drone collects from here on, obeying the arrows. Where the
-  spot sits decides the shape.
+  A spot's worth = the DISCOUNTED points the drone collects from here on, obeying the arrows.
+  Where the spot sits decides the shape.
 
   **A ground spot.** Touching the ground ends the flight. Nothing comes after. There is no
   future to count -- the worth is just the points painted there:
@@ -266,18 +278,18 @@
   Cross-check by the circle itself: with A = B = x, the law says x = -0.1 + 0.9x, so 0.1x = -0.1,
   so x = -1. Two routes, same -1.
 
-  Now the punchline. Drop the shrink -- use a plain 1 instead of 0.9. The bracket becomes
-  1 + 1 + 1 + ... = infinity. The worth is -infinity. The walks NEVER settle -- THAT would be
-  the junk-forever you feared. So the 0.9 < 1 is not a mood ("value the future a little less").
-  It is the floor that forbids an infinite bounce from summing to nothing-finite. The shrink is
-  what makes an answer EXIST -- and that is its real job, more often taught as a taste-knob than
-  as the thing keeping the sum finite.
+  Now the punchline. First, the fence: the drone world is episodic -- every path lands eventually,
+  so even with shrink = 1.0 the sum is finite and the math works (T would be 4.8, M 4.9, G 5).
+  The bounce is different. The bounce is a CONTINUING task -- no ground exists, the flight never
+  ends -- and that is the case where the shrink earns its keep.
 
-  The honest fence around that claim: this only bites when the flight can go on forever, like
-  this bounce. If every flight is guaranteed to LAND in a bounded number of moves (an "episodic"
-  world -- think a game that always ends), the sum is already finite and you can set the shrink
-  to 1 with no trouble. The shrink earns its keep precisely in the never-landing case; that is
-  the case almost every real problem is, and the case the bounce above makes concrete.
+  Drop the shrink from the bounce -- use a plain 1 instead of 0.9. The bracket becomes
+  1 + 1 + 1 + ... = infinity. The worth is -infinity. The walks NEVER settle. So for any task
+  that might run forever, 0.9 < 1 is not a mood ("value the future a little less"). It is the
+  floor that forbids an infinite sum from blowing up. Almost every real control problem is a
+  continuing task -- the robot does not stop, the server does not close. That is why the shrink
+  is in the standard formulation: not as a taste-knob but as the thing that keeps totals finite
+  when termination is not guaranteed.
 
 
   ## When to Stop -- delta and theta
@@ -292,12 +304,14 @@
 
   Say what delta < theta does and does NOT mean, exactly. It does NOT mean the table obeys the
   law perfectly -- you can sit a hair below the true value on every spot and still pass. It
-  means the LAST walk barely nudged anything, and here is why that bounds your error: each walk
-  multiplies whatever error is left by 0.9 (the same shrink). Errors shrink geometrically, so a
-  walk that moves less than theta means what is left to move is on the order of theta too. Pick
-  theta small enough and "barely moved" and "basically correct" become the same thing for any
-  use you have. That geometric squeeze -- error times 0.9 every walk -- is the whole guarantee
-  that the walks land at all; it has a fancy name (a contraction), but the 0.9 is all of it.
+  means the LAST walk barely nudged anything, and here is why that bounds your error: in the
+  worst sweep ordering, each walk multiplies whatever error remains by at most 0.9 (the same
+  shrink). In a better ordering -- bottom-to-top when arrows point down -- the error can vanish
+  in a single fill-walk (Case 4 proves it: 27 spots, settled after 1 pass). Either way, 0.9 is
+  a ceiling: the error cannot grow, only shrink. Pick theta small enough and "barely moved" and
+  "basically correct" become the same thing for any use you have. That geometric guarantee -- the
+  0.9 as a ceiling on error growth -- is the whole reason the walks land at all; it has a fancy
+  name (a contraction mapping), but the 0.9 is all of it.
 
   A safety cap on the number of walks is just a seatbelt so a bug cannot loop forever. The real
   stop is delta < theta.
@@ -354,7 +368,8 @@
       --------------------------------------   -------------------------------------------------
       state / s                                a spot -- a place the drone can be
       policy / pi                              the plan -- one arrow per spot, handed to you, fixed
-      value / V(s)                             the spot's worth -- points collected from here on
+      value / V(s)                             the spot's worth -- DISCOUNTED points from here on
+                                               (not the raw sum; future rewards shrunk by 0.9^k)
       reward / R(s)                            the painted points at a spot (+5 / -2 / -0.1)
       terminal state                           a ground spot -- touching it ends the flight
       discount factor / gamma                  the shrink (0.9) -- a future worth counts 0.9 per move
@@ -439,8 +454,10 @@
 
   A, B = 0.0, 0.0   # both start at the lie
 
+  # Gauss-Seidel again: B reads the A just written this same walk, not the frozen old one.
+  # Reproduce with frozen copies (Jacobi) and you get different intermediate numbers.
   A = FUEL + SHRINK * B    # -0.1 + 0.9*0       = -0.1
-  B = FUEL + SHRINK * A    # -0.1 + 0.9*(-0.1)  = -0.19
+  B = FUEL + SHRINK * A    # -0.1 + 0.9*(-0.1)  = -0.19   (reads the NEW A=-0.1)
   print(f"walk 1:  A={A:.4f}   B={B:.4f}")
   # walk 1:  A=-0.1000   B=-0.1900
 
@@ -599,14 +616,16 @@
 
   ---
 
-  One Breath: a spot's worth is the points the drone collects from here obeying the arrows;
-  the worth of an air spot leans on its neighbour's worth (a circle), so you start every spot
-  at a lie of 0 and lay down `-0.1 + 0.9 * worth(next)` again and again -- the painted ground is
-  a fixed anchor the truth climbs out from (one spot per walk in this top-to-bottom, read-in-
-  place order -- a gift of the order, not a law); even a ground-less forever-bounce settles, to
-  -1, because the 0.9 shrink turns an endless sum into a finite one, which is why the discount
-  matters once a flight might never land; and the only thing the engine ever measures is whether
-  the last walk moved anything -- that single delta is the stop rule, not a per-spot check.
+  One Breath: a spot's worth is the DISCOUNTED sum of points collected from here obeying the
+  arrows -- future rewards shrunk by 0.9 per move, so the drone's 4.8 raw points become T's
+  worth of 3.86; the worth of an air spot leans on its neighbour's worth (a circle), so you
+  start every spot at a lie of 0 and lay down `-0.1 + 0.9 * worth(next)` again and again -- the
+  painted ground is a fixed anchor the truth climbs out from (how fast depends on sweep order,
+  not on the algorithm); even a ground-less forever-bounce settles, to -1, because 0.9 < 1 turns
+  the endless sum finite AND squeezes each walk's remaining error by the same factor, which is
+  why the walks land even with no anchor -- not magic, just 0.9 doing two jobs at once; and the
+  only thing the engine measures is whether the last walk moved anything -- that single delta is
+  the stop rule, not a per-spot check.
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
