@@ -54,6 +54,21 @@
 
       start = S      goal = G
 
+  Drawn on paper (each number is a road cost):
+
+           S
+          / \
+         1   4
+        /     \
+       A --1-- B --8-- G
+        \     /       /
+         5   1       2
+          \ /       /
+           C ------+
+
+  The cheapest walk from S to G is NOT the most direct one (S->B->G = 4+8 = 12).
+  It is S->A->B->C->G = 1+1+1+2 = 5. Four roads, less than three.
+
   In code this is a dict of dicts: `graph['B'] = {'S': 4, 'A': 1, 'C': 1, 'G': 8}`. Nothing
   else. The map never changes. Every confusion that comes later traces back to forgetting this.
 

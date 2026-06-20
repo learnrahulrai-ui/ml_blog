@@ -40,6 +40,23 @@
 
   ## The Story (read this once; every problem below lives inside it)
 
+  Here is the whole room, drawn before any words:
+
+    PATIENT                              THE SHOPKEEPER'S STALL
+    (feels          ------ corridor --->  [FAULTY MACHINE]  --> BEEP paper
+     unwell)                              beep = cash for                |
+                                          shopkeeper                     v
+                                                              PATIENT returns to DOCTOR
+                                                              "Given your BEEP paper,
+                                                               how likely are you sick?"
+                                                              <- this is Bayes' question
+
+    Patients who got silence go home: healthy, OR sick but MISSED (THE WILD).
+
+    The machine lies two ways:
+      truly sick  + silence  = MISS    (false negative: machine stayed quiet)
+      truly well  + BEEP     = GLITCH  (false positive: machine fired by mistake)
+
   **THE PATIENT** arrives at the hospital feeling unwell. The doctor forms a suspicion --
   this patient might have a disease. To confirm, the doctor writes a referral slip and sends
   the patient down the corridor.

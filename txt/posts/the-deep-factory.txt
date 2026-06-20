@@ -36,6 +36,31 @@
 
   ## IN HAND
 
+  The factory Part 1 built, drawn as a pipeline:
+
+    32x32x3 photo (3,072 numbers)
+         |
+    [inspector floor 1: 32 magic papers, each 3x3x3=27 dials]
+         | each paper slides the photo, writes one score per position
+         v
+    32 score-sheets, each 30x30  (SAME WIDTH as photo, minus border)
+         |
+    [shrink boss 1: keep loudest of each 2x2 square]
+         v
+    32 score-sheets, each 15x15
+         |
+    [inspector floor 2: 64 magic papers, each 3x3x32=288 dials]
+         v
+    64 score-sheets, each 13x13
+         |
+    [shrink boss 2: keep loudest of each 2x2]
+         v
+    64 score-sheets, each 6x6 = 2,304 numbers  -> flatten -> 2,304 numbers
+         |
+    [Dense room: 64 clerks]  -> 64 numbers
+         |
+    [Dense room: 10 clerks, S-curve] -> 10 chances (one per bin)
+
   IN HAND: simple factory. 32x32x3 photo → 32 inspector papers → boss → 64 papers → boss
   → flatten 4096 → Dense(64) → Dense(10). Dial count: 32x28 + 64x289 + 4096x64+64
   + 64x10+10 = 896 + 18,496 + 262,208 + 650 = 282,250. Five loops → ~60% on the exam pile.

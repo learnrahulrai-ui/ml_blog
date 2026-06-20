@@ -30,7 +30,19 @@
 
   ## A Disease Called Memorising
 
-  Here is the disease in one picture. Train a plain network for thirty passes over the study
+  The five cures this chapter will build, drawn once so you see what is coming:
+
+    CURE 1 -- TAX (weight decay / L2):     every dial pays a fine proportional to its size.
+                                            Keeps dials small; nothing zeroed.
+    CURE 2 -- COFFEE BREAK (dropout):      during study, randomly zero 20% of clerks each pass.
+                                            Forces every clerk to work independently.
+    CURE 3 -- FIRE ALARM (early stopping): watch the practice score. When it stops climbing, stop.
+                                            Saves the best dials seen so far.
+    CURE 4 -- HUMBLER (batch norm):        after each room, tame the numbers to mean~0, spread~1.
+                                            Steadies the dials so they do not chase scale gaps.
+    CURE 5 -- SMALLER BUILDING (less capacity): fewer clerks, fewer dials, less room to memorise.
+
+    All five face the SAME disease. Here is the disease in one picture. Train a plain network for thirty passes over the study
   pile and plot two scores each pass: how well it does on the study pile it learns from, and
   how well it does on a held-aside practice pile it only watches.
 

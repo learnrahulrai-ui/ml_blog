@@ -80,6 +80,20 @@
   Machine learning, in one sentence: find a mathematical rule that maps the thirty
   measurements to the answer, by studying examples where we already know the answer.
 
+  The building we are going to build, drawn before the words arrive:
+
+    30 measurements                              one verdict
+    [ radius   ]                                 [ 1 = malignant ]
+    [ texture  ]  -> [Room 1: 16 clerks]  -> [Room 2: 8 clerks]  -> [1 clerk]  -> 0-1
+    [ smoothn. ]     multiply, add, bend        multiply, add, bend   squash to
+    [ ...      ]     every negative up          every negative up     a chance
+    [ 30 cols  ]         (ReLU)                     (ReLU)            (S-curve)
+                         |                              |
+                         v                              v
+                     16 numbers out               8 numbers out
+
+  That is the whole building. The rest of this post builds each room one brick at a time.
+
   The rule we are going to find is a building full of clerks, working in groups we will call
   ROOMS.
   A room is nothing more than a bunch of clerks working side by side at the same stage.

@@ -48,6 +48,24 @@
 
   ## A Machine Only Compares Numbers, and the Cupcake Was Never the Point
 
+  The setup, drawn before any words:
+
+    SECRET (only the scorer sees this):  [1, 3, 2, 1]
+
+    POPULATION (your current guesses):
+    guess 1 = [1, 3, 2, 4]   wrong by: |4-1| = 3      total error = 3
+    guess 2 = [1, 3, 4, 4]   wrong by: |4-2|+|4-1|=5  total error = 5
+    guess 3 = [2, 2, 2, 1]   wrong by: |2-1|+|3-2|=2  total error = 2
+    guess 4 = [1, 2, 2, 1]   wrong by: |2-3| = 1      total error = 1  <- best
+
+    one round:
+    SCORE each guess  ->  flip to goodness (small error = big chance)
+      ->  spin wheel twice (pick two parents by chance)
+      ->  CUT each parent at one point and GLUE halves together (crossover)
+      ->  maybe TWEAK one slot at random (mutation)
+      ->  one baby; repeat until a full new population
+      ->  babies replace everyone  ->  re-score  ->  repeat
+
   There is a secret row of numbers you are hunting. In the full task it is 8 numbers; here,
   to fit on paper, it is 4, each between 1 and 4:
 

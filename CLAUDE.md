@@ -63,10 +63,8 @@ Monitor loops for deployment status.
 
 ## Branch
 - `main` -- the only branch Claude ever touches. Live blog. GitHub Pages deploys from here.
-- `audit` -- orphan branch (no shared history with main). Contains ONLY `reports/`.
-  Anyone can fork it, drop a `.audit` file in `reports/`, push back. Claude never commits here.
-  When Rahul asks Claude to apply audits, Claude reads `reports/` on the audit branch and
-  fixes `main`. The audit branch is never deployed.
+- Audit rules and reports live LOCALLY ONLY (never pushed to GitHub on any branch).
+  They are Rahul's proprietary rules and must not appear on any public branch.
 - Never push to a branch other than `main` without explicit permission.
 - Never create a PR unless the user explicitly asks.
 

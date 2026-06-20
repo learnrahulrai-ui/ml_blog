@@ -41,6 +41,30 @@
   The zero-out rule, called ReLU, forces any negative result to zero.
   Everything else, we build here.
 
+  The problem, drawn before any words:
+
+    OLD WAY -- flat line (one room of clerks reads this):
+      [255, 0, 30, 200, 18, 220, 5, 45, ...]  <- 784 numbers in a row
+       spot(0,0) spot(0,1) spot(0,2) ...
+    problem: spot(0,0)'s TRUE neighbour is spot(1,0), which sits 32 places later.
+    The flat line LOSES the "next to" relationship.
+
+    THIS CHAPTER -- keep the grid:
+      row 0:  [255][ 0 ][30 ]  ...  (32 spots wide)
+      row 1:  [200][18 ][220]  ...
+      row 2:  [ 5 ][45 ][...]  ...
+              ...              (32 rows tall)
+
+    SLIDING WINDOW -- a tiny magic paper moves across the grid:
+      +---+---+
+      |255| 0 |  <- the window covers one 2x2 patch (or 3x3 in real CNNs)
+      +---+---+     the worker reads these 4 numbers, multiplies each by its own dial,
+      |200|18 |     adds them up, bends any negative to 0, writes ONE score.
+      +---+---+
+      slide right: window now covers [0][30][18][220] -> writes one more score
+      slide again: ... until every patch has been scored
+      result: one sheet of scores, same size as the photo but thinner
+
 
   ## Sheet of Colour Photos, and Goal
 

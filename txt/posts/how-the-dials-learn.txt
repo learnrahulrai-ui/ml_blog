@@ -22,6 +22,24 @@
   that. Here we make the dials LEARN -- and we do it the honest way, by computing the actual
   slopes by hand, with the chain rule, on a tiny network you can hold in your head.
 
+  The problem and the fix, drawn before anything else:
+
+    dials are wrong -> loss (wrongness) is HIGH
+    dials are right -> loss is LOW
+
+    loss                    <- think of wrongness as height
+     |  *                      we want to roll the dials DOWN to the valley
+     |    *
+     |      *
+     |          *
+     |              *  *  <- valley: lowest wrongness, best dials
+     +--------------------> dial value
+                  ^
+                  | roll toward this
+
+    The slope at any point tells us which way is downhill.
+    Backpropagation computes that slope for ALL 641 dials at once.
+
   If you have not read Part 1, the one thing you need from it is this: a clerk takes its
   inputs, multiplies each by a dial, adds them with a nudge to make a raw score Z, and either
   bends Z at zero (the zero-out rule, between rooms) or squashes it into a probability with

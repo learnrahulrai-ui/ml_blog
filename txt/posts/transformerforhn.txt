@@ -39,6 +39,32 @@
   middle 0 and typical-distance 1), softmax (turning scores into shares that add to 1),
   and ReLU (zeroing every negative number). Each is fully spelled out where it first runs.
 
+  The block, drawn before any algebra:
+
+    "cat"  -->  [word-row + seat-stamp]  =  x_cat = [2, 1, 1, 0]
+    "sat"  -->  [word-row + seat-stamp]  =  x_sat = [0, 1, 2, 1]
+                        |
+                    tame (LayerNorm)
+                        |
+              +---------+---------+
+              |                   |
+           x_cat               x_sat
+        three branches:      three branches:
+        ASK / OFFER / HANDOVER
+              |                   |
+        ASK_cat dot OFFER_cat  = self-score
+        ASK_cat dot OFFER_sat  = cross-score
+              |
+          softmax -> shares  (how much to listen to each word)
+              |
+     shares x HANDOVER_cat + shares x HANDOVER_sat = new_x_cat  (richer row)
+              |
+          + original x_cat  (add-the-original so nothing is lost)
+              |
+          tame  ->  small worker (two layers)  ->  + stream  ->  out
+
+  Two words go in. Two richer words come out. That is one block.
+
 
   ## A Machine Only Multiplies Numbers, and "cat" Is Not a Number -- So Hand It a Row
 

@@ -31,6 +31,24 @@
 
   The whole ladder, named once so you see the shape, then built rung by rung below:
 
+      RUNG 5 (learning)   [learns from feedback; updates its own model]
+         ^
+         | + one power: scores and model update, no longer frozen
+      RUNG 4 (scorecard)  [assigns a happiness number to outcomes]
+         ^
+         | + one power: ranks outcomes by expected happiness
+      RUNG 3 (sketchpad)  [imagines futures before committing a paw]
+         ^
+         | + one power: a goal + mental simulation
+      RUNG 2 (diary)      [remembers the past after the eyes go blank]
+         ^
+         | + one power: memory that survives one round
+      RUNG 1 (twitch)     [reacts only to what the eyes catch right now]
+
+      Same room on every rung:
+      positions :  0   1   2   3   4
+      start     :  C   .   .   .   M     (C=cat, M=mouse; cat cannot see past 1 cell)
+
       RUNG 1 (twitch)    -- wiring table: what the eyes catch right now -> one fixed action
       RUNG 2 (diary)     -- + a memory that survives after the eyes go blank
       RUNG 3 (sketchpad) -- + a goal, and trying moves in imagination before the paws move
