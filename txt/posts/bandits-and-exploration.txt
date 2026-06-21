@@ -10,9 +10,9 @@
   Posted: 2026-06-21 . Author: Rahul Rai . Tags: reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
   ============================================================================================
 
-  PATH . post 32/34 . part 1 of 3 in Chapter 12 -- Reinforcement Learning
+  PATH . post 32/35 . part 1 of 4 in Chapter 12 -- Reinforcement Learning
     <- prev:  [Chapter 12 intro: The Agent Ladder](the-agent-ladder.txt)
-       next:  [Chapter 12, Part 2: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt) ->
+       next:  [Chapter 12, Part 2: Worth and Bellman from Zero](worth-and-bellman-from-zero.txt) ->
 
   Every term defined where it first appears. Every number worked in front of you. Pencil is enough.
 

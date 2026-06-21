@@ -1,0 +1,662 @@
+@title Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 12 . REINFORCEMENT LEARNING FROM ZERO
+  Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches
+  Posted: 2026-06-22 . Author: Rahul Rai . Tags: reinforcement-learning, bellman, mdp, value-function, discount, by-hand
+  ============================================================================================
+
+  PATH . post 33/35 . part 2 of 4 in Chapter 12 -- Reinforcement Learning
+    <- prev:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt)
+       next:  [Chapter 12, Part 3: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt) ->
+
+  Every number worked in front of you. Every word defined where it first appears.
+  Anything named more than five lines ago is named again. One idea at a time.
+  A pencil and this page are the whole kit.
+
+  ---------------------------------------------------------------------------
+
+  The bandits lesson (Part 1) gave one spot and a row of arms. The shopkeeper at his clinic
+  counter never moved -- he stayed put, picked which arm to pull, watched the payout arrive,
+  and updated his guess of each arm's true average. The worth of an arm was that average.
+  Nothing behind it.
+
+  That is the simplest possible case. A real agent lives in a world with many spots, arrows
+  between them, and a worth that cannot be pinned to one spot alone: the worth of a spot
+  leans on the worth of the next spot, and the next on the one after. The drone in Part 3
+  lives in that world -- 27 spots, fixed arrows, worths that circle back on each other.
+
+  Something must be laid before you can grade or improve any plan. That something is what
+  "worth" actually means when the world has many spots, when a move can land in more than
+  one place by chance, and when the future goes on. This post lays that floor, piece by piece.
+
+  ---------------------------------------------------------------------------
+
+  A RETURN IS A PILE OF REWARDS, NOTHING MORE
+
+  A reward is a number you grab on a single move. Three moves, collecting +2, then +1, then +3:
+
+    now ──(+2)──► ──(+1)──► ──(+3)──► done
+    pile = 2 + 1 + 3 = 6
+
+  That pile -- all rewards grabbed from a moment on, added straight up -- is the return.
+  That is all "return" means: an addition. Nothing fancier.
+
+  The worth of a spot is a measure of that pile: "if I stand here and keep moving under some
+  plan, how big a pile do I collect?" The next four sections answer what the pile needs before
+  you can compute it: what if the rewards are unsure, what if the pile runs forever, does it
+  always end, and where do the entries come from?
+
+  ---------------------------------------------------------------------------
+
+  WHEN THE REWARD IS UNSURE, AVERAGE IT
+
+  A reward can be unsure -- the world rolls a die for it on each move. To see what you expect
+  per try, run the move many times and read the per-try average.
+
+  One move that pays +1 (chance ½) or +3 (chance ½). Run it 10 times:
+
+    runs:    1   1   1   1   1   3   3   3   3   3      ← five 1s, five 3s
+    pile     = 5 × 1  +  5 × 3  =  5  +  15  =  20
+    per try  = 20 ÷ 10 = 2
+
+  There is a shortcut that skips the 10 runs -- value × chance, added:
+
+    1 × ½  +  3 × ½  =  0.5  +  1.5  =  2
+
+  Same 2. That per-try number -- value × chance, added -- is the average (the mean).
+
+  The shortcut value × chance, added is the pile-of-10 reasoning applied without the 10 runs.
+  If a machine pays random amounts each use, its true average (the mean reward per use) is
+  exactly this: each possible payout × its probability, added.
+
+  >> YOUR TURN
+     A move pays 0 (chance ¼) or +4 (chance ¾). What is the average reward?
+
+     check your work:   0 × ¼  +  4 × ¾  =  0  +  3  =  3
+
+  Why only the average matters: the worth recipe (coming below) has exactly one slot for the
+  reward. Two moves with the same average but different noise drop the same number into that
+  slot -- so they produce the same worth. Proof in numbers (landing on a spot worth 10,
+  γ = 0.9, which is the fade defined in the next section):
+
+    story A:  pays +2 (chance ½) or 0 (chance ½)  →  average = 1
+    story B:  pays +1 flat                         →  average = 1
+
+    story A worth:  1  +  0.9 × 10  =  10.0
+    story B worth:  1  +  0.9 × 10  =  10.0
+
+  Same 10. The full noise pattern is irrelevant -- only the mean enters the recipe.
+
+  ---------------------------------------------------------------------------
+
+  THE FADE (γ): AN ENDLESS PILE MUST STAY FINITE
+
+  A reward later counts for less than the same reward now. The amount of fading per move is
+  one number: γ (gamma). These posts use γ = 0.9.
+
+  A +10 reward. What it is worth to you NOW, depending on when it arrives:
+
+    +10 right now           =  10
+    +10, one move off       =  0.9 × 10  =   9.0
+    +10, two moves off      =  0.9 ×  9  =   8.1
+    +10, three moves off    =  0.9 × 8.1 =   7.29
+
+  Each step further multiplies by 0.9 again. A reward k moves away is worth (0.9)^k × reward.
+
+  The reason for the fade is not impatience -- it is finiteness. Without it, a task that
+  runs forever and grabs +1 every move would accumulate:
+
+    1 + 1 + 1 + ...  →  no limit
+
+  That is not a number. With γ = 0.9, the endless +1 pile becomes:
+
+    1  +  0.9  +  0.9²  +  0.9³  +  ...
+
+  Call that whole pile S. Every term after the first is 0.9 times the same pile:
+
+    S      =  1  +  0.9 × S
+    S − 0.9 × S  =  1
+    S × (1 − 0.9)  =  1
+    S × 0.1  =  1
+    S  =  1 / 0.1  =  10
+
+  A +1 every move, faded at γ = 0.9, is worth 10 right now. More generally: an endless
+  stream of +1 at fade γ is worth 1 / (1 − γ). γ is what keeps an endless pile finite --
+  not a mood knob for impatience, but the thing that makes the math work at all.
+
+  ---------------------------------------------------------------------------
+
+  EPISODIC TASKS END; CONTINUING TASKS RUN FOREVER
+
+  Two shapes of task:
+
+    EPISODIC  :  start ──► ──► ──► [done]      pile ends when the task ends
+    CONTINUING:  start ──► ──► ──► ──► ...     pile grows without stopping
+
+  Episodic: the task hits a terminal spot and stops. The pile is finite on its own --
+  no fade needed. The drone from Part 3 lands on the runway: episodic.
+
+  Continuing: no terminal spot. The pile would grow forever. An air-conditioning unit
+  that runs and adjusts on and on: continuing. It NEEDS the fade (γ < 1) to make the
+  pile a finite number.
+
+  A one-move episodic task (one arrow, then done) has no future. The pile is just the
+  reward from that one move. The worth of a bandit arm is exactly this: one-step episodic,
+  worth = average reward, no fade. The bandit from Part 1 is the simplest possible case of
+  the worth idea -- one spot, one move, nothing after.
+
+  ---------------------------------------------------------------------------
+
+  THE WORLD'S DIE: WHERE YOU LAND IS NOT ALWAYS CERTAIN
+
+  When you pick an arrow from a spot, the world rolls a die. That die decides two things at
+  once: where you land and what reward you grab. The chances of that roll are written:
+
+    p( landing,  reward  |  spot,  arrow )
+       ↑ the outcomes        ↑ what you chose
+
+  Read: "given this spot and this arrow, the chance of landing there with that reward."
+
+  One spot, arrow →, the world's die:
+
+    ┌────────────────────────────────────────────────────┐
+    │  spot HERE,  arrow →                              │
+    │                                                   │
+    │  chance ½  →  land on spot X,  reward +2          │
+    │  chance ½  →  land on spot Y,  reward +2          │
+    │                                                   │
+    │  p( X, +2 | HERE, → ) = 0.5                      │
+    │  p( Y, +2 | HERE, → ) = 0.5                      │
+    └────────────────────────────────────────────────────┘
+
+  This is the only place randomness lives in the whole world model. Every sum you see
+  written "Σ over (landing, reward) of p(...) × something" means: average over the die --
+  value × chance, added, from the averaging section above.
+
+  In the toy worlds used in Parts 3 and 4, the drone's arrow always lands in exactly one
+  next spot (the die has only one outcome). That is a special case of p -- one outcome with
+  probability 1.0. The recipe handles both cases; the toy just happens to be the easy one.
+
+  ---------------------------------------------------------------------------
+
+  A POLICY IS A FIXED MAP OR A DICE OVER ARROWS
+
+  A policy is the rule you use to pick an arrow at each spot. Two kinds:
+
+    ┌────────────────────────────────────────────────────────────────┐
+    │  DETERMINISTIC:  one fixed arrow at every spot                │
+    │                                                               │
+    │    spot S  →  arrow always points left (no dice)             │
+    │                                                               │
+    │  STOCHASTIC:  a die over the arrows, with chances             │
+    │                                                               │
+    │    spot S  →  left (chance 0.7),  right (chance 0.3)         │
+    └────────────────────────────────────────────────────────────────┘
+
+  Deterministic: one fixed arrow per spot. No randomness in the choice.
+  Stochastic: you roll to pick your own arrow. The policy itself is noisy.
+
+  Key fact (proved in the "ties" section below): a deterministic optimal policy always
+  exists. You are never forced into stochastic arrows to achieve the best possible worth.
+
+  ---------------------------------------------------------------------------
+
+  V AND Q: TWO SEPARATE WORTH-MACHINES
+
+  Two machines both hand back a worth. They differ by what you feed in:
+
+    ┌──────────────────────────────────────────────────────────────────┐
+    │                                                                 │
+    │  V :  spot  ─────────────────────────────►  worth              │
+    │        one thing in (where am I?)                              │
+    │                                                                 │
+    │  Q :  spot + arrow  ────────────────────►  worth               │
+    │        two things in (where am I, which move first?)           │
+    │                                                                 │
+    └──────────────────────────────────────────────────────────────────┘
+
+  V( spot ) = worth of being here, then following the map at every spot afterward.
+  Q( spot, arrow ) = worth of taking THAT arrow first, then following the map afterward.
+
+  They are not one machine with two inputs -- they are two separate machines. V takes one
+  thing; Q takes two. The question "does a value function take 1 or 2 arguments?" has a
+  clean answer: there are two value functions, V takes 1 and Q takes 2.
+
+  For a bandit (one spot, one move then done), Q( spot, arm ) = average reward of that arm.
+  That is the entire worth of taking the arm. V at the bandit's single spot is the average
+  Q over whichever arm the map picks.
+
+  Policy evaluation (Part 3) fills in V at every spot. Policy iteration (Part 4) uses Q
+  to choose better arrows. The recipe below defines both.
+
+  ---------------------------------------------------------------------------
+
+  THE BELLMAN RECIPE: WORTH = REWARD NOW + FADED WORTH NEXT
+
+  The recipe that defines V and Q for any fixed map:
+
+    Q( spot, arrow )  =  mean reward grabbed now
+                       +  γ  ×  average worth of where you land
+
+  "Average worth of where you land" means: for each possible landing spot and reward
+  (each outcome of the world's die), take worth-of-landing-spot × chance, then add them.
+
+  Worked. Spot HERE. Arrow →. World's die from the picture above.
+
+  Outcome X (chance 0.5):  land on a spot worth 10,  reward +2
+  Outcome Y (chance 0.5):  land on a spot worth  0,  reward +2
+
+  γ = 0.9.
+
+    Q( HERE, → )
+
+      =  chance of X  ×  [ reward from X  +  γ × worth of landing X ]
+       + chance of Y  ×  [ reward from Y  +  γ × worth of landing Y ]
+
+      =  0.5  ×  [ 2  +  0.9 × 10 ]
+       + 0.5  ×  [ 2  +  0.9 ×  0 ]
+
+      =  0.5  ×  [ 2  +  9.0 ]
+       + 0.5  ×  [ 2  +  0.0 ]
+
+      =  0.5  ×  11
+       + 0.5  ×   2
+
+      =  5.5  +  1.0
+
+      =  6.5
+
+  >> YOUR TURN
+     Same setup. But landing on spot X is now worth 5 (not 10). Landing on Y still worth 0.
+     Both outcomes still reward +2 with chance ½. γ = 0.9. Compute Q( HERE, → ).
+
+     check your work:
+     outcome X = 0.5 × (2 + 0.9×5) = 0.5 × (2 + 4.5) = 0.5 × 6.5 = 3.25
+     outcome Y = 0.5 × (2 + 0.9×0) = 0.5 × 2.0        = 0.5 × 2.0 = 1.00
+     Q( HERE, → ) = 3.25 + 1.00 = 4.25
+
+  ---------------------------------------------------------------------------
+
+  GREEDY TAKES THE BEST ARROW -- THE BELLMAN OPTIMALITY EQUATION
+
+  The recipe above grades a fixed map. But what if you want the best possible worth?
+
+  Greedy = at each spot, pick the arrow with the highest Q-value -- the max. The Bellman
+  optimality equation replaces "follow the map" with "take the best arrow":
+
+    V*( spot )  =  max over arrows  [ mean reward  +  γ × average V* of next spot ]
+
+  V* is the optimal worth -- the pile you collect under the best possible plan.
+
+  Worked. One spot. Two arrows. Both land on a spot worth 5. γ = 0.9.
+
+    arrow left :  reward = 1  →  1  +  0.9 × 5  =  1  +  4.5  =  5.5
+    arrow right:  reward = 2  →  2  +  0.9 × 5  =  2  +  4.5  =  6.5
+
+    V*( spot ) = max( 5.5,  6.5 ) = 6.5    ← right is best
+
+  ** KEY TRAP: the optimality equation holds for V* alone -- NOT for any map that uses
+     greedy as its rule. Going greedy on a WRONG worth-map does not make that map obey
+     the equation. A map of all-zeros applied greedily just takes the biggest immediate
+     reward and has nothing to do with V*. The equation is a statement about V* itself;
+     it names no policy. In policy iteration (Part 4), you go greedy with respect to the
+     CURRENT worth, not with respect to V* directly -- you iterate until the worth is
+     good enough that greedy with respect to it is the same as greedy with respect to V*.
+
+  ---------------------------------------------------------------------------
+
+  THE BEST MAP MAY TIE; THE BEST WORTH NEVER DOES
+
+  Sometimes two arrows at a spot are equally good. Draw it:
+
+              spot T
+             /       \
+          left       right
+            ↓           ↓
+        worth 5     worth 5     ← equal
+
+  Four facts off this one picture:
+
+    unique best map?                NO   -- "always left" and "always right" both win
+    a FIXED (deterministic) best?   YES  -- "always left" has one fixed arrow and is best
+    unique best worth?              YES  -- both arrows give 5; spot's best worth is 5
+    forced into a stochastic map?   NO   -- "always left" is deterministic and is best
+
+  KEEPER: many best maps can share one best worth. The map may tie; the worth never splits.
+
+  In every finite MDP: a deterministic optimal policy always exists. The optimal worth V* is
+  unique -- you might not have a unique best map (when arrows tie), but V* is always one
+  number at each spot, not a range.
+
+  ---------------------------------------------------------------------------
+
+  ONLY THE MEAN REWARD ENTERS THE RECIPE
+
+  The "only the average matters" fact from the start of this post (two noise stories, same
+  average, same worth) has a clean consequence for the recipe. The reward slot holds one
+  number -- the mean. Name the mean reward of a spot-and-arrow pair r(s, a). The recipe
+  splits cleanly:
+
+    worth( spot ) = r(s, a)       +   γ  ×  Σ  p(landing | spot, arrow) × worth(landing)
+                    ↑ mean reward      ↑ faded next-worth, averaged over the die
+
+  The reward slot holds the mean. The future slot holds the average over where you land.
+  The split is exact -- nothing is hidden.
+
+  Why name r(s, a) separately? Because in some worlds the landing spot and the reward are
+  independent: where you end up does not determine what you earned on the way. The r(s, a)
+  split makes that independence visible in the formula.
+
+  ---------------------------------------------------------------------------
+
+  γ DECIDES WHICH STRATEGY WINS
+
+  The fade γ does not merely scale the future -- it changes which arrow is best.
+
+  One decision spot. Two arrows:
+
+    left  : grabs +1 now, then keeps earning +1 with no end  →  worth = 1 / (1 − γ)
+    right : grabs +2 once, then nothing                      →  worth = 2   (for any γ)
+
+  The worth of "left" uses the geometric-series formula from the fade section above:
+  1 / (1 − γ). Turn the γ knob:
+
+    γ = 0.0 :  left = 1 / (1 − 0.0) = 1 / 1.0 = 1.0    right = 2   →  RIGHT wins
+    γ = 0.5 :  left = 1 / (1 − 0.5) = 1 / 0.5 = 2.0    right = 2   →  TIE
+    γ = 0.9 :  left = 1 / (1 − 0.9) = 1 / 0.1 = 10.0   right = 2   →  LEFT wins
+
+  The winner flips with the fade. Small γ (short-sighted: only now matters) takes the big
+  reward now. Large γ (far-sighted: the future matters a lot) takes the small-but-endless
+  stream. At γ = 0.5 exactly they tie.
+
+  This means: change γ and you change the best policy. γ is not a detail of the recipe --
+  it is a choice that decides what behaviour you are rewarding.
+
+  ---------------------------------------------------------------------------
+
+  V IS THE AVERAGE OF Q OVER THE MAP
+
+  V at a spot and Q at a spot-and-arrow are connected by the map:
+
+    V( spot ) = Σ over arrows  [ chance map picks this arrow ] × Q( spot, arrow )
+
+  In words: V is the average of Q over however the map spreads probability across arrows.
+
+  Worked. Q( HERE, → ) = 6.5  (from the Bellman recipe section above).
+  Q( HERE, ← ) = 5.5  (given). Map flips a coin: each arrow with chance 0.5.
+
+    V( HERE ) = 0.5 × 6.5  +  0.5 × 5.5
+             = 3.25  +  2.75
+             = 6.0
+
+  No extra γ. The fade is already inside each Q. Adding it again would double-fade the future
+  and give the wrong number.
+
+  The OPTIMAL V uses max instead of the map-weighted average:
+
+    V*( HERE ) = max( Q*( HERE, → ),  Q*( HERE, ← ) )
+              = max( 6.5,  5.5 )
+              = 6.5
+
+  ---------------------------------------------------------------------------
+
+  A BANDIT IS A ONE-SPOT MDP -- AND Q IS THE ARM'S AVERAGE
+
+  Take an MDP with one spot and one move that ends it (episodic, one step). No next spot
+  -- no future -- so an arrow's worth is just its average reward:
+
+    Q( spot, arm ) = average reward of that arm
+
+  That is a bandit: one spot, a row of arms, Q = mean reward per arm. The multi-armed bandit
+  from Part 1 is an MDP with one spot and N arrows. Every Q-value there was an arm's average
+  payout. The "greedy lock" (first positive estimate captures all future patients) was a
+  policy optimization failure in a one-spot MDP. Epsilon-greedy was a stochastic policy.
+
+  V at the bandit's single spot = average of Q over the map's arm-probabilities.
+
+  When two arms are equally optimal (same average), both are best arrows. The equal-average
+  condition:
+
+  LEFT pays +1 (chance p) or +3 (chance 1−p). Average of LEFT:
+
+    1 × p  +  3 × (1 − p)  =  p  +  3  −  3p  =  3  −  2p
+
+  RIGHT pays 0 (chance q) or +10 (chance 1−q). Average of RIGHT:
+
+    0 × q  +  10 × (1 − q)  =  10  −  10q
+
+  Set equal -- arms equally optimal:
+
+    3 − 2p  =  10 − 10q
+    3 − 2p + 10q  =  10        ← add 10q to both sides
+    10q  =  10 − 3 + 2p        ← subtract 3, add 2p to both sides
+    10q  =  7 + 2p
+
+  Verify with p = 0.5:  q = (7 + 2 × 0.5) / 10 = (7 + 1.0) / 10 = 8.0 / 10 = 0.8
+    average of LEFT   = 3 − 2 × 0.5  = 3 − 1.0  = 2.0
+    average of RIGHT  = 10 − 10 × 0.8 = 10 − 8.0 = 2.0   ✓
+
+  ---------------------------------------------------------------------------
+
+  THE FLOOR, COMPLETE
+
+  Every piece above connects to the next:
+
+    a return is a pile of rewards, added
+      ↓  but rewards can be unsure
+    average: value × chance, added = what you pull per try
+      ↓  but an endless pile is not a number
+    fade γ < 1  →  endless pile = 1 / (1 − γ), a finite number
+      ↓  but does the pile end on its own?
+    episodic (task ends, no fade required) vs continuing (runs forever, γ < 1 required)
+      ↓  now: where does each pile-entry come from?
+    the world's die  p(landing, reward | spot, arrow) -- the only randomness in the model
+      ↓  and how do you choose which arrow?
+    the map (policy) -- fixed arrow per spot or dice over arrows
+      ↓  given a map, what is a spot worth?
+    V (one input: spot) and Q (two inputs: spot + arrow) -- two separate worth-machines
+      ↓  how do you compute them?
+    Bellman recipe: worth = mean reward + γ × average next-worth over the die
+      ↓  the recipe grades a fixed map -- what if you want the BEST map?
+    Bellman optimality: worth* takes max over arrows (not the map average)
+      ↓  is the best map unique?
+    the map may tie; a deterministic best always exists; V* itself is unique
+      ↓  does γ change which strategy is best?
+    yes -- γ flips the winning arrow between now-big and later-endless
+      ↓  how do V and Q connect?
+    V = average of Q over the map (no extra γ; the fade is already inside Q)
+
+  Policy evaluation (Part 3) takes a fixed map and runs the Bellman recipe at every spot
+  until the worths stop moving. Policy iteration (Part 4) also finds the arrows that
+  maximize the recipe at every spot. Both assume everything above.
+
+  ---------------------------------------------------------------------------
+
+  THE NUMBERS, IN PYTHON
+
+  All code below is hard-coded. No for or while loops. Every intermediate value is
+  shown with the actual number, not a variable name standing in for it.
+
+  ---------------------------------------------------------------------------
+
+  # ── return is a pile ──────────────────────────────────────────────────────────────────────
+
+  r_move1 = 2     # reward on move 1
+  r_move2 = 1     # reward on move 2
+  r_move3 = 3     # reward on move 3
+
+  pile = r_move1 + r_move2 + r_move3   # 2 + 1 + 3 = 6
+  print("return:", pile)                # return: 6
+
+
+  # ── average of an unsure reward ───────────────────────────────────────────────────────────
+
+  # move pays +1 (chance 1/2) or +3 (chance 1/2)
+  reward_low  = 1
+  reward_high = 3
+  prob_low    = 0.5
+  prob_high   = 0.5
+
+  avg_reward = reward_low * prob_low   +   reward_high * prob_high
+  #          = 1          * 0.5        +   3           * 0.5
+  #          = 0.5                     +   1.5
+  #          = 2.0
+  print("average reward:", avg_reward)    # average reward: 2.0
+
+
+  # ── fade γ: +10 faded by distance; endless +1 stays finite ───────────────────────────────
+
+  gamma = 0.9
+
+  worth_now       = 10 * (0.9 ** 0)    # = 10 × 1.000 = 10.0
+  worth_1_off     = 10 * (0.9 ** 1)    # = 10 × 0.900 = 9.0
+  worth_2_off     = 10 * (0.9 ** 2)    # = 10 × 0.810 = 8.1
+  worth_3_off     = 10 * (0.9 ** 3)    # = 10 × 0.729 = 7.29
+
+  print(worth_now, worth_1_off, worth_2_off, worth_3_off)
+  # 10.0  9.0  8.1  7.29
+
+  endless_1_per_move = 1 / (1 - gamma)  # = 1 / 0.1 = 10.0
+  print("endless +1 at γ=0.9:", endless_1_per_move)   # 10.0
+
+
+  # ── Q(s,a) from the Bellman recipe ────────────────────────────────────────────────────────
+
+  # spot HERE. arrow →. two outcomes.
+  # outcome X (chance 0.5): land on spot worth 10, reward +2
+  # outcome Y (chance 0.5): land on spot worth  0, reward +2
+
+  gamma        = 0.9
+  prob_X       = 0.5
+  reward_X     = 2
+  worth_land_X = 10
+
+  prob_Y       = 0.5
+  reward_Y     = 2
+  worth_land_Y = 0
+
+  term_X = prob_X  *  (reward_X  +  gamma * worth_land_X)
+  #       = 0.5    *  (2         +  0.9   * 10)
+  #       = 0.5    *  (2         +  9.0)
+  #       = 0.5    *  11
+  #       = 5.5
+
+  term_Y = prob_Y  *  (reward_Y  +  gamma * worth_land_Y)
+  #       = 0.5    *  (2         +  0.9   * 0)
+  #       = 0.5    *  (2         +  0.0)
+  #       = 0.5    *  2
+  #       = 1.0
+
+  Q_here_right = term_X + term_Y
+  #            = 5.5    + 1.0
+  #            = 6.5
+  print("Q(HERE, →):", Q_here_right)    # Q(HERE, →): 6.5
+
+
+  # ── V from Q: the map averages the arrow-worths ───────────────────────────────────────────
+
+  Q_right = 6.5   # Q(HERE, →) from above
+  Q_left  = 5.5   # Q(HERE, ←) given
+
+  prob_map_right = 0.5   # map flips a coin
+  prob_map_left  = 0.5
+
+  V_here = prob_map_right * Q_right  +  prob_map_left * Q_left
+  #       = 0.5           * 6.5      +  0.5           * 5.5
+  #       = 3.25                     +  2.75
+  #       = 6.0
+  print("V(HERE):", V_here)          # V(HERE): 6.0
+
+  V_star_here = max(Q_right, Q_left)   # max(6.5, 5.5) = 6.5  ← optimal: take right
+  print("V*(HERE):", V_star_here)      # V*(HERE): 6.5
+
+
+  # ── Bellman optimality: one spot, two arrows, both land on worth-5 spot ───────────────────
+
+  gamma      = 0.9
+  worth_next = 5    # both arrows land on a spot worth 5
+
+  Q_left_opt  = 1  +  gamma * worth_next   # = 1 + 0.9×5 = 1 + 4.5 = 5.5
+  Q_right_opt = 2  +  gamma * worth_next   # = 2 + 0.9×5 = 2 + 4.5 = 6.5
+
+  V_star = max(Q_left_opt, Q_right_opt)    # max(5.5, 6.5) = 6.5
+  print("V*(spot):", V_star)               # V*(spot): 6.5
+
+
+  # ── γ flips the winner ────────────────────────────────────────────────────────────────────
+
+  # left : endless +1 stream   worth = 1 / (1 - γ)
+  # right: +2 once, then done  worth = 2             (any γ)
+
+  worth_right = 2
+
+  worth_left_at_00  = 1 / (1 - 0.0)   # = 1 / 1.0 = 1.0
+  worth_left_at_05  = 1 / (1 - 0.5)   # = 1 / 0.5 = 2.0
+  worth_left_at_09  = 1 / (1 - 0.9)   # = 1 / 0.1 = 10.0
+
+  print("γ=0.0 :  left=", worth_left_at_00, " right=", worth_right, "→ right wins")
+  print("γ=0.5 :  left=", worth_left_at_05, " right=", worth_right, "→ tie")
+  print("γ=0.9 :  left=", worth_left_at_09, " right=", worth_right, "→ left wins")
+  # γ=0.0 :  left= 1.0  right= 2 → right wins
+  # γ=0.5 :  left= 2.0  right= 2 → tie
+  # γ=0.9 :  left= 10.0 right= 2 → left wins
+
+
+  # ── equal-arms algebra: when do two bandit arms tie? ─────────────────────────────────────
+
+  # LEFT  pays +1 (chance p) or +3 (chance 1-p)  →  average = 3 - 2p
+  # RIGHT pays  0 (chance q) or +10 (chance 1-q) →  average = 10 - 10q
+  # equal averages  →  3 - 2p = 10 - 10q  →  10q = 7 + 2p
+
+  # verify with p=0.5 → q=(7+2*0.5)/10=0.8:
+  p = 0.5
+  q = (7  +  2 * p) / 10      # = (7 + 1.0) / 10 = 8.0 / 10 = 0.8
+
+  avg_left  = 3  -  2 * p     # = 3 - 1.0 = 2.0
+  avg_right = 10 - 10 * q     # = 10 - 8.0 = 2.0
+
+  print("p=0.5,  q=0.8 :  avg_left =", avg_left, "  avg_right =", avg_right)
+  # p=0.5,  q=0.8 :  avg_left = 2.0  avg_right = 2.0   ✓
+
+  ---------------------------------------------------------------------------
+
+  >> NOTE: STANDARD JARGON
+
+  Plain term used above               Standard label
+  ----------------------------------  -----------------------------------------
+  reward                              reward  R_t
+  pile of rewards                     return  G_t
+  average (value × chance, added)     expected value  E[X]
+  worth                               value  V  (or value function)
+  mean reward of a spot+arrow pair    r(s, a)  -- expected immediate reward
+  fade                                discount factor  γ (gamma)
+  endless pile stays finite           geometric series  1/(1-γ)
+  episodic (task ends)                episodic task  (terminal state)
+  continuing (runs forever)           continuing task
+  spot                                state  s
+  arrow                               action  a
+  landing spot (next spot)            next state  s'
+  the world's die                     transition dynamics  p(s', r | s, a)
+  map (rule for picking arrows)       policy  π
+  fixed-arrow map                     deterministic policy  π(s) = a
+  dice-over-arrows map                stochastic policy  π(a | s)
+  V (spot worth under the map)        state-value function  V_π(s)
+  Q (spot + arrow worth)              action-value function  Q_π(s, a)
+  Bellman recipe for a fixed map      Bellman expectation equation
+  best-worth equation                 Bellman optimality equation  V*(s)
+  optimal worth                       optimal value function  V*(s),  Q*(s, a)
+  best map                            optimal policy  π*
+  V from Q (average over the map)     V_π(s) = Σ_a π(a|s) Q_π(s, a)
+
+----------------------------------------------------------------------------------------------
+  <- prev:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt)
+  -> next:  [Chapter 12, Part 3: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

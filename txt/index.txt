@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in twelve chapters (thirty-four posts),
-  meant to be read top to bottom. Each post opens with a "post N of 34" path header and a
+  This is not a pile of loose articles -- it is a short BOOK in twelve chapters (thirty-five posts),
+  meant to be read top to bottom. Each post opens with a "post N of 35" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 34:
+  >> NEW HERE? Start at post 1 of 35:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -490,7 +490,7 @@
     Required reading before the RL posts. Also stands alone as a Hacker News piece.
 
   [Part 1 -- Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines](posts/bandits-and-exploration.txt)
-    post 32/34 . 2026-06-21 . part 1 of 3 . reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
+    post 32/35 . 2026-06-21 . part 1 of 4 . reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
     A greedy shopkeeper at a railway station clinic rents faulty machines from a factory. Three
     machines, 1000 patients, and one problem: the true average payout of each machine is hidden.
     Three patients traced by pencil, the running average proved without storing old payouts, the
@@ -499,8 +499,18 @@
     Then shrinking nudge vs fixed nudge with the overnight factory-swap test: alpha=0.1 needs
     ~30 patients to unlearn a stale estimate; 1/n needs hundreds. Python for all three shopkeepers.
 
-  [Part 2 -- Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
-    post 33/34 . 2026-06-19 . part 2 of 3 . reinforcement-learning, policy-evaluation, bellman, by-hand
+  [Part 2 -- Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches](posts/worth-and-bellman-from-zero.txt)
+    post 33/35 . 2026-06-22 . part 2 of 4 . reinforcement-learning, bellman, mdp, value-function, discount, by-hand
+    Return as a pile of rewards, averaging unsure rewards (value × chance), the fade γ that keeps
+    an endless pile finite (geometric series 1/(1-γ) derived), episodic vs continuing tasks, the
+    world's die p(s',r|s,a), deterministic vs stochastic policies, V and Q as two separate worth-
+    machines, the Bellman recipe worked by hand (Q=6.5 with two die outcomes), Bellman optimality
+    (max over arrows), why the best map may tie but V* never does, only the mean reward enters the
+    recipe, γ flipping the winner between now-big and later-endless (γ=0/0.5/0.9 all worked),
+    V as average of Q over the map, and the bandit as a one-spot MDP with the equal-arm algebra.
+
+  [Part 3 -- Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
+    post 34/35 . 2026-06-19 . part 3 of 4 . reinforcement-learning, policy-evaluation, bellman, by-hand
     Policy evaluation built from a drone over enemy ground -- a runway (+5), dirt (-2), fuel (-0.1
     a move), and a fixed plan of arrows. Grading the plan = filling in the WORTH of every spot
     (discounted points collected from here on, obeying the arrows). The one law: a ground spot's
@@ -513,8 +523,8 @@
     derived from scratch to prove WHY the discount exists. delta/theta stop rule; Gauss-Seidel vs
     Jacobi update order; 27-spot 3x3x3 grid worked. Assumes zero background.
 
-  [Part 3 -- Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
-    post 34/34 . 2026-06-19 . part 3 of 3 . reinforcement-learning, policy-iteration, policy-improvement, by-hand
+  [Part 4 -- Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
+    post 35/35 . 2026-06-19 . part 4 of 4 . reinforcement-learning, policy-iteration, policy-improvement, by-hand
     Policy iteration: no plan given -- finding the best arrows IS the job. The IMPROVE move: at
     every air spot, peek all six nudges with the air-law and re-aim the arrow at the biggest peek
     (the textbook's Q(s,a) and argmax). The loop: seed any dumb plan, grade, improve, repeat until
