@@ -1,0 +1,325 @@
+@title Bandits and Exploration: How a Blind Gambler Learns Which Machine Pays :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . REINFORCEMENT LEARNING FROM ZERO
+  Bandits and Exploration: How a Blind Gambler Learns Which Machine Pays
+  Posted: 2026-06-21 . Author: Rahul Rai . Tags: reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
+  ============================================================================================
+
+  PATH . SPECIAL -- Bandits  (companion to the Policy Evaluation and Policy Iteration posts)
+
+  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
+  appears. Anything named more than five lines ago is named again. Every number is worked in
+  front of you, never "recall that...". One idea per line. A pencil and this page are the
+  whole kit.
+
+  Every reinforcement learning course starts with a simpler puzzle before the full agent-in-a-world
+  problem: you are in a casino, alone, with no map, no memory of where you came from, no score you
+  are chasing across many rooms. There is just a row of slot machines. You pull one. A number spills
+  out. You pull again. The only question is: which machine pays best in the long run?
+
+  This is the bandit problem. It sounds trivially simple. But it contains in miniature every tension
+  in all of reinforcement learning: greed vs curiosity, settling vs tracking, fast vs steady. Work it
+  by hand and the tension becomes concrete.
+
+  ** KEY: THE COMMITTED GAMBLER TRAP -- why always betting on your current best fails
+     Three machines. You pull A first. It pays 1.5. Machines B and C are untried -- their averages
+     sit at 0.0, the starting default.
+     Greed says: pick the highest average. That is A (1.5 > 0.0).
+     So you pull A again. And again. A locks near its hidden center -- say 1.2 -- and beats 0.0.
+     You never pull B or C again. But B's hidden center might be 3.0.
+     You will collect 1.2 forever while the 3.0 machine sits idle.
+     THE FIX: sometimes pull a random machine on purpose -- even when it looks worse.
+     That 10% of random pulls is the only mechanism that can find the 3.0 machine.
+
+
+  ## The Casino -- Three Numbers You Must Never Fuse
+
+  The casino has machines. Each machine has a secret center -- a number the house never shows you.
+  When you pull a machine, it coughs up: center + a fresh random wiggle. High center, higher payouts
+  on average. But the wiggle can be large, so one pull proves nothing.
+
+  Machines: A = slot 0, B = slot 1, C = slot 2.
+  Hidden centers (you cannot read these):
+
+    arms = [ 1.2,  -0.3,  0.8 ]
+             A      B      C
+
+  arms[0] = 1.2 means: pull A many times, the average payout drifts toward 1.2.
+  arms[1] = -0.3 means: B is a losing machine on average.
+  arms[2] = 0.8 means: C pays less than A, more than B.
+
+  You, the gambler, carry two records:
+
+    q_values  = [ 0,  0,  0 ]    your GUESS at each machine's center. starts wrong, moves toward truth.
+    arm_count = [ 0,  0,  0 ]    how many times you pulled each machine.
+
+  Three arrays. Three different jobs. Never mix them:
+
+    arms      (the house -- you cannot touch it)    the hidden truth
+    q_values  (yours)                               your running guess
+    arm_count (yours)                               your play count
+
+  The only thing crossing from the house to you is one naked number: the payout.
+  It arrives with no label. It does not say which machine paid it.
+  You know which machine paid because you saved your own last pick.
+
+
+  ## A Payout Lands -- and You Need to Decide Which Machine to Pull Next
+
+  The machine that picks the next pull is called argmax -- "the index of the biggest."
+  Given your strip of guesses, it returns the slot number with the highest value.
+
+    q_values = [ 1.6,  0.0,  0.0 ]
+                  A     B     C
+
+    argmax returns: 0    (slot A has the highest guess: 1.6 > 0.0)
+
+  What if two slots tie?
+
+    q_values = [ 1.0,  1.0,  0.5 ]
+
+    Both A and B are at 1.0. Numpy's built-in argmax always picks A (the first one it sees).
+    That biases the gambler toward A forever in a tie. So we build our own:
+
+      collect all tied slots into a list: [0, 1]
+      pick one at random: fair coin among the tied slots
+
+  This matters. An agent that always breaks ties left always misses the right side of the casino.
+
+
+  ## One Pull -- the Full Mechanics, by Hand
+
+  The gambler does two things on each pull:
+  (1) fold the payout into the machine's running average -- update the guess
+  (2) pick the next machine -- use argmax
+
+  Before this pull:
+
+    note (last machine pulled): B  =  slot 1
+    arm_count: A:2   B:3   C:0
+    q_values:  A:1.0  B:1.0  C:0.0
+
+  Payout from B lands: 5.
+
+  Fold it in:
+
+    last = 1                                     (slot B, from the note)
+
+    arm_count[1] = 3 + 1 = 4                    (B has now been pulled 4 times)
+
+    nudge_size = 1 / 4 = 0.25                   (the nudge shrinks as the count climbs)
+
+    q_values[1] = 1.0 + 0.25 * (5 - 1.0)
+               = 1.0 + 0.25 * 4
+               = 1.0 + 1.0
+               = 2.0                            (B's guess: 1.0 -> 2.0)
+
+  Now pick the next machine:
+
+    q_values: A:1.0  B:2.0  C:0.0
+    argmax -> slot 1  (B, with 2.0, is biggest)
+
+  Pull B again.
+
+  ** KEY: the nudge formula IS the running average -- no pile stored
+     The formula  new = old + (1/n) * (payout - old)  builds the arithmetic mean of all payouts
+     without keeping them. Proof (payouts 2, 0, 1, 5 on machine B):
+
+       pull 1, payout 2:  q = 0 + (1/1)*(2-0)  = 2.0    = avg(2)
+       pull 2, payout 0:  q = 2 + (1/2)*(0-2)  = 1.0    = avg(2,0)
+       pull 3, payout 1:  q = 1 + (1/3)*(1-1)  = 1.0    = avg(2,0,1)
+       pull 4, payout 5:  q = 1 + (1/4)*(5-1)  = 2.0    = avg(2,0,1,5) = 8/4 = 2.0  check: 2.0 = 2.0
+
+     Same answer as summing all payouts and dividing. No pile needed.
+
+
+  ## Greed Locks -- Why the Pure "Pick the Best" Agent Gets Stuck
+
+  The greedy gambler always picks the machine with the highest current q_value. After the first pull
+  of A (payout ~ 1.6), q_values look like:
+
+    q_values = [ 1.6,  0.0,  0.0 ]
+
+  Argmax returns A. Pull A again. A's payout averages toward 1.2. It stays well above 0.0.
+  Argmax returns A. Again. Forever.
+
+  B and C are never pulled again. Their q_values stay at 0.0 forever.
+  But C's hidden center is 0.8. A's is 1.2. The gambler will never find out.
+
+  Run a 1000-pull experiment over 8 different starting conditions:
+
+    condition 0:  A=1000  B=0  C=0
+    condition 1:  A=1000  B=0  C=0
+    condition 2:  A=1000  B=0  C=0
+    ... same result in all 8 conditions
+
+  Greedy milks A every single pull. The best-possible average (from C) goes untouched.
+  On a chart of "average payout over 1000 pulls," greedy plateaus well below the ceiling.
+
+  The flaw is structural: greedy only updates the machine it just pulled.
+  B and C are untouched, so their guesses sit at the starting value (0.0) forever.
+  A machine with a slightly positive real center looks better than any unplayed machine.
+  So A gets all the pulls, and the guesses for B and C never move.
+
+
+  ## The Fix -- Sometimes Roll a Die
+
+  The epsilon-greedy gambler adds one line to the pick:
+
+    roll = random number between 0 and 1
+
+    if roll < epsilon (say, 0.1):
+        pick a RANDOM machine (including A -- a re-pick of A is wasted but not a trap)
+    else:
+        pick the machine with the highest q_value (argmax)
+
+  With epsilon = 0.1: 90% of pulls are greedy, 10% are random.
+
+  That 10% tries B and C on purpose. B is discovered to be a loser (-0.3 center). C is discovered
+  to be decent (0.8 center). The agent's guess for each machine moves toward its true center over
+  time. On the chart, epsilon 0.1 climbs higher than greedy and sits much closer to the best
+  possible payout.
+
+  Why not epsilon = 0.4? Too much randomness. You pull the losing machine 40% of the time even
+  after you know it is the loser. The wasted pulls drag the average payout down.
+  Why not epsilon = 0.0? That is pure greedy -- the trap above.
+  epsilon = 0.1 is a middle: enough curiosity to find the truth, little enough waste to earn from it.
+
+
+  ## The Reward Arrives Naked -- the Hidden Mechanics
+
+  Here is the trap almost everyone hits when they first code this:
+
+    pull B         <- action chosen NOW
+    ...one moment passes...
+    payout lands   <- LABELED WITH NO MACHINE
+
+  The payout arrives as one bare number. It says "5." It does not say "this 5 is from B."
+  The gambler knows it is B's payout ONLY because it saved its own last pick on a note.
+
+  The call chain:
+
+    gambler picks B (slot 1), saves "1" on the note
+           |
+    house: payout = arms[1] + random_wiggle = -0.3 + 5.3 = 5.0
+           |
+    gambler receives 5.0 --- naked, no label
+    gambler reads note: "I picked slot 1 last time"
+    gambler credits slot 1: q_values[1] moves toward 5.0
+    gambler now picks the next machine
+
+  This is why the update always credits the LAST pick, not the current one.
+  The payout always belongs to the action already taken, not the one about to be taken.
+
+
+  ## Two Sizes of Nudge -- the 1/Count vs the Fixed Version
+
+  The greedy and epsilon-greedy agents above used nudge_size = 1/count.
+  That size starts large (1/1 = 1.0) and shrinks (1/2, 1/3, 1/4...).
+
+  Effect: early payouts pull the guess far. Late payouts barely move it.
+  After 500 pulls, the guess has settled near the true center and barely trembles.
+
+  This is good for a casino where the machines do not change. The guess converges.
+
+  Now try a fixed nudge_size of 0.1 instead:
+
+    new = old + 0.1 * (payout - old)
+
+  Every payout moves the guess by 10% of the gap -- whether it is pull 3 or pull 5000.
+  The guess never fully settles. It keeps leaning toward recent payouts.
+
+  This is bad for a stable casino (the guess jitters around the truth instead of landing on it).
+  But it is the only choice for a casino that CHANGES.
+
+  Non-stable casino: at pull 1000, the house secretly replaces the machine centers with new random
+  values. Now A's center is -1.0. C's center is 2.5. The world flipped.
+
+  The 1/count agent: its nudge_size for A is now 1/500 (pulled 500 times). Each new payout moves
+  the guess by only 0.002 of the gap. It takes thousands of pulls to unlearn the old 1.2 estimate.
+  It is slow to adapt because it weighted early evidence heavily and down-weights new evidence.
+
+  The fixed-size 0.1 agent: each payout still moves the guess 10% toward the new truth.
+  After about 10 pulls of the new A, the guess reaches near -1.0. It adapted.
+
+  The verdict: in a stable world, 1/count settles cleanly. In a changing world, a fixed size wins
+  because it never stops listening to new evidence.
+
+    Size comparison (fixed world, % of pulls on the best machine):
+
+    1/count:  highest -- converges fast early, stays settled
+    0.1:      close second -- steady throughout
+    0.5:      lower -- overshoots, jitters on each new payout
+    0.01:     lowest -- barely moves, never gets close to true center
+
+
+  ## Why Average Across Many Runs
+
+  Run the epsilon-greedy agent twice with different starting conditions:
+
+    condition 0: best machine found at pull 50.   average payout: 1.4 by pull 100.
+    condition 1: best machine found at pull 312.  average payout: 0.9 by pull 100.
+
+  Same agent, same epsilon, same casino structure -- but different random payouts early on.
+  One got lucky early. One did not. One chart looks good; one looks bad.
+
+  Neither tells you how the agent performs. You need many runs and their average.
+  200 runs averaged: the lucky and unlucky conditions cancel each other out.
+  What remains is the true pattern: how this epsilon, this nudge_size, this many pulls performs.
+
+  One run is a story. 200 averaged runs is a fact.
+
+
+  ## The Three Agents, Side by Side
+
+  Greedy:
+    update: q[last] += (1/count) * (payout - q[last])
+    pick:   argmax(q_values)  -- always the current best
+
+  Epsilon-greedy:
+    update: q[last] += (1/count) * (payout - q[last])    same update
+    pick:   random machine with probability epsilon
+            argmax(q_values)  otherwise
+
+  Constant-nudge epsilon-greedy:
+    update: q[last] += step_size * (payout - q[last])    fixed step_size, no 1/count
+    pick:   random machine with probability epsilon
+            argmax(q_values)  otherwise
+
+  The update is always for the machine just played (the note). The pick is always argmax or random.
+  Only the size of the nudge changes between greedy and constant-nudge.
+
+
+  ## The Keepers
+
+  A payout is a fraction, possibly negative. It folds into one slot's running average.
+  Argmax turns the strip of averages into an index -- the next machine to pull.
+
+  Greed alone locks onto the first decent machine and never leaves.
+  10% randomness (epsilon = 0.1) escapes that lock by trying other machines on purpose.
+
+  A shrinking nudge (1/count) settles on the truth in a stable world.
+  A fixed nudge tracks the truth in a changing world.
+
+  The payout always lags the action by one pull and arrives with no machine label.
+  You recover the machine from your own note -- the last pick you saved.
+
+  You never see the hidden centers. You guess them from naked numbers,
+  and trust the house to pay you for the machine you actually pulled.
+
+  ------------------------------------------------------------------------------------------
+  >> NOTE: STANDARD JARGON
+     This post used plain words throughout. The standard names for the pieces:
+     bandit = slot machine (or any single choice with a stochastic payoff)
+     arms   = the machines / choices (the "arm" of a one-armed bandit)
+     epsilon-greedy = the explore-or-exploit agent (epsilon controls how often it explores)
+     q_values = action-value estimates (Q(a) in the textbook)
+     1/count update = sample-mean update (converges to the true mean)
+     constant step size = exponential recency-weighted average (weights recent payouts more)
+     exploration vs exploitation = the name for the greed-vs-curiosity tension this post is about
+  ------------------------------------------------------------------------------------------

@@ -104,6 +104,7 @@
   --------------------------------------------
   post 32+/32+  [Part 1 -- Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth (Policy Evaluation)](posts/grading-a-plan-policy-evaluation.txt)
   post 33+/32+  [Part 2 -- Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway (Policy Iteration)](posts/finding-the-best-plan-policy-iteration.txt)
+  special       [SPECIAL. Bandits and Exploration -- How a Blind Gambler Learns Which Machine Pays](posts/bandits-and-exploration.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
