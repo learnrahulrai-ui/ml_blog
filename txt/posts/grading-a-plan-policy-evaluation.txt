@@ -10,7 +10,9 @@
   Posted: 2026-06-19 . Author: Rahul Rai . Tags: reinforcement-learning, policy-evaluation, bellman, dynamic-programming, by-hand
   ============================================================================================
 
-  PATH . SPECIAL -- Policy Evaluation From Zero  (standalone; no other page on this blog needed)
+  PATH . post 2 of 3 in Chapter 12 -- Reinforcement Learning
+    <- prev:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt)
+       next:  [Chapter 12, Part 3: Finding the Best Plan](finding-the-best-plan-policy-iteration.txt) ->
 
   Every reinforcement-learning post hands you the Bellman equation -- V(s) = R(s) + g * V(next)
   -- names it after a dead mathematician, and says "now just iterate until it converges." Two

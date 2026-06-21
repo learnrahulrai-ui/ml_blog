@@ -10,7 +10,9 @@
   Posted: 2026-06-19 . Author: Rahul Rai . Tags: reinforcement-learning, policy-iteration, policy-improvement, bellman, by-hand
   ============================================================================================
 
-  PATH . SPECIAL -- Policy Iteration From Zero  (companion to "Grading a Plan by Pencil")
+  PATH . post 3 of 3 in Chapter 12 -- Reinforcement Learning
+    <- prev:  [Chapter 12, Part 2: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt)
+       next:  (more posts coming)
 
   The companion post, [Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt), took a
   plan you were HANDED -- a fixed arrow on every spot -- and filled in the worth of each spot.

@@ -10,7 +10,9 @@
   Posted: 2026-06-21 . Author: Rahul Rai . Tags: reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
   ============================================================================================
 
-  PATH . SPECIAL -- Bandits  (companion to the Policy Evaluation and Policy Iteration posts)
+  PATH . post 1 of 3 in Chapter 12 -- Reinforcement Learning
+    <- prev:  (start of chapter)
+       next:  [Chapter 12, Part 2: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt) ->
 
   THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
   appears. Anything named more than five lines ago is named again. Every number is worked in
