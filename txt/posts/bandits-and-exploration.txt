@@ -19,10 +19,9 @@
   ---------------------------------------------------------------------------
 
   There is a greedy shopkeeper. He runs a medical testing clinic at a busy railway station.
-  Patients line up. He does not know which ones are sick.
-
-  He rents testing machines from a factory down the road. The factory owner built dozens.
-  Some test accurately. Some miss. The factory owner knows which is which. The shopkeeper does not.
+  Patients line up. He rents testing machines from a factory down the road.
+  The factory owner built dozens. Some run clean tests, some stumble.
+  The factory owner knows which is which. The shopkeeper does not.
 
   Money enters like this. When a patient goes through a machine and the result is clean and fast,
   the hospital down the road pays the shopkeeper. Better machines get cleaner results, fewer
@@ -33,9 +32,11 @@
   is faulty: it wobbles. Over many patients the wobble averages out. Machine A might average 1.2.
   But right now, after patient 1, all the shopkeeper sees is 1.6.
 
-  That 1.2 is the ceiling. Over thousands of patients, the shopkeeper can never average more
-  than 1.2 from machine A -- it is a faulty machine and that is its best. He cannot see 1.2.
-  He can only discover it by running patients through.
+  That 1.2 is the long-run average. The wobble is random noise -- it cancels across many patients,
+  leaving the true average behind. He cannot see 1.2. He can only discover it by running patients through.
+
+  For now, the machines are stable -- same true average throughout, same wobble every patient.
+  Non-stationary machines come later.
 
   He has three machines. Before any patient, his records look like this:
 
@@ -43,7 +44,9 @@
     q (guess):    0.0     0.0     0.0    <- his current guess of each machine's true average
     n (count):      0       0       0    <- how many patients each machine has served
 
-  All guesses tied at 0.0. So he sends the first patient to a randomly picked machine: A.
+  All guesses start at 0.0. This works here because A and C have positive true averages (1.2 and 0.8) --
+  if all machines paid negative on average, untried machines at 0.0 would always look better than tested
+  ones. He sends the first patient to a randomly picked machine: A.
 
   ---------------------------------------------------------------------------
 
@@ -133,25 +136,25 @@
 
   Why it matters: at the very start, q = [0.0, 0.0, 0.0]. All three tied.
   A lazy pick returns 0 every time. Machine A gets a thousand patients. B and C never tried.
-  Two lines fix it -- collect every tied index, pick one at random.
+  Three lines fix it -- collect every tied index, pick one at random.
 
   ---------------------------------------------------------------------------
 
   That fair pick solves the tie. It does not save the greedy shopkeeper.
   Over 1000 patients, with the three machines whose true averages are 1.2, -0.3, and 0.8:
 
-    after patient    1:   q = [ 1.60,  0.00,  0.00 ]   <- true averages: A=1.2, B=-0.3, C=0.8
-    after patient   10:   q = [ 1.28,  0.00,  0.00 ]
-    after patient  100:   q = [ 1.21,  0.00,  0.00 ]
-    after patient 1000:   q = [ 1.20,  0.00,  0.00 ]
+    after patient    1:   q =  [ 1.60,  0.00,  0.00 ]   <- true averages: A=1.2, B=-0.3, C=0.8
+    after patient   10:   q ≈ [ 1.28,  0.00,  0.00 ]
+    after patient  100:   q ≈ [ 1.21,  0.00,  0.00 ]
+    after patient 1000:   q ≈ [ 1.20,  0.00,  0.00 ]
 
   The first machine to earn a positive payout captures nearly all future patients.
   Here A went first, paid 1.6, and its guess beat the un-played 0.0 forever.
   So argmax returns A every time. B and C are mysteries the shopkeeper chose not to solve.
 
   The flaw is structural. Only the machine just played gets an update. Every unplayed machine
-  stays at 0.0. Any positive guess beats 0.0. Machine B's true average could be 5.0.
-  The shopkeeper earns 1.2 per patient forever while 5.0 sits idle.
+  stays at 0.0. A settled positive estimate beats 0.0 forever. Machine B's true average could be 2.0.
+  The shopkeeper earns 1.2 per patient while 2.0 sits idle.
 
   That is three machines. Scale it to 100.
 
@@ -225,14 +228,16 @@
       Barely moved. Needs 10,000 more patients to unlearn 1.2.
 
     Fixed nudge = 0.1:
-      q[A] = 1.20 + 0.1 * (-0.8 - 1.20) = 1.20 - 0.20 = 1.00
-      One patient moves it 0.20. Ten patients later: guess near -1.0.
+      q[A] = 1.20 + 0.1 * (-0.8 - 1.20) = 1.20 - 0.20 = 1.00   (1 patient)
+      q[A] ≈ -0.23  after 10 patients  -- heading down, not there yet
+      q[A] ≈ -0.73  after 20 patients
+      q[A] ≈ -0.91  after 30 patients  -- close enough to stop trusting A
 
   Non-stationary numbers: factory swaps all machines at patient 1000.
   New machine A true average: -1.0. New machine C true average: 2.5.
 
     Shrinking shopkeeper at patient 1001: nudge for A ≈ 1/900 = 0.001. Hundreds more patients to unlearn 1.2.
-    Fixed shopkeeper at patient 1001: nudge = 0.1. Ten patients. Done.
+    Fixed shopkeeper at patient 1001: nudge = 0.1. Guess near -1.0 after ~30 patients.
 
   ---------------------------------------------------------------------------
 
@@ -250,10 +255,10 @@
       nudge = 0.1     pick = same as epsilon-greedy
       q after 1000:  [ ~1.2, ~-0.3, ~0.8 ]  guesses jitter -- never fully settle
       stable world:  slightly lower average than epsilon-greedy (noisier estimates -> more wrong picks)
-      changing world: adapts in ~10 patients; epsilon-greedy needs hundreds
+      changing world: adapts in ~30 patients; epsilon-greedy with shrinking nudge needs hundreds
 
-  One run is luck -- early random payouts can make the best machine look bad. Average 200 runs:
-  luck cancels. The true pattern emerges.
+  One run is luck -- early random payouts can make the best machine look bad. Average many runs
+  and variance shrinks: the true pattern becomes visible.
 
   ---------------------------------------------------------------------------
 
@@ -338,7 +343,7 @@
     n = np.zeros(3, dtype=int)
     epsilon = 0.1
 
-    # patient 1
+    # patient 1  (all tied at 0.0 -- epsilon roll would give the same result: pick random)
     last   = argmax_fair(q)
     payout = true_avg[last] + rng.standard_normal() * 0.8   # ~ 1.6
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
@@ -373,6 +378,7 @@
     q = np.zeros(3)
     step    = 0.1
     epsilon = 0.1
+    # n[] not needed: fixed step size doesn't depend on patient count
 
     # patient 1  (all tied at 0.0 -- epsilon choice doesn't matter, pick random)
     last   = argmax_fair(q)
