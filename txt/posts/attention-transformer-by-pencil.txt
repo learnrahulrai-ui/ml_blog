@@ -10,7 +10,7 @@
   Posted: 2026-06-20 . Author: Rahul Rai . Tags: transformer, attention, self-attention, by-hand, deep-learning
   ============================================================================================
 
-  PATH . SPECIAL -- Attention From Zero  (reads alone; companion: RNN and LSTM by Pencil)
+  PATH . Chapter 11 companion -- Attention Grows Eyes (by-hand deep dive)
 
   The companion post, [The Walking Machine and the Vault](rnn-lstm-by-pencil.txt), showed why
   a signal from word 1 cannot survive eighty rewrites in an RNN, and how the LSTM's uncrushed

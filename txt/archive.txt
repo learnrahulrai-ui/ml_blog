@@ -5,106 +5,106 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 32+ posts: 12 chapters + appendices, in reading order.
+  ALL POSTS -- a book in 13 chapters, every number worked by hand.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
   CHAPTER 1 -- PREDICTING HOUSE PRICES (2026)
   -------------------------------------------
-  post 1/31   [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
-  post 2/31   [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
-  post 3/31   [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
+  post 1    [Part 1 -- Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
+  post 2    [Part 2 -- Ask the Closest Rows: Gap, Same-Ruler, and How Slow It Gets](posts/neighbor-machine-knn.txt)
+  post 3    [Part 3 -- The Straight-Stick Rule: Dials, Leftovers, and Numerics](posts/straight-stick-linear-regression.txt)
 
 
   CHAPTER 2 -- GRADING A GUESSER (2026)
   -------------------------------------
-  post 4/31   [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
-  post 5/31   [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
+  post 4    [Part 1 -- Two Rulers for One Guess: MSE and R^2](posts/grading-the-guess-mse-r2.txt)
+  post 5    [Part 2 -- Reading the Dials: What the Coefficients Say](posts/reading-the-dials.txt)
 
 
   CHAPTER 3 -- SORTING INTO BINS (2026)
   -------------------------------------
-  post 6/31   [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
-  post 7/31   [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
-  post 8/31   [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
-  post 9/31   [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
+  post 6    [Part 1 -- The S-Curve, the Four-Box Table, and Why Accuracy Lies](posts/sorting-into-bins.txt)
+  post 7    [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
+  post 8    [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
+  post 9    [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
+  by hand:  [Bayes by Head-Count -- The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild](posts/bayes-shopkeeper.txt)
+  ref:      [Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
 
 
   CHAPTER 4 -- HUMBLE DIALS AND WOBBLE BANDS (2026)
   -------------------------------------------------
-  post 10/31  [Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials](posts/humble-dials-ridge-lasso.txt)
-  post 11/31  [Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam](posts/wobble-bands-bootstrap.txt)
-  post 12/31  [Part 3 -- The Dial by Hand: Where the Dials Really Come From](posts/the-dial-by-hand.txt)
+  post 10   [Part 1 -- The Leash: Ridge, Lasso, and Humbling the Dials](posts/humble-dials-ridge-lasso.txt)
+  post 11   [Part 2 -- One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam](posts/wobble-bands-bootstrap.txt)
+  post 12   [Part 3 -- The Dial by Hand: Where the Dials Really Come From](posts/the-dial-by-hand.txt)
 
 
   CHAPTER 5 -- QUESTION CHARTS AND COMMITTEES (2026)
   --------------------------------------------------
-  post 13/31  [Part 1 -- Question Charts: Building a Tree by Hand](posts/question-charts-by-hand.txt)
-  post 14/31  [Part 2 -- The Mixing Ruler: Gini, Information Gain, and Pruning](posts/mixing-ruler-gini-pruning.txt)
-  post 15/31  [Part 3 -- Committees: Bagging, Random Forest, and Boosting](posts/committees-bag-forest-boost.txt)
+  post 13   [Part 1 -- Question Charts: Building a Tree by Hand](posts/question-charts-by-hand.txt)
+  post 14   [Part 2 -- The Mixing Ruler: Gini, Information Gain, and Pruning](posts/mixing-ruler-gini-pruning.txt)
+  post 15   [Part 3 -- Committees: Bagging, Random Forest, and Boosting](posts/committees-bag-forest-boost.txt)
 
 
   CHAPTER 6 -- FINDING PATTERNS WITHOUT ANSWERS (2026)
   ----------------------------------------------------
-  post 16/31  [Part 1 -- Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem](posts/eda-and-distance.txt)
-  post 17/31  [Part 2 -- The Strongest Direction: Crushing a Many-Wall Room Into a Flat Page (PCA)](posts/the-strongest-direction-pca.txt)
-  post 18/31  [Part 3 -- Grouping by Nearest Centre: K-Means From a Blank Sheet](posts/grouping-by-nearest-centre.txt)
-  post 19/31  [Part 4 -- The Family Tree: Hierarchical Clustering and the Dendrogram](posts/the-family-tree-clustering.txt)
-  post 20/31  [Part 5 -- Both Tools on NCI60: PCA and Clustering on Real Gene Data](posts/nci60-revisited.txt)
-  post 21/31  [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
+  post 16   [Part 1 -- Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem](posts/eda-and-distance.txt)
+  post 17   [Part 2 -- The Strongest Direction: Crushing a Many-Wall Room Into a Flat Page (PCA)](posts/the-strongest-direction-pca.txt)
+  post 18   [Part 3 -- Grouping by Nearest Centre: K-Means From a Blank Sheet](posts/grouping-by-nearest-centre.txt)
+  post 19   [Part 4 -- The Family Tree: Hierarchical Clustering and the Dendrogram](posts/the-family-tree-clustering.txt)
+  post 20   [Part 5 -- Both Tools on NCI60: PCA and Clustering on Real Gene Data](posts/nci60-revisited.txt)
+  post 21   [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
+  ref:      [Distance and Clustering Reference -- Rulers, Traps, and Ethics](posts/clustering-reference.txt)
 
 
   CHAPTER 7 -- BUILDING A NEURAL NETWORK FROM SCRATCH (2026)
-  ---------------------------------------------------------
-  post 22/31  [Part 1 -- Stacked Rooms and One Walk by Hand: How a Network Computes a Guess](posts/the-web-of-adders.txt)
-  post 23/31  [Part 2 -- Rolling Downhill by Hand: How a Network Learns](posts/how-the-dials-learn.txt)
+  ----------------------------------------------------------
+  post 22   [Part 1 -- Stacked Rooms and One Walk by Hand: How a Network Computes a Guess](posts/the-web-of-adders.txt)
+  post 23   [Part 2 -- Rolling Downhill by Hand: How a Network Learns](posts/how-the-dials-learn.txt)
 
 
   CHAPTER 8 -- KEEPING A NETWORK HONEST (2026)
   --------------------------------------------
-  post 24/31  [Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler](posts/five-machines-against-memorising.txt)
+  post 24   [Five Machines Against Memorising: A Tax, a Coffee Break, a Fire Alarm, and a Humbler](posts/five-machines-against-memorising.txt)
 
 
   CHAPTER 9 -- MACHINES THAT LOOK AT PICTURES (2026)
   --------------------------------------------------
-  post 25/31  [Part 1 -- A Magic Paper Slid Over a Photo: How a Picture Network Sees](posts/the-magic-paper-factory.txt)
-  post 26/31  [Part 2 -- The Deep Factory: Humbler, Send-Home, and the Confusion Sheet](posts/the-deep-factory.txt)
+  post 25   [Part 1 -- A Magic Paper Slid Over a Photo: How a Picture Network Sees](posts/the-magic-paper-factory.txt)
+  post 26   [Part 2 -- The Deep Factory: Humbler, Send-Home, and the Confusion Sheet](posts/the-deep-factory.txt)
 
 
   CHAPTER 10 -- MACHINES THAT READ WORDS (2026)
   ---------------------------------------------
-  post 27/31  [Part 1 -- Words Into a Machine: The Notepad and the Walking Worker](posts/the-walking-worker.txt)
-  post 28/31  [Part 2 -- The Two-Memory Worker: How an LSTM Remembers Far-Back Words](posts/the-two-memory-worker.txt)
-  post 29/31  [Part 3 -- The Look-Across Machine: Attention and the Transformer by Pencil](posts/the-look-across-machine.txt)
+  post 27   [Part 1 -- Words Into a Machine: The Notepad and the Walking Worker](posts/the-walking-worker.txt)
+  post 28   [Part 2 -- The Two-Memory Worker: How an LSTM Remembers Far-Back Words](posts/the-two-memory-worker.txt)
+  post 29   [Part 3 -- The Look-Across Machine: Attention and the Transformer by Pencil](posts/the-look-across-machine.txt)
+  by hand:  [RNN and LSTM From Zero -- The Walking Machine and the Vault](posts/rnn-lstm-by-pencil.txt)
+  by hand:  [LSTM From Pencil -- Every Gate, Every Number](posts/lstm-from-pencil.txt)
 
 
   CHAPTER 11 -- ATTENTION GROWS EYES (2026)
   -----------------------------------------
-  post 30/31  [Part 1 -- The Vision Transformer: A Photo Cut Into Strips That Look at Each Other](posts/the-vision-transformer.txt)
-  post 31/31  [Part 2 -- Encoder or Decoder: The One Mask That Splits BERT From GPT](posts/encoder-or-decoder.txt)
-
-
-  APPENDICES -- FLIP-TO REFERENCES (2026)
-  ---------------------------------------
-  reference   [A. Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
-  reference   [B. Distance and Clustering Reference -- Rulers, Traps, and Ethics](posts/clustering-reference.txt)
-  reference   [C. LSTM From Pencil -- RNN and LSTM From Scratch, Nothing But a Pencil](posts/lstm-from-pencil.txt)
-  reference   [D. Transformer From Pencil -- Attention From Scratch, One Number at a Time](posts/transformer-from-pencil.txt)
-  reference   [E. Vision Transformer From Pencil -- Strips, Seat-Stamps, and Masks by Hand](posts/vit-from-pencil.txt)
-  special     [SPECIAL. Cheapest Walk: UCS and A* -- Every Pop Shown, the Proof Included](posts/cheapest-walk-ucs-astar.txt)
-  special     [SPECIAL. Genetic Algorithm From Scratch -- Optimising With No Gradient](posts/genetic-algorithm-from-scratch.txt)
-  special     [SPECIAL. Informed Search Jargon -- One Machine, Three Slips, Every Word Debunked](posts/informed-search-jargon.txt)
-  special     [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
-  special     [SPECIAL. Bayes by Head-Count -- The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild](posts/bayes-shopkeeper.txt)
-  special     [SPECIAL. The Walking Machine and the Vault -- RNN and LSTM by Pencil](posts/rnn-lstm-by-pencil.txt)
-  special     [SPECIAL. Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
+  post 30   [Part 1 -- The Vision Transformer: A Photo Cut Into Strips That Look at Each Other](posts/the-vision-transformer.txt)
+  post 31   [Part 2 -- Encoder or Decoder: The One Mask That Splits BERT From GPT](posts/encoder-or-decoder.txt)
+  by hand:  [Transformer From Pencil -- Attention From Scratch, One Number at a Time](posts/transformer-from-pencil.txt)
+  by hand:  [Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
+  by hand:  [Vision Transformer From Pencil -- Strips, Seat-Stamps, and Masks by Hand](posts/vit-from-pencil.txt)
 
 
   CHAPTER 12 -- REINFORCEMENT LEARNING (2026)
   --------------------------------------------
-  post 32+  [Part 1 -- Bandits and Exploration -- How a Blind Gambler Learns Which Machine Pays](posts/bandits-and-exploration.txt)
-  post 33+  [Part 2 -- Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth (Policy Evaluation)](posts/grading-a-plan-policy-evaluation.txt)
-  post 34+  [Part 3 -- Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway (Policy Iteration)](posts/finding-the-best-plan-policy-iteration.txt)
+  intro:    [The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
+  post 32   [Part 1 -- Bandits and Exploration: How a Blind Gambler Learns Which Machine Pays](posts/bandits-and-exploration.txt)
+  post 33   [Part 2 -- Grading a Plan by Pencil: A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
+  post 34   [Part 3 -- Finding the Best Plan by Pencil: How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
+
+
+  CHAPTER 13 -- SEARCH AND OPTIMIZATION (2026)
+  --------------------------------------------
+  post 35   [Part 1 -- Informed Search Jargon: One Machine, Three Slips, Every Word Debunked](posts/informed-search-jargon.txt)
+  post 36   [Part 2 -- Cheapest Walk: UCS and A*, Every Pop Shown, the Proof Included](posts/cheapest-walk-ucs-astar.txt)
+  post 37   [Part 3 -- Genetic Algorithm From Scratch: Optimising With No Gradient](posts/genetic-algorithm-from-scratch.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .

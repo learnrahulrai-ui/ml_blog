@@ -10,7 +10,9 @@
   Posted: 2026-06-18 . Author: Rahul Rai . Tags: ai-agents, planning, utility, learning, by-hand
   ============================================================================================
 
-  PATH . SPECIAL -- The Agent Ladder  (standalone; no other page on this blog needed)
+  PATH . Chapter 12 intro -- Reinforcement Learning
+    <- prev:  (read before entering the RL posts)
+       next:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt) ->
 
   Every AI textbook gives you a taxonomy: five agent names, five bullet-point features, a table.
   "Simple reflex uses condition-action rules. Model-based has internal state. Goal-based has

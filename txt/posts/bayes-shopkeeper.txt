@@ -10,7 +10,7 @@
   Posted: 2026-06-18 . Author: Rahul Rai . Tags: probability, bayes, statistics, by-hand
   ============================================================================================
 
-  PATH . SPECIAL -- Bayes by Head-Count  (standalone; no other page on this blog needed)
+  PATH . Chapter 3 companion -- Sorting Into Bins (by-hand deep dive)
 
   Every Bayes tutorial gives you the formula:  P(A|B) = P(B|A) P(A) / P(B). Then it asks
   you to swap the letters around until the answer pops out. That is not an explanation -- it

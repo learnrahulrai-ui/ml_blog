@@ -11,7 +11,7 @@
   ============================================================================================
 
   PATH . post 1 of 3 in Chapter 12 -- Reinforcement Learning
-    <- prev:  (start of chapter)
+    <- prev:  [Chapter 12 intro: The Agent Ladder](the-agent-ladder.txt)
        next:  [Chapter 12, Part 2: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt) ->
 
   THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first

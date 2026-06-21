@@ -10,7 +10,7 @@
   Posted: 2026-06-15 . Author: Rahul Rai . Tags: vision-transformer, layernorm, masking, kata
   ============================================================================================
 
-  PATH . APPENDIX E -- Vision Transformer From Pencil  (standalone; no other page needed)
+  PATH . Chapter 11 companion -- Attention Grows Eyes (by-hand deep dive)
 
   A KATA. Work each number on a blank sheet, cover the CHECK line until you have your own
   answer, then compare. Repeat the whole page until your hand knows it. Five pencil-able cores

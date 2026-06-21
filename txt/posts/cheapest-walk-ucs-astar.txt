@@ -10,7 +10,9 @@
   Posted: 2026-06-17 . Author: Rahul Rai . Tags: search, ucs, a-star, dijkstra, by-hand
   ============================================================================================
 
-  PATH . SPECIAL -- Cheapest Walk: UCS and A*  (standalone; no other page on this blog needed)
+  PATH . post 2 of 3 in Chapter 13 -- Search and Optimization
+    <- prev:  [Chapter 13, Part 1: Informed Search Jargon](informed-search-jargon.txt)
+       next:  [Chapter 13, Part 3: Genetic Algorithm From Scratch](genetic-algorithm-from-scratch.txt) ->
 
   Every pathfinding post draws a maze with coloured arrows, names f = g + h, and waves at
   "admissibility." This page never waves. One town, five places. Every single pop and offer

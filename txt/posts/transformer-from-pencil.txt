@@ -10,7 +10,7 @@
   Posted: 2026-06-15 . Author: Rahul Rai . Tags: transformer, attention, by-hand, kata
   ============================================================================================
 
-  PATH . APPENDIX D -- Transformer From Pencil  (standalone; no other page needed)
+  PATH . Chapter 11 companion -- Attention Grows Eyes (by-hand deep dive)
 
   Goal: read a movie review -- plain words -- and stamp it liked (1) or not (0). Kit:
   a pencil, scratch paper. No code, no computer.

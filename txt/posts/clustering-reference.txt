@@ -10,8 +10,7 @@
   Posted: 2026-06-09 . Author: Rahul Rai . Tags: clustering, distance, hamming, mahalanobis, ethics
   ============================================================================================
 
-  PATH . APPENDIX -- Distance and Clustering Reference  (companion to Chapter 6; read any time)
-    <- back to:  [Chapter 6, Part 1: Looking at a Sheet With No Answers](eda-and-distance.txt)
+  PATH . Chapter 6 reference card -- Finding Patterns Without Answers
 
   This is the appendix to Chapter 6 (Finding Patterns Without Answers). The chapter draws
   each idea by hand; this is a flip-to reference for the loose ends the chapter does not

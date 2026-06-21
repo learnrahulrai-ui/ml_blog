@@ -10,7 +10,7 @@
   Posted: 2026-06-14 . Author: Rahul Rai . Tags: lstm, rnn, sequence-models, by-hand
   ============================================================================================
 
-  PATH . APPENDIX -- LSTM From Pencil  (standalone; needs no other page)
+  PATH . Chapter 10 companion -- Machines That Read Words (by-hand deep dive)
 
   Goal: read a movie review -- plain words -- and stamp it liked (1) or not (0). Kit: a
   pencil, graph paper, a few coat pockets. No computer, at any point.
