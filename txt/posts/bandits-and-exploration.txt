@@ -18,9 +18,8 @@
 
   ---------------------------------------------------------------------------
 
-  There is a greedy shopkeeper. He runs a medical testing clinic at a busy railway station.
-  Patients line up. He rents testing machines from a factory down the road.
-  The factory owner built dozens. Some run clean tests, some stumble.
+  There is a greedy shopkeeper who runs a medical testing clinic at a busy railway station.
+  He rents testing machines from a factory down the road -- dozens of them, some accurate, some not.
   The factory owner knows which is which. The shopkeeper does not.
 
   Money enters like this. When a patient goes through a machine and the result is clean and fast,
@@ -44,9 +43,7 @@
     q (guess):    0.0     0.0     0.0    <- his current guess of each machine's true average
     n (count):      0       0       0    <- how many patients each machine has served
 
-  All guesses start at 0.0. This works here because A and C have positive true averages (1.2 and 0.8) --
-  if all machines paid negative on average, untried machines at 0.0 would always look better than tested
-  ones. He sends the first patient to a randomly picked machine: A.
+  All guesses start at 0.0. He sends the first patient to a randomly picked machine: A.
 
   ---------------------------------------------------------------------------
 
@@ -189,7 +186,7 @@
 
   After 100 random patients scattered across 1000 total:
 
-    q = [ 1.20,  -0.31,  0.79 ]
+    q ≈ [ 1.20,  -0.31,  0.79 ]
 
   All three true averages discovered. The 10% tax paid off.
 
@@ -281,6 +278,9 @@
      1/n update = sample-mean update; converges to the true average in a stable world
      constant step size = exponential recency-weighted average; weights recent payouts more
      exploration vs exploitation = the greed-vs-curiosity tension above
+     optimistic initialization = starting all guesses at 0.0 (or higher) to encourage exploration;
+       works here because A=1.2 and C=0.8 are positive. If all true averages were negative,
+       un-tested machines at 0.0 would always beat tested ones and greedy would cycle rather than lock.
   ------------------------------------------------------------------------------------------
 
 
