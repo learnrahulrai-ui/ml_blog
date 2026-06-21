@@ -14,155 +14,64 @@
     <- prev:  [Chapter 12 intro: The Agent Ladder](the-agent-ladder.txt)
        next:  [Chapter 12, Part 2: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt) ->
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
-  appears. Anything named more than five lines ago is named again. Every number is worked in
-  front of you, never "recall that...". One idea per line. A pencil and this page are whole kit.
+  Every term defined where it first appears. Every number worked in front of you. Pencil is enough.
 
   ---------------------------------------------------------------------------
 
   There is a greedy shopkeeper. He runs a medical testing clinic at a busy railway station.
-  Patients line up every morning. He has no idea which ones are sick.
+  Patients line up. He does not know which ones are sick.
 
-  He rents testing machines from a factory owner down the road.
-  The factory owner makes dozens of different machines. Some are accurate. Some are junk.
-  The factory owner knows exactly how good each machine is. The shopkeeper does not.
-  He only rents them and runs patients through.
+  He rents testing machines from a factory down the road. The factory owner built dozens.
+  Some test accurately. Some miss. The factory owner knows which is which. The shopkeeper does not.
 
-  Here is how money enters the picture.
+  Money enters like this. When a patient goes through a machine and the result is clean and fast,
+  the hospital down the road pays the shopkeeper. Better machines get cleaner results, fewer
+  repeats, fewer refunds. Better machines earn more per patient on average.
 
-  The shopkeeper charges for each test. When a machine correctly flags a sick patient,
-  the hospital down the road pays him well. When the machine clears a healthy person
-  quickly, he still earns a small fee. When the machine fumbles -- misses a sick person,
-  or flags someone healthy and sets off a long follow-up -- he earns less and sometimes
-  refunds money. The better the machine, the more it earns him per patient on average.
+  That average is hidden. The shopkeeper only sees the number that arrives after each patient -- the
+  payout for that one test. Same machine, different patients, different number each time. The machine
+  is faulty: it wobbles. Over many patients the wobble averages out. Machine A might average 1.2.
+  But right now, after patient 1, all the shopkeeper sees is 1.6.
 
-  He does not see the average. He only sees the money that lands after each test.
+  The factory owner's rent for a machine equals its true average payout. Machine A rents for 1.2.
+  Over thousands of patients, the shopkeeper can never average more than 1.2 from it.
+  He cannot see 1.2. He can only discover it by running patients through.
 
-  Machine A runs a patient. Earns: 1.6
-  Machine A runs another patient. Earns: 0.9
-  Same machine. Different patients. Different number.
+  He has three machines. Before any patient, his records look like this:
 
-  That wobble is not a glitch. Every machine is faulty in this way --
-  the patients vary, the test results vary, the earnings vary. Even the best machine
-  does not pay exactly the same amount twice in a row.
+    machine:        A       B       C
+    q (guess):    0.0     0.0     0.0    <- his current guess of each machine's true average
+    n (count):      0       0       0    <- how many patients each machine has served
 
-  But averaged over many patients, each machine settles near its own true average.
-  Machine A's true average might be 1.2. Some days it earns 1.6. Some days 0.9.
-  Over 1000 patients it keeps drifting back to 1.2.
-  That 1.2 is what the factory owner knows. The shopkeeper never sees it.
-
-  So the shopkeeper's goal: run 1000 patients through his machines.
-  Earn as much money as possible across all 1000.
-  Do that without ever knowing the true averages.
-
-  Now -- here is the trap.
-
-  Say he has 100 machines and only 10 patients have come so far.
-
-          machine  1:  tested 3 patients   ->   average payout so far: 1.5
-          machine  2:  tested 2 patients   ->   average payout so far: 0.8
-          machine  3:  tested 2 patients   ->   average payout so far: 1.1
-          machine  4:  tested 1 patient    ->   average payout so far: 1.7
-          machines 5 through 100:          ->   never tested. payout so far: 0.0
-
-  Patient number 11 walks in. Which machine does he pick?
-
-  A greedy shopkeeper picks machine 4 (1.7 is highest). But machine 4 was tested once.
-  That 1.7 could be a lucky day. Machine 4's true average might be 0.6.
-  Machines 5 through 100 have never been tried. One of them might average 3.0.
-  The greedy shopkeeper will never know, because he never tries them.
-
-  ** KEY: THE COMMITTED GREED TRAP -- why locking onto the first decent machine fails
-     100 machines. Shopkeeper tests machine 1 first. It earns 1.5.
-     Machines 2 through 100: untested. Their recorded payouts sit at 0.0.
-     Greed rule: pick the machine with the highest recorded payout. That is machine 1.
-     Test it again. And again. Machine 1's recorded payout drifts toward its true average.
-     Machine 1's true average always beats 0.0. Machines 2 through 100 are never tested.
-     Machine 47's true average might be 3.0.
-     The shopkeeper earns 1.5-ish per patient forever. Machine 47 sits idle.
-     THE FIX: test a random machine on purpose sometimes -- even when it looks worse.
-     That random test is the only door to machine 47.
+  All guesses tied at 0.0. So he sends the first patient to a randomly picked machine: A.
 
   ---------------------------------------------------------------------------
 
-  Two sides of a wall.
+  Patient 1 goes through machine A. Payout arrives: 1.6
 
-  FACTORY SIDE (the shopkeeper can never look here):
+  The payout is a bare number. No label on it saying "this came from machine A."
+  The shopkeeper wrote "last = A" on a slip of paper before sending the patient through.
+  That slip is the only thread connecting 1.6 to machine A.
 
-    machine A:  true average = 1.2          <- the best machine; you do not know this
-    machine B:  true average = -0.3         <- a loser
-    machine C:  true average = 0.8
-
-  Test machine A many times: earnings per patient wobble around 1.2.
-  Test machine B many times: earnings per patient wobble around -0.3.
-  The true average is hidden. Each payout = true average + a fresh random jolt from that patient,
-  so one test proves nothing and twenty tests start to narrow it down.
-
-  The factory owner's rent for a machine = its true average.
-  Machine A rents for 1.2. You can never average more than 1.2 from it in the long run.
-  If you could see 1.2, -0.3, 0.8 you would run every patient through machine A. You cannot see them.
-
-  SHOPKEEPER SIDE (two strips; both start at zero before any test):
-
-    machine:        A       B       C
-    q (guess):    0.0     0.0     0.0    <- your guess of each true average; starts wrong
-    n (count):      0       0       0    <- how many patients you ran through each machine
-
-  One bare number crosses the wall after each test: the payout.
-  It carries no machine name. No label.
-
-  ** KEY: THE FLOATING FRACTION TRAP -- a bare number has no address
-     Factory hands you: 5.0
-     That number does not say "I came from machine B."
-     It says nothing. It is just 5.0.
-     You must update one machine's guess -- but which one?
-     THE FIX: write down which machine you tested BEFORE the payout arrives.
-     That note is the only link between a payout and the machine that earned it.
-
-  ** KEY: THE LAG TRAP -- the payout belongs to the test you already ran
-     You send a patient through machine B at 12:00. Payout arrives at 12:01.
-     By 12:01 you are already thinking about the next patient.
-     If you are not careful, you credit machine C (the NEXT test) for machine B's payout.
-     THE FIX: carry a note. Before picking next, read it. Update the machine on the note.
-     Then overwrite the note with the new pick.
-
-  ---------------------------------------------------------------------------
-
-  BEFORE GO 1:
-
-    machine:        A       B       C
-    q (guess):    0.0     0.0     0.0
-    n (count):      0       0       0
-    note: (nothing yet)
-
-  All guesses tied at 0.0. Fair coin -> pick machine A. Write on note: "last = A".
-  Run a patient through machine A. Payout lands: 1.6   (bare; note says "last = A")
-
-  Update machine A only:
+  Update machine A's records:
 
     n[A] = 0 + 1 = 1
     nudge = 1 / n[A] = 1 / 1 = 1.0
     q[A] = 0.0 + 1.0 * (1.6 - 0.0) = 1.6
 
-  AFTER GO 1:
-
-    machine:        A       B       C
-    q (guess):    1.6     0.0     0.0    <- only A moved
-    n (count):      1       0       0
-    note: "last = A"
-
-  Next pick: A has highest guess (1.6 > 0.0 > 0.0). Pick machine A again.
-
-  ---------------------------------------------------------------------------
-
-  BEFORE GO 2:
+  The nudge size is 1 / count-of-patients-through-A. First patient: nudge = 1. The entire 1.6 becomes
+  the new guess. That makes sense -- it is the only data point.
 
     machine:        A       B       C
     q (guess):    1.6     0.0     0.0
     n (count):      1       0       0
     note: "last = A"
 
-  Run patient through machine A. Payout lands: 0.9
+  Next patient. Which machine? Highest guess: A (1.6 > 0.0 > 0.0). Send to A again.
+
+  ---------------------------------------------------------------------------
+
+  Patient 2 through machine A. Payout arrives: 0.9
 
     n[A] = 1 + 1 = 2
     nudge = 1 / 2 = 0.50
@@ -171,24 +80,17 @@
          = 1.6 - 0.35
          = 1.25
 
-  AFTER GO 2:
-
-    machine:        A       B       C
-    q (guess):    1.25    0.0     0.0    <- nudged down from 1.6
-    n (count):      2       0       0
-
-  Machines B and C: untouched. Guesses frozen at 0.0.
-  A still biggest (1.25 > 0.0). Pick machine A again.
-
-  ---------------------------------------------------------------------------
-
-  BEFORE GO 3:
-
     machine:        A       B       C
     q (guess):    1.25    0.0     0.0
     n (count):      2       0       0
 
-  Run patient through machine A. Payout lands: 1.4
+  Second patient pulled A's guess down from 1.6 toward the truth. Nudge shrank to 0.50 because two
+  data points exist now -- new data earns less weight than it did when it was all there was.
+  A still highest (1.25 > 0.0). Third patient goes to A.
+
+  ---------------------------------------------------------------------------
+
+  Patient 3 through machine A. Payout arrives: 1.4
 
     n[A] = 2 + 1 = 3
     nudge = 1 / 3 = 0.333
@@ -197,187 +99,178 @@
          = 1.25 + 0.050
          = 1.30
 
-  AFTER GO 3:
-
     machine:        A       B       C
     q (guess):    1.30    0.0     0.0
     n (count):      3       0       0
 
-  That formula  q = old + (1/n) * (payout - old)  is the running average.
-  Check it: average of 1.6, 0.9, 1.4 = 3.9 / 3 = 1.30. Same answer. No pile stored.
+  That formula -- q = old + (1/n) * (payout - old) -- is the running average.
+  Proof: average of 1.6, 0.9, 1.4 = 3.9 / 3 = 1.30. Same number. No pile of old payouts stored.
 
-  Proof that it always matches the plain average:
+  Full check across four patients:
 
-    go 1, payout 1.6:  q = 0.00 + (1/1)*(1.6-0.00) = 1.60   avg(1.6) = 1.60
-    go 2, payout 0.9:  q = 1.60 + (1/2)*(0.9-1.60) = 1.25   avg(1.6,0.9) = 2.5/2 = 1.25
-    go 3, payout 1.4:  q = 1.25 + (1/3)*(1.4-1.25) = 1.30   avg(1.6,0.9,1.4) = 3.9/3 = 1.30
-    go 4, payout 1.2:  q = 1.30 + (1/4)*(1.2-1.30) = 1.28   avg(1.6,0.9,1.4,1.2) = 5.1/4 = 1.28
+    patient 1, payout 1.6:  q = 0.00 + (1/1)*(1.6-0.00) = 1.60   avg(1.6) = 1.60
+    patient 2, payout 0.9:  q = 1.60 + (1/2)*(0.9-1.60) = 1.25   avg(1.6,0.9) = 2.5/2 = 1.25
+    patient 3, payout 1.4:  q = 1.25 + (1/3)*(1.4-1.25) = 1.30   avg(1.6,0.9,1.4) = 3.9/3 = 1.30
+    patient 4, payout 1.2:  q = 1.30 + (1/4)*(1.2-1.30) = 1.28   avg(1.6,0.9,1.4,1.2) = 5.1/4 = 1.28
+
+  The guess creeps toward the true average (1.2) without storing a single old payout.
+  Two records per machine: count feeds the nudge size. Payout feeds the (payout - old) part.
+  The count is plays-through, never the payout amount. Patient 1 paying 900 would still add 1 to the
+  count, not 900.
 
   ---------------------------------------------------------------------------
 
-  TO PICK NEXT: find the machine with the highest guess. Return its index (0, 1, or 2).
+  To pick the next machine, find the highest guess and return its index -- a slot number, not the value.
 
-    q = [1.30,  0.0,  0.0]   -> scan left to right -> biggest at index 0 (machine A) -> pick A
+    q = [1.30,  0.0,  0.0]   -> biggest at index 0 -> pick machine A (slot 0)
 
-  What if two machines tie?
+  When two machines tie:
 
     q = [1.0,  1.0,  0.5]
 
-    NAIVE (numpy's built-in argmax):   reads left to right, returns 0 always in a tie.
-                                       A gets every patient. B silently ignored.
+    Lazy pick:  reads left to right, always returns 0. B silently ignored forever.
+    Fair pick:  collect tied slots -> [0, 1]. Flip a fair coin. Return 0 or 1 equally.
 
-    FAIR (write it yourself):          collect all tied machines -> [0, 1]
-                                       fair coin -> returns 0 or 1 equally.
-
-  ** KEY: THE ARGMAX TIE TRAP -- lazy code hides a bias you cannot see
-     q = [0.0, 0.0, 0.0] at the start. All three tied.
-     numpy argmax returns 0 every time. Machine A gets a thousand patients. B and C never tried.
-     THE FIX: two extra lines. Collect every tied index. Pick one at random.
+  Why it matters: at the very start, q = [0.0, 0.0, 0.0]. All three tied.
+  A lazy pick returns 0 every time. Machine A gets a thousand patients. B and C never tried.
+  Two lines fix it -- collect every tied index, pick one at random.
 
   ---------------------------------------------------------------------------
 
-  Watch what a greedy shopkeeper (always picks the highest guess) earns over 1000 patients:
+  Now watch what the greedy shopkeeper earns from 1000 patients.
 
-    after go    1:   q = [ 1.60,  0.00,  0.00 ]   -> pick A
-    after go   10:   q = [ 1.28,  0.00,  0.00 ]   -> pick A (B and C still frozen)
-    after go  100:   q = [ 1.21,  0.00,  0.00 ]   -> pick A
-    after go 1000:   q = [ 1.20,  0.00,  0.00 ]   -> pick A (forever)
+    after patient    1:   q = [ 1.60,  0.00,  0.00 ]
+    after patient   10:   q = [ 1.28,  0.00,  0.00 ]
+    after patient  100:   q = [ 1.21,  0.00,  0.00 ]
+    after patient 1000:   q = [ 1.20,  0.00,  0.00 ]
 
-    machine A true average:  1.2   <- guess settled here
-    machine B true average: -0.3   <- never discovered
-    machine C true average:  0.8   <- never discovered
+    machine A true average:  1.2
+    machine B true average: -0.3
+    machine C true average:  0.8
 
-  Run 8 different starting conditions. Same result every time: A = 1000 patients, B and C = 0.
+  Run with 8 different random seeds. Same result each time: A = 1000 patients, B = 0, C = 0.
+  Machine A's guess settled near 1.2. That 1.2 beats the un-played 0.0 forever.
+  So argmax returns A, forever. B and C are mysteries the shopkeeper chose not to solve.
 
-  ** KEY: THE FALSE CEILING TRAP -- the first decent machine blocks all others
-     After go 1 of machine A: q = [1.6, 0.0, 0.0].
-     1.6 beats 0.0. A is picked again. Forever.
-     The flaw is structural: only the machine just tested gets updated.
-     Every untested machine stays at 0.0. Any positive guess beats 0.0.
-     Machine B's true average could be 5.0. You earn 1.2 forever.
-
-  ---------------------------------------------------------------------------
-
-  ** KEY: THE EXPLORATION TAX PARADOX -- you must spend patients to find the best machine
-     To learn whether B or C is better than A, you must test them.
-     Testing a machine you suspect is worse costs you a patient.
-     A shopkeeper who refuses to waste a single patient guarantees he will never find the best.
-     The tax is mandatory. There is no shortcut.
-
-  Fix: before each pick, roll a number.
-
-    roll = one random number between 0.0 and 1.0
-
-    roll < 0.10  (10% of patients):   EXPLORE -> test a random machine
-    roll >= 0.10 (90% of patients):   EXPLOIT -> test the highest-guess machine
-
-  Example sequence with epsilon = 0.1:
-
-    go 2,  roll = 0.07:  EXPLORE  -> random -> machine C   <- tries C for first time
-    go 4,  roll = 0.54:  EXPLOIT  -> machine A (still highest)
-    go 9,  roll = 0.03:  EXPLORE  -> random -> machine B   <- finds B is a loser
-    go 17, roll = 0.91:  EXPLOIT  -> machine A
-
-  After 100 random goes scattered across 1000 total:
-
-    q = [ 1.20,  -0.31,  0.79 ]   <- guesses near their true averages
-
-  epsilon = 0.1 earns more than pure greed and stays near the true ceiling (1.2).
-  epsilon = 0.4: too much random. You test the losing machine 40% of the time even after
-                 you know it loses. Wasted patients drag average earnings down.
-  epsilon = 0.0: pure greed. The trap above.
+  The flaw is structural. Only the machine just played gets an update. Every unplayed machine
+  stays at 0.0. Any positive guess beats 0.0. Machine B's true average could be 5.0.
+  The shopkeeper earns 1.2 per patient forever while 5.0 sits idle.
 
   ---------------------------------------------------------------------------
 
-  Two sizes of nudge.
+  Now say the shopkeeper has 100 machines and only 10 patients have come.
 
-  SHRINKING (nudge = 1/n):
+    machines 1-4:  tested. guesses are real numbers.
+    machines 5-100: never tested. guesses sit at 0.0. not "bad" -- unknown.
 
-    n =     1      2       3       10      100     1000
-    nudge = 1.000  0.500   0.333   0.100   0.010   0.001
+  Patient 11 arrives. Greedy picks the highest-guess tested machine. Locks in. Machines 5 through 100
+  stay at 0.0 forever, because tested beats untested and the tested machine's guess keeps winning.
 
-  Early payouts drag the guess far. Late payouts barely move it.
-  Guess converges and stays put. Right when the machines never change.
+  The only way to find whether machine 47 is better is to send a patient through machine 47.
+  A greedy shopkeeper who refuses to waste a single patient on a worse-looking machine will never
+  find machine 47 even if it earns three times more. The wasted patient is not optional -- it is
+  the only price of admission.
 
-  ** KEY: THE SHRINKING NUDGE TRAP -- a settled guess is deaf in a changing world
-     After 10,000 patients: nudge = 1/10000 = 0.0001.
-     The factory owner swaps machine A's internals overnight. True average drops from 1.2 to -1.0.
-     (Think: Tuesday electricity problem -- the machine behaves differently now.)
-     Next payout: -0.8. Update:
-       q[A] = 1.20 + 0.0001 * (-0.8 - 1.20) = 1.20 - 0.0002 = 1.1998
-     Barely moved. Needs 10,000 more patients to unlearn 1.2. Deaf.
-     THE FIX: constant nudge (say 0.1). Always moves 10% of the gap.
-       q[A] = 1.20 + 0.1 * (-0.8 - 1.20) = 1.20 - 0.20 = 1.00   <- adapts in one go
+  Before each pick, the shopkeeper rolls a number between 0.0 and 1.0.
 
-  FIXED (nudge = 0.1 always):
+    roll < 0.10:   EXPLORE -- send patient to a random machine
+    roll >= 0.10:  EXPLOIT -- send patient to the highest-guess machine
 
-    n =     1      2       3       10      100     1000
-    nudge = 0.1    0.1     0.1     0.1     0.1     0.1
+  epsilon = 0.10 means 10% of patients go to random machines. The other 90% go to the current best.
 
-  Guess never fully sleeps. Jitters around the true average.
-  Less precise when machines are stable. Adapts fast when the factory changes.
+  What that looks like across a few patients:
 
-  Non-stationary test: at go 1000, factory owner swaps all machines overnight.
+    patient 2,  roll = 0.07:  EXPLORE  -> random -> machine C   (first patient ever through C)
+    patient 4,  roll = 0.54:  EXPLOIT  -> machine A (still highest guess)
+    patient 9,  roll = 0.03:  EXPLORE  -> random -> machine B   (B's payout is low: it is a loser)
+    patient 17, roll = 0.91:  EXPLOIT  -> machine A
+
+  After 100 random patients scattered across 1000 total:
+
+    q = [ 1.20,  -0.31,  0.79 ]
+
+  All three true averages discovered. The 10% tax paid off.
+
+  epsilon = 0.4 is too much -- the shopkeeper tests the losing machine 40% of the time even after
+  knowing it loses. Earnings drop.
+  epsilon = 0.0 is pure greed -- the first result above.
+
+  ---------------------------------------------------------------------------
+
+  Two nudge sizes. One question: should the nudge shrink, or stay fixed?
+
+  Shrinking nudge = 1/n:
+
+    n:     1      2      3      10     100    1000
+    nudge: 1.000  0.500  0.333  0.100  0.010  0.001
+
+  Early patients pull the guess far. Late patients barely move it. Guess converges and stays.
+  Right for stable machines that never change.
+
+  Fixed nudge = 0.1:
+
+    n:     1      2      3      10     100    1000
+    nudge: 0.1    0.1    0.1    0.1    0.1    0.1
+
+  Guess never fully settles. Always moves 10% toward the latest payout. Less precise in a stable world.
+  Adapts fast when the machines change.
+
+  Now the factory owner swaps machine A's internals overnight. True average drops from 1.2 to -1.0.
+  (Think: power cut Tuesday, machine recalibrated wrong, never corrected.)
+  Next payout from A: -0.8.
+
+    Shrinking nudge after 10,000 patients:  nudge = 1/10000 = 0.0001
+      q[A] = 1.20 + 0.0001 * (-0.8 - 1.20) = 1.20 - 0.0002 = 1.1998
+      Barely moved. Needs 10,000 more patients to unlearn 1.2.
+
+    Fixed nudge = 0.1:
+      q[A] = 1.20 + 0.1 * (-0.8 - 1.20) = 1.20 - 0.20 = 1.00
+      One patient moves it 0.20. Ten patients later: guess near -1.0.
+
+  Non-stationary numbers: factory swaps all machines at patient 1000.
   New machine A true average: -1.0. New machine C true average: 2.5.
 
-    1/n shopkeeper at go 1001:   nudge for machine A = 1/500 = 0.002.
-    Takes ~5000 more patients to move the guess from 1.2 toward -1.0.
-
-    Fixed 0.1 shopkeeper at go 1001:  nudge = 0.1.
-    After 10 patients of new machine A: guess near -1.0. Done.
+    Shrinking shopkeeper at patient 1001: nudge for A = 1/500 = 0.002. 5000 patients to adapt.
+    Fixed shopkeeper at patient 1001: nudge = 0.1. Ten patients. Done.
 
   ---------------------------------------------------------------------------
 
-  One run of the epsilon-greedy shopkeeper is luck. Two runs with the same shopkeeper:
-
-    run 0:  best machine found at go 50.   average earnings by go 100: 1.4
-    run 1:  best machine found at go 312.  average earnings by go 100: 0.9
-
-  Same shopkeeper, same settings -- different random payouts early on.
-  Average 200 runs: luck cancels. The true pattern emerges.
-
-  ---------------------------------------------------------------------------
-
-  Three shopkeepers, side by side (machines A/B/C with true averages 1.2 / -0.3 / 0.8):
+  Three shopkeepers, same machines (true averages: A=1.2, B=-0.3, C=0.8):
 
     Greedy:
-      update q[note] = q[note] + (1/n[note]) * (payout - q[note])
-      pick:   highest guess always
-      result: q = [ 1.20,  0.00,  0.00 ] after 1000 patients every time
+      nudge = 1/n     pick = highest guess always
+      q after 1000:  [ 1.20,  0.00,  0.00 ]
 
     Epsilon-greedy (epsilon = 0.1):
-      update: same
-      pick:   random machine 10% of patients; highest guess 90%
-      result: q = [ 1.20, -0.31,  0.79 ] after 1000 patients; average earnings near 1.2
+      nudge = 1/n     pick = random 10%, highest guess 90%
+      q after 1000:  [ 1.20, -0.31,  0.79 ]   average payout near 1.2
 
-    Constant-nudge (nudge = 0.1 fixed, epsilon = 0.1):
-      update q[note] = q[note] + 0.1 * (payout - q[note])   <- nudge never shrinks
-      pick:   same as epsilon-greedy
-      result: same average earnings but adapts when the factory changes machines overnight
+    Constant-nudge (nudge = 0.1, epsilon = 0.1):
+      nudge = 0.1     pick = same as epsilon-greedy
+      q after 1000:  same average payout, adapts if factory changes overnight
 
-  The note (self.last_action) always holds the machine that earned this payout.
-  Update only that machine. Then pick next. Then overwrite the note.
+  One run is luck -- early random payouts can make the best machine look bad. Average 200 runs:
+  luck cancels. The true pattern emerges.
 
   ---------------------------------------------------------------------------
 
-  A payout is a number, possibly negative. It folds into one machine's running average.
-  Finding the highest guess returns an index -- the next machine to test, not the value itself.
-  Greed alone locks onto the first decent machine and never leaves.
-  10% randomness escapes that lock by testing others on purpose.
-  A shrinking nudge settles on truth when the factory is stable.
-  A fixed nudge tracks truth when the factory swaps machines overnight.
-  Payout always lags the test by one go and arrives with no machine label.
-  You recover the machine from your own note. You never see the true averages.
+  A payout is a float, possibly negative. It folds into one machine's running average.
+  The highest guess returns an index -- the slot to test, not the value.
+  Pure greed locks onto the first decent machine and stays.
+  10% random breaks that lock by testing others.
+  Shrinking nudge settles in a stable world.
+  Fixed nudge tracks truth in a changing one.
+  Payout lags the test by one patient, arrives with no machine label.
+  The machine is recovered from the shopkeeper's own note. True averages are never seen.
 
   ------------------------------------------------------------------------------------------
   >> NOTE: STANDARD JARGON
-     bandit    = slot machine (the "arm" is the lever; one-armed bandit is the old name --
-                 this page says machine instead)
-     arms      = the machines / choices available
-     epsilon-greedy = explore-or-exploit agent; epsilon = fraction of random tests
-     q_values  = action-value estimates (Q(a) in textbooks); this page says guess
-     true average = expected reward (the factory owner's known value per machine)
-     1/n update = sample-mean update; converges to the true average
+     bandit    = slot machine ("one-armed bandit" is the old name; this page says machine)
+     arm       = one machine / one choice
+     epsilon-greedy = the explore-or-exploit shopkeeper above; epsilon = fraction of random tests
+     q_values  = action-value estimates Q(a); this page says guess
+     true average = expected reward; the factory owner's known value per machine
+     1/n update = sample-mean update; converges to the true average in a stable world
      constant step size = exponential recency-weighted average; weights recent payouts more
      exploration vs exploitation = the greed-vs-curiosity tension above
   ------------------------------------------------------------------------------------------
@@ -385,8 +278,7 @@
 
   ## The Code, If You Want It
 
-  Nothing above needed a computer. This section shows the same pencil work in Python.
-  Each go is written out explicitly so you can see the same three lines repeating.
+  The pencil work above, spoken in Python. Each patient written out explicitly.
 
   >> NEW TO PYTHON?
        np.zeros(3)          -- strip of three 0.0 values: [0. 0. 0.]
@@ -394,99 +286,101 @@
        np.where(q == top)   -- indices where q equals top (all tied machines)
        rng.choice(tied)     -- pick one index at random from the tied list
        rng.random()         -- one random number between 0.0 and 1.0
-       rng.integers(3)      -- one random integer from 0, 1, or 2
+       rng.integers(3)      -- one random integer: 0, 1, or 2
 
     import numpy as np
     rng = np.random.default_rng(42)
 
-    # factory side (hidden in a real problem -- only here for the demo)
+    # factory side (hidden in a real problem -- shown here for verification only)
     true_avg = np.array([1.2, -0.3, 0.8])
 
     # shopkeeper's records
-    q = np.zeros(3)    # [0. 0. 0.]  guesses; start wrong
+    q = np.zeros(3)    # [0. 0. 0.]  guesses; all wrong at start
     n = np.zeros(3)    # [0. 0. 0.]  patient counts
 
     def argmax_fair(q):
         top  = np.max(q)
         tied = np.where(q == top)[0]    # all machines tied for biggest guess
-        return int(rng.choice(tied))    # fair coin among tied machines
+        return int(rng.choice(tied))    # fair pick among ties
 
-    # --- greedy shopkeeper: go 1 ---
-    last   = argmax_fair(q)                                # 0  (random tie at start)
-    payout = true_avg[last] + rng.standard_normal() * 0.8 # 1.2 + noise  ~  1.6
-    n[last] += 1                                           # n = [1, 0, 0]
+    # --- greedy shopkeeper ---
+
+    # patient 1
+    last   = argmax_fair(q)                                  # 0  (random tie at start)
+    payout = true_avg[last] + rng.standard_normal() * 0.8   # 1.2 + noise  ~  1.6
+    n[last] += 1                                             # n = [1, 0, 0]
     q[last] += (1 / n[last]) * (payout - q[last])
     print(q)    # [1.60  0.00  0.00]
 
-    # --- greedy shopkeeper: go 2 ---
-    last   = argmax_fair(q)                                # 0  (1.60 > 0.00)
-    payout = true_avg[last] + rng.standard_normal() * 0.8 # ~  0.9
-    n[last] += 1                                           # n = [2, 0, 0]
+    # patient 2
+    last   = argmax_fair(q)                                  # 0  (1.60 > 0.00)
+    payout = true_avg[last] + rng.standard_normal() * 0.8   # ~  0.9
+    n[last] += 1                                             # n = [2, 0, 0]
     q[last] += (1 / n[last]) * (payout - q[last])
     print(q)    # [1.25  0.00  0.00]
 
-    # --- greedy shopkeeper: go 3 ---
-    last   = argmax_fair(q)                                # 0  (1.25 > 0.00)
-    payout = true_avg[last] + rng.standard_normal() * 0.8 # ~  1.4
-    n[last] += 1                                           # n = [3, 0, 0]
+    # patient 3
+    last   = argmax_fair(q)                                  # 0  (1.25 > 0.00)
+    payout = true_avg[last] + rng.standard_normal() * 0.8   # ~  1.4
+    n[last] += 1                                             # n = [3, 0, 0]
     q[last] += (1 / n[last]) * (payout - q[last])
-    print(q)    # [1.30  0.00  0.00]  <- B and C still frozen at 0.0
+    print(q)    # [1.30  0.00  0.00]  <- B and C frozen at 0.0
 
-    # ... after 1000 goes:  q ≈ [1.20  0.00  0.00]  B and C never move
+    # after 1000 patients:  q ≈ [1.20  0.00  0.00]  B and C never move
 
-    # --- epsilon-greedy shopkeeper: same update, one extra decision per pick ---
+    # --- epsilon-greedy shopkeeper ---
 
-    q = np.zeros(3)    # reset
+    q = np.zeros(3)
     n = np.zeros(3)
     epsilon = 0.1
 
-    # go 1
-    last   = argmax_fair(q)    # 0  (random tie)
+    # patient 1
+    last   = argmax_fair(q)
     payout = true_avg[last] + rng.standard_normal() * 0.8   # ~ 1.6
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
     print(q)    # [1.60  0.00  0.00]
 
-    # go 2 -- epsilon check
+    # patient 2 -- explore
     roll = rng.random()    # 0.07  <  0.10  ->  EXPLORE
-    last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # random -> 2
-    payout = true_avg[last] + rng.standard_normal() * 0.8   # machine C pays ~ 0.9
+    last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 2
+    payout = true_avg[last] + rng.standard_normal() * 0.8               # C pays ~ 0.9
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
-    print(q)    # [1.60  0.00  0.90]   <- machine C just got sampled
+    print(q)    # [1.60  0.00  0.90]   <- C sampled for first time
 
-    # go 3 -- epsilon check
+    # patient 3 -- exploit
     roll = rng.random()    # 0.54  >= 0.10  ->  EXPLOIT
-    last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # greedy -> 0
-    payout = true_avg[last] + rng.standard_normal() * 0.8   # machine A pays ~ 1.4
+    last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 0
+    payout = true_avg[last] + rng.standard_normal() * 0.8               # A pays ~ 1.4
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
     print(q)    # [1.25  0.00  0.90]
 
-    # go 4 -- epsilon check
+    # patient 4 -- explore
     roll = rng.random()    # 0.02  <  0.10  ->  EXPLORE
-    last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # random -> 1
-    payout = true_avg[last] + rng.standard_normal() * 0.8   # machine B pays ~ -0.4
+    last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 1
+    payout = true_avg[last] + rng.standard_normal() * 0.8               # B pays ~ -0.4
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
-    print(q)    # [1.25  -0.40  0.90]   <- machine B discovered as loser
+    print(q)    # [1.25  -0.40  0.90]   <- B found as loser
 
-    # ... after 1000 goes:  q ≈ [1.20  -0.30  0.80]  all three true averages found
+    # after 1000 patients:  q ≈ [1.20  -0.30  0.80]  all three true averages found
 
-    # --- constant nudge shopkeeper: same pick, fixed nudge instead of 1/n ---
+    # --- constant-nudge shopkeeper ---
 
-    q = np.zeros(3)    # reset
+    q = np.zeros(3)
     step = 0.1
 
-    # go 1
-    last   = argmax_fair(q)                                # 0
-    payout = true_avg[last] + rng.standard_normal() * 0.8 # ~ 1.6
-    q[last] += step * (payout - q[last])                   # nudge = 0.1 always
-    print(q)    # [0.16  0.00  0.00]   <- only 10% of the gap; never leaps all the way
+    # patient 1
+    last   = argmax_fair(q)
+    payout = true_avg[last] + rng.standard_normal() * 0.8   # ~ 1.6
+    q[last] += step * (payout - q[last])                     # nudge = 0.1 always
+    print(q)    # [0.16  0.00  0.00]   <- 10% of the gap only; never leaps
 
-    # go 2
-    last   = argmax_fair(q)                                # 0  (0.16 > 0.00)
-    payout = true_avg[last] + rng.standard_normal() * 0.8 # ~ 0.9
+    # patient 2
+    last   = argmax_fair(q)                                  # 0  (0.16 > 0.00)
+    payout = true_avg[last] + rng.standard_normal() * 0.8   # ~ 0.9
     q[last] += step * (payout - q[last])
     print(q)    # [0.22  0.00  0.00]
 
-    # ... guess creeps up slowly; never fully settles; stays ready to track if factory changes
+    # guess creeps up; never fully settles; tracks if factory swaps machines
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 12 -- Reinforcement Learning):
