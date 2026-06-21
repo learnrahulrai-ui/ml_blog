@@ -137,28 +137,27 @@
 
   ---------------------------------------------------------------------------
 
-  Now watch what the greedy shopkeeper earns from 1000 patients.
+  That fair pick solves the tie. It does not save the greedy shopkeeper.
+  Over 1000 patients, with the three machines whose true averages are 1.2, -0.3, and 0.8:
 
-    after patient    1:   q = [ 1.60,  0.00,  0.00 ]
+    after patient    1:   q = [ 1.60,  0.00,  0.00 ]   <- true averages: A=1.2, B=-0.3, C=0.8
     after patient   10:   q = [ 1.28,  0.00,  0.00 ]
     after patient  100:   q = [ 1.21,  0.00,  0.00 ]
     after patient 1000:   q = [ 1.20,  0.00,  0.00 ]
 
-    machine A true average:  1.2
-    machine B true average: -0.3
-    machine C true average:  0.8
-
-  In most runs, the first machine to earn a positive payout captures nearly all future patients --
-  here, that was A. Machine A's guess settled near 1.2. That beats the un-played 0.0 forever.
+  The first machine to earn a positive payout captures nearly all future patients.
+  Here A went first, paid 1.6, and its guess beat the un-played 0.0 forever.
   So argmax returns A every time. B and C are mysteries the shopkeeper chose not to solve.
 
   The flaw is structural. Only the machine just played gets an update. Every unplayed machine
   stays at 0.0. Any positive guess beats 0.0. Machine B's true average could be 5.0.
   The shopkeeper earns 1.2 per patient forever while 5.0 sits idle.
 
+  That is three machines. Scale it to 100.
+
   ---------------------------------------------------------------------------
 
-  Now say the shopkeeper has 100 machines and only 10 patients have come.
+  Say the shopkeeper has 100 machines and only 10 patients have come.
 
     machines 1-4:  tested. guesses are real numbers.
     machines 5-100: never tested. guesses sit at 0.0. not "bad" -- unknown.
@@ -197,7 +196,9 @@
 
   ---------------------------------------------------------------------------
 
-  Two nudge sizes. One question: should the nudge shrink, or stay fixed?
+  Epsilon-greedy finds all three machines. But what if the factory swaps internals overnight?
+  The shrinking nudge, small after many patients, barely moves -- it goes deaf.
+  That forces a second question: should the nudge shrink as data accumulates, or stay fixed?
 
   Shrinking nudge = 1/n:
 
@@ -247,7 +248,9 @@
 
     Constant-nudge (nudge = 0.1, epsilon = 0.1):
       nudge = 0.1     pick = same as epsilon-greedy
-      q after 1000:  slightly lower average in a stable world; adapts when factory changes overnight
+      q after 1000:  [ ~1.2, ~-0.3, ~0.8 ]  guesses jitter -- never fully settle
+      stable world:  slightly lower average than epsilon-greedy (noisier estimates -> more wrong picks)
+      changing world: adapts in ~10 patients; epsilon-greedy needs hundreds
 
   One run is luck -- early random payouts can make the best machine look bad. Average 200 runs:
   luck cancels. The true pattern emerges.
@@ -260,7 +263,7 @@
   10% random breaks that lock by testing others.
   Shrinking nudge settles in a stable world.
   Fixed nudge tracks truth in a changing one.
-  The payout arrives at the code boundary as a bare number; record which machine you tested before picking so the update finds the right slot.
+  Record which machine you tested before picking -- the payout arrives as a bare number with no label.
   True averages are never seen.
 
   ------------------------------------------------------------------------------------------
@@ -278,7 +281,8 @@
 
   ## The Code, If You Want It
 
-  The pencil work above, spoken in Python. Each patient written out explicitly.
+  The pencil work above, spoken in Python. The greedy block uses the same payouts (1.6, 0.9, 1.4)
+  as the walkthrough -- these are illustrative values, not the output of any specific random seed.
 
   >> NEW TO PYTHON?
        np.zeros(3)          -- strip of three 0.0 values: [0. 0. 0.]
@@ -343,7 +347,7 @@
     # patient 2 -- explore
     roll = rng.random()    # 0.07  <  0.10  ->  EXPLORE
     last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 2
-    payout = true_avg[last] + rng.standard_normal() * 0.8               # C pays ~ 0.9
+    payout = true_avg[last] + rng.standard_normal() * 0.8               # noisy payout around C's true average (0.8)
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
     print(q)    # [1.60  0.00  0.90]   <- C sampled for first time
 
@@ -358,7 +362,7 @@
     # patient 4 -- explore
     roll = rng.random()    # 0.02  <  0.10  ->  EXPLORE
     last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 1
-    payout = true_avg[last] + rng.standard_normal() * 0.8               # B pays ~ -0.4
+    payout = true_avg[last] + rng.standard_normal() * 0.8               # noisy payout around B's true average (-0.3)
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
     print(q)    # [1.25  -0.40  0.90]   <- B found as loser
 
