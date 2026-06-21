@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in eleven chapters (thirty-one posts),
-  meant to be read top to bottom. Each post opens with a "post N of 31" path header and a
+  This is not a pile of loose articles -- it is a short BOOK in twelve chapters (thirty-four posts),
+  meant to be read top to bottom. Each post opens with a "post N of 34" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 31:
+  >> NEW HERE? Start at post 1 of 34:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -287,7 +287,7 @@
     flagged as skipped. Assumes zero background.
 
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
-    special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand
+    special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand . (also: Chapter 12 intro)
     Written for Hacker News, self-contained: why five agent types are a LADDER (each rung =
     the rung below + exactly one new power) rather than a taxonomy. Rung 1 (twitch/simple
     reflex): wiring table, breaks at sealed box -- mouse hides, cat wanders off (no memory).
@@ -484,8 +484,23 @@
   CHAPTER 12 . REINFORCEMENT LEARNING -- agents, rewards, and plans by hand
   --------------------------------------------------------------------------
 
-  [Part 1 -- Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
-    post 32+ . 2026-06-19 . part 1 of 2+ . reinforcement-learning, policy-evaluation, bellman, by-hand
+  [Intro -- The Agent Ladder: Five Cat-Bots, One New Power Each](posts/the-agent-ladder.txt)
+    intro . see also: SPECIAL below . 2026-06-18 . ai-agents, planning, utility, learning
+    Why five agent types are a ladder (each rung = the rung below + exactly one new power).
+    Required reading before the RL posts. Also stands alone as a Hacker News piece.
+
+  [Part 1 -- Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines](posts/bandits-and-exploration.txt)
+    post 32/34 . 2026-06-21 . part 1 of 3 . reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
+    A greedy shopkeeper at a railway station clinic rents faulty machines from a factory. Three
+    machines, 1000 patients, and one problem: the true average payout of each machine is hidden.
+    Three patients traced by pencil, the running average proved without storing old payouts, the
+    tie-breaking bug, the greed lock (first positive estimate captures all future patients), the
+    100-machine version of the same trap, and the epsilon fix -- 10% random breaks the lock.
+    Then shrinking nudge vs fixed nudge with the overnight factory-swap test: alpha=0.1 needs
+    ~30 patients to unlearn a stale estimate; 1/n needs hundreds. Python for all three shopkeepers.
+
+  [Part 2 -- Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
+    post 33/34 . 2026-06-19 . part 2 of 3 . reinforcement-learning, policy-evaluation, bellman, by-hand
     Policy evaluation built from a drone over enemy ground -- a runway (+5), dirt (-2), fuel (-0.1
     a move), and a fixed plan of arrows. Grading the plan = filling in the WORTH of every spot
     (discounted points collected from here on, obeying the arrows). The one law: a ground spot's
@@ -498,8 +513,8 @@
     derived from scratch to prove WHY the discount exists. delta/theta stop rule; Gauss-Seidel vs
     Jacobi update order; 27-spot 3x3x3 grid worked. Assumes zero background.
 
-  [Part 2 -- Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
-    post 33+ . 2026-06-19 . part 2 of 2+ . reinforcement-learning, policy-iteration, policy-improvement, by-hand
+  [Part 3 -- Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
+    post 34/34 . 2026-06-19 . part 3 of 3 . reinforcement-learning, policy-iteration, policy-improvement, by-hand
     Policy iteration: no plan given -- finding the best arrows IS the job. The IMPROVE move: at
     every air spot, peek all six nudges with the air-law and re-aim the arrow at the biggest peek
     (the textbook's Q(s,a) and argmax). The loop: seed any dumb plan, grade, improve, repeat until
