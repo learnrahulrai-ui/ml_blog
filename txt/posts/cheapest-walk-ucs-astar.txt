@@ -20,9 +20,8 @@
   numbers, not hand-waved. And A* as the few-line change to UCS that it really is -- run on
   the same map, every pop shown, the exact moment it wins demonstrated.
 
-  TOY MAP, REAL RECIPE. One line of honesty up front, so nothing misleads. The RECIPE --
-  every move, in order -- is exactly Uniform-Cost Search and A* as Dijkstra, Russell, and
-  Norvig wrote them. The MAP is a toy: five letter-nodes, a handful of roads with small costs,
+  TOY MAP, REAL RECIPE. One line of honesty up front: every move, in order, is exactly
+  Uniform-Cost Search and A* as Dijkstra, Russell, and Norvig wrote them. The MAP is a toy: five letter-nodes, a handful of roads with small costs,
   chosen so every number fits on paper. Where a toy choice could mislead about the method,
   the text says so. Trust the recipe; treat the map as a sketchpad.
 

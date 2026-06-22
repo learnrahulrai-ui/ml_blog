@@ -30,9 +30,9 @@
      Also pick parents by tournament (best of 3 random candidates), not just top-2 overall.
      That guarantees some diversity survives. Diversity is what lets the search escape the hill.
 
-  TOY NUMBERS, REAL RECIPE. One line of honesty up front. The RECIPE -- score, flip, share,
-  pick, cut, tweak, replace -- is exactly a real genetic algorithm, nothing faked or skipped.
-  The NUMBERS are a toy: a secret of 4 slots instead of hundreds, a population of 4 guesses
+  TOY NUMBERS, REAL RECIPE. One line of honesty up front: score, flip, share, pick, cut,
+  tweak, replace -- exactly a real genetic algorithm, nothing faked or skipped. The NUMBERS
+  are a toy: a secret of 4 slots instead of hundreds, a population of 4 guesses
   instead of thousands, and parents chosen so the first generation lands the answer cleanly so
   you can check it by eye. Where a toy choice could be mistaken for the method, the text says
   so. Trust the recipe; treat the sizes as a sketchpad.

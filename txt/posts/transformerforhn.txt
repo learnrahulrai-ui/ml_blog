@@ -16,9 +16,8 @@
   Q, K, V, and waves at "attention is all you need." This page never waves. One transformer
   block runs end to end on two words, and EVERY number is worked in front of you on paper.
 
-  TOY NUMBERS, REAL RECIPE. One line of honesty up front, so nothing here misleads. The
-  RECIPE on this page -- every move, in order -- is exactly a real GPT-style transformer block,
-  nothing faked or skipped. The NUMBERS are a toy: rows 4 wide instead of 512, two words instead
+  TOY NUMBERS, REAL RECIPE. One line of honesty up front: every move, in order, is exactly
+  a real GPT-style transformer block, nothing faked or skipped. The NUMBERS are a toy: rows 4 wide instead of 512, two words instead
   of thousands, and weight-grids picked small and clean so you can check each by eye. Where a toy
   choice could be mistaken for the mechanism, the text says so and shows the real version
   beside it. Trust the recipe; treat the sizes as a sketchpad.

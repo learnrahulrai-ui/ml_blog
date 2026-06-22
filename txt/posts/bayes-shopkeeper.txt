@@ -18,8 +18,8 @@
   hospital corridor, and ten concrete cases, every answer arrived at by counting patients on
   paper. The formula appears at the end, after you have already used it.
 
-  TOY NUMBERS, REAL RECIPE. The RECIPE -- the head-count trick, the two-crowd distinction,
-  the gluing move, Bayes' rule itself -- is exact. The NUMBERS are a toy: small groups (100
+  TOY NUMBERS, REAL RECIPE. The head-count trick, the two-crowd distinction, the gluing
+  move, Bayes' rule itself -- all exact. The NUMBERS are a toy: small groups (100
   or 1,000 patients) and simple machine rates, chosen so arithmetic fits on paper. Where a
   toy choice could mislead, the text says so. Trust the recipe; treat the group sizes as a
   sketchpad.

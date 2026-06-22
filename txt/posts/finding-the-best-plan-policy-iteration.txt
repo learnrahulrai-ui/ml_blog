@@ -24,8 +24,8 @@
   a plan that got tired. This page shows both, by hand. No magic.
 
 
-  TOY WORLD, REAL RECIPE. The RECIPE -- grade a plan, peek every nudge, keep the best, repeat
-  until the arrows freeze -- is exact. The WORLD is a toy: a small box of spots, simple painted
+  TOY WORLD, REAL RECIPE. Grade a plan, peek every nudge, keep the best, repeat until the
+  arrows freeze -- exact. The WORLD is a toy: a small box of spots, simple painted
   scores, and moves that always land where you aim (no slipping). Real problems let a move slip
   -- push North, sometimes drift East -- and then a peek averages over where you MIGHT land,
   weighted by the odds. Here a push lands for sure, so that average collapses to a single spot.

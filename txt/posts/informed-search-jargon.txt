@@ -21,8 +21,8 @@
   earns its own existence is visible; (2) explaining what "admissible" actually forbids and why
   that one rule makes or breaks optimality. This page shows both, start to finish, with numbers.
 
-  TOY TOWN, REAL RECIPE. One line of honesty up front. The RECIPE -- one machine, three ways to
-  label slips, the proof admissibility makes A* optimal -- is exact. The TOWN is a toy: four
+  TOY TOWN, REAL RECIPE. One line of honesty up front: one machine, three ways to label
+  slips, the proof admissibility makes A* optimal -- exact. The TOWN is a toy: four
   nodes, four roads, numbers chosen so arithmetic fits on paper and the moment greedy gets fooled
   is impossible to miss. Where a toy choice could mislead about the method, the text says so.
   Trust the recipe; treat the numbers as a sketchpad.
