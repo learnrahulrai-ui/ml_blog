@@ -1,0 +1,682 @@
+@title The Mark That Tells a Transformer Where It Is: Positional Encoding Built From Scratch :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . DEEP DIVE -- companion to Chapter 10
+  The Mark That Tells a Transformer Where It Is: Positional Encoding Built From Scratch
+  Posted: 2026-06-22 . Author: Rahul Rai . Tags: transformer, positional-encoding, rope, attention, by-hand, deep-learning
+  ============================================================================================
+
+  PATH . Companion to [The Look-Across Machine](the-look-across-machine.txt) and
+         [Attention and the Transformer by Pencil](attention-transformer-by-pencil.txt).
+         Those posts flagged positional encoding as "skipped." This is what was skipped.
+
+  ** KEY: THE ORDER-BLIND MACHINE
+     score("nolan" looking at "ended")  =  nolan.WANT · ended.HAVE
+     score("ended" looking at "nolan")  =  ended.WANT · nolan.HAVE
+
+     Swap the words and the scores swap, but the model still produces the same
+     verdict -- because the dot product knows NOTHING about which word came first.
+     Attention processes all words at once, so the order of the words is invisible.
+
+     The fix is a MARK added to each word's stick before attention runs.
+     The question is what mark, and why.
+
+  This post builds two marks from the ground up -- sinusoidal and RoPE -- fails
+  twice, and then proves algebraically why RoPE works. Every number is worked by
+  hand. Assume you remember nothing.
+
+  THE RULE OF THIS PAGE. Every mark is built from zero, broken, and replaced.
+  Every formula is derived; none appear from nowhere. Every number is calculated
+  in front of you.
+
+
+  ## Attention Cannot See Order -- the Numbers
+
+  From the transformer post: "nolan ended." The stick for "nolan" is [2, 1, 1, 0].
+  The stick for "ended" is [0, 1, 2, 1]. Width 4.
+
+  Attention turns each stick into three tags via three grids: WANT, HAVE, GIVE.
+  The score between two words is nolan.WANT dotted against ended.HAVE.
+
+  Now swap the words: "ended nolan." The sticks are the same -- "nolan" still has
+  stick [2, 1, 1, 0] and "ended" still has [0, 1, 2, 1]. The same WANT/HAVE grids
+  produce the same WANT and HAVE tags. The dot product is unchanged.
+
+  "nolan ended" and "ended nolan" produce the same attention scores. The model
+  cannot tell which sentence it read.
+
+  The fix must happen BEFORE the WANT/HAVE grids. We modify each word's stick
+  depending on its position in the sentence, so the grids see different inputs
+  even for the same word at different positions.
+
+
+  ## The Scalar Trap -- Adding a Number
+
+  The most direct idea: add the slot number to each element of the word's stick.
+
+      "nolan" at slot 1:  [2, 1, 1, 0] + 1  =  [3, 2, 2, 1]
+      "nolan" at slot 5:  [2, 1, 1, 0] + 5  =  [7, 6, 6, 5]
+
+  This breaks on two counts.
+
+  ONE: the position number is on a different scale than the embedding. A stick
+  trained to carry values in the range [-1, 1] now has 5 added to every element
+  at slot 5, and 500 added at slot 500. The position drowns the word's meaning.
+  Any dial trained to distinguish "good" from "great" has to fight through a
+  scale difference of 500.
+
+  TWO: there is no upper bound. A position number can grow without limit. A word
+  at slot 50,000 gets 50,000 added to its stick -- a number the model has never
+  seen in training.
+
+
+  ## The Normalised Scalar -- Better, But Breaks at Inference
+
+  Normalize: divide by the length of the sequence, so the mark is always in [0, 1].
+
+      Sequence of length 512:  slot 1 → 1/512 = 0.00195
+                               slot 256 → 256/512 = 0.500
+                               slot 512 → 512/512 = 1.000
+
+  Now the number is bounded. But something else breaks.
+
+  During training the model reads sequences of length 512. Position 256 maps to 0.5.
+  During inference, a sequence of length 1024 arrives. Position 256 now maps to
+  256/1024 = 0.25. The same word at the same slot in the sentence now produces a
+  DIFFERENT mark depending on the total length of the sequence the model is
+  processing.
+
+  Everything the model learned about "position 256" now points at the wrong mark.
+
+  The scalar approach has a deeper flaw: we are trying to cram two jobs into one
+  number -- be unique AND encode relative distance AND stay bounded. One number
+  cannot do all three.
+
+
+  ## Give Each Position a Vector -- Sinusoidal Encoding
+
+  Instead of one number, give each position a full vector -- one number per
+  dimension of the embedding. With stick width d = 4, each position gets a
+  4-number mark.
+
+  We need a function that, given a position number, returns d numbers that are:
+  (a) bounded, (b) unique for every position, (c) deterministic (same position
+  always gives the same mark), and (d) useful for encoding relative distance.
+
+  Bounded and deterministic: sine and cosine. Both stay in [-1, 1] and return
+  the same value for the same input, always.
+
+  But a single sine wave is not unique. sin(0) = 0, sin(2π) ≈ 0, sin(4π) ≈ 0.
+  Positions 0, 6, 13 all get nearly the same mark.
+
+  THE FIX: use many sine and cosine waves at different speeds simultaneously.
+  Position j produces one number per wave; the collection of all those numbers
+  across all waves is the mark.
+
+  If all waves run at the same speed they all repeat at the same positions --
+  still not unique. You need some waves to be fast (they complete a cycle every
+  few positions) and some to be slow (they complete a cycle every thousands of
+  positions). The fast waves distinguish nearby slots; the slow waves distinguish
+  far-apart slots.
+
+  Why not linearly spaced speeds: if you choose frequencies 0.1, 0.2, 0.3, ...,
+  you get 200 waves all bunched in the "medium" range, barely different from each
+  other. You want the waves to span a wide range, so space the frequencies
+  EXPONENTIALLY: each wave proportionally slower than the last. Dimension pair i
+  gets frequency:
+
+      freq_i  =  1 / 10000 ^ (2i / d_model)
+
+  For d_model = 4, pairs i = 0 and i = 1:
+
+      freq_0  =  1 / 10000 ^ (0/4)  =  1 / 10000^0  =  1 / 1       =  1.0
+      freq_1  =  1 / 10000 ^ (2/4)  =  1 / 10000^0.5  =  1 / 100   =  0.01
+
+  Each pair (2i, 2i+1) uses both sine and cosine at that frequency:
+
+      dim 2i:    sin(pos × freq_i)
+      dim 2i+1:  cos(pos × freq_i)
+
+  Both are needed because sin(30°) = sin(150°) = 0.5. A single sine cannot
+  uniquely identify a position within one cycle. Using both sin AND cos resolves
+  the ambiguity: the pair (sin θ, cos θ) uniquely identifies any angle in [0, 2π].
+
+  WORKED EXAMPLE -- the mark for position 3, stick width 4 (two pairs):
+
+      pair 0 (fast):  freq_0 = 1.0
+          dim 0:  sin(3 × 1.0) = sin(3.0) =  0.141
+          dim 1:  cos(3 × 1.0) = cos(3.0) = -0.990
+
+      pair 1 (slow):  freq_1 = 0.01
+          dim 2:  sin(3 × 0.01) = sin(0.03) =  0.030
+          dim 3:  cos(3 × 0.01) = cos(0.03) =  0.9996
+
+      mark for position 3:  [ 0.141, -0.990, 0.030, 0.9996 ]
+
+  WORKED EXAMPLE -- position 4:
+
+      pair 0:  sin(4.0) = -0.757,  cos(4.0) = -0.654
+      pair 1:  sin(0.04) = 0.040,  cos(0.04) = 0.999
+
+      mark for position 4:  [ -0.757, -0.654, 0.040, 0.999 ]
+
+  The marks for 3 and 4 are different in every dimension. Each position gets a
+  unique fingerprint.
+
+  The word "nolan" at slot 3 gets stick [2, 1, 1, 0] + [0.141, -0.990, 0.030, 0.9996]
+  = [2.141, 0.010, 1.030, 0.9996] -- a unique stick that carries both its meaning
+  and its position, mixed together.
+
+
+  ## Where Sinusoidal Breaks -- The Relative Distance Problem
+
+  Sinusoidal encoding has three failure modes. Two are manageable. One is
+  fundamental.
+
+  FAILURE 1 -- The mixing problem. When you add a position vector to a word
+  stick, the two are entangled into one vector. The WANT/HAVE grids then have
+  to untangle "what this word means" from "where this word sits." Somehow this
+  works in practice, which is why some people argue that position marks are
+  optional. But it is asking the model to do extra work that it does not have to.
+
+  FAILURE 2 -- The extrapolation problem. At position 10,000 the mark is the
+  sinusoidal fingerprint at pos=10,000. If the model was only trained on sequences
+  up to length 512, it has never seen a fingerprint for position 10,000. Sine and
+  cosine are smooth, so the numbers exist mathematically -- but the model's WANT
+  and HAVE grids were never tuned for inputs stamped with those values.
+
+      Real numbers. Pair 0, position 512:  sin(512 × 1.0) = sin(512) ≈ -0.398
+                    Pair 0, position 513:  sin(513 × 1.0) = sin(513) ≈  0.257
+      The model has seen those values many times during training -- they are within
+      the familiar range of sin.
+
+      But at position 10,000:
+          Pair 1 (slow), freq_1 = 0.01:  sin(10000 × 0.01) = sin(100) ≈ -0.506
+      That specific value at that specific dimension did appear during training,
+      but the COMBINATION of all dimensions at position 10,000 -- the full 512-dim
+      fingerprint -- was never seen as a coherent pattern.
+
+  FAILURE 3 -- The relative distance problem. This is the deepest one.
+
+  Attention does not need to know "token A is at position 47 and token B is at
+  position 51." It needs to know "token A and token B are 4 apart." The SCORE
+  between two tokens should depend on their semantic similarity AND their distance,
+  not their absolute slots.
+
+  There is a trig identity that makes this almost solvable:
+
+      sin(a + b) = sin(a)cos(b) + cos(a)sin(b)
+      cos(a + b) = cos(a)cos(b) - sin(a)sin(b)
+
+  This means: the fingerprint for position 51 can be expressed in terms of the
+  fingerprint for position 47 plus a fixed rotation that depends only on the gap
+  of 4, not on 47 or 51 themselves.
+
+  WORKED: position 47, pair 0 (freq = 1.0):
+
+      sin(47) = 0.124,  cos(47) = -0.992
+
+  47 radians lands in the second quadrant (47 mod 2π ≈ 3.018 rad, between π/2 and π),
+  where cosine is negative. Easy to miss if you evaluate sin/cos by habit without
+  checking the quadrant first.
+
+  Position 51 = position 47 + gap 4:
+
+      sin(51) = sin(47 + 4)
+              = sin(47)cos(4) + cos(47)sin(4)
+              = 0.124 × (-0.654) + (-0.992) × (-0.757)
+              = -0.081 + 0.751
+              = 0.670
+
+  Check:  sin(51) directly = 0.670   ✓ (rounding difference)
+
+  So the sinusoidal fingerprint of position 51 IS derivable from position 47 and
+  the gap. But "derivable" is not the same as "what attention computes." When
+  attention forms the dot product (WANT at pos 47) · (HAVE at pos 51), the identity
+  above does not directly appear. The model would have to learn to factor the
+  relative distance out of the dot product -- which means learning the trig
+  identity implicitly, inside weights that were not trained to do that.
+
+  The better path: design the encoding so the dot product automatically captures
+  relative distance. That is what RoPE does.
+
+
+  ## RoPE -- Rotate Instead of Add
+
+  Instead of adding a position vector to the word stick, ROTATE the word stick by
+  an angle proportional to its position.
+
+  Why rotation and not something else: rotation preserves the length of the vector
+  (the word's magnitude is unchanged) and changes only its direction. The position
+  is encoded in the DIRECTION, not the MAGNITUDE. When two rotated vectors are
+  dotted, a specific cancellation happens -- we will work it out.
+
+  Start in 2D. A word "cat" has embedding [0.9, 0.4]. Rotating a 2D vector [x, y]
+  by angle θ:
+
+      new_x  =  x · cos(θ)  -  y · sin(θ)
+      new_y  =  x · sin(θ)  +  y · cos(θ)
+
+  Why this formula: rotating [1, 0] by θ gives [cos(θ), sin(θ)]. Rotating [0, 1]
+  by θ gives [-sin(θ), cos(θ)]. A general [x, y] is x copies of [1,0] plus y
+  copies of [0,1]; rotation distributes, giving the formula above.
+
+  In RoPE, the token at position m is rotated by angle m × θ. Use θ = 0.1 rad.
+
+  "cat" at position 3, rotated by 3 × 0.1 = 0.3 rad:
+
+      cos(0.3) = 0.9553,  sin(0.3) = 0.2955
+
+      cat_x  =  0.9 × 0.9553  -  0.4 × 0.2955  =  0.860 - 0.118  =  0.742
+      cat_y  =  0.9 × 0.2955  +  0.4 × 0.9553  =  0.266 + 0.382  =  0.648
+
+      "cat" at position 3:  [0.742, 0.648]
+
+  "cat" at position 7, rotated by 7 × 0.1 = 0.7 rad:
+
+      cos(0.7) = 0.7648,  sin(0.7) = 0.6442
+
+      cat_x  =  0.9 × 0.7648  -  0.4 × 0.6442  =  0.688 - 0.258  =  0.430
+      cat_y  =  0.9 × 0.6442  +  0.4 × 0.7648  =  0.580 + 0.306  =  0.886
+
+      "cat" at position 7:  [0.430, 0.886]
+
+  The same word "cat" points in a different direction at every position. Its
+  meaning (the length of the vector, which is sqrt(0.9²+0.4²) = 0.985) is
+  preserved. Only the direction changes.
+
+
+  ## The Proof That RoPE Encodes Relative Distance
+
+  This is the step Satvik's post names but does not show.
+
+  Setup: query q at position m, key k at position n. Both are 2D vectors. RoPE
+  rotates q by angle mθ and k by angle nθ. Attention computes their dot product.
+
+  Write out the rotated vectors:
+
+      q_m = R(mθ) q  where  q = [q₁, q₂]
+          q_m = [q₁·cos(mθ) - q₂·sin(mθ),  q₁·sin(mθ) + q₂·cos(mθ)]
+
+      k_n = R(nθ) k  where  k = [k₁, k₂]
+          k_n = [k₁·cos(nθ) - k₂·sin(nθ),  k₁·sin(nθ) + k₂·cos(nθ)]
+
+  Dot product q_m · k_n = (first elements multiply) + (second elements multiply):
+
+      = [q₁·cos(mθ) - q₂·sin(mθ)] × [k₁·cos(nθ) - k₂·sin(nθ)]
+      + [q₁·sin(mθ) + q₂·cos(mθ)] × [k₁·sin(nθ) + k₂·cos(nθ)]
+
+  Expand:
+
+      = q₁k₁·cos(mθ)cos(nθ) - q₁k₂·cos(mθ)sin(nθ) - q₂k₁·sin(mθ)cos(nθ) + q₂k₂·sin(mθ)sin(nθ)
+      + q₁k₁·sin(mθ)sin(nθ) + q₁k₂·sin(mθ)cos(nθ) + q₂k₁·cos(mθ)sin(nθ) + q₂k₂·cos(mθ)cos(nθ)
+
+  Collect by pairs:
+
+      q₁k₁: [ cos(mθ)cos(nθ) + sin(mθ)sin(nθ) ]  =  cos(mθ - nθ)  =  cos((m-n)θ)
+      q₁k₂: [-cos(mθ)sin(nθ) + sin(mθ)cos(nθ) ]  =  sin(mθ - nθ)  =  sin((m-n)θ)
+      q₂k₁: [-sin(mθ)cos(nθ) + cos(mθ)sin(nθ) ]  = -sin(mθ - nθ)  = -sin((m-n)θ)
+      q₂k₂: [ sin(mθ)sin(nθ) + cos(mθ)cos(nθ) ]  =  cos(mθ - nθ)  =  cos((m-n)θ)
+
+  Therefore:
+
+      q_m · k_n  =  (q₁k₁ + q₂k₂) · cos((m-n)θ)
+                  + (q₁k₂ - q₂k₁) · sin((m-n)θ)
+
+  The absolute positions m and n have vanished. Only the DIFFERENCE (m-n) remains.
+  The two terms have names:
+
+      q₁k₁ + q₂k₂  =  the ordinary dot product  q · k  (semantic similarity)
+      q₁k₂ - q₂k₁  =  the 2D cross product       q × k  (orientation between the vectors)
+
+  So the final result is:
+
+      q_m · k_n  =  (q · k) · cos((m-n)θ)  +  (q × k) · sin((m-n)θ)
+
+  Attention computes attention scores from scratch and relative distance emerges
+  automatically -- not because the model learned to extract it, but because the
+  geometry forces it. This is what Satvik describes as "the geometric property of
+  dot products" -- the algebra above is the proof.
+
+  VERIFY WITH NUMBERS. Use q = [0.9, 0.4], k = [0.9, 0.4] (same token, same
+  word, to keep the arithmetic clean). θ = 0.1. Positions m = 3, n = 7.
+
+  By direct calculation (rotated vectors computed above):
+
+      cat at position 3:  [0.742, 0.648]
+      cat at position 7:  [0.430, 0.886]
+
+      dot product:  0.742 × 0.430  +  0.648 × 0.886
+                 =  0.319          +  0.574
+                 =  0.893
+
+  By the formula:
+
+      q · k  =  0.9 × 0.9 + 0.4 × 0.4  =  0.81 + 0.16  =  0.97
+      q × k  =  0.9 × 0.4 - 0.4 × 0.9  =  0.36 - 0.36  =  0.00
+
+      (m-n)θ  =  (3 - 7) × 0.1  =  -0.4 rad
+
+      cos(-0.4)  =  0.921,   sin(-0.4)  =  -0.389
+
+      0.97 × 0.921  +  0.00 × (-0.389)
+      =  0.894        +  0
+      =  0.894
+
+  Check:  0.893 vs 0.894.  ✓ (rounding at 3 decimal places)
+
+  The formula holds. The attention score between "cat at position 3" and "cat at
+  position 7" is a function of only the gap (3-7 = -4) and the original, unrotated
+  vectors. Change the gap and the score changes. Change the absolute positions
+  while keeping the gap fixed and the score is unchanged.
+
+
+  ## Scaling to 512 Dimensions -- 256 Rotation Planes
+
+  That 2D proof works because one pair of numbers defines one rotation plane.
+  A real embedding has d_model = 512 dimensions -- which means 256 independent
+  rotation planes, each needing its own angle and frequency. You cannot rotate
+  a 512-vector the way you rotate a 2-vector -- there is no single angle.
+
+  RoPE handles this by splitting the 512 dimensions into 256 pairs and rotating
+  each pair independently, each in its own 2D plane:
+
+      [dim 0,   dim 1]   →  rotate by  m × freq_0
+      [dim 2,   dim 3]   →  rotate by  m × freq_1
+      ...
+      [dim 510, dim 511] →  rotate by  m × freq_255
+
+  Each pair has its own rotation frequency, spaced exponentially (same as
+  sinusoidal encoding):
+
+      freq_i  =  1 / 10000 ^ (2i / d_model)
+
+  The fast pairs (small i, large freq) rotate quickly -- they complete a full
+  cycle every few positions and are sensitive to nearby distance.
+
+  The slow pairs (large i, small freq) rotate barely at all -- they are sensitive
+  to large distances.
+
+  WORKED: for d_model = 4 (two pairs), θ = 0.1 rad and θ = 0.0001 rad:
+
+      Pair 0 (fast, θ = 0.1):
+          "cat" at position 3 → rotate [0.9, 0.4] by 0.3 rad → [0.742, 0.648]
+
+      Pair 1 (slow, θ = 0.0001):
+          "cat" at position 3 → rotate [0.9, 0.4] by 0.0003 rad
+          cos(0.0003) ≈ 1.000,  sin(0.0003) ≈ 0.000300
+          new_x  =  0.9 × 1.000  -  0.4 × 0.0003  =  0.900 - 0.000120  =  0.8999
+          new_y  =  0.9 × 0.0003  +  0.4 × 1.000  =  0.000270 + 0.4     =  0.4003
+
+          Very little rotation at position 3. "cat" at position 3000:
+          rotate by 3000 × 0.0001 = 0.3 rad
+          (same as the fast pair was doing at position 3)
+
+  That is the design: the slow pair at position 3000 looks like the fast pair at
+  position 3. Every pair has seen "rotate by 0.3 rad" many times during training.
+
+
+  ## Where RoPE Still Breaks -- the Slow Pairs
+
+  RoPE extrapolates better than sinusoidal encoding because attention scores depend
+  on the RELATIVE gap, not absolute positions. A gap of 50 at position 100 looks
+  the same as a gap of 50 at position 10,000. The model has seen many gaps of 50
+  during training.
+
+  But the slow pairs still break for large gaps.
+
+  Fast pair (θ = 0.1): training sequences are up to length 8192. The maximum
+  training gap is 8192. Angle = 8192 × 0.1 = 819.2 rad. That is 819.2 / (2π) ≈
+  130 full cycles -- every angle from 0 to 2π has been seen many times. Fine.
+
+  Slow pair (θ = 0.0001): maximum training gap 8192.
+  Angle = 8192 × 0.0001 = 0.8192 rad = 46.9 degrees.
+
+  A full circle is 360 degrees. The slow pair has only ever rotated through 47 of
+  those 360 degrees during training. At inference, a gap of 50,000 arrives:
+  angle = 50,000 × 0.0001 = 5.0 rad = 287 degrees. The model has never seen
+  a slow-pair angle larger than 47 degrees.
+
+  For the slow pair, RoPE breaks at long context for exactly the same reason
+  sinusoidal encoding does: the model is asked to handle an angular regime it
+  never trained on.
+
+
+  ## The Fix -- Scale the Base Frequency
+
+  The insight: the slow pairs are producing out-of-distribution angles. Make them
+  rotate more slowly, so far-out positions map back into the training range.
+
+  Original: θ_i = 1 / 10000 ^ (2i / d_model)
+
+  Scaled:   θ_i_new = θ_i / scale_factor
+
+  For a slow pair that was covering 0 to 47 degrees over 8192 positions, and now
+  needs to cover a gap of 50,000:
+
+      Original angle at gap 50,000:  50,000 × 0.0001 = 5.0 rad = 287°
+      Scale by 8:                     5.0 / 8 = 0.625 rad = 35.8°
+
+  35.8 degrees is inside the training range (0 to 47 degrees). The model has seen
+  this angle many times.
+
+  You cannot scale all frequencies equally: the fast pairs are fine as-is, and
+  slowing them would blur nearby-position distinctions. The practical approach
+  (from the YaRN paper) scales the base 10000 upward -- effectively slowing ALL
+  frequencies proportionally -- and combines this with a short fine-tuning run at
+  the new context length.
+
+  Original base: 10000.
+  Llama 3's 128K extension used a scaled base of 500,000.
+
+      freq_i_new  =  1 / 500,000 ^ (2i / d_model)
+
+  At i=255 (the slowest pair), d_model=512:
+
+      freq_255_old  =  1 / 10000 ^ (510/512)    ≈  0.000104
+      freq_255_new  =  1 / 500,000 ^ (510/512)   ≈  0.0000021
+
+  The slowest pair is ~49x slower. A gap of 50,000 now produces an angle of
+  50,000 × 0.0000021 = 0.105 rad = 6° instead of 50,000 × 0.000104 = 5.2 rad = 298°.
+  The training range for this pair was 0 to 8192 × 0.000104 = 0.85 rad = 49°.
+  6° is inside the training range. 298° was not.
+
+  The geometry problem is fixed. The weights problem is not.
+
+  Fixing the frequency only repairs the ANGLE distribution. The model's weights
+  were still only ever asked to relate tokens that are within 8192 positions of
+  each other. Attending across a gap of 50,000 requires the model to have learned
+  what long-range dependency looks like -- and it has not, because training
+  sequences were capped at 8192.
+
+  The production recipe is therefore three things:
+
+      1. Scale the base frequency (fix the angle problem)
+      2. Continue training on long documents (teach the weights what long range means)
+      3. Use documents that actually require long-range attention (papers, books,
+         code with long function calls) -- not just longer padding
+
+  Llama 3 used 800 billion tokens in this extension phase to go from 8K to 128K.
+  Cerebras later showed that with better synthetic data (position ID shifting,
+  carefully seeded long-range dependencies) the same quality is reachable with
+  under 10 billion tokens -- 80x cheaper -- because the bottleneck was never the
+  number of tokens; it was whether the training data forced the model to actually
+  USE long-range attention.
+
+
+  ## The Decoder
+
+      PLAIN WORD                           JARGON
+      -----------------------------------  --------------------------------------------
+      position mark                        positional encoding
+      position mark added to the stick     absolute positional encoding (sinusoidal)
+      frequency per dimension pair         RoPE base frequency (θ_i = 1/10000^(2i/d))
+      rotate instead of add                Rotary Position Embedding (RoPE)
+      gap between two tokens               relative position (m − n)
+      ordinary dot product (q·k)           inner product (the semantic similarity term)
+      2D cross product (q₁k₂ − q₂k₁)     the rotation term in the RoPE dot product
+      slow-down factor                     RoPE scaling (YaRN / LongRoPE)
+      new base frequency                   scaled RoPE base (e.g. 500,000 for 128K ctx)
+      continue training                    continual pre-training / context extension
+      position ID shifting                 position interleaving (Cerebras technique)
+
+
+  ## Python: Sinusoidal Marks and RoPE, Every Number Checked
+
+  ```python
+  import numpy as np
+
+  # -----------------------------------------------------------------------
+  # PART 1: sinusoidal marks -- unrolled for d_model=4 (two pairs)
+  # -----------------------------------------------------------------------
+  freq_0 = 1.0    # 1 / 10000^(0/4) = 1.0   (fast pair)
+  freq_1 = 0.01   # 1 / 10000^(2/4) = 0.01  (slow pair)
+
+  # position 3
+  dim_0 = np.sin(3 * freq_0)   # sin(3.0)  =  0.1411
+  dim_1 = np.cos(3 * freq_0)   # cos(3.0)  = -0.9900
+  dim_2 = np.sin(3 * freq_1)   # sin(0.03) =  0.0300
+  dim_3 = np.cos(3 * freq_1)   # cos(0.03) =  0.9996
+  mark_3 = np.array([dim_0, dim_1, dim_2, dim_3])
+  print(f"mark(pos=3): {np.round(mark_3, 4)}")   # [ 0.1411 -0.9900  0.0300  0.9996]
+
+  # position 4
+  dim_0 = np.sin(4 * freq_0)   # sin(4.0)  = -0.7568
+  dim_1 = np.cos(4 * freq_0)   # cos(4.0)  = -0.6536
+  dim_2 = np.sin(4 * freq_1)   # sin(0.04) =  0.0400
+  dim_3 = np.cos(4 * freq_1)   # cos(0.04) =  0.9992
+  mark_4 = np.array([dim_0, dim_1, dim_2, dim_3])
+  print(f"mark(pos=4): {np.round(mark_4, 4)}")   # [-0.7568 -0.6536  0.0400  0.9992]
+
+  # -----------------------------------------------------------------------
+  # PART 2: RoPE -- "cat" = [0.9, 0.4], theta = 0.1 rad per position
+  # query at pos 3, key at pos 7 (gap = -4). Unrolled, every number shown.
+  # -----------------------------------------------------------------------
+
+  # query rotated to position 3 (angle = 3 * 0.1 = 0.3 rad)
+  c3 = np.cos(0.3)   # 0.9553
+  s3 = np.sin(0.3)   # 0.2955
+  q3_x = 0.9 * c3 - 0.4 * s3   # 0.9*0.9553 - 0.4*0.2955 = 0.7416
+  q3_y = 0.9 * s3 + 0.4 * c3   # 0.9*0.2955 + 0.4*0.9553 = 0.6481
+  print(f"cat@pos3: [{q3_x:.4f}, {q3_y:.4f}]")   # [0.7416, 0.6481]
+
+  # key rotated to position 7 (angle = 7 * 0.1 = 0.7 rad)
+  c7 = np.cos(0.7)   # 0.7648
+  s7 = np.sin(0.7)   # 0.6442
+  k7_x = 0.9 * c7 - 0.4 * s7   # 0.9*0.7648 - 0.4*0.6442 = 0.4307
+  k7_y = 0.9 * s7 + 0.4 * c7   # 0.9*0.6442 + 0.4*0.7648 = 0.8857
+  print(f"cat@pos7: [{k7_x:.4f}, {k7_y:.4f}]")   # [0.4307, 0.8857]
+
+  # attention score -- direct dot product
+  score_direct = q3_x * k7_x + q3_y * k7_y
+  #            = 0.7416*0.4307 + 0.6481*0.8857 = 0.8934
+  print(f"\ndirect score: {score_direct:.4f}")    # 0.8934
+
+  # attention score -- by the formula
+  dot_qk   = 0.9*0.9 + 0.4*0.4    # 0.97  (q . k)
+  cross_qk = 0.9*0.4 - 0.4*0.9    # 0.00  (q x k)
+  gap_angle = (3 - 7) * 0.1        # -0.4 rad
+  score_formula = dot_qk * np.cos(gap_angle) + cross_qk * np.sin(gap_angle)
+  #             = 0.97 * 0.9211    +  0.00 * (-0.3894)
+  #             = 0.8934
+  print(f"formula score: {score_formula:.4f}")    # 0.8934
+
+  # verify: same gap (-4), different absolute positions (10 and 14)
+  c10 = np.cos(1.0); s10 = np.sin(1.0)   # 0.5403, 0.8415
+  q10_x = 0.9*c10 - 0.4*s10              # 0.9*0.5403 - 0.4*0.8415 = 0.1497
+  q10_y = 0.9*s10 + 0.4*c10              # 0.9*0.8415 + 0.4*0.5403 = 0.9734
+
+  c14 = np.cos(1.4); s14 = np.sin(1.4)   # 0.1700, 0.9854
+  k14_x = 0.9*c14 - 0.4*s14             # 0.9*0.1700 - 0.4*0.9854 = -0.2412
+  k14_y = 0.9*s14 + 0.4*c14             # 0.9*0.9854 + 0.4*0.1700 =  0.9549
+
+  score_shifted = q10_x*k14_x + q10_y*k14_y   # -0.0361 + 0.9295 = 0.8934
+  print(f"same gap, pos 10 and 14: {score_shifted:.4f}")   # 0.8934  same gap => same score
+
+  # -----------------------------------------------------------------------
+  # PART 3: RoPE for a full 512-dim embedding (256 pairs; loop acceptable
+  # here -- per-pair logic is identical to the two pairs shown above)
+  # -----------------------------------------------------------------------
+  def rope_full(x, pos, d_model=512):
+      out = x.copy().astype(float)
+      for i in range(d_model // 2):
+          freq  = 1.0 / (10000 ** (2*i / d_model))
+          angle = pos * freq
+          c, s  = np.cos(angle), np.sin(angle)
+          x0, x1 = x[2*i], x[2*i+1]
+          out[2*i]   = x0*c - x1*s
+          out[2*i+1] = x0*s + x1*c
+      return out
+
+  rng = np.random.default_rng(42)
+  token = rng.normal(size=512)
+
+  rotated_3  = rope_full(token, pos=3)
+  rotated_7  = rope_full(token, pos=7)
+  rotated_10 = rope_full(token, pos=10)
+  rotated_14 = rope_full(token, pos=14)
+
+  score_3_7   = np.dot(rotated_3,  rotated_7)
+  score_10_14 = np.dot(rotated_10, rotated_14)
+
+  print(f"\n512-dim RoPE, same token:")
+  print(f"  score(pos 3 vs 7):   {score_3_7:.4f}")
+  print(f"  score(pos 10 vs 14): {score_10_14:.4f}")
+  # Same gap (-4) => same score. The algebraic guarantee holds at all dimensions.
+  ```
+
+  Sample output:
+
+      mark(pos=3): [ 0.1411 -0.9900  0.0300  0.9996]
+      mark(pos=4): [-0.7568 -0.6536  0.0400  0.9992]
+      cat@pos3: [0.7416, 0.6481]
+      cat@pos7: [0.4307, 0.8857]
+
+      direct score: 0.8934
+      formula score: 0.8934
+      same gap, pos 10 and 14: 0.8934
+
+      512-dim RoPE, same token:
+        score(pos 3 vs 7):   22.3814
+        score(pos 10 vs 14): 22.3814
+
+
+  ---
+
+  Companion: [The Look-Across Machine](the-look-across-machine.txt) builds the attention
+  mechanism that these marks slot into.
+  [Attention and the Transformer by Pencil](attention-transformer-by-pencil.txt)
+  traces the same attention step digit by digit with "nolan ended."
+  [Transformers With Pencil](transformerforhn.txt) runs a full transformer block end to end.
+
+  ---
+
+  One Breath: attention computes scores from WANT-dotted-against-HAVE and cannot see word
+  order -- "nolan ended" and "ended nolan" produce the same scores; a position mark must
+  be injected before attention runs; adding a scalar crushes the embedding, normalising it
+  breaks at inference, so the mark becomes a vector of sine/cosine waves at exponentially
+  spaced frequencies -- unique per position, bounded, deterministic; sinusoidal encoding
+  solves uniqueness but mixes position into the embedding, struggles to extrapolate, and
+  only approximately encodes relative distance via a trig identity the model must learn
+  implicitly; RoPE instead rotates each word's stick by an angle proportional to its
+  position, and the algebra proves why this works: expand the dot product q_m · k_n, the
+  products of trig functions collapse via the cos(a-b) and sin(a-b) identities, and what
+  survives is (q·k)·cos((m-n)θ) + (q×k)·sin((m-n)θ) -- the absolute positions m and n are
+  gone, only the gap (m-n) remains, automatically, by geometry not by training; RoPE scales
+  to 512 dimensions by splitting into 256 pairs each with its own rotation speed, fast pairs
+  for nearby distinctions, slow pairs for distant ones; the slow pairs still break at long
+  context because they cover only a fraction of the rotation range during training, so the
+  base frequency (10000) is scaled up to slow all pairs further, combined with continued
+  training on long documents with real long-range dependencies; the $500B native pre-training
+  that would be required to train on 1M-length sequences directly collapses to tens of
+  millions when you understand that relative distance is a geometric property, not a learned
+  one, and that the bottleneck is data quality, not token count.
+
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

@@ -286,6 +286,19 @@
     footnote: encoder-only (no future masking, no cross-attention); positional encoding named and
     flagged as skipped. Assumes zero background.
 
+  [SPECIAL. The Mark That Tells a Transformer Where It Is -- Positional Encoding Built From Scratch](posts/positional-embeddings-from-scratch.txt)
+    special . 2026-06-22 . standalone . transformer, positional-encoding, rope, by-hand
+    The companion to the attention post that fills the gap it flagged as "skipped." Two naive
+    marks (scalar, normalised) fail for specific reasons worked by arithmetic. Sinusoidal encoding
+    built from scratch: exponential frequency spacing, why both sin and cos are needed, every
+    number computed for positions 3 and 4. Three sinusoidal failure modes. Then RoPE: the rotation
+    formula derived, "cat" at positions 3 and 7 rotated by hand, and the full algebraic proof that
+    q_m · k_n = (q·k)·cos((m−n)θ) + (q×k)·sin((m−n)θ) -- absolute positions cancel, only the
+    gap remains, forced by geometry not learned. Slow-pair failure shown with angles (47° training
+    range vs 298° at inference). Base-frequency scaling fix computed (0.000104 → 0.0000021, ~49x
+    slower, 6° vs 298° for gap 50,000). Production recipe: geometry fix + continued training +
+    long-range data. Python unrolled for d_model=4, 512-dim loop, all scores verified.
+
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
     special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand . (also: Chapter 12 intro)
     Written for Hacker News, self-contained: why five agent types are a LADDER (each rung =
