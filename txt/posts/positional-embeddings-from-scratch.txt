@@ -29,11 +29,6 @@
   twice, and then proves algebraically why RoPE works. Every number is worked by
   hand. Assume you remember nothing.
 
-  THE RULE OF THIS PAGE. Every mark is built from zero, broken, and replaced.
-  Every formula is derived; none appear from nowhere. Every number is calculated
-  in front of you.
-
-
   ## Attention Cannot See Order -- the Numbers
 
   From the transformer post: "nolan ended." The stick for "nolan" is [2, 1, 1, 0].

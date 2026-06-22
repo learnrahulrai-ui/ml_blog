@@ -20,10 +20,6 @@
   structural change (an UNCRUSHED vault) that lets a number survive indefinitely. This page
   builds both, digit by digit, with a pencil. One word at a time.
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
-  appears. Anything named more than five lines ago is named again. Every number is worked in
-  front of you. One idea per line.
-
   TOY WORLD, REAL RECIPE. We read movie reviews and guess thumbs-up (1) or thumbs-down (0).
   Our worked review: "nolan ended" -- two words, small enough to trace by hand. The recipe
   (walk word by word, carry memory, tick at the end) is exact. The numbers (width 4 instead

@@ -24,10 +24,6 @@
   caveat when we hit it.) This page shows both, digit by digit, with a pencil. The formula
   appears at the end, after you have already used it.
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
-  appears. Anything named more than five lines ago is named again. Every number is worked in
-  front of you, never "recall that...". One idea per line. A pencil and this page are the whole
-  kit. Decimals shown to four places where they matter.
 
   TOY WORLD, REAL RECIPE. One line of honesty up front. The RECIPE -- start at a lie, lay the
   same two-line rule down again and again, watch it settle -- is exact. The WORLD is a toy:

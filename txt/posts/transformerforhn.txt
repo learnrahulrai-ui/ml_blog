@@ -16,11 +16,6 @@
   Q, K, V, and waves at "attention is all you need." This page never waves. One transformer
   block runs end to end on two words, and EVERY number is worked in front of you on paper.
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it appears.
-  Anything named more than five lines ago is named again. Every number is worked in front of
-  you -- never "recall that...". One idea per line. A pencil and this page are the whole kit.
-  Decimals are shown to three places, so a final digit may sit one off from a longer division.
-
   TOY NUMBERS, REAL RECIPE. One line of honesty up front, so nothing here misleads. The
   RECIPE on this page -- every move, in order -- is exactly a real GPT-style transformer block,
   nothing faked or skipped. The NUMBERS are a toy: rows 4 wide instead of 512, two words instead

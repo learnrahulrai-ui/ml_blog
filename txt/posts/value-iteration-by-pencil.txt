@@ -14,9 +14,6 @@
     <- prev:  [Chapter 12, Part 4: Finding the Best Plan](finding-the-best-plan-policy-iteration.txt)
        next:  (more posts coming)
 
-  THE RULE OF THIS PAGE. Assume you remember nothing -- including the other RL posts. Every
-  word is defined where it first appears. Anything named more than five lines ago is named
-  again. Every number is worked in front of you, never "recall that...". One idea per line.
 
   ---
 

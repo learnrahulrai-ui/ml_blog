@@ -21,10 +21,6 @@
   the mouse is just faster? This page answers all three, rung by rung, in the same room. A cat.
   A mouse. One corridor. The room never changes -- only the cat's brain does.
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
-  appears. Anything named more than five lines ago is named again. Every number is worked in
-  front of you. One idea per line. A pencil and this page are the whole kit.
-
   TOY ROOM, REAL LADDER. The room -- a cat chasing a mouse in a short corridor -- is a toy:
   five cells, one cat, one mouse. The LADDER is real: each of the five rungs adds exactly one
   power to the cat's brain, and that one power kills a specific failure the rung below couldn't

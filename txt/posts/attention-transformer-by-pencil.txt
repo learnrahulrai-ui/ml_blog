@@ -37,10 +37,6 @@
   does; (3) how 100 words each with their own attention output collapse into a single verdict.
   This page shows all three, digit by digit, with one word: "nolan."
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
-  appears. Anything named more than five lines ago is named again. Every number is worked in
-  front of you. One idea per line.
-
   TOY WORLD, REAL RECIPE. Pile of movie reviews, each ticked liked (1) or not (0). Our
   worked review: "nolan ended" -- two words. Stick width 4 (real: 32). The recipe is exact;
   the numbers are the toy.

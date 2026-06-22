@@ -21,11 +21,6 @@
   earns its own existence is visible; (2) explaining what "admissible" actually forbids and why
   that one rule makes or breaks optimality. This page shows both, start to finish, with numbers.
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
-  appears. Anything named more than five lines ago is named again. Every number is worked in
-  front of you, never "recall that...". One idea per line. A pencil and this page are the whole
-  kit. Decimals shown to three places.
-
   TOY TOWN, REAL RECIPE. One line of honesty up front. The RECIPE -- one machine, three ways to
   label slips, the proof admissibility makes A* optimal -- is exact. The TOWN is a toy: four
   nodes, four roads, numbers chosen so arithmetic fits on paper and the moment greedy gets fooled

@@ -30,11 +30,6 @@
      Also pick parents by tournament (best of 3 random candidates), not just top-2 overall.
      That guarantees some diversity survives. Diversity is what lets the search escape the hill.
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
-  appears. Anything named more than five lines ago is named again. Every number is worked in
-  front of you, never "recall that...". One idea per line. A pencil and this page are the
-  whole kit. Decimals shown to three places.
-
   TOY NUMBERS, REAL RECIPE. One line of honesty up front. The RECIPE -- score, flip, share,
   pick, cut, tweak, replace -- is exactly a real genetic algorithm, nothing faked or skipped.
   The NUMBERS are a toy: a secret of 4 slots instead of hundreds, a population of 4 guesses

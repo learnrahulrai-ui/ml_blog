@@ -18,11 +18,6 @@
   hospital corridor, and ten concrete cases, every answer arrived at by counting patients on
   paper. The formula appears at the end, after you have already used it.
 
-  THE RULE OF THIS PAGE. Assume you remember nothing. Every word is defined where it first
-  appears. Anything named more than five lines ago is named again. Every number is worked in
-  front of you. One idea per line. A pencil and this page are the whole kit. Decimals shown
-  to four places; rounded to two in summaries.
-
   TOY NUMBERS, REAL RECIPE. The RECIPE -- the head-count trick, the two-crowd distinction,
   the gluing move, Bayes' rule itself -- is exact. The NUMBERS are a toy: small groups (100
   or 1,000 patients) and simple machine rates, chosen so arithmetic fits on paper. Where a
