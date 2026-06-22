@@ -46,7 +46,7 @@
      study it -- the idea stands on its own either way.
 
 
-  ## The Job: Guess From a Sheet of Numbers
+  THE JOB: GUESS FROM A SHEET OF NUMBERS
 
     rooms  income  age  ocean  people  |  PRICE   <- right-answer column
     --------------------------------------------------------
@@ -92,7 +92,7 @@
      product.
 
 
-  ## The One Rule: Hide Some Rows
+  THE ONE RULE: HIDE SOME ROWS
 
     ALL ROWS
     ################----
@@ -128,7 +128,7 @@
      shuffle removes order bias.
 
 
-  ## Rule 1 -- Ask the Closest Rows
+  RULE 1 -- ASK THE CLOSEST ROWS
 
   IN HAND: a sheet of 20,640 rows.
   Each row has 8 measured columns plus one right-answer column (price).
@@ -216,7 +216,7 @@
   But remember the bill: it comes due every time another house walks in.
 
 
-  ## Measuring How Wrong: RMSE
+  MEASURING HOW WRONG: RMSE
 
   A guesser is only as good as its misses are small.
   So before trusting any rule we need an honest way to size up how wrong it is.
@@ -291,7 +291,7 @@
   And 0.36 / 0.09 = 4, so doubling the miss gives it four times the weight.
 
 
-  ## Rule 2 -- The Straight-Stick Rule
+  RULE 2 -- THE STRAIGHT-STICK RULE
 
   IN HAND: one guessing rule and one honest ruler.
   The rule is ask-closest: measure gaps, then average the k nearest answers.
@@ -316,7 +316,7 @@
   Full derivation in [Part 3](straight-stick-linear-regression.txt).
 
 
-  ## Picking Settings Without Peeking at the Hidden Pile
+  PICKING SETTINGS WITHOUT PEEKING AT THE HIDDEN PILE
 
   IN HAND: two rules, one ruler, and one drawer that must stay shut.
   The first rule is ask-closest, with its knob k (the count of neighbours).
@@ -361,7 +361,7 @@
      memorised the working pile a little.
 
 
-  ## The Whole Blog in Six Lines
+  THE WHOLE BLOG IN SIX LINES
 
   Here is everything above, boiled down to six lines.
   Pin them somewhere.
@@ -376,7 +376,7 @@
     6. Refit on all of working pile; read the hidden pile exactly once.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  .shape is a PAIR, not a product
        df.shape in Python returns TWO numbers wrapped together: (n_rows, n_cols).
@@ -412,7 +412,7 @@
        scaler relearns fresh from each fold's build portion only.
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
   Now that you have built the thing, here are the proper names.
   Every post on this blog ends this way.
@@ -438,7 +438,7 @@
     memorising the working pile           overfitting
     mistake on rows never seen            generalisation error
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same six steps, spoken in Python.
@@ -465,23 +465,23 @@
 
     RANDOM_STATE = 42   # same seed everywhere so your splits match mine
 
-    # --- load the sheet ---
+    --- LOAD THE SHEET ---
     data = fetch_california_housing()
     X, y = data.data, data.target
     print(X.shape)      # (20640, 8)  -- 20640 rows, 8 measured columns
     print(y.shape)      # (20640,)    -- one price per row
 
-    # --- carve off the hidden 20% ---
+    --- CARVE OFF THE HIDDEN 20% ---
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=RANDOM_STATE)
     print(X_train.shape[0])    # 16512  <- working pile
     print(X_test.shape[0])     # 4128   <- hidden pile, locked away
 
-    # --- the always-average fool (baseline) ---
+    --- THE ALWAYS-AVERAGE FOOL (BASELINE) ---
     baseline_rmse = np.std(y_train)
     print(baseline_rmse)    # 1.1541  <- the bar to beat
 
-    # --- ask-closest rule (k=25) ---
+    --- ASK-CLOSEST RULE (K=25) ---
     knn_pipe = Pipeline([
         ("scale", StandardScaler()),       # put all 8 columns on the same ruler
         ("knn",   KNeighborsRegressor(n_neighbors=25))  # ask the 25 closest rows
@@ -491,7 +491,7 @@
     knn_rmse  = np.sqrt(np.mean((y_test - knn_preds)**2))
     print(knn_rmse)    # 0.6308  <- typical miss ~$63,000; beats the fool by 1.83x
 
-    # --- straight-stick rule ---
+    --- STRAIGHT-STICK RULE ---
     lr_pipe = Pipeline([
         ("scale", StandardScaler()),
         ("lr",    LinearRegression())
@@ -501,27 +501,27 @@
     lr_rmse  = np.sqrt(np.mean((y_test - lr_preds)**2))
     print(lr_rmse)    # 0.7270  <- typical miss ~$73,000; KNN wins here
 
-    # --- pick k by rotating folds (never touch the hidden pile here) ---
-    # The computer runs the same three lines four times, once per k value.
-    # Shown flat so you can see every run -- the loop is just the same work repeated:
+    --- PICK K BY ROTATING FOLDS (NEVER TOUCH THE HIDDEN PILE HERE) ---
+    THE COMPUTER RUNS THE SAME THREE LINES FOUR TIMES, ONCE PER K VALUE.
+    SHOWN FLAT SO YOU CAN SEE EVERY RUN -- THE LOOP IS JUST THE SAME WORK REPEATED:
     cv = KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
 
-    # k = 5
+    K = 5
     pipe = Pipeline([("scale", StandardScaler()), ("knn", KNeighborsRegressor(n_neighbors=5))])
     scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring="neg_root_mean_squared_error")
     print(-scores.mean())    # 0.7408  -- too jumpy: 5 neighbours copies noise
 
-    # k = 10
+    K = 10
     pipe = Pipeline([("scale", StandardScaler()), ("knn", KNeighborsRegressor(n_neighbors=10))])
     scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring="neg_root_mean_squared_error")
     print(-scores.mean())    # 0.6945  -- better
 
-    # k = 25   <- smallest mistake; pick this one
+    K = 25   <- SMALLEST MISTAKE; PICK THIS ONE
     pipe = Pipeline([("scale", StandardScaler()), ("knn", KNeighborsRegressor(n_neighbors=25))])
     scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring="neg_root_mean_squared_error")
     print(-scores.mean())    # 0.6612  -- best
 
-    # k = 50
+    K = 50
     pipe = Pipeline([("scale", StandardScaler()), ("knn", KNeighborsRegressor(n_neighbors=50))])
     scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring="neg_root_mean_squared_error")
     print(-scores.mean())    # 0.6781  -- worse again: 50 neighbours blurs the detail

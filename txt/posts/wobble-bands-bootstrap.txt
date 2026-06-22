@@ -45,7 +45,7 @@
      The spread of those 200 dials accurately simulates what would happen if you had
      drawn 200 fresh crowds from the real world. It feels circular, but the math holds.
 
-  ## I Cannot Visit the Hospital 200 Times
+  I CANNOT VISIT THE HOSPITAL 200 TIMES
 
   The honest fix would be to gather two hundred fresh crowds and watch the dial dance.
   I cannot do that -- I have one pile of patients and that is all.
@@ -109,7 +109,7 @@
      Free Exam" below).
 
 
-  ## The Wobble Band
+  THE WOBBLE BAND
 
   IN HAND: one real pile, re-dealt WITH REPEATS into 200 fake piles (the pile stands in
   for the world because the world is where the pile came from), each fake pile refit into
@@ -181,7 +181,7 @@
      Same 190 notes in both. Wildly different trust. Never confuse the count with the gap.
 
 
-  ## The Free Exam (Out-of-Bag)
+  THE FREE EXAM (OUT-OF-BAG)
 
   Now the gift. Remember that ~37% of patients sit out of every deal. The machine never saw
   them while it set its dials -- which makes them a perfect, honest, FREE EXAM. No need to
@@ -204,7 +204,7 @@
      between confidence and honesty.
 
 
-  ## The Tug-of-War Behind the Whole Chapter
+  THE TUG-OF-WAR BEHIND THE WHOLE CHAPTER
 
   Step all the way back. Everything in this chapter -- the leash in Part 1, the wobble band
   here -- is one single trade-off, and it is easiest to see as two bad drivers:
@@ -224,7 +224,7 @@
   you measure the panic that is left over.
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -240,29 +240,29 @@
     the whole trade                       the bias-variance trade-off
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
   First the OOB and band arithmetic from the worked examples, hard-coded:
 
-    # chance a patient sits out a deal of n=4 with replacement
-    # each draw: prob of NOT picking them = (4-1)/4 = 3/4; all 4 draws miss = (3/4)^4
+    CHANCE A PATIENT SITS OUT A DEAL OF N=4 WITH REPLACEMENT
+    EACH DRAW: PROB OF NOT PICKING THEM = (4-1)/4 = 3/4; ALL 4 DRAWS MISS = (3/4)^4
     oob_4 = (3/4)**4                  # 81/256 = 0.316 (about 32% sit out at n=4)
     print(round(oob_4, 3))            # 0.316
 
-    # as n grows, settles near 1/e ~= 0.368
+    AS N GROWS, SETTLES NEAR 1/E ~= 0.368
     oob_80 = (79/80)**80              # ~0.364 (about 37% sit out at n=80)
     print(round(oob_80, 3))           # 0.364
 
-    # 95% band: chop 2.5% off each end of 200 sorted dial values
+    95% BAND: CHOP 2.5% OFF EACH END OF 200 SORTED DIAL VALUES
     n_redeals = 200
     chop_each_end = int(n_redeals * 0.025)   # 200 * 0.025 = 5
     keep_count = n_redeals - 2 * chop_each_end  # 200 - 5 - 5 = 190
     print(chop_each_end, keep_count)  # 5 190  (same count every time; trust is in WIDTH)
 
-    # two example dials -- same count (190) but very different trust
+    TWO EXAMPLE DIALS -- SAME COUNT (190) BUT VERY DIFFERENT TRUST
     bmi_lower, bmi_upper = 0.42, 0.58   # tight, away from 0 -> trust it
     s5_lower,  s5_upper  = -0.80, 0.90  # straddles 0 -> cannot trust its sign
 
@@ -287,7 +287,7 @@
     from sklearn.linear_model import LinearRegression
     from sklearn.metrics import mean_squared_error
 
-    # --- wobble bands for the dials ---
+    --- WOBBLE BANDS FOR THE DIALS ---
     def bootstrap_ols_coefficients(X_train_scaled, y_train, B=200):
         coefs = []
         rng = np.random.RandomState(RANDOM_STATE)
@@ -301,7 +301,7 @@
         coef_ci_95 = pd.DataFrame({'lower': lower, 'upper': upper})
         return coef_bootstrap_df, coef_ci_95
 
-    # --- the free exam: out-of-bag error ---
+    --- THE FREE EXAM: OUT-OF-BAG ERROR ---
     def bootstrap_oob_rmse_ols(X_train_scaled, y_train, B=200):
         rmses = []
         rng = np.random.RandomState(RANDOM_STATE)

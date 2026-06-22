@@ -35,7 +35,7 @@
      trapdoor to dump it. New information is added (not multiplied) onto the belt.
      Addition preserves gradients; the beginning of the sentence stays alive.
 
-  ## One Axiom: What a Clerk Does
+  ONE AXIOM: WHAT A CLERK DOES
 
   A clerk does one job. Take some numbers in. Multiply each by a frozen dial. Add results.
   Add one more fixed number, a nudge. Emit a single number out. That is all a clerk can do.
@@ -55,7 +55,7 @@
        check: 2*4 + (-1)*5 + 3 = 8 - 5 + 3 = 6.
 
 
-  ## Words Are Not Numbers, So Hand Each Word a Row
+  WORDS ARE NOT NUMBERS, SO HAND EACH WORD A ROW
 
   A clerk multiplies numbers. Word "boring" is not a number. So before any clerk runs, swap
   each word for a fixed row of numbers, copied off a word-book -- one page per word:
@@ -73,7 +73,7 @@
       a row of slots:        slot1 = lean, slot2 = flipper, slot3 = ...    (room for both)
 
 
-  ## One Clerk Scores One Word, But Loses Order
+  ONE CLERK SCORES ONE WORD, BUT LOSES ORDER
 
   Hand a clerk a word-row, let it emit one score. Fine for one word. Now feed a whole review
   by adding up each word's row, slot by slot, and scoring that sum. Watch two reviews:
@@ -95,7 +95,7 @@
   That memory is forced on us. Build it next.
 
 
-  ## A Carried Memory, Rewritten Each Word
+  A CARRIED MEMORY, REWRITTEN EACH WORD
 
   Keep a pocket holding a row of numbers -- a memory. Start it at all zeros. Read words left
   to right. After each word, rewrite that memory from two things only: this word's row, and
@@ -140,7 +140,7 @@
        slots.)
 
 
-  ## Why a Squash Sits at Each Word
+  WHY A SQUASH SITS AT EACH WORD
 
   Blend gives: word through grid Gw, memory through grid Gm, add a nudge row:
 
@@ -180,7 +180,7 @@
   stamps liked or not. Done -- for short reviews.
 
 
-  ## This Reader Forgets (a Result You Can Prove)
+  THIS READER FORGETS (A RESULT YOU CAN PROVE)
 
   Track one slot of a mark left by word 1. Say word 1 pushes 0.2 into it. Each later word,
   that 0.2 gets multiplied by a memory-side dial (say ~0.5) and bent by tanh, which squeezes
@@ -206,7 +206,7 @@
   it a proven failure, and fix its cause.
 
 
-  ## Carry Without Crushing: a Second Memory
+  CARRY WITHOUT CRUSHING: A SECOND MEMORY
 
   We want a word-1 mark to survive 90 words. Multiply-and-crush kills it -- just proved. What
   single operation lets a number ride many words unharmed? Scale by about 1 and add a little.
@@ -236,7 +236,7 @@
     Letting it grow is exactly how a far-back mark stays alive.
 
 
-  ## A Store Too Big to Read, So Tame a Readout
+  A STORE TOO BIG TO READ, SO TAME A READOUT
 
   Memory A now may sit at 50. Feed 50 to a clerk and its bend saturates flat -- useless. So do
   not hand A out raw. Build a tamed readout B: bend A back into band, then reveal only a
@@ -260,7 +260,7 @@
        check: 0.7 * 1.0 = 0.70. A holds 4.62 in silence; B says 0.70 out loud about it.
 
 
-  ## Where keep, admit, show, fresh Come From
+  WHERE KEEP, ADMIT, SHOW, FRESH COME FROM
 
   Carry and readout forced four rows, no more, no fewer, each by a need already shown:
 
@@ -310,7 +310,7 @@
     One bend each, picked by duty.
 
 
-  ## Combine, in Real Numbers
+  COMBINE, IN REAL NUMBERS
 
   Per slot, four machines hand you: fresh, keep, admit, show. Memory A and B from last word
   sit in pockets. Two lines finish it:
@@ -363,7 +363,7 @@
        Kept half a long store, admitted all new content.
 
 
-  ## One Word, Start to Finish
+  ONE WORD, START TO FINISH
 
   Put it in one block. First word, so A and B are zeros:
 
@@ -386,7 +386,7 @@
   B, rebuilt every word. Nothing in that name was needed to build it; a number built each part.
 
 
-  ## A Word on What Was a Pick, Not a Proof
+  A WORD ON WHAT WAS A PICK, NOT A PROOF
 
   Forgetting is a result, provable with a pencil, as you did. A COUNT of three fractions named
   keep/admit/show, and this exact wiring, is a pick that happened to read well. A leaner cousin
@@ -407,7 +407,7 @@
   And it is why every gated reader of this kind keeps an additive store at its core.
 
 
-  ## Traps, Each as a Clash to Sit With
+  TRAPS, EACH AS A CLASH TO SIT WITH
 
   Stated as a wrong line, then a clash, then a fix. Read a wrong line, find a clash yourself,
   then check.
@@ -451,33 +451,33 @@
         review readout.
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   Every step above -- the fade, the combine, the 3-slot example -- done by pencil.
   Here in Python so you can check each number.
 
     import math
 
-    # --- The fade: a mark worn down over words ---
+    --- THE FADE: A MARK WORN DOWN OVER WORDS ---
     mark_w1 = 0.2
     after_w2  = 0.5 * mark_w1          # 0.10
     after_w3  = 0.5 * after_w2         # 0.05
     after_w10 = 0.2 * (0.5 ** 9)       # 0.00039
     after_w30 = 0.2 * (0.5 ** 29)      # ~0.0000000004  -- effectively gone
 
-    # --- One-slot combine ---
+    --- ONE-SLOT COMBINE ---
     A_old, fresh, keep, admit, show = 5.0, 0.6, 0.9, 0.2, 0.7
     A_new   = keep  * A_old  +  admit * fresh   # 0.9*5.0 + 0.2*0.6 = 4.62
     tanh_A  = math.tanh(A_new)                  # ~1.00 (A grew large)
     B_new   = show  * tanh_A                    # 0.7 * 1.0 = 0.70
 
-    # --- Loud vs quiet: worth is separate from loudness ---
+    --- LOUD VS QUIET: WORTH IS SEPARATE FROM LOUDNESS ---
     fresh_loud,  admit_low  = 0.9, 0.0    # loud but worthless
     fresh_quiet, admit_high = 0.2, 0.95   # quiet but needed
     lands_loud  = fresh_loud  * admit_low    # 0.000
     lands_quiet = fresh_quiet * admit_high   # 0.190
 
-    # --- 3-slot combine (element-wise, no summing across slots) ---
+    --- 3-SLOT COMBINE (ELEMENT-WISE, NO SUMMING ACROSS SLOTS) ---
     A1, A2, A3    = 5.0,  -2.0,  0.3
     k1, k2, k3    = 0.9,   0.5,  1.0    # keep fractions
     f1, f2, f3    = 0.6,   0.8, -0.1    # fresh values
@@ -489,14 +489,14 @@
     nA3 = k3*A3 + a3*f3   # 1.0*0.3  + 0.9*(-0.1) = 0.21
 
     tA1, tA2, tA3 = math.tanh(nA1), math.tanh(nA2), math.tanh(nA3)
-    # ~1.00,  ~-0.76,  ~0.21
+    ~1.00,  ~-0.76,  ~0.21
 
     nB1 = s1 * tA1   # 0.70
     nB2 = s2 * tA2   # -0.15
     nB3 = s3 * tA3   # 0.21
 
 
-  ## Two Lines to Carry Away
+  TWO LINES TO CARRY AWAY
 
   One memory, bent every word: a mark from word 1 wears to nothing by word 90. Proven, not
   tuned.

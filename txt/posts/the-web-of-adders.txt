@@ -72,7 +72,7 @@
      Every dial's share of the guilt is calculated simultaneously, not sequentially.
 
 
-  ## What Problem We Are Actually Solving
+  WHAT PROBLEM WE ARE ACTUALLY SOLVING
 
   Before building anything, let me be precise about what we want.
 
@@ -135,7 +135,7 @@
   That is a skill you will use constantly.
 
 
-  ## Splitting Evidence Into Three Honest Piles
+  SPLITTING EVIDENCE INTO THREE HONEST PILES
 
   Before touching any measurements, cut the 569 patients into three piles.
   This is the first thing to do.
@@ -202,7 +202,7 @@
   Check: 273 + 91 + 91 = 455. Done.
 
 
-  ## Putting Every Column on One Ruler
+  PUTTING EVERY COLUMN ON ONE RULER
 
   Look at two columns: radius (about 7 to 28) and smoothness (about 0.05 to 0.16).
   Radius numbers are roughly 200 times larger than smoothness numbers.
@@ -255,7 +255,7 @@
   (11.0 - 15.0) / 2.0 = -4.0 / 2.0 = -2.0. Two spreads below average.
 
 
-  ## Building a Room of Clerks
+  BUILDING A ROOM OF CLERKS
 
   A single room has this shape.
   Say it has 16 clerks and each patient has 30 measurements.
@@ -299,7 +299,7 @@
   clerks handles this before lunch. A single pencil would take months.
 
 
-  ## Why Plain Stacking Falls Apart
+  WHY PLAIN STACKING FALLS APART
 
   IN HAND: Room 1 built (16 clerks, 30 inputs, 496 dials). For one patient, Room 1 does
   480 multiplications + 480 additions = 960 steps. The zero-out rule will bend negatives.
@@ -339,7 +339,7 @@
   So we need a BEND -- a sharp corner no multiplication can reproduce.
 
 
-  ## Bending Scores at Zero
+  BENDING SCORES AT ZERO
 
   Between each room, apply one rule to every score leaving the room:
 
@@ -381,7 +381,7 @@
   [3.1, 0, 0, 0]. Only the non-negative score passes; the rest become zero.
 
 
-  ## Squashing Any Score Into a Probability
+  SQUASHING ANY SCORE INTO A PROBABILITY
 
   Room 1 bends its outputs and passes them on.
   Room 2 does the same.
@@ -457,7 +457,7 @@
   e^0 = 1. So 1 / (1 + 1) = 1/2 = 0.50. Exactly on the fence.
 
 
-  ## Walking One Patient Through, Start to Finish
+  WALKING ONE PATIENT THROUGH, START TO FINISH
 
   The building is complete on paper. Let me walk one patient through it by hand.
 
@@ -549,7 +549,7 @@
   negative, so the zero-out rule keeps both. A good sign.
 
 
-  ## How Wrong Was That Guess?
+  HOW WRONG WAS THAT GUESS?
 
   IN HAND: patient [0.5, -1.2], true answer 1. Room 1 raw scores [-0.1, -1.3]; zero-out
   gave [0, 0]; final clerk raw score 0.5; S-curve gave p = 0.622.
@@ -607,7 +607,7 @@
   And HOW the dials change to make that loss fall is the whole of the next post.
 
 
-  ## Standard Names for Part 1
+  STANDARD NAMES FOR PART 1
 
   Plain terms used above, translated to the labels you will meet in papers and docs:
 
@@ -631,7 +631,7 @@
   in Part 2, where they belong.)
 
 
-  ## Code, If You Want It
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer: every step was pencil arithmetic a tireless clerk could do.
   This section is for the day you meet one.
@@ -641,31 +641,31 @@
 
     import math
 
-    # Patient measurements (humbled): [0.5, -1.2]. True answer: 1 (malignant).
+    PATIENT MEASUREMENTS (HUMBLED): [0.5, -1.2]. TRUE ANSWER: 1 (MALIGNANT).
     m1, m2 = 0.5, -1.2
 
-    # Room 1 -- Clerk 1: dials [2.0, 1.0], nudge 0.1
+    ROOM 1 -- CLERK 1: DIALS [2.0, 1.0], NUDGE 0.1
     c1_raw = m1*2.0 + m2*1.0 + 0.1   # 1.0 + (-1.2) + 0.1 = -0.1
     print(round(c1_raw, 1))           # -0.1
 
-    # Room 1 -- Clerk 2: dials [-1.0, 0.5], nudge -0.2
+    ROOM 1 -- CLERK 2: DIALS [-1.0, 0.5], NUDGE -0.2
     c2_raw = m1*(-1.0) + m2*0.5 + (-0.2)   # -0.5 + (-0.6) + (-0.2) = -1.3
     print(round(c2_raw, 1))                 # -1.3
 
-    # zero-out rule (ReLU): negative -> 0, else keep
+    ZERO-OUT RULE (RELU): NEGATIVE -> 0, ELSE KEEP
     c1_out = max(0, c1_raw)   # 0  (dead clerk: no signal passes)
     c2_out = max(0, c2_raw)   # 0
     print(c1_out, c2_out)     # 0 0
 
-    # Final clerk: dials [3.0, -2.0], nudge 0.5
+    FINAL CLERK: DIALS [3.0, -2.0], NUDGE 0.5
     z_final = c1_out*3.0 + c2_out*(-2.0) + 0.5   # 0 + 0 + 0.5 = 0.5
     print(z_final)  # 0.5
 
-    # S-curve squasher: p = 1 / (1 + e^-z)
+    S-CURVE SQUASHER: P = 1 / (1 + E^-Z)
     p = 1 / (1 + math.exp(-z_final))   # 1/(1+0.607) = 0.622
     print(round(p, 3))                  # 0.622
 
-    # wrongness (loss) for true=1: -ln(p)
+    WRONGNESS (LOSS) FOR TRUE=1: -LN(P)
     loss = -math.log(p)   # 0.475
     print(round(loss, 3)) # 0.475
 
@@ -696,19 +696,19 @@
     data = load_breast_cancer()          # 569 patients, 30 measurements
     X, y = data.data, data.target
 
-    # Three honest piles: 60% study, 20% practice, 20% exam
+    THREE HONEST PILES: 60% STUDY, 20% PRACTICE, 20% EXAM
     X_temp, X_test,  y_temp, y_test  = train_test_split(X, y,
                                             test_size=0.20, random_state=SEED)
     X_train, X_val,  y_train, y_val  = train_test_split(X_temp, y_temp,
                                             test_size=0.25, random_state=SEED)
 
-    # Humble the columns -- fit on the study pile ONLY
+    HUMBLE THE COLUMNS -- FIT ON THE STUDY PILE ONLY
     scaler = StandardScaler()
     X_train_s = scaler.fit_transform(X_train)  # learn mean/spread from study + apply
     X_val_s   = scaler.transform(X_val)        # same ruler, applied blindly
     X_test_s  = scaler.transform(X_test)       # same ruler, exam never peeked
 
-    # Build the building: Room 1 (16 clerks), Room 2 (8 clerks), Room 3 (1 clerk)
+    BUILD THE BUILDING: ROOM 1 (16 CLERKS), ROOM 2 (8 CLERKS), ROOM 3 (1 CLERK)
     model = Sequential([
         Dense(16, activation='relu', input_shape=(X_train_s.shape[1],)),
         Dropout(0.2),                          # coffee break -- explained in Part 2
@@ -717,7 +717,7 @@
         Dense(1,  activation='sigmoid'),       # S-curve exit: output is a probability
     ])
 
-    # The by-hand forward pass, in code (reproduces the 0.622 from above)
+    THE BY-HAND FORWARD PASS, IN CODE (REPRODUCES THE 0.622 FROM ABOVE)
     def forward_pass_by_hand(X, weights):
         A = X.copy()
         for i in range(0, len(weights) - 2, 2):

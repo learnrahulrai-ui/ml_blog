@@ -484,7 +484,7 @@
 
   ---------------------------------------------------------------------------
 
-  # ── return is a pile ──────────────────────────────────────────────────────────────────────
+  ── RETURN IS A PILE ──────────────────────────────────────────────────────────────────────
 
   r_move1 = 2     # reward on move 1
   r_move2 = 1     # reward on move 2
@@ -494,22 +494,22 @@
   print("return:", pile)                # return: 6
 
 
-  # ── average of an unsure reward ───────────────────────────────────────────────────────────
+  ── AVERAGE OF AN UNSURE REWARD ───────────────────────────────────────────────────────────
 
-  # move pays +1 (chance 1/2) or +3 (chance 1/2)
+  MOVE PAYS +1 (CHANCE 1/2) OR +3 (CHANCE 1/2)
   reward_low  = 1
   reward_high = 3
   prob_low    = 0.5
   prob_high   = 0.5
 
   avg_reward = reward_low * prob_low   +   reward_high * prob_high
-  #          = 1          * 0.5        +   3           * 0.5
-  #          = 0.5                     +   1.5
-  #          = 2.0
+  = 1          * 0.5        +   3           * 0.5
+  = 0.5                     +   1.5
+  = 2.0
   print("average reward:", avg_reward)    # average reward: 2.0
 
 
-  # ── fade γ: +10 faded by distance; endless +1 stays finite ───────────────────────────────
+  ── FADE Γ: +10 FADED BY DISTANCE; ENDLESS +1 STAYS FINITE ───────────────────────────────
 
   gamma = 0.9
 
@@ -519,17 +519,17 @@
   worth_3_off     = 10 * (0.9 ** 3)    # = 10 × 0.729 = 7.29
 
   print(worth_now, worth_1_off, worth_2_off, worth_3_off)
-  # 10.0  9.0  8.1  7.29
+  10.0  9.0  8.1  7.29
 
   endless_1_per_move = 1 / (1 - gamma)  # = 1 / 0.1 = 10.0
   print("endless +1 at γ=0.9:", endless_1_per_move)   # 10.0
 
 
-  # ── Q(s,a) from the Bellman recipe ────────────────────────────────────────────────────────
+  ── Q(S,A) FROM THE BELLMAN RECIPE ────────────────────────────────────────────────────────
 
-  # spot HERE. arrow →. two outcomes.
-  # outcome X (chance 0.5): land on spot worth 10, reward +2
-  # outcome Y (chance 0.5): land on spot worth  0, reward +2
+  SPOT HERE. ARROW →. TWO OUTCOMES.
+  OUTCOME X (CHANCE 0.5): LAND ON SPOT WORTH 10, REWARD +2
+  OUTCOME Y (CHANCE 0.5): LAND ON SPOT WORTH  0, REWARD +2
 
   gamma        = 0.9
   prob_X       = 0.5
@@ -541,24 +541,24 @@
   worth_land_Y = 0
 
   term_X = prob_X  *  (reward_X  +  gamma * worth_land_X)
-  #       = 0.5    *  (2         +  0.9   * 10)
-  #       = 0.5    *  (2         +  9.0)
-  #       = 0.5    *  11
-  #       = 5.5
+  = 0.5    *  (2         +  0.9   * 10)
+  = 0.5    *  (2         +  9.0)
+  = 0.5    *  11
+  = 5.5
 
   term_Y = prob_Y  *  (reward_Y  +  gamma * worth_land_Y)
-  #       = 0.5    *  (2         +  0.9   * 0)
-  #       = 0.5    *  (2         +  0.0)
-  #       = 0.5    *  2
-  #       = 1.0
+  = 0.5    *  (2         +  0.9   * 0)
+  = 0.5    *  (2         +  0.0)
+  = 0.5    *  2
+  = 1.0
 
   Q_here_right = term_X + term_Y
-  #            = 5.5    + 1.0
-  #            = 6.5
+  = 5.5    + 1.0
+  = 6.5
   print("Q(HERE, →):", Q_here_right)    # Q(HERE, →): 6.5
 
 
-  # ── V from Q: the map averages the arrow-worths ───────────────────────────────────────────
+  ── V FROM Q: THE MAP AVERAGES THE ARROW-WORTHS ───────────────────────────────────────────
 
   Q_right = 6.5   # Q(HERE, →) from above
   Q_left  = 5.5   # Q(HERE, ←) given
@@ -567,16 +567,16 @@
   prob_map_left  = 0.5
 
   V_here = prob_map_right * Q_right  +  prob_map_left * Q_left
-  #       = 0.5           * 6.5      +  0.5           * 5.5
-  #       = 3.25                     +  2.75
-  #       = 6.0
+  = 0.5           * 6.5      +  0.5           * 5.5
+  = 3.25                     +  2.75
+  = 6.0
   print("V(HERE):", V_here)          # V(HERE): 6.0
 
   V_star_here = max(Q_right, Q_left)   # max(6.5, 5.5) = 6.5  ← optimal: take right
   print("V*(HERE):", V_star_here)      # V*(HERE): 6.5
 
 
-  # ── Bellman optimality: one spot, two arrows, both land on worth-5 spot ───────────────────
+  ── BELLMAN OPTIMALITY: ONE SPOT, TWO ARROWS, BOTH LAND ON WORTH-5 SPOT ───────────────────
 
   gamma      = 0.9
   worth_next = 5    # both arrows land on a spot worth 5
@@ -588,10 +588,10 @@
   print("V*(spot):", V_star)               # V*(spot): 6.5
 
 
-  # ── γ flips the winner ────────────────────────────────────────────────────────────────────
+  ── Γ FLIPS THE WINNER ────────────────────────────────────────────────────────────────────
 
-  # left : endless +1 stream   worth = 1 / (1 - γ)
-  # right: +2 once, then done  worth = 2             (any γ)
+  LEFT : ENDLESS +1 STREAM   WORTH = 1 / (1 - Γ)
+  RIGHT: +2 ONCE, THEN DONE  WORTH = 2             (ANY Γ)
 
   worth_right = 2
 
@@ -602,18 +602,18 @@
   print("γ=0.0 :  left=", worth_left_at_00, " right=", worth_right, "→ right wins")
   print("γ=0.5 :  left=", worth_left_at_05, " right=", worth_right, "→ tie")
   print("γ=0.9 :  left=", worth_left_at_09, " right=", worth_right, "→ left wins")
-  # γ=0.0 :  left= 1.0  right= 2 → right wins
-  # γ=0.5 :  left= 2.0  right= 2 → tie
-  # γ=0.9 :  left= 10.0 right= 2 → left wins
+  Γ=0.0 :  LEFT= 1.0  RIGHT= 2 → RIGHT WINS
+  Γ=0.5 :  LEFT= 2.0  RIGHT= 2 → TIE
+  Γ=0.9 :  LEFT= 10.0 RIGHT= 2 → LEFT WINS
 
 
-  # ── equal-arms algebra: when do two bandit arms tie? ─────────────────────────────────────
+  ── EQUAL-ARMS ALGEBRA: WHEN DO TWO BANDIT ARMS TIE? ─────────────────────────────────────
 
-  # LEFT  pays +1 (chance p) or +3 (chance 1-p)  →  average = 3 - 2p
-  # RIGHT pays  0 (chance q) or +10 (chance 1-q) →  average = 10 - 10q
-  # equal averages  →  3 - 2p = 10 - 10q  →  10q = 7 + 2p
+  LEFT  PAYS +1 (CHANCE P) OR +3 (CHANCE 1-P)  →  AVERAGE = 3 - 2P
+  RIGHT PAYS  0 (CHANCE Q) OR +10 (CHANCE 1-Q) →  AVERAGE = 10 - 10Q
+  EQUAL AVERAGES  →  3 - 2P = 10 - 10Q  →  10Q = 7 + 2P
 
-  # verify with p=0.5 → q=(7+2*0.5)/10=0.8:
+  VERIFY WITH P=0.5 → Q=(7+2*0.5)/10=0.8:
   p = 0.5
   q = (7  +  2 * p) / 10      # = (7 + 1.0) / 10 = 8.0 / 10 = 0.8
 
@@ -621,7 +621,7 @@
   avg_right = 10 - 10 * q     # = 10 - 8.0 = 2.0
 
   print("p=0.5,  q=0.8 :  avg_left =", avg_left, "  avg_right =", avg_right)
-  # p=0.5,  q=0.8 :  avg_left = 2.0  avg_right = 2.0   ✓
+  P=0.5,  Q=0.8 :  AVG_LEFT = 2.0  AVG_RIGHT = 2.0   ✓
 
   ---------------------------------------------------------------------------
 

@@ -76,7 +76,7 @@
       result: one sheet of scores, same size as the photo but thinner
 
 
-  ## Sheet of Colour Photos, and Goal
+  SHEET OF COLOUR PHOTOS, AND GOAL
 
   A new pile, and louder than usual because it trips people.
   An earlier pile in this book was grey clothing photos.
@@ -106,7 +106,7 @@
   The goal: read the 3,072 numbers of a new photo and name the bin.
 
 
-  ## Folding the Flat String Into a Grid
+  FOLDING THE FLAT STRING INTO A GRID
 
   The photo arrives as a flat string -- one long line of 3,072 numbers.
   The first move is to FOLD it back into its true shape.
@@ -137,7 +137,7 @@
   Then fold each photo.
 
 
-  ## What One Magic Paper Does
+  WHAT ONE MAGIC PAPER DOES
 
   Forget the whole machine for now.
   Picture one worker holding one small window.
@@ -202,7 +202,7 @@
        upside-down from the one I hunt." (After the zero-out rule, -60 becomes 0: not my shape.)
 
 
-  ## One Inspector, One Scan -- and the Traps
+  ONE INSPECTOR, ONE SCAN -- AND THE TRAPS
 
   One worker carrying one magic paper is an INSPECTOR.
   Here is what an inspector actually does.
@@ -262,7 +262,7 @@
   A pencil-and-paper worker would need about a year per photo.
 
 
-  ## Colour: Twenty-Seven Numbers Under the Paper
+  COLOUR: TWENTY-SEVEN NUMBERS UNDER THE PAPER
 
   One more layer of truth, because the photo is three colours deep.
   Recall each spot carries three numbers: how red, how green, how blue.
@@ -304,7 +304,7 @@
        0.9. Different dials, different shape hunted, same multiply-add.
 
 
-  ## A Floor of Thirty-Two Inspectors
+  A FLOOR OF THIRTY-TWO INSPECTORS
 
   IN HAND: one magic paper (3x3 wide, 3 colours deep = 27 dials + 1 nudge = 28 numbers).
   One inspector slides it to 1,024 centres, writing one score at each: 54,272 steps total.
@@ -350,7 +350,7 @@
        the "32" is how many inspectors. Output: 32 x 32 x 32.
 
 
-  ## A Shrink Boss That Keeps the Loudest
+  A SHRINK BOSS THAT KEEPS THE LOUDEST
 
   Thirty-two full 32-by-32 score-sheets is a lot of paper.
   A boss now shrinks each one.
@@ -402,7 +402,7 @@
        Both directions halve: 16/2 = 8 by 8. Depth unchanged. So 16x16 becomes 8x8.
 
 
-  ## A Second Floor That Drills Through All Thirty-Two
+  A SECOND FLOOR THAT DRILLS THROUGH ALL THIRTY-TWO
 
   IN HAND: floor 1 (32 inspectors, each 3x3x3 = 27 dials + 1 nudge = 28 per paper; total
   32 x 28 = 896 dials) + boss produced 32 score-sheets, each 16x16. At each spot the 32
@@ -456,7 +456,7 @@
   Memorise the shape of the move, not the figures.
 
 
-  ## Ironing the Grid Flat, Then the Old Clerks Finish
+  IRONING THE GRID FLAT, THEN THE OLD CLERKS FINISH
 
   IN HAND: two floors + two bosses produced 8x8x64. Floor 1: 896 dials. Floor 2: each of 64
   papers is 3x3x32 = 288 dials + 1 nudge = 289; 64 x 289 = 18,496 dials. Together the two
@@ -489,7 +489,7 @@
   A clerk weighs all the evidence with no regard for where it came from.
 
 
-  ## Whole Machine, Size Flow, and Where the Dials Hide
+  WHOLE MACHINE, SIZE FLOW, AND WHERE THE DIALS HIDE
 
   Here is the entire factory and the size of the paper at every step:
 
@@ -527,7 +527,7 @@
        inspectors, half the floor-1 dials -- and the papers stay cheap either way.
 
 
-  ## Predicting the Grid Size by Hand
+  PREDICTING THE GRID SIZE BY HAND
 
   IN HAND: our factory's grid runs 32x32x3 -> 32x32x32 -> 16x16x32 -> 16x16x64 -> 8x8x64,
   because every Conv2D carries padding='same' (the border of zeros that lets corner spots
@@ -570,7 +570,7 @@
        Conv: 28 - 3 + 1 = 26, so 26x26.  Boss: 26 / 2 = 13, so 13x13.
 
 
-  ## Common Tripwires
+  COMMON TRIPWIRES
 
   Real snags from building this, each fixed at the spot it bites.
 
@@ -601,7 +601,7 @@
      that READS the flattened line.
 
 
-  ## Standard Names for Everything Above
+  STANDARD NAMES FOR EVERYTHING ABOVE
 
     Plain term used above               Standard label
     ----------------------------------  -------------------------------------------
@@ -619,37 +619,37 @@
     one small paper reused everywhere   weight sharing / parameter sharing
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   Every dial count, convolution score, and grid-size calculation above done by hand.
   Here the exact numbers are spelled out in Python.
 
-    # --- 3x3 top-edge magic paper: dials 1,1,1 / 0,0,0 / -1,-1,-1 ---
-    # patch = bright row (10s), middle row (0s), dark row (-10s)
+    --- 3X3 TOP-EDGE MAGIC PAPER: DIALS 1,1,1 / 0,0,0 / -1,-1,-1 ---
+    PATCH = BRIGHT ROW (10S), MIDDLE ROW (0S), DARK ROW (-10S)
     patch_top_r1 = 10*1  + 10*1  + 10*1    # 30
     patch_top_r2 = 0*0   + 0*0   + 0*0     # 0
     patch_top_r3 = (-10)*(-1) + (-10)*(-1) + (-10)*(-1)  # 30
     score_match  = patch_top_r1 + patch_top_r2 + patch_top_r3  # 60 -- "edge found!"
 
-    # same paper on flat grey (all 5s)
+    SAME PAPER ON FLAT GREY (ALL 5S)
     flat_r1 = 5*1 + 5*1 + 5*1     # 15
     flat_r2 = 5*0 + 5*0 + 5*0     # 0
     flat_r3 = 5*(-1) + 5*(-1) + 5*(-1)  # -15
     score_flat = flat_r1 + flat_r2 + flat_r3  # 0 -- "nothing here"
 
-    # same paper on inverted edge (-10 top, 10 bottom)
+    SAME PAPER ON INVERTED EDGE (-10 TOP, 10 BOTTOM)
     inv_r1 = (-10)*1  + (-10)*1  + (-10)*1   # -30
     inv_r2 = 0
     inv_r3 = 10*(-1) + 10*(-1)  + 10*(-1)   # -30
     score_inv = inv_r1 + inv_r2 + inv_r3     # -60 -- (ReLU zeros this: "not my shape")
 
-    # --- Redness finder (9 red-dials=1, green/blue=0) ---
+    --- REDNESS FINDER (9 RED-DIALS=1, GREEN/BLUE=0) ---
     red_spot = 0.8 * 9   # 7.2 -- reddish spot
     sky_spot = 0.1 * 9   # 0.9 -- sky (only red component counts)
-    # sky-finder (9 blue-dials=1) on sky:
+    SKY-FINDER (9 BLUE-DIALS=1) ON SKY:
     sky_blue = 0.9 * 9   # 8.1 -- sky-finder lights up
 
-    # --- Steps per photo ---
+    --- STEPS PER PHOTO ---
     mults_per_centre = 27   # 9 spots x 3 colours
     adds_per_centre  = 26
     steps_per_centre = mults_per_centre + adds_per_centre   # 53
@@ -658,13 +658,13 @@
     inspectors_floor1 = 32
     floor1_steps_per_photo = inspectors_floor1 * steps_per_inspector   # 1,736,704
 
-    # --- MaxPooling: 75% tossed ---
+    --- MAXPOOLING: 75% TOSSED ---
     scores_per_sheet  = 32 * 32    # 1,024
     kept_per_sheet    = scores_per_sheet // 4   # 256
     tossed_per_sheet  = scores_per_sheet - kept_per_sheet   # 768
     toss_fraction     = tossed_per_sheet / scores_per_sheet  # 0.75
 
-    # --- Dial counts: whole factory ---
+    --- DIAL COUNTS: WHOLE FACTORY ---
     paper_floor1 = 3*3*3 + 1    # 28  (27 dials + 1 nudge)
     dials_floor1 = 32 * paper_floor1   # 896
 
@@ -674,16 +674,16 @@
     dials_dense1 = 4096 * 64 + 64   # 262,208
     dials_dense2 = 64   * 10 + 10   # 650
     total_dials  = dials_floor1 + dials_floor2 + dials_dense1 + dials_dense2  # 282,250
-    # 262,208 / 282,250 = 93% live in the single Dense floor after Flatten
+    262,208 / 282,250 = 93% LIVE IN THE SINGLE DENSE FLOOR AFTER FLATTEN
 
-    # --- No-padding grid size trace ---
+    --- NO-PADDING GRID SIZE TRACE ---
     after_conv1 = 32 - 3 + 1   # 30
     after_pool1 = after_conv1 // 2   # 15
     after_conv2 = after_pool1 - 3 + 1   # 13
     after_pool2 = after_conv2 // 2   # 6
 
 
-  ## Code, If You Want It
+  CODE, IF YOU WANT IT
 
   The whole factory, the same steps spoken in Keras. Nothing here needs a machine to follow
   -- the section above did it all by hand -- but here is the day you meet one.

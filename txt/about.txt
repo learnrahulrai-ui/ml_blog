@@ -128,7 +128,7 @@
   --------
   Plain-text source files wrapped in one <pre> tag each, styled by a single hand-written
   stylesheet. No JavaScript, no tracking, no cookies, no frameworks, no web fonts.
-  Authored to 100 columns so it reads the same in a browser or piped through `less` in a
+  Authored to 100 columns so it reads the same in a browser or piped through 'less' in a
   terminal. Hosted on GitHub Pages.
 
 

@@ -42,7 +42,7 @@
      That number forces you to see the cost. ROC hid it by dividing by the vast honest pile.
 
 
-  ## Settings I Pick By Hand (Hyperparameters)
+  SETTINGS I PICK BY HAND (HYPERPARAMETERS)
 
   Some numbers inside a machine are set by rolling downhill on the leftover.
   The leftover means the error the machine measures on each pass and tries to shrink.
@@ -64,7 +64,7 @@
       n_estimators in RandomForest      <- how many trees to grow
 
 
-  ## The Grid Hunt
+  THE GRID HUNT
 
   You have several settings, each with several candidate values.
   A grid lists every combination of those values.
@@ -154,7 +154,7 @@
      Therefore the final score comes out optimistic -- the machine has already peeked.
 
 
-  ## Two Kinds of Same-Ruler
+  TWO KINDS OF SAME-RULER
 
   The series so far has leaned on the standard ruler.
   The standard ruler shifts each column to mean 0, then divides by its spread.
@@ -195,7 +195,7 @@
   Therefore the exam pile never helps shape the ruler that grades it.
 
 
-  ## When ALARM Matters More Than MISSED
+  WHEN ALARM MATTERS MORE THAN MISSED
 
   First, two words for the two kinds of mistake.
   A MISSED is a truly-sick row the machine wrongly calls clear (the standard label is false negative).
@@ -227,7 +227,7 @@
   So the precision-recall curve (next) shows the exact deal between them.
 
 
-  ## Skewed Piles and the Precision-Recall Curve
+  SKEWED PILES AND THE PRECISION-RECALL CURVE
 
   The breast lump sheet leaned 63% well to 37% sick.
   That is tilted, but you could still stand on it.
@@ -296,7 +296,7 @@
   That code is waiting at the end of the post.
 
 
-  ## Scoring With Three or More Bins
+  SCORING WITH THREE OR MORE BINS
 
   Cancer has subtypes.
   Handwritten digits have ten classes.
@@ -317,7 +317,7 @@
   This section asks how to roll three F1 numbers into one.
   And it shows the two answers disagree on purpose.
 
-  ## Two Averaging Rules
+  TWO AVERAGING RULES
 
     three-class example: cancer type A, B, C
     +---------+-----------+--------+------+
@@ -385,7 +385,7 @@
      appears for multi-label problems, where the collapse doesn't happen.)
 
 
-  ## Summary: Which Tool for Which Problem
+  SUMMARY: WHICH TOOL FOR WHICH PROBLEM
 
     +------------------------------+------------------------------------------+
     | Situation                    | Reach for                                |
@@ -403,38 +403,38 @@
     +------------------------------+------------------------------------------+
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   Nothing above needed a computer.  Here the hand examples are spelled out in Python
   so you can run each one and see the same numbers the post printed.
 
-    # --- 5-fold CV: C=0.1 vs C=1.0, recall per fold ---
+    --- 5-FOLD CV: C=0.1 VS C=1.0, RECALL PER FOLD ---
     c01_fold1, c01_fold2, c01_fold3, c01_fold4, c01_fold5 = 0.92, 0.88, 0.94, 0.90, 0.86
     c10_fold1, c10_fold2, c10_fold3, c10_fold4, c10_fold5 = 0.95, 0.90, 0.89, 0.93, 0.82
 
     c01_avg = (c01_fold1 + c01_fold2 + c01_fold3 + c01_fold4 + c01_fold5) / 5  # 0.900
     c10_avg = (c10_fold1 + c10_fold2 + c10_fold3 + c10_fold4 + c10_fold5) / 5  # 0.898
-    # C=0.1 wins by 0.002
+    C=0.1 WINS BY 0.002
 
-    # --- Grid size: 4 C-values x 3 k-values x 5 folds = 60 fits ---
+    --- GRID SIZE: 4 C-VALUES X 3 K-VALUES X 5 FOLDS = 60 FITS ---
     c_choices, k_choices, folds = 4, 3, 5
     total_fits = c_choices * k_choices * folds   # 60
 
-    # --- Fool machine on 99900-normal / 100-fraud sheet ---
+    --- FOOL MACHINE ON 99900-NORMAL / 100-FRAUD SHEET ---
     normal_rows, fraud_rows = 99900, 100
     fool_accuracy = normal_rows / (normal_rows + fraud_rows)  # 0.999
     fool_recall   = 0 / fraud_rows                             # 0.0 -- catches no fraud
 
-    # --- Outlier scaling: 4 houses (500, 520, 3000, 15000) ---
+    --- OUTLIER SCALING: 4 HOUSES (500, 520, 3000, 15000) ---
     area_A, area_B, area_C, area_D = 500, 520, 3000, 15000
     area_min, area_max = 500, 15000
     pinch_A = (area_A - area_min) / (area_max - area_min)   # 0.000
     pinch_B = (area_B - area_min) / (area_max - area_min)   # 0.001
     pinch_C = (area_C - area_min) / (area_max - area_min)   # 0.172
     pinch_D = (area_D - area_min) / (area_max - area_min)   # 1.000
-    # normal houses A and B squished to bottom 17%; outlier D fills the far end
+    NORMAL HOUSES A AND B SQUISHED TO BOTTOM 17%; OUTLIER D FILLS THE FAR END
 
-    # --- Macro vs micro: 3-class cancer scorecard ---
+    --- MACRO VS MICRO: 3-CLASS CANCER SCORECARD ---
     f1_A, f1_B, f1_C = 0.89, 0.67, 0.34
     macro_f1 = (f1_A + f1_B + f1_C) / 3   # 0.633 -- class C (10 rows) drags it down
 
@@ -448,10 +448,10 @@
 
     micro_precision = total_caught / (total_caught + total_alarm)   # 0.800
     micro_recall    = total_caught / (total_caught + total_missed)  # 0.763
-    # class A (1000 rows) dominates the pool; class C (10 rows) barely registers
+    CLASS A (1000 ROWS) DOMINATES THE POOL; CLASS C (10 ROWS) BARELY REGISTERS
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -471,8 +471,8 @@
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import StandardScaler
 
-    # scaler lives INSIDE the pipeline so it is rebuilt on each fold's
-    # training strip only -- never on the strip being scored
+    SCALER LIVES INSIDE THE PIPELINE SO IT IS REBUILT ON EACH FOLD'S
+    TRAINING STRIP ONLY -- NEVER ON THE STRIP BEING SCORED
     pipe = Pipeline([
         ('scaler', StandardScaler()),
         ('clf',    LogisticRegression()),
@@ -496,17 +496,17 @@
 
     print(classification_report(y_test, y_pred,
           target_names=['type A', 'type B', 'type C']))
-    # per-class precision/recall/F1, then: accuracy, macro avg, weighted avg
+    PER-CLASS PRECISION/RECALL/F1, THEN: ACCURACY, MACRO AVG, WEIGHTED AVG
 
-    # note: for ordinary single-label multiclass, micro precision = micro recall
-    # = micro F1 = accuracy, so classification_report does NOT print a "micro avg"
-    # row -- it prints "accuracy" instead. To see the micro number by name, ask for it:
+    NOTE: FOR ORDINARY SINGLE-LABEL MULTICLASS, MICRO PRECISION = MICRO RECALL
+    = MICRO F1 = ACCURACY, SO CLASSIFICATION_REPORT DOES NOT PRINT A "MICRO AVG"
+    ROW -- IT PRINTS "ACCURACY" INSTEAD. TO SEE THE MICRO NUMBER BY NAME, ASK FOR IT:
     micro = precision_recall_fscore_support(y_test, y_pred, average='micro')
     macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
-    # micro[:3] == (accuracy, accuracy, accuracy);  macro[:3] == the equal-weight blend
+    MICRO[:3] == (ACCURACY, ACCURACY, ACCURACY);  MACRO[:3] == THE EQUAL-WEIGHT BLEND
 
 
-  ## Where That Leaves Us
+  WHERE THAT LEAVES US
 
   And there the series rests. Look back at the road: we began by turning a sliding number
   into a yes-or-no verdict, learned why a machine that catches nobody can still boast 63%
@@ -522,7 +522,7 @@
   cannot teach yourself.
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

@@ -51,7 +51,7 @@
      Accuracy hides catastrophe when one bin outnumbers the other.
 
 
-  ## From Number to Bin
+  FROM NUMBER TO BIN
 
     a number machine:   ----------*------>   answer = 2.83
 
@@ -68,7 +68,7 @@
     columns -> *dials -> add -> SQUASH -> chance 0-1 -> CUTOFF -> [B] or [M]
 
 
-  ## The Squash Curve
+  THE SQUASH CURVE
 
   The squash is a function that takes any number and returns a chance between 0 and 1.
   Its graph has an S-shape, so call it the S-curve.
@@ -176,7 +176,7 @@
   Log-odds 0 means odds = 1, which means P(sick) = P(well) = 0.5.
 
 
-  ## Setting the Dials: What the Machine Minimises
+  SETTING THE DIALS: WHAT THE MACHINE MINIMISES
 
   A machine that predicts a number scores itself by squared leftovers.
   A leftover is the gap between the truth and the guess.
@@ -242,7 +242,7 @@
      So the scaler is fit and applied to X_train and X_test alone.
 
 
-  ## Encoding the Labels
+  ENCODING THE LABELS
 
   A machine eats numbers.
   But the sheet holds letters: M for malignant, B for benign.
@@ -256,7 +256,7 @@
   along with a warning about running it twice.
 
 
-  ## The Four-Box Table
+  THE FOUR-BOX TABLE
 
   IN HAND so far: a machine that adds 30 dialed columns into a number z.
   It squashes z into a chance with sig(z) = 1 / (1 + e^-z); z = 0 gives 0.5, even money.
@@ -338,7 +338,7 @@
   So is the easy-to-miss gotcha about which way round sklearn wants the arguments.
 
 
-  ## Four Scores, Four Angles
+  FOUR SCORES, FOUR ANGLES
 
   IN HAND so far: a four-box table.
   On the 4-lump pile the boxes held CAUGHT 2, MISSED 0, ALARM 1, CLEAR 1.
@@ -372,7 +372,7 @@
   The code that reads them off is at the end of the post.
 
 
-  ## Why Accuracy Alone Lies
+  WHY ACCURACY ALONE LIES
 
   Now the most important paragraph in the post.
   Recall: accuracy = share of all guesses that were right = (CAUGHT + CLEAR) / everyone.
@@ -403,7 +403,7 @@
      Accuracy tells you nothing about which mistake you are making.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
   These are the exact wrong pictures that cost me real time.
   Each one stopped me cold until I drew the concrete shape of the mistake.
@@ -479,7 +479,7 @@
        predict_proba gives a different number per row -> the full sweep.
 
 
-  ## F1: Why the Harmonic Mean
+  F1: WHY THE HARMONIC MEAN
 
   Recall the two scores F1 blends.
   Precision = of those it called sick, the share that really were.
@@ -500,7 +500,7 @@
     harmonic mean   = 2 * 0.10 * 0.98 / (0.10 + 0.98) = 0.18   <- honest
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet a computer: the same work, spoken in Python.
@@ -510,7 +510,7 @@
 
     import math
 
-    # S-curve for 4 people: b0 = 1.2, b1 = -30 (the one-bmi-column example)
+    S-CURVE FOR 4 PEOPLE: B0 = 1.2, B1 = -30 (THE ONE-BMI-COLUMN EXAMPLE)
     bmi_A, bmi_B, bmi_C, bmi_D = 0.04, 0.06, 0.12, 0.18
     z_A = 1.2 + (-30)*bmi_A  # 0.0
     z_B = 1.2 + (-30)*bmi_B  # -0.6
@@ -523,7 +523,7 @@
     sig_D = 1/(1 + math.exp(-z_D))  # 0.015
     print(round(sig_A,3), round(sig_B,3), round(sig_C,3), round(sig_D,3))  # 0.5 0.354 0.083 0.015
 
-    # four-box counts from the 4-lump example (chances 0.92, 0.63, 0.78, 0.11; cutoff 0.5)
+    FOUR-BOX COUNTS FROM THE 4-LUMP EXAMPLE (CHANCES 0.92, 0.63, 0.78, 0.11; CUTOFF 0.5)
     CAUGHT, MISSED, ALARM, CLEAR = 2, 0, 1, 1
 
     accuracy  = (CAUGHT + CLEAR) / (CAUGHT + MISSED + ALARM + CLEAR)  # 0.75
@@ -532,7 +532,7 @@
     F1        = 2*precision*recall / (precision + recall)  # 0.800
     print(round(accuracy,2), round(recall,2), round(precision,3), round(F1,3))  # 0.75 1.0 0.667 0.8
 
-    # harmonic mean punishes one bad score; arithmetic mean hides it
+    HARMONIC MEAN PUNISHES ONE BAD SCORE; ARITHMETIC MEAN HIDES IT
     P, R = 0.10, 0.98
     arithmetic_mean = (P + R) / 2             # 0.54  (looks ok)
     harmonic_mean   = 2*P*R / (P + R)         # 0.181 (exposes the terrible precision)
@@ -594,7 +594,7 @@
     f1        = f1_score(y_test, y_pred)
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

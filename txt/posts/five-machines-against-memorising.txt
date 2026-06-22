@@ -37,7 +37,7 @@
   machine. This chapter changes nothing about it -- it only adds guards against memorising.
 
 
-  ## A Disease Called Memorising
+  A DISEASE CALLED MEMORISING
 
   The five cures this chapter will build, drawn once so you see what is coming:
 
@@ -73,7 +73,7 @@
   Everything in this chapter is a way to keep that gap small.
 
 
-  ## Sheet of Clothes, and Goal
+  SHEET OF CLOTHES, AND GOAL
 
   A new sheet, not Chapter 7's tumours. Each row is one photograph of a piece of clothing,
   28 pixels across by 28 pixels tall -- 784 little grey numbers, each from 0 (black) to 255
@@ -92,7 +92,7 @@
   least.
 
 
-  ## Baseline Machine With No Defence
+  BASELINE MACHINE WITH NO DEFENCE
 
   Start with the plain machine, no cure at all. Four rooms of clerks:
 
@@ -119,7 +119,7 @@
   want to cure.
 
 
-  ## Softmax: Turning Ten Scores Into Ten Chances
+  SOFTMAX: TURNING TEN SCORES INTO TEN CHANCES
 
   IN HAND: baseline machine built (784->256->128->64->10). Dial count: 200,960+32,896+8,256
   +650 = 242,762. The exit has 10 clerks producing raw scores -- any real numbers.
@@ -168,7 +168,7 @@
   softmax hands it an 88% chance -- the exponential stretch at work.
 
 
-  ## Watching It Rot
+  WATCHING IT ROT
 
   Run the baseline for thirty passes and the disease from the opening picture appears on
   schedule. The study-score marches toward 0.99; the practice-score peaks somewhere in the
@@ -177,7 +177,7 @@
   bending itself around noise?
 
 
-  ## A Tax on Big Dials (L2)
+  A TAX ON BIG DIALS (L2)
 
   The first cure starts from a clue: a memorising machine needs HUGE, precise dials. To bend
   sharply around one freckle in one photo, some dial has to crank to an extreme value. A
@@ -198,7 +198,7 @@
   knob you pick, not a dial the machine learns.
 
 
-  ## Sending Clerks Home (Dropout)
+  SENDING CLERKS HOME (DROPOUT)
 
   Chapter 7 met dropout as a coffee break. Here is the disease it cures, stated sharply,
   because it is subtler than "big dials."
@@ -224,7 +224,7 @@
   crippled each pass to learn anything.
 
 
-  ## A Fire Alarm That Stops the Clock (Early Stopping)
+  A FIRE ALARM THAT STOPS THE CLOCK (EARLY STOPPING)
 
   The first two cures change the machine. This one changes nothing about the machine -- it
   just knows when to quit.
@@ -257,7 +257,7 @@
   the alarm fires after pass 10, and the dials rewind to pass 5.
 
 
-  ## A Humbler Between Floors (Batch Normalisation)
+  A HUMBLER BETWEEN FLOORS (BATCH NORMALISATION)
 
   The last cure fixes a problem you would not guess at: the floors of the network keep moving
   the goalposts on each other.
@@ -299,7 +299,7 @@
   3/2.236 = -1.34, -0.45, 0.45, 1.34. Middle 0, scatter 1.
 
 
-  ## One Honest Judge (Breaking the Sealed Pile)
+  ONE HONEST JUDGE (BREAKING THE SEALED PILE)
 
   IN HAND: five machines trained on the study pile -- baseline, L2 tax, dropout, early-
   stopping, batch-norm. Practice pile was watched every pass and steered the fire alarm.
@@ -323,7 +323,7 @@
   spent. Keep one pile sealed and unspent, or you will have no honest judge left at the end.
 
 
-  ## Naming the Biggest Liar (the Memorising Gap)
+  NAMING THE BIGGEST LIAR (THE MEMORISING GAP)
 
   One more number tells you something the sealed score alone cannot: WHICH machine memorised
   least, regardless of who scored highest. For each machine, take its final study-score and
@@ -339,7 +339,7 @@
   the whole story: how good, and how honest.
 
 
-  ## Common Tripwires
+  COMMON TRIPWIRES
 
   Real struggles from running this lab, not invented ones.
 
@@ -363,7 +363,7 @@
   final grade. You peeked at it thirty times. Report the sealed pile, opened once.
 
 
-  ## Standard Names for Everything Above
+  STANDARD NAMES FOR EVERYTHING ABOVE
 
     Plain term used above                 Standard label
     ------------------------------------  -------------------------------------------
@@ -383,21 +383,21 @@
     study-score minus practice-score      the generalisation gap
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   Every dial count, softmax, tax fine, and humbling step above worked by hand.  Here they
   are in Python so you can verify each number on your own screen.
 
     import math
 
-    # --- Dial count: 4-room network 784->256->128->64->10 ---
+    --- DIAL COUNT: 4-ROOM NETWORK 784->256->128->64->10 ---
     room1 = 784 * 256 + 256    # 200,960 -- dominates the count
     room2 = 256 * 128 + 128    # 32,896
     room3 = 128 * 64  + 64     # 8,256
     exit_ = 64  * 10  + 10     # 650
     total_dials = room1 + room2 + room3 + exit_   # 242,762
 
-    # --- Softmax: 3 bins, raw scores 2, 1, 0 ---
+    --- SOFTMAX: 3 BINS, RAW SCORES 2, 1, 0 ---
     score_A, score_B, score_C = 2, 1, 0
     exp_A = math.exp(score_A)   # 7.389
     exp_B = math.exp(score_B)   # 2.718
@@ -406,24 +406,24 @@
     chance_A = exp_A / total_exp   # 0.665
     chance_B = exp_B / total_exp   # 0.245
     chance_C = exp_C / total_exp   # 0.090
-    # check: 0.665 + 0.245 + 0.090 = 1.000
+    CHECK: 0.665 + 0.245 + 0.090 = 1.000
 
-    # --- L2 tax: big dial vs small dial (rate = 0.001) ---
+    --- L2 TAX: BIG DIAL VS SMALL DIAL (RATE = 0.001) ---
     dial_big, dial_small, rate = 50, 0.5, 0.001
     fine_big   = dial_big**2   * rate   # 2.500   -- enormous
     fine_small = dial_small**2 * rate   # 0.00025 -- rounding error
 
-    # --- Batch norm: 5 hand-off numbers (10, 20, 30, 40, 50) ---
+    --- BATCH NORM: 5 HAND-OFF NUMBERS (10, 20, 30, 40, 50) ---
     v1, v2, v3, v4, v5 = 10, 20, 30, 40, 50
     middle = (v1 + v2 + v3 + v4 + v5) / 5   # 30
     d1, d2, d3, d4, d5 = v1-middle, v2-middle, v3-middle, v4-middle, v5-middle
-    # -20, -10, 0, 10, 20
-    avg_sq  = (d1**2 + d2**2 + d3**2 + d4**2 + d5**2) / 5   # 200
+    -20, -10, 0, 10, 20
+    avg_sq  = (d12 + d22 + d32 + d42 + d5**2) / 5   # 200
     scatter = math.sqrt(avg_sq)   # 14.14
     h1, h2, h3, h4, h5 = d1/scatter, d2/scatter, d3/scatter, d4/scatter, d5/scatter
-    # -1.41, -0.71, 0, 0.71, 1.41 -- middle 0, scatter 1
+    -1.41, -0.71, 0, 0.71, 1.41 -- MIDDLE 0, SCATTER 1
 
-    # --- Early stopping: patience=5, val-loss passes 1-8 ---
+    --- EARLY STOPPING: PATIENCE=5, VAL-LOSS PASSES 1-8 ---
     loss_p1, loss_p2, loss_p3 = 0.50, 0.42, 0.39   # pass 3 is the LOW
     loss_p4, loss_p5, loss_p6 = 0.41, 0.40, 0.43   # +1, +2, +3
     loss_p7, loss_p8          = 0.44, 0.45          # +4, +5 -> ALARM fires
@@ -431,7 +431,7 @@
     alarm_pass = 8   # five strikes: passes 4 through 8
 
 
-  ## Code, If You Want It
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer: every dial count, every wrongness step, and every cure
   was pencil and arithmetic. This section is for the day you meet one.
@@ -455,8 +455,8 @@
     from tensorflow.keras.regularizers import l2
     from tensorflow.keras.callbacks import EarlyStopping
 
-    # x_train etc. are 28x28 photos flattened to 784 and divided by 255 (humbled to 0..1),
-    # then cut 60/20/20 into study (x_train), practice (x_val), sealed exam (x_test).
+    X_TRAIN ETC. ARE 28X28 PHOTOS FLATTENED TO 784 AND DIVIDED BY 255 (HUMBLED TO 0..1),
+    THEN CUT 60/20/20 INTO STUDY (X_TRAIN), PRACTICE (X_VAL), SEALED EXAM (X_TEST).
 
     def compile_and_report(model):
         model.compile(optimizer='adam',
@@ -464,7 +464,7 @@
                       metrics=['accuracy'])
         return model
 
-    # --- Baseline: no defence ---
+    --- BASELINE: NO DEFENCE ---
     baseline = compile_and_report(Sequential([
         Dense(256, activation='relu', input_shape=(784,)),
         Dense(128, activation='relu'),
@@ -472,14 +472,14 @@
         Dense(10,  activation='softmax'),
     ]))
 
-    # --- Cure 1: a tax on big dials (L2) ---
+    --- CURE 1: A TAX ON BIG DIALS (L2) ---
     l2_model = compile_and_report(Sequential([
         Dense(300, activation='relu', input_shape=(784,), kernel_regularizer=l2(0.001)),
         Dense(100, activation='relu', kernel_regularizer=l2(0.001)),
         Dense(10,  activation='softmax'),
     ]))
 
-    # --- Cure 2: send clerks home (Dropout) ---
+    --- CURE 2: SEND CLERKS HOME (DROPOUT) ---
     dropout_model = compile_and_report(Sequential([
         Dense(300, activation='relu', input_shape=(784,)),
         Dropout(0.3),
@@ -488,7 +488,7 @@
         Dense(10,  activation='softmax'),
     ]))
 
-    # --- Cure 3: the fire alarm (Early Stopping) ---
+    --- CURE 3: THE FIRE ALARM (EARLY STOPPING) ---
     early = compile_and_report(Sequential([
         Dense(256, activation='relu', input_shape=(784,)),
         Dense(128, activation='relu'),
@@ -496,9 +496,9 @@
         Dense(10,  activation='softmax'),
     ]))
     alarm = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
-    # early.fit(..., epochs=100, callbacks=[alarm])   # 100 is a ceiling; the alarm stops it
+    EARLY.FIT(..., EPOCHS=100, CALLBACKS=[ALARM])   # 100 IS A CEILING; THE ALARM STOPS IT
 
-    # --- Cure 4: the humbler between floors (BatchNorm) ---
+    --- CURE 4: THE HUMBLER BETWEEN FLOORS (BATCHNORM) ---
     batchnorm_model = compile_and_report(Sequential([
         Dense(256, activation='relu', input_shape=(784,)),
         BatchNormalization(),
@@ -509,9 +509,9 @@
         Dense(10,  activation='softmax'),       # no BatchNorm after the exit -- it would
     ]))                                          # wreck the ten softmax chances
 
-    # --- The one honest grade: open the sealed pile ONCE, per machine ---
-    # loss, acc = model.evaluate(x_test, y_test, verbose=0)
-    # The generalisation gap = final train accuracy - final val accuracy (smaller = honester).
+    --- THE ONE HONEST GRADE: OPEN THE SEALED PILE ONCE, PER MACHINE ---
+    LOSS, ACC = MODEL.EVALUATE(X_TEST, Y_TEST, VERBOSE=0)
+    THE GENERALISATION GAP = FINAL TRAIN ACCURACY - FINAL VAL ACCURACY (SMALLER = HONESTER).
 
 
 ----------------------------------------------------------------------------------------------

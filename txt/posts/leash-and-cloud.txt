@@ -65,7 +65,7 @@
      so no single outlier in one column can flip the verdict alone.
 
 
-  ## What a Loose Leash Lets Happen
+  WHAT A LOOSE LEASH LETS HAPPEN
 
     default machine (C=1.0):  medium leash -> dials kept modest, but a dominant
                               column can still pull its dial fairly large
@@ -85,7 +85,7 @@
   And does the machine get more humble?
 
 
-  ## A Leash on the Dials (L2 Penalty)
+  A LEASH ON THE DIALS (L2 PENALTY)
 
   Add a price tag to large dials.
   Every extra unit of dial size costs something.
@@ -123,7 +123,7 @@
      Otherwise the dials stay modest.
 
 
-  ## The C Parameter: Counter-Intuitive Direction
+  THE C PARAMETER: COUNTER-INTUITIVE DIRECTION
 
   sklearn spells the leash strength as C, not lambda.
   lambda is the fine-strength on squared dials; C is sklearn's name for its reciprocal.
@@ -144,7 +144,7 @@
      "C small = heavy leash" feels backwards until you remember C = 1/lambda.
 
 
-  ## Did the Dials Shrink?
+  DID THE DIALS SHRINK?
 
   IN HAND so far: one S-curve machine (one dial per column, sum into z, squash z into a
   chance).
@@ -200,7 +200,7 @@
      averages those sizes. What you want to compare is pull strength, not direction.
 
 
-  ## Scaling and the Leash Are Not the Same Fix
+  SCALING AND THE LEASH ARE NOT THE SAME FIX
 
     Scaling (put columns on one ruler):  fixes the INPUTS
     L2 leash:                            fixes the DIALS
@@ -213,7 +213,7 @@
   So removing either one leaves a different problem unsolved.
 
 
-  ## A Completely Different Machine: The Two-Cloud Wall
+  A COMPLETELY DIFFERENT MACHINE: THE TWO-CLOUD WALL
 
   The problem this machine solves, drawn before the words:
 
@@ -261,7 +261,7 @@
                          wall here
 
 
-  ## Fisher's Criterion: Where to Aim the Wall
+  FISHER'S CRITERION: WHERE TO AIM THE WALL
 
   A naive wall at the midpoint between the two centres works when both clouds are round.
   But real clouds are stretched -- some directions have more spread than others.
@@ -373,7 +373,7 @@
      LinearDiscriminantAnalysis(priors=[0.5, 0.5]).
 
 
-  ## Generative vs Discriminative
+  GENERATIVE VS DISCRIMINATIVE
 
   The S-curve machine and LDA arrive at the same final form -- a straight-line wall through
   the 30-column space.
@@ -403,7 +403,7 @@
   Same wall shape, different route.
 
 
-  ## Same Accuracy: What It Means
+  SAME ACCURACY: WHAT IT MEANS
 
   On the Wisconsin breast cancer sheet, LDA and the S-curve machine give nearly identical
   accuracy.
@@ -420,7 +420,7 @@
      And that disagreement would tell you something important: the boundary is ambiguous.
 
 
-  ## Why Scaling Also Matters for LDA
+  WHY SCALING ALSO MATTERS FOR LDA
 
   LDA computes S_W, the pooled within-class spread matrix (how spread the points are inside
   each class, averaged across both classes).
@@ -446,14 +446,14 @@
        When they disagree, the boundary is ambiguous.
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
   First the dial comparison, L2 fine, and LDA projection from the worked examples:
 
-    # 3-column dial comparison: free machine vs C=1.0 vs tight C=0.1
+    3-COLUMN DIAL COMPARISON: FREE MACHINE VS C=1.0 VS TIGHT C=0.1
     x1_free, x2_free, x3_free   = +8.2, -5.7, +0.3
     x1_def,  x2_def,  x3_def    = +3.1, -2.4, +0.2
     x1_tight,x2_tight,x3_tight  = +1.4, -0.9, +0.1
@@ -463,19 +463,19 @@
     avg_tight = (abs(x1_tight)+abs(x2_tight)+abs(x3_tight)) / 3  # (1.4+0.9+0.1)/3 = 0.80
     print(round(avg_free,2), round(avg_def,2), round(avg_tight,2))  # 4.73 1.9 0.8
 
-    # L2 fine on the FREE machine's dials: lambda=10 times sum of squared dials
+    L2 FINE ON THE FREE MACHINE'S DIALS: LAMBDA=10 TIMES SUM OF SQUARED DIALS
     lam = 10
-    fine_free  = lam*(x1_free**2  + x2_free**2  + x3_free**2)   # 10*(67.24+32.49+0.09) = 998.2
-    fine_tight = lam*(x1_tight**2 + x2_tight**2 + x3_tight**2)  # 10*(1.96+0.81+0.01)  = 27.8
+    fine_free  = lam*(x1_free2  + x2_free2  + x3_free**2)   # 10*(67.24+32.49+0.09) = 998.2
+    fine_tight = lam*(x1_tight2 + x2_tight2 + x3_tight**2)  # 10*(1.96+0.81+0.01)  = 27.8
     print(round(fine_free,1), round(fine_tight,1))  # 998.2 27.8  (ballooned dials ~36x costlier)
 
-    # C = 1/lambda: small C = heavy squeeze
+    C = 1/LAMBDA: SMALL C = HEAVY SQUEEZE
     lam_tight = 1/0.1   # 10
     lam_def   = 1/1.0   # 1
     lam_free  = 1/1000  # 0.001
     print(lam_tight, lam_def, lam_free)  # 10.0 1.0 0.001
 
-    # LDA 4-person walkthrough: sick A(0.04,0.90) B(0.06,0.85), well C(0.12,0.50) D(0.18,0.45)
+    LDA 4-PERSON WALKTHROUGH: SICK A(0.04,0.90) B(0.06,0.85), WELL C(0.12,0.50) D(0.18,0.45)
     mu1_bmi = (0.04 + 0.06) / 2   # 0.05
     mu1_bp  = (0.90 + 0.85) / 2   # 0.875
     mu0_bmi = (0.12 + 0.18) / 2   # 0.15
@@ -492,7 +492,7 @@
     proj_C = w_bmi*0.12 + w_bp*0.50   # -0.012 + 0.200 = 0.188 < 0.260 -> well
     proj_D = w_bmi*0.18 + w_bp*0.45   # -0.018 + 0.180 = 0.162 < 0.260 -> well
     print(round(proj_A,3), round(proj_B,3), round(proj_C,3), round(proj_D,3))
-    # 0.356 0.334 0.188 0.162  -> all 4 correct: A,B sick, C,D well
+    0.356 0.334 0.188 0.162  -> ALL 4 CORRECT: A,B SICK, C,D WELL
 
   All numbers from the worked examples, each on its own line.  The toolbox block
   below fits both machines on the full Wisconsin sheet:
@@ -514,22 +514,22 @@
 
     avg_coef_baseline = np.mean(np.abs(log_reg_baseline.coef_))  # C=1.0 (default)
     avg_coef_l2       = np.mean(np.abs(log_reg_l2.coef_))         # C=0.1 (tighter)
-    # expect: avg_coef_l2 < avg_coef_baseline (the tighter leash shrinks them further)
+    EXPECT: AVG_COEF_L2 < AVG_COEF_BASELINE (THE TIGHTER LEASH SHRINKS THEM FURTHER)
 
   The two-cloud wall, both ways -- sklearn's default uses empirical priors, so force equal
   priors if you want the exact halfway wall:
 
-    # sklearn default: empirical priors -> wall shifted off the midpoint
+    SKLEARN DEFAULT: EMPIRICAL PRIORS -> WALL SHIFTED OFF THE MIDPOINT
     lda = LinearDiscriminantAnalysis()
     lda.fit(X_train_scaled, y_train)
     y_pred_lda = lda.predict(X_test_scaled)
 
-    # to reproduce the exact "halfway between the centres" wall:
+    TO REPRODUCE THE EXACT "HALFWAY BETWEEN THE CENTRES" WALL:
     lda_equal = LinearDiscriminantAnalysis(priors=[0.5, 0.5])
     lda_equal.fit(X_train_scaled, y_train)
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

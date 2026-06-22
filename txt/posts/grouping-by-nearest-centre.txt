@@ -43,7 +43,7 @@
      The loop converges because it is always walking downhill. It stops when neither
      move changes anything. The starting guess is wrong but the loop fixes it.
 
-  ## The Job
+  THE JOB
 
     a cloud of dots (rows), and a number K you pick
     carve the cloud into K piles so each pile is tight (its dots sit close together)
@@ -58,7 +58,7 @@
   Picking K well is its own problem.
   We get to it at the end.
 
-  ## The Two Moves
+  THE TWO MOVES
 
   A centre is one point that stands for a pile.
   Start by dropping K centres anywhere.
@@ -96,7 +96,7 @@
      So the machine compares squared gaps directly and never takes a root.
      Same winner, less arithmetic.
 
-  ## A Worked Example, by Hand
+  A WORKED EXAMPLE, BY HAND
 
   Six dots on one ruler (one column, to keep the arithmetic small).  K = 2.
 
@@ -133,7 +133,7 @@
      5 - 11 = -6, squared 36.  9 < 36, so the dot joins pile A -- and since squaring
      keeps the order, the winner is the same one a square root would have crowned.
 
-  ## The Score: Tightness (Inertia)
+  THE SCORE: TIGHTNESS (INERTIA)
 
   IN HAND: six dots carved into two piles, {1,2,3} and {10,11,12}, by two moves on a
   loop; the settled centres are mean(1,2,3) = 6/3 = 2 and mean(10,11,12) = 33/3 = 11.
@@ -178,7 +178,7 @@
   Here the "miss" being squared is a dot's gap from its centre.
   There is no answer column anywhere.
 
-  ## The Catch: Where You Drop the First Centres Matters
+  THE CATCH: WHERE YOU DROP THE FIRST CENTRES MATTERS
 
   K-means always settles.
   But it can settle into a BAD grouping if the starting centres were unlucky.
@@ -197,7 +197,7 @@
   There is also a smarter starting trick named k-means++.
   K-means++ spreads the first centres far apart on purpose, so an unlucky start is rarer.
 
-  ## Choosing K: The Elbow
+  CHOOSING K: THE ELBOW
 
   IN HAND: two moves on a loop, a tightness to score what they settle on (the six-dot
   grouping foots to 1+0+1 = 2 per pile, 2 + 2 = 4 in all), and the warning that an
@@ -240,7 +240,7 @@
      The two endpoints always sag zero.
      So the answer is forced to sit somewhere in between.
 
-  ## A Second Ruler: How Well Does Each Dot Fit Its Pile?
+  A SECOND RULER: HOW WELL DOES EACH DOT FIT ITS PILE?
 
   IN HAND: a grouping for every K, each scored by one tightness total (at K = 2 the six
   dots foot to 2 + 2 = 4), and an elbow to squint at on the tightness curve.  This
@@ -316,7 +316,7 @@
   neighbour.
   That is two piles drawn where the data holds one.
 
-  ## What Makes ANY Grouper Good
+  WHAT MAKES ANY GROUPER GOOD
 
   Before the tripwires, here is the yardstick that outlives K-means.
   Whatever grouping machine you ever meet, it is judged on the same short list:
@@ -338,7 +338,7 @@
   single centre; these are called Gaussian mixtures.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  Standardise first -- same as Part 1.
        K-means lives entirely on the straight-line gap, so a column measured in
@@ -406,7 +406,7 @@
        algorithm a lot cleaner to reason about.
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -427,7 +427,7 @@
     number of piles you pick              K (the n_clusters hyperparameter)
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -435,34 +435,34 @@
   First the 6-dot example from the worked section, hard-coded -- one dot per line so
   every assign, update, tightness, and silhouette number lands visibly:
 
-    # dots: 1, 2, 3 (pile A) and 10, 11, 12 (pile B);  K=2;  starting centres: 2 and 10
+    DOTS: 1, 2, 3 (PILE A) AND 10, 11, 12 (PILE B);  K=2;  STARTING CENTRES: 2 AND 10
 
-    # ROUND 1 -- ASSIGN: gap from each dot to each centre (squared -- order preserved)
-    sq_1_c2, sq_1_c10 = (1-2)**2, (1-10)**2   # 1, 81 -> pile A (centre 2)
-    sq_3_c2, sq_3_c10 = (3-2)**2, (3-10)**2   # 1, 49 -> pile A
-    sq_10_c2, sq_10_c10 = (10-2)**2, (10-10)**2  # 64, 0 -> pile B (centre 10)
+    ROUND 1 -- ASSIGN: GAP FROM EACH DOT TO EACH CENTRE (SQUARED -- ORDER PRESERVED)
+    sq_1_c2, sq_1_c10 = (1-2)2, (1-10)2   # 1, 81 -> pile A (centre 2)
+    sq_3_c2, sq_3_c10 = (3-2)2, (3-10)2   # 1, 49 -> pile A
+    sq_10_c2, sq_10_c10 = (10-2)2, (10-10)2  # 64, 0 -> pile B (centre 10)
     print(sq_1_c2, sq_1_c10, sq_3_c2, sq_3_c10)   # 1 81 1 49
 
-    # ROUND 1 -- UPDATE: new centres = mean of each pile
+    ROUND 1 -- UPDATE: NEW CENTRES = MEAN OF EACH PILE
     centre_A = (1+2+3)/3    # 2.0
     centre_B = (10+11+12)/3  # 11.0
     print(centre_A, centre_B)   # 2.0 11.0
 
-    # ROUND 2 -- ASSIGN: same piles, nobody switched -> STOP
+    ROUND 2 -- ASSIGN: SAME PILES, NOBODY SWITCHED -> STOP
 
-    # TIGHTNESS (inertia): squared gap from each dot to its own centre
-    tight_A = (1-2)**2 + (2-2)**2 + (3-2)**2    # 1 + 0 + 1 = 2
-    tight_B = (10-11)**2 + (11-11)**2 + (12-11)**2  # 1 + 0 + 1 = 2
+    TIGHTNESS (INERTIA): SQUARED GAP FROM EACH DOT TO ITS OWN CENTRE
+    tight_A = (1-2)2 + (2-2)2 + (3-2)**2    # 1 + 0 + 1 = 2
+    tight_B = (10-11)2 + (11-11)2 + (12-11)**2  # 1 + 0 + 1 = 2
     total_tight = tight_A + tight_B              # 4
     print(tight_A, tight_B, total_tight)  # 2 2 4
 
-    # SILHOUETTE for dot 1: a = avg gap to own pile-mates; b = avg gap to other pile
+    SILHOUETTE FOR DOT 1: A = AVG GAP TO OWN PILE-MATES; B = AVG GAP TO OTHER PILE
     a_1 = (abs(1-2) + abs(1-3)) / 2                    # (1+2)/2 = 1.5
     b_1 = (abs(1-10) + abs(1-11) + abs(1-12)) / 3      # (9+10+11)/3 = 10
     fit_1 = (b_1 - a_1) / max(a_1, b_1)                # (10-1.5)/10 = 0.85
     print(round(a_1,1), round(b_1,1), round(fit_1,2))  # 1.5 10.0 0.85
 
-    # SILHOUETTE for dot 3: edge of pile A
+    SILHOUETTE FOR DOT 3: EDGE OF PILE A
     a_3 = (abs(3-1) + abs(3-2)) / 2                    # (2+1)/2 = 1.5
     b_3 = (abs(3-10) + abs(3-11) + abs(3-12)) / 3      # (7+8+9)/3 = 8
     fit_3 = (b_3 - a_3) / max(a_3, b_3)                # (8-1.5)/8 = 0.8125
@@ -484,17 +484,17 @@
     from sklearn.preprocessing import StandardScaler
     from sklearn.cluster import KMeans
 
-    # same-ruler first
+    SAME-RULER FIRST
     X_scaled = StandardScaler().fit_transform(df)
 
-    # one grouping with K = 3
+    ONE GROUPING WITH K = 3
     km = KMeans(n_clusters=3, n_init=10, random_state=42)
     km.fit(X_scaled)
     labels = km.labels_              # pile per row
     centres = km.cluster_centers_    # the 3 centres
     print(km.inertia_)               # the tightness
 
-    # the elbow: tightness for K = 1..8
+    THE ELBOW: TIGHTNESS FOR K = 1..8
     tightness = []
     for k in range(1, 9):
         km = KMeans(n_clusters=k, n_init=10, random_state=42).fit(X_scaled)
@@ -506,9 +506,9 @@
     plt.title("Elbow: where does adding piles stop helping?")
     plt.grid(True, linestyle="--", alpha=0.4)
     plt.show()
-    # pick K at the bend
+    PICK K AT THE BEND
 
-    # the second ruler: average fit score per K  (starts at K=2 -- see the note)
+    THE SECOND RULER: AVERAGE FIT SCORE PER K  (STARTS AT K=2 -- SEE THE NOTE)
     from sklearn.metrics import silhouette_score
     fits = []
     for k in range(2, 9):
@@ -521,7 +521,7 @@
     plt.title("Fit score: pick K at the highest peak")
     plt.grid(True, linestyle="--", alpha=0.4)
     plt.show()
-    # pick K at the PEAK -- no squinting at a bend
+    PICK K AT THE PEAK -- NO SQUINTING AT A BEND
 
 
 ----------------------------------------------------------------------------------------------

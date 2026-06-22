@@ -32,7 +32,7 @@
      No word-by-word mapping. One full-sentence understanding, then one full-sentence output.
 
 
-  ## Attention Is a Grid: Row Looks, Column Is Looked At
+  ATTENTION IS A GRID: ROW LOOKS, COLUMN IS LOOKED AT
 
   Strip the mechanism down to the one picture that matters now. Lay every token's score in a
   grid: row i is the token doing the looking, column j is the token being looked at. Cell (i,j)
@@ -54,7 +54,7 @@
   yet -- this is Chapter 10's machine. The new question is one word: which cells are ALLOWED?
 
 
-  ## The One Switch: May a Token See the Future, or Not?
+  THE ONE SWITCH: MAY A TOKEN SEE THE FUTURE, OR NOT?
 
   Until now, every cell was allowed -- token i could look at tokens before AND after it. That
   has a name:
@@ -87,7 +87,7 @@
        check: token 1 sees only itself → [1.0, 0]. token 2 sees both → [0.5, 0.5].
 
 
-  ## No Block Builds a Reader; the Block Builds a Writer
+  NO BLOCK BUILDS A READER; THE BLOCK BUILDS A WRITER
 
   Read off what each setting is FOR.
 
@@ -105,7 +105,7 @@
       DECODER : future mask → causal → WRITES forward (next token, then the next)
 
 
-  ## The Names: BERT Reads, GPT Writes
+  THE NAMES: BERT READS, GPT WRITES
 
   Two famous machines are exactly these two settings, and their names say so:
 
@@ -134,7 +134,7 @@
               +-- GPT   (words)      ← you did NOT build this
 
 
-  ## Where Your ViT Sits: You Built the Reader, Not the Writer
+  WHERE YOUR VIT SITS: YOU BUILT THE READER, NOT THE WRITER
 
   Look back at Part 1's two telling lines.
 
@@ -159,7 +159,7 @@
   (Those four strings are the grader's exact keys -- letter-for-letter.)
 
 
-  ## Traps, Each as a Clash
+  TRAPS, EACH AS A CLASH
 
   WRONG TURN  "The causal mask deletes the future tokens -- they are gone."
   ─────────────────────────────────────────────────────────────────────────────────────────
@@ -186,39 +186,39 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   The only calculation in this post is the causal mask turning raw scores into portions.
   Here it is spelled out in Python, using equal raw scores of 1.0 for every allowed cell.
 
     import math
 
-    # 3 tokens; raw score = 1.0 for every ALLOWED cell, -inf for blocked cells
-    # Token 1 sees only itself; token 2 sees tokens 1-2; token 3 sees all three.
+    3 TOKENS; RAW SCORE = 1.0 FOR EVERY ALLOWED CELL, -INF FOR BLOCKED CELLS
+    TOKEN 1 SEES ONLY ITSELF; TOKEN 2 SEES TOKENS 1-2; TOKEN 3 SEES ALL THREE.
 
-    # --- token 1 row (only cell (1,1) allowed) ---
+    --- TOKEN 1 ROW (ONLY CELL (1,1) ALLOWED) ---
     raw_11 = 1.0
     exp_11 = math.exp(raw_11)             # 2.718
     row1_total = exp_11                   # 2.718
     p11, p12, p13 = exp_11/row1_total, 0.0, 0.0   # [1.0, 0, 0]
 
-    # --- token 2 row (cells (2,1) and (2,2) allowed) ---
+    --- TOKEN 2 ROW (CELLS (2,1) AND (2,2) ALLOWED) ---
     raw_21, raw_22 = 1.0, 1.0
     exp_21, exp_22 = math.exp(raw_21), math.exp(raw_22)   # 2.718, 2.718
     row2_total = exp_21 + exp_22          # 5.437
     p21, p22, p23 = exp_21/row2_total, exp_22/row2_total, 0.0   # [0.5, 0.5, 0]
 
-    # --- token 3 row (all three cells allowed) ---
+    --- TOKEN 3 ROW (ALL THREE CELLS ALLOWED) ---
     raw_31, raw_32, raw_33 = 1.0, 1.0, 1.0
     exp_31 = exp_32 = exp_33 = math.exp(1.0)   # 2.718 each
     row3_total = exp_31 + exp_32 + exp_33       # 8.155
     p31 = p32 = p33 = exp_31 / row3_total       # 0.333 each
 
-    # Encoder (no mask): all nine cells open -> equal portions everywhere
-    # Decoder (causal):  upper triangle = 0 portions -> each row adds to 1 from left only
+    ENCODER (NO MASK): ALL NINE CELLS OPEN -> EQUAL PORTIONS EVERYWHERE
+    DECODER (CAUSAL):  UPPER TRIANGLE = 0 PORTIONS -> EACH ROW ADDS TO 1 FROM LEFT ONLY
 
 
-  ## One Breath
+  ONE BREATH
 
   Attention lays scores in a grid: row looks, column is looked at, each row softmaxed into
   portions. One switch decides which cells are allowed. Leave them all open and a token sees both

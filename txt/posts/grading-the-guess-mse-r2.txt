@@ -52,7 +52,7 @@
     R^2 < 0 means "worse than the baseline -- something has gone badly wrong"
 
 
-  ## Same Stick, New Sheet
+  SAME STICK, NEW SHEET
 
     displacement  horsepower  weight  acceleration  |  MPG  <- right answer
     -----------------------------------------------------------
@@ -76,7 +76,7 @@
   The new work is grading.
 
 
-  ## Ruler One: MSE -- Just the Size of the Miss
+  RULER ONE: MSE -- JUST THE SIZE OF THE MISS
 
   Start with a mistake-score called RMSE.
   RMSE stands for root mean squared error.
@@ -128,7 +128,7 @@
   One clerk clears it in an hour; the room, before the coffee cools.
 
 
-  ## The Problem MSE Can't Solve
+  THE PROBLEM MSE CAN'T SOLVE
 
     "the guess was off by 9."
 
@@ -142,7 +142,7 @@
   That is the second ruler.
 
 
-  ## Ruler Two: R^2 -- A Race Against a Fool
+  RULER TWO: R^2 -- A RACE AGAINST A FOOL
 
   IN HAND: a sheet of cars, a stick that guesses mpg from four columns, and one ruler.
   That ruler is MSE: miss -> square -> mean -> stop.
@@ -274,7 +274,7 @@
   On a sheet the stick has never seen, it sometimes does.
 
 
-  ## Guess Once, Grade Twice
+  GUESS ONCE, GRADE TWICE
 
   IN HAND: two rulers for the same misses.
   MSE: miss -> square -> mean -> stop.
@@ -313,7 +313,7 @@
   Grading on rows the stick never saw is the whole job of the hidden pile.
 
 
-  ## Three Things Worth Stating Precisely
+  THREE THINGS WORTH STATING PRECISELY
 
   IN HAND: one set of guesses off the sealed pile, graded twice.
   MSE for the size of the misses.
@@ -381,7 +381,7 @@
     5. Guess once, grade twice: the same guesses feed both rulers.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  MSE has NO root -- read the name
        WRONG: mean_squared_error(...) then ** 0.5.
@@ -430,7 +430,7 @@
               an honest comparison.
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same moves, spoken in Python.
@@ -438,21 +438,21 @@
   First the five cars by hand, one line each (no loop) -- the same truths and stick-guesses
   from the worked example, so you can run it and watch 34, 2, and 0.94 print back:
 
-    # the five cars: (truth, stick's guess), written out one per line
+    THE FIVE CARS: (TRUTH, STICK'S GUESS), WRITTEN OUT ONE PER LINE
     y1, g1 = 2, 2.5
     y2, g2 = 4, 4.5
     y3, g3 = 9, 8.0
     y4, g4 = 3, 3.5
     y5, g5 = 7, 6.5
 
-    # RULER ONE -- MSE = miss -> square -> mean -> stop
-    mse = ((y1-g1)**2 + (y2-g2)**2 + (y3-g3)**2 + (y4-g4)**2 + (y5-g5)**2) / 5
+    RULER ONE -- MSE = MISS -> SQUARE -> MEAN -> STOP
+    mse = ((y1-g1)2 + (y2-g2)2 + (y3-g3)2 + (y4-g4)2 + (y5-g5)**2) / 5
     print("MSE:", mse)                 # 0.4   (.25+.25+1+.25+.25 = 2, over 5)
 
-    # RULER TWO -- R^2 = race the stick against the always-average fool
+    RULER TWO -- R^2 = RACE THE STICK AGAINST THE ALWAYS-AVERAGE FOOL
     fool = (2 + 4 + 9 + 3 + 7) / 5     # 5.0  (the fool's one safe shout)
-    total_wobble = ((2-fool)**2 + (4-fool)**2 + (9-fool)**2 + (3-fool)**2 + (7-fool)**2)  # 34
-    leftover     = ((y1-g1)**2 + (y2-g2)**2 + (y3-g3)**2 + (y4-g4)**2 + (y5-g5)**2)        # 2
+    total_wobble = ((2-fool)2 + (4-fool)2 + (9-fool)2 + (3-fool)2 + (7-fool)**2)  # 34
+    leftover     = ((y1-g1)2 + (y2-g2)2 + (y3-g3)2 + (y4-g4)2 + (y5-g5)**2)        # 2
     r2 = (total_wobble - leftover) / total_wobble
     print("R^2:", round(r2, 2))        # 0.94  = (34 - 2) / 34 = 32/34
 
@@ -472,7 +472,7 @@
         return (mse, r2)                             # truth first, guesses second
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                     Standard label
     -------------------------------------     ----------------------------------------

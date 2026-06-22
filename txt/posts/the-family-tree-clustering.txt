@@ -35,7 +35,7 @@
        A compromise that tends to find round, equally-sized clusters.
      The linkage rule you pick changes which groups form. There is no single right answer.
 
-  ## The Sheet (Same as Part 1)
+  THE SHEET (SAME AS PART 1)
 
     50 states, 3 measurements (Murder, Assault, UrbanPop).  No answer column.
     Standardised first, so every column sits on the same ruler.
@@ -50,7 +50,7 @@
   = 9 strokes, so the whole sheet is 1,225 x 9 = 11,025 strokes -- one clerk's long
   morning, and (by the row-merge trick below) the ONLY measuring the whole tree needs.
 
-  ## The One Move: Marry the Two Closest
+  THE ONE MOVE: MARRY THE TWO CLOSEST
 
   Start with 50 groups -- every state is its own lonely group of one.  Then repeat one
   move until a single group remains:
@@ -68,7 +68,7 @@
      times and keep the best.  The family tree has no random start at all: the same
      sheet of gaps gives the SAME tree, every single run.  Nothing to re-roll.
 
-  ## A Worked Example, by Hand
+  A WORKED EXAMPLE, BY HAND
 
   Four dots on one ruler.  Gaps are just differences.
 
@@ -114,7 +114,7 @@
   That tree is the DENDROGRAM.  Tall joins = forced marriages between unlike groups.
   Short joins = natural twins.
 
-  ## Cut the Tree to Get Groups
+  CUT THE TREE TO GET GROUPS
 
   IN HAND: four dots 1, 2, 6, 8 married into one family closest-pair-first -- {1,2} at
   height 1, {6,8} at height 2, then the two pairs at height max(5,7,4,6) = 7.  This
@@ -140,7 +140,7 @@
   possible K, read off by sliding a ruler up and down.  Cut just below the tallest jump and
   you get the most natural split -- the groups that resisted marrying the longest.
 
-  ## How Do You Measure the Gap BETWEEN Two GROUPS?
+  HOW DO YOU MEASURE THE GAP BETWEEN TWO GROUPS?
 
   Marrying two lone dots is easy -- the gap is just their distance.  But once a group holds
   several dots, "the gap between two groups" needs a rule.  This rule is called the LINKAGE,
@@ -171,7 +171,7 @@
      is the one to reach for when groups are long thin shapes (and the one to fear when
      you do not want chaining).  Always say which linkage you used.
 
-  ## The Engine Never Re-Measures (the Row-Merge Trick)
+  THE ENGINE NEVER RE-MEASURES (THE ROW-MERGE TRICK)
 
   A worry, caught while building it by hand: after every wedding, must you re-measure
   the gap from the new group to everybody else?  With 150 rows the starting sheet
@@ -195,7 +195,7 @@
   comparing numbers you already have -- no dot is ever measured twice.
 
 
-  ## Agglomerative (Bottom-Up) vs Divisive (Top-Down)
+  AGGLOMERATIVE (BOTTOM-UP) VS DIVISIVE (TOP-DOWN)
 
   What we just did -- start with singletons and marry upward -- is BOTTOM-UP
   (agglomerative).  It is by far the common one.  The opposite, TOP-DOWN (divisive),
@@ -203,7 +203,7 @@
   tree idea, opposite direction.  This whole post is bottom-up.
 
 
-  ## Reading the Merge Diary (the Z Table)
+  READING THE MERGE DIARY (THE Z TABLE)
 
   Every wedding writes one line in a diary.  With 50 states there are 49 weddings,
   so the diary has 49 rows.  Four columns per row:
@@ -233,7 +233,7 @@
      reads the root's gap without you ever counting the rows.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  Standardise first -- again.
        Like every distance method in this chapter, hierarchical clustering reads the
@@ -286,7 +286,7 @@
        code.  Say out loud which one the question asks for BEFORE typing the dot.
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -306,16 +306,16 @@
     the row-merge trick (keep the bigger)  the Lance-Williams update (complete linkage)
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
   First the 4-dot worked example, hard-coded -- every pairwise gap then every wedding:
 
-    # 4 dots on one ruler: 1, 2, 6, 8
+    4 DOTS ON ONE RULER: 1, 2, 6, 8
 
-    # all 6 pairwise gaps (absolute difference on 1 dimension)
+    ALL 6 PAIRWISE GAPS (ABSOLUTE DIFFERENCE ON 1 DIMENSION)
     gap_1_2 = abs(1-2)   # 1
     gap_1_6 = abs(1-6)   # 5
     gap_1_8 = abs(1-8)   # 7
@@ -324,24 +324,24 @@
     gap_6_8 = abs(6-8)   # 2
     print(gap_1_2, gap_1_6, gap_1_8, gap_2_6, gap_2_8, gap_6_8)  # 1 5 7 4 6 2
 
-    # WEDDING 1: closest pair = {1} and {2}, married at height 1
+    WEDDING 1: CLOSEST PAIR = {1} AND {2}, MARRIED AT HEIGHT 1
     wedding_1 = gap_1_2   # 1
 
-    # WEDDING 2: remaining {6} and {8} are closest, married at height 2
+    WEDDING 2: REMAINING {6} AND {8} ARE CLOSEST, MARRIED AT HEIGHT 2
     wedding_2 = gap_6_8   # 2
 
-    # WEDDING 3: {1,2} vs {6,8} -- cross-pair gaps from the distance sheet
-    # complete linkage = farthest cross-pair
+    WEDDING 3: {1,2} VS {6,8} -- CROSS-PAIR GAPS FROM THE DISTANCE SHEET
+    COMPLETE LINKAGE = FARTHEST CROSS-PAIR
     complete_3 = max(gap_1_6, gap_1_8, gap_2_6, gap_2_8)   # max(5,7,4,6) = 7
-    # single  linkage = nearest cross-pair
+    SINGLE  LINKAGE = NEAREST CROSS-PAIR
     single_3   = min(gap_1_6, gap_1_8, gap_2_6, gap_2_8)   # min(5,7,4,6) = 4
-    # average linkage = mean of all cross-pairs
+    AVERAGE LINKAGE = MEAN OF ALL CROSS-PAIRS
     average_3  = (gap_1_6 + gap_1_8 + gap_2_6 + gap_2_8) / 4  # (5+7+4+6)/4 = 5.5
 
     print(complete_3, single_3, average_3)   # 7 4 5.5
-    # single < average < complete -- cautious complete linkage always waits longest
+    SINGLE < AVERAGE < COMPLETE -- CAUTIOUS COMPLETE LINKAGE ALWAYS WAITS LONGEST
 
-    # wedding diary: three rows, heights only grow
+    WEDDING DIARY: THREE ROWS, HEIGHTS ONLY GROW
     print(wedding_1, wedding_2, complete_3)  # 1 2 7
 
   All 6 gaps on one page, three weddings, three linkage rules compared.  The toolbox block
@@ -358,13 +358,13 @@
     from sklearn.preprocessing import StandardScaler
     from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 
-    # same-ruler first
+    SAME-RULER FIRST
     X_scaled = StandardScaler().fit_transform(df)
 
-    # build the tree (Ward linkage = compact, even groups)
+    BUILD THE TREE (WARD LINKAGE = COMPACT, EVEN GROUPS)
     Z = linkage(X_scaled, method="ward")
 
-    # draw it
+    DRAW IT
     plt.figure(figsize=(10, 5))
     dendrogram(Z, labels=df.index.tolist(), leaf_rotation=90)
     plt.ylabel("merge height (gap)")
@@ -372,15 +372,15 @@
     plt.tight_layout()
     plt.show()
 
-    # cut into 3 groups
+    CUT INTO 3 GROUPS
     groups = fcluster(Z, t=3, criterion="maxclust")   # one label per row
 
-    # describe each group: the middle of every column, per group
+    DESCRIBE EACH GROUP: THE MIDDLE OF EVERY COLUMN, PER GROUP
     desc = df.assign(group=groups).groupby("group").mean()
     desc["Murder"].idxmax()   # NAME of the group where Murder runs highest
     desc["Murder"].max()      # the number itself -- a different question
 
-    # the sklearn one-shot equivalent
+    THE SKLEARN ONE-SHOT EQUIVALENT
     from sklearn.cluster import AgglomerativeClustering
     agg = AgglomerativeClustering(n_clusters=3, linkage="ward")
     labels = agg.fit_predict(X_scaled)

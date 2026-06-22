@@ -50,7 +50,7 @@
      A good heuristic is as close to the truth as possible without ever going over.
 
 
-  ## The Town (the picture everything lives in)
+  THE TOWN (THE PICTURE EVERYTHING LIVES IN)
 
   Four places in a small town. Roads between them. Each road has a cost.
 
@@ -82,24 +82,24 @@
       (h at the goal is always 0 -- no distance left once you have arrived)
 
 
-  ## The Only Three Numbers That Matter
+  THE ONLY THREE NUMBERS THAT MATTER
 
   Stand at some place. Three numbers describe it.
 
-  **g = cost-so-far.** The tolls on roads you have already walked to get here. Real money spent.
+  g = cost-so-far. The tolls on roads you have already walked to get here. Real money spent.
   Your odometer.
 
       stood at A after walking S->A :   g = 1
       stood at B after walking S->B :   g = 10
 
-  **h = the guess.** A cheap estimate of the toll still left to reach G from here. Not measured --
+  h = the guess. A cheap estimate of the toll still left to reach G from here. Not measured --
   guessed. Often the straight-line distance on a real map. The textbook calls it "the heuristic."
   It is just the guess. (It can be wrong. The section on "admissible" below is entirely about how
   wrong it is allowed to be.)
 
       guess sheet for this town:    h(A) = 1      h(B) = 10      h(G) = 0
 
-  **g + h = the whole-trip estimate.** How dear the full trip looks if you travel through this
+  g + h = the whole-trip estimate. How dear the full trip looks if you travel through this
   place: spent so far plus guessed-still-to-go.
 
       through A:   g + h = 1 + 1   = 2
@@ -110,7 +110,7 @@
   it actually cost.)
 
 
-  ## One Machine, Three Characters
+  ONE MACHINE, THREE CHARACTERS
 
   The machine never changes: a cheapest-pile -- a heap that always hands you the place with the
   smallest number written on its slip. You offer places to the heap by writing a number on a slip
@@ -129,7 +129,7 @@
   them is whether h appears on the slip.
 
 
-  ## Greedy Gets Fooled -- Walked by Hand
+  GREEDY GETS FOOLED -- WALKED BY HAND
 
   Greedy writes only h on the slip. It never looks at what it already paid.
 
@@ -156,7 +156,7 @@
   > Greedy trusts the look of closeness. The look was a lie.
 
 
-  ## A* Does Not Get Fooled -- Walked by Hand
+  A* DOES NOT GET FOOLED -- WALKED BY HAND
 
   A* writes g + h on the slip. The toll already paid is always part of the number.
 
@@ -189,7 +189,7 @@
   > looked through A. That is why g + h beats h alone: h steers; g corrects the lie.
 
 
-  ## "Admissible" -- The Guess Never Lies HIGH
+  "ADMISSIBLE" -- THE GUESS NEVER LIES HIGH
 
   A guess is admissible when it never says the goal is FARTHER than it truly is. It may say
   less than the truth (underestimate) or exactly the truth. Never more. Honest-or-modest, never
@@ -206,22 +206,22 @@
       guess never lies high (admissible)  ->  A* always finds the cheapest path  (optimal)
       guess lies high       (inadmissible)->  A* can return a dearer path         (not optimal)
 
-  **The trap the quiz always dangles:** "a heuristic that consistently underestimates -- is that
+  The trap the quiz always dangles: "a heuristic that consistently underestimates -- is that
   bad?" NO. Underestimating (guess too LOW) keeps A* optimal. The flaw is always OVERestimating.
   Underestimating can only make A* over-explore a little -- it never makes it skip the cheap road.
 
-  **The laziest honest guess: h = 0.** Zero never lies high. A* with h = 0 writes g + 0 = g on
+  The laziest honest guess: h = 0. Zero never lies high. A* with h = 0 writes g + 0 = g on
   every slip -- which is UCS. UCS is still optimal. (Greedy with h = 0 writes 0 on every slip --
   every place looks equally close -- nothing to steer by -- rudderless. Not the same thing.)
 
-  **Worked on this town.** Check admissibility for our h values:
+  Worked on this town. Check admissibility for our h values:
 
       h(A) = 1.  True toll left from A to G = 100.   1 <= 100  OK (very modest -- leaves a lot of room)
       h(B) = 10. True toll left from B to G = 10.    10 <= 10  OK (exactly tight)
       h(G) = 0.  True toll left at G = 0.             0 <= 0   OK
 
 
-  ## "Consistent" -- The Triangle Rule
+  "CONSISTENT" -- THE TRIANGLE RULE
 
   A guess is consistent when it never drops by more than the road you actually walk. Walk one road
   from place n to neighbour n', toll c. The guess at n must be no bigger than (that toll) +
@@ -248,7 +248,7 @@
       reopen it. No rework. That is the payoff of consistency: efficiency.
 
 
-  ## Three Ways a Search Blows It
+  THREE WAYS A SEARCH BLOWS IT
 
   "Optimal" means returns the cheapest path. "Complete" means returns a path if one exists.
 
@@ -270,7 +270,7 @@
   map kill it just as dead.
 
 
-  ## A* Eats Memory -- Why, and vs Depth-First
+  A* EATS MEMORY -- WHY, AND VS DEPTH-FIRST
 
   To always jump to the globally cheapest place, A* must remember the whole frontier of
   half-explored places at once -- the cheapest-pile plus the tab of best costs. A fat ring.
@@ -295,7 +295,7 @@
   the spreading frontier of paths. Not bandwidth, not backtracking -- memory.
 
 
-  ## What Makes a Guess Good (and What Doesn't)
+  WHAT MAKES A GUESS GOOD (AND WHAT DOESN'T)
 
   A good guess is:
 
@@ -316,7 +316,7 @@
   or slow guesses are the bad ones.
 
 
-  ## The Decoder (jargon -> plain, master sheet)
+  THE DECODER (JARGON -> PLAIN, MASTER SHEET)
 
       THE PEACOCK WORD                         WHAT IT ACTUALLY MEANS
       --------------------------------------   -------------------------------------------------
@@ -343,12 +343,11 @@
       computationally intractable              the sums take too long or need too much room
 
 
-  ## Python: Two Searches, One Town, by Hand
+  PYTHON: TWO SEARCHES, ONE TOWN, BY HAND
 
   The town from the walk above. Three blocks: greedy, A*, and an admissibility checker.
   Hard-coded round by round -- no loops hiding the decisions.
 
-  ```python
   # -----------------------------------------------------------------------
   # THE TOWN
   # Roads: S-A (cost 1), S-B (cost 10), A-G (cost 100), B-G (cost 10)
@@ -468,7 +467,6 @@
   print("But if the cheap path had been S->A->G with cost 2, lying high would hide it.")
   # h(A)=150 puffs up A's slip from 2 to 151, so A* never goes back to check A even
   # when A is on the truly cheapest route.
-  ```
 
   Output of the three blocks:
 

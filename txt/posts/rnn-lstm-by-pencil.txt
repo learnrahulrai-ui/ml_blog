@@ -46,7 +46,7 @@
   any machine runs, is to turn every word in every review into a number.
 
 
-  ## Words Are Not Numbers -- the First Problem
+  WORDS ARE NOT NUMBERS -- THE FIRST PROBLEM
 
   Two moves turn words into numbers.
 
@@ -101,7 +101,7 @@
   one row (one word) at a time, left to right.
 
 
-  ## The RNN -- One Worker, One Memory, Walking Left to Right
+  THE RNN -- ONE WORKER, ONE MEMORY, WALKING LEFT TO RIGHT
 
   New words, defined here before use:
 
@@ -171,7 +171,7 @@
   inside memory_2 for it to influence the tick.
 
 
-  ## Why the RNN Breaks -- the Crush Kills Far-Back Signals
+  WHY THE RNN BREAKS -- THE CRUSH KILLS FAR-BACK SIGNALS
 
   The tanh crush looks harmless. It is not. Every word, memory is crushed into -1..+1 and
   then OVERWRITTEN with new information. Follow one number (the rest of the 4 work the same):
@@ -210,7 +210,7 @@
   and that echo is crushed again on the next word. Far-back words fade to nothing.
 
 
-  ## The LSTM -- a Silent Vault and a Spoken Readout
+  THE LSTM -- A SILENT VAULT AND A SPOKEN READOUT
 
   The fix is one structural change: carry TWO memories instead of one, and the first one is
   NEVER crushed on carry.
@@ -263,7 +263,7 @@
   That is the whole LSTM. Two lines.
 
 
-  ## Why the Vault Survives -- the Arithmetic
+  WHY THE VAULT SURVIVES -- THE ARITHMETIC
 
   WORKED EXAMPLE (one number; real machine: all 32 run identically and in parallel):
 
@@ -308,7 +308,7 @@
   The tick reads B_2.
 
 
-  ## The Two Memories, Side by Side
+  THE TWO MEMORIES, SIDE BY SIDE
 
       VAULT (A):   the long-running number that crosses word boundaries uncrushed.
                    No machine reads it directly. keep and admit are applied TO it.
@@ -343,7 +343,7 @@
   Two memories, four machines, two lines -- that is the complete LSTM.
 
 
-  ## The Decoder
+  THE DECODER
 
       THE PEACOCK WORD              WHAT IT ACTUALLY MEANS
       --------------------------    --------------------------------------------------------
@@ -360,12 +360,11 @@
       vanishing gradient            the crush-and-scale that kills far-back signals in an RNN
 
 
-  ## Python: the RNN and LSTM Update, by Hand
+  PYTHON: THE RNN AND LSTM UPDATE, BY HAND
 
   Three blocks. The first traces the RNN's crush problem with real numbers. The second
   traces one LSTM word-step. Both are hardcoded -- no framework calls, no hidden moves.
 
-  ```python
   import numpy as np
 
   # -----------------------------------------------------------------------
@@ -462,7 +461,6 @@
   # word 10: RNN=0.3726  LSTM=1.7434
   # The RNN signal is below 1.0 after word 1 and stays trapped there.
   # The LSTM vault is still 1.7 after 10 words starting from 5.0.
-  ```
 
   Output of the three blocks:
 

@@ -47,7 +47,7 @@
      Gini mathematically punishes the useless split and rewards the clean one.
 
 
-  ## The Classification Tree: One Change at the Bottom
+  THE CLASSIFICATION TREE: ONE CHANGE AT THE BOTTOM
 
   The build hunt is the SAME shape as for a number answer.
   Sort each column, try every midpoint as a cut, score each cut's badness, keep the smallest.
@@ -68,7 +68,7 @@
     only the "ruler for badness" and the "guess at the bottom" differ
 
 
-  ## From 4 Counts to 1 Number: The Gini Ruler
+  FROM 4 COUNTS TO 1 NUMBER: THE GINI RULER
 
   At the first pairwise midpoint from the sorted column, draw a line:
 
@@ -146,7 +146,7 @@
     smallest Gini in that column = the column's champion (its cleanest split).
 
 
-  ## A Real Cancer Cut: Radius and Texture
+  A REAL CANCER CUT: RADIUS AND TEXTURE
 
   The earlier example used abstract "yes" and "no."
   Here is the same ruler tied to the actual cancer sheet the lab works with.
@@ -224,7 +224,7 @@
      A positive gain means the cut left the two sides cleaner than the parent;  the
      champion cut is the one with the biggest gain.
 
-  ## Why That Formula Is Not Astrology
+  WHY THAT FORMULA IS NOT ASTROLOGY
 
   The formula 1 - p^2 - q^2 looks pulled from thin air.
   It isn't.
@@ -288,7 +288,7 @@
     criterion='entropy'  -> -p log p - q log q slow (log is expensive)
 
 
-  ## Information Gain: The Drop
+  INFORMATION GAIN: THE DROP
 
   Information gain = how much a cut DROPS the mixing from parent to children.
   (parent = the room before the cut; children = the two piles after it.)
@@ -305,7 +305,7 @@
   It is just measured from the other direction.
 
 
-  ## Stratify: Keep the Mix Even
+  STRATIFY: KEEP THE MIX EVEN
 
   The cancer sheet is ~63% well, ~37% sick.
   A plain random split might deal 71% well into the exam pile by luck.
@@ -321,7 +321,7 @@
   No new idea -- just insurance against a lopsided deal.
 
 
-  ## Pruning: The Alpha Tax
+  PRUNING: THE ALPHA TAX
 
   A full-grown tree memorises every quirk.
   Which means its exam error is high.
@@ -361,7 +361,7 @@
      ccp_alpha: snips weak twigs ANYWHERE, keeps strong deep branches.  smart, uneven.
 
 
-  ## Where Does the Alpha Menu Come From?
+  WHERE DOES THE ALPHA MENU COME FROM?
 
   You do NOT guess random alpha values.  The tree hands you the exact list of alphas
   where a branch would snip:
@@ -403,7 +403,7 @@
      on the exam -- not to make up alphas.
 
 
-  ## The Nested Averages Ladder
+  THE NESTED AVERAGES LADDER
 
   To pick the best alpha, the same 5-slice check from Chapter 4.  Three averages,
   stacked, each doing a different job:
@@ -434,7 +434,7 @@
     alpha scores       --MIN-->  alpha_hat     (top, not avg)
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
   These are the exact wrong pictures I had to untangle -- each one cost me
   real time until I saw the concrete shape of the mistake:
@@ -482,7 +482,7 @@
               confusion.
 
 
-  ## Any Room Has a Wrongness -- Not Just Leaves
+  ANY ROOM HAS A WRONGNESS -- NOT JUST LEAVES
 
   "You only measure wrongness at the end -- how can you measure it in the middle?"
 
@@ -502,7 +502,7 @@
   Wrongness is NOT leaf-only.  Any room can be graded by "pretend it's a leaf."
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -519,7 +519,7 @@
     keep the sick:well ratio even         stratified train/test split
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same counts, spoken in Python.
@@ -527,21 +527,21 @@
   First the Gini ruler by hand -- the exact four counts from the worked example, each side
   on its own line, no loop, so you watch 0.375, 0.32, and 0.344 print back:
 
-    # the BELOW side: 3 yes, 1 no (4 people). Gini = chance two random grabs DISAGREE
-    below = 1 - (3/4)**2 - (1/4)**2      # 1 - 9/16 - 1/16 = 0.375
-    # the ABOVE side: 1 yes, 4 no (5 people)
-    above = 1 - (1/5)**2 - (4/5)**2      # 1 - 1/25 - 16/25 = 0.32
+    THE BELOW SIDE: 3 YES, 1 NO (4 PEOPLE). GINI = CHANCE TWO RANDOM GRABS DISAGREE
+    below = 1 - (3/4)2 - (1/4)2      # 1 - 9/16 - 1/16 = 0.375
+    THE ABOVE SIDE: 1 YES, 4 NO (5 PEOPLE)
+    above = 1 - (1/5)2 - (4/5)2      # 1 - 1/25 - 16/25 = 0.32
 
-    # weighted badness of the cut: weight each side by its head-count (4 of 9, 5 of 9)
+    WEIGHTED BADNESS OF THE CUT: WEIGHT EACH SIDE BY ITS HEAD-COUNT (4 OF 9, 5 OF 9)
     cut = (4/9)*below + (5/9)*above
     print(round(below,3), round(above,3), round(cut,3))   # 0.375 0.32 0.344
 
   Now the same ruler racing two cuts on the four cancer lumps, each cut spelled out:
 
-    # cut RADIUS > 12 : below {well, well} pure -> 0 ; above {sick, sick} pure -> 0
+    CUT RADIUS > 12 : BELOW {WELL, WELL} PURE -> 0 ; ABOVE {SICK, SICK} PURE -> 0
     radius_12 = (2/4)*0.0 + (2/4)*0.0                      # 0.0  <- perfectly clean
-    # cut RADIUS > 15 : below {well, well, sick} = 1 sick 2 well ; above {sick} pure
-    below_15  = 1 - (1/3)**2 - (2/3)**2                    # 4/9 = 0.444
+    CUT RADIUS > 15 : BELOW {WELL, WELL, SICK} = 1 SICK 2 WELL ; ABOVE {SICK} PURE
+    below_15  = 1 - (1/3)2 - (2/3)2                    # 4/9 = 0.444
     radius_15 = (3/4)*below_15 + (1/4)*0.0                 # 0.333
     print(round(radius_12,3), round(radius_15,3))         # 0.0 0.333  -> cut>12 wins
 
@@ -551,28 +551,28 @@
 
   >> NEW TO PYTHON? Each named once:
        DecisionTreeClassifier()     -- a question-chart machine for bin answers
-       criterion='gini'             -- the mixing ruler (default) -- our `cut`, automated
+       criterion='gini'             -- the mixing ruler (default) -- our 'cut', automated
        cost_complexity_pruning_path -- the staircase of alpha snip-points
        KFold                        -- the 5-slice splitter for the alpha check
 
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.metrics import accuracy_score, confusion_matrix
 
-    # classification tree
+    CLASSIFICATION TREE
     tree_cls = DecisionTreeClassifier(criterion='gini', random_state=42)
     tree_cls.fit(X_train_cls, y_train_cls)
     acc = accuracy_score(y_test_cls, tree_cls.predict(X_test_cls))
 
-    # pruning: get alpha menu, 5-slice check, pick winner
+    PRUNING: GET ALPHA MENU, 5-SLICE CHECK, PICK WINNER
     path = DecisionTreeRegressor(random_state=42).fit(X_train, y_train) \
            .cost_complexity_pruning_path(X_train, y_train)
     ccp_alphas = path.ccp_alphas   # the staircase
 
     from sklearn.model_selection import KFold
     kf = KFold(n_splits=5, shuffle=True, random_state=42)
-    # for each alpha: 5-fold CV -> mean MSE -> pick argmin -> alpha_hat
-    # then: tree_pruned = DecisionTreeRegressor(ccp_alpha=alpha_hat, ...)
-    #       tree_pruned.fit(X_train, y_train)  <- rebuild with the tax
+    FOR EACH ALPHA: 5-FOLD CV -> MEAN MSE -> PICK ARGMIN -> ALPHA_HAT
+    THEN: TREE_PRUNED = DECISIONTREEREGRESSOR(CCP_ALPHA=ALPHA_HAT, ...)
+    TREE_PRUNED.FIT(X_TRAIN, Y_TRAIN)  <- REBUILD WITH THE TAX
 
 
 ----------------------------------------------------------------------------------------------

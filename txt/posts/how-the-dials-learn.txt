@@ -58,7 +58,7 @@
      Too small: takes forever. This is the hardest hyperparameter in deep learning.
 
 
-  ## Why Brute Force Will Not Do
+  WHY BRUTE FORCE WILL NOT DO
 
   Our full building has more dials than you might guess. Let me count them.
 
@@ -83,7 +83,7 @@
   it fits in a sentence.
 
 
-  ## A Network You Can Hold in Your Head
+  A NETWORK YOU CAN HOLD IN YOUR HEAD
 
   One measurement. One hidden clerk. One output clerk. That is the entire network.
 
@@ -111,7 +111,7 @@
   or down, and how steeply?
 
 
-  ## Chain Rule, Said Plainly
+  CHAIN RULE, SAID PLAINLY
 
   IN HAND: tiny network with numbers locked in -- x=0.5, w1=1.0, b1=0.3, w2=1.5, b2=0.2,
   y=1. Forward pass gave z1=0.8, a1=0.8, z2=1.4, p=0.802, L=0.221.
@@ -196,7 +196,7 @@
   the error at the clerk it belongs to. No input factor, no chain to trace.
 
 
-  ## Reading the Slope, and Taking a Step
+  READING THE SLOPE, AND TAKING A STEP
 
   The slope of L w.r.t. w2 is -0.158. NEGATIVE. What does that mean in plain words?
 
@@ -245,7 +245,7 @@
     A nudge changes z2 exactly one-for-one, so its slope IS the error -- nothing else dilutes it.
 
 
-  ## Sending the Error One Room Further Back
+  SENDING THE ERROR ONE ROOM FURTHER BACK
 
   IN HAND: error born at the output = p - y = -0.198. Slopes already found:
   w2 slope = -0.158, new w2 = 1.516. b2 slope = -0.198, new b2 = 0.220.
@@ -329,7 +329,7 @@
   network corrects fastest exactly where it was most wrong.
 
 
-  ## How Big a Step? (Learning Rate)
+  HOW BIG A STEP? (LEARNING RATE)
 
   We used a step size of 0.1 above. That number is the learning rate, and it is its own small
   art.
@@ -345,7 +345,7 @@
   training diverges, suspect the step size first.
 
 
-  ## A Manager Who Sizes the Steps (Adam)
+  A MANAGER WHO SIZES THE STEPS (ADAM)
 
   A fixed step is crude: early on you want big strides, near the bottom you want tiny ones,
   and different dials want different sizes. Rather than tune one number forever, the standard
@@ -371,7 +371,7 @@
   with a hand-tuned step also works -- but Adam saves you the tuning, so I use it.
 
 
-  ## Lazy Clerks and Coffee Breaks (Dropout)
+  LAZY CLERKS AND COFFEE BREAKS (DROPOUT)
 
   Run the study loop for thirty or forty passes and a subtler failure appears. Among Room 1's
   16 clerks, one happens to start with good dials and contribute a lot. The others discover
@@ -399,7 +399,7 @@
   clerks face a 25% rate? 16 x 0.25 = 4. Four out, twelve working.
 
 
-  ## When Numbers Explode (Numerical Stability)
+  WHEN NUMBERS EXPLODE (NUMERICAL STABILITY)
 
   One sharp edge from the real machine. The clerks usually compute in standard 32-bit
   floating-point numbers (float32), and in that format the largest representable value is
@@ -428,7 +428,7 @@
   explained.)
 
 
-  ## Three Mistakes Worth Knowing
+  THREE MISTAKES WORTH KNOWING
 
   I have made all three. The first burned half a day.
 
@@ -457,7 +457,7 @@
   at the exit.
 
 
-  ## Putting It All in Motion (The Real Run)
+  PUTTING IT ALL IN MOTION (THE REAL RUN)
 
   Everything above was one dial moving one step, by hand. A real run is just that same step
   -- error born at the output, sent backward through every dial, each one nudged by step x
@@ -477,7 +477,7 @@
   hundred are told the wrong thing.
 
 
-  ## Standard Names for Part 2
+  STANDARD NAMES FOR PART 2
 
     Plain term                          Standard label
     ----------------------------------  -------------------------------------------
@@ -495,7 +495,7 @@
     clipping Z to [-80, +80]            numerical stability / sigmoid clipping
 
 
-  ## Code, If You Want It
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer: the chain rule, the error flows, and every slope calculation
   fit on scratch paper. This section is for the day you meet one.
@@ -506,13 +506,13 @@
 
     import math
 
-    # the network's numbers, locked in (one input, one hidden clerk, one output clerk)
+    THE NETWORK'S NUMBERS, LOCKED IN (ONE INPUT, ONE HIDDEN CLERK, ONE OUTPUT CLERK)
     x  = 0.5
     w1, b1 = 1.0, 0.3
     w2, b2 = 1.5, 0.2
     y  = 1
 
-    # ---- FORWARD: hidden clerk, then output clerk ----
+    ---- FORWARD: HIDDEN CLERK, THEN OUTPUT CLERK ----
     z1 = x*w1 + b1               # 0.5*1.0 + 0.3 = 0.8
     a1 = max(0, z1)              # zero-out rule (ReLU): 0.8 is positive, kept
     z2 = a1*w2 + b2              # 0.8*1.5 + 0.2 = 1.4
@@ -520,7 +520,7 @@
     L  = -math.log(p)            # loss when truth = 1: ~0.22 (0.221 by hand from p=0.802)
     print(round(z1,3), round(a1,3), round(z2,3), round(p,3), round(L,3))
 
-    # ---- BACKWARD: error born at the output, sent left, one link at a time ----
+    ---- BACKWARD: ERROR BORN AT THE OUTPUT, SENT LEFT, ONE LINK AT A TIME ----
     err_z2   = p - y             # the miracle: (-1/p)*(p*(1-p)) collapses to p - y = -0.198
     slope_w2 = err_z2 * a1       # x its own input a1=0.8 : -0.158
     slope_b2 = err_z2 * 1        # a nudge moves z2 one-for-one : -0.198
@@ -530,7 +530,7 @@
     slope_b1 = err_z1 * 1        # -0.297
     print(round(err_z2,3), round(slope_w2,3), round(slope_w1,3))   # -0.198 -0.158 -0.148
 
-    # ---- one downhill step, learning rate 0.1 : dial = dial - step*slope ----
+    ---- ONE DOWNHILL STEP, LEARNING RATE 0.1 : DIAL = DIAL - STEP*SLOPE ----
     new_w2 = w2 - 0.1*slope_w2   # 1.5 + 0.0158 = 1.5158
     new_w1 = w1 - 0.1*slope_w1   # 1.0 + 0.0148 = 1.0148
     print(round(new_w2,4), round(new_w1,4))
@@ -550,7 +550,7 @@
        batch_size=32                      -- adjust dials after every 32 patients
        model.evaluate(X_test_s, y_test)   -- the sealed exam, once, at the very end
 
-    # (continues directly from the Part 1 code: X_train_s, X_val_s, X_test_s, model)
+    (CONTINUES DIRECTLY FROM THE PART 1 CODE: X_TRAIN_S, X_VAL_S, X_TEST_S, MODEL)
 
     model.compile(
         optimizer='adam',
@@ -563,7 +563,7 @@
         epochs=50,
         batch_size=32,
         validation_data=(X_val_s, y_val),   # the practice pile, watched but never studied
-        # TODO: add EarlyStopping on val_loss so it stops when practice loss turns upward
+        TODO: ADD EARLYSTOPPING ON VAL_LOSS SO IT STOPS WHEN PRACTICE LOSS TURNS UPWARD
     )
 
     loss, acc = model.evaluate(X_test_s, y_test, verbose=0)

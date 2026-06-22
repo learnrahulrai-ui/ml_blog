@@ -56,7 +56,7 @@
      large enough not to follow individual outliers. Cross-validation finds it.
 
 
-  ## Working Pile and Hidden Pile
+  WORKING PILE AND HIDDEN PILE
 
     WORKING PILE (rows with answers)        HIDDEN PILE (answers withheld)
     rooms income age pop | price            rooms income age pop | price
@@ -68,7 +68,7 @@
   at scoring -- never during guessing.
 
 
-  ## Measuring the Gap
+  MEASURING THE GAP
 
   Straight-line gap over all measured columns:
 
@@ -90,7 +90,7 @@
      1.73) and B (sqrt(115) ~= 10.72) -- a middling neighbour, nowhere near the closest.
 
 
-  ## Put Columns on the Same Ruler First
+  PUT COLUMNS ON THE SAME RULER FIRST
 
   IN HAND: one gap rule -- subtract column by column, square, add, root -- worked on a
   new row (3, 2, 5, 4): row A sat at sqrt(1+0+1+1) = sqrt(3) ~= 1.73, row B at
@@ -153,7 +153,7 @@
      relearn per round -- the bound pipeline does this.
 
 
-  ## Guessing One Row
+  GUESSING ONE ROW
 
     1. measure gap to every working-pile row          O(n*d)
     2. pick the k smallest gaps                        O(n) with a heap
@@ -166,7 +166,7 @@
   Equal weights (w_i = 1) recover the plain average.
 
 
-  ## How Slow Is It
+  HOW SLOW IS IT
 
   The ask-closest rule is generous at study time and stingy at guess time -- it does no
   work up front, then pays for it on every single question. The pile is stored, never
@@ -194,7 +194,7 @@
                    "closest" stops meaning anything
 
 
-  ## Worked by Hand
+  WORKED BY HAND
 
   IN HAND: the gap rule (subtract column by column, square, add, root) and the same-ruler
   fix z = (x - mu) / sd, with mu and sd learned on the working pile only.  Each guess
@@ -224,7 +224,7 @@
      the guess moves with it -- the rule simply follows whoever its neighbours are.
 
 
-  ## k Is the Stiff-vs-Jumpy Dial
+  K IS THE STIFF-VS-JUMPY DIAL
 
     k = 1       asks 1 row     -> copies its noise exactly
                 zero mistake on working pile
@@ -237,7 +237,7 @@
     right k  ->  somewhere in between -- found by rotating folds
 
 
-  ## Picking k Without Touching the Hidden Pile
+  PICKING K WITHOUT TOUCHING THE HIDDEN PILE
 
   IN HAND: the full rule, run once by hand -- five working rows, new row at income 5.0,
   three closest answers 3.4, 2.7, 2.4, guess (3.4 + 2.7 + 2.4) / 3 = 8.5 / 3 ~= 2.83 --
@@ -251,7 +251,7 @@
   waiting at the end of the post.
 
 
-  ## Origin
+  ORIGIN
 
   The rule feels too simple to be serious, so it is worth knowing it has a pedigree.
   Evelyn Fix and Joseph Hodges wrote it down in 1951. Sixteen years later Thomas Cover and
@@ -268,7 +268,7 @@
      5. When columns pile up, close stops meaning close.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  Shape slot -- rows vs columns
        WRONG: X.shape[1] gives rows.
@@ -303,7 +303,7 @@
               Get the name of the winner, not the smallest name alphabetically.
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same rows, spoken in Python.
@@ -311,14 +311,14 @@
   First the rule by hand -- no loop, every gap on its own line, exactly the worked example,
   so you watch the gaps and the guess 2.83 print back:
 
-    # the gap rule on two rows (new row at (3, 2, 5, 4)) -- subtract, square, add, root
-    gap_A = ((3-4)**2 + (2-2)**2 + (5-6)**2 + (4-3)**2) ** 0.5   # sqrt(3)   = 1.73
-    gap_B = ((3-8)**2 + (2-9)**2 + (5-1)**2 + (4-9)**2) ** 0.5   # sqrt(115) = 10.72
+    THE GAP RULE ON TWO ROWS (NEW ROW AT (3, 2, 5, 4)) -- SUBTRACT, SQUARE, ADD, ROOT
+    gap_A = ((3-4)2 + (2-2)2 + (5-6)2 + (4-3)2) ** 0.5   # sqrt(3)   = 1.73
+    gap_B = ((3-8)2 + (2-9)2 + (5-1)2 + (4-9)2) ** 0.5   # sqrt(115) = 10.72
     print(round(gap_A,2), round(gap_B,2))     # 1.73 10.72  -> A is the closer neighbour
 
-    # ask the 3 closest, one column (income). Working pile, five (income, price) rows:
-    #   (5.6, 3.4) (4.0, 2.7) (3.8, 2.4) (2.5, 1.5) (7.3, 3.5)
-    # new row at income 5.0 -- gap to each row, one line each (|5.0 - income|)
+    ASK THE 3 CLOSEST, ONE COLUMN (INCOME). WORKING PILE, FIVE (INCOME, PRICE) ROWS:
+    (5.6, 3.4) (4.0, 2.7) (3.8, 2.4) (2.5, 1.5) (7.3, 3.5)
+    NEW ROW AT INCOME 5.0 -- GAP TO EACH ROW, ONE LINE EACH (|5.0 - INCOME|)
     g1 = abs(5.0 - 5.6)    # 0.6  -> price 3.4   (closest)
     g2 = abs(5.0 - 4.0)    # 1.0  -> price 2.7   (2nd)
     g3 = abs(5.0 - 3.8)    # 1.2  -> price 2.4   (3rd)
@@ -326,7 +326,7 @@
     g5 = abs(5.0 - 7.3)    # 2.3  -> price 3.5
     print(round(g1,1), round(g2,1), round(g3,1), round(g4,1), round(g5,1))   # 0.6 1.0 1.2 2.5 2.3
 
-    # k=3: average the prices of the three smallest gaps (g1, g2, g3)
+    K=3: AVERAGE THE PRICES OF THE THREE SMALLEST GAPS (G1, G2, G3)
     guess = (3.4 + 2.7 + 2.4) / 3     # 8.5 / 3 = 2.83
     print(round(guess, 2))            # 2.83
 
@@ -355,7 +355,7 @@
     knn.fit(X_train, y_train)          # stores pile; learns mu, sd on working rows
     pred = knn.predict(X_test)         # same ruler -> measure gaps -> average
 
-    rmse = mean_squared_error(y_test, pred) ** 0.5   # ** 0.5 means square root
+    rmse = mean_squared_error(y_test, pred)  0.5   #  0.5 means square root
     print(round(rmse, 3))
 
   And the hunt for the best k -- try each candidate, score it by rotating folds, keep the

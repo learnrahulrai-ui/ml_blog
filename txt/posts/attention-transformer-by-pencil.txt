@@ -53,7 +53,7 @@
   at each other simultaneously. Only then does the verdict come out.
 
 
-  ## Words Are Not Numbers -- the Front End (same as the walking machine)
+  WORDS ARE NOT NUMBERS -- THE FRONT END (SAME AS THE WALKING MACHINE)
 
   A machine multiplies numbers; it cannot multiply letters. So words become numbers first.
 
@@ -98,7 +98,7 @@
       This sheet is what the attention step reads. ALL rows at the same time.
 
 
-  ## Why the Walking Machine Fades -- and Why We Drop It
+  WHY THE WALKING MACHINE FADES -- AND WHY WE DROP IT
 
   In the walking machine (the RNN), "nolan" reaches "ended" only through a memory that is
   tanh-crushed and rewritten at every word. In an 80-word review, a signal from word 1 must
@@ -124,7 +124,7 @@
   explicitly. More on that at the end.
 
 
-  ## Why Three Sticks -- Want, Have, Give
+  WHY THREE STICKS -- WANT, HAVE, GIVE
 
   Each word arrives as one stick (its embedding). Attention turns it into THREE sticks:
 
@@ -164,7 +164,7 @@
   The HAVE and GIVE sticks are produced the same way, each with their own grid.
 
 
-  ## The Match -- nolan's WANT Dots Every Word's HAVE
+  THE MATCH -- NOLAN'S WANT DOTS EVERY WORD'S HAVE
 
   To score how much nolan cares about a word, take nolan's WANT stick and that word's HAVE
   stick and DOT them.
@@ -185,7 +185,7 @@
       (Every word dots against EVERY other word, including itself -- n words -> n scores.)
 
 
-  ## Scale -- Divide by the Square Root of the Stick Width
+  SCALE -- DIVIDE BY THE SQUARE ROOT OF THE STICK WIDTH
 
   Wider sticks produce larger dot sums (more products added). The divisor keeps scores
   from growing just because the sticks are wide.
@@ -201,7 +201,7 @@
   (Real stick width = 32; divisor = sqrt(32) ~= 5.66.)
 
 
-  ## Softmax -- Turn Scores Into Fractions That Add to 1
+  SOFTMAX -- TURN SCORES INTO FRACTIONS THAT ADD TO 1
 
   We want "how much to listen to each word" as fractions -- so they can weight the GIVE
   sticks by exactly how much to take from each.
@@ -230,7 +230,7 @@
   what softmax does that plain division would not.
 
 
-  ## Weighted Sum -- Build nolan's New Stick From the GIVE Sticks
+  WEIGHTED SUM -- BUILD NOLAN'S NEW STICK FROM THE GIVE STICKS
 
   Use the fractions to mix the GIVE sticks:
 
@@ -259,7 +259,7 @@
   enriched with information from every other row.
 
 
-  ## Two Teams -- Multi-Head Attention
+  TWO TEAMS -- MULTI-HEAD ATTENTION
 
   One set of three grids (want/have/give) catches one kind of link. Run TWO sets side by
   side:
@@ -283,7 +283,7 @@
   sticks of width 32. "key_dim" is the width of the WANT/HAVE/GIVE sticks per team.
 
 
-  ## Position -- the Price of Not Walking
+  POSITION -- THE PRICE OF NOT WALKING
 
   Because every word is looked at all-at-once, the raw attention step cannot tell "nolan
   ended" from "ended nolan" -- order is invisible when you look everywhere at once.
@@ -301,7 +301,7 @@
   so you know the full machine has it.
 
 
-  ## Collapsing 100 Sticks to One Summary
+  COLLAPSING 100 STICKS TO ONE SUMMARY
 
   After attention, there are 100 new sticks (one per word-slot). The verdict needs ONE.
 
@@ -323,7 +323,7 @@
   Same end goal: one stick for the verdict.
 
 
-  ## The Verdict -- Plain Workers at the End
+  THE VERDICT -- PLAIN WORKERS AT THE END
 
   Feed the summary stick through plain workers to a single tick:
 
@@ -351,7 +351,7 @@
   Dropout (zero-a-random-tenth) = forced independence, only during practice, off at exam.
 
 
-  ## The Decoder (jargon -> plain, master sheet)
+  THE DECODER (JARGON -> PLAIN, MASTER SHEET)
 
       THE PEACOCK WORD              WHAT IT ACTUALLY MEANS
       --------------------------    -------------------------------------------------------
@@ -373,13 +373,12 @@
       dense layer                   workers: multiply-add + nudge -> one number each
 
 
-  ## Python: Attention by Hand, Then the Full Machine
+  PYTHON: ATTENTION BY HAND, THEN THE FULL MACHINE
 
   Three blocks. The first traces the exact attention math for "nolan" with numpy -- every
   number equals the pencil walk above. The second shows the same as one Keras call. The
   third is the full transformer model, each line mapped back to the pencil.
 
-  ```python
   import numpy as np
 
   # -----------------------------------------------------------------------
@@ -500,7 +499,6 @@
   # 5 passes over the study pile, 64 reviews per handful
   """
   print(full_model)
-  ```
 
   Output of Case 1 (Cases 2 and 3 are descriptions, not run here):
 

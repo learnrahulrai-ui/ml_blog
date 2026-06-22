@@ -53,7 +53,7 @@
   That single trick turns a circular formula into plain arithmetic you can check by hand.
 
 
-  ## The World (the picture everything lives in)
+  THE WORLD (THE PICTURE EVERYTHING LIVES IN)
 
   A drone hangs in the air over a patch of enemy ground. We want to grade a flight PLAN.
 
@@ -96,7 +96,7 @@
   = the "discount factor", written gamma. Touching the ground = a "terminal state".
 
 
-  ## What "Grade the Plan" Even Means -- the WORTH of a Spot
+  WHAT "GRADE THE PLAN" EVEN MEANS -- THE WORTH OF A SPOT
 
   Someone hands you the PLAN (the arrows). You are NOT asked to improve it. You are asked one
   thing, for every spot: what is this spot's WORTH?
@@ -132,12 +132,12 @@
   picks a better path. It only SCORES the arrows you were given, on the discounted scale.
 
 
-  ## The One Law (derived, not declared)
+  THE ONE LAW (DERIVED, NOT DECLARED)
 
   A spot's worth = the DISCOUNTED points the drone collects from here on, obeying the arrows.
   Where the spot sits decides the shape.
 
-  **A ground spot.** Touching the ground ends the flight. Nothing comes after. There is no
+  A ground spot. Touching the ground ends the flight. Nothing comes after. There is no
   future to count -- the worth is just the points painted there:
 
       worth(ground)  =  its painted points          (+5 on the runway, -2 on dirt)
@@ -145,7 +145,7 @@
   No lookup, no neighbour, no arithmetic. The number is painted on. Burn that in: a ground
   spot's worth is TRUE the instant you write it down, and can never be wrong.
 
-  **An air spot.** The drone does not stop; it pays fuel and rides the arrow onward. Two parts:
+  An air spot. The drone does not stop; it pays fuel and rides the arrow onward. Two parts:
 
       it pays fuel right now ........................... -0.1
       one move along the arrow sits the NEXT spot,
@@ -155,18 +155,18 @@
 
       worth(air)  =  -0.1  +  0.9 * worth(next)
 
-  That is the entire law. Two lines. (`next` = the single spot the arrow points to.)
+  That is the entire law. Two lines. ('next' = the single spot the arrow points to.)
 
 
-  ## Why There Is No One-Shot Formula -- the Circle
+  WHY THERE IS NO ONE-SHOT FORMULA -- THE CIRCLE
 
   Look hard at the air line:
 
       worth(air)  =  -0.1  +  0.9 * worth(next)
 
-  To get this spot's worth you need `worth(next)`. But if `next` is also an air spot, ITS worth
+  To get this spot's worth you need 'worth(next)'. But if 'next' is also an air spot, ITS worth
   needs the worth of ITS next, and on it goes. A worth leans on another worth, which leans on
-  another. You cannot just write `worth = <number>` for an air spot -- the number you need is
+  another. You cannot just write 'worth = <number>' for an air spot -- the number you need is
   one you do not have yet. That circle is the whole obstacle. Your gut is right to balk: there
   is no formula that spits out the answer in one shot WITH A PENCIL.
 
@@ -178,7 +178,7 @@
   pencil -- not none in all of mathematics.)
 
 
-  ## Breaking the Circle -- the WALK, and Starting From a Lie
+  BREAKING THE CIRCLE -- THE WALK, AND STARTING FROM A LIE
 
   New word, defined by a picture:
 
@@ -212,11 +212,11 @@
   Just the two-line law, laid down again and again.
 
 
-  ## Why Starting From a Lie Still Lands on the Truth (the heart, with numbers)
+  WHY STARTING FROM A LIE STILL LANDS ON THE TRUTH (THE HEART, WITH NUMBERS)
 
   Two facts make the lie heal. Neither is magic; both are arithmetic.
 
-  **The "+" lays down a SOLID layer.** The air law is `reward + 0.9 * next`. The reward part
+  The "+" lays down a SOLID layer. The air law is 'reward + 0.9 * next'. The reward part
   (the -0.1 fuel) is solid -- it is painted, it needs no lookup, it goes down on every walk no
   matter what the neighbour says. So even reading a junk neighbour (still 0):
 
@@ -226,7 +226,7 @@
   addition. Junk cannot multiply into junk-forever, because a solid layer is added on top every
   pass. The "+" is the floor under the "*".
 
-  **The ground is a fixed ANCHOR.** A ground spot's worth is its painted points, with no
+  The ground is a fixed ANCHOR. A ground spot's worth is its painted points, with no
   lookup -- correct from the first walk, never junk. That is the one fixed truth every air spot
   is dragged toward.
 
@@ -282,7 +282,7 @@
   > and plain multiplication drags every spot to that truth, one spot closer per pass.
 
 
-  ## The Harder Case: a Forever-Bounce With NO Ground at All
+  THE HARDER CASE: A FOREVER-BOUNCE WITH NO GROUND AT ALL
 
   "Fine," you say, "it heals because there is a +5 anchor to climb to. What if the drone never
   lands?" Good -- that is the case that looks impossible.
@@ -309,7 +309,7 @@
   can an endless bounce cost a finite amount? Because of the shrink.
 
 
-  ## Why the Shrink Forces a Finite Answer (the math cracked from scratch)
+  WHY THE SHRINK FORCES A FINITE ANSWER (THE MATH CRACKED FROM SCRATCH)
 
   Bounce forever, paying -0.1 a move, with one more shrink stacked on each move:
 
@@ -342,7 +342,7 @@
   when termination is not guaranteed.
 
 
-  ## When to Stop -- delta and theta
+  WHEN TO STOP -- DELTA AND THETA
 
   Two more words, defined:
 
@@ -367,7 +367,7 @@
   stop is delta < theta.
 
 
-  ## The Only Check Is "Did Anything Move" -- the Settling Is EMERGENT
+  THE ONLY CHECK IS "DID ANYTHING MOVE" -- THE SETTLING IS EMERGENT
 
   This is the part that feels too small to work. There is no code that spots junk, waits for a
   neighbour, or certifies a single spot is "correct." There is exactly ONE measurement in the
@@ -378,7 +378,7 @@
   geometric squeeze of the last section), not in any clever check.
 
 
-  ## A Full Table, Filled by Hand -- and What It Reveals
+  A FULL TABLE, FILLED BY HAND -- AND WHAT IT REVEALS
 
   One more pass, the whole picture, so the payoff is concrete. A 3-wide, 3-tall world: spots
   are (x, y, height), each of x, y, height in {0,1,2}. The runway is the middle ground spot
@@ -412,7 +412,7 @@
   job. Grading the plan we were handed is done.
 
 
-  ## The Decoder (jargon -> plain, master sheet)
+  THE DECODER (JARGON -> PLAIN, MASTER SHEET)
 
       THE PEACOCK WORD                         WHAT IT ACTUALLY MEANS
       --------------------------------------   -------------------------------------------------
@@ -439,7 +439,7 @@
                                                neighbour's table entry, settled or not
 
 
-  ## Python: the Settling, by Hand, Four Ways
+  PYTHON: THE SETTLING, BY HAND, FOUR WAYS
 
   Four blocks. The first two are hard-coded spot by spot -- no loops hiding the decisions, so
   you can check every digit against the walks above. The third is the real engine on the tiny
@@ -448,7 +448,6 @@
   appears is flagged in plain words: it lists positions or repeats the law -- it never hides a
   decision.
 
-  ```python
   # -----------------------------------------------------------------------
   # THE PAINTED FACTS (handed to us, fixed)
   #   runway  -> +5      dirt -> -2      fuel in the air -> -0.1
@@ -613,7 +612,6 @@
   #   RUNWAY column (1,1,*):  5.0 , 4.4000 , 3.8600   <- matches the by-hand table exactly
   #   dirt column   (0,0,*): -2.0 , -1.9000 , -1.8100
   #   dirt column   (2,2,*): -2.0 , -1.9000 , -1.8100
-  ```
 
   Output of the four blocks:
 
@@ -647,9 +645,9 @@
   same answer -- only the sweep direction moved, and that is the whole of the difference.
 
   > THE ONE HONEST FOOTNOTE (named again, loudly). The air law here reads ONE next-spot:
-  > `FUEL + 0.9 * worth(next)`. Real policy evaluation lets the arrow land on several next-spots
+  > 'FUEL + 0.9 * worth(next)'. Real policy evaluation lets the arrow land on several next-spots
   > by chance and adds them up weighted by their odds:
-  > `worth = reward + 0.9 * sum over next of  P(next) * worth(next)`.
+  > 'worth = reward + 0.9 * sum over next of  P(next) * worth(next)'.
   > Our plan is deterministic -- the arrow lands on exactly one spot -- so P(next) = 1 for that
   > one spot and 0 for the rest, and the whole sum collapses to the single term you saw. That is
   > the only thing the toy hides. Add the weighted sum back and every walk, every heal, every
@@ -669,7 +667,7 @@
   One Breath: a spot's worth is the DISCOUNTED sum of points collected from here obeying the
   arrows -- future rewards shrunk by 0.9 per move, so the drone's 4.8 raw points become T's
   worth of 3.86; the worth of an air spot leans on its neighbour's worth (a circle), so you
-  start every spot at a lie of 0 and lay down `-0.1 + 0.9 * worth(next)` again and again -- the
+  start every spot at a lie of 0 and lay down '-0.1 + 0.9 * worth(next)' again and again -- the
   painted ground is a fixed anchor the truth climbs out from (how fast depends on sweep order,
   not on the algorithm); even a ground-less forever-bounce settles, to -1, because 0.9 < 1 turns
   the endless sum finite AND squeezes each walk's remaining error by the same factor, which is

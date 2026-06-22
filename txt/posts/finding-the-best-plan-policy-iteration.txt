@@ -51,7 +51,7 @@
       peek untouched is provably the best.
 
 
-  ## The World (redrawn here so the companion post is not needed)
+  THE WORLD (REDRAWN HERE SO THE COMPANION POST IS NOT NEEDED)
 
   A drone hangs in the air over a patch of enemy ground. We want to find the best flight plan.
 
@@ -93,7 +93,7 @@
                    Scratch paper: rebuilt from nothing each time the plan changes.
 
 
-  ## The Grade Step, Folded Into One Box (the companion post, compressed)
+  THE GRADE STEP, FOLDED INTO ONE BOX (THE COMPANION POST, COMPRESSED)
 
   Before a plan can be bettered, it must be GRADED -- every spot given a worth under the current
   arrows. That is the companion post's entire job; here is the whole of it in one box, so you
@@ -113,7 +113,7 @@
   picture for the worked example below.
 
 
-  ## Why We Now Need All Six Nudges (the grading post only ever read one)
+  WHY WE NOW NEED ALL SIX NUDGES (THE GRADING POST ONLY EVER READ ONE)
 
   Grading read ONE arrow per spot -- whatever the plan said -- and followed it. To IMPROVE a
   plan we must compare the arrow it has against the arrows it could have. So for the first time
@@ -129,7 +129,7 @@
   spot has no nudge at all (the flight is over); its only "move" is to stay put.
 
 
-  ## The Improve Move -- Peek the Six, Keep the Winner
+  THE IMPROVE MOVE -- PEEK THE SIX, KEEP THE WINNER
 
   Stand on an air spot. You hold a worth for every spot (from the grade). You want this spot's
   BEST arrow. Do not solve anything. PEEK each nudge and score it:
@@ -156,11 +156,11 @@
   you do not write it six times.
 
   Note what does NOT change across the six: the fuel -0.1 is the same for every nudge (it is the
-  cost of being in the air this move, not of the direction). Only `worth(where it lands)` moves.
+  cost of being in the air this move, not of the direction). Only 'worth(where it lands)' moves.
   So the peek really asks one thing: which neighbour is worth the most? Aim there.
 
 
-  ## The Whole Loop -- Grade, Peek, Repeat, Freeze
+  THE WHOLE LOOP -- GRADE, PEEK, REPEAT, FREEZE
 
   No worths exist before a plan exists, and no smart plan exists before worths exist -- another
   circle. Break it the same way grading broke its circle: start from a lie. Scribble ANY plan
@@ -197,7 +197,7 @@
   the WORTH is scratch, rebuilt from 0 every time the plan changes.
 
 
-  ## Watch the Good Arrows Spread -- Worked by Hand
+  WATCH THE GOOD ARROWS SPREAD -- WORKED BY HAND
 
   Seed the dumb plan "always nudge Left" (every air arrow = W). The drone just slides into the
   west wall and never lands. Grade it: an air spot that keeps bumping a wall lands on itself
@@ -260,7 +260,7 @@
   that is the universal signal. That frozen plan is the answer.
 
 
-  ## Why a Frozen Plan Is THE BEST (derived, not declared)
+  WHY A FROZEN PLAN IS THE BEST (DERIVED, NOT DECLARED)
 
   "It stopped changing" sounds like it merely ran out of energy. It is stronger than that.
   Three facts, in order, force the frozen plan to be optimal:
@@ -296,7 +296,7 @@
   math hands back exactly the plan a human would draw for this map.
 
 
-  ## The Decoder (jargon -> plain, master sheet)
+  THE DECODER (JARGON -> PLAIN, MASTER SHEET)
 
       THE PEACOCK WORD                         WHAT IT ACTUALLY MEANS
       --------------------------------------   -------------------------------------------------
@@ -319,13 +319,12 @@
       fixed point                              a plan that an improve leaves unchanged
 
 
-  ## Python: the Improve, by Hand, Then the Whole Loop
+  PYTHON: THE IMPROVE, BY HAND, THEN THE WHOLE LOOP
 
   Three blocks. The first two are hard-coded -- the six peeks at a spot, then the spread -- so
   you can check every score against the walk above. The third is the real loop; the one honest
   place a loop is the lesson and not a hiding spot is flagged in plain words.
 
-  ```python
   # -----------------------------------------------------------------------
   # THE PAINTED FACTS (handed to us, fixed)
   #   runway -> +5     dirt -> -2     fuel in the air -> -0.1     shrink -> 0.9
@@ -431,7 +430,6 @@
   # froze after 3 goes.  best plan: M->down, T->down
   #   (go 1 fixes M, the ring on the pad; go 2 fixes T, the next ring; go 3 confirms.)
   #   worths: T=3.86  M=4.40  G=5.0
-  ```
 
   Output of the three blocks:
 
@@ -448,9 +446,9 @@
           worths: T=3.86  M=4.40  G=5.0
 
   > THE ONE HONEST FOOTNOTE (named again, loudly). Each peek here reads ONE landing spot:
-  > `-0.1 + 0.9 * worth(where the nudge lands)`. Real problems let a nudge slip -- push down,
+  > '-0.1 + 0.9 * worth(where the nudge lands)'. Real problems let a nudge slip -- push down,
   > sometimes drift sideways -- so a peek must average over where you MIGHT land:
-  > `-0.1 + 0.9 * sum over landings of  P(landing) * worth(landing)`.
+  > '-0.1 + 0.9 * sum over landings of  P(landing) * worth(landing)'.
   > Our nudges land for sure, so P = 1 for the one spot and 0 for the rest, and the average
   > collapses to the single term you saw. That is the only thing the toy hides. Put the
   > weighted average back and every peek, every spread, every freeze on this page holds.
@@ -465,7 +463,7 @@
   ---
 
   One Breath: with no plan handed to you, seed any plan, GRADE it (fill every spot's worth), then
-  IMPROVE each air spot by peeking every nudge -- `-0.1 + 0.9 * worth(where it lands)` -- and
+  IMPROVE each air spot by peeking every nudge -- '-0.1 + 0.9 * worth(where it lands)' -- and
   re-aiming the arrow at the biggest peek; grade and improve again until a pass re-aims nothing;
   that frozen plan is greedy with respect to its own value function, and the Policy Improvement
   Theorem proves that any such plan is optimal -- not by definition, but because satisfying the

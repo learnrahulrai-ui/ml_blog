@@ -227,7 +227,7 @@
 
 
 
-  ## A Note on the Plain Words
+  A NOTE ON THE PLAIN WORDS
 
   >> NOTE: THE PLAIN WORDS ARE NOT BABY-TALK
      "Straight-stick rule" is not a dumbed-down stand-in for linear regression -- it is

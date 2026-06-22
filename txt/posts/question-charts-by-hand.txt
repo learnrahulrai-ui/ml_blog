@@ -39,7 +39,7 @@
      branches that do not earn their keep on the hidden pile.
 
 
-  ## The Sheet: Two New Piles
+  THE SHEET: TWO NEW PILES
 
     diabetes -- 442 people, 10 body measurements, one answer
     patient   age   bmi   bp    s1 ... s6  |  answer
@@ -63,7 +63,7 @@
   Grade once on the sealed 25%.
 
 
-  ## BUILD vs USE -- Two Different Times
+  BUILD VS USE -- TWO DIFFERENT TIMES
 
   This is where the first confusion lives.
   There are two SEPARATE phases.
@@ -86,7 +86,7 @@
     USE:    chart frozen -> walk each patient top -> bottom in one go  (walk only)
 
 
-  ## Inside the Build Hunt, Nothing Hidden
+  INSIDE THE BUILD HUNT, NOTHING HIDDEN
 
   IN HAND so far: two sheets, each chopped 75/25.
   Diabetes: 442 people x 3/4 = 331.5, call it 331 on the study pile.
@@ -183,7 +183,7 @@
       that is the guess for any new person who lands in it.
 
 
-  ## A Worked Example: 4 People, 1 Column
+  A WORKED EXAMPLE: 4 PEOPLE, 1 COLUMN
 
   A sheet with 4 people, 1 measurement, 1 answer.  Every number visible.  Every
   cut's arithmetic done with pencil and paper.  No calculator needed.
@@ -280,7 +280,7 @@
      always guesses the average of the answers that fell into it -- one number for
      everyone in that room.
 
-  ## Now Add Age: The Second Column
+  NOW ADD AGE: THE SECOND COLUMN
 
   IN HAND so far: bmi's champion is the cut at 0.09.
   Its badness = 144 + 144 + 64 + 64 = 416.
@@ -343,7 +343,7 @@
        means someone picks arbitrarily.
 
 
-  ## The Corrections I Caught
+  THE CORRECTIONS I CAUGHT
 
   Building this by hand exposed five wrong pictures I would have carried forever:
 
@@ -374,7 +374,7 @@
      many questions deep before you hit an answer.
 
 
-  ## The Leaf -- What Sits at the Bottom
+  THE LEAF -- WHAT SITS AT THE BOTTOM
 
   A leaf = a final pile at the bottom of the chart, where a guess sits.
   A leaf is not always one person.
@@ -400,7 +400,7 @@
   So the mean sits at the very bottom of that wrongness curve.
 
 
-  ## Depth: The Stiff-vs-Jumpy Dial of Trees
+  DEPTH: THE STIFF-VS-JUMPY DIAL OF TREES
 
     depth 1  (one question only):    2 guesses       too stubborn
     depth 3  (three layers):         up to 8 guesses
@@ -428,7 +428,7 @@
     max_depth = None?  same thing.   both mean "no real ceiling."
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -445,17 +445,17 @@
     same menu, different winner           greedy, locally optimal splitting
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same work, spoken in Python.
 
   First the 4-person cut badness from the worked example, hard-coded -- one cut per block:
 
-    # 4 people: sorted by bmi -> C(0.04,97), B(0.06,121), D(0.12,135), A(0.18,151)
-    # 3 candidate cuts at midpoints: 0.05, 0.09, 0.15
+    4 PEOPLE: SORTED BY BMI -> C(0.04,97), B(0.06,121), D(0.12,135), A(0.18,151)
+    3 CANDIDATE CUTS AT MIDPOINTS: 0.05, 0.09, 0.15
 
-    # cut at 0.05: below={C}, above={B,D,A}
+    CUT AT 0.05: BELOW={C}, ABOVE={B,D,A}
     mean_below_05 = 97                                    # one person, mean = itself
     mean_above_05 = (121 + 135 + 151) / 3                # 135.667
     badness_05 = ((97  - mean_below_05)**2
@@ -464,23 +464,23 @@
                + (151 - mean_above_05)**2)               # 0 + 215.1 + 0.4 + 235.1 = 450.6
     print(round(mean_above_05, 1), round(badness_05, 1)) # 135.7 450.6
 
-    # cut at 0.09: below={C,B}, above={D,A}  <- CHAMPION
+    CUT AT 0.09: BELOW={C,B}, ABOVE={D,A}  <- CHAMPION
     mean_below_09 = (97 + 121) / 2    # 109
     mean_above_09 = (135 + 151) / 2   # 143
-    badness_09 = ((97  - mean_below_09)**2 + (121 - mean_below_09)**2
-               + (135 - mean_above_09)**2 + (151 - mean_above_09)**2)
-    # = 144 + 144 + 64 + 64 = 416
+    badness_09 = ((97  - mean_below_09)2 + (121 - mean_below_09)2
+               + (135 - mean_above_09)2 + (151 - mean_above_09)2)
+    = 144 + 144 + 64 + 64 = 416
     print(mean_below_09, mean_above_09, badness_09)      # 109 143 416
 
-    # cut at 0.15: below={C,B,D}, above={A}
+    CUT AT 0.15: BELOW={C,B,D}, ABOVE={A}
     mean_below_15 = (97 + 121 + 135) / 3  # 117.667
     mean_above_15 = 151                    # one person
-    badness_15 = ((97  - mean_below_15)**2 + (121 - mean_below_15)**2
-               + (135 - mean_below_15)**2 + (151 - mean_above_15)**2)
-    # = 427.1 + 11.1 + 300.4 + 0 = 738.6
+    badness_15 = ((97  - mean_below_15)2 + (121 - mean_below_15)2
+               + (135 - mean_below_15)2 + (151 - mean_above_15)2)
+    = 427.1 + 11.1 + 300.4 + 0 = 738.6
     print(round(mean_below_15, 1), round(badness_15, 1)) # 117.7 738.6
 
-    # champion of champions: the cut with smallest badness
+    CHAMPION OF CHAMPIONS: THE CUT WITH SMALLEST BADNESS
     print(min(badness_05, badness_09, badness_15))  # 416  -> bmi at 0.09 wins
 
   Three cuts, three badness numbers, one champion.  The toolbox line below runs the same
@@ -502,13 +502,13 @@
     mse = mean_squared_error(y_test, y_pred)
     r2  = r2_score(y_test, y_pred)
 
-    # depth sweep: try each ceiling, pick lowest exam-error
+    DEPTH SWEEP: TRY EACH CEILING, PICK LOWEST EXAM-ERROR
     depths = [1, 2, 3, 4, 5, 6, 8, 10, None]
     for d in depths:
         t = DecisionTreeRegressor(max_depth=d, random_state=42)
         t.fit(X_train, y_train)
         print(d, mean_squared_error(y_test, t.predict(X_test)))
-    # pick the depth with smallest test MSE
+    PICK THE DEPTH WITH SMALLEST TEST MSE
 
   !! WARN: EVERY ROOM'S QUESTION IS FOUND BY BRUTE FORCE
      The machine does not guess "try bmi."  It tries EVERY column times EVERY

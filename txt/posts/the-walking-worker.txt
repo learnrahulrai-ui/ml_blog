@@ -45,7 +45,7 @@
   Pencil and scratch paper out. Every number here is recomputed where it is needed.
 
 
-  ## The New Sheet, and the Wall
+  THE NEW SHEET, AND THE WALL
 
   The sheet:
 
@@ -69,7 +69,7 @@
   Three moves get us there -- a numbering, a length-fix, and a split.
 
 
-  ## Words Are Not Numbers, So Hand Each One a Number (Q1, Q2a-b)
+  WORDS ARE NOT NUMBERS, SO HAND EACH ONE A NUMBER (Q1, Q2A-B)
 
   Walk every review in the pile and COUNT how often each word appears.
   This is the oldest trick in the book -- count every word in a giant pile of text.
@@ -83,14 +83,14 @@
 
   Now a CHOICE, not a fact: keep only the 10,000 most-common words.
   Every rarer word is a typo, a name, or weird slang seen twice in the whole pile.
-  Each such rarer word is dumped into ONE shared bin we will call <unknown>.
-  We reserve the number 0 for "empty" (the next move needs it), so <unknown> gets its own
+  Each such rarer word is dumped into ONE shared bin we will call [unknown].
+  We reserve the number 0 for "empty" (the next move needs it), so [unknown] gets its own
   number instead of 0.
   The counts:
 
     reviews in the pile        = maybe 50,000     <- ROWS of the sheet
     distinct words KEPT        = 10,000           <- a knob WE set (call it VOCAB_SIZE)
-    every rarer word           -> one shared <unknown> number
+    every rarer word           -> one shared [unknown] number
 
   Why toss the rare words?
   A word seen twice in 50,000 reviews cannot teach the machine anything reliable.
@@ -107,10 +107,10 @@
   Each number is just a NAME TAG pointing at a word.
 
 
-  ## A Fixed Factory Needs One Length, So Pad Every Review (Q2c)
+  A FIXED FACTORY NEEDS ONE LENGTH, SO PAD EVERY REVIEW (Q2C)
 
   IN HAND: every word now has a number (the=1, boring=4, and so on).
-  We kept 10,000 words; the rest are pooled as <unknown>.
+  We kept 10,000 words; the rest are pooled as [unknown].
   A review is now a row of word-numbers of WHATEVER length it was.
 
   Here is the problem.
@@ -141,7 +141,7 @@
          "the" x7 = [1,1,1,1,1,1,1], 7 numbers, need 5 -> chop to first 5 -> [1, 1, 1, 1, 1].
 
 
-  ## Never Grade on Studied Cards, So Cut Study From Exam (Q2d)
+  NEVER GRADE ON STUDIED CARDS, SO CUT STUDY FROM EXAM (Q2D)
 
   The honest rule: never grade the machine on cards it studied.
   So cut 80% of the reviews to study from.
@@ -156,7 +156,7 @@
   The factory can finally be built.
 
 
-  ## The First Text-Factory: Three Floors (Q3)
+  THE FIRST TEXT-FACTORY: THREE FLOORS (Q3)
 
   IN HAND: every review is now 100 word-numbers (e.g. [4, 73, 1, 87, 0, 0, ...]), 0 = empty.
   We feed that line of 100 numbers into a factory with three floors:
@@ -176,7 +176,7 @@
   into a chance between 0 and 1 (more on it at floor 3).
 
 
-  ## Floor 1: The Notepad (Embedding)
+  FLOOR 1: THE NOTEPAD (EMBEDDING)
 
   The word-number is just a NAME TAG.
   boring=4 and masterpiece=73 -- the size of the number means NOTHING.
@@ -262,7 +262,7 @@
        The sheet is 3 rows tall x 4 wide.
 
 
-  ## Floor 2: The Walking Worker (the RNN Cell, by Hand)
+  FLOOR 2: THE WALKING WORKER (THE RNN CELL, BY HAND)
 
   IN HAND: floor 1 turned the review into a sheet of 100 notes, each note 32 numbers wide.
   Floor 2 must boil that whole sheet down to ONE summary of the review.
@@ -376,7 +376,7 @@
          squash: [tanh(1), tanh(2)] ~ [0.76, 0.96].  New memory ~ [0.76, 0.96].
 
 
-  ## Why the Loop Needs the tanh Squash
+  WHY THE LOOP NEEDS THE TANH SQUASH
 
   IN HAND: the worker rewrites its 32-number memory once per word, 100 times, each time
   ending with tanh -- a fixed bend that crushes a number into the band -1 to +1.
@@ -417,7 +417,7 @@
   It bends each number through the same fixed curve, alone, every time.
 
 
-  ## Floor 3: The Final Clerk (Dense + S-curve)
+  FLOOR 3: THE FINAL CLERK (DENSE + S-CURVE)
 
   IN HAND: floor 2 walked all 100 words and left a 32-number summary in pocket A.
 
@@ -445,7 +445,7 @@
   cousins inherit and the Transformer (a later chapter) finally breaks.
 
 
-  ## Common Tripwires
+  COMMON TRIPWIRES
 
   Built from the live lab session -- every confusion actually hit.
 
@@ -481,12 +481,12 @@
     from a lean. Width 32 gives the word room to be several things at once. Width is a knob.
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     pile of words, 1/0 per row       sentiment classification (binary)
     number each word by frequency    tokenisation by frequency rank
     10,000 kept words                vocabulary size (VOCAB_SIZE / num_words)
-    shared rare-word bin             <unknown> / out-of-vocabulary (OOV) token
+    shared rare-word bin             [unknown] / out-of-vocabulary (OOV) token
     same-length fix                  padding / truncating (pad_sequences)
     empty slot = 0                   pad token (id 0), mask
     MAX_LEN = 100                    sequence length
@@ -503,21 +503,18 @@
     downhill-roller                  Adam optimiser
 
 
-  ## Code, If You Want It
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer; this section is for the day you meet one.
 
   Open the pile and check the balance (Q1):
 
-  ```python
   df = load_data(DATA_PATH)                 # CSV with columns 'text' and 'label'
   q1_shape = df.shape                        # (how many reviews, 2)
   q1_dist  = df['label'].value_counts().sort_index()   # how many 0s, how many 1s
-  ```
 
   Number the words, cap the vocabulary, pad to one length, split (Q2):
 
-  ```python
   from tensorflow.keras.preprocessing.text import Tokenizer
   from tensorflow.keras.preprocessing.sequence import pad_sequences
   from sklearn.model_selection import train_test_split
@@ -534,11 +531,9 @@
 
   X_train, X_test, y_train, y_test = train_test_split(
       X, y, test_size=0.2, random_state=RANDOM_STATE)
-  ```
 
   Build the three-floor text-factory (Q3):
 
-  ```python
   from tensorflow.keras.models import Sequential
   from tensorflow.keras.layers import Input, Embedding, SimpleRNN, Dense
 
@@ -552,12 +547,11 @@
   model_rnn.add(Dense(1, activation="sigmoid"))                     # floor 3: final yes/no
   model_rnn.compile(optimizer="adam",
                     loss="binary_crossentropy", metrics=["accuracy"])
-  ```
 
-  - `binary_crossentropy` = wrongness for a yes/no guesser: -log(the chance given to the
+  - 'binary_crossentropy' = wrongness for a yes/no guesser: -log(the chance given to the
     true answer). Truth 1, said 0.9 -> tiny; said 0.1 -> huge. (Chapter 7 derives it.)
-  - `adam` = the downhill-roller from Chapter 7, Part 2.
-  - `model_rnn.summary()` prints 322,113 total dials -- 320,000 in the notepad alone.
+  - 'adam' = the downhill-roller from Chapter 7, Part 2.
+  - 'model_rnn.summary()' prints 322,113 total dials -- 320,000 in the notepad alone.
 
   Training this factory, watching it forget far-back words, and the two-memory fix that
   rescues it (the LSTM) are Part 2.

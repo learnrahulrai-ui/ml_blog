@@ -34,7 +34,7 @@
      No searching, no luck. The formula you derive IS the bottom of the bowl.
 
 
-  ## The Rule
+  THE RULE
 
     one row of measured things:  [rooms, income, age, ...]
           x
@@ -52,7 +52,7 @@
   rule stays linear in the dials.
 
 
-  ## The Squared Leftover to Shrink
+  THE SQUARED LEFTOVER TO SHRINK
 
       \         /
        \       /        height  = total squared leftover J(beta)
@@ -67,7 +67,7 @@
   point is the global bottom. No local traps, no searching.
 
 
-  ## Finding the Dials: The Flat-Point Equations
+  FINDING THE DIALS: THE FLAT-POINT EQUATIONS
 
   Set the slope of the bowl to zero:
 
@@ -132,7 +132,7 @@
      all three points.
 
 
-  ## Checking the Leftovers
+  CHECKING THE LEFTOVERS
 
   IN HAND: three rows (x = 1, 2, 3 against y = 2, 3, 5) and the dials the flat-point
   solve dropped out: 2*w = 3 so w = 3/2 = 1.5, then 3*b = 10 - 6*1.5 = 10 - 9 = 1 so
@@ -172,7 +172,7 @@
      nudge in m.intercept_.
 
 
-  ## When the Straight-Stick Rule Is the Best Possible
+  WHEN THE STRAIGHT-STICK RULE IS THE BEST POSSIBLE
 
   The Gauss-Markov result: if the leftover has zero average given the rows (E[eps|X] = 0),
   the same spread everywhere, leftovers do not echo each other, and X has full column rank
@@ -185,7 +185,7 @@
       X^T X is flat (no single solution) and (X^T X)^-1 does not exist.
 
 
-  ## Getting the Dials Right: Don't Flip the Sheet
+  GETTING THE DIALS RIGHT: DON'T FLIP THE SHEET
 
   IN HAND: the exact formula beta = (X^T X)^-1 X^T y, proved bowl-bottomed and checked
   by hand -- three rows gave w = 3/2 = 1.5 and b = 1/3 ~= 0.333, with leftovers
@@ -222,7 +222,7 @@
      scale.
 
 
-  ## Ask-Closest vs. Straight-Stick
+  ASK-CLOSEST VS. STRAIGHT-STICK
 
   IN HAND: both rules of this chapter, built and checked.  Ask-closest keeps the whole
   working pile (20,640 x 8/10 = 16,512 rows) and pays 16,512 x 24 = 396,288 strokes per
@@ -245,7 +245,7 @@
   depends on the pile in front of you, and that judgement is the real craft.
 
 
-  ## Going Deeper
+  GOING DEEPER
 
     - flat-point equations, ordinary least squares -- the solve
     - QR / SVD least squares, shakiness number (condition number) -- the numerics
@@ -267,7 +267,7 @@
       small bump to the diagonal.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  MSE has NO root in Lab 2
        WRONG: tack on ** 0.5 to mean_squared_error(...).
@@ -308,7 +308,7 @@
               Then each dial means "answer-units per one-spread step."
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same three rows, spoken in Python.
@@ -316,24 +316,24 @@
   First the flat-point solve by hand -- three rows, four sums, the 2x2 system, all written
   out, no loop, so you watch w=1.5, b=0.333, and the leftovers print back:
 
-    # three rows, one column: (x, y) one per line
+    THREE ROWS, ONE COLUMN: (X, Y) ONE PER LINE
     x1, y1 = 1, 2
     x2, y2 = 2, 3
     x3, y3 = 3, 5
 
-    # the four sums the flat-point equations need
+    THE FOUR SUMS THE FLAT-POINT EQUATIONS NEED
     sum_x  = 1 + 2 + 3            # 6
     sum_y  = 2 + 3 + 5            # 10
     sum_xx = 1*1 + 2*2 + 3*3      # 14
     sum_xy = 1*2 + 2*3 + 3*5      # 23
 
-    # flat-point equations (n=3):  3*b + 6*w = 10  and  6*b + 14*w = 23
-    # eliminate b and solve the 2x2 system:
+    FLAT-POINT EQUATIONS (N=3):  3*B + 6*W = 10  AND  6*B + 14*W = 23
+    ELIMINATE B AND SOLVE THE 2X2 SYSTEM:
     w = (3*sum_xy - sum_x*sum_y) / (3*sum_xx - sum_x*sum_x)   # 9/6 = 1.5  (the dial on x)
     b = (sum_y - w*sum_x) / 3                                 # (10-9)/3 = 0.333 (the nudge)
     print(round(w,3), round(b,3))      # 1.5 0.333
 
-    # the stick's guess at each x, and the leftover (y - guess), one line each
+    THE STICK'S GUESS AT EACH X, AND THE LEFTOVER (Y - GUESS), ONE LINE EACH
     yhat1 = b + w*1;  yhat2 = b + w*2;  yhat3 = b + w*3
     print(round(yhat1,3), round(yhat2,3), round(yhat3,3))             # 1.833 3.333 4.833
     print(round(y1-yhat1,3), round(y2-yhat2,3), round(y3-yhat3,3))    # 0.167 -0.333 0.167

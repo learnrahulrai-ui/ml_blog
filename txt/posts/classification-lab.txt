@@ -22,7 +22,7 @@
   Plain language first, standard labels at the very bottom.
 
 
-  ## 1. Why Cross-Entropy, Not MSE
+  1. WHY CROSS-ENTROPY, NOT MSE
 
   Linear regression is the straight-stick rule: it fits a line to predict a sliding number.
   It scores itself by squared leftovers.
@@ -68,7 +68,7 @@
      chance output in [0,1], so it produces badly calibrated probabilities.
 
 
-  ## 2. The Leash: L2 Regularisation and the C Parameter
+  2. THE LEASH: L2 REGULARISATION AND THE C PARAMETER
 
   sklearn is the standard Python machine-learning library.
   LogisticRegression is its yes/no machine; its dials are the numbers it tunes to fit the data.
@@ -116,7 +116,7 @@
   Correlated columns let dials swing wildly without a check, and the squeeze stops that.
 
 
-  ## 3. A Second Sorter: Linear Discriminant Analysis
+  3. A SECOND SORTER: LINEAR DISCRIMINANT ANALYSIS
 
   Logistic regression learns its boundary by gradient descent on log-loss.
   Gradient descent means rolling the dials downhill on the cost a little at a time.
@@ -161,7 +161,7 @@
       lda_mid = LinearDiscriminantAnalysis(priors=[0.5,0.5])  # equal priors, midpoint wall
 
 
-  ## 4. Settings vs Dials: Hyperparameters
+  4. SETTINGS VS DIALS: HYPERPARAMETERS
 
   Every machine has two kinds of knobs:
 
@@ -181,7 +181,7 @@
     settings ->  YOU find them        (by grid search over a validation set)
 
 
-  ## 5. The Grid Hunt: Finding the Best Setting
+  5. THE GRID HUNT: FINDING THE BEST SETTING
 
   You want the best C, the leash setting from section 2 -- small C squeezes the dials, large C frees them.
   Candidates to try: [0.01, 0.1, 1, 10].
@@ -222,7 +222,7 @@
   And, which score to optimise -- recall, F1, or AUC, all defined in the sections below.
 
 
-  ## 6. Pinch-to-Fit: Min-Max Scaling
+  6. PINCH-TO-FIT: MIN-MAX SCALING
 
   StandardScaler shifts each column to mean 0, spread 1.
   Mean 0 means subtract the average; spread 1 means divide by the standard deviation.
@@ -252,7 +252,7 @@
                                            or feeding a neural network / image model
 
 
-  ## 7. The Lives-vs-Money Trade: Precision and Recall in Business
+  7. THE LIVES-VS-MONEY TRADE: PRECISION AND RECALL IN BUSINESS
 
   CAUGHT means a sick case the machine correctly shouted sick.
   MISSED means a sick case the machine wrongly called well.
@@ -289,7 +289,7 @@
      heavily. F2 (beta=2) counts a miss twice as costly as a false alarm.
 
 
-  ## 8. The Trade Curve Revisited: When AUC Misleads
+  8. THE TRADE CURVE REVISITED: WHEN AUC MISLEADS
 
   The trade curve, standard name ROC curve, sweeps the cutoff from 1 down to 0.
   The cutoff is the chance above which the machine shouts sick.
@@ -325,7 +325,7 @@
      PR curves surface this; ROC curves hide it.
 
 
-  ## 9. Skewed Piles: What Goes Wrong and How to Fix It
+  9. SKEWED PILES: WHAT GOES WRONG AND HOW TO FIX IT
 
   Skewed classes, also called imbalanced classes, means one label is far rarer than the other.
   This is the norm in real classification tasks.
@@ -355,7 +355,7 @@
   So it stops defaulting to the common class.
 
 
-  ## 10. Counting Across Classes: Macro, Micro, Weighted
+  10. COUNTING ACROSS CLASSES: MACRO, MICRO, WEIGHTED
 
   When there are more than two bins -- say tumour types A, B, C -- you get one precision and one recall per class.
   Precision is the share of a class's shouts that were right; recall is the share of a class's true members found.
@@ -396,7 +396,7 @@
           macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                  Standard label
     ------------------------------------   -------------------------------------------

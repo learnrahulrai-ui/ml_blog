@@ -78,7 +78,7 @@
      The value function lets the agent grade locally without waiting 100 steps to see the end.
 
 
-  ## The Room
+  THE ROOM
 
   A corridor of five cells:
 
@@ -99,7 +99,7 @@
   the walls or calm the mouse.
 
 
-  ## Rung 1 -- the Twitch Cat (sees NOW, nothing else)
+  RUNG 1 -- THE TWITCH CAT (SEES NOW, NOTHING ELSE)
 
   The twitch cat has exactly ONE tool: a wiring table. Each row is an IF-THEN rule: if this is
   what the eyes catch right now, do this action. No record of a moment ago. No guess about a
@@ -114,7 +114,7 @@
   The textbook calls this a "simple reflex agent." This page calls it "twitch cat" because the
   name describes the mechanism: pure reaction to the present instant.
 
-  **The sealed-box failure.** Cat at cell 2. Mouse at cell 3 -- one step away, visible. Cat
+  The sealed-box failure. Cat at cell 2. Mouse at cell 3 -- one step away, visible. Cat
   steps right and arrives at 3. The mouse ducks behind the wall and moves to cell 0. The cat's
   eyes now say "nothing in sight":
 
@@ -128,7 +128,7 @@
   > Root cause: no memory. A past fact cannot fire a present rule if there is nowhere to keep it.
 
 
-  ## Rung 2 -- the Diary Cat (+ memory)
+  RUNG 2 -- THE DIARY CAT (+ MEMORY)
 
   One new power over the twitch cat: a DIARY -- a written note that survives after the eyes go
   blank. The diary holds facts:
@@ -150,7 +150,7 @@
   Kills the sealed-box failure: the cat chases the ghost of the mouse even when it can't see it.
   Kills blind loops: the diary notices the repeated cell and redirects.
 
-  **The juke failure.** Mouse runs right (diary writes: "last direction = right"), ducks behind
+  The juke failure. Mouse runs right (diary writes: "last direction = right"), ducks behind
   a box, then CHANGES direction and bolts left. The diary cat charges right, straight into empty
   space, while the mouse escapes left:
 
@@ -165,7 +165,7 @@
   > Root cause: memory records what happened. It cannot simulate what will happen.
 
 
-  ## Rung 3 -- the Sketchpad Cat (+ goal + planning)
+  RUNG 3 -- THE SKETCHPAD CAT (+ GOAL + PLANNING)
 
   One new power: a GOAL ("catch the mouse") and a SKETCHPAD -- the ability to try moves in
   imagination before the paws move. The cat plays out short chains of "if I go here, the mouse
@@ -180,7 +180,7 @@
   Kills blind loops: the sketchpad says "I was at cell 2 two rounds ago -- going back leads
   nowhere -- skip that branch."
 
-  **The black-and-white failure.** The sketchpad only asks: does this chain end in a catch?
+  The black-and-white failure. The sketchpad only asks: does this chain end in a catch?
   A plan that catches the mouse in 5 steps scores EQUAL to one that catches it in 500 steps.
   A route that avoids a bear trap and a route that walks through one both read as "catch = yes"
   if they end in a catch. No way to prefer one over the other:
@@ -194,7 +194,7 @@
   > Root cause: a yes-or-no label on an outcome cannot rank outcomes against each other.
 
 
-  ## Rung 4 -- the Scorecard Cat (+ utility)
+  RUNG 4 -- THE SCORECARD CAT (+ UTILITY)
 
   One new power: a HAPPINESS SCORE pinned to each outcome. The textbook calls this a "utility
   function." It is just a number per outcome -- no biology, no philosophy, just arithmetic.
@@ -228,7 +228,7 @@
   Chase right has the higher expected score (79.0 > 58.0). Pick it. The textbook calls this
   "maximising expected utility."
 
-  **Two failures the scorecard cannot fix.** The scores and the world model -- the hand-coded
+  Two failures the scorecard cannot fix. The scores and the world model -- the hand-coded
   guess about how the mouse moves -- are frozen at build time. If the hand got the numbers wrong,
   every score is wrong. And if the world has many possible futures, computing expected scores for
   all branches takes too long -- the cat freezes mid-calculation while the mouse escapes. The
@@ -237,7 +237,7 @@
   > Root cause: the scorecard and the world model are frozen -- and can be wrong, or too slow.
 
 
-  ## Rung 5 -- the Learning Cat (+ updatable models)
+  RUNG 5 -- THE LEARNING CAT (+ UPDATABLE MODELS)
 
   One new power: after each chase, a FEEDBACK SIGNAL arrives -- caught the mouse (reward +),
   wasted rounds or hit a wall (penalty -). The cat uses that signal to nudge its own dials. The
@@ -255,7 +255,7 @@
   "in this exact configuration, always cut left" -- so it stops recomputing from scratch every
   round.
 
-  **What learning still cannot fix.** The first few chases are terrible: the cat flails by
+  What learning still cannot fix. The first few chases are terrible: the cat flails by
   trial and error until the dials settle. This is the "cold start" problem. And no amount of dial
   tuning changes the hard physics of the room: if the mouse can run faster than the cat's maximum
   speed, no adjustment of the world model bridges that gap.
@@ -263,7 +263,7 @@
   > Root cause of the limits: learning needs time, and it cannot rewrite physics.
 
 
-  ## The Pattern (say it back to yourself)
+  THE PATTERN (SAY IT BACK TO YOURSELF)
 
       RUNG   new power               kills                           then breaks at
       ----   --------------------    ----------------------------    ----------------------------
@@ -280,7 +280,7 @@
   mouse. Sequential moves. Two players. Only the brain changed; the world did not.
 
 
-  ## The Jargon Decoder
+  THE JARGON DECODER
 
       our plain word                       ->  textbook name
       ---------------------------------        ------------------------------------------
@@ -301,13 +301,12 @@
       cold start                           ->  exploration phase / cold-start problem
 
 
-  ## Python: Five Cats, One Corridor, by Hand
+  PYTHON: FIVE CATS, ONE CORRIDOR, BY HAND
 
   The corridor has five cells (0 through 4). Cat starts at 0. Mouse starts at 4. Vision range:
   one cell. Each rung is a separate block. Hard-coded rounds -- no loops hiding the decisions --
   so you can watch each rung work and then hit its wall.
 
-  ```python
   # -------------------------------------------------------------------------
   # THE ROOM
   # Five-cell corridor: positions 0, 1, 2, 3, 4
@@ -485,7 +484,6 @@
   print(f"\nStarted at 0.70. After three left-only chases: {belief:.2f}.")
   print("The frozen wrong assumption is correcting. It needs more chases to settle near 0.")
   print("Cold start: the first few chases are wasted -- the belief is miles from the truth.")
-  ```
 
   Output of the five blocks:
 

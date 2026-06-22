@@ -284,7 +284,7 @@
   ------------------------------------------------------------------------------------------
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   The pencil work above, spoken in Python. The greedy block uses the same payouts (1.6, 0.9, 1.4)
   as the walkthrough -- these are illustrative values, not the output of any specific random seed.
@@ -300,10 +300,10 @@
     import numpy as np
     rng = np.random.default_rng(42)
 
-    # factory side (hidden in a real problem -- shown here for verification only)
+    FACTORY SIDE (HIDDEN IN A REAL PROBLEM -- SHOWN HERE FOR VERIFICATION ONLY)
     true_avg = np.array([1.2, -0.3, 0.8])
 
-    # shopkeeper's records
+    SHOPKEEPER'S RECORDS
     q = np.zeros(3)            # [0. 0. 0.]  guesses; all wrong at start
     n = np.zeros(3, dtype=int) # [0, 0, 0]   patient counts (integers)
 
@@ -312,90 +312,90 @@
         tied = np.where(q == top)[0]    # all machines tied for biggest guess
         return int(rng.choice(tied))    # fair pick among ties
 
-    # --- greedy shopkeeper ---
+    --- GREEDY SHOPKEEPER ---
 
-    # patient 1
+    PATIENT 1
     last   = argmax_fair(q)                                  # 0  (random tie at start)
     payout = true_avg[last] + rng.standard_normal() * 0.8   # 1.2 + noise  ~  1.6
     n[last] += 1                                             # n = [1, 0, 0]
     q[last] += (1 / n[last]) * (payout - q[last])
     print(q)    # [1.60  0.00  0.00]
 
-    # patient 2
+    PATIENT 2
     last   = argmax_fair(q)                                  # 0  (1.60 > 0.00)
     payout = true_avg[last] + rng.standard_normal() * 0.8   # ~  0.9
     n[last] += 1                                             # n = [2, 0, 0]
     q[last] += (1 / n[last]) * (payout - q[last])
     print(q)    # [1.25  0.00  0.00]
 
-    # patient 3
+    PATIENT 3
     last   = argmax_fair(q)                                  # 0  (1.25 > 0.00)
     payout = true_avg[last] + rng.standard_normal() * 0.8   # ~  1.4
     n[last] += 1                                             # n = [3, 0, 0]
     q[last] += (1 / n[last]) * (payout - q[last])
     print(q)    # [1.30  0.00  0.00]  <- B and C frozen at 0.0
 
-    # after 1000 patients:  q ≈ [1.20  0.00  0.00]  B and C never move
+    AFTER 1000 PATIENTS:  Q ≈ [1.20  0.00  0.00]  B AND C NEVER MOVE
 
-    # --- epsilon-greedy shopkeeper ---
+    --- EPSILON-GREEDY SHOPKEEPER ---
 
     q = np.zeros(3)
     n = np.zeros(3, dtype=int)
     epsilon = 0.1
 
-    # patient 1  (all tied at 0.0 -- epsilon roll would give the same result: pick random)
+    PATIENT 1  (ALL TIED AT 0.0 -- EPSILON ROLL WOULD GIVE THE SAME RESULT: PICK RANDOM)
     last   = argmax_fair(q)
     payout = true_avg[last] + rng.standard_normal() * 0.8   # ~ 1.6
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
     print(q)    # [1.60  0.00  0.00]
 
-    # patient 2 -- explore
+    PATIENT 2 -- EXPLORE
     roll = rng.random()    # 0.07  <  0.10  ->  EXPLORE
     last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 2
     payout = true_avg[last] + rng.standard_normal() * 0.8               # noisy payout around C's true average (0.8)
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
     print(q)    # [1.60  0.00  0.90]   <- C sampled for first time
 
-    # patient 3 -- exploit
+    PATIENT 3 -- EXPLOIT
     roll = rng.random()    # 0.54  >= 0.10  ->  EXPLOIT
     last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 0  (A at 1.60 > C at 0.90)
     payout = true_avg[last] + rng.standard_normal() * 0.8               # A pays ~ 0.9  (n[A] was 1, now 2)
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
-    # q[A] = 1.60 + (1/2)*(0.9-1.60) = 1.60 - 0.35 = 1.25
+    Q[A] = 1.60 + (1/2)*(0.9-1.60) = 1.60 - 0.35 = 1.25
     print(q)    # [1.25  0.00  0.90]
 
-    # patient 4 -- explore
+    PATIENT 4 -- EXPLORE
     roll = rng.random()    # 0.02  <  0.10  ->  EXPLORE
     last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 1
     payout = true_avg[last] + rng.standard_normal() * 0.8               # noisy payout around B's true average (-0.3)
     n[last] += 1;  q[last] += (1/n[last]) * (payout - q[last])
     print(q)    # [1.25  -0.40  0.90]   <- B found as loser
 
-    # after 1000 patients:  q ≈ [1.20  -0.30  0.80]  all three true averages found
+    AFTER 1000 PATIENTS:  Q ≈ [1.20  -0.30  0.80]  ALL THREE TRUE AVERAGES FOUND
 
-    # --- constant-nudge shopkeeper (epsilon = 0.1, step = 0.1) ---
+    --- CONSTANT-NUDGE SHOPKEEPER (EPSILON = 0.1, STEP = 0.1) ---
 
     q = np.zeros(3)
     step    = 0.1
     epsilon = 0.1
-    # n[] not needed: fixed step size doesn't depend on patient count
+    N[] NOT NEEDED: FIXED STEP SIZE DOESN'T DEPEND ON PATIENT COUNT
 
-    # patient 1  (all tied at 0.0 -- epsilon choice doesn't matter, pick random)
+    PATIENT 1  (ALL TIED AT 0.0 -- EPSILON CHOICE DOESN'T MATTER, PICK RANDOM)
     last   = argmax_fair(q)
     payout = true_avg[last] + rng.standard_normal() * 0.8   # noisy payout around the true average
     q[last] += step * (payout - q[last])                     # nudge = 0.1 always
-    # say payout ~ 1.6:  q[A] = 0 + 0.1*(1.6-0) = 0.16
+    SAY PAYOUT ~ 1.6:  Q[A] = 0 + 0.1*(1.6-0) = 0.16
     print(q)    # [0.16  0.00  0.00]   <- 10% of the gap only; never leaps
 
-    # patient 2 -- exploit (0.16 > 0.00 for both B and C)
+    PATIENT 2 -- EXPLOIT (0.16 > 0.00 FOR BOTH B AND C)
     roll = rng.random()
     last = int(rng.integers(3)) if roll < epsilon else argmax_fair(q)   # -> 0
     payout = true_avg[last] + rng.standard_normal() * 0.8   # noisy payout around the true average
     q[last] += step * (payout - q[last])
-    # say payout ~ 0.9:  q[A] = 0.16 + 0.1*(0.9-0.16) = 0.16 + 0.074 = 0.234
+    SAY PAYOUT ~ 0.9:  Q[A] = 0.16 + 0.1*(0.9-0.16) = 0.16 + 0.074 = 0.234
     print(q)    # [0.23  0.00  0.00]
 
-    # guess creeps up slowly; never fully settles; tracks if factory swaps machines
+    GUESS CREEPS UP SLOWLY; NEVER FULLY SETTLES; TRACKS IF FACTORY SWAPS MACHINES
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 12 -- Reinforcement Learning):

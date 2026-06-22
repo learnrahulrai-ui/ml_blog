@@ -51,7 +51,7 @@
   first runs.
 
 
-  ## A Machine Only Compares Numbers, and the Cupcake Was Never the Point
+  A MACHINE ONLY COMPARES NUMBERS, AND THE CUPCAKE WAS NEVER THE POINT
 
   The setup, drawn before any words:
 
@@ -89,7 +89,7 @@
   sees four numbers against four numbers. Nothing else is in the room.
 
 
-  ## One Number Tells You How Wrong, Never Which Slot -- So the Search Is Blind
+  ONE NUMBER TELLS YOU HOW WRONG, NEVER WHICH SLOT -- SO THE SEARCH IS BLIND
 
   Score a guess by how far it sits from the target. On each slot take the gap -- the size of
   the difference, ignoring sign, since being too high by 3 is as wrong as too low by 3 -- and
@@ -126,7 +126,7 @@
   plus the freedom to let losers die, is enough.
 
 
-  ## Raw Error Scores Breed Backwards -- So Flip to Goodness, Then Share Out to One
+  RAW ERROR SCORES BREED BACKWARDS -- SO FLIP TO GOODNESS, THEN SHARE OUT TO ONE
 
   You want each guess to breed in proportion to how good it is. So you need a chance for each
   guess, and the chances must (a) be bigger for smaller sin, (b) never go negative -- a chance
@@ -169,7 +169,7 @@
   by hand, so it is the one used here.)
 
 
-  ## You Cannot Pick the Best Two and Stop -- So Spin a Weighted Wheel, Twice, With Replacement
+  YOU CANNOT PICK THE BEST TWO AND STOP -- SO SPIN A WEIGHTED WHEEL, TWICE, WITH REPLACEMENT
 
   The temptation is to take the top two guesses and breed only them. That throws away the rest
   of the population's numbers and collapses the hunt onto two rows fast. Instead, pick parents
@@ -196,7 +196,7 @@
   have two parents. Say the wheel hands you guess 1 and guess 3.
 
 
-  ## No One Knows Which Halves Are Good -- So Cut Blind at One Point and Let Dying Choose
+  NO ONE KNOWS WHICH HALVES ARE GOOD -- SO CUT BLIND AT ONE POINT AND LET DYING CHOOSE
 
   You have two parents:
 
@@ -225,7 +225,7 @@
   will get zero or near-zero chances and die. The dying does the choosing. The cut is blind.
 
 
-  ## A Pile That Only Breeds Will Freeze -- So Resample One Slot on a Coin
+  A PILE THAT ONLY BREEDS WILL FREEZE -- SO RESAMPLE ONE SLOT ON A COIN
 
   Crossover only shuffles numbers already present in the population. If no guess anywhere holds
   a 3 in slot 2, no amount of cutting and gluing will ever produce one, and the hunt stalls
@@ -245,7 +245,7 @@
   the target.
 
 
-  ## The Babies Replace Everyone -- So the Good Numbers Survive, Not the Good Guesses
+  THE BABIES REPLACE EVERYONE -- SO THE GOOD NUMBERS SURVIVE, NOT THE GOOD GUESSES
 
   Repeat the wheel-cut-tweak until you have built a whole new population the same size as the
   old one -- four babies here, thousands in the real run. Then throw away ALL the old guesses
@@ -267,13 +267,12 @@
   Darwin's (natural selection, 1859); turning it into this code loop is John Holland's (1970s).
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   Every score, flip, share, cut, and coin above worked on paper. Here the exact numbers in
   Python -- same moves, same digits. A guess is a plain list (so the cut can glue two pieces);
   the target is a numpy array (so the gap subtracts slot by slot).
 
-  ```python
   import numpy as np
 
   target = np.array([1, 3, 2, 1])          # the secret (real run: 8 numbers)
@@ -325,10 +324,9 @@
 
   baby = prob.reproduce(pop[0], pop[2])     # seed=0 -> k=3 -> [1,3,2] + [1] = [1,3,2,1]
   recipe_success(baby)                      # 0  -> equals the target
-  ```
 
 
-  ## Honest Extras (Three Short)
+  HONEST EXTRAS (THREE SHORT)
 
   NO GRADIENT, AND THAT IS THE WHOLE POINT. Gradient descent needs the score to be smooth and
   differentiable, so it can read a per-parameter slope and step downhill. This method needs
@@ -353,7 +351,7 @@
   fit without exterminating everyone else in one generation.
 
 
-  ## One Breath (Carry This Away)
+  ONE BREATH (CARRY THIS AWAY)
 
   Score every guess by its total gap from the secret and negate it (closer = bigger); flip the
   scores into positive goodness so a small gap is a big number (subtract the worst score, or

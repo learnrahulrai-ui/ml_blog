@@ -33,7 +33,7 @@
   That single translation turns ten formulas into one arithmetic count.
 
 
-  ## The Story (read this once; every problem below lives inside it)
+  THE STORY (READ THIS ONCE; EVERY PROBLEM BELOW LIVES INSIDE IT)
 
   Here is the whole room, drawn before any words:
 
@@ -52,11 +52,11 @@
       truly sick  + silence  = MISS    (false negative: machine stayed quiet)
       truly well  + BEEP     = GLITCH  (false positive: machine fired by mistake)
 
-  **THE PATIENT** arrives at the hospital feeling unwell. The doctor forms a suspicion --
+  THE PATIENT arrives at the hospital feeling unwell. The doctor forms a suspicion --
   this patient might have a disease. To confirm, the doctor writes a referral slip and sends
   the patient down the corridor.
 
-  **THE GREEDY SHOPKEEPER** runs the test stall at the end of that corridor. He owns one
+  THE GREEDY SHOPKEEPER runs the test stall at the end of that corridor. He owns one
   faulty machine (sometimes two). Feed him a patient and his machine prints a paper: BEEP
   (the test fired) or silence (the test stayed quiet). The shopkeeper is greedy -- each BEEP
   paper is a sale. Because every beep is income, he has no incentive to tell you how many
@@ -68,18 +68,18 @@
   The doctor must learn to spot and ignore them. Not every fact on a beep paper belongs in the
   probability calculation.
 
-  **THE FAULTY MACHINE** lies in two directions:
+  THE FAULTY MACHINE lies in two directions:
   - It stays quiet on a truly sick patient. That patient gets a clean paper (no beep), walks
     back to the doctor, and the doctor must say "the test found nothing." MISS. The textbook
     calls this a false negative.
   - It fires on a healthy patient. That patient gets a beep paper, returns alarmed, and the
     doctor must deal with a false alarm. GLITCH. The textbook calls this a false positive.
 
-  **THE DOCTOR** sits at the end of the story. The patient returns clutching a beep paper.
+  THE DOCTOR sits at the end of the story. The patient returns clutching a beep paper.
   The doctor's question: "Given that your paper beeped, how likely are you actually sick?"
   Answering that question is Bayes' rule. It is the doctor's question, not the shopkeeper's.
 
-  **THE WILD.** Every patient who got a clean paper and went home is now undiagnosed. They
+  THE WILD. Every patient who got a clean paper and went home is now undiagnosed. They
   may be truly healthy (good) or truly sick but missed (bad). The missed-sick patients are
   out in the wild -- untreated, possibly worsening, possibly spreading the illness. Note
   carefully: Bayes answers the doctor's question (given a beep, how likely sick?). It does
@@ -88,12 +88,12 @@
   The danger of the missed cases is real and separate from the formula.
 
 
-  ## The Two Questions the Doctor and the Shopkeeper Answer Differently
+  THE TWO QUESTIONS THE DOCTOR AND THE SHOPKEEPER ANSWER DIFFERENTLY
 
   Two probability symbols look almost identical but describe completely different groups of
   patients.
 
-  **The comma: P(Sick, Beep) = JOINT = "both, out of the whole group."**
+  The comma: P(Sick, Beep) = JOINT = "both, out of the whole group."
 
   P(Sick, Beep) is the share of ALL patients sent for testing who are sick AND came back
   with a beep paper. You stand at the hospital entrance and count every patient -- healthy,
@@ -102,7 +102,7 @@
       100 patients sent for testing. 15 are sick AND have a beep paper.
       P(Sick, Beep) = 15/100 = 0.15.  Denominator: all 100.
 
-  **The bar: P(Beep | Sick) = CONDITIONAL = "out of one shrunk back-room."**
+  The bar: P(Beep | Sick) = CONDITIONAL = "out of one shrunk back-room."
 
   P(Beep | Sick) is the machine's catch rate: of the patients who ARE truly sick, what share
   came back with a beep? First, throw out every healthy patient. Lock only the confirmed-sick
@@ -123,7 +123,7 @@
   The machine answers about the sick. Those are opposite directions of the same relationship.
 
 
-  ## The Shopkeeper Hides the Total -- So We Build It by Gluing the Two Piles
+  THE SHOPKEEPER HIDES THE TOTAL -- SO WE BUILD IT BY GLUING THE TWO PILES
 
   The doctor's question would be trivial if the shopkeeper told us the total share of beep
   papers. He refuses. So we build that total ourselves from the only two ways a beep paper
@@ -161,7 +161,7 @@
   divide the pile you want by the total.
 
 
-  ## Ten Patients, Ten Visits to the Shopkeeper
+  TEN PATIENTS, TEN VISITS TO THE SHOPKEEPER
 
   The same move in every case: imagine a concrete group of patients, run them through the
   machine, count the beep papers by pile, divide.
@@ -362,13 +362,12 @@
   rate helps this; nothing eliminates it entirely.
 
 
-  ## Python: Three Visits Hard-Coded, Then a Full Simulation
+  PYTHON: THREE VISITS HARD-CODED, THEN A FULL SIMULATION
 
   Visits 4, 5, and 6 shown as explicit variables -- no loops, every patient count on its own
   line -- so the head-count move stays visible. Then a full Monte Carlo simulation (100,000
   patients per scenario) to verify all six non-trivial visits.
 
-  ```python
   # -----------------------------------------------------------------------
   # PART 1: VISITS 4, 5, 6 -- explicit head-counts, no loops
   # Every quantity is a named variable matching the story above.
@@ -436,7 +435,6 @@
   # Rarity trap: Visit 4 precision=8.3%, Visit 6 precision=24.6%
   # Doubling prevalence (1%->2%) with a better machine triples precision.
   # Prevalence is the dominant lever, not the machine's catch rate.
-  ```
 
   Output of Part 1:
 
@@ -448,7 +446,6 @@
       Visit 6: missed into wild = 4 per 1000 patients
       Rarity trap: Visit 4 precision=8.3%, Visit 6 precision=24.6%
 
-  ```python
   # -----------------------------------------------------------------------
   # PART 2: FULL SIMULATION -- 100,000 patients, every visit verified
   # Each patient walks the same path: doctor -> shopkeeper -> machine(s) -> return.
@@ -565,7 +562,6 @@
       print("=" * 62)
 
   run_simulation()
-  ```
 
   Sample output:
 
@@ -592,7 +588,7 @@
       ==============================================================
 
 
-  ## The Formula (it was here all along)
+  THE FORMULA (IT WAS HERE ALL ALONG)
 
   You have now used Bayes' rule ten times without once reading it as a formula. Here it is,
   for the exam or the quiz:
@@ -610,7 +606,7 @@
   The formula is not magic. It is the patient head-count, compressed into one line.
 
 
-  ## The Decoder (jargon -> plain)
+  THE DECODER (JARGON -> PLAIN)
 
       PEACOCK WORD                       PLAIN WORD (hospital story)
       --------------------------------   -----------------------------------------------

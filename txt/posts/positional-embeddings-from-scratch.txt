@@ -29,7 +29,7 @@
   twice, and then proves algebraically why RoPE works. Every number is worked by
   hand. Assume you remember nothing.
 
-  ## Attention Cannot See Order -- the Numbers
+  ATTENTION CANNOT SEE ORDER -- THE NUMBERS
 
   From the transformer post: "nolan ended." The stick for "nolan" is [2, 1, 1, 0].
   The stick for "ended" is [0, 1, 2, 1]. Width 4.
@@ -49,7 +49,7 @@
   even for the same word at different positions.
 
 
-  ## The Scalar Trap -- Adding a Number
+  THE SCALAR TRAP -- ADDING A NUMBER
 
   The most direct idea: add the slot number to each element of the word's stick.
 
@@ -69,7 +69,7 @@
   seen in training.
 
 
-  ## The Normalised Scalar -- Better, But Breaks at Inference
+  THE NORMALISED SCALAR -- BETTER, BUT BREAKS AT INFERENCE
 
   Normalize: divide by the length of the sequence, so the mark is always in [0, 1].
 
@@ -92,7 +92,7 @@
   cannot do all three.
 
 
-  ## Give Each Position a Vector -- Sinusoidal Encoding
+  GIVE EACH POSITION A VECTOR -- SINUSOIDAL ENCODING
 
   Instead of one number, give each position a full vector -- one number per
   dimension of the embedding. With stick width d = 4, each position gets a
@@ -167,7 +167,7 @@
   and its position, mixed together.
 
 
-  ## Where Sinusoidal Breaks -- The Relative Distance Problem
+  WHERE SINUSOIDAL BREAKS -- THE RELATIVE DISTANCE PROBLEM
 
   Sinusoidal encoding has three failure modes. Two are manageable. One is
   fundamental.
@@ -240,7 +240,7 @@
   relative distance. That is what RoPE does.
 
 
-  ## RoPE -- Rotate Instead of Add
+  ROPE -- ROTATE INSTEAD OF ADD
 
   Instead of adding a position vector to the word stick, ROTATE the word stick by
   an angle proportional to its position.
@@ -285,7 +285,7 @@
   preserved. Only the direction changes.
 
 
-  ## The Proof That RoPE Encodes Relative Distance
+  THE PROOF THAT ROPE ENCODES RELATIVE DISTANCE
 
   This is the step Satvik's post names but does not show.
 
@@ -370,7 +370,7 @@
   while keeping the gap fixed and the score is unchanged.
 
 
-  ## Scaling to 512 Dimensions -- 256 Rotation Planes
+  SCALING TO 512 DIMENSIONS -- 256 ROTATION PLANES
 
   That 2D proof works because one pair of numbers defines one rotation plane.
   A real embedding has d_model = 512 dimensions -- which means 256 independent
@@ -415,7 +415,7 @@
   position 3. Every pair has seen "rotate by 0.3 rad" many times during training.
 
 
-  ## Where RoPE Still Breaks -- the Slow Pairs
+  WHERE ROPE STILL BREAKS -- THE SLOW PAIRS
 
   RoPE extrapolates better than sinusoidal encoding because attention scores depend
   on the RELATIVE gap, not absolute positions. A gap of 50 at position 100 looks
@@ -441,7 +441,7 @@
   never trained on.
 
 
-  ## The Fix -- Scale the Base Frequency
+  THE FIX -- SCALE THE BASE FREQUENCY
 
   The insight: the slow pairs are producing out-of-distribution angles. Make them
   rotate more slowly, so far-out positions map back into the training range.
@@ -503,7 +503,7 @@
   USE long-range attention.
 
 
-  ## The Decoder
+  THE DECODER
 
       PLAIN WORD                           JARGON
       -----------------------------------  --------------------------------------------
@@ -520,9 +520,8 @@
       position ID shifting                 position interleaving (Cerebras technique)
 
 
-  ## Python: Sinusoidal Marks and RoPE, Every Number Checked
+  PYTHON: SINUSOIDAL MARKS AND ROPE, EVERY NUMBER CHECKED
 
-  ```python
   import numpy as np
 
   # -----------------------------------------------------------------------
@@ -622,7 +621,6 @@
   print(f"  score(pos 3 vs 7):   {score_3_7:.4f}")
   print(f"  score(pos 10 vs 14): {score_10_14:.4f}")
   # Same gap (-4) => same score. The algebraic guarantee holds at all dimensions.
-  ```
 
   Sample output:
 

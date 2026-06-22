@@ -41,7 +41,7 @@
      THE FIX: standardise. Shift every column to spread 1 (z-score).
      Then each column speaks with equal volume, and every dimension contributes to the gap.
 
-  ## The Sheet
+  THE SHEET
 
     State       Murder    Assault    UrbanPop
     -------     ------    -------    --------
@@ -62,7 +62,7 @@
 
   No right answer.  The goal: find which states are most alike.
 
-  ## The Middle and the Spread
+  THE MIDDLE AND THE SPREAD
 
   For each column, compute two numbers.
   The first is the middle, called the mean: add up all 50 values, then divide by 50.
@@ -91,7 +91,7 @@
   This is a warning light: Assault's numbers are much bigger.
   Therefore Assault will dominate any gap measurement unless we intervene.
 
-  ## The Ruler Problem
+  THE RULER PROBLEM
 
   The range of a column is its biggest value minus its smallest value (max - min).
   Look at the range of each column:
@@ -107,7 +107,7 @@
   Which means the Assault column shouts about seventeen times louder than Murder.
   Therefore the gap number mostly reflects Assault, not the full picture.
 
-  ## The Gap Between Two States: Two Rulers
+  THE GAP BETWEEN TWO STATES: TWO RULERS
 
   IN HAND: a sheet of 50 states by 3 columns.
   In hand also: a middle (mean) and a spread (standard deviation) for each column.
@@ -143,7 +143,7 @@
   It is called "city-block" because it measures like walking around a grid.
   That is the opposite of cutting diagonally through the block.
 
-  ## A Worked Example: Alabama vs Alaska, by Hand
+  A WORKED EXAMPLE: ALABAMA VS ALASKA, BY HAND
 
     Alabama:  Murder=13.2   Assault=236   UrbanPop=58
     Alaska:   Murder=10.0   Assault=263   UrbanPop=48
@@ -189,7 +189,7 @@
      City-block (53) tops straight-line (41.3), as the L-walk always does.
      And Assault's 1600 drowns the other two.
 
-  ## The Sheet of Gaps
+  THE SHEET OF GAPS
 
   Now repeat the straight-line gap for ALL pairs of states.
   There are 50 states.
@@ -211,7 +211,7 @@
   This sheet IS the foundation of clustering.
   Every grouping method starts from some version of "who is closest to whom."
 
-  ## The Same Ruler: Standardisation
+  THE SAME RULER: STANDARDISATION
 
   The gap between Alabama and Alaska came out to 28.97.
   That number is heavily influenced by Assault.
@@ -251,7 +251,7 @@
   Standardised Alaska:
     Murder: 0.51    Assault: 1.11    UrbanPop: -1.21
 
-  ## The Fair Gap (After Same-Ruler)
+  THE FAIR GAP (AFTER SAME-RULER)
 
   Straight-line gap on standardised numbers:
 
@@ -283,7 +283,7 @@
      So it is a high-murder state.
      And it is now in plain ruler-units, which any other column can be compared against.
 
-  ## The Closest Pair
+  THE CLOSEST PAIR
 
   Build the 50x50 fair gap sheet.
   Fair gap means the straight-line gap measured on standardised numbers, not raw numbers.
@@ -293,7 +293,7 @@
   Which pair is it?
   That is for you to look up from the full sheet.
 
-  ## Ask the Closest Neighbors
+  ASK THE CLOSEST NEIGHBORS
 
   For any state, you can find its k nearest neighbours.
   The k nearest neighbours are the k states with the smallest fair gaps to it.
@@ -307,7 +307,7 @@
   That is the core of unsupervised learning: looking at neighbours without a right answer to check.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  The raw distance is not "wrong," just unfair.
        The raw Alabama-Alaska gap is 28.97.
@@ -354,7 +354,7 @@
        That is expected, not a bug.
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -373,7 +373,7 @@
     row                                    observation / sample
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one.
@@ -383,21 +383,21 @@
 
     import math
 
-    # Alabama and Alaska, raw measurements
+    ALABAMA AND ALASKA, RAW MEASUREMENTS
     al_murder, al_assault, al_urbanpop = 13.2, 236, 58
     ak_murder, ak_assault, ak_urbanpop = 10.0, 263, 48
 
-    # straight-line (Euclidean) gap -- raw, unfair
-    euclid_raw = math.sqrt((al_murder-ak_murder)**2 + (al_assault-ak_assault)**2 + (al_urbanpop-ak_urbanpop)**2)
-    # sqrt(3.2^2 + 27^2 + 10^2) = sqrt(10.24 + 729 + 100) = sqrt(839.24) = 28.97
+    STRAIGHT-LINE (EUCLIDEAN) GAP -- RAW, UNFAIR
+    euclid_raw = math.sqrt((al_murder-ak_murder)2 + (al_assault-ak_assault)2 + (al_urbanpop-ak_urbanpop)**2)
+    SQRT(3.2^2 + 27^2 + 10^2) = SQRT(10.24 + 729 + 100) = SQRT(839.24) = 28.97
     print(round(euclid_raw, 2))   # 28.97
 
-    # city-block (Manhattan) gap -- raw, unfair
+    CITY-BLOCK (MANHATTAN) GAP -- RAW, UNFAIR
     manhattan_raw = abs(al_murder-ak_murder) + abs(al_assault-ak_assault) + abs(al_urbanpop-ak_urbanpop)
-    # 3.2 + 27 + 10 = 40.2
+    3.2 + 27 + 10 = 40.2
     print(round(manhattan_raw, 1))   # 40.2  (city-block always >= straight-line)
 
-    # standardise: z = (raw - mean) / spread  (means and spreads from the full 50-state sheet)
+    STANDARDISE: Z = (RAW - MEAN) / SPREAD  (MEANS AND SPREADS FROM THE FULL 50-STATE SHEET)
     murder_mean,   murder_spread   = 7.79,  4.36
     assault_mean,  assault_spread  = 170.76, 83.34
     urbanpop_mean, urbanpop_spread = 65.54, 14.47
@@ -413,9 +413,9 @@
     print(round(al_m_z,2), round(al_a_z,2), round(al_u_z,2))   # 1.24  0.78 -0.52
     print(round(ak_m_z,2), round(ak_a_z,2), round(ak_u_z,2))   # 0.51  1.11 -1.21
 
-    # fair gap -- straight-line on standardised numbers
-    euclid_fair = math.sqrt((al_m_z-ak_m_z)**2 + (al_a_z-ak_a_z)**2 + (al_u_z-ak_u_z)**2)
-    # sqrt(0.73^2 + 0.33^2 + 0.69^2) = sqrt(0.53+0.11+0.48) = sqrt(1.12) = 1.06
+    FAIR GAP -- STRAIGHT-LINE ON STANDARDISED NUMBERS
+    euclid_fair = math.sqrt((al_m_z-ak_m_z)2 + (al_a_z-ak_a_z)2 + (al_u_z-ak_u_z)**2)
+    SQRT(0.73^2 + 0.33^2 + 0.69^2) = SQRT(0.53+0.11+0.48) = SQRT(1.12) = 1.06
     print(round(euclid_fair, 2))   # 1.06  (fair: each column gets equal voice)
 
   Two states, two gaps (raw and fair), every column on its own line.  The toolbox block
@@ -435,36 +435,36 @@
     import numpy as np
     from sklearn.preprocessing import StandardScaler
 
-    # load the sheet
+    LOAD THE SHEET
     df = pd.read_csv("us_arrests.csv", index_col=0)
     print(df.shape)              # (50, 3)
     print(df.columns.tolist())   # ['Murder', 'Assault', 'UrbanPop']
 
-    # summary statistics
+    SUMMARY STATISTICS
     means = df.mean().round(2).to_dict()
     stds  = df.std(ddof=0).round(2).to_dict()
     ranges = (df.max() - df.min()).round(2).to_dict()
 
-    # Euclidean distance function
+    EUCLIDEAN DISTANCE FUNCTION
     def euclidean_distance(x, y):
         return float(np.sqrt(np.sum((x - y) ** 2)).round(3))
 
-    # Manhattan distance function
+    MANHATTAN DISTANCE FUNCTION
     def manhattan_distance(x, y):
         return float(np.sum(np.abs(x - y)).round(3))
 
-    # distance between Alabama and Alaska
+    DISTANCE BETWEEN ALABAMA AND ALASKA
     al = df.loc["Alabama"]
     ak = df.loc["Alaska"]
     print(euclidean_distance(al, ak))    # 28.97
     print(manhattan_distance(al, ak))    # 40.2
 
-    # standardise
+    STANDARDISE
     scaler = StandardScaler()
     scaled = scaler.fit_transform(df)
     df_scaled = pd.DataFrame(scaled, index=df.index, columns=df.columns)
 
-    # fair distance matrix (50x50)
+    FAIR DISTANCE MATRIX (50X50)
     n = len(df_scaled)
     dist_mat = np.zeros((n, n))
     for i in range(n):
@@ -472,12 +472,12 @@
             dist_mat[i, j] = euclidean_distance(df_scaled.iloc[i],
                                                 df_scaled.iloc[j])
 
-    # closest pair (exclude diagonal)
+    CLOSEST PAIR (EXCLUDE DIAGONAL)
     np.fill_diagonal(dist_mat, np.inf)
     min_idx = np.unravel_index(dist_mat.argmin(), dist_mat.shape)
     pair = (df_scaled.index[min_idx[0]], df_scaled.index[min_idx[1]])
 
-    # k-nearest neighbours
+    K-NEAREST NEIGHBOURS
     def find_k_nearest(state_name, k):
         idx = df_scaled.index.get_loc(state_name)
         row = dist_mat[idx].copy()

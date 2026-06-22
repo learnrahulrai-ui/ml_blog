@@ -58,7 +58,7 @@
   Pencil out.
 
 
-  ## The CSV Carries a Hidden Column -- Drop Both Or Every Number Is Wrong
+  THE CSV CARRIES A HIDDEN COLUMN -- DROP BOTH OR EVERY NUMBER IS WRONG
 
   Fashion-MNIST arrives as a CSV with one row per photo.
   The usual move: drop the 'label' column, take the rest as pixel values.
@@ -95,7 +95,7 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
-  ## A Photo Has 784 Dots, Too Many to Pin at Once -- So Cut It Into Strips
+  A PHOTO HAS 784 DOTS, TOO MANY TO PIN AT ONCE -- SO CUT IT INTO STRIPS
 
   Recall attention: every item in a list looks at every other item, all at once.
   Call each such item a TOKEN -- one row of numbers attention treats as a unit.
@@ -160,7 +160,7 @@
   (Appendix E works a tiny 4 x 4 photo through these three moves by hand, dot by dot.)
 
 
-  ## 16 Dots Is a Thin Description, So Re-Describe Each Strip Wider
+  16 DOTS IS A THIN DESCRIPTION, SO RE-DESCRIBE EACH STRIP WIDER
 
   16 raw greyness numbers say little about a strip.
   So pass each strip through one learned grid that turns 16 numbers into 64.
@@ -176,7 +176,7 @@
   Call 64 the strip WIDTH (also written d_model).
 
 
-  ## Cutting Threw Away WHERE Each Strip Sat -- So Stamp the Seat Back On
+  CUTTING THREW AWAY WHERE EACH STRIP SAT -- SO STAMP THE SEAT BACK ON
 
   Here is the debt named at the start: positional encoding, the stamp for WHERE each strip sat.
   Attention looks at all 49 strips at once, as a SET.
@@ -243,7 +243,7 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
-  ## Now Every Strip Looks at Every Strip -- The Same Attention, Pointed at One Photo
+  NOW EVERY STRIP LOOKS AT EVERY STRIP -- THE SAME ATTENTION, POINTED AT ONE PHOTO
 
   This is the same attention as before, aimed inward at the 49 strips of ONE photo.
   Here is the whole mechanism from scratch, no memory needed.
@@ -306,7 +306,7 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
-  ## Attention Can Drown the Original Strip -- So Keep the Original, Then Tame
+  ATTENTION CAN DROWN THE ORIGINAL STRIP -- SO KEEP THE ORIGINAL, THEN TAME
 
   Two new machines, both small, both fixing a real failure.
 
@@ -360,7 +360,7 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
-  ## A Bench of Workers Mixes Each Strip, Then Keep-and-Tame Again
+  A BENCH OF WORKERS MIXES EACH STRIP, THEN KEEP-AND-TAME AGAIN
 
   After looking around, each strip passes through a small bench of plain workers.
   The bench does three things: widen, bend, narrow.
@@ -382,7 +382,7 @@
   This lab uses one, which is plenty for clothing.
 
 
-  ## 49 Strips, But One Answer -- So Fold Them Into One Summary
+  49 STRIPS, BUT ONE ANSWER -- SO FOLD THEM INTO ONE SUMMARY
 
   After the layer, the photo is still 49 strips of 64. The answer is ONE of 10 kinds. Fold the
   49 into one 64-number summary by averaging, slot by slot (the same move Chapter 10 used to
@@ -401,7 +401,7 @@
   Chapter 8 derived softmax; this is the same 10-way version.
 
 
-  ## The Whole Vision Transformer in Code (Q6)
+  THE WHOLE VISION TRANSFORMER IN CODE (Q6)
 
       inputs = Input(shape=(49, 16))                       # one photo, pre-cut to 49 strips of 16
       x = Dense(64)(inputs)                                 # re-describe each strip: 16 → 64
@@ -441,7 +441,7 @@
       MultiHeadAttention(...)(x, X)  -- capital X is undefined; both arguments are lowercase x.
 
 
-  ## The ViT Races the CNN (Q8, Q10)
+  THE VIT RACES THE CNN (Q8, Q10)
 
   Chapter 9's convolution factory -- magic papers sliding over 3x3 corners, pooling, flatten,
   Dense -- is the natural rival. Build it (the Chapter 9 machine) and race both on the sealed
@@ -465,41 +465,41 @@
             (global). Assumes nothing about nearness -- needs more data, scales further.
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   Every calculation in this post -- photo cutting, positional encoding, attention, LayerNorm --
   worked by hand above.  Here each step is spelled out in Python.
 
     import math
 
-    # --- Photo cutting: 28x28, patch size 4 ---
+    --- PHOTO CUTTING: 28X28, PATCH SIZE 4 ---
     photo_w, patch_size = 28, 4
     bands   = photo_w // patch_size    # 7 (across and down)
     n_strips = bands * bands            # 49
     strip_dots = patch_size * patch_size  # 16
 
-    # --- Positional encoding (width=4, seats 0-2) ---
-    # stamp[pos][2i] = sin(pos / 10000^(2i/width)),  stamp[pos][2i+1] = cos(...)
-    # i=0: scale=1;  i=1: scale=100
+    --- POSITIONAL ENCODING (WIDTH=4, SEATS 0-2) ---
+    STAMP[POS][2I] = SIN(POS / 10000^(2I/WIDTH)),  STAMP[POS][2I+1] = COS(...)
+    I=0: SCALE=1;  I=1: SCALE=100
     seat0 = [math.sin(0/1),   math.cos(0/1),   math.sin(0/100),   math.cos(0/100)]
-    # [0, 1.000, 0, 1.000]
+    [0, 1.000, 0, 1.000]
     seat1 = [math.sin(1/1),   math.cos(1/1),   math.sin(1/100),   math.cos(1/100)]
-    # [0.841, 0.540, 0.010, 1.000]
+    [0.841, 0.540, 0.010, 1.000]
     seat2 = [math.sin(2/1),   math.cos(2/1),   math.sin(2/100),   math.cos(2/100)]
-    # [0.909, -0.416, 0.020, 1.000]
+    [0.909, -0.416, 0.020, 1.000]
 
-    # --- Attention (2 strips, tag width=4, scale=2) ---
-    # WANT, HAVE, GIVE for s1 and s2
+    --- ATTENTION (2 STRIPS, TAG WIDTH=4, SCALE=2) ---
+    WANT, HAVE, GIVE FOR S1 AND S2
     s1_want = [2, 0, 1, 0];  s1_have = [1, 0, 0, 0];  s1_give = [2, 0, 0, 1]
     s2_want = [0, 0, 2, 0];  s2_have = [3, 0, 2, 0];  s2_give = [0, 3, 1, 0]
 
-    # MATCH grid: dot every WANT with every HAVE
+    MATCH GRID: DOT EVERY WANT WITH EVERY HAVE
     m_s1_s1 = s1_want[0]*s1_have[0] + s1_want[1]*s1_have[1] + s1_want[2]*s1_have[2] + s1_want[3]*s1_have[3]  # 2
     m_s1_s2 = s1_want[0]*s2_have[0] + s1_want[1]*s2_have[1] + s1_want[2]*s2_have[2] + s1_want[3]*s2_have[3]  # 8
     m_s2_s1 = s2_want[0]*s1_have[0] + s2_want[1]*s1_have[1] + s2_want[2]*s1_have[2] + s2_want[3]*s1_have[3]  # 0
     m_s2_s2 = s2_want[0]*s2_have[0] + s2_want[1]*s2_have[1] + s2_want[2]*s2_have[2] + s2_want[3]*s2_have[3]  # 4
 
-    # SCALE (÷2) then SOFTMAX each row
+    SCALE (÷2) THEN SOFTMAX EACH ROW
     sc_s1 = [m_s1_s1/2, m_s1_s2/2]   # [1, 4]
     sc_s2 = [m_s2_s1/2, m_s2_s2/2]   # [0, 2]
 
@@ -508,13 +508,13 @@
     e_s2 = [math.exp(sc_s2[0]), math.exp(sc_s2[1])]   # [1.000, 7.389]
     p_s2 = [e_s2[0]/sum(e_s2), e_s2[1]/sum(e_s2)]     # [0.119, 0.881]
 
-    # WEIGHTED SUM of GIVE tags
+    WEIGHTED SUM OF GIVE TAGS
     s1_new = [p_s1[0]*s1_give[k] + p_s1[1]*s2_give[k] for k in range(4)]
-    # [0.094, 2.859, 0.953, 0.047]
+    [0.094, 2.859, 0.953, 0.047]
     s2_new = [p_s2[0]*s1_give[k] + p_s2[1]*s2_give[k] for k in range(4)]
-    # [0.238, 2.643, 0.881, 0.119]
+    [0.238, 2.643, 0.881, 0.119]
 
-    # --- LayerNorm on a 4-number strip [50, 60, 40, 30] ---
+    --- LAYERNORM ON A 4-NUMBER STRIP [50, 60, 40, 30] ---
     strip = [50, 60, 40, 30]
     middle  = sum(strip) / len(strip)   # 45
     diffs   = [v - middle for v in strip]   # [5, 15, -5, -15]
@@ -523,7 +523,7 @@
     humbled = [d / spread for d in diffs]   # [0.45, 1.34, -0.45, -1.34]
 
 
-  ## One Breath
+  ONE BREATH
 
   Cut a 28 x 28 photo into 49 strips of 16 dots (fold, swap, glue -- the swap is what keeps each
   square together). Re-describe each strip 16 → 64. Stamp its seat on, so attention knows where

@@ -27,7 +27,7 @@
      Each token describes one region -- enough local information, no pixel-level explosion.
 
 
-  ## A Photo Is a Grid of Numbers, Cut Into Square Strips
+  A PHOTO IS A GRID OF NUMBERS, CUT INTO SQUARE STRIPS
 
   Take a tiny 4 x 4 photo (real ones are 28 x 28), one greyness number per dot:
 
@@ -82,7 +82,7 @@
             Chip 1 = top-right square [3, 4, 7, 8]. Spot 2 = the third dot = 7. ✓
 
 
-  ## Cutting Threw Away WHERE -- So Stamp the Seat On (Sine/Cosine)
+  CUTTING THREW AWAY WHERE -- SO STAMP THE SEAT ON (SINE/COSINE)
 
   Attention looks at the four strips as a SET, with no sense of which sat where. Stamp a unique
   seat-row onto each. The fixed recipe, for seat "pos" and slot pairs i = 0, 1, ...:
@@ -110,7 +110,7 @@
      check: [2+0, 2+1, 2+0, 2+1] = [2, 3, 2, 3].
 
 
-  ## Every Strip Looks at Every Strip (the Grid)
+  EVERY STRIP LOOKS AT EVERY STRIP (THE GRID)
 
   Each strip makes three tags from three reused grids.
   WANT (called the query) is what a strip looks for.
@@ -157,7 +157,7 @@
   the whole board in one shot.
 
 
-  ## Tame One Strip, Alone (LayerNorm)
+  TAME ONE STRIP, ALONE (LAYERNORM)
 
   Take ONE strip's numbers and humble them -- middle to 0, spread to 1 -- reading only this
   strip, no other strip, no batch:
@@ -193,7 +193,7 @@
      check: middle (2+4+6)/3 = 4. diffs: -2, 0, +2.
 
 
-  ## Block the Future (the Causal Mask)
+  BLOCK THE FUTURE (THE CAUSAL MASK)
 
   A token here is one item in the sequence -- one strip, or one word -- in the order it sits.
   Lay the match scores in a grid: row i is the token doing the looking, column j is the token looked at.
@@ -218,31 +218,31 @@
      check: token 2 sees tokens 1 and 2, not 3 → [0.5, 0.5, 0].
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   Five pencil cores above: cutting strips, seat-stamping, attention, LayerNorm, causal mask.
   Here the exact numbers in Python.
 
     import math
 
-    # --- 4x4 photo cut into 2x2 strips ---
+    --- 4X4 PHOTO CUT INTO 2X2 STRIPS ---
     photo = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]
-    # with fold+swap+glue:
+    WITH FOLD+SWAP+GLUE:
     strip_top_left  = [1, 2, 5, 6]
     strip_top_right = [3, 4, 7, 8]
     strip_bot_left  = [9, 10, 13, 14]
     strip_bot_right = [11, 12, 15, 16]
-    # (without swap: strip_0 would be [1,2,3,4] -- the wrong full-width slice)
+    (WITHOUT SWAP: STRIP_0 WOULD BE [1,2,3,4] -- THE WRONG FULL-WIDTH SLICE)
 
-    # --- Positional encoding (width=4, seats 0-2 by sine/cosine) ---
+    --- POSITIONAL ENCODING (WIDTH=4, SEATS 0-2 BY SINE/COSINE) ---
     seat0_stamp = [math.sin(0/1), math.cos(0), math.sin(0/100), math.cos(0)]
-    # [0, 1.000, 0, 1.000]
+    [0, 1.000, 0, 1.000]
     seat1_stamp = [math.sin(1/1), math.cos(1), math.sin(1/100), math.cos(1/100)]
-    # [0.841, 0.540, 0.010, 1.000]
-    # strip [2,2,2,2] + seat0 stamp = [2+0, 2+1, 2+0, 2+1] = [2, 3, 2, 3]
+    [0.841, 0.540, 0.010, 1.000]
+    STRIP [2,2,2,2] + SEAT0 STAMP = [2+0, 2+1, 2+0, 2+1] = [2, 3, 2, 3]
     strip_stamped = [2+seat0_stamp[k] for k in range(4)]   # [2, 3, 2, 3]
 
-    # --- Attention (2 strips, tag width=4, ÷sqrt(4)=÷2) ---
+    --- ATTENTION (2 STRIPS, TAG WIDTH=4, ÷SQRT(4)=÷2) ---
     s1_want, s1_have, s1_give = [2,0,1,0], [1,0,0,0], [2,0,0,1]
     s2_want, s2_have, s2_give = [0,0,2,0], [3,0,2,0], [0,3,1,0]
 
@@ -251,7 +251,7 @@
     match_s2s1 = sum(s2_want[k]*s1_have[k] for k in range(4))   # 0
     match_s2s2 = sum(s2_want[k]*s2_have[k] for k in range(4))   # 4
 
-    # scale ÷2, softmax each row
+    SCALE ÷2, SOFTMAX EACH ROW
     e1_s1, e4_s1 = math.exp(1), math.exp(4)    # 2.718, 54.60
     p_s1 = [e1_s1/(e1_s1+e4_s1), e4_s1/(e1_s1+e4_s1)]   # [0.047, 0.953]
     e0_s2, e2_s2 = math.exp(0), math.exp(2)    # 1.000, 7.389
@@ -262,24 +262,24 @@
     s2_new_0 = p_s2[0]*s1_give[0] + p_s2[1]*s2_give[0]  # 0.238
     s2_new_3 = p_s2[0]*s1_give[3] + p_s2[1]*s2_give[3]  # 0.119
 
-    # --- LayerNorm on strip [50, 60, 40, 30] ---
+    --- LAYERNORM ON STRIP [50, 60, 40, 30] ---
     vals = [50, 60, 40, 30]
     mid = sum(vals)/4    # 45
     diffs = [v - mid for v in vals]   # [5, 15, -5, -15]
     spread = math.sqrt(sum(d**2 for d in diffs)/4)   # 11.18
     humbled = [round(d/spread, 2) for d in diffs]    # [0.45, 1.34, -0.45, -1.34]
 
-    # --- Causal mask: 3 tokens, equal raw scores ---
-    # token 1 sees only itself:  e^1 / e^1 = 1.0
+    --- CAUSAL MASK: 3 TOKENS, EQUAL RAW SCORES ---
+    TOKEN 1 SEES ONLY ITSELF:  E^1 / E^1 = 1.0
     p_t1 = [1.0, 0.0, 0.0]
-    # token 2 sees tokens 1 and 2:  each e^1/(2*e^1) = 0.5
+    TOKEN 2 SEES TOKENS 1 AND 2:  EACH E^1/(2*E^1) = 0.5
     p_t2 = [0.5, 0.5, 0.0]
-    # token 3 sees all three:  each e^1/(3*e^1) = 0.333
+    TOKEN 3 SEES ALL THREE:  EACH E^1/(3*E^1) = 0.333
     one_third = math.exp(1) / (3*math.exp(1))   # 0.333
     p_t3 = [one_third, one_third, one_third]
 
 
-  ## One Recitation (Carry This Away)
+  ONE RECITATION (CARRY THIS AWAY)
 
   Cut the photo into square strips (fold, swap, glue -- the swap keeps each square whole).
   Stamp each strip's seat on (sine/cosine wave, or a learned table). Every strip's WANT dots

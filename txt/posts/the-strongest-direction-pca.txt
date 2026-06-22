@@ -46,7 +46,7 @@
      possible. The direction with the most spread (variance) preserves the most truth.
      That direction is the first principal component. Crush along that axis.
 
-  ## The Sheet
+  THE SHEET
 
     alcohol, malic_acid, ash, alcalinity_of_ash, magnesium, total_phenols,
     flavanoids, nonflavanoid_phenols, proanthocyanins, color_intensity,
@@ -83,7 +83,7 @@
   A room of clerks clears the whole crush by lunch.
   You would still be sharpening your pencil.
 
-  ## The Core Metaphor: Flashlight and Shadows
+  THE CORE METAPHOR: FLASHLIGHT AND SHADOWS
 
   Imagine each wine is a dot floating in a 13-wall room.
   You cannot draw this room.
@@ -104,18 +104,18 @@
   Rotate the flashlight.
   The shadow gets longer or shorter.
   The LONGEST shadow is the one that spreads the dots out the most.
-  That longest-shadow direction is the **first principal component (PC1)**.
+  That longest-shadow direction is the first principal component (PC1).
   A principal component is a direction through the cloud; the shadow of the dots onto it is what you keep.
   So PC1, the longest shadow, is the single most informative way to look at the data.
 
   Now rotate 90 degrees from PC1.
-  The next-longest shadow at that right angle is **PC2**, the second principal component.
+  The next-longest shadow at that right angle is PC2, the second principal component.
 
   Now you have two shadows (PC1 and PC2) at right angles.
   Plot each wine at (its PC1 coordinate, its PC2 coordinate).
   That dot on flat paper captures MORE of the original structure than any other two-number summary.
 
-  ## A 2-Wall Worked Example (Not 13, So You Can See It)
+  A 2-WALL WORKED EXAMPLE (NOT 13, SO YOU CAN SEE IT)
 
   Take 2 measurements (alcohol, color_intensity) for 4 wines.
   Two measurements means you can draw the room on paper.
@@ -201,7 +201,7 @@
      E sits far out along PC1 and dead centre on PC2.
      So E is a wine the strongest shadow finds extreme.
 
-  ## How Much Does Each Shadow Capture?
+  HOW MUCH DOES EACH SHADOW CAPTURE?
 
   IN HAND so far: four wines put on the same ruler (mean 0, spread 1 per column).
   Then a recipe PC1 = 0.71 * alcohol_z + 0.71 * color_z that spread them from -1.64 to +1.64.
@@ -249,7 +249,7 @@
   PC2 carries ~19%.
   The rest scatters across PCs 3-13.
 
-  ## Why Kept + Lost Always Adds Back to the Same Total
+  WHY KEPT + LOST ALWAYS ADDS BACK TO THE SAME TOTAL
 
   Here is the lock that makes the fraction trustworthy.
   Take one dot and the line it casts its shadow on.
@@ -299,7 +299,7 @@
 
     kept fraction  =  sum of shadow^2  /  sum of stick^2
 
-  ## Choosing How Many Shadows to Keep
+  CHOOSING HOW MANY SHADOWS TO KEEP
 
   Add the fractions from the biggest shadows downward until you hit 80%:
 
@@ -315,7 +315,7 @@
   So most of the structure is captured in the first 5 or 6 shadows.
   The remaining 7 PCs carry mostly noise.
 
-  ## The Recipe (Loadings)
+  THE RECIPE (LOADINGS)
 
   Each PC is a RECIPE.
   The recipe says how much of each original column goes into it.
@@ -329,7 +329,7 @@
   For PC1 on the wine data, the highest loading is often on proline or flavanoids.
   These columns vary the most, so they drive the longest shadow.
 
-  ## The Scores (Transform)
+  THE SCORES (TRANSFORM)
 
   Every wine gets a PC1 score and a PC2 score.
   A score is the wine's coordinate along one PC, computed by running that PC's recipe.
@@ -348,7 +348,7 @@
   Each dot is one wine.
   Dots close together mean chemically similar wines.
 
-  ## Blowing It Back Up (Reconstruction)
+  BLOWING IT BACK UP (RECONSTRUCTION)
 
   Reconstruction means rebuilding the original columns from the kept scores.
   To do it: take only PC1 and PC2 scores and multiply each back by its loadings.
@@ -383,7 +383,7 @@
   And still be able to draw the picture on flat paper.
 
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  Standardise BEFORE PCA, not after.
        PCA hunts for the direction of greatest SPREAD.  If one column has
@@ -437,7 +437,7 @@
        will not land between 0 and 1.
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -459,35 +459,35 @@
     the 13 numbers crunched into 2        2D embedding / projection
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same four wines, the same numbers, in Python.
   No loop, no hidden helper -- every wine written on its own line, exactly as on the slate,
   so you can run it and watch the pencil numbers print back.
 
-    # ---- the four wines, by hand, one line each (no loop) ----
-    # column average = add the four, divide by four
+    ---- THE FOUR WINES, BY HAND, ONE LINE EACH (NO LOOP) ----
+    COLUMN AVERAGE = ADD THE FOUR, DIVIDE BY FOUR
     alc_mean = (13.0 + 13.5 + 14.0 + 14.5) / 4         # 13.75
     col_mean = (4.0  + 6.0  + 5.0  + 7.0 ) / 4         # 5.5
 
-    # column spread = subtract mean, square, add, divide by (4-1), take the root
-    alc_spread = (((13.0-13.75)**2 + (13.5-13.75)**2 + (14.0-13.75)**2 + (14.5-13.75)**2)/3)**0.5  # ~0.65
-    col_spread = (((4.0 -5.5 )**2 + (6.0 -5.5 )**2 + (5.0 -5.5 )**2 + (7.0 -5.5 )**2)/3)**0.5       # ~1.29
+    COLUMN SPREAD = SUBTRACT MEAN, SQUARE, ADD, DIVIDE BY (4-1), TAKE THE ROOT
+    alc_spread = (((13.0-13.75)2 + (13.5-13.75)2 + (14.0-13.75)2 + (14.5-13.75)2)/3)**0.5  # ~0.65
+    col_spread = (((4.0 -5.5 )2 + (6.0 -5.5 )2 + (5.0 -5.5 )2 + (7.0 -5.5 )2)/3)**0.5       # ~1.29
 
-    # standardise each wine: z = (raw - mean) / spread, one line per wine
+    STANDARDISE EACH WINE: Z = (RAW - MEAN) / SPREAD, ONE LINE PER WINE
     A_alc_z = (13.0 - 13.75)/0.65;  A_col_z = (4.0 - 5.5)/1.29   # -1.15, -1.16
     B_alc_z = (13.5 - 13.75)/0.65;  B_col_z = (6.0 - 5.5)/1.29   # -0.38,  0.39
     C_alc_z = (14.0 - 13.75)/0.65;  C_col_z = (5.0 - 5.5)/1.29   #  0.38, -0.39
     D_alc_z = (14.5 - 13.75)/0.65;  D_col_z = (7.0 - 5.5)/1.29   #  1.15,  1.16
 
-    # PC1 score = 0.71*alc_z + 0.71*col_z, worked for each wine on its own line
+    PC1 SCORE = 0.71*ALC_Z + 0.71*COL_Z, WORKED FOR EACH WINE ON ITS OWN LINE
     A_pc1 = 0.71*A_alc_z + 0.71*A_col_z     # -1.64
     B_pc1 = 0.71*B_alc_z + 0.71*B_col_z     #  0.01
     C_pc1 = 0.71*C_alc_z + 0.71*C_col_z     # -0.01
     D_pc1 = 0.71*D_alc_z + 0.71*D_col_z     #  1.64
 
-    # PC2 score = -0.71*alc_z + 0.71*col_z (the right-angle recipe)
+    PC2 SCORE = -0.71*ALC_Z + 0.71*COL_Z (THE RIGHT-ANGLE RECIPE)
     A_pc2 = -0.71*A_alc_z + 0.71*A_col_z    #  0.00  (A and D land on ~0 here)
     B_pc2 = -0.71*B_alc_z + 0.71*B_col_z    #  0.55
     C_pc2 = -0.71*C_alc_z + 0.71*C_col_z    # -0.55
@@ -496,9 +496,9 @@
     print("PC1:", round(A_pc1,2), round(B_pc1,2), round(C_pc1,2), round(D_pc1,2))
     print("PC2:", round(A_pc2,2), round(B_pc2,2), round(C_pc2,2), round(D_pc2,2))
 
-    # how much spread each shadow caught: variance = mean of squared scores (mean is 0)
-    pc1_var = (A_pc1**2 + B_pc1**2 + C_pc1**2 + D_pc1**2) / 4    # 1.35
-    pc2_var = (A_pc2**2 + B_pc2**2 + C_pc2**2 + D_pc2**2) / 4    # 0.15
+    HOW MUCH SPREAD EACH SHADOW CAUGHT: VARIANCE = MEAN OF SQUARED SCORES (MEAN IS 0)
+    pc1_var = (A_pc12 + B_pc12 + C_pc12 + D_pc12) / 4    # 1.35
+    pc2_var = (A_pc22 + B_pc22 + C_pc22 + D_pc22) / 4    # 0.15
     print("PC1 fraction:", round(pc1_var/(pc1_var+pc2_var), 2))  # 0.90
     print("PC2 fraction:", round(pc2_var/(pc1_var+pc2_var), 2))  # 0.10
 

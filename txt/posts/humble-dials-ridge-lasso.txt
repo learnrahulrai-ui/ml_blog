@@ -48,7 +48,7 @@
      selecting one column and deleting the other.
 
 
-  ## A New Sheet: The Diabetes Pile
+  A NEW SHEET: THE DIABETES PILE
 
     diabetes -- 442 people, 10 body measurements, one answer
     patient   age   bmi   bp    s1 ... s6  |  answer
@@ -73,7 +73,7 @@
   What is new is that we no longer trust the machine to set those dials sensibly on its own.
 
 
-  ## The Disease: Huge Dials That Memorise
+  THE DISEASE: HUGE DIALS THAT MEMORISE
 
   Here is the failure, drawn. Give the dials free rein and they grow huge to chase every
   little wiggle in the study pile:
@@ -97,7 +97,7 @@
   So we want to FORBID huge dials.
 
 
-  ## The Leash: Add a Fine
+  THE LEASH: ADD A FINE
 
   Until now the machine paid only for being wrong.
   Now we make it pay a second fine -- for being immodest.
@@ -118,7 +118,7 @@
   of this post.
 
 
-  ## Ridge: The Smooth Squeeze
+  RIDGE: THE SMOOTH SQUEEZE
 
   IN HAND: the diabetes sheet -- 442 people, 10 columns, one answer.
   The guess is the straight-stick rule: 10 dials plus 1 nudge = 11 numbers.
@@ -231,7 +231,7 @@
      blows up.  Adding a*I down the diagonal always makes the grid invertible again.
 
 
-  ## Lasso: The Sharp Snap
+  LASSO: THE SHARP SNAP
 
   Lasso's fine is the ABSOLUTE size of each dial -- its size with the sign thrown away.
   ("Absolute size" of -0.7 is 0.7; the absolute size of 0.7 is also 0.7.)
@@ -285,7 +285,7 @@
      Which means Lasso must loop until the dials stop moving.
 
 
-  ## Ridge vs Lasso, Side by Side
+  RIDGE VS LASSO, SIDE BY SIDE
 
                      Ridge                  Lasso
     fine             a * sum(dial^2)        a * sum(|dial|)
@@ -303,7 +303,7 @@
   Everything else follows from that one choice.
 
 
-  ## Picking the Knob a -- Never Guess It
+  PICKING THE KNOB A -- NEVER GUESS IT
 
   Both machines have the same knob a.
   You do NOT eyeball it.
@@ -344,7 +344,7 @@
      That single 50 is one dot on the valley curve;  the winning a is wherever the
      row of such dots bottoms out.
 
-  ## Common Tripwires I Caught
+  COMMON TRIPWIRES I CAUGHT
 
   These are the exact wrong pictures I had to untangle.
   Each one cost me real time until I saw the plain shape of the mistake:
@@ -400,7 +400,7 @@
               picture) -- name it that, never call it "the dial."
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -416,14 +416,14 @@
     too stiff vs too jumpy                the bias-variance trade-off
 
 
-  ## The Code, If You Want It
+  THE CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
 
   First the Ridge dial formula from the worked example, hard-coded -- one person per line:
 
-    # Ridge dial: 4-person bmi example
+    RIDGE DIAL: 4-PERSON BMI EXAMPLE
     A_bmi, A_ans = 0.04, 97
     B_bmi, B_ans = 0.06, 121
     C_bmi, C_ans = 0.12, 135
@@ -433,7 +433,7 @@
     ans_avg = (A_ans + B_ans + C_ans + D_ans) / 4    # 126
     print(bmi_avg, ans_avg)  # 0.1 126
 
-    # top = sum((bmi - bmi_avg) * (ans - ans_avg))
+    TOP = SUM((BMI - BMI_AVG) * (ANS - ANS_AVG))
     top_A = (A_bmi - bmi_avg) * (A_ans - ans_avg)  # (-0.06)*(-29) = 1.74
     top_B = (B_bmi - bmi_avg) * (B_ans - ans_avg)  # (-0.04)*(-5)  = 0.20
     top_C = (C_bmi - bmi_avg) * (C_ans - ans_avg)  #  (0.02)*(9)   = 0.18
@@ -441,7 +441,7 @@
     top = top_A + top_B + top_C + top_D             # 4.12
     print(round(top,2))  # 4.12
 
-    # bottom = sum((bmi - bmi_avg)^2)
+    BOTTOM = SUM((BMI - BMI_AVG)^2)
     bot_A = (A_bmi - bmi_avg)**2   # (-0.06)^2 = 0.0036
     bot_B = (B_bmi - bmi_avg)**2   # (-0.04)^2 = 0.0016
     bot_C = (C_bmi - bmi_avg)**2   #  (0.02)^2 = 0.0004
@@ -449,7 +449,7 @@
     bottom = bot_A + bot_B + bot_C + bot_D  # 0.0120
     print(round(bottom,4))  # 0.012
 
-    # Ridge dial = top / (bottom + a) -- watch how a shrinks the dial
+    RIDGE DIAL = TOP / (BOTTOM + A) -- WATCH HOW A SHRINKS THE DIAL
     dial_a0   = top / (bottom + 0)    # 4.12/0.012 = 343   (plain, no leash)
     dial_a10  = top / (bottom + 10)   # 4.12/10.012 = 0.411
     dial_a100 = top / (bottom + 100)  # 4.12/100.012 = 0.0412
@@ -471,20 +471,20 @@
     from sklearn.metrics import mean_squared_error, r2_score
     import numpy as np
 
-    # Ridge: sweep 50 a's, keep the valley. store_cv_values lets us read the curve later.
+    RIDGE: SWEEP 50 A'S, KEEP THE VALLEY. STORE_CV_VALUES LETS US READ THE CURVE LATER.
     ridge_alphas = np.logspace(-3, 3, 50)
     ridge_cv = RidgeCV(alphas=ridge_alphas, store_cv_values=True)
     ridge_cv.fit(X_train_scaled, y_train)
     ridge_best_alpha = float(ridge_cv.alpha_)
 
-    # Lasso: its own a-ladder, 5 folds, more loop-room (max_iter) for the snap to settle.
+    LASSO: ITS OWN A-LADDER, 5 FOLDS, MORE LOOP-ROOM (MAX_ITER) FOR THE SNAP TO SETTLE.
     lasso_alphas = np.logspace(-3, 1, 50)
     lasso_cv = LassoCV(alphas=lasso_alphas, cv=5, max_iter=10000)
     lasso_cv.fit(X_train_scaled, y_train)
     lasso_best_alpha = float(lasso_cv.alpha_)
     n_nonzero_lasso  = int(np.sum(lasso_cv.coef_ != 0))   # the survivors
 
-    # the error-vs-a curves the lab asks for
+    THE ERROR-VS-A CURVES THE LAB ASKS FOR
     ridge_cv_mse_mean = ridge_cv.cv_values_.mean(axis=0)
     lasso_cv_mse_mean = lasso_cv.mse_path_.mean(axis=1)
 

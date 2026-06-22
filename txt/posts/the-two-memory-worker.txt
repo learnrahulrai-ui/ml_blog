@@ -1,4 +1,4 @@
-﻿@title The Two-Memory Worker: How an LSTM Remembers Far-Back Words (RNNs by Hand, Part 2) :: Rahul's ML Blog
+@title The Two-Memory Worker: How an LSTM Remembers Far-Back Words (RNNs by Hand, Part 2) :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -41,7 +41,7 @@
   Pencil out. Pocket A, pocket B, and a row of clerks.
 
 
-  ## Train the Plain Worker (Q4)
+  TRAIN THE PLAIN WORKER (Q4)
 
   IN HAND: the Part 1 factory -- notepad (320,000 dials), one walking worker (2,080), a
   final clerk (33), 322,113 dials total. Study pile of reviews, each 100 word-numbers, exam
@@ -72,7 +72,7 @@
        check your slate: 32,000 / 64 = 500 grabs per loop. 500 x 5 = 2,500 dial-turns.
 
 
-  ## Why the Plain Worker Forgets (the Fade)
+  WHY THE PLAIN WORKER FORGETS (THE FADE)
 
   IN HAND: the plain worker's one recipe, every word:
 
@@ -99,7 +99,7 @@
   Cummins in 2000.)
 
 
-  ## The Two Memories
+  THE TWO MEMORIES
 
   The fix carries TWO memories instead of one. Two pant pockets, A and B, both starting all
   zeros:
@@ -116,7 +116,7 @@
   pocket, and crushing it every word is what made it forget.
 
 
-  ## The Four Little Machines (all read the SAME two things)
+  THE FOUR LITTLE MACHINES (ALL READ THE SAME TWO THINGS)
 
   IN HAND: this word's note (call it the word32), plus memory-B from last word. Memory-A is
   NOT read by any machine -- hold that thought.
@@ -149,7 +149,7 @@
   0..1 voters around it. LSTM = the old RNN cell + three dimmer knobs.
 
 
-  ## READ Is Not MULTIPLY (the knot)
+  READ IS NOT MULTIPLY (THE KNOT)
 
   This is the single hardest knot in the whole chapter, so it gets its own table. A voter is
   BORN FROM one thing and APPLIED TO another -- and they are different things.
@@ -173,7 +173,7 @@
   though they are decided from B.
 
 
-  ## Loudness Is Not Worth
+  LOUDNESS IS NOT WORTH
 
   The most natural wrong assumption, worth its own section: a LOUDER fresh value (say +0.9,
   near the top of the tanh band) must matter MORE than a quiet one. It does not. The fresh
@@ -195,7 +195,7 @@
   it has loudness but no separate judge of worth.
 
 
-  ## The Combine, with Real Numbers
+  THE COMBINE, WITH REAL NUMBERS
 
   IN HAND: four machines have produced, for this word: a fresh value, a keep-fraction, an
   admit-fraction, a show-fraction (each a row of 32 numbers). Memory-A and memory-B from
@@ -288,7 +288,7 @@
        Kept half the old long memory (2.0) and admitted all the fresh value (2.0).
 
 
-  ## Build and Train the LSTM (Q5, Q6) -- One Word Changed
+  BUILD AND TRAIN THE LSTM (Q5, Q6) -- ONE WORD CHANGED
 
   IN HAND: Part 1's factory was Input -> Embedding(notepad) -> SimpleRNN(32) -> Dense(1).
   The LSTM factory is the SAME factory with ONE word swapped: SimpleRNN becomes LSTM.
@@ -303,7 +303,7 @@
   point of the extra wiring is that one improvement.
 
 
-  ## Read It Both Ways: the BiLSTM (Q7)
+  READ IT BOTH WAYS: THE BILSTM (Q7)
 
   IN HAND: one LSTM worker walks the review front-to-back, building a memory in which word N
   has heard words 1..N -- everything BEFORE it, nothing after.
@@ -332,7 +332,7 @@
   directions.
 
 
-  ## All Four, Head to Head, Honestly (Q10 preview)
+  ALL FOUR, HEAD TO HEAD, HONESTLY (Q10 PREVIEW)
 
   IN HAND: four factories now exist, all sharing the same notepad and final-clerk shape,
   differing only in floor 2:
@@ -364,7 +364,7 @@
                     memory chain, no votes. That is a later chapter.
 
 
-  ## Honest Note: Engineered, Not Derived
+  HONEST NOTE: ENGINEERED, NOT DERIVED
 
   Worth saying plainly, because it is true and rarely said. The plain worker's fade is a
   real, derivable problem -- you can watch the memory get crushed 90 times. But the EXACT
@@ -381,7 +381,7 @@
   historical accident, not a law.
 
 
-  ## Common Tripwires
+  COMMON TRIPWIRES
 
   Built from the live derivation -- every confusion actually hit, logged so it stays fixed.
 
@@ -454,31 +454,31 @@
     swallowed every earlier B. It is not tied to any single word.
 
 
-  ## The Numbers, in Python
+  THE NUMBERS, IN PYTHON
 
   Every step above -- training cost, the combine, the dial count -- done by pencil.
   Here the exact numbers are spelled out in Python.
 
     import math
 
-    # --- Training cost: 40,000 reviews, grab=64, 5 loops ---
+    --- TRAINING COST: 40,000 REVIEWS, GRAB=64, 5 LOOPS ---
     study_reviews, grab_size, loops = 40000, 64, 5
     grabs_per_loop = study_reviews // grab_size   # 625
     total_dial_turns = grabs_per_loop * loops     # 3,125
 
-    # --- Loudness is not worth: two slots compared ---
+    --- LOUDNESS IS NOT WORTH: TWO SLOTS COMPARED ---
     fresh_loud,  admit_loud  = 0.9, 0.10   # loud value, nearly zero admission
     fresh_quiet, admit_quiet = 0.2, 0.95   # quiet value, nearly full admission
     land_loud  = fresh_loud  * admit_loud    # 0.09  -- nearly nothing lands
     land_quiet = fresh_quiet * admit_quiet   # 0.19  -- more lands despite smaller value
 
-    # --- One-slot combine: the core arithmetic ---
+    --- ONE-SLOT COMBINE: THE CORE ARITHMETIC ---
     old_A, fresh, keep_frac, admit_frac, show_frac = 5.0, 0.6, 0.9, 0.2, 0.7
     new_A = keep_frac * old_A  +  admit_frac * fresh   # 0.9*5.0 + 0.2*0.6 = 4.62
     tanh_new_A = math.tanh(new_A)                       # ~1.00 (A grew large)
     new_B = show_frac * tanh_new_A                      # 0.7 * 1.0 = 0.70
 
-    # --- 3-slot combine (element-wise, no summing) ---
+    --- 3-SLOT COMBINE (ELEMENT-WISE, NO SUMMING) ---
     A1, A2, A3        = 5.0, -2.0, 0.3    # memory-A slots
     k1, k2, k3        = 0.9,  0.5, 1.0    # keep-frac slots
     f1, f2, f3        = -0.8, 0.6, 0.2    # fresh value slots
@@ -496,14 +496,14 @@
     newB2 = s2 * tA2   # -0.15
     newB3 = s3 * tA3   # 0.45
 
-    # --- Dial counts ---
+    --- DIAL COUNTS ---
     one_machine  = 32*32 + 32*32 + 32   # 2,080  (word-paper + memory-paper + nudge)
     lstm_dials   = 4 * one_machine       # 8,320  (four little RNN cells)
     bilstm_dials = 2 * lstm_dials        # 16,640 (two LSTMs, opposite directions)
     final_clerk_bilstm = 64 + 1          # 65     (glued memory is 64 wide)
 
 
-  ## The Labels, Last
+  THE LABELS, LAST
 
     plain walking worker             SimpleRNN (vanilla recurrent layer)
     the fade / worn-down memory      vanishing gradient over time steps
@@ -527,13 +527,12 @@
     nudge per machine                bias vector, shape (units,)
 
 
-  ## Code, If You Want It
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer; this section is for the day you meet one.
 
   Train the plain worker (Q4) -- a routine fit:
 
-  ```python
   history_rnn = model_rnn.fit(
       X_train, y_train,
       epochs=5,                          # 5 read-throughs of the study pile
@@ -541,11 +540,9 @@
       validation_data=(X_test, y_test),  # this lab grades on the test pile
   )
   q4_val_acc = round(float(history_rnn.history['val_accuracy'][-1]), 3)  # last loop
-  ```
 
   Build the LSTM (Q5) -- it is the Q3 factory with ONE word changed:
 
-  ```python
   from tensorflow.keras.models import Sequential
   from tensorflow.keras.layers import Input, Embedding, LSTM, Dense
 
@@ -557,22 +554,18 @@
   model_lstm.compile(optimizer="adam",
                      loss="binary_crossentropy", metrics=["accuracy"])
   # model_lstm.summary() shows floor 2 = 8,320 dials -- four little RNN cells.
-  ```
 
   Train the LSTM (Q6) -- same fit, expect val_acc usually >= the RNN's:
 
-  ```python
   history_lstm = model_lstm.fit(
       X_train, y_train,
       epochs=5, batch_size=64,
       validation_data=(X_test, y_test),
   )
   q6_val_acc = round(float(history_lstm.history['val_accuracy'][-1]), 3)
-  ```
 
   The BiLSTM (Q7) -- wrap the LSTM to read both ways:
 
-  ```python
   from tensorflow.keras.layers import Bidirectional
 
   model_bilstm = Sequential()
@@ -587,7 +580,6 @@
                                     validation_data=(X_test, y_test))
   q7_val_acc = round(float(history_bilstm.history['val_accuracy'][-1]), 3)
   # floor 2 = 16,640 dials (2 x 8,320); the glued memory is 64 wide.
-  ```
 
   Compare all four val-accuracies and pick the best (Q10) -- one number per factory, read
   off the sealed pile. The Transformer (attention) -- which kills the walk entirely and lets
