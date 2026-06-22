@@ -229,6 +229,7 @@ __marimo__/
 /feed.xml
 /sitemap.xml
 # Audit notes and reports -- stay local, never push
-*audit*.txt
-*audit*.md
+*audit*
+*Audit*
+markdownaudti
 
