@@ -32,7 +32,7 @@
   The other is a trick of units, and it is the kind of mistake that ends up in published
   papers.
 
-  ** KEY: THE TANGLED WIRES PARADOX -- why reading one dial in isolation is a lie
+  KEY: THE TANGLED WIRES PARADOX -- why reading one dial in isolation is a lie
      Suppose dial A = +5. Does that mean column A pushes the answer up hard?
      Not necessarily. Suppose column A and column B are highly correlated (near identical).
      The machine may set dial A = +5 and dial B = -4 because they fight each other to
@@ -139,7 +139,7 @@
 
   AND DON'T OVER-TRUST A SINGLE DIAL
 
-  ** KEY: "HOLDING THE OTHERS FIXED" CAN BE A FICTION
+  KEY: "HOLDING THE OTHERS FIXED" CAN BE A FICTION
      A dial means "move this column by one, hold the rest still."
      But displacement, horsepower and weight rise together -- heavy cars tend to have big
      engines.

@@ -34,14 +34,14 @@
   And from here on every choice we make is haunted by which kind of mistake
   we can least afford to make.
 
-  ** KEY: THE INFINITE RULER TRAP -- why a straight stick cannot predict chances
+  KEY: THE INFINITE RULER TRAP -- why a straight stick cannot predict chances
      Try a straight line: chance = 0.2 + 0.1 * (age).
      A 50-year-old gets chance = 0.2 + 5.0 = 5.2.  That is 520%.
      A straight stick reaches infinity. A chance cannot go above 1 or below 0.
      THE FIX: the S-curve (sigmoid). It crushes any number down into 0-to-1.
      No matter how high the dial sum goes, the curve flattens against the ceiling.
 
-  ** KEY: THE LAZY DOCTOR PARADOX -- why accuracy alone is a deadly trap
+  KEY: THE LAZY DOCTOR PARADOX -- why accuracy alone is a deadly trap
      Suppose 99 out of 100 lumps are benign.
      A lazy doctor who never looks at the scan and shouts "WELL!" to everyone:
        accuracy = 99 out of 100 = 99%.  The hospital board gives him a medal.
@@ -394,7 +394,7 @@
     recall    = 0.00   <- catches nobody (CAUGHT = 0, so 0 / total sick = 0)
     precision = N/A    <- never shouts sick, no CAUGHT and no ALARM, so 0/0, undefined
 
-  ** KEY: IN CANCER SCREENING, RECALL IS THE NORTH STAR
+  KEY: IN CANCER SCREENING, RECALL IS THE NORTH STAR
      Recall = of the truly sick, the share the machine caught = CAUGHT / (CAUGHT + MISSED).
      Missing a sick person is the catastrophe.
      You can tolerate some ALARM, since extra biopsies cost money, not lives.

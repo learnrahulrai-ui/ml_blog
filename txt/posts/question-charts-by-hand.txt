@@ -27,7 +27,7 @@
   You keep splitting until each group's answers are tight enough.
   Therefore that group's average is a good guess for anyone who lands in it.
 
-  ** KEY: THE ENDLESS INTERROGATION TRAP -- when to stop asking questions
+  KEY: THE ENDLESS INTERROGATION TRAP -- when to stop asking questions
      If you keep asking yes/no questions, eventually every bucket has exactly 1 person.
      At that point you have built a "perfect" decision tree -- every bucket is pure.
      But you just built a filing cabinet that memorised the study pile.
@@ -368,7 +368,7 @@
            exceed column count.  the real ceiling is PEOPLE running out (a pile
            of 1 cannot be split).
 
-  ** KEY: THE TREE HAS NO FORMULA AND NO DIALS
+  KEY: THE TREE HAS NO FORMULA AND NO DIALS
      There are no multipliers anywhere.  No sum of weighted columns.  No algebra.
      Just questions and a number at each end.  The "flexibility knob" is DEPTH: how
      many questions deep before you hit an answer.

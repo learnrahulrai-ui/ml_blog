@@ -21,7 +21,7 @@
   [Chapter 1, Part 3](straight-stick-linear-regression.txt) first did it -- and then it
   catches one honest trap that nobody warns you about until it is too late.
 
-  ** KEY: THE DUMB ADDER TRAP -- how a machine that only multiplies can adjust its own dials
+  KEY: THE DUMB ADDER TRAP -- how a machine that only multiplies can adjust its own dials
      The machine only knows how to multiply and add. It does not "know" calculus.
      Yet gradient descent requires a derivative -- the slope of the loss at the current dial.
      PARADOX: how does a multiplier calculate a slope?

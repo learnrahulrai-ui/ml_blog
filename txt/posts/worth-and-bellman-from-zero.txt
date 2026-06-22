@@ -300,7 +300,7 @@
 
     V*( spot ) = max( 5.5,  6.5 ) = 6.5    ← right is best
 
-  ** KEY TRAP: the optimality equation holds for V* alone -- NOT for any map that uses
+  KEY TRAP: the optimality equation holds for V* alone -- NOT for any map that uses
      greedy as its rule. Going greedy on a WRONG worth-map does not make that map obey
      the equation. A map of all-zeros applied greedily just takes the biggest immediate
      reward and has nothing to do with V*. The equation is a statement about V* itself;

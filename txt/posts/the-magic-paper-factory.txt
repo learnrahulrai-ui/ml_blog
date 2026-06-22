@@ -55,7 +55,7 @@
       row 2:  [ 5 ][45 ][...]  ...
               ...              (32 rows tall)
 
-  ** KEY: THE LINEAR PRISON TRAP -- why you must bend the straight line
+  KEY: THE LINEAR PRISON TRAP -- why you must bend the straight line
      Suppose the factory is all straight additions and multiplications with no bends.
      Layer 1 output = 2 * input.
      Layer 2 output = 3 * (Layer 1) = 6 * input.

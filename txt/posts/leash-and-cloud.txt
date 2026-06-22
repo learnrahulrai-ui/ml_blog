@@ -55,7 +55,7 @@
      It is MEDIUM LEASH (C=1.0) vs TIGHTER LEASH (C=0.1).
      To see a genuinely unleashed machine you would have to pass penalty=None explicitly.
 
-  ** KEY: THE HERO WORSHIP TRAP -- why one loud column makes the machine fragile
+  KEY: THE HERO WORSHIP TRAP -- why one loud column makes the machine fragile
      Column 7 (radius) is strongly predictive. The machine loves it and sets dial = 40.
      All other columns now barely matter -- the machine is a one-column dictator.
      A new patient arrives with a slightly unusual radius, and the predicted chance
@@ -410,7 +410,7 @@
   Two completely different approaches, same result.
   That is not a coincidence.
 
-  ** KEY: AGREEMENT = CLEAN DATA, GENUINELY SEPARABLE CLASSES
+  KEY: AGREEMENT = CLEAN DATA, GENUINELY SEPARABLE CLASSES
      When the two methods agree, the data is telling you the answer.
      The S-curve machine sets dials to make the true bins as likely as it can.
      LDA reads the two cloud shapes instead.

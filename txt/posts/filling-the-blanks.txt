@@ -23,7 +23,7 @@
   empty -- nobody watches everything.  Fill a blank well and you can say "you, who has not
   seen this film, will probably rate it 4.5 stars" -- a recommendation.
 
-  ** KEY: THE ZERO GRAVITY TRAP -- why you cannot ignore blank cells, and cannot fill them with zero
+  KEY: THE ZERO GRAVITY TRAP -- why you cannot ignore blank cells, and cannot fill them with zero
      If you delete every row with a blank, you throw away most of the data.
      (A user who rated 3 out of 1,700 films has 1,697 blank cells -- delete the row and
      you lose that user entirely.)

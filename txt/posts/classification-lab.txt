@@ -63,7 +63,7 @@
   Log-loss drives toward infinity instead.
   Which means the gradient (the downhill slope the machine slides on) always points away from confident wrong answers.
 
-  ** KEY: USE LOG-LOSS FOR CLASSIFICATION, MSE FOR REGRESSION
+  KEY: USE LOG-LOSS FOR CLASSIFICATION, MSE FOR REGRESSION
      sklearn's LogisticRegression minimises log-loss by default. MSE has no ceiling on a
      chance output in [0,1], so it produces badly calibrated probabilities.
 
@@ -320,7 +320,7 @@
   So it cannot be flattered by a large well pile.
   High area under the PR curve means the machine finds sick cases AND its sick shouts are reliable.
 
-  ** KEY: USE ROC/AUC FOR BALANCED CLASSES; USE PR CURVE FOR SKEWED CLASSES
+  KEY: USE ROC/AUC FOR BALANCED CLASSES; USE PR CURVE FOR SKEWED CLASSES
      A machine with AUC 0.95 can have precision 0.10 on a 1:100 sick-to-well pile.
      PR curves surface this; ROC curves hide it.
 

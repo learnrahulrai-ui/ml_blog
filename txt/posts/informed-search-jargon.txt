@@ -40,7 +40,7 @@
   - f (evaluation):         another name for g + h. The same thing. The textbook uses f; this page
                             uses g + h so the arithmetic stays visible.
 
-  ** KEY: THE OPTIMISM RULE -- why the compass must never overestimate
+  KEY: THE OPTIMISM RULE -- why the compass must never overestimate
      To be guaranteed to find the shortest path, the compass (h) must NEVER guess
      a cost higher than the true remaining cost. If h says "3 miles left" when the
      truth is 2, the search might skip the 2-mile path and lock onto a longer one.

@@ -25,7 +25,7 @@
   exact formula. No searching, no luck. This post derives that formula by hand on three
   rows, then shows it is the very same arithmetic the toolbox runs on sixteen thousand.
 
-  ** KEY: THE BOTTOM OF THE BOWL PARADOX -- why the best dials come from setting slope to zero
+  KEY: THE BOTTOM OF THE BOWL PARADOX -- why the best dials come from setting slope to zero
      You could try every possible dial value and pick the one with the smallest total miss.
      But "every possible" is infinite -- the dial could be 1.0, 1.001, 1.0001, ...
      THE KEY INSIGHT: the total-miss bowl has exactly one lowest point, and at that point
@@ -165,7 +165,7 @@
   gives itself back (H^2 = H). trace(H) equals the number of fitted dials -- here the
   nudge b plus the dial w, 1 + 1 = 2. No point on the flat sheet sits closer to y.
 
-  ** KEY: SAME WORK, BIGGER SHEET
+  KEY: SAME WORK, BIGGER SHEET
      The three-row pencil solve is identical to what the toolbox runs on 16,000-odd rows
      (the working pile: 20,640 x 8/10 = 16,512) and 8 columns -- only the size of X^T X
      changes. Fitted dials land in m.coef_, the fixed

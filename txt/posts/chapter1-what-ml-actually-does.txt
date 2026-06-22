@@ -28,7 +28,7 @@
   Two later posts then take the two rules apart screw by screw.
   For now, stand back and see the whole thing at once.
 
-  ** KEY: THE 1950 CONTRACT
+  KEY: THE 1950 CONTRACT
      Pretend it is 1950.  Print these pages.  Pencils, graph paper, a blackboard --
      and a room of infinite, tireless clerks for the heavy arithmetic.  No computer,
      no calculator, anywhere in the teaching.  Every number is recomputed where it is
@@ -76,7 +76,7 @@
   Anyone can memorise answers they have been shown.
   The trick is being right about the houses you have not seen.
 
-  ** KEY: THE CANCEL-OUT TRAP -- why squaring the miss is not optional
+  KEY: THE CANCEL-OUT TRAP -- why squaring the miss is not optional
      Suppose you average the raw misses to see how wrong a guesser is.
      House A: truth 120, guess 100  -> miss = +20
      House B: truth  80, guess 100  -> miss = -20
@@ -122,7 +122,7 @@
   But that rule then stumbles on new rows.
   Which means the drawer is the only number that does not lie.
 
-  ** KEY: SHUFFLE FIRST
+  KEY: SHUFFLE FIRST
      Rows often arrive sorted by district. Shuffle with a fixed starting point so the
      split is reproducible and not ordered. The fixed point controls reproducibility; the
      shuffle removes order bias.

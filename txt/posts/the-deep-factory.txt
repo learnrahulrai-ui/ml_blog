@@ -31,7 +31,7 @@
   writes ONE score, (2) the shrink boss halves the sheet by keeping the loudest of each 2x2.
   Everything else is rebuilt here.
 
-  ** KEY: THE LINEAR PRISON TRAP -- why the bend after each layer is not optional
+  KEY: THE LINEAR PRISON TRAP -- why the bend after each layer is not optional
      Suppose every layer only multiplies: layer-1 = 2*x, layer-2 = 3*(2*x) = 6*x.
      A fifty-layer factory with no bends is still just one giant multiplier.
      You added fifty rooms and gained nothing.

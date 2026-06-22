@@ -59,7 +59,7 @@
 
   Two words go in. Two richer words come out. That is one block.
 
-  ** KEY: THE ATTENTION SCALING TRAP -- why transformers cannot read entire books
+  KEY: THE ATTENTION SCALING TRAP -- why transformers cannot read entire books
      Self-attention compares every word to every other word.
      A 1,000-word document: 1,000 x 1,000 = 1 million comparisons per layer.
      A 100,000-word book: 100,000 x 100,000 = 10 BILLION comparisons per layer.

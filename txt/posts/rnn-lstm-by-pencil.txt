@@ -33,7 +33,7 @@
       "boring and a total waste of time"  -->   [  ???  ]  --> 0  (hated)
       "not good at all , skip it"         -->   [  ???  ]  --> ???
 
-  ** KEY: THE VANISHING GRADIENT TRAP -- why plain memory crushes the signal
+  KEY: THE VANISHING GRADIENT TRAP -- why plain memory crushes the signal
      A mistake happens on word 100 of a review. Backpropagating through 100 steps
      means multiplying the error signal by some number (say 0.5) one hundred times:
      0.5^100 = 0.0000000000000000000000000000008.

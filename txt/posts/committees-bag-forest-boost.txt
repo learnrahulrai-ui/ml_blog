@@ -35,7 +35,7 @@
     BOOSTING (Line of fixers, tiny stumps):
       stump-1 --> stump-2 (fixes stump-1's leftovers) --> stump-3 --> ... --> SUM
 
-  ** KEY: THE ECHO CHAMBER TRAP -- why 100 identical trees do not help
+  KEY: THE ECHO CHAMBER TRAP -- why 100 identical trees do not help
      If every tree reads the same full dataset and uses the same split rule,
      all 100 trees make the exact same mistake at the exact same time.
      A committee of 100 clones is no smarter than 1 clone.
@@ -81,7 +81,7 @@
      the 200 trees would be identical and averaging would do nothing.
      The randomness IS the point.
 
-  ** KEY: ONE TREE = JUMPY GARBAGE. 200 TREES AVERAGED = STEADY AND TRUSTWORTHY.
+  KEY: ONE TREE = JUMPY GARBAGE. 200 TREES AVERAGED = STEADY AND TRUSTWORTHY.
      The jumps point in different directions and cancel when averaged.  This is the
      "wisdom of the crowds."  No single tree improved -- only the average did.
 
@@ -210,7 +210,7 @@
   Fewer columns per cut -> trees differ more -> averaging steadier -> better exam error.
   But too few -> each tree is too weak.  Sweep all three and let the exam-error pick.
 
-  ** KEY: FOREST = BAGGING + ONE KNOB (max_features)
+  KEY: FOREST = BAGGING + ONE KNOB (max_features)
      The only real news is that each cut sees fewer columns.  Everything else --
      bootstrap piles, build trees, average guesses, OOB exam -- is identical to bagging.
 

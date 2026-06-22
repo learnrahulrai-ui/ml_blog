@@ -22,7 +22,7 @@
   it climbs to the answer with NO gradient, no per-slot feedback, nothing but a single
   "how wrong" number per guess and the freedom to let bad guesses die.
 
-  ** KEY: THE INCEST TRAP -- why picking only the best creates a stuck population
+  KEY: THE INCEST TRAP -- why picking only the best creates a stuck population
      If you only breed the 2 highest-scoring solutions, their children are nearly identical.
      In 5 generations the entire population is clones of one small corner of the search space.
      The machine found a local hill and stopped. The mountain next door goes unexplored.

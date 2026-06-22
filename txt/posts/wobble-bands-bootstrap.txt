@@ -36,7 +36,7 @@
   We need to know how much it would jump around if the world had dealt us a slightly
   different crowd.
 
-  ** KEY: THE ONE UNIVERSE TRAP -- how to fake 200 experiments from one dataset
+  KEY: THE ONE UNIVERSE TRAP -- how to fake 200 experiments from one dataset
      To know your error margin, you need to run the experiment 1,000 times.
      But you only have money and data for one run.
      THE FIX: the Bootstrap. Treat your one dataset as if it were the entire universe.
@@ -197,7 +197,7 @@
   over-confident, the same self-graded-exam lie from Chapter 1. The left-out third keeps it
   honest for free.
 
-  ** KEY: THE BAND IS THE REPORT, NOT THE SINGLE NUMBER
+  KEY: THE BAND IS THE REPORT, NOT THE SINGLE NUMBER
      One dial value is a point; the wobble band is the truth around it. A wide band on the
      error means the machine itself is shaky -- it would guess differently if the patients
      had been different. Reporting the band instead of the bare number is the difference

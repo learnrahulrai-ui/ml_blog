@@ -12,7 +12,7 @@
   Who Am I
   --------
   Hi, I'm Rahul Rai. I write about machine learning from first principles -- not the
-  hype version, the actual nuts-and-bolts. What *is* a rule, really? Why hide part of
+  hype version, the actual nuts-and-bolts. What IS a rule, really? Why hide part of
   the pile? What is the machine actually doing when it guesses?
 
   One rule on this blog: no jargon until it's been earned. If I can't explain something

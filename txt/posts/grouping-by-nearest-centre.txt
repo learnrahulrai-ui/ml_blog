@@ -34,7 +34,7 @@
   That is it.
   Two moves, on a loop.
 
-  ** KEY: THE FROZEN CENTRE TRAP -- why the chicken-and-egg is not a problem
+  KEY: THE FROZEN CENTRE TRAP -- why the chicken-and-egg is not a problem
      The two moves seem circular: to assign dots you need centres, but to find
      centres you need to know which dots belong together. Where do you start?
      THE FIX: guess. Drop K centres anywhere at random.
@@ -296,7 +296,7 @@
   You just pick the K with the HIGHEST peak.
   A clean maximum instead of a fuzzy corner.
 
-  ** KEY: TWO RULERS, SAME QUESTION, PICK DIFFERENTLY
+  KEY: TWO RULERS, SAME QUESTION, PICK DIFFERENTLY
      The elbow reads TIGHTNESS (squared gaps to centres) and you hunt a BEND.
      The fit score reads HOME-VS-NEXT-DOOR gaps and you hunt a PEAK.
      They answer the same "how many groups?" question with different measurements,

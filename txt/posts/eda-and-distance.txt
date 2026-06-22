@@ -32,7 +32,7 @@
   Which means the gap between two rows gets hijacked by the loudest column.
   So you must put every column on the SAME ruler first.
 
-  ** KEY: THE MISSING TAPE MEASURE PARADOX -- why raw distance fails in many columns
+  KEY: THE MISSING TAPE MEASURE PARADOX -- why raw distance fails in many columns
      If you try to measure distance in 100 dimensions using raw values:
      one column measured in hundreds (like Assault: 0 to 292) shouts much louder
      than one measured in tens (like Murder: 0 to 17).

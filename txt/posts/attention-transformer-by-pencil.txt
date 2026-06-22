@@ -19,7 +19,7 @@
   every other word -- no carrying, no fade. That is attention. The Transformer is what you get
   when you stack this on top of a plain classifier.
 
-  ** KEY: THE FORGOTTEN PRONOUN TRAP -- why a word's meaning depends on the whole sentence
+  KEY: THE FORGOTTEN PRONOUN TRAP -- why a word's meaning depends on the whole sentence
      "The animal didn't cross the street because it was too tired."
      "The animal didn't cross the street because it was too wide."
      The word "it" is identical in both sentences. But "it" means "animal" in the first
