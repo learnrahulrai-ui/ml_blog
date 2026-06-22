@@ -10,7 +10,7 @@
   Posted: 2026-06-22 . Author: Rahul Rai . Tags: reinforcement-learning, bellman, mdp, value-function, discount, by-hand
   ============================================================================================
 
-  PATH . post 33/35 . part 2 of 4 in Chapter 12 -- Reinforcement Learning
+  PATH . post 33/36 . part 2 of 5 in Chapter 12 -- Reinforcement Learning
     <- prev:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt)
        next:  [Chapter 12, Part 3: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt) ->
 

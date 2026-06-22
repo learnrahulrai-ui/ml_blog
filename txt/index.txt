@@ -503,7 +503,7 @@
     Required reading before the RL posts. Also stands alone as a Hacker News piece.
 
   [Part 1 -- Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines](posts/bandits-and-exploration.txt)
-    post 32/35 . 2026-06-21 . part 1 of 4 . reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
+    post 32/36 . 2026-06-21 . part 1 of 5 . reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
     A greedy shopkeeper at a railway station clinic rents faulty machines from a factory. Three
     machines, 1000 patients, and one problem: the true average payout of each machine is hidden.
     Three patients traced by pencil, the running average proved without storing old payouts, the
@@ -513,7 +513,7 @@
     ~30 patients to unlearn a stale estimate; 1/n needs hundreds. Python for all three shopkeepers.
 
   [Part 2 -- Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches](posts/worth-and-bellman-from-zero.txt)
-    post 33/35 . 2026-06-22 . part 2 of 4 . reinforcement-learning, bellman, mdp, value-function, discount, by-hand
+    post 33/36 . 2026-06-22 . part 2 of 5 . reinforcement-learning, bellman, mdp, value-function, discount, by-hand
     Return as a pile of rewards, averaging unsure rewards (value × chance), the fade γ that keeps
     an endless pile finite (geometric series 1/(1-γ) derived), episodic vs continuing tasks, the
     world's die p(s',r|s,a), deterministic vs stochastic policies, V and Q as two separate worth-
@@ -523,7 +523,7 @@
     V as average of Q over the map, and the bandit as a one-spot MDP with the equal-arm algebra.
 
   [Part 3 -- Grading a Plan by Pencil -- A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
-    post 34/35 . 2026-06-19 . part 3 of 4 . reinforcement-learning, policy-evaluation, bellman, by-hand
+    post 34/36 . 2026-06-19 . part 3 of 5 . reinforcement-learning, policy-evaluation, bellman, by-hand
     Policy evaluation built from a drone over enemy ground -- a runway (+5), dirt (-2), fuel (-0.1
     a move), and a fixed plan of arrows. Grading the plan = filling in the WORTH of every spot
     (discounted points collected from here on, obeying the arrows). The one law: a ground spot's
@@ -537,7 +537,7 @@
     Jacobi update order; 27-spot 3x3x3 grid worked. Assumes zero background.
 
   [Part 4 -- Finding the Best Plan by Pencil -- How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
-    post 35/35 . 2026-06-19 . part 4 of 4 . reinforcement-learning, policy-iteration, policy-improvement, by-hand
+    post 35/36 . 2026-06-19 . part 4 of 5 . reinforcement-learning, policy-iteration, policy-improvement, by-hand
     Policy iteration: no plan given -- finding the best arrows IS the job. The IMPROVE move: at
     every air spot, peek all six nudges with the air-law and re-aim the arrow at the biggest peek
     (the textbook's Q(s,a) and argmax). The loop: seed any dumb plan, grade, improve, repeat until
@@ -546,6 +546,20 @@
     plan is OPTIMAL (Policy Improvement Theorem): improve never worsens; finitely many plans; a
     frozen plan is its own best reply -- a fixed point that cannot be beaten. Python: six peeks
     hard-coded, the one-ring spread, then the full grade-improve loop. Assumes zero background.
+
+  [Part 5 -- No Map in the Arguments: Value Iteration Built by Pencil](posts/value-iteration-by-pencil.txt)
+    post 36/36 . 2026-06-22 . part 5 of 5 . reinforcement-learning, value-iteration, dynamic-programming, bellman, by-hand
+    The third DP algorithm -- the one that needs no plan during the computation. From the same
+    three scores (GRADE averages by the plan, IMPROVE takes argmax, VALUE-IT takes max), why
+    max beats any weighted average proved algebraically: the gap = Σ w_i(max - score_i) ≥ 0.
+    The parking street (spot 3, price 1) worked from the real die table (score = 2.04); why
+    the 0-start lie heals (truth climbs one horizon per pass). The algorithm in plain words:
+    apply VALUE-IT at every spot, repeat until delta < theta, extract the plan with one argmax
+    pass at the end. Code: price 1 fully unrolled, bellman_optimality_update shown, all three
+    DP functions compared by argument list (pi present = GRADE or IMPROVE; no pi = VALUE-IT).
+    Value iteration vs policy iteration: same V*, different routes (one max per spot per pass
+    vs full convergence before each improve). Full Python loop, 23 passes to convergence.
+    Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------

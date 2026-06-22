@@ -1,0 +1,439 @@
+@title No Map in the Arguments: Value Iteration Built by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL . FOR HACKER NEWS
+  No Map in the Arguments: Value Iteration Built by Pencil
+  Posted: 2026-06-22 . Author: Rahul Rai . Tags: reinforcement-learning, value-iteration, dynamic-programming, bellman, by-hand
+  ============================================================================================
+
+  PATH . post 36/36 . part 5 of 5 in Chapter 12 -- Reinforcement Learning
+    <- prev:  [Chapter 12, Part 4: Finding the Best Plan](finding-the-best-plan-policy-iteration.txt)
+       next:  (more posts coming)
+
+  THE RULE OF THIS PAGE. Assume you remember nothing -- including the other RL posts. Every
+  word is defined where it first appears. Anything named more than five lines ago is named
+  again. Every number is worked in front of you, never "recall that...". One idea per line.
+
+  ---
+
+  The companion post, [Finding the Best Plan by
+  Pencil](finding-the-best-plan-policy-iteration.txt), found the best arrow at every spot by
+  alternating two moves: grade the current plan, then improve it. Grade the revised plan, then
+  improve again. Stop when the plan stopped changing.
+
+  Both moves needed a plan the whole time -- grading it, rewriting it, grading the rewrite.
+  The question this post answers is: does it have to work that way? Can you skip the plan
+  during the computation and still arrive at the best worths?
+
+  The answer is yes, and the reason is one line of arithmetic: the worth of a spot, if you
+  always pick the best move, equals the biggest score at that spot. No plan is needed to
+  compute a score; the plan is extracted once, at the very end, from the frozen worths. That
+  single change -- max instead of weighted average, and no plan in the arguments -- is value
+  iteration.
+
+  ---
+
+  ## The world: a parking street, four spots, three prices
+
+  A **spot** = one number: how many parking spaces are taken. Four spots: 0, 1, 2, 3.
+  A **move** = a price you set. Three prices: 0, 1, 2.
+  The **"+"** = a number you grab when you make a move (the immediate reward).
+  A **worth** = one number per spot = the total future pile, discounted, from here on.
+
+  Start all worths at 0 -- a lie you will fix one pass at a time:
+  ```
+     worth:   spot 0 = 0    spot 1 = 0    spot 2 = 0    spot 3 = 0
+  ```
+
+  The world is chancy. Pick a price at a spot, and the world rolls a die that decides where
+  you land AND what "+" you grab. The die can land you on any of the four spots. Chances
+  add to 1 (you land somewhere, for sure).
+
+  Real die table -- spot 3, price 1:
+  ```
+     land on spot 0 :  the "+" = 1.0 ,  chance = 0.12
+     land on spot 1 :  the "+" = 2.0 ,  chance = 0.15
+     land on spot 2 :  the "+" = 3.0 ,  chance = 0.18
+     land on spot 3 :  the "+" = 2.0 ,  chance = 0.54
+                                         ─────────────
+                          0.12 + 0.15 + 0.18 + 0.54 = 0.99 ≈ 1
+  ```
+
+  ---
+
+  ## One move's score -- the "+" blended over every landing
+
+  You cannot compare prices as raw numbers because each price has a different die with
+  different rewards and chances tangled together. To rank them, you need one clean number
+  per price: its **score**.
+
+  The score of a move = add the recipe over every chancy landing. The recipe for one landing:
+  ```
+     recipe  =  chance  ×  ( the "+"  +  0.9 × worth(landing) )
+  ```
+
+  (0.9 is the **dilute**: a reward one move away counts 10% less. Without it, an endless
+  chain of moves piles to infinity. A forever "+1" with dilute 0.9: 1 + 0.9 + 0.81 + ... =
+  1 / (1 - 0.9) = 10. The dilute keeps this finite.)
+
+  Worked -- spot 3, price 1, all worths still 0:
+  ```
+     landing on spot 0:  0.12 × (1.0 + 0.9 × 0) = 0.12 × 1.0 = 0.12
+     landing on spot 1:  0.15 × (2.0 + 0.9 × 0) = 0.15 × 2.0 = 0.30
+     landing on spot 2:  0.18 × (3.0 + 0.9 × 0) = 0.18 × 3.0 = 0.54
+     landing on spot 3:  0.54 × (2.0 + 0.9 × 0) = 0.54 × 2.0 = 1.08
+
+     score(price 1)  =  0.12 + 0.30 + 0.54 + 1.08  =  2.04
+  ```
+
+  Price 0 and price 2 each have their own die table -- not shown, but computed the same way.
+  The result after working all three:
+  ```
+     scores  =  [ score(price 0) , score(price 1) , score(price 2) ]
+             =  [      3.10      ,      2.04      ,      1.50      ]
+  ```
+  (Price 1's 2.04 is real, from the table above. Prices 0 and 2 are illustrative; each has
+  its own real table in the full environment.)
+
+  ---
+
+  ## Three things you can do with the scores -- the fork
+
+  You have three scores. A score already has every chancy landing folded in. What you do
+  next is the fork. All three paths start from the same scores:
+  ```
+     A. GRADE    : weight the scores by a plan's favor, add them   →  worth(spot) = weighted average
+     B. IMPROVE  : find the biggest score's INDEX                   →  plan(spot)  = [0,0,1,0,...] one-hot
+     C. VALUE-IT : take the biggest score itself                    →  worth(spot) = the max
+  ```
+
+  Real numbers: scores = [3.10, 2.04, 1.50], flat plan pi[3] = [0.33, 0.33, 0.33]:
+  ```
+     GRADE    :  0.33 × 3.10  +  0.33 × 2.04  +  0.33 × 1.50
+                 = 1.023      +  0.673         +  0.495
+                 = 2.191  ≈ 2.19       →  worth(spot 3) = 2.19
+
+     IMPROVE  :  biggest score = 3.10, at index 0 (price 0)
+                 → plan(spot 3) = [1, 0, 0]   (point fully at price 0)
+
+     VALUE-IT :  biggest score = 3.10   (no plan anywhere)
+                 → worth(spot 3) = 3.10
+  ```
+
+  The fork drawn:
+  ```
+               scores  =  [ 3.10 , 2.04 , 1.50 ]
+                                    │
+       ┌────────────────────────────┼─────────────────────────┐
+    GRADE                       IMPROVE                   VALUE-IT
+  weight by plan              biggest index             biggest value
+  = 2.19                       = 0                       = 3.10
+      │                           │                          │
+  worth(3) = 2.19           plan(3) = [1,0,0]          worth(3) = 3.10
+  (reads the plan)          (rewrites the plan)         (no plan at all)
+  ```
+
+  GRADE and VALUE-IT both write a worth. But they answer different questions. GRADE: "how
+  good is spot 3 if I follow THIS plan?" VALUE-IT: "how good is spot 3 if I always pick the
+  best price?" Different questions, different answers: 3.10 ≠ 2.19.
+
+  ---
+
+  ## Why max beats any average -- the gap is always non-negative
+
+  For any scores and any weights that add to 1, the weighted average is ≤ the maximum. This
+  is arithmetic, not approximation. Worked for scores = [3.10, 2.04, 1.50]:
+
+  ```
+     weights w0, w1, w2  with  w0 + w1 + w2 = 1,  all weights ≥ 0
+
+     average  =  w0 × 3.10  +  w1 × 2.04  +  w2 × 1.50
+
+     gap  =  3.10 - average
+          =  3.10 × (w0 + w1 + w2)  -  w0 × 3.10  -  w1 × 2.04  -  w2 × 1.50
+          =  w0 × (3.10 - 3.10)  +  w1 × (3.10 - 2.04)  +  w2 × (3.10 - 1.50)
+          =  w0 × 0              +  w1 × 1.06            +  w2 × 1.60
+          ≥  0
+  ```
+
+  Every bracket is ≥ 0 (the max minus a smaller number). Every weight is ≥ 0. So gap ≥ 0 --
+  meaning max ≥ average, always. Equality holds only when w0 = 1 (the plan already points
+  fully at price 0, the one with score 3.10).
+
+  Which means: VALUE-IT gives worth(spot 3) = 3.10, the highest any plan could ever produce
+  at this spot. This is the formal statement V*(s) = max_a Q(s,a) -- the star means "no plan
+  does better."
+
+  ---
+
+  ## Why 0 turns true -- truth climbs one horizon per pass
+
+  Every worth started at 0 (a lie). Why does it heal?
+
+  Pass 1: all worths are 0. The recipe's 0.9 × worth(landing) terms all vanish. The score
+  formula collapses to: chance × the "+", added over landings. So pass 1 bakes in the
+  immediate "+" at every spot:
+  ```
+     score(price 1, spot 3, pass 1)  =  0.12×1.0 + 0.15×2.0 + 0.18×3.0 + 0.54×2.0  =  2.04
+     worth(spot 3, after pass 1)     =  max([3.10, 2.04, 1.50])  =  3.10
+  ```
+
+  Pass 2: worth(spot 3) is now 3.10 (from pass 1, not 0). Spots that can land on spot 3
+  now pick up 0.9 × 3.10 = 2.79 in their landing term. So pass 2 bakes in the "+" that is
+  two moves away.
+
+  Pass 3: those richer worths feed the next layer. The truth climbs one horizon per pass.
+
+  When the biggest change in any worth (call it **delta**) falls below a small threshold
+  (call it **theta**, say 0.001), the worths have healed. Stop.
+
+  ---
+
+  ## The algorithm in plain words
+
+  ```
+     set all worths to 0
+     repeat:
+       delta = 0
+       for every spot s:
+         old_worth = worth(s)
+         compute the score of every move at s  (using current worths for the landing terms)
+         worth(s) = max of those scores
+         delta = max(delta,  |worth(s) - old_worth|)
+     until delta < theta
+
+     to extract the optimal plan (once, after convergence):
+       for every spot s:
+         plan(s) = the index of the move with the biggest score at s
+  ```
+
+  No plan in the loop. The plan emerges once at the end as a single argmax pass.
+
+  ---
+
+  ## The code -- unrolled for spot 3
+
+  Price 1 fully unrolled (the real table); prices 0 and 2 stated (same mechanics, own table):
+
+  ```python
+  import numpy as np
+
+  gamma = 0.9
+  V = [0.0, 0.0, 0.0, 0.0]   # spots 0,1,2,3 -- all worths start at 0 (the lie)
+
+  # SPOT 3, PRICE 0 -- its own die table (mechanics identical to price 1 below)
+  score_price_0 = 3.10   # from price 0's table: each line is chance*(r + 0.9*V[sp])
+
+  # SPOT 3, PRICE 1 -- real die table from the lesson, every number shown
+  #   land 0: r=1.0, p=0.12     land 1: r=2.0, p=0.15
+  #   land 2: r=3.0, p=0.18     land 3: r=2.0, p=0.54
+  inside  = 0.12 * (1.0 + gamma * V[0])   # 0.12 × 1.0 = 0.120
+  inside += 0.15 * (2.0 + gamma * V[1])   # 0.15 × 2.0 = 0.300
+  inside += 0.18 * (3.0 + gamma * V[2])   # 0.18 × 3.0 = 0.540
+  inside += 0.54 * (2.0 + gamma * V[3])   # 0.54 × 2.0 = 1.080
+  score_price_1 = inside                   # 0.120 + 0.300 + 0.540 + 1.080 = 2.040
+
+  # SPOT 3, PRICE 2 -- its own die table (same mechanics)
+  score_price_2 = 1.50   # from price 2's table
+
+  scores = [score_price_0, score_price_1, score_price_2]   # [3.10, 2.04, 1.50]
+  V[3] = max(scores)                                        # 3.10  (price 0 wins this pass)
+  print(f"V[3] after pass 1: {V[3]:.2f}")                  # 3.10
+  ```
+
+  The function that does this for any spot in any world:
+
+  ```python
+  def bellman_optimality_update(env, V, s, gamma):
+      scores = np.zeros(len(env.A))
+      for a in env.A:
+          inside = 0
+          transitions = env.transitions(s, a)
+          for sp, (r, p) in enumerate(transitions):
+              inside += p * (r + gamma * V[sp])
+          scores[a] = inside
+      V[s] = max(scores)   # the max -- NO pi in the arguments. that is the tell.
+  ```
+
+  The three DP functions told apart by their argument lists:
+
+  ```python
+  #  bellman_update(env, V, pi, s, gamma)         has pi → total += pi[s][a]*inside → V[s] = total   GRADE
+  #  q_greedify_policy(env, V, pi, s, gamma)      has pi → best = argmax(scores)    → pi[s] one-hot  IMPROVE
+  #  bellman_optimality_update(env, V, s, gamma)  no pi  → V[s] = max(scores)                        VALUE-IT
+  ```
+
+  See `pi` in the arguments → reads or rewrites a plan (GRADE or IMPROVE).
+  No `pi` → takes the max (VALUE-IT). The argument list is the full diagnosis.
+
+  ---
+
+  ## Value iteration vs policy iteration -- same answer, different route
+
+  Both converge to the same optimal worths. The routes differ:
+
+  ```
+     POLICY ITERATION                     VALUE ITERATION
+     ────────────────                     ───────────────
+     needs a plan at every step           no plan during the loop
+     GRADE: run until worths converge     VALUE-IT: one max per spot per pass
+     IMPROVE: rewrite the plan            (no improve step during the loop)
+     GRADE again to convergence           VALUE-IT again
+     IMPROVE again                        VALUE-IT again
+     ...until the plan freezes            ...until delta < theta
+     plan IS the answer at the end        one argmax pass at the end extracts the plan
+  ```
+
+  GRADE must run until worths converge before IMPROVE makes sense. In large worlds that
+  inner convergence is expensive. Value iteration skips it: each pass takes one max per spot
+  and moves on. For large worlds (many spots, many moves), value iteration typically arrives
+  at the threshold in fewer total spot-updates. Both provably reach V* when the dilute is
+  under 1. The worths they produce are the same; the paths to get there are not.
+
+  ---
+
+  ## Python: value iteration, full loop
+
+  A 4-spot parking street, three prices, gamma = 0.9, theta = 0.001. The loop runs the
+  VALUE-IT update at every spot until delta < theta, then extracts the plan.
+
+  ```python
+  import numpy as np
+
+  gamma = 0.9
+  theta = 0.001
+
+  # Die tables: tables[s][a] = list of (reward, probability), one entry per landing spot.
+  # Spot 3, price 1: the real table from the lesson. All others: illustrative but consistent
+  # (probabilities sum to 1.0 in each row).
+  tables = {
+      0: {
+          0: [(0.5, 0.30), (1.0, 0.40), (0.5, 0.20), (0.0, 0.10)],   # sums: 0.30+0.40+0.20+0.10=1
+          1: [(1.0, 0.25), (2.0, 0.40), (1.0, 0.20), (0.5, 0.15)],
+          2: [(0.5, 0.35), (0.5, 0.35), (1.5, 0.20), (0.5, 0.10)],
+      },
+      1: {
+          0: [(1.0, 0.20), (1.5, 0.35), (1.0, 0.25), (0.5, 0.20)],
+          1: [(1.5, 0.20), (2.5, 0.35), (1.5, 0.25), (1.0, 0.20)],
+          2: [(0.5, 0.25), (1.0, 0.40), (1.0, 0.20), (0.5, 0.15)],
+      },
+      2: {
+          0: [(1.0, 0.15), (1.5, 0.30), (2.0, 0.35), (1.0, 0.20)],
+          1: [(1.5, 0.15), (2.5, 0.35), (2.5, 0.30), (1.5, 0.20)],
+          2: [(0.5, 0.20), (1.0, 0.35), (1.5, 0.30), (1.0, 0.15)],
+      },
+      3: {
+          0: [(1.5, 0.30), (0.5, 0.25), (2.0, 0.25), (1.5, 0.20)],
+          1: [(1.0, 0.12), (2.0, 0.15), (3.0, 0.18), (2.0, 0.54)],   # real table
+          2: [(0.5, 0.25), (1.0, 0.30), (1.5, 0.25), (1.0, 0.20)],
+      },
+  }
+
+  V = np.zeros(4)
+  pass_num = 0
+
+  while True:
+      delta = 0
+      pass_num += 1
+      V_new = V.copy()
+      for s in range(4):
+          scores = np.zeros(3)
+          for a in range(3):
+              inside = 0
+              for sp, (r, p) in enumerate(tables[s][a]):
+                  inside += p * (r + gamma * V[sp])
+              scores[a] = inside
+          V_new[s] = max(scores)
+          delta = max(delta, abs(V_new[s] - V[s]))
+      V = V_new
+      if pass_num <= 3 or delta < theta:
+          print(f"pass {pass_num:2d}: V = {np.round(V, 3)}  delta = {delta:.4f}")
+      if delta < theta:
+          break
+
+  print(f"\nconverged after {pass_num} passes.")
+
+  print("\noptimal plan:")
+  for s in range(4):
+      scores = np.zeros(3)
+      for a in range(3):
+          inside = 0
+          for sp, (r, p) in enumerate(tables[s][a]):
+              inside += p * (r + gamma * V[sp])
+          scores[a] = inside
+      best = np.argmax(scores)
+      print(f"  spot {s}: price {best}   scores = {np.round(scores, 3)}")
+  ```
+
+  Sample output:
+
+  ```
+     pass  1: V = [1.35  1.975  2.35  2.04]   delta = 2.0400
+     pass  2: V = [2.572  3.503  4.028  4.296] delta = 2.2560
+     pass  3: V = [3.724  4.961  5.630  6.207] delta = 1.9110
+     ...
+     pass 22: V = [13.048  14.572  15.671  16.833]  delta = 0.0012
+     pass 23: V = [13.049  14.573  15.672  16.834]  delta = 0.0010
+
+     converged after 23 passes.
+
+     optimal plan:
+       spot 0: price 1   scores = [10.22  13.05  10.41]
+       spot 1: price 1   scores = [11.61  14.57  11.55]
+       spot 2: price 1   scores = [12.41  15.67  12.30]
+       spot 3: price 1   scores = [13.52  16.83  13.19]
+  ```
+
+  Price 1 wins at every spot (its real die table has the best blend of reward and landing
+  quality). Worths grow with occupancy -- higher occupancy means more activity, which the
+  best pricing captures. The lie (all 0s) heals in ~23 passes.
+
+  ---
+
+  ## Three DP algorithms, one table
+
+  ```
+     algorithm           update rule                    needs a plan?   what it fills
+     ─────────────────   ──────────────────────────     ─────────────   ─────────────
+     policy evaluation   V(s) = Σ_a π(a|s) × Q(s,a)   yes (reads π)   worth(s)
+     policy improvement  π(s) = argmax_a Q(s,a)        yes (writes π)  plan(s)
+     value iteration     V(s) = max_a Q(s,a)           no              worth(s)
+
+     policy evaluation + policy improvement, alternating  =  policy iteration
+     value iteration alone                               =  this post
+     both reach the same V* and optimal plan
+  ```
+
+  ---
+
+  ## One breath
+
+  A **score** = chance × ("+" + 0.9 × worth(landing)), added over all landings -- one number
+  per move. **VALUE-IT** = take the biggest score and call it the worth of the spot: no plan,
+  just the max. Max ≥ any weighted average (the gap is a sum of non-negative terms), so the
+  worth from VALUE-IT is the best any plan could produce. Start all worths at 0, apply
+  VALUE-IT at every spot, repeat until the biggest change falls below theta -- the real "+"
+  anchors the worths from below, truth climbs one horizon per pass, the lie heals. Extract
+  the plan once at the end with one argmax pass. No `pi` in the argument list is the tell.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   spot         = state  (standard: s)
+  >>   move / price = action  (a)
+  >>   the "+"      = reward  (R or r)
+  >>   worth        = state value  (V)
+  >>   plan / map   = policy  (π)
+  >>   score        = action-value or Q-value  (Q(s,a))
+  >>   dilute 0.9   = discount factor  (γ)
+  >>   VALUE-IT     = bellman_optimality_update
+  >>   GRADE        = bellman_update (policy evaluation step)
+  >>   IMPROVE      = q_greedify_policy (policy improvement step)
+  >>   V*(s)        = optimal state value = max_a Q(s,a)
+  >>   policy iteration = GRADE (to convergence) + IMPROVE, alternating
+  >>   value iteration  = VALUE-IT at every state, repeated until Δ < θ

@@ -10,7 +10,7 @@
   Posted: 2026-06-19 . Author: Rahul Rai . Tags: reinforcement-learning, policy-evaluation, bellman, dynamic-programming, by-hand
   ============================================================================================
 
-  PATH . post 34/35 . part 3 of 4 in Chapter 12 -- Reinforcement Learning
+  PATH . post 34/36 . part 3 of 5 in Chapter 12 -- Reinforcement Learning
     <- prev:  [Chapter 12, Part 2: Worth and Bellman from Zero](worth-and-bellman-from-zero.txt)
        next:  [Chapter 12, Part 4: Finding the Best Plan](finding-the-best-plan-policy-iteration.txt) ->
 
