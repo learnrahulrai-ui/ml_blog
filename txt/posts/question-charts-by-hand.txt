@@ -39,7 +39,7 @@
      branches that do not earn their keep on the hidden pile.
 
 
-  THE SHEET: TWO NEW PILES
+  SHEET: TWO NEW PILES
 
     diabetes -- 442 people, 10 body measurements, one answer
     patient   age   bmi   bp    s1 ... s6  |  answer
@@ -343,7 +343,7 @@
        means someone picks arbitrarily.
 
 
-  THE CORRECTIONS I CAUGHT
+  CORRECTIONS I CAUGHT
 
   Building this by hand exposed five wrong pictures I would have carried forever:
 
@@ -374,7 +374,7 @@
      many questions deep before you hit an answer.
 
 
-  THE LEAF -- WHAT SITS AT THE BOTTOM
+  LEAF -- WHAT SITS AT THE BOTTOM
 
   A leaf = a final pile at the bottom of the chart, where a guess sits.
   A leaf is not always one person.
@@ -428,7 +428,7 @@
     max_depth = None?  same thing.   both mean "no real ceiling."
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -445,7 +445,7 @@
     same menu, different winner           greedy, locally optimal splitting
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same work, spoken in Python.

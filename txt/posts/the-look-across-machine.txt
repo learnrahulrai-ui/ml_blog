@@ -88,7 +88,7 @@
        check: the one shared "unknown" number.
 
 
-  THE WALK STILL FADES, SO LOOK ACROSS INSTEAD
+  WALK STILL FADES, SO LOOK ACROSS INSTEAD
 
   The LSTM walked. "not" (word 1) reaches "good" (word 80) only by riding the memory belt
   through 79 rewrites. The transformer removes the walk entirely: lay all 100 words out at once
@@ -228,7 +228,7 @@
        check: e^0 = 1 for each. Total = 2. Both portions = 0.5. Equal listening.
 
 
-  THE PORTIONS WEIGHT THE GIVE STICKS -- NOLAN'S NEW STICK FALLS OUT
+  PORTIONS WEIGHT THE GIVE STICKS -- NOLAN'S NEW STICK FALLS OUT
 
   nolan listens 0.047 to itself, 0.953 to "ended". Those portions weight the GIVE sticks:
   multiply each word's GIVE by its portion, then ADD number-by-number → one new stick:
@@ -346,7 +346,7 @@
   sigmoid (not softmax) because the answer is ONE yes/no, not a choice among multiple classes.
 
 
-  THE FULL MACHINE IN CODE (Q8)
+  FULL MACHINE IN CODE (Q8)
 
   Each code line is one pencil move:
 

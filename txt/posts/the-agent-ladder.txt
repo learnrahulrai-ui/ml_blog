@@ -78,7 +78,7 @@
      The value function lets the agent grade locally without waiting 100 steps to see the end.
 
 
-  THE ROOM
+  ROOM
 
   A corridor of five cells:
 
@@ -263,7 +263,7 @@
   > Root cause of the limits: learning needs time, and it cannot rewrite physics.
 
 
-  THE PATTERN (SAY IT BACK TO YOURSELF)
+  PATTERN (SAY IT BACK TO YOURSELF)
 
       RUNG   new power               kills                           then breaks at
       ----   --------------------    ----------------------------    ----------------------------
@@ -280,7 +280,7 @@
   mouse. Sequential moves. Two players. Only the brain changed; the world did not.
 
 
-  THE JARGON DECODER
+  JARGON DECODER
 
       our plain word                       ->  textbook name
       ---------------------------------        ------------------------------------------

@@ -35,7 +35,7 @@
        A compromise that tends to find round, equally-sized clusters.
      The linkage rule you pick changes which groups form. There is no single right answer.
 
-  THE SHEET (SAME AS PART 1)
+  SHEET (SAME AS PART 1)
 
     50 states, 3 measurements (Murder, Assault, UrbanPop).  No answer column.
     Standardised first, so every column sits on the same ruler.
@@ -50,7 +50,7 @@
   = 9 strokes, so the whole sheet is 1,225 x 9 = 11,025 strokes -- one clerk's long
   morning, and (by the row-merge trick below) the ONLY measuring the whole tree needs.
 
-  THE ONE MOVE: MARRY THE TWO CLOSEST
+  ONE MOVE: MARRY THE TWO CLOSEST
 
   Start with 50 groups -- every state is its own lonely group of one.  Then repeat one
   move until a single group remains:
@@ -171,7 +171,7 @@
      is the one to reach for when groups are long thin shapes (and the one to fear when
      you do not want chaining).  Always say which linkage you used.
 
-  THE ENGINE NEVER RE-MEASURES (THE ROW-MERGE TRICK)
+  ENGINE NEVER RE-MEASURES (THE ROW-MERGE TRICK)
 
   A worry, caught while building it by hand: after every wedding, must you re-measure
   the gap from the new group to everybody else?  With 150 rows the starting sheet
@@ -286,7 +286,7 @@
        code.  Say out loud which one the question asks for BEFORE typing the dot.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -306,7 +306,7 @@
     the row-merge trick (keep the bigger)  the Lance-Williams update (complete linkage)
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -380,7 +380,7 @@
     desc["Murder"].idxmax()   # NAME of the group where Murder runs highest
     desc["Murder"].max()      # the number itself -- a different question
 
-    THE SKLEARN ONE-SHOT EQUIVALENT
+    SKLEARN ONE-SHOT EQUIVALENT
     from sklearn.cluster import AgglomerativeClustering
     agg = AgglomerativeClustering(n_clusters=3, linkage="ward")
     labels = agg.fit_predict(X_scaled)

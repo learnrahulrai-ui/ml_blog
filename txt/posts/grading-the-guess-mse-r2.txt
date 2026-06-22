@@ -128,7 +128,7 @@
   One clerk clears it in an hour; the room, before the coffee cools.
 
 
-  THE PROBLEM MSE CAN'T SOLVE
+  PROBLEM MSE CAN'T SOLVE
 
     "the guess was off by 9."
 
@@ -430,7 +430,7 @@
               an honest comparison.
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same moves, spoken in Python.
@@ -438,7 +438,7 @@
   First the five cars by hand, one line each (no loop) -- the same truths and stick-guesses
   from the worked example, so you can run it and watch 34, 2, and 0.94 print back:
 
-    THE FIVE CARS: (TRUTH, STICK'S GUESS), WRITTEN OUT ONE PER LINE
+    FIVE CARS: (TRUTH, STICK'S GUESS), WRITTEN OUT ONE PER LINE
     y1, g1 = 2, 2.5
     y2, g2 = 4, 4.5
     y3, g3 = 9, 8.0
@@ -472,7 +472,7 @@
         return (mse, r2)                             # truth first, guesses second
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                     Standard label
     -------------------------------------     ----------------------------------------

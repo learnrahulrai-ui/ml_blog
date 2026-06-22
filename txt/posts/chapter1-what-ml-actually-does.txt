@@ -46,7 +46,7 @@
      study it -- the idea stands on its own either way.
 
 
-  THE JOB: GUESS FROM A SHEET OF NUMBERS
+  JOB: GUESS FROM A SHEET OF NUMBERS
 
     rooms  income  age  ocean  people  |  PRICE   <- right-answer column
     --------------------------------------------------------
@@ -92,7 +92,7 @@
      product.
 
 
-  THE ONE RULE: HIDE SOME ROWS
+  ONE RULE: HIDE SOME ROWS
 
     ALL ROWS
     ################----
@@ -361,7 +361,7 @@
      memorised the working pile a little.
 
 
-  THE WHOLE BLOG IN SIX LINES
+  WHOLE BLOG IN SIX LINES
 
   Here is everything above, boiled down to six lines.
   Pin them somewhere.
@@ -412,7 +412,7 @@
        scaler relearns fresh from each fold's build portion only.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
   Now that you have built the thing, here are the proper names.
   Every post on this blog ends this way.
@@ -438,7 +438,7 @@
     memorising the working pile           overfitting
     mistake on rows never seen            generalisation error
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same six steps, spoken in Python.
@@ -502,7 +502,7 @@
     print(lr_rmse)    # 0.7270  <- typical miss ~$73,000; KNN wins here
 
     --- PICK K BY ROTATING FOLDS (NEVER TOUCH THE HIDDEN PILE HERE) ---
-    THE COMPUTER RUNS THE SAME THREE LINES FOUR TIMES, ONCE PER K VALUE.
+    COMPUTER RUNS THE SAME THREE LINES FOUR TIMES, ONCE PER K VALUE.
     SHOWN FLAT SO YOU CAN SEE EVERY RUN -- THE LOOP IS JUST THE SAME WORK REPEATED:
     cv = KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
 

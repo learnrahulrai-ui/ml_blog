@@ -383,7 +383,7 @@
     study-score minus practice-score      the generalisation gap
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Every dial count, softmax, tax fine, and humbling step above worked by hand.  Here they
   are in Python so you can verify each number on your own screen.
@@ -511,7 +511,7 @@
 
     --- THE ONE HONEST GRADE: OPEN THE SEALED PILE ONCE, PER MACHINE ---
     LOSS, ACC = MODEL.EVALUATE(X_TEST, Y_TEST, VERBOSE=0)
-    THE GENERALISATION GAP = FINAL TRAIN ACCURACY - FINAL VAL ACCURACY (SMALLER = HONESTER).
+    GENERALISATION GAP = FINAL TRAIN ACCURACY - FINAL VAL ACCURACY (SMALLER = HONESTER).
 
 
 ----------------------------------------------------------------------------------------------

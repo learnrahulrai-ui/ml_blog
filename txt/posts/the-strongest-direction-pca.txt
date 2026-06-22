@@ -46,7 +46,7 @@
      possible. The direction with the most spread (variance) preserves the most truth.
      That direction is the first principal component. Crush along that axis.
 
-  THE SHEET
+  SHEET
 
     alcohol, malic_acid, ash, alcalinity_of_ash, magnesium, total_phenols,
     flavanoids, nonflavanoid_phenols, proanthocyanins, color_intensity,
@@ -83,7 +83,7 @@
   A room of clerks clears the whole crush by lunch.
   You would still be sharpening your pencil.
 
-  THE CORE METAPHOR: FLASHLIGHT AND SHADOWS
+  CORE METAPHOR: FLASHLIGHT AND SHADOWS
 
   Imagine each wine is a dot floating in a 13-wall room.
   You cannot draw this room.
@@ -315,7 +315,7 @@
   So most of the structure is captured in the first 5 or 6 shadows.
   The remaining 7 PCs carry mostly noise.
 
-  THE RECIPE (LOADINGS)
+  RECIPE (LOADINGS)
 
   Each PC is a RECIPE.
   The recipe says how much of each original column goes into it.
@@ -329,7 +329,7 @@
   For PC1 on the wine data, the highest loading is often on proline or flavanoids.
   These columns vary the most, so they drive the longest shadow.
 
-  THE SCORES (TRANSFORM)
+  SCORES (TRANSFORM)
 
   Every wine gets a PC1 score and a PC2 score.
   A score is the wine's coordinate along one PC, computed by running that PC's recipe.
@@ -437,7 +437,7 @@
        will not land between 0 and 1.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -459,7 +459,7 @@
     the 13 numbers crunched into 2        2D embedding / projection
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same four wines, the same numbers, in Python.

@@ -33,7 +33,7 @@
   That single translation turns ten formulas into one arithmetic count.
 
 
-  THE STORY (READ THIS ONCE; EVERY PROBLEM BELOW LIVES INSIDE IT)
+  STORY (READ THIS ONCE; EVERY PROBLEM BELOW LIVES INSIDE IT)
 
   Here is the whole room, drawn before any words:
 
@@ -88,7 +88,7 @@
   The danger of the missed cases is real and separate from the formula.
 
 
-  THE TWO QUESTIONS THE DOCTOR AND THE SHOPKEEPER ANSWER DIFFERENTLY
+  TWO QUESTIONS THE DOCTOR AND THE SHOPKEEPER ANSWER DIFFERENTLY
 
   Two probability symbols look almost identical but describe completely different groups of
   patients.
@@ -123,7 +123,7 @@
   The machine answers about the sick. Those are opposite directions of the same relationship.
 
 
-  THE SHOPKEEPER HIDES THE TOTAL -- SO WE BUILD IT BY GLUING THE TWO PILES
+  SHOPKEEPER HIDES THE TOTAL -- SO WE BUILD IT BY GLUING THE TWO PILES
 
   The doctor's question would be trivial if the shopkeeper told us the total share of beep
   papers. He refuses. So we build that total ourselves from the only two ways a beep paper
@@ -588,7 +588,7 @@
       ==============================================================
 
 
-  THE FORMULA (IT WAS HERE ALL ALONG)
+  FORMULA (IT WAS HERE ALL ALONG)
 
   You have now used Bayes' rule ten times without once reading it as a formula. Here it is,
   for the exam or the quiz:
@@ -606,7 +606,7 @@
   The formula is not magic. It is the patient head-count, compressed into one line.
 
 
-  THE DECODER (JARGON -> PLAIN)
+  DECODER (JARGON -> PLAIN)
 
       PEACOCK WORD                       PLAIN WORD (hospital story)
       --------------------------------   -----------------------------------------------

@@ -47,7 +47,7 @@
      Gini mathematically punishes the useless split and rewards the clean one.
 
 
-  THE CLASSIFICATION TREE: ONE CHANGE AT THE BOTTOM
+  CLASSIFICATION TREE: ONE CHANGE AT THE BOTTOM
 
   The build hunt is the SAME shape as for a number answer.
   Sort each column, try every midpoint as a cut, score each cut's badness, keep the smallest.
@@ -403,7 +403,7 @@
      on the exam -- not to make up alphas.
 
 
-  THE NESTED AVERAGES LADDER
+  NESTED AVERAGES LADDER
 
   To pick the best alpha, the same 5-slice check from Chapter 4.  Three averages,
   stacked, each doing a different job:
@@ -502,7 +502,7 @@
   Wrongness is NOT leaf-only.  Any room can be graded by "pretend it's a leaf."
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -519,7 +519,7 @@
     keep the sick:well ratio even         stratified train/test split
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same counts, spoken in Python.
@@ -527,9 +527,9 @@
   First the Gini ruler by hand -- the exact four counts from the worked example, each side
   on its own line, no loop, so you watch 0.375, 0.32, and 0.344 print back:
 
-    THE BELOW SIDE: 3 YES, 1 NO (4 PEOPLE). GINI = CHANCE TWO RANDOM GRABS DISAGREE
+    BELOW SIDE: 3 YES, 1 NO (4 PEOPLE). GINI = CHANCE TWO RANDOM GRABS DISAGREE
     below = 1 - (3/4)2 - (1/4)2      # 1 - 9/16 - 1/16 = 0.375
-    THE ABOVE SIDE: 1 YES, 4 NO (5 PEOPLE)
+    ABOVE SIDE: 1 YES, 4 NO (5 PEOPLE)
     above = 1 - (1/5)2 - (4/5)2      # 1 - 1/25 - 16/25 = 0.32
 
     WEIGHTED BADNESS OF THE CUT: WEIGHT EACH SIDE BY ITS HEAD-COUNT (4 OF 9, 5 OF 9)

@@ -197,7 +197,7 @@
   That is a morning for the clerks, an afternoon's nap for the kettle.
 
 
-  THE AREA UNDER THE CURVE
+  AREA UNDER THE CURVE
 
   IN HAND: a 6-person exam swept through cutoffs into (FPR, TPR) dots.
   FPR is the false-alarm rate (well lumps wrongly called sick over all truly well).
@@ -343,7 +343,7 @@
      So the curve shows the available deals; the doctor picks one.
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet a computer: the same work, spoken in Python.
@@ -426,7 +426,7 @@
     plt.show()
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                    Standard label
     -------------------------------------    -------------------------------------------

@@ -49,7 +49,7 @@
   even for the same word at different positions.
 
 
-  THE SCALAR TRAP -- ADDING A NUMBER
+  SCALAR TRAP -- ADDING A NUMBER
 
   The most direct idea: add the slot number to each element of the word's stick.
 
@@ -69,7 +69,7 @@
   seen in training.
 
 
-  THE NORMALISED SCALAR -- BETTER, BUT BREAKS AT INFERENCE
+  NORMALISED SCALAR -- BETTER, BUT BREAKS AT INFERENCE
 
   Normalize: divide by the length of the sequence, so the mark is always in [0, 1].
 
@@ -285,7 +285,7 @@
   preserved. Only the direction changes.
 
 
-  THE PROOF THAT ROPE ENCODES RELATIVE DISTANCE
+  PROOF THAT ROPE ENCODES RELATIVE DISTANCE
 
   This is the step Satvik's post names but does not show.
 
@@ -441,7 +441,7 @@
   never trained on.
 
 
-  THE FIX -- SCALE THE BASE FREQUENCY
+  FIX -- SCALE THE BASE FREQUENCY
 
   The insight: the slow pairs are producing out-of-distribution angles. Make them
   rotate more slowly, so far-out positions map back into the training range.
@@ -503,7 +503,7 @@
   USE long-range attention.
 
 
-  THE DECODER
+  DECODER
 
       PLAIN WORD                           JARGON
       -----------------------------------  --------------------------------------------

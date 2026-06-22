@@ -123,7 +123,7 @@
      Otherwise the dials stay modest.
 
 
-  THE C PARAMETER: COUNTER-INTUITIVE DIRECTION
+  C PARAMETER: COUNTER-INTUITIVE DIRECTION
 
   sklearn spells the leash strength as C, not lambda.
   lambda is the fine-strength on squared dials; C is sklearn's name for its reciprocal.
@@ -446,7 +446,7 @@
        When they disagree, the boundary is ambiguous.
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -529,7 +529,7 @@
     lda_equal.fit(X_train_scaled, y_train)
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

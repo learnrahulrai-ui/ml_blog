@@ -619,7 +619,7 @@
     one small paper reused everywhere   weight sharing / parameter sharing
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Every dial count, convolution score, and grid-size calculation above done by hand.
   Here the exact numbers are spelled out in Python.

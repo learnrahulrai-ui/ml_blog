@@ -73,7 +73,7 @@
   What is new is that we no longer trust the machine to set those dials sensibly on its own.
 
 
-  THE DISEASE: HUGE DIALS THAT MEMORISE
+  DISEASE: HUGE DIALS THAT MEMORISE
 
   Here is the failure, drawn. Give the dials free rein and they grow huge to chase every
   little wiggle in the study pile:
@@ -97,7 +97,7 @@
   So we want to FORBID huge dials.
 
 
-  THE LEASH: ADD A FINE
+  LEASH: ADD A FINE
 
   Until now the machine paid only for being wrong.
   Now we make it pay a second fine -- for being immodest.
@@ -400,7 +400,7 @@
               picture) -- name it that, never call it "the dial."
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -416,7 +416,7 @@
     too stiff vs too jumpy                the bias-variance trade-off
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -484,7 +484,7 @@
     lasso_best_alpha = float(lasso_cv.alpha_)
     n_nonzero_lasso  = int(np.sum(lasso_cv.coef_ != 0))   # the survivors
 
-    THE ERROR-VS-A CURVES THE LAB ASKS FOR
+    ERROR-VS-A CURVES THE LAB ASKS FOR
     ridge_cv_mse_mean = ridge_cv.cv_values_.mean(axis=0)
     lasso_cv_mse_mean = lasso_cv.mse_path_.mean(axis=1)
 

@@ -33,7 +33,7 @@
      THE FIX: imputation. Estimate the blank by asking the row's nearest neighbours what THEY
      scored that column. A calculated best guess beats zero and beats deletion.
 
-  THE SHEET FULL OF HOLES
+  SHEET FULL OF HOLES
 
            Matrix  Titanic  Alien  Notebook  Rambo
     Ann  [   5       .       4        .        . ]
@@ -48,7 +48,7 @@
   Alien a 4, we recommend Alien to Ben.  There is no separate "answer column" -- the answers
   ARE the scattered ratings themselves, and the blanks are what we predict.
 
-  THE OLD IDEA IN NEW CLOTHES: HIDDEN TASTES
+  OLD IDEA IN NEW CLOTHES: HIDDEN TASTES
 
   Stare at the filled cells and a pattern leaks out.  Ann and Eve both love Matrix and
   Alien -- sci-fi.  Ben and Dee both love Titanic and Notebook -- romance.  Nobody told us
@@ -114,7 +114,7 @@
      the Chapter 4 leash -- a fine on big taste/flavour numbers -- to keep it humble.  Same
      leash, brand new place to need it.
 
-  THE LAB, END TO END: 100 PEOPLE, 50 MOVIES, 3,786 HOLES
+  LAB, END TO END: 100 PEOPLE, 50 MOVIES, 3,786 HOLES
 
   Rule done -- now the real sheet from the lab.  100 people down the side, 50 movies
   across the top: 100 x 50 = 5,000 cells.  Only 1,214 hold a rating; the other
@@ -188,7 +188,7 @@
   The machine below never falls in this hole, because no blank is ever filled from ONE
   donor: every mark is blended from the entire sheet at once.
 
-  THE MACHINE LOOP: REBUILD, RESTORE, REPEAT
+  MACHINE LOOP: REBUILD, RESTORE, REPEAT
 
   IN HAND: a lab sheet of 100 people x 50 movies = 5,000 cells, of which 5,000 - 1,214 =
   3,786 are blank (3,786 / 5,000 = 0.757, three-quarters holes).  Each blank is humbled by
@@ -400,7 +400,7 @@
        The 20% you hide must come from cells that actually hold ratings.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -428,7 +428,7 @@
     un-humble (add the middle back)       un-centring / adding back the item mean
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -483,7 +483,7 @@
     PICKING K: HIDE 20% OF THE RATED CELLS, RUN THE LOOP PER K IN [1,2,3,5,10],
     GRADE EACH K'S MARKS AGAINST THE POCKETED TRUTH, KEEP THE SMALLEST ERROR.
 
-    THE HEAVYWEIGHT TOOLBOX ROUTE (THE SURPRISE PACKAGE: FROM SKLEARN / SURPRISE):
+    HEAVYWEIGHT TOOLBOX ROUTE (THE SURPRISE PACKAGE: FROM SKLEARN / SURPRISE):
     FROM SKLEARN.DECOMPOSITION IMPORT TRUNCATEDSVD   # FACTOR A FILLED MATRIX
     OR A DEDICATED LIBRARY (E.G. `SURPRISE`) FOR THE HOLEY, REGULARISED CASE
 

@@ -41,7 +41,7 @@
   worked review: "nolan ended" -- two words. Stick width 4 (real: 32). The recipe is exact;
   the numbers are the toy.
 
-  THE PROBLEM, DRAWN:
+  PROBLEM, DRAWN:
 
       PILE OF REVIEWS (each hand-labelled)               MACHINE         VERDICT
       "the nolan film ended beautifully"  ----------->  [Transformer] -> 1 (liked)
@@ -164,7 +164,7 @@
   The HAVE and GIVE sticks are produced the same way, each with their own grid.
 
 
-  THE MATCH -- NOLAN'S WANT DOTS EVERY WORD'S HAVE
+  MATCH -- NOLAN'S WANT DOTS EVERY WORD'S HAVE
 
   To score how much nolan cares about a word, take nolan's WANT stick and that word's HAVE
   stick and DOT them.
@@ -323,7 +323,7 @@
   Same end goal: one stick for the verdict.
 
 
-  THE VERDICT -- PLAIN WORKERS AT THE END
+  VERDICT -- PLAIN WORKERS AT THE END
 
   Feed the summary stick through plain workers to a single tick:
 
@@ -351,9 +351,9 @@
   Dropout (zero-a-random-tenth) = forced independence, only during practice, off at exam.
 
 
-  THE DECODER (JARGON -> PLAIN, MASTER SHEET)
+  DECODER (JARGON -> PLAIN, MASTER SHEET)
 
-      THE PEACOCK WORD              WHAT IT ACTUALLY MEANS
+      PEACOCK WORD              WHAT IT ACTUALLY MEANS
       --------------------------    -------------------------------------------------------
       embedding                     a word's stick -- a fixed-width list of numbers
       query (Q)                     a word's WANT stick -- it does the looking

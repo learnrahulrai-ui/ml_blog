@@ -99,7 +99,7 @@
   Cummins in 2000.)
 
 
-  THE TWO MEMORIES
+  TWO MEMORIES
 
   The fix carries TWO memories instead of one. Two pant pockets, A and B, both starting all
   zeros:
@@ -116,7 +116,7 @@
   pocket, and crushing it every word is what made it forget.
 
 
-  THE FOUR LITTLE MACHINES (ALL READ THE SAME TWO THINGS)
+  FOUR LITTLE MACHINES (ALL READ THE SAME TWO THINGS)
 
   IN HAND: this word's note (call it the word32), plus memory-B from last word. Memory-A is
   NOT read by any machine -- hold that thought.
@@ -195,7 +195,7 @@
   it has loudness but no separate judge of worth.
 
 
-  THE COMBINE, WITH REAL NUMBERS
+  COMBINE, WITH REAL NUMBERS
 
   IN HAND: four machines have produced, for this word: a fresh value, a keep-fraction, an
   admit-fraction, a show-fraction (each a row of 32 numbers). Memory-A and memory-B from
@@ -454,7 +454,7 @@
     swallowed every earlier B. It is not tied to any single word.
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Every step above -- training cost, the combine, the dial count -- done by pencil.
   Here the exact numbers are spelled out in Python.
@@ -503,7 +503,7 @@
     final_clerk_bilstm = 64 + 1          # 65     (glued memory is 64 wide)
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     plain walking worker             SimpleRNN (vanilla recurrent layer)
     the fade / worn-down memory      vanishing gradient over time steps

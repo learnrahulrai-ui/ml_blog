@@ -227,7 +227,7 @@
   Check: 0.269 + 0.731 = 1.000. cat spends 26.9% of its attention on itself, 73.1% on sat.
 
 
-  THE SHARES DECIDE HOW MUCH TO PULL IN -- ADD HANDOVERS BY SHARE, THEN PROJECT
+  SHARES DECIDE HOW MUCH TO PULL IN -- ADD HANDOVERS BY SHARE, THEN PROJECT
 
   Each word offered a HANDOVER row earlier (from the tamed inputs):
   HANDOVER(cat) = [0.000, 0.000, -1.414, 1.414], HANDOVER(sat) = [0.000, 1.414, 0.000, -1.414].
@@ -434,7 +434,7 @@
   The mask is the heart of the split, not the whole of it.
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Every matrix dot, LayerNorm, softmax, and residual add above worked on paper.  Here the
   exact numbers in Python -- same moves, same digits.

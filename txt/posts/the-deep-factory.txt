@@ -159,7 +159,7 @@
   That is the humbler.
 
 
-  THE HUMBLER BY HAND (BATCH NORMALISATION)
+  HUMBLER BY HAND (BATCH NORMALISATION)
 
   The humbler works on ONE inspector's pile at a time. During training, the machine
   processes a HANDFUL of photos together -- say 64. So inspector 1 produces not one
@@ -300,7 +300,7 @@
      output: [0, -2.67, 10.67, 0, 4.0, 0]
 
 
-  THE DEEP FACTORY -- FULL BUILD (Q7)
+  DEEP FACTORY -- FULL BUILD (Q7)
 
   IN HAND: simple factory, 282,250 dials, ~60% at five loops. Two new floors: humbler
   (standardise over the 64-photo handful, then stretch + shift, four numbers kept per
@@ -347,7 +347,7 @@
   is photo-blind: each photo's sheets never touch another photo's sheets.
 
 
-  THE CONFUSION SHEET -- WHICH ANIMALS DOES THE MACHINE MIX UP? (Q8)
+  CONFUSION SHEET -- WHICH ANIMALS DOES THE MACHINE MIX UP? (Q8)
 
   IN HAND: deep factory trained and exam pile sealed (10,000 test photos, roughly 1,000
   per animal). The machine gives 10 chance-scores per photo. This section builds the pile
@@ -405,7 +405,7 @@
   biggest confusion is sensible, not random. (32x32 is the DATA's limit, not a factory
   stupidity -- even a human eye struggles at that resolution.)
 
-  THE COPY TRAP:
+  COPY TRAP:
 
   The test cell checks that the confusion sheet still sums to 10,000. If you zero the
   diagonal on the REAL sheet to find the biggest miss, the hits vanish, the sum drops
@@ -546,7 +546,7 @@
     Not 32 colour channels. 32 different measurements of the same region.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     handful of 64 photos          batch (batch_size=64)
     dial-turn per handful         gradient update / optimiser step

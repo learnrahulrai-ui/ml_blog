@@ -121,7 +121,7 @@
   structure.  Keep enough shadows to stay honest (the 80% rule of thumb), no more.
 
 
-  THE PART THE LAB SKIPS -- ETHICS OF SORTING PEOPLE
+  PART THE LAB SKIPS -- ETHICS OF SORTING PEOPLE
 
   Every tool in this chapter sorts rows into piles.  When the rows are PEOPLE, the math
   carries weight it never warns you about:
@@ -160,7 +160,7 @@
   the whole of Chapter 6.
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   The worked examples above (Hamming, dimension count, pinch-to-fit with an outlier) need
   no library.  Here they are as plain variables.
@@ -191,7 +191,7 @@
     hamming_words = ch1 + ch2 + ch3   # 1
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

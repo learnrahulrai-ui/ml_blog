@@ -45,7 +45,7 @@
   Pencil and scratch paper out. Every number here is recomputed where it is needed.
 
 
-  THE NEW SHEET, AND THE WALL
+  NEW SHEET, AND THE WALL
 
   The sheet:
 
@@ -156,7 +156,7 @@
   The factory can finally be built.
 
 
-  THE FIRST TEXT-FACTORY: THREE FLOORS (Q3)
+  FIRST TEXT-FACTORY: THREE FLOORS (Q3)
 
   IN HAND: every review is now 100 word-numbers (e.g. [4, 73, 1, 87, 0, 0, ...]), 0 = empty.
   We feed that line of 100 numbers into a factory with three floors:
@@ -481,7 +481,7 @@
     from a lean. Width 32 gives the word room to be several things at once. Width is a knob.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     pile of words, 1/0 per row       sentiment classification (binary)
     number each word by frequency    tokenisation by frequency rank

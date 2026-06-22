@@ -303,7 +303,7 @@
               Get the name of the winner, not the smallest name alphabetically.
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same rows, spoken in Python.
@@ -311,7 +311,7 @@
   First the rule by hand -- no loop, every gap on its own line, exactly the worked example,
   so you watch the gaps and the guess 2.83 print back:
 
-    THE GAP RULE ON TWO ROWS (NEW ROW AT (3, 2, 5, 4)) -- SUBTRACT, SQUARE, ADD, ROOT
+    GAP RULE ON TWO ROWS (NEW ROW AT (3, 2, 5, 4)) -- SUBTRACT, SQUARE, ADD, ROOT
     gap_A = ((3-4)2 + (2-2)2 + (5-6)2 + (4-3)2) ** 0.5   # sqrt(3)   = 1.73
     gap_B = ((3-8)2 + (2-9)2 + (5-1)2 + (4-9)2) ** 0.5   # sqrt(115) = 10.72
     print(round(gap_A,2), round(gap_B,2))     # 1.73 10.72  -> A is the closer neighbour

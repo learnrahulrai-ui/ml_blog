@@ -41,7 +41,7 @@
      THE FIX: standardise. Shift every column to spread 1 (z-score).
      Then each column speaks with equal volume, and every dimension contributes to the gap.
 
-  THE SHEET
+  SHEET
 
     State       Murder    Assault    UrbanPop
     -------     ------    -------    --------
@@ -62,7 +62,7 @@
 
   No right answer.  The goal: find which states are most alike.
 
-  THE MIDDLE AND THE SPREAD
+  MIDDLE AND THE SPREAD
 
   For each column, compute two numbers.
   The first is the middle, called the mean: add up all 50 values, then divide by 50.
@@ -91,7 +91,7 @@
   This is a warning light: Assault's numbers are much bigger.
   Therefore Assault will dominate any gap measurement unless we intervene.
 
-  THE RULER PROBLEM
+  RULER PROBLEM
 
   The range of a column is its biggest value minus its smallest value (max - min).
   Look at the range of each column:
@@ -107,7 +107,7 @@
   Which means the Assault column shouts about seventeen times louder than Murder.
   Therefore the gap number mostly reflects Assault, not the full picture.
 
-  THE GAP BETWEEN TWO STATES: TWO RULERS
+  GAP BETWEEN TWO STATES: TWO RULERS
 
   IN HAND: a sheet of 50 states by 3 columns.
   In hand also: a middle (mean) and a spread (standard deviation) for each column.
@@ -189,7 +189,7 @@
      City-block (53) tops straight-line (41.3), as the L-walk always does.
      And Assault's 1600 drowns the other two.
 
-  THE SHEET OF GAPS
+  SHEET OF GAPS
 
   Now repeat the straight-line gap for ALL pairs of states.
   There are 50 states.
@@ -211,7 +211,7 @@
   This sheet IS the foundation of clustering.
   Every grouping method starts from some version of "who is closest to whom."
 
-  THE SAME RULER: STANDARDISATION
+  SAME RULER: STANDARDISATION
 
   The gap between Alabama and Alaska came out to 28.97.
   That number is heavily influenced by Assault.
@@ -251,7 +251,7 @@
   Standardised Alaska:
     Murder: 0.51    Assault: 1.11    UrbanPop: -1.21
 
-  THE FAIR GAP (AFTER SAME-RULER)
+  FAIR GAP (AFTER SAME-RULER)
 
   Straight-line gap on standardised numbers:
 
@@ -283,7 +283,7 @@
      So it is a high-murder state.
      And it is now in plain ruler-units, which any other column can be compared against.
 
-  THE CLOSEST PAIR
+  CLOSEST PAIR
 
   Build the 50x50 fair gap sheet.
   Fair gap means the straight-line gap measured on standardised numbers, not raw numbers.
@@ -354,7 +354,7 @@
        That is expected, not a bug.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -373,7 +373,7 @@
     row                                    observation / sample
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one.

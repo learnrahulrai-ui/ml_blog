@@ -451,7 +451,7 @@
         review readout.
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Every step above -- the fade, the combine, the 3-slot example -- done by pencil.
   Here in Python so you can check each number.

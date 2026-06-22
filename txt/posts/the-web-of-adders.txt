@@ -717,7 +717,7 @@
         Dense(1,  activation='sigmoid'),       # S-curve exit: output is a probability
     ])
 
-    THE BY-HAND FORWARD PASS, IN CODE (REPRODUCES THE 0.622 FROM ABOVE)
+    BY-HAND FORWARD PASS, IN CODE (REPRODUCES THE 0.622 FROM ABOVE)
     def forward_pass_by_hand(X, weights):
         A = X.copy()
         for i in range(0, len(weights) - 2, 2):

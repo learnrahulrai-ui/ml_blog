@@ -34,7 +34,7 @@
 
   ---
 
-  THE WORLD: A PARKING STREET, FOUR SPOTS, THREE PRICES
+  WORLD: A PARKING STREET, FOUR SPOTS, THREE PRICES
 
   A spot = one number: how many parking spaces are taken. Four spots: 0, 1, 2, 3.
   A move = a price you set. Three prices: 0, 1, 2.
@@ -170,7 +170,7 @@
 
   ---
 
-  THE ALGORITHM IN PLAIN WORDS
+  ALGORITHM IN PLAIN WORDS
 
      set all worths to 0
      repeat:
@@ -190,7 +190,7 @@
 
   ---
 
-  THE CODE -- UNROLLED FOR SPOT 3
+  CODE -- UNROLLED FOR SPOT 3
 
   Price 1 fully unrolled (the real table); prices 0 and 2 stated (same mechanics, own table):
 

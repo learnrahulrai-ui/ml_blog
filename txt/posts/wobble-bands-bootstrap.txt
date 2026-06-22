@@ -109,7 +109,7 @@
      Free Exam" below).
 
 
-  THE WOBBLE BAND
+  WOBBLE BAND
 
   IN HAND: one real pile, re-dealt WITH REPEATS into 200 fake piles (the pile stands in
   for the world because the world is where the pile came from), each fake pile refit into
@@ -181,7 +181,7 @@
      Same 190 notes in both. Wildly different trust. Never confuse the count with the gap.
 
 
-  THE FREE EXAM (OUT-OF-BAG)
+  FREE EXAM (OUT-OF-BAG)
 
   Now the gift. Remember that ~37% of patients sit out of every deal. The machine never saw
   them while it set its dials -- which makes them a perfect, honest, FREE EXAM. No need to
@@ -204,7 +204,7 @@
      between confidence and honesty.
 
 
-  THE TUG-OF-WAR BEHIND THE WHOLE CHAPTER
+  TUG-OF-WAR BEHIND THE WHOLE CHAPTER
 
   Step all the way back. Everything in this chapter -- the leash in Part 1, the wobble band
   here -- is one single trade-off, and it is easiest to see as two bad drivers:
@@ -224,7 +224,7 @@
   you measure the panic that is left over.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -240,7 +240,7 @@
     the whole trade                       the bias-variance trade-off
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.

@@ -53,7 +53,7 @@
   That single trick turns a circular formula into plain arithmetic you can check by hand.
 
 
-  THE WORLD (THE PICTURE EVERYTHING LIVES IN)
+  WORLD (THE PICTURE EVERYTHING LIVES IN)
 
   A drone hangs in the air over a patch of enemy ground. We want to grade a flight PLAN.
 
@@ -132,7 +132,7 @@
   picks a better path. It only SCORES the arrows you were given, on the discounted scale.
 
 
-  THE ONE LAW (DERIVED, NOT DECLARED)
+  ONE LAW (DERIVED, NOT DECLARED)
 
   A spot's worth = the DISCOUNTED points the drone collects from here on, obeying the arrows.
   Where the spot sits decides the shape.
@@ -282,12 +282,12 @@
   > and plain multiplication drags every spot to that truth, one spot closer per pass.
 
 
-  THE HARDER CASE: A FOREVER-BOUNCE WITH NO GROUND AT ALL
+  HARDER CASE: A FOREVER-BOUNCE WITH NO GROUND AT ALL
 
   "Fine," you say, "it heals because there is a +5 anchor to climb to. What if the drone never
   lands?" Good -- that is the case that looks impossible.
 
-  THE BOUNCE, DRAWN:
+  BOUNCE, DRAWN:
 
          spot A  <----+
             |         |
@@ -367,7 +367,7 @@
   stop is delta < theta.
 
 
-  THE ONLY CHECK IS "DID ANYTHING MOVE" -- THE SETTLING IS EMERGENT
+  ONLY CHECK IS "DID ANYTHING MOVE" -- THE SETTLING IS EMERGENT
 
   This is the part that feels too small to work. There is no code that spots junk, waits for a
   neighbour, or certifies a single spot is "correct." There is exactly ONE measurement in the
@@ -412,9 +412,9 @@
   job. Grading the plan we were handed is done.
 
 
-  THE DECODER (JARGON -> PLAIN, MASTER SHEET)
+  DECODER (JARGON -> PLAIN, MASTER SHEET)
 
-      THE PEACOCK WORD                         WHAT IT ACTUALLY MEANS
+      PEACOCK WORD                         WHAT IT ACTUALLY MEANS
       --------------------------------------   -------------------------------------------------
       state / s                                a spot -- a place the drone can be
       policy / pi                              the plan -- one arrow per spot, handed to you, fixed

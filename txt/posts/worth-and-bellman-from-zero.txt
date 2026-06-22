@@ -94,7 +94,7 @@
 
   ---------------------------------------------------------------------------
 
-  THE FADE (γ): AN ENDLESS PILE MUST STAY FINITE
+  FADE (γ): AN ENDLESS PILE MUST STAY FINITE
 
   A reward later counts for less than the same reward now. The amount of fading per move is
   one number: γ (gamma). These posts use γ = 0.9.
@@ -152,7 +152,7 @@
 
   ---------------------------------------------------------------------------
 
-  THE WORLD'S DIE: WHERE YOU LAND IS NOT ALWAYS CERTAIN
+  WORLD'S DIE: WHERE YOU LAND IS NOT ALWAYS CERTAIN
 
   When you pick an arrow from a spot, the world rolls a die. That die decides two things at
   once: where you land and what reward you grab. The chances of that roll are written:
@@ -236,7 +236,7 @@
 
   ---------------------------------------------------------------------------
 
-  THE BELLMAN RECIPE: WORTH = REWARD NOW + FADED WORTH NEXT
+  BELLMAN RECIPE: WORTH = REWARD NOW + FADED WORTH NEXT
 
   The recipe that defines V and Q for any fixed map:
 
@@ -310,7 +310,7 @@
 
   ---------------------------------------------------------------------------
 
-  THE BEST MAP MAY TIE; THE BEST WORTH NEVER DOES
+  BEST MAP MAY TIE; THE BEST WORTH NEVER DOES
 
   Sometimes two arrows at a spot are equally good. Draw it:
 
@@ -443,7 +443,7 @@
 
   ---------------------------------------------------------------------------
 
-  THE FLOOR, COMPLETE
+  FLOOR, COMPLETE
 
   Every piece above connects to the next:
 
@@ -477,7 +477,7 @@
 
   ---------------------------------------------------------------------------
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   All code below is hard-coded. No for or while loops. Every intermediate value is
   shown with the actual number, not a variable name standing in for it.

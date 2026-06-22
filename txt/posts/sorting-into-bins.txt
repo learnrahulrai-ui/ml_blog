@@ -68,7 +68,7 @@
     columns -> *dials -> add -> SQUASH -> chance 0-1 -> CUTOFF -> [B] or [M]
 
 
-  THE SQUASH CURVE
+  SQUASH CURVE
 
   The squash is a function that takes any number and returns a chance between 0 and 1.
   Its graph has an S-shape, so call it the S-curve.
@@ -256,7 +256,7 @@
   along with a warning about running it twice.
 
 
-  THE FOUR-BOX TABLE
+  FOUR-BOX TABLE
 
   IN HAND so far: a machine that adds 30 dialed columns into a number z.
   It squashes z into a chance with sig(z) = 1 / (1 + e^-z); z = 0 gives 0.5, even money.
@@ -500,7 +500,7 @@
     harmonic mean   = 2 * 0.10 * 0.98 / (0.10 + 0.98) = 0.18   <- honest
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet a computer: the same work, spoken in Python.
@@ -594,7 +594,7 @@
     f1        = f1_score(y_test, y_pred)
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

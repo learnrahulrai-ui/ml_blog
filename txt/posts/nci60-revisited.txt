@@ -34,7 +34,7 @@
      leukemia cells cluster apart from melanoma cells. The structure was already there;
      you just could not see it until PCA flattened the room to a page.
 
-  THE SHEET: WIDE, NOT TALL
+  SHEET: WIDE, NOT TALL
 
     NCI60 -- 64 cell-line samples, ~6,830 gene measurements each
     (each measurement = log-brightness of one gene's activity in that cell line:
@@ -256,7 +256,7 @@
        +1 means identical.  Reading the raw fraction makes nonsense look like a match.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -272,7 +272,7 @@
     re-zeroed agreement score (-1..1)     adjusted Rand score (adjusted_rand_score)
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.

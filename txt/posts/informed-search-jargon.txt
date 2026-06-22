@@ -50,7 +50,7 @@
      A good heuristic is as close to the truth as possible without ever going over.
 
 
-  THE TOWN (THE PICTURE EVERYTHING LIVES IN)
+  TOWN (THE PICTURE EVERYTHING LIVES IN)
 
   Four places in a small town. Roads between them. Each road has a cost.
 
@@ -82,7 +82,7 @@
       (h at the goal is always 0 -- no distance left once you have arrived)
 
 
-  THE ONLY THREE NUMBERS THAT MATTER
+  ONLY THREE NUMBERS THAT MATTER
 
   Stand at some place. Three numbers describe it.
 
@@ -316,9 +316,9 @@
   or slow guesses are the bad ones.
 
 
-  THE DECODER (JARGON -> PLAIN, MASTER SHEET)
+  DECODER (JARGON -> PLAIN, MASTER SHEET)
 
-      THE PEACOCK WORD                         WHAT IT ACTUALLY MEANS
+      PEACOCK WORD                         WHAT IT ACTUALLY MEANS
       --------------------------------------   -------------------------------------------------
       node                                     a place in the town
       edge / step cost                         a road / its toll

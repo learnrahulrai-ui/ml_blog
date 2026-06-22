@@ -396,7 +396,7 @@
           macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                  Standard label
     ------------------------------------   -------------------------------------------

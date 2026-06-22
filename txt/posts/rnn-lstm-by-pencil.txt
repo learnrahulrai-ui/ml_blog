@@ -26,7 +26,7 @@
   of 32, two words instead of thousands) are the toy. The machinery is identical to what runs
   at full scale.
 
-  THE PROBLEM, DRAWN:
+  PROBLEM, DRAWN:
 
       PILE OF REVIEWS (each hand-labelled)      MACHINE        VERDICT
       "the nolan film ended beautifully"  -->   [  ???  ]  --> 1  (liked)
@@ -101,7 +101,7 @@
   one row (one word) at a time, left to right.
 
 
-  THE RNN -- ONE WORKER, ONE MEMORY, WALKING LEFT TO RIGHT
+  RNN -- ONE WORKER, ONE MEMORY, WALKING LEFT TO RIGHT
 
   New words, defined here before use:
 
@@ -186,7 +186,7 @@
       word 80 ("good"): the signal from word 1 has been tanh-crushed and scaled by U
                         seventy-nine times. What survives: nearly nothing.
 
-  THE FADE, DRAWN:
+  FADE, DRAWN:
 
       SIGNAL STRENGTH FROM WORD 1 ("not") -- measured at each word:
 
@@ -210,12 +210,12 @@
   and that echo is crushed again on the next word. Far-back words fade to nothing.
 
 
-  THE LSTM -- A SILENT VAULT AND A SPOKEN READOUT
+  LSTM -- A SILENT VAULT AND A SPOKEN READOUT
 
   The fix is one structural change: carry TWO memories instead of one, and the first one is
   NEVER crushed on carry.
 
-  THE LSTM STRUCTURE, DRAWN:
+  LSTM STRUCTURE, DRAWN:
 
                      VAULT A  (the silent long-term carry)
       +--------------------------------------------------------------+
@@ -283,7 +283,7 @@
           tanh(4.62) = 0.9999 (practically 1.0)
           new readout B = 0.7 * 0.9999 ~= 0.70
 
-  THE RNN VS LSTM COMPARISON, ONE TABLE:
+  RNN VS LSTM COMPARISON, ONE TABLE:
 
       MEMORY TYPE    OLD VALUE    ONE WORD LATER    CRUSHED INTO -1..+1?
       -----------    ---------    --------------    --------------------
@@ -308,7 +308,7 @@
   The tick reads B_2.
 
 
-  THE TWO MEMORIES, SIDE BY SIDE
+  TWO MEMORIES, SIDE BY SIDE
 
       VAULT (A):   the long-running number that crosses word boundaries uncrushed.
                    No machine reads it directly. keep and admit are applied TO it.
@@ -343,9 +343,9 @@
   Two memories, four machines, two lines -- that is the complete LSTM.
 
 
-  THE DECODER
+  DECODER
 
-      THE PEACOCK WORD              WHAT IT ACTUALLY MEANS
+      PEACOCK WORD              WHAT IT ACTUALLY MEANS
       --------------------------    --------------------------------------------------------
       embedding                     a word's stick -- a fixed-width list of numbers
       hidden state                  the readout B -- what the machine speaks each word

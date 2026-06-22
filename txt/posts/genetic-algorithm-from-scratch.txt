@@ -245,7 +245,7 @@
   the target.
 
 
-  THE BABIES REPLACE EVERYONE -- SO THE GOOD NUMBERS SURVIVE, NOT THE GOOD GUESSES
+  BABIES REPLACE EVERYONE -- SO THE GOOD NUMBERS SURVIVE, NOT THE GOOD GUESSES
 
   Repeat the wheel-cut-tweak until you have built a whole new population the same size as the
   old one -- four babies here, thousands in the real run. Then throw away ALL the old guesses
@@ -267,7 +267,7 @@
   Darwin's (natural selection, 1859); turning it into this code loop is John Holland's (1970s).
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Every score, flip, share, cut, and coin above worked on paper. Here the exact numbers in
   Python -- same moves, same digits. A guess is a plain list (so the cut can glue two pieces);

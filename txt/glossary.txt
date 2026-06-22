@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  THE DECODER RING
+  DECODER RING
   Plain words on the left. The buzzwords they map to on the right.
   ============================================================================================
 

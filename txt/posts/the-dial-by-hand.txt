@@ -31,7 +31,7 @@
      the slope. The math is pre-cooked; the machine just executes it.
 
 
-  THE SHEET, THE GOAL
+  SHEET, THE GOAL
 
     patient   age   bmi   bp    ...   answer
     ----------------------------------------
@@ -71,7 +71,7 @@
   3 ground through that solve by hand on three rows; here we just name its answer.
 
 
-  THE EXACT DIALS: ONE LINE THAT UNTANGLES EVERYTHING
+  EXACT DIALS: ONE LINE THAT UNTANGLES EVERYTHING
 
   Stack the sheet as a grid X (people down, columns across) and the answers as a column y.
   The flat-bottom solve collapses to one famous line:
@@ -85,7 +85,7 @@
   computes under the hood, and it is EXACT whether the columns overlap or not.
 
 
-  THE LADDER: A CRUTCH THAT LOOKS LIKE THE ANSWER
+  LADDER: A CRUTCH THAT LOOKS LIKE THE ANSWER
 
   There is a tempting shortcut for a single dial -- just measure how that one column and the
   answer move together, on their own:
@@ -174,7 +174,7 @@
   untangler (X^T X)^-1 to share credit among overlapping columns.  This section adds the
   eleventh number, the nudge.
 
-  THE NUDGE -- AND ITS QUIET ASTERISK
+  NUDGE -- AND ITS QUIET ASTERISK
 
   The fixed lift looks like it should be just as fiddly. On a centred sheet it is almost
   insultingly simple:
@@ -208,7 +208,7 @@
     R^2        = (total wobble - leftover) / total wobble
 
 
-  THE HONEST ONE PAGE
+  HONEST ONE PAGE
 
     guess  = sum(dial * column) + nudge
     dials  = (X^T X)^-1 X^T y           <- EXACT (untangles overlapping columns)
@@ -222,7 +222,7 @@
   black boxes left in it.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
@@ -236,7 +236,7 @@
     centred columns                       mean-centred / zero-mean features
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -244,7 +244,7 @@
   First the LADDER by hand -- the four people from the worked example, each term on its own
   line, no loop, so you watch top 4.12, bottom 0.0120, and dial 343 print back:
 
-    THE FOUR PEOPLE: (BMI, ANSWER), ONE PER LINE
+    FOUR PEOPLE: (BMI, ANSWER), ONE PER LINE
     A_x, A_y = 0.04,  97
     B_x, B_y = 0.06, 121
     C_x, C_y = 0.12, 135
@@ -279,13 +279,13 @@
     import numpy as np
     from sklearn.linear_model import LinearRegression
 
-    THE TOOLBOX -- ONE LINE, EXACT, UNTANGLING AND ALL
+    TOOLBOX -- ONE LINE, EXACT, UNTANGLING AND ALL
     dials = LinearRegression(fit_intercept=False).fit(Xc, y).coef_
 
-    THE SAME THING BY HAND -- THE FLAT-BOTTOM SOLVE, SPELLED OUT
+    SAME THING BY HAND -- THE FLAT-BOTTOM SOLVE, SPELLED OUT
     dials_by_hand = np.linalg.inv(Xc.T @ Xc) @ Xc.T @ y     # (X^T X)^-1 X^T y
 
-    THE LADDER FOR ONE COLUMN, ALONE -- MATCHES ONLY IF COLUMNS DON'T OVERLAP
+    LADDER FOR ONE COLUMN, ALONE -- MATCHES ONLY IF COLUMNS DON'T OVERLAP
     x = Xc[:, 1]                                            # e.g. the bmi column, centred
     ladder_bmi = np.sum(x * y) / np.sum(x * x)              # sum(x*y) / sum(x*x) on centred x
 

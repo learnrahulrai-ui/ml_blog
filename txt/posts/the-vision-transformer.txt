@@ -58,7 +58,7 @@
   Pencil out.
 
 
-  THE CSV CARRIES A HIDDEN COLUMN -- DROP BOTH OR EVERY NUMBER IS WRONG
+  CSV CARRIES A HIDDEN COLUMN -- DROP BOTH OR EVERY NUMBER IS WRONG
 
   Fashion-MNIST arrives as a CSV with one row per photo.
   The usual move: drop the 'label' column, take the rest as pixel values.
@@ -401,7 +401,7 @@
   Chapter 8 derived softmax; this is the same 10-way version.
 
 
-  THE WHOLE VISION TRANSFORMER IN CODE (Q6)
+  WHOLE VISION TRANSFORMER IN CODE (Q6)
 
       inputs = Input(shape=(49, 16))                       # one photo, pre-cut to 49 strips of 16
       x = Dense(64)(inputs)                                 # re-describe each strip: 16 → 64
@@ -441,7 +441,7 @@
       MultiHeadAttention(...)(x, X)  -- capital X is undefined; both arguments are lowercase x.
 
 
-  THE VIT RACES THE CNN (Q8, Q10)
+  VIT RACES THE CNN (Q8, Q10)
 
   Chapter 9's convolution factory -- magic papers sliding over 3x3 corners, pooling, flatten,
   Dense -- is the natural rival. Build it (the Chapter 9 machine) and race both on the sealed
@@ -465,7 +465,7 @@
             (global). Assumes nothing about nearness -- needs more data, scales further.
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Every calculation in this post -- photo cutting, positional encoding, attention, LayerNorm --
   worked by hand above.  Here each step is spelled out in Python.

@@ -34,7 +34,7 @@
      No searching, no luck. The formula you derive IS the bottom of the bowl.
 
 
-  THE RULE
+  RULE
 
     one row of measured things:  [rooms, income, age, ...]
           x
@@ -52,7 +52,7 @@
   rule stays linear in the dials.
 
 
-  THE SQUARED LEFTOVER TO SHRINK
+  SQUARED LEFTOVER TO SHRINK
 
       \         /
        \       /        height  = total squared leftover J(beta)
@@ -308,7 +308,7 @@
               Then each dial means "answer-units per one-spread step."
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same three rows, spoken in Python.
@@ -321,7 +321,7 @@
     x2, y2 = 2, 3
     x3, y3 = 3, 5
 
-    THE FOUR SUMS THE FLAT-POINT EQUATIONS NEED
+    FOUR SUMS THE FLAT-POINT EQUATIONS NEED
     sum_x  = 1 + 2 + 3            # 6
     sum_y  = 2 + 3 + 5            # 10
     sum_xx = 1*1 + 2*2 + 3*3      # 14
@@ -333,7 +333,7 @@
     b = (sum_y - w*sum_x) / 3                                 # (10-9)/3 = 0.333 (the nudge)
     print(round(w,3), round(b,3))      # 1.5 0.333
 
-    THE STICK'S GUESS AT EACH X, AND THE LEFTOVER (Y - GUESS), ONE LINE EACH
+    STICK'S GUESS AT EACH X, AND THE LEFTOVER (Y - GUESS), ONE LINE EACH
     yhat1 = b + w*1;  yhat2 = b + w*2;  yhat3 = b + w*3
     print(round(yhat1,3), round(yhat2,3), round(yhat3,3))             # 1.833 3.333 4.833
     print(round(y1-yhat1,3), round(y2-yhat2,3), round(y3-yhat3,3))    # 0.167 -0.333 0.167

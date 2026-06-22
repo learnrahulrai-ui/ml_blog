@@ -64,7 +64,7 @@
       n_estimators in RandomForest      <- how many trees to grow
 
 
-  THE GRID HUNT
+  GRID HUNT
 
   You have several settings, each with several candidate values.
   A grid lists every combination of those values.
@@ -403,7 +403,7 @@
     +------------------------------+------------------------------------------+
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Nothing above needed a computer.  Here the hand examples are spelled out in Python
   so you can run each one and see the same numbers the post printed.
@@ -451,7 +451,7 @@
     CLASS A (1000 ROWS) DOMINATES THE POOL; CLASS C (10 ROWS) BARELY REGISTERS
 
 
-  THE CODE, IF YOU WANT IT
+  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -522,7 +522,7 @@
   cannot teach yourself.
 
 
-  THE LABELS, LAST
+  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

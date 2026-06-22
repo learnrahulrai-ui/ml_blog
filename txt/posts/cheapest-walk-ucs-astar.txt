@@ -126,7 +126,7 @@
   standing on S right now, so S is reached for 0.
 
 
-  THE WHEEL: PULL, DISCARD OR STOP OR OPEN
+  WHEEL: PULL, DISCARD OR STOP OR OPEN
 
   Pull the cheapest slip (cost, place) off the pile. Three cases, in order:
 
@@ -147,7 +147,7 @@
   place is already sealed, and gets tossed. Popped many times; sealed exactly once.
 
 
-  THE FULL UCS WALK (SIX POPS, EVERY OFFER SHOWN)
+  FULL UCS WALK (SIX POPS, EVERY OFFER SHOWN)
 
     start:  q=[(0,S)]  states={S:0}  previous={S:None}  sealed={}
 
@@ -292,7 +292,7 @@
   proved below, is exactly what makes A* safe.
 
 
-  THE FULL A* WALK (FIVE POPS -- ONE FEWER THAN UCS)
+  FULL A* WALK (FIVE POPS -- ONE FEWER THAN UCS)
 
     start:  pile = [(3.61, 0, S)]   states = {S:0}   prev = {S:None}   sealed = {}
 
@@ -334,7 +334,7 @@
   hundreds of pops.
 
 
-  THE GUESS IS AN UNDER-COUNT -- WHICH IS WHY A* RETURNS THE SAME ANSWER AS UCS
+  GUESS IS AN UNDER-COUNT -- WHICH IS WHY A* RETURNS THE SAME ANSWER AS UCS
 
   The heuristic h(place) is admissible if it never overcounts the true remaining cost:
   h(place) ≤ true cheapest road cost from place to G, always. Here is the careful version
@@ -393,7 +393,7 @@
   cost to place P?"
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Round-by-round, the same numbers from the walk above, as named variables:
 

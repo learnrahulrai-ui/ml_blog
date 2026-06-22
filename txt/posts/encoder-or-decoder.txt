@@ -54,7 +54,7 @@
   yet -- this is Chapter 10's machine. The new question is one word: which cells are ALLOWED?
 
 
-  THE ONE SWITCH: MAY A TOKEN SEE THE FUTURE, OR NOT?
+  ONE SWITCH: MAY A TOKEN SEE THE FUTURE, OR NOT?
 
   Until now, every cell was allowed -- token i could look at tokens before AND after it. That
   has a name:
@@ -105,7 +105,7 @@
       DECODER : future mask → causal → WRITES forward (next token, then the next)
 
 
-  THE NAMES: BERT READS, GPT WRITES
+  NAMES: BERT READS, GPT WRITES
 
   Two famous machines are exactly these two settings, and their names say so:
 
@@ -186,7 +186,7 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   The only calculation in this post is the causal mask turning raw scores into portions.
   Here it is spelled out in Python, using equal raw scores of 1.0 for every allowed cell.

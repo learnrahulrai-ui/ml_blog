@@ -201,7 +201,7 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
-  THE PORTIONS WEIGHT THE GIVE STICKS -- NOLAN'S NEW STICK FALLS OUT
+  PORTIONS WEIGHT THE GIVE STICKS -- NOLAN'S NEW STICK FALLS OUT
 
   Multiply each word's GIVE stick by its portion, then ADD number-by-number:
 
@@ -340,7 +340,7 @@
   ─────────────────────────────────────────────────────────────────────────────────────────
 
 
-  THE NUMBERS, IN PYTHON
+  NUMBERS, IN PYTHON
 
   Every dot product, softmax, and weighted sum above done by pencil.  Here the same numbers
   in Python -- run it and compare each line with the post's arithmetic.

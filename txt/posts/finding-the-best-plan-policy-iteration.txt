@@ -51,7 +51,7 @@
       peek untouched is provably the best.
 
 
-  THE WORLD (REDRAWN HERE SO THE COMPANION POST IS NOT NEEDED)
+  WORLD (REDRAWN HERE SO THE COMPANION POST IS NOT NEEDED)
 
   A drone hangs in the air over a patch of enemy ground. We want to find the best flight plan.
 
@@ -93,7 +93,7 @@
                    Scratch paper: rebuilt from nothing each time the plan changes.
 
 
-  THE GRADE STEP, FOLDED INTO ONE BOX (THE COMPANION POST, COMPRESSED)
+  GRADE STEP, FOLDED INTO ONE BOX (THE COMPANION POST, COMPRESSED)
 
   Before a plan can be bettered, it must be GRADED -- every spot given a worth under the current
   arrows. That is the companion post's entire job; here is the whole of it in one box, so you
@@ -129,7 +129,7 @@
   spot has no nudge at all (the flight is over); its only "move" is to stay put.
 
 
-  THE IMPROVE MOVE -- PEEK THE SIX, KEEP THE WINNER
+  IMPROVE MOVE -- PEEK THE SIX, KEEP THE WINNER
 
   Stand on an air spot. You hold a worth for every spot (from the grade). You want this spot's
   BEST arrow. Do not solve anything. PEEK each nudge and score it:
@@ -160,13 +160,13 @@
   So the peek really asks one thing: which neighbour is worth the most? Aim there.
 
 
-  THE WHOLE LOOP -- GRADE, PEEK, REPEAT, FREEZE
+  WHOLE LOOP -- GRADE, PEEK, REPEAT, FREEZE
 
   No worths exist before a plan exists, and no smart plan exists before worths exist -- another
   circle. Break it the same way grading broke its circle: start from a lie. Scribble ANY plan
   (a nudge in the air, "stay put" on the ground). Garbage is fine; it gets fixed.
 
-  THE LOOP, DRAWN:
+  LOOP, DRAWN:
 
       START: scribble ANY plan (e.g. "always go Left")
             |
@@ -296,9 +296,9 @@
   math hands back exactly the plan a human would draw for this map.
 
 
-  THE DECODER (JARGON -> PLAIN, MASTER SHEET)
+  DECODER (JARGON -> PLAIN, MASTER SHEET)
 
-      THE PEACOCK WORD                         WHAT IT ACTUALLY MEANS
+      PEACOCK WORD                         WHAT IT ACTUALLY MEANS
       --------------------------------------   -------------------------------------------------
       state / s                                a spot -- a place the drone can be
       action / a                               a nudge -- N S E W U D (or "stay put" on the ground)
