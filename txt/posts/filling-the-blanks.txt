@@ -476,6 +476,20 @@
        np.allclose(a, b)      -- "are these two sheets the same, near enough?"
        np.clip(x, 1, 5)       -- clamp every number into a range
 
+  The grid, drawn -- a holey ratings sheet R split into two skinny sheets whose product
+  refills it (. = a blank to be guessed):
+
+      R (users x movies)              U (users x K)       V (movies x K)
+          M1 M2 M3 M4 M5                 t1  t2              t1  t2
+      u1 [ 5  .  4  .  . ]          u1 [ .   . ]        M1 [ .   . ]
+      u2 [ .  3  .  2  . ]    ~     u2 [ .   . ]    x   M2 [ .   . ]      (K = 2 tastes)
+      u3 [ 4  .  .  .  1 ]          u3 [ .   . ]        ...
+
+  pred = U @ V.T refills EVERY cell, blanks included -- those are the recommendations.
+  One cell is a user-row dotted with a movie-row:
+
+      pred[u1, M2] = U[u1] . V[M2] = t1_u1 * t1_M2 + t2_u1 * t2_M2
+
     import numpy as np
 
     R = RATINGS GRID, NP.NAN IN THE BLANKS
