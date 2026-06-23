@@ -40,14 +40,23 @@
   - f (evaluation):         another name for g + h. The same thing. The textbook uses f; this page
                             uses g + h so the arithmetic stays visible.
 
-  THE OPTIMISM RULE -- why the compass must never overestimate
-     To be guaranteed to find the shortest path, the compass (h) must NEVER guess
-     a cost higher than the true remaining cost. If h says "3 miles left" when the
-     truth is 2, the search might skip the 2-mile path and lock onto a longer one.
-     THE PARADOX: to find the perfect path, you must be optimistic -- you must
-     underestimate. The moment you overestimate even once, the guarantee is gone.
-     A compass that always guesses 0 (UCS) is perfectly admissible but gives no speed.
-     A good heuristic is as close to the truth as possible without ever going over.
+  For A* to be guaranteed to find the shortest path, the compass h must never claim
+  more distance than truly remains. Watch what a single overestimate does. Two roads
+  to the goal, true remaining costs 2 and 3 -- but the compass oversells the short
+  one:
+
+      via P:  cost so far 0  +  h says 5   (truth: 2)   ->  scored 5
+      via Q:  cost so far 0  +  h says 3   (truth: 3)   ->  scored 3
+
+  A* trusts the scores and takes Q at 3 -- the longer road -- because the compass
+  inflated the short road P to 5 and buried it. Overestimate once and the shortest
+  path can be skipped for good.
+
+  Here is the twist: the safe compass is the humble one. As long as h never guesses
+  over the true cost left, the guarantee holds. Set h = 0 everywhere and you are
+  perfectly safe -- that is plain UCS, which never oversteps but gives no steer at
+  all. A good compass hugs the truth from below: as high as it dares without ever
+  going over.
 
   THE TOWN (THE PICTURE EVERYTHING LIVES IN)
 

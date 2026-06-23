@@ -48,7 +48,7 @@
   depending on its position in the sentence, so the grids see different inputs
   even for the same word at different positions.
 
-  SCALAR TRAP -- ADDING A NUMBER
+  THE FIRST IDEA: JUST ADD THE SLOT NUMBER
 
   The most direct idea: add the slot number to each element of the word's stick.
 

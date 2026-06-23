@@ -55,15 +55,23 @@
       row 2:  [ 5 ][45 ][...]  ...
               ...              (32 rows tall)
 
-  THE LINEAR PRISON TRAP -- why you must bend the straight line
-     Suppose the factory is all straight additions and multiplications with no bends.
-     Layer 1 output = 2 * input.
-     Layer 2 output = 3 * (Layer 1) = 6 * input.
-     A 50-layer factory built this way is still just: output = BIG_NUMBER * input.
-     One straight line dressed up as a deep network.
-     THE FIX: the bend (ReLU). After each layer, crush any negative value to 0.
-     Now when you stack layers the bends multiply into curves, curves multiply into
-     complex shapes. Without the bend, deep learning is physically impossible.
+  Suppose the factory is nothing but straight additions and multiplications, no
+  bends. Layer 1 doubles its input; layer 2 triples that:
+
+      input  -->  [x2]  -->  2*input  -->  [x3]  -->  6*input
+
+  Stack fifty of these and the whole thing is still output = BIG_NUMBER * input --
+  one straight line wearing a deep network's clothes:
+
+      straight in, straight out:   /       stacking straight lines only makes a line
+
+  So after each layer, bend it -- ReLU, which crushes any negative to 0. Stack bends
+  and they fold into curves; stack curves and they fold into any shape there is:
+
+      one bend:  _/        two bends:  _/\_        many:  _/\__/\_   (any shape)
+
+  Without the bend the deep factory collapses to a single multiply, and deep learning
+  is physically impossible. With it, every layer adds real shaping power.
 
     SLIDING WINDOW -- a tiny magic paper moves across the grid:
       +---+---+
