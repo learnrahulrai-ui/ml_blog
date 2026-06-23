@@ -55,14 +55,23 @@
      It is MEDIUM LEASH (C=1.0) vs TIGHTER LEASH (C=0.1).
      To see a genuinely unleashed machine you would have to pass penalty=None explicitly.
 
-  THE HERO WORSHIP TRAP -- why one loud column makes the machine fragile
-     Column 7 (radius) is strongly predictive. The machine loves it and sets dial = 40.
-     All other columns now barely matter -- the machine is a one-column dictator.
-     A new patient arrives with a slightly unusual radius, and the predicted chance
-     swings wildly from 1% to 99% on that one measurement alone.
-     THE FIX: the leash (L2 penalty / SVM C parameter). The leash charges a tax on
-     large dials. The machine is forced to spread its attention across many columns,
-     so no single outlier in one column can flip the verdict alone.
+  One column, radius, predicts well on its own. So the machine falls for it and
+  cranks that one dial sky-high:
+
+      dial_radius = 40         every other dial ~ 0
+      verdict  =  40 * radius  +  (almost nothing else)
+
+  Now the whole machine is a single column wearing a crowd. A new patient shows up
+  with a slightly odd radius and the prediction lurches the full width of the scale
+  on that one reading:
+
+      radius 1.0  -->  chance  1%
+      radius 1.2  -->  chance 99%        a hair of input, the verdict flips
+
+  A machine balanced on one column is a fragile machine. So put it on a leash: tax
+  every large dial (the L2 penalty, the SVM's C). With big dials made expensive, it
+  can no longer afford a single giant -- it has to spread its bet across many
+  columns, and no lone outlier can flip the verdict by itself.
 
   WHAT A LOOSE LEASH LETS HAPPEN
 

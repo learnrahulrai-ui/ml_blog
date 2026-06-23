@@ -36,15 +36,26 @@
   The next-longest shadow, at a right angle to the first, is the second.
   So crush to those two shadows and draw what you see.
 
-  THE FLAT SHADOW PARADOX -- why you must pick the right direction to crush
-     Imagine compressing a 3D object to 2D. If you look straight down from above,
-     you see a flat square -- all the height is gone. If you look from the side,
-     you see the full profile.
-     THE PARADOX: you MUST throw away one dimension. But throwing away the wrong
-     direction destroys the data.
-     THE FIX: PCA spins the data cloud until its shadow is as WIDE and SPREAD as
-     possible. The direction with the most spread (variance) preserves the most truth.
-     That direction is the first principal component. Crush along that axis.
+  Crushing a 3D object down to a flat picture means killing one direction -- the
+  only question is which. Look straight down on a tall bottle and its height is gone:
+
+      from above            from the side
+        +---+                  ___
+        |   |                 /   \
+        +---+                 |   |       same bottle, two shadows: overhead
+       a flat blob            |   |       throws the shape away, the side
+       (height lost)          \___/       keeps it
+
+  You have to drop a dimension; drop the wrong one and the shadow says nothing. So
+  do not pick by eye -- spin the cloud and watch its shadow stretch and shrink, then
+  keep the angle where the shadow is WIDEST:
+
+      narrow shadow ->  . (points pile on top of each other)
+      wide shadow   ->  . . . . . . . (points stay spread, every one distinct)
+
+  Widest shadow means the most spread survives the crush, which means the most
+  truth kept. That widest direction is the first principal component, and PCA
+  crushes along it.
 
   THE SHEET
 

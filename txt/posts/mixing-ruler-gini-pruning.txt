@@ -36,15 +36,27 @@
   Pruning snips the weak branches after the fact.
   An alpha tax (a charge per leaf) decides which branches to fire.
 
-  THE PURITY TRAP -- why you need a formula to pick the best question
-     Question A: splits 20 patients into [10 sick, 10 well] and [10 sick, 10 well].
-     Question B: splits 20 patients into [20 sick, 0 well] and [0 sick, 20 well].
-     Both questions split the pile exactly in half. But Question A learned nothing --
-     each half is as mixed as the start. Question B solved the entire problem.
-     THE FIX: the Gini impurity ruler. Measure how mixed each bucket is after the split.
-     A pure bucket (all sick, or all well) scores 0. A 50/50 mix scores 0.5.
-     Pick the question that produces the lowest total impurity across both buckets.
-     Gini mathematically punishes the useless split and rewards the clean one.
+  You are choosing which yes/no question to split 20 patients on. Two candidates,
+  and both cut the pile clean in half:
+
+      Question A                       Question B
+      ----------                       ----------
+      [10 sick, 10 well]               [20 sick,  0 well]
+      [10 sick, 10 well]               [ 0 sick, 20 well]
+
+  Both look "balanced." But A's two halves are each as muddled as the pile you
+  began with -- it learned nothing. B's halves are clean: ask the question and you
+  KNOW the answer. Same split size, opposite worth. Counting heads per side cannot
+  tell them apart, so you need a number for how MIXED each bucket is.
+
+  That number is Gini impurity: a bucket that is all one kind scores 0, a 50/50
+  bucket scores 0.5.
+
+      A:  0.5  and  0.5   -> total left = 0.5    (no gain over the start)
+      B:  0.0  and  0.0   -> total left = 0.0    (solved)
+
+  Pick the question that leaves the lowest impurity behind, and the useless split
+  is punished while the clean one wins -- automatically, by arithmetic.
 
   CLASSIFICATION TREE: ONE CHANGE AT THE BOTTOM
 

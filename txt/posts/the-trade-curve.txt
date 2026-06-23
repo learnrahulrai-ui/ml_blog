@@ -43,14 +43,25 @@
   The trade curve is what you get when you stop arguing over a single spot.
   It lays all the bargains out side by side, in one picture.
 
-  THE PERFECT MACHINE ILLUSION TRAP -- why grading on one cutoff misleads
-     Machine A scores the sick lumps at 0.49 and 0.48, and the well lumps at 0.01 and 0.02.
-     At the standard cutoff 0.5, both sick patients score below 0.5 and get called "well."
-     The machine catches nobody. It looks useless.
-     But Machine A has PERFECTLY separated the sick (higher scores) from the well (lower).
-     Slide the cutoff down to 0.40 and it catches everyone with zero false alarms.
-     THE FIX: never grade on one cutoff. Sweep the cutoff from 1 down to 0 and trace the
-     catches and false alarms at every point. That sweep is the trade curve (ROC curve).
+  Machine A hands each lump a score. The two sick lumps get 0.49 and 0.48; the two
+  well lumps get 0.01 and 0.02. Grade it at the usual cutoff of 0.5:
+
+      0.0    0.01 0.02                    0.48 0.49     1.0
+       |------oo----------------------------ss--|--------
+            well                                ^ cutoff 0.5
+            sick scores 0.48, 0.49 sit BELOW 0.5  ->  both called "well"
+
+  At 0.5 the machine catches nobody and looks worthless. But look again -- it put
+  both sick lumps ABOVE both well lumps. The separation is perfect; the cutoff is
+  just standing in the wrong spot. Slide it down to 0.40:
+
+      0.0    0.01 0.02         0.40       0.48 0.49     1.0
+       |------oo----------------|-----------ss----------
+                            cutoff here  ->  both sick caught, zero false alarms
+
+  So a single cutoff can bury a perfect machine. Never grade on one line. Sweep the
+  cutoff from 1 down to 0 and trace the catches and false alarms the whole way --
+  that sweep is the trade curve, the ROC curve.
 
   IN HAND: the machine gives each lump a chance-score from 0 to 1.
   You draw a line (the cutoff) somewhere on that scale.

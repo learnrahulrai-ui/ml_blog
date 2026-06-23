@@ -33,23 +33,29 @@
   loudly, in the box at the end -- so the one place we hide a sum behind a single arrow is never
   smuggled past you. Trust the recipe; treat the rest as a sketchpad.
 
-  THE HALL OF MIRRORS TRAP -- why you cannot just calculate worths directly
-     Spot A's worth depends on spot B's worth. Spot B's worth depends on spot A's worth.
-     Worth(A) = reward + Worth(B).  Worth(B) = reward + Worth(A).
-     The equations loop back on each other. You cannot solve them in a straight line.
-     THE FIX: lie first. Set every worth to 0. Sweep across all spots, updating each
-     one from its neighbours using the formula. Sweep again. The numbers settle toward
-     the true values -- the same truth the loop equation would give if you could solve it.
-     The lie heals itself, one sweep at a time.
+  Two spots lean on each other. A's worth needs B's worth; B's worth needs A's:
 
-  The one move, named here so you are not surprised later:
+      Worth(A) = reward + Worth(B)
+      Worth(B) = reward + Worth(A)
+                  ^___________|        each one needs the other already solved
 
-      A worth leans on its neighbour's worth, which leans on ITS neighbour's worth -- a circle.
-      You cannot write a bare number for any spot up front. So you LIE: write 0 everywhere,
-      then lay the rule down over the table again and again. The lie heals. The truth climbs
-      out from one painted anchor, a spot at a time, until nothing moves.
+  There is no first spot to compute -- the definitions chase each other around a
+  circle, so you cannot write a bare number for any spot up front.
 
-  That single trick turns a circular formula into plain arithmetic you can check by hand.
+  So lie. Write 0 in every spot, then lay the rule over the whole table anyway,
+  reading each spot from its neighbours and rewriting it. The first pass is mostly
+  lies feeding on lies -- but every spot is also anchored to a real reward, and that
+  scrap of truth seeps one spot further on each pass:
+
+      start:   A = 0     B = 0
+      pass 1:  A = 2.0   B = 1.0      (the rewards bite first)
+      pass 2:  A = 2.9   B = 2.4
+      pass 3:  A = 3.3   B = 2.9
+        ...                            settling toward the values the circular
+      stop:    A = 3.6   B = 3.2       equations would give, if you could solve them
+
+  The lie heals itself, one sweep at a time, and stops when nothing moves. That one
+  move turns a circular formula into plain arithmetic you can check by hand.
 
   THE WORLD (THE PICTURE EVERYTHING LIVES IN)
 

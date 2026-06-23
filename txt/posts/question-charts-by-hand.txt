@@ -27,16 +27,27 @@
   You keep splitting until each group's answers are tight enough.
   Therefore that group's average is a good guess for anyone who lands in it.
 
-  THE ENDLESS INTERROGATION TRAP -- when to stop asking questions
-     If you keep asking yes/no questions, eventually every bucket has exactly 1 person.
-     At that point you have built a "perfect" decision tree -- every bucket is pure.
-     But you just built a filing cabinet that memorised the study pile.
-     It will fail on the next patient. Ask it about someone it never studied
-     and it has no answer -- it only knows the 442 people it drilled on.
-     THE FIX: stop early. Forbid the tree from growing past a certain depth,
-     or forbid buckets with fewer than 10 people. Force it to generalise.
-     Pruning does the same thing after the tree is fully grown: it trims back
-     branches that do not earn their keep on the hidden pile.
+  Keep asking yes/no questions and the buckets keep shrinking. Ask enough of them
+  and every bucket ends up holding exactly one person:
+
+      442 people
+        q1 --> 210 | 232
+          q2 --> 95 | 115 | ...
+            ...
+              --> 1 | 1 | 1 | 1 | ... | 1      (442 buckets, one person each)
+
+  Every bucket is now "pure," so on the study pile the chart is never wrong -- it
+  kept a private drawer for each of the 442 people it drilled on. But that is a
+  filing cabinet, not a rule. Send in patient 443, never seen, and there is no
+  drawer to open:
+
+      new patient --> drops through the questions --> lands nowhere it has been --> ???
+
+  So stop before the cabinet forms: forbid the chart past a set depth, or forbid
+  any bucket smaller than, say, ten people. Pruning works from the far end -- grow
+  the chart fully, then cut back the branches that do not earn their keep on rows
+  it never studied. Either way you force it to lump people together, and lumping
+  is the only thing that lets it answer for someone new.
 
   THE SHEET: TWO NEW PILES
 

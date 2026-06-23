@@ -34,21 +34,45 @@
   And from here on every choice we make is haunted by which kind of mistake
   we can least afford to make.
 
-  THE INFINITE RULER TRAP -- why a straight stick cannot predict chances
-     Try a straight line: chance = 0.2 + 0.1 * (age).
-     A 50-year-old gets chance = 0.2 + 5.0 = 5.2.  That is 520%.
-     A straight stick reaches infinity. A chance cannot go above 1 or below 0.
-     THE FIX: the S-curve (sigmoid). It crushes any number down into 0-to-1.
-     No matter how high the dial sum goes, the curve flattens against the ceiling.
+  You want to predict a chance -- a number that has to live between 0 and 1. Reach
+  for a straight line, chance = 0.2 + 0.1 * age, and feed it a 50-year-old:
 
-  THE LAZY DOCTOR PARADOX -- why accuracy alone is a deadly trap
-     Suppose 99 out of 100 lumps are benign.
-     A lazy doctor who never looks at the scan and shouts "WELL!" to everyone:
-       accuracy = 99 out of 100 = 99%.  The hospital board gives him a medal.
-       Meanwhile the 1 sick patient is sent home to die.
-     THE FIX: measure RECALL -- what fraction of the truly sick did you catch?
-       lazy doctor: caught 0 out of 1.  Recall = 0%.  He is fired immediately.
-     Accuracy hides catastrophe when one bin outnumbers the other.
+      chance = 0.2 + 0.1*50 = 5.2  =  520%
+
+      0 |--------------------------1|.........5.2
+        floor                  ceiling      the line sailed clean through it
+
+  A straight stick climbs forever; it has no ceiling and no floor. But a chance
+  physically cannot pass 1 or fall below 0. The shapes do not match.
+
+  So bend the line into an S. The sigmoid takes any dial sum, however large, and
+  squashes it into the 0-to-1 band -- the higher the input climbs, the harder the
+  curve flattens against the ceiling:
+
+      1 |            .--------------
+        |        .-''
+      0 |__..--''_____________________
+           big negative -> ~0     big positive -> ~1
+
+  Now grade a yes/no machine where 99 of every 100 lumps are harmless. Here is a
+  doctor who never looks at the scan and calls everyone "well":
+
+      100 lumps:  99 well  +  1 sick
+      he says:    "WELL" to all 100
+                  -------------------------------
+      right on 99, wrong on 1   ->   accuracy = 99%      (the board hands him a medal)
+
+  Ninety-nine percent -- and the one sick patient walks out the door to die. The
+  single number that mattered, did you catch the sick one, is buried under a heap
+  of easy correct "well"s.
+
+  So stop scoring on accuracy and ask recall: of the truly sick, what fraction did
+  you actually catch?
+
+      sick caught / sick total  =  0 / 1  =  0%          (and now he is fired)
+
+  When one bin dwarfs the other, accuracy flatters a machine that catches nothing.
+  Recall refuses to.
 
   FROM NUMBER TO BIN
 
