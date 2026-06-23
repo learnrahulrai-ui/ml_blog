@@ -467,78 +467,101 @@
 
   q10_filter_shape = (3, 3, 3, 32).
 
-  COMMON TRIPWIRES
+  A pile of places this lab bit, in the order it bit, each a thing that feels right.
 
-  Built from the live lab session. Every confusion actually hit, in the order it bit.
+  At training time 64 photos go through together, so "1 photo -> 1 sheet" is wrong:
 
-  TRIPWIRE 1  The batch axis -- "1 photo → 1 sheet."
-    At training time, 64 photos pass through together. Inspector 1 makes 64 sheets,
-    one per photo. 32 inspectors x 64 photos = 2,048 sheets in flight simultaneously.
-    The HUMBLER is the only floor that reaches across all 64 photos' sheets to compute
-    the average and scatter. Every other floor is photo-blind.
+      32 inspectors  x  64 photos  =  2,048 sheets in flight at once
 
-  TRIPWIRE 2  "The humbler has 4 numbers -- aren't they all tuned by wrongness?"
-    No. Only stretch and shift are dials tuned by wrongness. Settled middle and settled
-    scatter are running averages -- they are REMEMBERED but the answer key never touches
-    them. They are used only at exam time when a single photo arrives.
+  Only the HUMBLER reaches across all 64 photos' sheets (to take the average and
+  scatter); every other floor is photo-blind, working one sheet at a time.
 
-  TRIPWIRE 3  "Send-home zeroes workers, or the whole image."
-    Neither. It zeroes NUMBERS on the scratch sheets (individual entries). Inspector 3
-    still runs, his paper still moves, the photo is unchanged. Some of his output
-    entries get set to zero; the others survive and are scaled up.
+  The humbler carries 4 numbers, but they are not all tuned by wrongness:
 
-  TRIPWIRE 4  "Floor-2 magic paper must be 16x16 -- that is the sheet size after the boss."
-    No. The paper is always small (3x3) and moves one step at a time. Its DEPTH
-    auto-stretches to match what arrives (32 deep, since 32 inspector sheets fed in).
-    A 16x16 paper couldn't move -- one position, no neighborhoods.
+      stretch, shift                    -> dials, nudged by the answer key   (learned)
+      settled middle, settled scatter   -> running averages, REMEMBERED, never tuned
 
-  TRIPWIRE 5  "The machine never forgets -- but we throw away the sheets?!"
-    Two separate things.
-    DIALS: never discarded; nudged every loop; kept forever. That is the learning.
-    SHEETS: scratch paper; made for one photo; used; binned. Every photo, every loop.
-    Even the 256 kept numbers after the boss get binned once the answer is computed.
-    "Learns forever" = dials.  "Forgets instantly" = sheets.
+  The two remembered ones are used only at exam time, when a single photo arrives
+  alone.
 
-  TRIPWIRE 6  "The boss deletes 75% of each inspector's work -- 768 of 1024 scores."
-    Yes, and that is the design. Four near-identical alarm readings in one 2x2 region
-    say no more than one. The loudest carries the information. The quiet three are dead
-    forever -- the blame-nudging from later floors never flows back through them.
+  "Send-home" zeroes neither a worker nor the image -- it zeroes NUMBERS on the
+  scratch sheet:
 
-  TRIPWIRE 7  "1 in 4 send-home means group the entries into groups of 4 and zero one."
-    No. Each entry independently flips its own coin. Sometimes two in a row get zeroed;
-    sometimes none do. The independence is what breaks the secret teams.
+      inspector 3 still runs, photo unchanged
+      some of his output ENTRIES -> 0; the survivors get scaled up
 
-  TRIPWIRE 8  Zeroing the diagonal to find the biggest miss.
-    Always zero it on a COPY, never on the real sheet. The test cell checks
-    np.sum(q8_conf_matrix) == 10,000. Zeroing the real diagonal drops the sum and crashes.
+  It is entries that drop out, not workers.
 
-  TRIPWIRE 9  "Flip-safe means the image is symmetric."
-    Not the same thing. A flip is safe if the FLIPPED CARD is STILL a true example
-    of the label -- the label survives the mirror.
-    cat → mirror → still a cat  ✓
-    "2" → mirror → backwards "2"  ✗  (not a valid 2 anymore)
-    You do not need the cat to be symmetric; you need CAT-NESS to survive the flip.
+  Floor-2 magic paper is NOT 16x16 to match the sheet after the boss. It stays small
+  and slides:
 
-  TRIPWIRE 10  "32x32 is the factory's limit -- a better factory would fix it."
-    The ceiling is in the DATA, not the factory. At 32 dots a side, even a human eye
-    cannot reliably tell a blurry cat from a blurry dog. The machine's biggest confusion
-    (cat↔dog) is the same pair that fools humans at that resolution. Sensible machine,
-    sensible mistakes.
+      paper:  3x3, moves one step at a time
+      depth:  auto-stretches to 32 (one per incoming inspector sheet)
 
-  TRIPWIRE 11  "get_weights() returns one pile -- the dials."
-    It returns TWO: dials (shape (3,3,3,32)) and nudges (shape (32,)).
-    Unpack both; store only the dials' shape for Q10.
+  A 16x16 paper could not move -- one position, no neighbourhoods to scan.
 
-  TRIPWIRE 12  "The 32 score-sheets after floor 1 are some kind of colour sheets."
-    No. Colour meaning DIES at floor 1. Each of the 32 numbers at a given spot is the
-    answer to a DIFFERENT QUESTION about that neighborhood:
+  "The machine never forgets -- but we bin the sheets?" Two different things:
 
-      at (5,5):  inspector 1  "redness here?"  7.2
-                 inspector 2  "top edge here?" 0.3
-                 inspector 3  "corner here?"   5.1
-                 ... 32 questions, 32 answers.
+      DIALS:   nudged every loop, kept forever            <- this is the learning
+      SHEETS:  scratch paper, one photo, used then binned  (even the 256 kept numbers)
 
-    Not 32 colour channels. 32 different measurements of the same region.
+  "Learns forever" = dials. "Forgets instantly" = sheets.
+
+  The boss really does drop 768 of each inspector's 1,024 scores -- by design:
+
+      2x2 region:  [7.2  6.9]      four near-identical alarms say no more than
+                   [7.0  7.1]      one -> keep the loudest (7.2), kill the other 3
+
+  The quiet three are dead forever; later blame-nudging never flows back through them.
+
+  "1 in 4 send-home" does NOT mean group entries in fours and zero one each:
+
+      grouped:      [. . . X][. . . X]    <- wrong picture
+      independent:  each entry flips its OWN coin -> sometimes 2 in a row, sometimes 0
+
+  That independence is what breaks the secret teams of co-adapted entries.
+
+  To find the biggest miss you zero the confusion sheet's diagonal -- but on a COPY,
+  never the real sheet:
+
+      real sheet:   sum must stay 10,000        (the test cell checks it)
+      zero real diagonal -> sum drops  -> crash
+      zero a COPY        -> real sheet intact
+
+  Always np.fill_diagonal on a copy.
+
+  A flip being "safe" does NOT mean the image is symmetric. It means the MIRRORED card
+  is still a true example of its label:
+
+      cat  -> mirror -> still a cat       safe
+      "2"  -> mirror -> backwards "2"     not a valid 2 -> unsafe
+
+  You do not need the cat to be symmetric; you need cat-ness to survive the mirror.
+
+  The 32x32 blur is the DATA's ceiling, not the factory's:
+
+      32 dots a side -> even a human eye cannot split a blurry cat from a blurry dog
+      machine's biggest mix-up: cat <-> dog -- the same pair that fools people
+
+  A fancier factory cannot recover detail the data never held. Sensible machine,
+  sensible mistakes.
+
+  get_weights() returns TWO arrays, not one:
+
+      dials    shape (3, 3, 3, 32)
+      nudges   shape (32,)
+
+  Unpack both; keep only the dials' shape for Q10.
+
+  Last, the 32 score-sheets after floor 1 are NOT colour channels -- colour meaning
+  DIED at floor 1. Each of the 32 numbers at a spot answers a DIFFERENT question:
+
+      at (5,5):  inspector 1  "redness here?"   7.2
+                 inspector 2  "top edge here?"  0.3
+                 inspector 3  "corner here?"    5.1
+                  ...          32 questions       32 answers
+
+  Thirty-two measurements of the same region, not 32 colours.
 
     handful of 64 photos          batch (batch_size=64)
     dial-turn per handful         gradient update / optimiser step

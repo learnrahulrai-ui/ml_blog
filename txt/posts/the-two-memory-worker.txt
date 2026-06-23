@@ -382,66 +382,98 @@
   a long memory, gate it with dimmer knobs -- and treat the precise count of voters as a
   historical accident, not a law.
 
-  COMMON TRIPWIRES
+  A pile of confusions from the live derivation, each a thing that feels right.
 
-  Built from the live derivation -- every confusion actually hit, logged so it stays fixed.
+  A loud fresh value -- a big tanh near +1 or -1 -- feels like it should count a lot.
+  It need not:
 
-  TRIPWIRE 1  "More is better -- a loud fresh value should count a lot."
-    No. A loud value (a big tanh near +1 or -1) can still be deemed worthless: the admit-voter
-    can set its fraction near 0 and let almost none of it in. LOUDNESS is the value; WORTH is
-    the voter, judged separately.
+      fresh value:  +0.97  (loud)
+      admit-voter:   0.02   -> almost none of it gets in
 
-  TRIPWIRE 2  "The old memory can't be 5.0 -- tanh keeps it inside -1..+1."
-    True for the PLAIN worker (crushed every word). FALSE for the LSTM's memory-A, which is
-    never crushed on the carry -- only scaled and added -- so it CAN read 5.0. That is the
-    whole escape from the fade.
+  LOUDNESS is the value; WORTH is the voter, judged separately. A loud value the voter
+  distrusts barely moves the memory.
 
-  TRIPWIRE 3  "A voter reads the thing it multiplies."
-    No. All four machines READ the same two things (word32 + memory-B). They are APPLIED to
-    DIFFERENT targets (keep -> A, admit -> fresh value, show -> tanh(new A)). Born-from same,
-    applied-to different.
+  "Memory can't be 5.0 -- tanh keeps it in -1..+1." True for the plain worker, false
+  for the LSTM:
 
-  TRIPWIRE 4  "If no voter reads memory-A, why keep A?"
-    Because the votes are APPLIED to A -- they scale it and add to it. A is the long-term
-    treasure the votes act on, even though the voters decide their fractions from B and the
-    word. Drop A and nothing carries far.
+      plain worker:   memory crushed by tanh every word   -> stuck in [-1, +1]
+      LSTM memory-A:  only scaled and added on the carry    -> CAN read 5.0
 
-  TRIPWIRE 5  "Two memories means two copies of the same memory."
-    No -- two DIFFERENT memories. A is the long keep (never crushed on the carry); B is the
-    spoken recent (show-frac x tanh(A)). Different roles, different numbers.
+  That uncrushed carry is the whole escape from the fade.
 
-  TRIPWIRE 6  "The voter-multiply sums across slots, like the dial-papers do."
-    No. Two different multiplies. The dial-paper inside a machine SUMS a row of products into
-    one number (a dot product). The combine's voter-multiplies are PAIR-BY-PAIR and do NOT
-    sum -- all 32 slots survive as 32 slots.
+  A voter does not read the thing it acts on. All four machines READ the same two
+  inputs, then APPLY to different targets:
 
-  TRIPWIRE 7  "Add the nudge after the squash."
-    No. Inside each machine: word-part + memory-part + nudge FIRST, THEN the one squash
-    (tanh or sigmoid) at the end. One crush, last.
+      read:     word32 + memory-B   (all four)
+      applied:  keep -> A,   admit -> fresh value,   show -> tanh(new A)
 
-  TRIPWIRE 8  "The fresh value is some new invention."
-    It is the plain Part 1 worker's recipe, reused unchanged as one of the four machines. The
-    LSTM = that old cell + three voters.
+  Born from the same inputs, applied to different places.
 
-  TRIPWIRE 9  "A GPU runs the words in parallel like it runs the matrix multiply."
-    No. The dial-paper multiply and the separate reviews run in parallel, but the WORDS must
-    be walked IN ORDER -- each word needs the previous word's memory. Breaking that ordered
-    chain is exactly what the Transformer (a later chapter) does.
+  No voter reads memory-A -- so why keep it? Because the votes are APPLIED to A:
 
-  TRIPWIRE 10  "The LSTM is derived from first principles, so the wiring is forced."
-    No. The fade is derivable; the exact wiring was engineered by trial. Variants (e.g. the
-    GRU) work about as well. The mechanism is the lesson, not the precise voter count.
+      keep-frac x A   +   admit-frac x fresh   ->  new A
 
-  TRIPWIRE 11  "The four machines are two machines -- a word-machine that feeds a B-machine."
-    No -- ONE machine, two papers inside. In KEEP-VOTER: sigmoid(word32 x Wk + memoryB x Uk
-    + nudge_k), word32 and memoryB are both inputs that ADD inside the same one machine before
-    the squash. There is no cascade. Each of the four machines has this one-combine structure,
-    with its own W, its own U, its own nudge.
+  A is the long-term treasure the votes act on, even though the voters set their
+  fractions from B and the word. Drop A and nothing carries far.
 
-  TRIPWIRE 12  "Memory-B is a matrix."
-    No. B is a VECTOR -- 32 numbers, same shape as the word32 embedding. The DIALS are the
-    matrices: 8 papers (Wf/Uf, Wk/Uk, Wa/Ua, Ws/Us), each 32x32. A and B are vectors; W and
-    U are 32x32 matrices; nudges are 32-wide vectors (one per machine).
+  Two memories does not mean two copies of one memory -- two DIFFERENT ones:
+
+      A:  the long keep, never crushed on the carry
+      B:  the spoken recent, show-frac x tanh(A)
+
+  Different roles, different numbers.
+
+  The voter-multiply is not the dial-paper's summing multiply:
+
+      dial-paper:      a row of products SUMMED into one number   (dot product)
+      voter-multiply:  PAIR by pair, slot 1 x slot 1, ...          (no sum)
+
+  All 32 slots go in and 32 come out; nothing collapses to one.
+
+  The nudge goes in BEFORE the squash, not after:
+
+      word-part + memory-part + nudge    FIRST
+                  then one squash (tanh or sigmoid)    LAST
+
+  One crush, at the very end.
+
+  The "fresh value" is not new -- it is the plain Part 1 worker's recipe, reused
+  unchanged:
+
+      LSTM  =  the old Part-1 cell  +  three voters (keep, admit, show)
+
+  Old cell, three new gates wrapped around it.
+
+  A GPU parallelises the dial-paper multiply and separate reviews -- but NOT the
+  words:
+
+      parallel:  the matrix multiply, and many reviews at once
+      serial:    word 1 -> word 2 -> word 3 ...   each needs the previous memory
+
+  Breaking that ordered word-chain is exactly what the Transformer (later) does.
+
+  The fade is derivable; the exact wiring is not forced -- it was engineered by trial:
+
+      forced:      "memory must not be crushed on the carry"   (the fade demands it)
+      engineered:  the precise voter count and layout           (the GRU works too)
+
+  The mechanism is the lesson, not the exact number of voters.
+
+  The four machines are not a word-machine feeding a B-machine. Each is ONE machine
+  with two papers inside:
+
+      keep-voter = sigmoid( word32 x Wk  +  memoryB x Uk  +  nudge_k )
+                            \_________ both ADD in the same machine _________/
+
+  No cascade. Four machines, each with its own W, U, and nudge, each a single combine.
+
+  Last, memory-B is a VECTOR, not a matrix -- the matrices are the dials:
+
+      A, B:    vectors, 32 numbers each (same shape as the word embedding)
+      W, U:    32x32 matrices, eight of them (Wf/Uf, Wk/Uk, Wa/Ua, Ws/Us)
+      nudges:  32-wide vectors, one per machine
+
+  Vectors flow through; the matrices are the dials they pass.
 
   TRIPWIRE 13  "keep = 1 minus admit -- what you don't keep, you admit."
     No. There is NO subtraction here. keep and admit are TWO separate machines, each with its
