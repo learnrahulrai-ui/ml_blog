@@ -488,30 +488,21 @@
     fair = squareform(pdist(z, metric="euclidean"))     # the fair sheet
     print(round(fair[0, 1], 2))                         # 1.06   Alabama-Alaska, fair
 
-    STANDARDISE
-    scaler = StandardScaler()
-    scaled = scaler.fit_transform(df)
-    df_scaled = pd.DataFrame(scaled, index=df.index, columns=df.columns)
+  Two reads of that fair sheet answer the usual questions. The closest PAIR is the
+  smallest number anywhere off the zero diagonal. The k NEAREST states to one anchor
+  is just that anchor's ROW, sorted, with its own 0 dropped:
 
-    FAIR DISTANCE MATRIX (50X50)
-    n = len(df_scaled)
-    dist_mat = np.zeros((n, n))
-    for i in range(n):
-        for j in range(n):
-            dist_mat[i, j] = euclidean_distance(df_scaled.iloc[i],
-                                                df_scaled.iloc[j])
+      fair[Alabama] = [ 0.00   1.06   ...   ]    sort ascending, drop the 0, take k
+                         AL     AK             -> the states most like Alabama
 
-    CLOSEST PAIR (EXCLUDE DIAGONAL)
-    np.fill_diagonal(dist_mat, np.inf)
-    min_idx = np.unravel_index(dist_mat.argmin(), dist_mat.shape)
-    pair = (df_scaled.index[min_idx[0]], df_scaled.index[min_idx[1]])
+    # closest PAIR: smallest off-diagonal entry in the whole sheet
+    np.fill_diagonal(fair, np.inf)                 # hide each state-to-itself 0
+    i, j = np.unravel_index(fair.argmin(), fair.shape)
+    print(df.index[i], df.index[j])                # the two most-alike states
 
-    K-NEAREST NEIGHBOURS
-    def find_k_nearest(state_name, k):
-        idx = df_scaled.index.get_loc(state_name)
-        row = dist_mat[idx].copy()
-        closest = np.argsort(row)[:k]
-        return [df_scaled.index[i] for i in closest]
+    # k NEAREST to one state: sort that state's row, take the first k
+    row = fair[df.index.get_loc("Alabama")]
+    print(list(df.index[np.argsort(row)[:4]]))     # Alabama, then its 3 closest
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):
