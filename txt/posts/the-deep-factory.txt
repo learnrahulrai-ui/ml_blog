@@ -42,7 +42,6 @@
 
   Pencil and scratch paper out. Both new tools get real arithmetic.
 
-
   IN HAND
 
   The factory Part 1 built, drawn as a pipeline:
@@ -76,7 +75,6 @@
   The rest of this post adds three cures -- jiggled copies, a humbler, a send-home -- then
   reads the trained machine.
 
-
   TRAINING IN HANDFULS OF SIXTY-FOUR (Q5)
 
   Before any cure, recall how the dials get tuned at all. The study pile holds about 42,000
@@ -104,7 +102,6 @@
        Study pile of 50,000 cards, grab size 100, three loops. How many dial-turns?
 
        check your slate: 50,000 / 100 = 500 grabs per loop. 500 x 3 = 1,500 dial-turns.
-
 
   JIGGLED COPIES: AUGMENTATION (Q6)
 
@@ -142,7 +139,6 @@
   reuse a trained one; (2) the EXAM pile is NEVER jiggled. You grade on honest, un-jiggled
   cats, or the grade is a lie.
 
-
   WHY SCORES DRIFT -- THE PROBLEM THE HUMBLER SOLVES
 
   After inspector 1 fills his 32x32 score-sheet, the values might all sit between 5 and 45.
@@ -157,7 +153,6 @@
   The fix: before the shrink boss processes a floor's sheets, MAKE EVERY INSPECTOR'S
   NUMBERS SPEAK THE SAME LANGUAGE. Pull each inspector's pile to middle 0, scatter 1.
   That is the humbler.
-
 
   HUMBLER BY HAND (BATCH NORMALISATION)
 
@@ -236,7 +231,6 @@
 
   Steady FIRST. Then shrink. Then silence.
 
-
   >> YOUR TURN
      Inspector 2: settled middle = 10, settled scatter = 4, stretch = 1, shift = 0.
      A number in the pile reads 18. What does the humbler write in its place?
@@ -244,7 +238,6 @@
      check your slate: standardised = (18 - 10) / 4 = 8 / 4 = 2.0.
      humbled output = 1 x 2.0 + 0 = 2.0.
      The humbler replaced 18 with 2.0.
-
 
   SEND-HOME -- RANDOMLY SILENCING NUMBERS (DROPOUT)
 
@@ -285,7 +278,6 @@
   through unchanged. No coins, no zeroing, no scaling. The humbler's remembered middle and
   scatter take over for steady scaling; send-home simply steps aside.
 
-
   >> YOUR TURN
      Six entries: [4, -2, 8, 0, 3, 6]. Coin results in order: tails, heads, heads, tails,
      heads, tails. Send-home rate 25%, scale factor 4/3. What is the output?
@@ -298,7 +290,6 @@
        3  → heads →  3 x 4/3 = 4.0
        6  → tails → 0
      output: [0, -2.67, 10.67, 0, 4.0, 0]
-
 
   DEEP FACTORY -- FULL BUILD (Q7)
 
@@ -345,7 +336,6 @@
   ACROSS all 64 photos' worth of sheets to compute the average and scatter. That is the
   only floor that sees across the batch. Every other floor -- boss, send-home, clerks --
   is photo-blind: each photo's sheets never touch another photo's sheets.
-
 
   CONFUSION SHEET -- WHICH ANIMALS DOES THE MACHINE MIX UP? (Q8)
 
@@ -415,7 +405,6 @@
     RIGHT: off = q8_conf_matrix.copy()            <- always work on a copy
            np.fill_diagonal(off, 0)
 
-
   ONE NUMBER PER FACTORY -- THE SELECTION RULE (Q9)
 
   IN HAND: three factories trained (simple, augmented, deep). Each produced a 10x10
@@ -438,7 +427,6 @@
   pile you never touched during training.
 
   The confusion sheet stays whole -- never altered to make this calculation.
-
 
   READING THE FILTERS -- WHAT SHAPE ARE THE MAGIC PAPERS? (Q10)
 
@@ -470,7 +458,6 @@
     "1 paper, 3 colors deep, 27 dials"  =  "3 color-sheets of dials that ADD to 1 number"
 
   q10_filter_shape = (3, 3, 3, 32).
-
 
   COMMON TRIPWIRES
 
@@ -545,9 +532,6 @@
 
     Not 32 colour channels. 32 different measurements of the same region.
 
-
-  LABELS, LAST
-
     handful of 64 photos          batch (batch_size=64)
     dial-turn per handful         gradient update / optimiser step
     jiggled copy                  augmented sample
@@ -571,9 +555,6 @@
     shape (3, 3, 3, 32)           (height, width, in_channels, filters)
     deep factory order            Conv → BN → MaxPool → Dropout
     nudges                        biases
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer; this section is for the day you meet one.
 

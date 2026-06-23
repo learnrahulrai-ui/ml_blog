@@ -41,7 +41,6 @@
      THE FIX: only compare dials after putting every column on the same ruler
      (same spread), or use regularisation to untangle the correlated columns first.
 
-
   ONE DIAL PER COLUMN
 
     guess = d1*disp + d2*horse + d3*weight + d4*accel + nudge
@@ -54,7 +53,6 @@
   The size of the dial says how hard.
   So "drags mpg down hardest" means the MOST NEGATIVE dial.
   Easy -- except the rule hands the dials to you with the names torn off.
-
 
   BARE ROW PROBLEM
 
@@ -70,7 +68,6 @@
             horse : -0.04
             weight: -0.007
             accel : +0.12
-
 
   MOST NEGATIVE MEANS MIN, NOT MAX
 
@@ -90,7 +87,6 @@
   So zip the names on, then grab the name sitting on the smallest dial.
   This is a plain winner-hunt: scan the shelf, keep the smallest.
   The two lines that do it are at the end of the post.
-
 
   IN HAND: a bare row of dials [-0.01, -0.04, -0.007, +0.12] with the names zipped
   back on (disp, horse, weight, accel).
@@ -135,7 +131,6 @@
      So scaling changes nothing about how well it fits.
      It only changes whether the dials are COMPARABLE TO EACH OTHER as a measure of pull.
      Same-ruler is for the reading, not the fitting.
-
 
   AND DON'T OVER-TRUST A SINGLE DIAL
 
@@ -187,7 +182,6 @@
      One typical-sized step in weight (800 pounds) drops the guess by 4 mpg.
      That is the honest pull, now comparable to any other column's per-spread dial.
 
-
   PENCIL IT
 
     shelf (already on a shared ruler):
@@ -220,7 +214,6 @@
     4. Raw dials wear each column's own units -- not comparable until you put the columns
        on one shared ruler first.
      5. When columns move together, a single dial is shaky; treat it as evidence, not proof.
-
 
   COMMON TRIPWIRES I CAUGHT
 
@@ -264,9 +257,6 @@
               weight all rise with car size), the rule cannot cleanly
               separate their pulls.  A single dial can swing wildly or
               even flip sign.  Read dials as evidence, not proof.
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same moves, spoken in Python.
@@ -321,9 +311,6 @@
      the NAME with the lowest score -- not the dial itself. Plain min(dials) would instead
      compare the names alphabetically and hand back "accel" -- the wrong question answered
      confidently.
-
-
-  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

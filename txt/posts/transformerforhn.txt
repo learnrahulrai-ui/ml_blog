@@ -69,7 +69,6 @@
      Full transformers are powerful but short-range; long-document variants trade
      full attention for speed so the book fits in memory.
 
-
   A MACHINE ONLY MULTIPLIES NUMBERS, AND "CAT" IS NOT A NUMBER -- SO HAND IT A ROW
 
   Take two words: cat, sat. A machine cannot multiply the letters c-a-t, so first swap each
@@ -82,7 +81,6 @@
 
   That is all "embedding" means: a word's seat-number used to fetch its row from a table.
   Width 4 is a toy size chosen so the arithmetic fits on paper; real ones use 512 or more.
-
 
   TWO WORDS, BUT THE NEXT MACHINE SEES THEM ALL AT ONCE -- SO STAMP WHERE EACH SAT
 
@@ -116,7 +114,6 @@
       -> seat 1 stamp = [0.841, 0.540, 0.010, 1.000]
 
   Same end: a unique row per seat, near seats close, far seats apart. Both ways are legal.
-
 
   ONE WORD MUST BOTH ASK AND BE ASKED -- BUT THE ROW IS ON A WILD SCALE, SO TAME IT FIRST
 
@@ -193,7 +190,6 @@
 
   Textbook names, stuck on only now: ASK = Query (Q), OFFER = Key (K), HANDOVER = Value (V).
 
-
   HOW MUCH SHOULD CAT LISTEN TO EACH WORD? MATCH ITS ASK AGAINST EVERY OFFER
 
   cat now holds an ASK row; cat and sat each hold an OFFER row. Score a match by the dot
@@ -210,7 +206,6 @@
 
   cat's raw scores are [0.000, 2.000] -- it matches sat much harder than itself.
 
-
   RAW SCORES RUN ANY SIZE AND BLOW UP THE NEXT MOVE -- SO SHRINK, THEN SQUASH TO SHARES
 
   Two fixes, in order. First, big dot products make the squash below saturate, so divide each
@@ -225,7 +220,6 @@
       share on cat = 1.000 / 3.718 = 0.269         share on sat = 2.718 / 3.718 = 0.731
 
   Check: 0.269 + 0.731 = 1.000. cat spends 26.9% of its attention on itself, 73.1% on sat.
-
 
   SHARES DECIDE HOW MUCH TO PULL IN -- ADD HANDOVERS BY SHARE, THEN PROJECT
 
@@ -256,7 +250,6 @@
       W_O row4 = [0,0,0,1] .                               = -0.654
       attention output for cat = [0.000, 1.034, -0.380, -0.654]
 
-
   ATTENTION CAN WASH CAT AWAY -- SO LAY THE ORIGINAL ROW BACK ON TOP
 
   cat's attention output [0.000, 1.034, -0.380, -0.654] is built entirely from HANDOVER rows
@@ -275,7 +268,6 @@
   original 2017 paper tamed AFTER the add; GPT tames BEFORE. Both recipes keep middle at 0
   and typical-distance at 1; they differ in which value is stored in the residual stream.
   Every number on this page follows the GPT Pre-LayerNorm order.)
-
 
   CAT HAS GATHERED BUT NOT THOUGHT -- SO TAME ITS STREAM, THEN RUN THE TINY WORKER
 
@@ -327,7 +319,6 @@
 
   That row, [3.145, 3.863, 1.208, -0.654], is cat's output from ONE full transformer block.
   Nothing was skipped, nothing waved.
-
 
   SAT RIDES THE SAME RECIPE -- CARRIED ALL THE WAY OUT, NOTHING HIDDEN
 
@@ -400,7 +391,6 @@
       cat out: [3.145, 3.863, 1.208, -0.654]
       sat out: [0.465, 1.707, 2.880, 1.000]
 
-
   THAT IS ONE BLOCK -- THREE HONEST EXTRAS, EACH IN ONE BREATH
 
   STACK IT. The block took two 4-wide rows in and gave two 4-wide rows out -- same shape. So
@@ -432,9 +422,6 @@
   the next word left to right), and the original 2017 machine wired an encoder AND a decoder
   together for translation, with the decoder also attending to the encoder (cross-attention).
   The mask is the heart of the split, not the whole of it.
-
-
-  NUMBERS, IN PYTHON
 
   Every matrix dot, LayerNorm, softmax, and residual add above worked on paper.  Here the
   exact numbers in Python -- same moves, same digits.
@@ -503,7 +490,6 @@
     --- SAT'S FINAL OUTPUT (RUN SAME RECIPE) ---
     out_sat = [0.465, 1.707, 2.880, 1.000]   # verified in the post above
 
-
   ONE BREATH (CARRY THIS AWAY)
 
   Swap each word for a learned row of numbers; add a row that marks its seat. Tame each row
@@ -521,7 +507,6 @@
   cat went in as [2,1,1,0] and came out as [3.145, 3.863, 1.208, -0.654].
   sat went in as [0,1,2,1] and came out as [0.465, 1.707, 2.880, 1.000].
   Two words in, two rows out, every number on this page, by pencil, no magic, no leftover wire.
-
 
 ----------------------------------------------------------------------------------------------
   SPECIAL . TRANSFORMERS WITH PENCIL  (written for Hacker News; standalone)

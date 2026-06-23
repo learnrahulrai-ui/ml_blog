@@ -46,7 +46,6 @@
      Pick the question that produces the lowest total impurity across both buckets.
      Gini mathematically punishes the useless split and rewards the clean one.
 
-
   CLASSIFICATION TREE: ONE CHANGE AT THE BOTTOM
 
   The build hunt is the SAME shape as for a number answer.
@@ -66,7 +65,6 @@
 
     same hunt, same recursion
     only the "ruler for badness" and the "guess at the bottom" differ
-
 
   FROM 4 COUNTS TO 1 NUMBER: THE GINI RULER
 
@@ -145,7 +143,6 @@
     each of the 330 cuts in a column -> one Gini number.
     smallest Gini in that column = the column's champion (its cleanest split).
 
-
   A REAL CANCER CUT: RADIUS AND TEXTURE
 
   The earlier example used abstract "yes" and "no."
@@ -206,7 +203,6 @@
 
   The abstract "3 yes, 1 no" from earlier is the same math.
   It is just wrapped in real column names from the cancer lab the machine actually touches.
-
 
   IN HAND so far: a cut turned 4 counts into one mixed-ness number.
   Below side 3 yes 1 no gave 0.375.
@@ -287,7 +283,6 @@
     criterion='gini'     -> 1 - p^2 - q^2     fast (multiply and subtract)
     criterion='entropy'  -> -p log p - q log q slow (log is expensive)
 
-
   INFORMATION GAIN: THE DROP
 
   Information gain = how much a cut DROPS the mixing from parent to children.
@@ -304,7 +299,6 @@
   That is the same as picking the LOWEST weighted Gini.
   It is just measured from the other direction.
 
-
   STRATIFY: KEEP THE MIX EVEN
 
   The cancer sheet is ~63% well, ~37% sick.
@@ -319,7 +313,6 @@
 
   One flag in the split call.
   No new idea -- just insurance against a lopsided deal.
-
 
   PRUNING: THE ALPHA TAX
 
@@ -359,7 +352,6 @@
   KEY: MAX_DEPTH IS A CEILING; CCP_ALPHA IS A TAX
      max_depth: chops ALL corridors at height N.  blunt, same haircut everywhere.
      ccp_alpha: snips weak twigs ANYWHERE, keeps strong deep branches.  smart, uneven.
-
 
   WHERE DOES THE ALPHA MENU COME FROM?
 
@@ -402,7 +394,6 @@
      where branches would fire.  Your job is to pick WHICH one works best
      on the exam -- not to make up alphas.
 
-
   NESTED AVERAGES LADDER
 
   To pick the best alpha, the same 5-slice check from Chapter 4.  Three averages,
@@ -432,7 +423,6 @@
     misses over people --avg-->  round error   (rung 2)
     5 round-errors     --avg-->  alpha score   (rung 3)
     alpha scores       --MIN-->  alpha_hat     (top, not avg)
-
 
   COMMON TRIPWIRES I CAUGHT
 
@@ -481,7 +471,6 @@
               Rung 3 = cross-fold.  Mixing them is the classic cross-val
               confusion.
 
-
   ANY ROOM HAS A WRONGNESS -- NOT JUST LEAVES
 
   "You only measure wrongness at the end -- how can you measure it in the middle?"
@@ -501,9 +490,6 @@
 
   Wrongness is NOT leaf-only.  Any room can be graded by "pretend it's a leaf."
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     mixed-ness / how mixed                Gini impurity
@@ -517,9 +503,6 @@
     the staircase of snip-points          the effective-alpha sequence
     fire a doctor                         prune a subtree
     keep the sick:well ratio even         stratified train/test split
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same counts, spoken in Python.
@@ -573,7 +556,6 @@
     FOR EACH ALPHA: 5-FOLD CV -> MEAN MSE -> PICK ARGMIN -> ALPHA_HAT
     THEN: TREE_PRUNED = DECISIONTREEREGRESSOR(CCP_ALPHA=ALPHA_HAT, ...)
     TREE_PRUNED.FIT(X_TRAIN, Y_TRAIN)  <- REBUILD WITH THE TAX
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 5 -- Question Charts and Committees):

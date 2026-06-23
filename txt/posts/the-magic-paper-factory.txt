@@ -75,8 +75,7 @@
       slide again: ... until every patch has been scored
       result: one sheet of scores, same size as the photo but thinner
 
-
-  SHEET OF COLOUR PHOTOS, AND GOAL
+  THE SHEET OF COLOUR PHOTOS, AND GOAL
 
   A new pile, and louder than usual because it trips people.
   An earlier pile in this book was grey clothing photos.
@@ -104,7 +103,6 @@
     5 dog       6 frog        7 horse  8 ship  9 truck
 
   The goal: read the 3,072 numbers of a new photo and name the bin.
-
 
   FOLDING THE FLAT STRING INTO A GRID
 
@@ -135,7 +133,6 @@
   The practice pile checks progress along the way.
   The sealed exam pile is touched only once, at the end, to grade honestly.
   Then fold each photo.
-
 
   WHAT ONE MAGIC PAPER DOES
 
@@ -201,7 +198,6 @@
        total = -30 + 0 - 30 = -60. A big NEGATIVE -- this magic paper screams "the edge here is
        upside-down from the one I hunt." (After the zero-out rule, -60 becomes 0: not my shape.)
 
-
   ONE INSPECTOR, ONE SCAN -- AND THE TRAPS
 
   One worker carrying one magic paper is an INSPECTOR.
@@ -261,7 +257,6 @@
   Tireless clerks finish that before lunch.
   A pencil-and-paper worker would need about a year per photo.
 
-
   COLOUR: TWENTY-SEVEN NUMBERS UNDER THE PAPER
 
   One more layer of truth, because the photo is three colours deep.
@@ -302,7 +297,6 @@
        blue only: 0.9 x 1, nine times = 8.1. Red and green multiplied by 0 add nothing.
        Score 8.1 -- the sky-finder lights up bright over sky, where the redness-finder gave only
        0.9. Different dials, different shape hunted, same multiply-add.
-
 
   A FLOOR OF THIRTY-TWO INSPECTORS
 
@@ -348,7 +342,6 @@
      check your slate:
        32 papers (one per inspector) and 32 score-sheets. The "(3,3)" is the size of each paper;
        the "32" is how many inspectors. Output: 32 x 32 x 32.
-
 
   A SHRINK BOSS THAT KEEPS THE LOUDEST
 
@@ -400,7 +393,6 @@
 
      check your slate:
        Both directions halve: 16/2 = 8 by 8. Depth unchanged. So 16x16 becomes 8x8.
-
 
   A SECOND FLOOR THAT DRILLS THROUGH ALL THIRTY-TWO
 
@@ -455,7 +447,6 @@
   The shape of the move is identical; only the depth grows.
   Memorise the shape of the move, not the figures.
 
-
   IRONING THE GRID FLAT, THEN THE OLD CLERKS FINISH
 
   IN HAND: two floors + two bosses produced 8x8x64. Floor 1: 896 dials. Floor 2: each of 64
@@ -487,7 +478,6 @@
   An inspector slides a tiny paper and cares WHERE a shape sits.
   A clerk sits still and reads the whole line at once.
   A clerk weighs all the evidence with no regard for where it came from.
-
 
   WHOLE MACHINE, SIZE FLOW, AND WHERE THE DIALS HIDE
 
@@ -525,7 +515,6 @@
      check your slate:
        Each paper still has 3x3x3 + 1 = 28. With 16 papers: 16 x 28 = 448 dials. Half the
        inspectors, half the floor-1 dials -- and the papers stay cheap either way.
-
 
   PREDICTING THE GRID SIZE BY HAND
 
@@ -569,7 +558,6 @@
      check your slate:
        Conv: 28 - 3 + 1 = 26, so 26x26.  Boss: 26 / 2 = 13, so 13x13.
 
-
   COMMON TRIPWIRES
 
   Real snags from building this, each fixed at the spot it bites.
@@ -600,7 +588,6 @@
      any dials to the flatten step, you have miscounted -- the dials are all in the Dense floor
      that READS the flattened line.
 
-
   STANDARD NAMES FOR EVERYTHING ABOVE
 
     Plain term used above               Standard label
@@ -617,9 +604,6 @@
     ten scores into ten chances         softmax
     depth auto-matches the input        channel dimension
     one small paper reused everywhere   weight sharing / parameter sharing
-
-
-  NUMBERS, IN PYTHON
 
   Every dial count, convolution score, and grid-size calculation above done by hand.
   Here the exact numbers are spelled out in Python.
@@ -682,9 +666,6 @@
     after_conv2 = after_pool1 - 3 + 1   # 13
     after_pool2 = after_conv2 // 2   # 6
 
-
-  CODE, IF YOU WANT IT
-
   The whole factory, the same steps spoken in Keras. Nothing here needs a machine to follow
   -- the section above did it all by hand -- but here is the day you meet one.
 
@@ -721,7 +702,6 @@
   !! WARN: input_shape ONLY ON THE FIRST FLOOR
      The first Conv2D must be told the grid size, input_shape=(32, 32, 3). The later floors
      work out their own input size from what the floor below hands them -- never type it twice.
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 9 -- Machines That Look at Pictures):

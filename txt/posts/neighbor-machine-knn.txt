@@ -55,7 +55,6 @@
      The right k is somewhere in between: small enough to follow local patterns,
      large enough not to follow individual outliers. Cross-validation finds it.
 
-
   WORKING PILE AND HIDDEN PILE
 
     WORKING PILE (rows with answers)        HIDDEN PILE (answers withheld)
@@ -66,7 +65,6 @@
 
   Gaps are measured from the measured columns only. Hidden right-answers are read once,
   at scoring -- never during guessing.
-
 
   MEASURING THE GAP
 
@@ -88,7 +86,6 @@
      check your slate:  gaps 3-3 = 0, 2-4 = -2, 5-5 = 0, 4-2 = 2;  squares 0, 4, 0, 4;
      sum 0 + 4 + 0 + 4 = 8;  gap = sqrt(8) ~= 2.83.  Row C lands between A (sqrt(3) ~=
      1.73) and B (sqrt(115) ~= 10.72) -- a middling neighbour, nowhere near the closest.
-
 
   PUT COLUMNS ON THE SAME RULER FIRST
 
@@ -152,7 +149,6 @@
      numbers into the build step. Learn on working, apply to both. Inside rotating folds,
      relearn per round -- the bound pipeline does this.
 
-
   GUESSING ONE ROW
 
     1. measure gap to every working-pile row          O(n*d)
@@ -164,7 +160,6 @@
       guess = ( sum_i w_i * y_i ) / ( sum_i w_i )
 
   Equal weights (w_i = 1) recover the plain average.
-
 
   HOW SLOW IS IT
 
@@ -192,7 +187,6 @@
     few columns:   nearby rows are truly nearby  <- sorting shelf helps
     many columns:  all rows sit about the same gap away
                    "closest" stops meaning anything
-
 
   WORKED BY HAND
 
@@ -223,7 +217,6 @@
      2.4, 2.7;  guess = (1.5 + 2.4 + 2.7) / 3 = 6.6 / 3 = 2.2.  Move the question and
      the guess moves with it -- the rule simply follows whoever its neighbours are.
 
-
   K IS THE STIFF-VS-JUMPY DIAL
 
     k = 1       asks 1 row     -> copies its noise exactly
@@ -235,7 +228,6 @@
                 at k = n_working, every guess = average price
 
     right k  ->  somewhere in between -- found by rotating folds
-
 
   PICKING K WITHOUT TOUCHING THE HIDDEN PILE
 
@@ -249,7 +241,6 @@
   and keep the winner. Because k sets how jumpy the rule is, the fold scores fall to a
   sweet spot and then climb again -- and that dip is your k. The hunt itself, in code, is
   waiting at the end of the post.
-
 
   ORIGIN
 
@@ -266,7 +257,6 @@
     3. No building ahead; each guess costs O(n*d) and stores the whole pile.
     4. k sets the stiff-vs-jumpy balance; pick it by rotating folds.
      5. When columns pile up, close stops meaning close.
-
 
   COMMON TRIPWIRES I CAUGHT
 
@@ -301,9 +291,6 @@
               KEY (k=1), not the value (mistake).
        RIGHT: min(cv, key=cv.get) returns the KEY with the smallest VALUE.
               Get the name of the winner, not the smallest name alphabetically.
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same rows, spoken in Python.

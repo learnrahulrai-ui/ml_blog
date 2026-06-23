@@ -36,7 +36,6 @@
   wrong the guess was, send that error backward, nudge every dial a little. That is the whole
   machine. This chapter changes nothing about it -- it only adds guards against memorising.
 
-
   A DISEASE CALLED MEMORISING
 
   The five cures this chapter will build, drawn once so you see what is coming:
@@ -72,8 +71,7 @@
 
   Everything in this chapter is a way to keep that gap small.
 
-
-  SHEET OF CLOTHES, AND GOAL
+  THE SHEET OF CLOTHES, AND GOAL
 
   A new sheet, not Chapter 7's tumours. Each row is one photograph of a piece of clothing,
   28 pixels across by 28 pixels tall -- 784 little grey numbers, each from 0 (black) to 255
@@ -90,7 +88,6 @@
 
   The goal: build five machines that sort a photo into its bin, and find which one memorises
   least.
-
 
   BASELINE MACHINE WITH NO DEFENCE
 
@@ -117,7 +114,6 @@
   live in room 1, wired to the 784 raw pixels. A machine with that many free dials and only a
   few thousand study photos is exactly the kind that memorises. Good -- that is the patient we
   want to cure.
-
 
   SOFTMAX: TURNING TEN SCORES INTO TEN CHANCES
 
@@ -167,7 +163,6 @@
   chance first bin = 20.09 / 22.81 = 0.881. The first bin's score was only 2 higher, but
   softmax hands it an 88% chance -- the exponential stretch at work.
 
-
   WATCHING IT ROT
 
   Run the baseline for thirty passes and the disease from the opening picture appears on
@@ -175,7 +170,6 @@
   high 0.80s and then sags. The machine is memorising. Now the four cures. Each one is a
   different answer to the same question: how do you stop a machine with 242,762 dials from
   bending itself around noise?
-
 
   A TAX ON BIG DIALS (L2)
 
@@ -196,7 +190,6 @@
   tax wins and the dial shrinks. The result is a machine of humble dials -- a smoother rule
   that generalises better. The standard name is L2 regularisation, and the rate (0.001) is a
   knob you pick, not a dial the machine learns.
-
 
   SENDING CLERKS HOME (DROPOUT)
 
@@ -222,7 +215,6 @@
   takes the practice or sealed exam, every clerk reports for duty. And the rate (0.3) is a
   knob you choose. Send too few home and the deals survive; send too many and the floor is too
   crippled each pass to learn anything.
-
 
   A FIRE ALARM THAT STOPS THE CLOCK (EARLY STOPPING)
 
@@ -255,7 +247,6 @@
 
   The lowest is 0.47 at pass 5. Passes 6 through 10 all fail to beat it -- five strikes -- so
   the alarm fires after pass 10, and the dials rewind to pass 5.
-
 
   A HUMBLER BETWEEN FLOORS (BATCH NORMALISATION)
 
@@ -298,7 +289,6 @@
   average = 20/4 = 5. scatter = root of 5 = 2.236. humbled = -3/2.236, -1/2.236, 1/2.236,
   3/2.236 = -1.34, -0.45, 0.45, 1.34. Middle 0, scatter 1.
 
-
   ONE HONEST JUDGE (BREAKING THE SEALED PILE)
 
   IN HAND: five machines trained on the study pile -- baseline, L2 tax, dropout, early-
@@ -322,7 +312,6 @@
   The rule this whole chapter rests on: a pile you make decisions with is a pile you have
   spent. Keep one pile sealed and unspent, or you will have no honest judge left at the end.
 
-
   NAMING THE BIGGEST LIAR (THE MEMORISING GAP)
 
   One more number tells you something the sealed score alone cannot: WHICH machine memorised
@@ -337,7 +326,6 @@
   smallest gap names the least-memorising machine -- usually one of the four cures, and often
   dropout or batch-norm. Two numbers, read together -- the sealed score and the gap -- tell
   the whole story: how good, and how honest.
-
 
   COMMON TRIPWIRES
 
@@ -362,7 +350,6 @@
   Judging on a spent pile. The most expensive mistake: reporting the practice score as your
   final grade. You peeked at it thirty times. Report the sealed pile, opened once.
 
-
   STANDARD NAMES FOR EVERYTHING ABOVE
 
     Plain term used above                 Standard label
@@ -381,9 +368,6 @@
     humbler between floors                batch normalisation
     stretch and shift rescue dials        gamma (scale) and beta (shift)
     study-score minus practice-score      the generalisation gap
-
-
-  NUMBERS, IN PYTHON
 
   Every dial count, softmax, tax fine, and humbling step above worked by hand.  Here they
   are in Python so you can verify each number on your own screen.
@@ -429,9 +413,6 @@
     loss_p7, loss_p8          = 0.44, 0.45          # +4, +5 -> ALARM fires
     best_loss, rewind_to = loss_p3, 3   # 0.39, pass 3
     alarm_pass = 8   # five strikes: passes 4 through 8
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer: every dial count, every wrongness step, and every cure
   was pencil and arithmetic. This section is for the day you meet one.
@@ -512,7 +493,6 @@
     --- THE ONE HONEST GRADE: OPEN THE SEALED PILE ONCE, PER MACHINE ---
     LOSS, ACC = MODEL.EVALUATE(X_TEST, Y_TEST, VERBOSE=0)
     GENERALISATION GAP = FINAL TRAIN ACCURACY - FINAL VAL ACCURACY (SMALLER = HONESTER).
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 8 -- Keeping a Network Honest):

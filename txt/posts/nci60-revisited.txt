@@ -34,7 +34,7 @@
      leukemia cells cluster apart from melanoma cells. The structure was already there;
      you just could not see it until PCA flattened the room to a page.
 
-  SHEET: WIDE, NOT TALL
+  THE SHEET: WIDE, NOT TALL
 
     NCI60 -- 64 cell-line samples, ~6,830 gene measurements each
     (each measurement = log-brightness of one gene's activity in that cell line:
@@ -200,7 +200,6 @@
      pair's together/apart answer untouched, so the score never changes.  It is a
      symmetric agreement number, not "how well did tool B copy tool A".
 
-
   WHY TWO TOOLS, NOT ONE
 
   PCA and clustering answer different questions and back each other up:
@@ -211,7 +210,6 @@
   On NCI60 they work as a pair: PCA crushes 6,830 noisy walls to a few honest ones, and
   clustering carves the crushed cloud into groups.  Looking at either alone tells half the
   story; together they show both the shape AND the groupings.
-
 
   COMMON TRIPWIRES I CAUGHT
 
@@ -255,9 +253,6 @@
        adjusted Rand score subtracts that luck baseline, so 0 means chance-level and
        +1 means identical.  Reading the raw fraction makes nonsense look like a match.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     wide sheet (more columns than rows)   high-dimensional / p >> n data
@@ -270,9 +265,6 @@
     everything is far from everything     the curse of dimensionality
     together-or-apart, then agree/disagree  pair-counting (the Rand index)
     re-zeroed agreement score (-1..1)     adjusted Rand score (adjusted_rand_score)
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -314,7 +306,6 @@
     GRADE BLIND GROUPS AGAINST THE SEALED TYPES (THE PEEK)
     print(pd.crosstab(pd.Series(km_labels, name="group"),
                       pd.Series(types,     name="true_type")))
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):

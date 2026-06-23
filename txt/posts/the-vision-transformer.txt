@@ -57,7 +57,6 @@
 
   Pencil out.
 
-
   CSV CARRIES A HIDDEN COLUMN -- DROP BOTH OR EVERY NUMBER IS WRONG
 
   Fashion-MNIST arrives as a CSV with one row per photo.
@@ -93,7 +92,6 @@
   as 3-D (b, 28, 28) but finds 4-D (b, 28, 28, 1). Error: "cannot reshape array of size ...
   into shape ...". Use (-1, 28, 28) and it never appears.
   ─────────────────────────────────────────────────────────────────────────────────────────
-
 
   A PHOTO HAS 784 DOTS, TOO MANY TO PIN AT ONCE -- SO CUT IT INTO STRIPS
 
@@ -159,7 +157,6 @@
   One photo becomes 49 strips of 16 dots each.
   (Appendix E works a tiny 4 x 4 photo through these three moves by hand, dot by dot.)
 
-
   16 DOTS IS A THIN DESCRIPTION, SO RE-DESCRIBE EACH STRIP WIDER
 
   16 raw greyness numbers say little about a strip.
@@ -174,7 +171,6 @@
   Which gives later machines room to pull patterns apart.
   Shape goes (49, 16) → (49, 64).
   Call 64 the strip WIDTH (also written d_model).
-
 
   CUTTING THREW AWAY WHERE EACH STRIP SAT -- SO STAMP THE SEAT BACK ON
 
@@ -242,7 +238,6 @@
   it broadcasts across any batch size. A shape bug, not a math bug -- but it stops the build.
   ─────────────────────────────────────────────────────────────────────────────────────────
 
-
   NOW EVERY STRIP LOOKS AT EVERY STRIP -- THE SAME ATTENTION, POINTED AT ONE PHOTO
 
   This is the same attention as before, aimed inward at the 49 strips of ONE photo.
@@ -305,7 +300,6 @@
   what-each-head-finds are different things. 4 x 16 = 64, the width -- that is the only sum.
   ─────────────────────────────────────────────────────────────────────────────────────────
 
-
   ATTENTION CAN DROWN THE ORIGINAL STRIP -- SO KEEP THE ORIGINAL, THEN TAME
 
   Two new machines, both small, both fixing a real failure.
@@ -359,7 +353,6 @@
   not care how many photos ride along. That batch-independence is why transformers use it.
   ─────────────────────────────────────────────────────────────────────────────────────────
 
-
   A BENCH OF WORKERS MIXES EACH STRIP, THEN KEEP-AND-TAME AGAIN
 
   After looking around, each strip passes through a small bench of plain workers.
@@ -381,7 +374,6 @@
   Real machines stack many such layers.
   This lab uses one, which is plenty for clothing.
 
-
   49 STRIPS, BUT ONE ANSWER -- SO FOLD THEM INTO ONE SUMMARY
 
   After the layer, the photo is still 49 strips of 64. The answer is ONE of 10 kinds. Fold the
@@ -399,7 +391,6 @@
 
   softmax (10 portions) here, not sigmoid -- the answer is ONE of 10 kinds, not a single yes/no.
   Chapter 8 derived softmax; this is the same 10-way version.
-
 
   WHOLE VISION TRANSFORMER IN CODE (Q6)
 
@@ -440,7 +431,6 @@
                                    write Dropout(0.3)(x).
       MultiHeadAttention(...)(x, X)  -- capital X is undefined; both arguments are lowercase x.
 
-
   VIT RACES THE CNN (Q8, Q10)
 
   Chapter 9's convolution factory -- magic papers sliding over 3x3 corners, pooling, flatten,
@@ -463,9 +453,6 @@
             pre-wired with "nearby goes together" -- strong on small piles.
       ViT : the photo is pre-cut into strips; each strip looks at EVERY other strip at once
             (global). Assumes nothing about nearness -- needs more data, scales further.
-
-
-  NUMBERS, IN PYTHON
 
   Every calculation in this post -- photo cutting, positional encoding, attention, LayerNorm --
   worked by hand above.  Here each step is spelled out in Python.
@@ -522,7 +509,6 @@
     spread  = math.sqrt(avg_sq)   # 11.18
     humbled = [d / spread for d in diffs]   # [0.45, 1.34, -0.45, -1.34]
 
-
   ONE BREATH
 
   Cut a 28 x 28 photo into 49 strips of 16 dots (fold, swap, glue -- the swap is what keeps each
@@ -536,7 +522,6 @@
 
   Next: you built a transformer -- but which KIND? One switch, the future-mask, splits the whole
   family into BERT and GPT. That is Part 2.
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 11 -- Attention Grows Eyes):

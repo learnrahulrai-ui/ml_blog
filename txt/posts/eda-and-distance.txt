@@ -41,7 +41,7 @@
      THE FIX: standardise. Shift every column to spread 1 (z-score).
      Then each column speaks with equal volume, and every dimension contributes to the gap.
 
-  SHEET
+  THE SHEET
 
     State       Murder    Assault    UrbanPop
     -------     ------    -------    --------
@@ -189,7 +189,7 @@
      City-block (53) tops straight-line (41.3), as the L-walk always does.
      And Assault's 1600 drowns the other two.
 
-  SHEET OF GAPS
+  THE SHEET OF GAPS
 
   Now repeat the straight-line gap for ALL pairs of states.
   There are 50 states.
@@ -211,7 +211,7 @@
   This sheet IS the foundation of clustering.
   Every grouping method starts from some version of "who is closest to whom."
 
-  SAME RULER: STANDARDISATION
+  THE SAME RULER: STANDARDISATION
 
   The gap between Alabama and Alaska came out to 28.97.
   That number is heavily influenced by Assault.
@@ -306,7 +306,6 @@
   So you just list who is nearby.
   That is the core of unsupervised learning: looking at neighbours without a right answer to check.
 
-
   COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  The raw distance is not "wrong," just unfair.
@@ -353,9 +352,6 @@
        So the ordering changes.
        That is expected, not a bug.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     sheet with no answer column           unlabelled data / unsupervised learning
@@ -371,9 +367,6 @@
     closest k states to anchor            k-nearest neighbours (KNN lookup)
     column                                 feature / variable
     row                                    observation / sample
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one.
@@ -483,7 +476,6 @@
         row = dist_mat[idx].copy()
         closest = np.argsort(row)[:k]
         return [df_scaled.index[i] for i in closest]
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):

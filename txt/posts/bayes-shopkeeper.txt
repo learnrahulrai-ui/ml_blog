@@ -32,8 +32,7 @@
 
   That single translation turns ten formulas into one arithmetic count.
 
-
-  STORY (READ THIS ONCE; EVERY PROBLEM BELOW LIVES INSIDE IT)
+  THE STORY (READ THIS ONCE; EVERY PROBLEM BELOW LIVES INSIDE IT)
 
   Here is the whole room, drawn before any words:
 
@@ -87,7 +86,6 @@
   are two different questions. Bayes is not wrong -- it is simply answering a different one.
   The danger of the missed cases is real and separate from the formula.
 
-
   TWO QUESTIONS THE DOCTOR AND THE SHOPKEEPER ANSWER DIFFERENTLY
 
   Two probability symbols look almost identical but describe completely different groups of
@@ -121,7 +119,6 @@
 
   Confusing these two is the most common Bayes mistake. The doctor asks about beepers.
   The machine answers about the sick. Those are opposite directions of the same relationship.
-
 
   SHOPKEEPER HIDES THE TOTAL -- SO WE BUILD IT BY GLUING THE TWO PILES
 
@@ -159,7 +156,6 @@
 
   That is Bayes' rule. You never need to memorise it. Just build the two piles, glue them,
   divide the pile you want by the total.
-
 
   TEN PATIENTS, TEN VISITS TO THE SHOPKEEPER
 
@@ -361,7 +357,6 @@
   60 per 1,000 patients walk home with clean papers and enter the wild. Raising the catch
   rate helps this; nothing eliminates it entirely.
 
-
   PYTHON: THREE VISITS HARD-CODED, THEN A FULL SIMULATION
 
   Visits 4, 5, and 6 shown as explicit variables -- no loops, every patient count on its own
@@ -391,7 +386,6 @@
   # Visit 4: true_beeps=9, glitch_beeps=99, total=108, P(D|Beep)=0.0833
   # Visit 4: missed into wild = 1 per 1000 patients
 
-
   # ---- VISIT 5: 30% disease, catch 60%, glitch 20%, group of 100 ----
   group_v5            = 100
   sick_v5             = group_v5 * 0.30        # 30
@@ -409,7 +403,6 @@
   print(f"Visit 5: missed into wild = {missed_v5:.0f} per {group_v5} patients")
   # Visit 5: true_beeps=18, glitch_beeps=14, total=32, P(Sick|Beep)=0.5625
   # Visit 5: missed into wild = 12 per 100 patients
-
 
   # ---- VISIT 6: 2% disease, catch 80%, glitch 5%, group of 1000 ----
   group_v6            = 1000
@@ -587,7 +580,6 @@
         (_red_coat was generated but never used -- irrelevant to the answer)
       ==============================================================
 
-
   FORMULA (IT WAS HERE ALL ALONG)
 
   You have now used Bayes' rule ten times without once reading it as a formula. Here it is,
@@ -604,7 +596,6 @@
   - P(Sick | Beep): of all the beep papers, what share went to sick patients?
 
   The formula is not magic. It is the patient head-count, compressed into one line.
-
 
   DECODER (JARGON -> PLAIN)
 
@@ -630,7 +621,6 @@
       Law of Total Probability           the gluing move: add beep-pile counts from every
                                          non-overlapping sub-group to find P(Beep)
       Bayes' rule / Bayes' theorem       divide the sick-beep pile by the total beep pile
-
 
   ---
 

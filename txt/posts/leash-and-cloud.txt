@@ -64,7 +64,6 @@
      large dials. The machine is forced to spread its attention across many columns,
      so no single outlier in one column can flip the verdict alone.
 
-
   WHAT A LOOSE LEASH LETS HAPPEN
 
     default machine (C=1.0):  medium leash -> dials kept modest, but a dominant
@@ -83,7 +82,6 @@
   if we pull it TIGHTER (down to C=0.1, a stronger leash)?
   Do the dials shrink further?
   And does the machine get more humble?
-
 
   A LEASH ON THE DIALS (L2 PENALTY)
 
@@ -122,7 +120,6 @@
      The data can override this prior if the evidence is strong enough.
      Otherwise the dials stay modest.
 
-
   C PARAMETER: COUNTER-INTUITIVE DIRECTION
 
   sklearn spells the leash strength as C, not lambda.
@@ -142,7 +139,6 @@
      A small budget means little room to ignore it -- a hard squeeze.
      A large C means a large "ignore" budget -- so the penalty barely bites.
      "C small = heavy leash" feels backwards until you remember C = 1/lambda.
-
 
   DID THE DIALS SHRINK?
 
@@ -199,7 +195,6 @@
      the absolute value first measures the SIZE of each dial regardless of sign, then
      averages those sizes. What you want to compare is pull strength, not direction.
 
-
   SCALING AND THE LEASH ARE NOT THE SAME FIX
 
     Scaling (put columns on one ruler):  fixes the INPUTS
@@ -211,7 +206,6 @@
   Scaling means putting all 30 input columns on one ruler before the machine sees them.
   The leash limits how large any individual dial grows while the machine sets its dials.
   So removing either one leaves a different problem unsolved.
-
 
   A COMPLETELY DIFFERENT MACHINE: THE TWO-CLOUD WALL
 
@@ -259,7 +253,6 @@
     well centre #----------+----------# sick centre
                            ^
                          wall here
-
 
   FISHER'S CRITERION: WHERE TO AIM THE WALL
 
@@ -372,7 +365,6 @@
      To get the clean halfway wall, force equal priors:
      LinearDiscriminantAnalysis(priors=[0.5, 0.5]).
 
-
   GENERATIVE VS DISCRIMINATIVE
 
   The S-curve machine and LDA arrive at the same final form -- a straight-line wall through
@@ -402,7 +394,6 @@
   So that is the same S-curve form as logistic regression.
   Same wall shape, different route.
 
-
   SAME ACCURACY: WHAT IT MEANS
 
   On the Wisconsin breast cancer sheet, LDA and the S-curve machine give nearly identical
@@ -418,7 +409,6 @@
      If the sheet were noisy or the two groups heavily overlapping, the two methods would
      diverge.
      And that disagreement would tell you something important: the boundary is ambiguous.
-
 
   WHY SCALING ALSO MATTERS FOR LDA
 
@@ -444,9 +434,6 @@
        But they derive it from opposite directions -- generative vs discriminative.
     7. When both machines agree on accuracy, the data is cleanly separable.
        When they disagree, the boundary is ambiguous.
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -527,9 +514,6 @@
     TO REPRODUCE THE EXACT "HALFWAY BETWEEN THE CENTRES" WALL:
     lda_equal = LinearDiscriminantAnalysis(priors=[0.5, 0.5])
     lda_equal.fit(X_train_scaled, y_train)
-
-
-  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

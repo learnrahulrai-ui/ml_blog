@@ -41,7 +41,6 @@
      Precision = truly caught / all blocked = 100 / (100 + 2000) = 4.7%.
      That number forces you to see the cost. ROC hid it by dividing by the vast honest pile.
 
-
   SETTINGS I PICK BY HAND (HYPERPARAMETERS)
 
   Some numbers inside a machine are set by rolling downhill on the leftover.
@@ -62,7 +61,6 @@
       C in LogisticRegression(C=0.1)    <- leash strength
       k in KNeighborsClassifier(k=5)    <- how many neighbours to ask
       n_estimators in RandomForest      <- how many trees to grow
-
 
   GRID HUNT
 
@@ -153,7 +151,6 @@
      But if you tune settings on the exam pile, you are leaking future information.
      Therefore the final score comes out optimistic -- the machine has already peeked.
 
-
   TWO KINDS OF SAME-RULER
 
   The series so far has leaned on the standard ruler.
@@ -194,7 +191,6 @@
   So compute min and max (for pinch-to-fit), or mean and spread (for the standard ruler), from the study pile only.
   Therefore the exam pile never helps shape the ruler that grades it.
 
-
   WHEN ALARM MATTERS MORE THAN MISSED
 
   First, two words for the two kinds of mistake.
@@ -225,7 +221,6 @@
   Therefore recall is the primary score.
   But both kinds of mistake matter.
   So the precision-recall curve (next) shows the exact deal between them.
-
 
   SKEWED PILES AND THE PRECISION-RECALL CURVE
 
@@ -295,7 +290,6 @@
   Computing that curve, and its area the average precision (AP), is three lines.
   That code is waiting at the end of the post.
 
-
   SCORING WITH THREE OR MORE BINS
 
   Cancer has subtypes.
@@ -309,7 +303,6 @@
   Recall = caught rows of a class / all rows truly of that class.
   F1 blends those two into one number for that class.
   The question becomes: how do you average those K scores into one number?
-
 
   IN HAND: a three-class scorecard.
   Type A scores F1 0.89, type B 0.67, type C 0.34.
@@ -384,7 +377,6 @@
      precision_recall_fscore_support(..., average='micro'). (A true "micro avg" row only
      appears for multi-label problems, where the collapse doesn't happen.)
 
-
   SUMMARY: WHICH TOOL FOR WHICH PROBLEM
 
     +------------------------------+------------------------------------------+
@@ -401,9 +393,6 @@
     | 3+ classes, all equally imp. | macro averaging                          |
     | 3+ classes, size = importance| micro (or weighted) averaging            |
     +------------------------------+------------------------------------------+
-
-
-  NUMBERS, IN PYTHON
 
   Nothing above needed a computer.  Here the hand examples are spelled out in Python
   so you can run each one and see the same numbers the post printed.
@@ -449,9 +438,6 @@
     micro_precision = total_caught / (total_caught + total_alarm)   # 0.800
     micro_recall    = total_caught / (total_caught + total_missed)  # 0.763
     CLASS A (1000 ROWS) DOMINATES THE POOL; CLASS C (10 ROWS) BARELY REGISTERS
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -505,7 +491,6 @@
     macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
     MICRO[:3] == (ACCURACY, ACCURACY, ACCURACY);  MACRO[:3] == THE EQUAL-WEIGHT BLEND
 
-
   WHERE THAT LEAVES US
 
   And there the series rests. Look back at the road: we began by turning a sliding number
@@ -520,9 +505,6 @@
   understanding; they were handles screwed on at the end, once the thing was already built
   and working in your hands. Keep that order and there is very little in this field you
   cannot teach yourself.
-
-
-  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

@@ -35,7 +35,7 @@
        A compromise that tends to find round, equally-sized clusters.
      The linkage rule you pick changes which groups form. There is no single right answer.
 
-  SHEET (SAME AS PART 1)
+  THE SHEET (SAME AS PART 1)
 
     50 states, 3 measurements (Murder, Assault, UrbanPop).  No answer column.
     Standardised first, so every column sits on the same ruler.
@@ -194,14 +194,12 @@
   The ruler comes out once, at the very start.  After that, the entire tree is built by
   comparing numbers you already have -- no dot is ever measured twice.
 
-
   AGGLOMERATIVE (BOTTOM-UP) VS DIVISIVE (TOP-DOWN)
 
   What we just did -- start with singletons and marry upward -- is BOTTOM-UP
   (agglomerative).  It is by far the common one.  The opposite, TOP-DOWN (divisive),
   starts with everyone in one group and splits the loosest group again and again.  Same
   tree idea, opposite direction.  This whole post is bottom-up.
-
 
   READING THE MERGE DIARY (THE Z TABLE)
 
@@ -231,7 +229,6 @@
      Instead of remembering the diary has 49 rows and writing Z[48, 2], the minus
      sign counts from the end: -1 is the last row, -2 the second-to-last.  Z[-1, 2]
      reads the root's gap without you ever counting the rows.
-
 
   COMMON TRIPWIRES I CAUGHT
 
@@ -285,9 +282,6 @@
        value itself, a different question, and the two read almost identically in
        code.  Say out loud which one the question asks for BEFORE typing the dot.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     the family tree                       dendrogram
@@ -304,9 +298,6 @@
     the merge diary (Z table)             the linkage matrix
     the root's gap (Z[-1, 2])             the maximum merge distance
     the row-merge trick (keep the bigger)  the Lance-Williams update (complete linkage)
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -384,7 +375,6 @@
     from sklearn.cluster import AgglomerativeClustering
     agg = AgglomerativeClustering(n_clusters=3, linkage="ward")
     labels = agg.fit_predict(X_scaled)
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):

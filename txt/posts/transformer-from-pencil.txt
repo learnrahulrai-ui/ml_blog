@@ -31,7 +31,6 @@
      Use positional encoding to tell words apart (word 1 vs word 37) without a chain.
      All 10,000 cores fire at once. Training that took weeks now takes hours.
 
-
   A MACHINE ONLY MULTIPLIES NUMBERS, SO WORDS MUST BECOME NUMBERS FIRST
 
   Walk every review in the pile. Count every word. Hand each word a number by how often it
@@ -67,7 +66,6 @@
 
   After this: "nolan ended" → SHEET 2 tall × 4 wide. Every word-slot has a stick.
 
-
   WALKING THROUGH 79 REWRITES STILL FADES, SO LOOK ACROSS INSTEAD
 
   One older way to read a sentence WALKS it.
@@ -86,7 +84,6 @@
       LOOK-ACROSS: not  ←──── direct ────→  good       no fade; all at once
 
   No chain means no fade, and no chain means every word computes in parallel.
-
 
   EACH WORD MAKES THREE TAGS TO ASK, ANSWER, AND GIVE
 
@@ -124,7 +121,6 @@
 
        check: 0·2 + 1·1 + 0·1 + 0·0 = 1.
 
-
   NOLAN'S WANT DOTS EVERY WORD'S HAVE
 
   Dot product: lay one stick flat as a row, the other as a column, multiply matching pairs, add.
@@ -148,7 +144,6 @@
   Lay one flat: [2,0,1,0]. Stand the other as column. Multiply pairs, add → one number.
   Two same-width sticks always dot. That is the dot product.
   ─────────────────────────────────────────────────────────────────────────────────────────
-
 
   WIDER TAGS BLOAT THE MATCH NUMBERS, SO DIVIDE BY √(TAG WIDTH)
 
@@ -176,7 +171,6 @@
   Tag width is 4, so √4 = 2, always, no matter what the numbers are.
   ─────────────────────────────────────────────────────────────────────────────────────────
 
-
   SCORES ARE NOT FRACTIONS YET -- SOFTMAX MAKES THEM
 
   Scaled scores [1, 4] are raw numbers. Turn them into portions adding to 1. Recipe: raise e
@@ -199,7 +193,6 @@
   Softmax raises e to each number FIRST (4 → e^4 = 54.6, not 4), then divides by the total
   of the raised values. Nothing is added raw. Each number becomes a separate portion.
   ─────────────────────────────────────────────────────────────────────────────────────────
-
 
   PORTIONS WEIGHT THE GIVE STICKS -- NOLAN'S NEW STICK FALLS OUT
 
@@ -239,7 +232,6 @@
   softmax turns the scaled matches into portions that add to 1.
   V is the stack of GIVE tags (what each word hands over); multiplying by V is the weighted sum.
 
-
   TWO HEADS CATCH TWO KINDS OF LINK
 
   One set of WANT/HAVE/GIVE grids learns one kind of cross-word relationship. A second set of
@@ -259,7 +251,6 @@
   Which means the two heads' findings blend instead of staying in separate halves.
   That mixing grid is the output projection inside MultiHeadAttention.
   Running two head-sets like this is what num_heads=2 means.
-
 
   NO WALK MEANS NO ORDER -- FLAGGED
 
@@ -290,7 +281,6 @@
   their spread to 1 (this is called LayerNorm).
   Both are left out on purpose -- this is one layer, one short review.
 
-
   100 STICKS NEED ONE SUMMARY -- AVERAGE THEM ALL
 
   After attention, every word-slot has a new stick.
@@ -307,7 +297,6 @@
 
        check: (4+0)/2=2, (2+0)/2=1 → [2, 1].
 
-
   A SMALL HEAD READS THE SUMMARY AND WRITES THE TICK
 
       summary stick
@@ -320,7 +309,6 @@
              0.9 = 90% liked . 0.1 = probably not liked
 
   Dropout fires during practice only.
-
 
   TRAPS, EACH AS A CLASH
 
@@ -338,9 +326,6 @@
   weighted sum. In longer reviews self-attention weights are often small (other words are more
   relevant), but the match is always computed. n entries, not n−1.
   ─────────────────────────────────────────────────────────────────────────────────────────
-
-
-  NUMBERS, IN PYTHON
 
   Every dot product, softmax, and weighted sum above done by pencil.  Here the same numbers
   in Python -- run it and compare each line with the post's arithmetic.
@@ -390,7 +375,6 @@
     avg_2 = (word1[2] + word2[2]) / 2   # 0.7
     avg_3 = (word1[3] + word2[3]) / 2   # 0.2
 
-
   ONE RECITATION (CARRY THIS AWAY)
 
   Number words. Swap each for a stick (embedding table). Each word makes WANT / HAVE / GIVE
@@ -401,7 +385,6 @@
   Dropout → 1 sigmoid → the tick.
 
   No walk. No memory. Every word straight at every other.
-
 
 ----------------------------------------------------------------------------------------------
   APPENDIX D . TRANSFORMER FROM PENCIL

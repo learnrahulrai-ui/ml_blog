@@ -23,7 +23,6 @@
   toy with arithmetic; (2) WHY a plan that stops changing is provably the best one, not merely
   a plan that got tired. This page shows both, by hand. No magic.
 
-
   TOY WORLD, REAL RECIPE. Grade a plan, peek every nudge, keep the best, repeat until the
   arrows freeze -- exact. The WORLD is a toy: a small box of spots, simple painted
   scores, and moves that always land where you aim (no slipping). Real problems let a move slip
@@ -50,8 +49,7 @@
       spread outward from the runway one ring per pass, then stop. A plan that survives a full
       peek untouched is provably the best.
 
-
-  WORLD (REDRAWN HERE SO THE COMPANION POST IS NOT NEEDED)
+  THE WORLD (REDRAWN HERE SO THE COMPANION POST IS NOT NEEDED)
 
   A drone hangs in the air over a patch of enemy ground. We want to find the best flight plan.
 
@@ -92,7 +90,6 @@
       the WORTH  = a notebook, spot -> a number (points collected from here on under the plan).
                    Scratch paper: rebuilt from nothing each time the plan changes.
 
-
   GRADE STEP, FOLDED INTO ONE BOX (THE COMPANION POST, COMPRESSED)
 
   Before a plan can be bettered, it must be GRADED -- every spot given a worth under the current
@@ -112,7 +109,6 @@
   property of this particular map -- one prize, one path, no competing rewards.) Hold that
   picture for the worked example below.
 
-
   WHY WE NOW NEED ALL SIX NUDGES (THE GRADING POST ONLY EVER READ ONE)
 
   Grading read ONE arrow per spot -- whatever the plan said -- and followed it. To IMPROVE a
@@ -127,7 +123,6 @@
   The wall rule, worked once: at (0, 0, 1) a nudge W would set x = -1, off the box -- so the
   drone stays at (0, 0, 1). A wall nudge is a move that lands you back on yourself. A ground
   spot has no nudge at all (the flight is over); its only "move" is to stay put.
-
 
   IMPROVE MOVE -- PEEK THE SIX, KEEP THE WINNER
 
@@ -158,7 +153,6 @@
   Note what does NOT change across the six: the fuel -0.1 is the same for every nudge (it is the
   cost of being in the air this move, not of the direction). Only 'worth(where it lands)' moves.
   So the peek really asks one thing: which neighbour is worth the most? Aim there.
-
 
   WHOLE LOOP -- GRADE, PEEK, REPEAT, FREEZE
 
@@ -195,7 +189,6 @@
   many passes settle the worths for ONE plan. OUTSIDE, the grade-then-improve cycle swaps that
   plan for a better one. The PLAN is the thread that carries across and keeps getting better;
   the WORTH is scratch, rebuilt from 0 every time the plan changes.
-
 
   WATCH THE GOOD ARROWS SPREAD -- WORKED BY HAND
 
@@ -259,7 +252,6 @@
   need not move in neat rings. When a whole pass re-aims nothing -- the frozen condition --
   that is the universal signal. That frozen plan is the answer.
 
-
   WHY A FROZEN PLAN IS THE BEST (DERIVED, NOT DECLARED)
 
   "It stopped changing" sounds like it merely ran out of energy. It is stronger than that.
@@ -295,7 +287,6 @@
   stochastic slipping, the worth table and the best plan can look completely different.) Here the
   math hands back exactly the plan a human would draw for this map.
 
-
   DECODER (JARGON -> PLAIN, MASTER SHEET)
 
       PEACOCK WORD                         WHAT IT ACTUALLY MEANS
@@ -317,7 +308,6 @@
       policy iteration                         grade, improve, repeat until the arrows freeze
       optimal policy / pi*                     the frozen plan -- its own best reply, unbeatable
       fixed point                              a plan that an improve leaves unchanged
-
 
   PYTHON: THE IMPROVE, BY HAND, THEN THE WHOLE LOOP
 

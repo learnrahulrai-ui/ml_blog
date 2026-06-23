@@ -52,7 +52,6 @@
      THE FIX: never grade on one cutoff. Sweep the cutoff from 1 down to 0 and trace the
      catches and false alarms at every point. That sweep is the trade curve (ROC curve).
 
-
   IN HAND: the machine gives each lump a chance-score from 0 to 1.
   You draw a line (the cutoff) somewhere on that scale.
   Above the line the machine calls "sick"; below the line it calls "well".
@@ -89,7 +88,6 @@
   Moving the cutoff shifts both at once.
   Therefore they cannot be improved together without limit.
 
-
   SLIDING THE CUTOFF
 
     chance 0.0 --------------- 1.0
@@ -110,7 +108,6 @@
   There is no cutoff that maximises TPR while holding FPR at zero.
   The one exception is a machine that perfectly separates the two groups.
   So what exists instead is a continuous family of deals.
-
 
   DRAWING ALL THE DEALS AT ONCE
 
@@ -196,7 +193,6 @@
   Therefore (569 + 1) x 569 = 570 x 569 = 324,330 comparisons to draw the whole curve.
   That is a morning for the clerks, an afternoon's nap for the kettle.
 
-
   AREA UNDER THE CURVE
 
   IN HAND: a 6-person exam swept through cutoffs into (FPR, TPR) dots.
@@ -246,7 +242,6 @@
   (0.45, 0.22, 0.11).
   So for ANY cutoff between 0.72 and 0.45, the machine catches all sick and alarms none.
 
-
   WHAT AUC ACTUALLY MEASURES
 
   Areas under curves are easy to compute and hard to feel.
@@ -294,7 +289,6 @@
      So it is the right score when you want to compare two machines before deciding where
      to set the cutoff.
 
-
   WHY YOU NEED CHANCES, NOT LABELS
 
   The ROC sweep needs a continuous score to slide the cutoff through.
@@ -317,14 +311,12 @@
   For the ROC curve you want the sick-chance, which is column 1.
   The code that sweeps it into a curve is at the end of the post.
 
-
   PLOTTING IT
 
   When you plot it (code at the end), the grey 45-degree diagonal is the reference line.
   A machine that assigns random scores sits right on that diagonal.
   So any curve above the diagonal beats random guessing.
   And the further it bulges toward the top-left corner, the cleaner the separation.
-
 
   PRACTICAL READING
 
@@ -341,9 +333,6 @@
      In cancer screening, a doctor reading a curve of AUC 0.97 might pick the cutoff that
      gives 99% recall even if the false-alarm rate climbs to 15%.
      So the curve shows the available deals; the doctor picks one.
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet a computer: the same work, spoken in Python.
@@ -424,9 +413,6 @@
     plt.title('Trade Curve')
     plt.legend()
     plt.show()
-
-
-  LABELS, LAST
 
     Plain term used above                    Standard label
     -------------------------------------    -------------------------------------------

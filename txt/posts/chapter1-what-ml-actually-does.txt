@@ -45,7 +45,6 @@
      need are explained in one short line the first time they appear. Skip the code or
      study it -- the idea stands on its own either way.
 
-
   JOB: GUESS FROM A SHEET OF NUMBERS
 
     rooms  income  age  ocean  people  |  PRICE   <- right-answer column
@@ -91,7 +90,6 @@
      df.shape returns (n_rows, n_cols) in that fixed order -- (20640, 9) -- never their
      product.
 
-
   ONE RULE: HIDE SOME ROWS
 
     ALL ROWS
@@ -126,7 +124,6 @@
      Rows often arrive sorted by district. Shuffle with a fixed starting point so the
      split is reproducible and not ordered. The fixed point controls reproducibility; the
      shuffle removes order bias.
-
 
   RULE 1 -- ASK THE CLOSEST ROWS
 
@@ -215,7 +212,6 @@
   A room of clerks does it by lunch.
   But remember the bill: it comes due every time another house walks in.
 
-
   MEASURING HOW WRONG: RMSE
 
   A guesser is only as good as its misses are small.
@@ -290,7 +286,6 @@
   A double-sized miss of -0.6 squares to 0.6 x 0.6 = 0.36.
   And 0.36 / 0.09 = 4, so doubling the miss gives it four times the weight.
 
-
   RULE 2 -- THE STRAIGHT-STICK RULE
 
   IN HAND: one guessing rule and one honest ruler.
@@ -314,7 +309,6 @@
   The dials are not searched for.
   They drop out of an exact formula.
   Full derivation in [Part 3](straight-stick-linear-regression.txt).
-
 
   PICKING SETTINGS WITHOUT PEEKING AT THE HIDDEN PILE
 
@@ -360,7 +354,6 @@
      A gap between the rotating-fold estimate and the hidden-pile mistake means the rule
      memorised the working pile a little.
 
-
   WHOLE BLOG IN SIX LINES
 
   Here is everything above, boiled down to six lines.
@@ -374,7 +367,6 @@
     4. Measure mistake with RMSE (same units as price); the bar to beat is std(y).
     5. Pick settings by rotating folds, preparing numbers inside each round.
     6. Refit on all of working pile; read the hidden pile exactly once.
-
 
   COMMON TRIPWIRES I CAUGHT
 
@@ -411,9 +403,6 @@
        leak their numbers into the build. A Pipeline chains scaler + rule so the
        scaler relearns fresh from each fold's build portion only.
 
-
-  LABELS, LAST
-
   Now that you have built the thing, here are the proper names.
   Every post on this blog ends this way.
   Plain words sit on the left; the textbook term sits on the right.
@@ -437,8 +426,6 @@
     rotating folds                        k-fold cross-validation
     memorising the working pile           overfitting
     mistake on rows never seen            generalisation error
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same six steps, spoken in Python.
@@ -525,7 +512,6 @@
     pipe = Pipeline([("scale", StandardScaler()), ("knn", KNeighborsRegressor(n_neighbors=50))])
     scores = cross_val_score(pipe, X_train, y_train, cv=cv, scoring="neg_root_mean_squared_error")
     print(-scores.mean())    # 0.6781  -- worse again: 50 neighbours blurs the detail
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 1 -- Predicting House Prices):

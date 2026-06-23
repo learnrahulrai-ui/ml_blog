@@ -44,7 +44,6 @@
 
   Pencil and scratch paper out. Every number here is recomputed where it is needed.
 
-
   NEW SHEET, AND THE WALL
 
   The sheet:
@@ -67,7 +66,6 @@
 
   So we must number the words first.
   Three moves get us there -- a numbering, a length-fix, and a split.
-
 
   WORDS ARE NOT NUMBERS, SO HAND EACH ONE A NUMBER (Q1, Q2A-B)
 
@@ -106,7 +104,6 @@
   After this the review "boring movie the" becomes [4, 2, 1] -- three numbers, one per word.
   Each number is just a NAME TAG pointing at a word.
 
-
   A FIXED FACTORY NEEDS ONE LENGTH, SO PAD EVERY REVIEW (Q2C)
 
   IN HAND: every word now has a number (the=1, boring=4, and so on).
@@ -140,7 +137,6 @@
          [1, 2, 3, 4] has 4 numbers, need 5 -> pad one zero -> [1, 2, 3, 4, 0].
          "the" x7 = [1,1,1,1,1,1,1], 7 numbers, need 5 -> chop to first 5 -> [1, 1, 1, 1, 1].
 
-
   NEVER GRADE ON STUDIED CARDS, SO CUT STUDY FROM EXAM (Q2D)
 
   The honest rule: never grade the machine on cards it studied.
@@ -155,8 +151,7 @@
   The pile is cut into a study 80% and a sealed exam 20%.
   The factory can finally be built.
 
-
-  FIRST TEXT-FACTORY: THREE FLOORS (Q3)
+  THE FIRST TEXT-FACTORY: THREE FLOORS (Q3)
 
   IN HAND: every review is now 100 word-numbers (e.g. [4, 73, 1, 87, 0, 0, ...]), 0 = empty.
   We feed that line of 100 numbers into a factory with three floors:
@@ -174,7 +169,6 @@
   Floor 2 is the heart of the chapter.
   Floor 3 is a single clerk that ends in an S-curve -- a fixed bend that crushes any number
   into a chance between 0 and 1 (more on it at floor 3).
-
 
   FLOOR 1: THE NOTEPAD (EMBEDDING)
 
@@ -260,7 +254,6 @@
          row 0  -> [0.0, 0.0, 0.0, 0.0]   (empty)
          row 0  -> [0.0, 0.0, 0.0, 0.0]   (empty)
        The sheet is 3 rows tall x 4 wide.
-
 
   FLOOR 2: THE WALKING WORKER (THE RNN CELL, BY HAND)
 
@@ -375,7 +368,6 @@
          add + nudge: [1, 2] + [0, 0] + [0, 0] = [1, 2]
          squash: [tanh(1), tanh(2)] ~ [0.76, 0.96].  New memory ~ [0.76, 0.96].
 
-
   WHY THE LOOP NEEDS THE TANH SQUASH
 
   IN HAND: the worker rewrites its 32-number memory once per word, 100 times, each time
@@ -416,7 +408,6 @@
   It peeks at no one, learns nothing, keeps no diary.
   It bends each number through the same fixed curve, alone, every time.
 
-
   FLOOR 3: THE FINAL CLERK (DENSE + S-CURVE)
 
   IN HAND: floor 2 walked all 100 words and left a 32-number summary in pocket A.
@@ -443,7 +434,6 @@
   a rounding error in the dial budget. The cost is not in the dials; it is in the WALK --
   100 steps per review, in order, one after another, which is the bottleneck Part 2's
   cousins inherit and the Transformer (a later chapter) finally breaks.
-
 
   COMMON TRIPWIRES
 
@@ -480,9 +470,6 @@
     One number cannot encode "I am a flipper" (not) or "I am an amplifier" (very) separately
     from a lean. Width 32 gives the word room to be several things at once. Width is a knob.
 
-
-  LABELS, LAST
-
     pile of words, 1/0 per row       sentiment classification (binary)
     number each word by frequency    tokenisation by frequency rank
     10,000 kept words                vocabulary size (VOCAB_SIZE / num_words)
@@ -501,9 +488,6 @@
     final clerk + S-curve            Dense(1) + sigmoid
     wrongness for yes/no             binary cross-entropy
     downhill-roller                  Adam optimiser
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer; this section is for the day you meet one.
 
@@ -557,7 +541,6 @@
   rescues it (the LSTM) are Part 2.
 
   --> Continue: [Chapter 10, Part 2: The Two-Memory Worker](the-two-memory-worker.txt)
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 10 -- Machines That Read Words):

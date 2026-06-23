@@ -48,7 +48,6 @@
   depending on its position in the sentence, so the grids see different inputs
   even for the same word at different positions.
 
-
   SCALAR TRAP -- ADDING A NUMBER
 
   The most direct idea: add the slot number to each element of the word's stick.
@@ -67,7 +66,6 @@
   TWO: there is no upper bound. A position number can grow without limit. A word
   at slot 50,000 gets 50,000 added to its stick -- a number the model has never
   seen in training.
-
 
   NORMALISED SCALAR -- BETTER, BUT BREAKS AT INFERENCE
 
@@ -90,7 +88,6 @@
   The scalar approach has a deeper flaw: we are trying to cram two jobs into one
   number -- be unique AND encode relative distance AND stay bounded. One number
   cannot do all three.
-
 
   GIVE EACH POSITION A VECTOR -- SINUSOIDAL ENCODING
 
@@ -166,7 +163,6 @@
   = [2.141, 0.010, 1.030, 0.9996] -- a unique stick that carries both its meaning
   and its position, mixed together.
 
-
   WHERE SINUSOIDAL BREAKS -- THE RELATIVE DISTANCE PROBLEM
 
   Sinusoidal encoding has three failure modes. Two are manageable. One is
@@ -239,7 +235,6 @@
   The better path: design the encoding so the dot product automatically captures
   relative distance. That is what RoPE does.
 
-
   ROPE -- ROTATE INSTEAD OF ADD
 
   Instead of adding a position vector to the word stick, ROTATE the word stick by
@@ -283,7 +278,6 @@
   The same word "cat" points in a different direction at every position. Its
   meaning (the length of the vector, which is sqrt(0.9²+0.4²) = 0.985) is
   preserved. Only the direction changes.
-
 
   PROOF THAT ROPE ENCODES RELATIVE DISTANCE
 
@@ -369,7 +363,6 @@
   vectors. Change the gap and the score changes. Change the absolute positions
   while keeping the gap fixed and the score is unchanged.
 
-
   SCALING TO 512 DIMENSIONS -- 256 ROTATION PLANES
 
   That 2D proof works because one pair of numbers defines one rotation plane.
@@ -414,7 +407,6 @@
   That is the design: the slow pair at position 3000 looks like the fast pair at
   position 3. Every pair has seen "rotate by 0.3 rad" many times during training.
 
-
   WHERE ROPE STILL BREAKS -- THE SLOW PAIRS
 
   RoPE extrapolates better than sinusoidal encoding because attention scores depend
@@ -439,7 +431,6 @@
   For the slow pair, RoPE breaks at long context for exactly the same reason
   sinusoidal encoding does: the model is asked to handle an angular regime it
   never trained on.
-
 
   FIX -- SCALE THE BASE FREQUENCY
 
@@ -502,7 +493,6 @@
   number of tokens; it was whether the training data forced the model to actually
   USE long-range attention.
 
-
   DECODER
 
       PLAIN WORD                           JARGON
@@ -518,7 +508,6 @@
       new base frequency                   scaled RoPE base (e.g. 500,000 for 128K ctx)
       continue training                    continual pre-training / context extension
       position ID shifting                 position interleaving (Cerebras technique)
-
 
   PYTHON: SINUSOIDAL MARKS AND ROPE, EVERY NUMBER CHECKED
 
@@ -636,7 +625,6 @@
       512-dim RoPE, same token:
         score(pos 3 vs 7):   22.3814
         score(pos 10 vs 14): 22.3814
-
 
   ---
 

@@ -57,7 +57,6 @@
      The fraction (learning rate) still needs to be chosen by hand -- too big: oscillation.
      Too small: takes forever. This is the hardest hyperparameter in deep learning.
 
-
   WHY BRUTE FORCE WILL NOT DO
 
   Our full building has more dials than you might guess. Let me count them.
@@ -81,7 +80,6 @@
   backpropagation. And contrary to its fearsome reputation, on a small network it is just
   the chain rule from calculus, applied a few times. Let me show you on a network so small
   it fits in a sentence.
-
 
   A NETWORK YOU CAN HOLD IN YOUR HEAD
 
@@ -109,7 +107,6 @@
   four dials (w1, b1, w2, b2) so that next time the loss is smaller. To know which way to
   nudge each one, we need its SLOPE: if I increase this dial a little, does the loss go up
   or down, and how steeply?
-
 
   CHAIN RULE, SAID PLAINLY
 
@@ -195,7 +192,6 @@
   New b2 = 0.2 - (0.1 x -0.198) = 0.2 + 0.020 = 0.220. Rule for every nudge: its slope equals
   the error at the clerk it belongs to. No input factor, no chain to trace.
 
-
   READING THE SLOPE, AND TAKING A STEP
 
   The slope of L w.r.t. w2 is -0.158. NEGATIVE. What does that mean in plain words?
@@ -243,7 +239,6 @@
     Measured slope = (0.201 - 0.221) / (0.3 - 0.2) = -0.020 / 0.100 = -0.20.
     Our chain-rule value: -0.198. Agree. ✓
     A nudge changes z2 exactly one-for-one, so its slope IS the error -- nothing else dilutes it.
-
 
   SENDING THE ERROR ONE ROOM FURTHER BACK
 
@@ -328,7 +323,6 @@
   A bigger output error pushes a bigger slope back to w1 -- so w1 takes a bigger step. The
   network corrects fastest exactly where it was most wrong.
 
-
   HOW BIG A STEP? (LEARNING RATE)
 
   We used a step size of 0.1 above. That number is the learning rate, and it is its own small
@@ -343,7 +337,6 @@
   building was WORSE after training than before. The dials were bouncing around the valley
   floor, never settling in it. Halving the step fixed it instantly. The lesson stuck: when
   training diverges, suspect the step size first.
-
 
   A MANAGER WHO SIZES THE STEPS (ADAM)
 
@@ -369,7 +362,6 @@
   up; that bookkeeping is not essential to the picture.) The effect is that each of the 641
   dials gets its own self-sizing step. Adam is a choice, not a law -- plain gradient descent
   with a hand-tuned step also works -- but Adam saves you the tuning, so I use it.
-
 
   LAZY CLERKS AND COFFEE BREAKS (DROPOUT)
 
@@ -397,7 +389,6 @@
   The 20% is a choice. On this dataset I tried 10%, 20%, and 30% and they landed in the same
   neighbourhood -- this is a knob not worth agonising over. How many clerks sit out if 16
   clerks face a 25% rate? 16 x 0.25 = 4. Four out, twelve working.
-
 
   WHEN NUMBERS EXPLODE (NUMERICAL STABILITY)
 
@@ -427,7 +418,6 @@
   comparison. Always worth it. (This is the np.clip(Z, -80, 80) line in the Part 1 code, now
   explained.)
 
-
   THREE MISTAKES WORTH KNOWING
 
   I have made all three. The first burned half a day.
@@ -456,7 +446,6 @@
   clerk instead of activation='sigmoid'. Zero-out belongs between rooms; the S-curve belongs
   at the exit.
 
-
   PUTTING IT ALL IN MOTION (THE REAL RUN)
 
   Everything above was one dial moving one step, by hand. A real run is just that same step
@@ -476,7 +465,6 @@
   is a standing reminder that 97.4% accuracy still means roughly three patients in every
   hundred are told the wrong thing.
 
-
   STANDARD NAMES FOR PART 2
 
     Plain term                          Standard label
@@ -493,9 +481,6 @@
     coffee break                        dropout
     gear shatter past e^88              float32 overflow
     clipping Z to [-80, +80]            numerical stability / sigmoid clipping
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer: the chain rule, the error flows, and every slope calculation
   fit on scratch paper. This section is for the day you meet one.
@@ -584,7 +569,6 @@
   patient it has not seen. Curing that is the next chapter.
 
   --> Continue: [Chapter 8: Five Machines Against Memorising](five-machines-against-memorising.txt)
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 7 -- Building a Neural Network from Scratch):

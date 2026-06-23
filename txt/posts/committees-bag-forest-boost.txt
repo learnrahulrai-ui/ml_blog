@@ -46,7 +46,6 @@
 
   Each builds on the previous.  The ideas are small.  The power is in the pile-up.
 
-
   BAGGING: DEAL, BUILD, AVERAGE
 
   One tree is jumpy.  Why?  Because it was trained on THIS crowd.  A different crowd
@@ -125,7 +124,6 @@
     BOOTSTRAP  = the sticky-note dealing (with put-back)  -> makes 200 different piles
     AGGREGATE  = ask all 200 trees, AVERAGE the answers
 
-
   FREE EXAM (OOB) -- AGAIN
 
   IN HAND: 200 trees, each built from a sticky-note pile dealt WITH REPEATS, all voting
@@ -165,7 +163,6 @@
 
   You get an honest error WITHOUT touching the sealed 25% exam pile.
 
-
   NUMBER TREES VS BIN TREES
 
   Trees work for BOTH answer types.  Bagging uses whichever fits:
@@ -174,7 +171,6 @@
     bin answer    (cancer):    each leaf guesses MAJORITY   -> bagging takes MAJORITY VOTE
 
   The lab's bagging stage uses the diabetes/number tree -> 200 trees -> average.
-
 
   RANDOM FOREST: BAGGING + HIDE COLUMNS
 
@@ -230,7 +226,6 @@
      need more friends to reach the same steadiness.  If you hid even
      fewer columns (max_features=0.3), you'd need even more trees.
 
-
   FEATURE IMPORTANCES: WHICH COLUMNS LEANED HARDEST
 
   After building 300 trees, you can ask: "which columns did the most work?"  Each time a
@@ -239,7 +234,6 @@
 
   This is not the same as "which column matters most in nature" -- it's "which column the
   trees used the most."  A correlated stand-in might steal credit from the true cause.
-
 
   BOOSTING: A LINE OF FIXERS
 
@@ -342,7 +336,6 @@
     out, then rises.  The bottom is where you stop.  Beyond it, each new
     stump is memorising study-pile noise while harming exam performance.
 
-
   SO WHY KEEP BOTH: ONE FAMILY CALMS JUMPS, THE OTHER FIGHTS STUBBORNNESS
 
   Two ways for a tree to be wrong, the same two from the depth sweep and from
@@ -368,7 +361,6 @@
   So they are not rivals you pick between by taste.  Reach for bagging or a forest
   when a single tree is wild and over-eager; reach for boosting when a shallow tree
   is too blunt to catch the shape.  Same trees, opposite cures.
-
 
   SCRAMBLE A COLUMN TO SEE WHICH ONE MATTERED
 
@@ -438,7 +430,6 @@
      other look more important than it is.  The jump tells you "how much the
      forest relied on this column" -- not "how much this column matters in
      the real world."
-
 
   SLIDE A COLUMN TO SEE HOW IT PUSHES THE GUESS
 
@@ -547,9 +538,6 @@
      You test 20 fake bmi values -> 20 points per person -> 88 lines.
      The trees don't change.  Only the fake column value changes.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     sticky note / fake pile               bootstrap sample (with replacement)
@@ -569,9 +557,6 @@
     one line per person                   individual conditional expectation (ICE)
     n_estimators                          number of trees in the ensemble
     feature_importances_                  mean decrease in impurity (MDI)
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -663,7 +648,6 @@
     perm = permutation_importance(rf, X_test, y_test, n_repeats=10, random_state=42)
     PERM.IMPORTANCES_MEAN = HOW MUCH EACH COLUMN'S SCRAMBLE HURT THE SCORE
     PARTIALDEPENDENCEDISPLAY.FROM_ESTIMATOR(RF, X_TEST, [TOP_FEATURE], KIND='BOTH')
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 5 -- Question Charts and Committees):

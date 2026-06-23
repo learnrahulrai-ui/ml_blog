@@ -14,7 +14,6 @@
     <- prev:  [Chapter 12, Part 4: Finding the Best Plan](finding-the-best-plan-policy-iteration.txt)
        next:  (more posts coming)
 
-
   ---
 
   The companion post, [Finding the Best Plan by
@@ -34,7 +33,7 @@
 
   ---
 
-  WORLD: A PARKING STREET, FOUR SPOTS, THREE PRICES
+  THE WORLD: A PARKING STREET, FOUR SPOTS, THREE PRICES
 
   A spot = one number: how many parking spaces are taken. Four spots: 0, 1, 2, 3.
   A move = a price you set. Three prices: 0, 1, 2.

@@ -26,7 +26,6 @@
      token. A 224x224 photo becomes 196 tokens. Attention over 196 tokens is fast.
      Each token describes one region -- enough local information, no pixel-level explosion.
 
-
   A PHOTO IS A GRID OF NUMBERS, CUT INTO SQUARE STRIPS
 
   Take a tiny 4 x 4 photo (real ones are 28 x 28), one greyness number per dot:
@@ -81,7 +80,6 @@
             GLUE: chip = 0×2 + 1 = 1.   spot = 1×2 + 0 = 2.
             Chip 1 = top-right square [3, 4, 7, 8]. Spot 2 = the third dot = 7. ✓
 
-
   CUTTING THREW AWAY WHERE -- SO STAMP THE SEAT ON (SINE/COSINE)
 
   Attention looks at the four strips as a SET, with no sense of which sat where. Stamp a unique
@@ -108,7 +106,6 @@
      Seat 0's stamp is [0,1,0,1]. A strip reads [2,2,2,2]. After adding the stamp?
 
      check: [2+0, 2+1, 2+0, 2+1] = [2, 3, 2, 3].
-
 
   EVERY STRIP LOOKS AT EVERY STRIP (THE GRID)
 
@@ -156,7 +153,6 @@
   weights @ value is (n, n) @ (n, d_v) = (n, d_v): every strip's weighted sum of GIVE rows,
   the whole board in one shot.
 
-
   TAME ONE STRIP, ALONE (LAYERNORM)
 
   Take ONE strip's numbers and humble them -- middle to 0, spread to 1 -- reading only this
@@ -192,7 +188,6 @@
 
      check: middle (2+4+6)/3 = 4. diffs: -2, 0, +2.
 
-
   BLOCK THE FUTURE (THE CAUSAL MASK)
 
   A token here is one item in the sequence -- one strip, or one word -- in the order it sits.
@@ -216,9 +211,6 @@
      Causal mask, token 2 of 3, equal raw scores. Its three portions?
 
      check: token 2 sees tokens 1 and 2, not 3 → [0.5, 0.5, 0].
-
-
-  NUMBERS, IN PYTHON
 
   Five pencil cores above: cutting strips, seat-stamping, attention, LayerNorm, causal mask.
   Here the exact numbers in Python.
@@ -278,7 +270,6 @@
     one_third = math.exp(1) / (3*math.exp(1))   # 0.333
     p_t3 = [one_third, one_third, one_third]
 
-
   ONE RECITATION (CARRY THIS AWAY)
 
   Cut the photo into square strips (fold, swap, glue -- the swap keeps each square whole).
@@ -287,7 +278,6 @@
   numbers. Tame one strip alone (LayerNorm: middle 0, spread 1, this row only). And one switch --
   leave the score grid open (bidirectional, a reader) or set the future to -inf (causal, a
   writer). Strips that see everything, tamed one at a time, with or without a view of the future.
-
 
 ----------------------------------------------------------------------------------------------
   APPENDIX E . VISION TRANSFORMER FROM PENCIL

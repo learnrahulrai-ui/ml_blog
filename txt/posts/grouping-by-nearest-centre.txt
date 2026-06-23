@@ -178,7 +178,7 @@
   Here the "miss" being squared is a dot's gap from its centre.
   There is no answer column anywhere.
 
-  CATCH: WHERE YOU DROP THE FIRST CENTRES MATTERS
+  THE CATCH: WHERE YOU DROP THE FIRST CENTRES MATTERS
 
   K-means always settles.
   But it can settle into a BAD grouping if the starting centres were unlucky.
@@ -337,7 +337,6 @@
   There are also machines that fit each pile a lean-and-stretch recipe instead of a
   single centre; these are called Gaussian mixtures.
 
-
   COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  Standardise first -- same as Part 1.
@@ -405,9 +404,6 @@
        measures a gap.  Keeping the two moves separate makes the whole
        algorithm a lot cleaner to reason about.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     grouping with no answer column        clustering (unsupervised)
@@ -425,9 +421,6 @@
     run from several random starts        n_init / multiple restarts
     spread first centres far apart        k-means++ initialisation
     number of piles you pick              K (the n_clusters hyperparameter)
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -522,7 +515,6 @@
     plt.grid(True, linestyle="--", alpha=0.4)
     plt.show()
     PICK K AT THE PEAK -- NO SQUINTING AT A BEND
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):

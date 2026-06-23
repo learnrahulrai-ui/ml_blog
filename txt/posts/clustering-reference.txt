@@ -27,7 +27,6 @@
      distance, trace connected chains of density. Any region where dots are close enough
      to each other forms one cluster, regardless of its overall shape.
 
-
   HOW MANY PILES? -- THE K YOU PICK
 
   K-means (Chapter 6, Part 3) cannot invent the number of groups.  You name it first.
@@ -36,7 +35,6 @@
 
   The machine obeys blindly: ask for k = 5 on data with 2 real clumps and it WILL hand you
   5 piles, splitting real groups to do it.  Pick k at the elbow (Part 3), not by feel.
-
 
   MEASURING WORDS, NOT NUMBERS -- HAMMING DISTANCE
 
@@ -70,7 +68,6 @@
   It is the natural gap for categories and bit-strings, where "how far
   apart" just means "how many positions disagree."
 
-
   WHEN THE ROOM HAS TOO MANY WALLS -- MAHALANOBIS DISTANCE
 
   The straight-line ruler quietly assumes every column is independent and on the same
@@ -87,7 +84,6 @@
   (It is the same un-tangling move as the straight-stick rule's (X^T X)^-1 -- a sheet of
   numbers that records how the columns stretch and lean together, then divides that stretch
   back out before measuring.)
-
 
   SPILLED COFFEE -- MISSING DATA
 
@@ -107,7 +103,6 @@
   The pattern of the holes matters more than the holes.  Decide what the blank MEANS before
   you decide what to write in it.
 
-
   WHY CRUSH THE ROOM -- DIMENSIONALITY REDUCTION
 
   PCA (the strongest-direction tool from Chapter 6, Part 2) crushes a many-wall room to a
@@ -119,7 +114,6 @@
 
   The cost is blur (reconstruction error, Part 2): crush too hard and you lose real
   structure.  Keep enough shadows to stay honest (the 80% rule of thumb), no more.
-
 
   PART THE LAB SKIPS -- ETHICS OF SORTING PEOPLE
 
@@ -145,7 +139,6 @@
      distance" stops being an excuse.  Measure on data you trust, guard what it holds, and
      be ready to explain every wall you used.
 
-
   WHAT THE PILES ARE FOR -- CUSTOMER SEGMENTATION
 
   The whole point of grouping with no answer column: sweep look-alikes together so you can
@@ -158,9 +151,6 @@
   No one labelled those shoppers in advance.  The piles fall out of the data, and the names
   are the story you tell after looking at each pile -- exactly the unsupervised idea from
   the whole of Chapter 6.
-
-
-  NUMBERS, IN PYTHON
 
   The worked examples above (Hamming, dimension count, pinch-to-fit with an outlier) need
   no library.  Here they are as plain variables.
@@ -190,9 +180,6 @@
     ch3 = 0 if 'T'=='T' else 1   # 0
     hamming_words = ch1 + ch2 + ch3   # 1
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     how many piles you pick (k)           the number of clusters (n_clusters)
@@ -206,7 +193,6 @@
     unfair because of who was counted     sampling bias / fairness
     explain which walls drove the pile    model interpretability / transparency
     sweep buyers into piles               customer segmentation
-
 
 ----------------------------------------------------------------------------------------------
   SEE ALSO (Chapter 6 -- Finding Patterns Without Answers):

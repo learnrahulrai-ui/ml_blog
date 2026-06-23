@@ -50,7 +50,6 @@
        lazy doctor: caught 0 out of 1.  Recall = 0%.  He is fired immediately.
      Accuracy hides catastrophe when one bin outnumbers the other.
 
-
   FROM NUMBER TO BIN
 
     a number machine:   ----------*------>   answer = 2.83
@@ -67,8 +66,7 @@
 
     columns -> *dials -> add -> SQUASH -> chance 0-1 -> CUTOFF -> [B] or [M]
 
-
-  SQUASH CURVE
+  THE SQUASH CURVE
 
   The squash is a function that takes any number and returns a chance between 0 and 1.
   Its graph has an S-shape, so call it the S-curve.
@@ -175,7 +173,6 @@
   For person A the dial sum was z = 0, so log-odds = 0.
   Log-odds 0 means odds = 1, which means P(sick) = P(well) = 0.5.
 
-
   SETTING THE DIALS: WHAT THE MACHINE MINIMISES
 
   A machine that predicts a number scores itself by squared leftovers.
@@ -241,7 +238,6 @@
      into fractions.
      So the scaler is fit and applied to X_train and X_test alone.
 
-
   ENCODING THE LABELS
 
   A machine eats numbers.
@@ -254,7 +250,6 @@
   Recall counts them, precision counts them, F1 counts them; those scores are defined below.
   The one-line shelf that does this M->1, B->0 swap is in the code at the end,
   along with a warning about running it twice.
-
 
   FOUR-BOX TABLE
 
@@ -337,7 +332,6 @@
   Drawing this table from the guesses is in the code at the end.
   So is the easy-to-miss gotcha about which way round sklearn wants the arguments.
 
-
   FOUR SCORES, FOUR ANGLES
 
   IN HAND so far: a four-box table.
@@ -371,7 +365,6 @@
   All four come straight from the four-box counts.
   The code that reads them off is at the end of the post.
 
-
   WHY ACCURACY ALONE LIES
 
   Now the most important paragraph in the post.
@@ -401,7 +394,6 @@
      So the first score to check is recall.
      It tells you how large a share of the sick lumps the machine catches.
      Accuracy tells you nothing about which mistake you are making.
-
 
   COMMON TRIPWIRES I CAUGHT
 
@@ -478,7 +470,6 @@
        predict gives two unique values -> the ROC curve has two dots -> useless.
        predict_proba gives a different number per row -> the full sweep.
 
-
   F1: WHY THE HARMONIC MEAN
 
   Recall the two scores F1 blends.
@@ -498,9 +489,6 @@
     example:  P=0.10,  R=0.98
     arithmetic mean = (0.10 + 0.98) / 2 = 0.54
     harmonic mean   = 2 * 0.10 * 0.98 / (0.10 + 0.98) = 0.18   <- honest
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet a computer: the same work, spoken in Python.
@@ -592,9 +580,6 @@
     recall    = recall_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred)
     f1        = f1_score(y_test, y_pred)
-
-
-  LABELS, LAST
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

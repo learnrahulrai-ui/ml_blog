@@ -30,8 +30,7 @@
      It is not doing calculus -- it is following a static recipe that HAPPENS to encode
      the slope. The math is pre-cooked; the machine just executes it.
 
-
-  SHEET, THE GOAL
+  THE SHEET, THE GOAL
 
     patient   age   bmi   bp    ...   answer
     ----------------------------------------
@@ -48,7 +47,6 @@
   Multiply each of #10's ten columns by its dial, add the ten pieces, add the nudge. So the
   whole machine is just eleven numbers: ten dials and one nudge. The only question worth
   this post is where those eleven numbers come from.
-
 
   WHAT MAKES A DIAL "RIGHT"
 
@@ -70,7 +68,6 @@
   "slope = 0" for all ten dials and solving those equations is the whole job. Chapter 1 Part
   3 ground through that solve by hand on three rows; here we just name its answer.
 
-
   EXACT DIALS: ONE LINE THAT UNTANGLES EVERYTHING
 
   Stack the sheet as a grid X (people down, columns across) and the answers as a column y.
@@ -84,8 +81,7 @@
   That second piece is the hero of the post. This is exactly what LinearRegression().fit
   computes under the hood, and it is EXACT whether the columns overlap or not.
 
-
-  LADDER: A CRUTCH THAT LOOKS LIKE THE ANSWER
+  THE LADDER: A CRUTCH THAT LOOKS LIKE THE ANSWER
 
   There is a tempting shortcut for a single dial -- just measure how that one column and the
   answer move together, on their own:
@@ -168,7 +164,6 @@
   don't overlap" as small print after you have already built on it. Don't be fooled, and
   don't fool anyone else: name it EXACT or LADDER up front.
 
-
   IN HAND: the bmi LADDER dial, worked from top 4.12 over bottom 0.0120 ~ 343 -- the
   credit bmi grabs if it stands alone -- with the warning that the EXACT dials need the
   untangler (X^T X)^-1 to share credit among overlapping columns.  This section adds the
@@ -197,7 +192,6 @@
      to add is the answer's average. This is NOT a universal law. Un-centre the columns and
      the nudge changes. (It is the reason every chapter puts the columns on one ruler first.)
 
-
   GUESS, THEN GRADE
 
   With eleven numbers in hand, the rest is the old ritual from Chapter 2:
@@ -206,7 +200,6 @@
     miss       = answer - guess
     RMSE       = sqrt( mean( miss^2 ) )      miss -> square -> mean -> root
     R^2        = (total wobble - leftover) / total wobble
-
 
   HONEST ONE PAGE
 
@@ -221,9 +214,6 @@
   2). Name your crutches out loud, keep your columns on one ruler, and the machine has no
   black boxes left in it.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     total wrongness                       residual sum of squares / squared loss
@@ -234,9 +224,6 @@
     columns that move together            collinearity / multicollinearity
     the fixed lift                        the intercept / bias term
     centred columns                       mean-centred / zero-mean features
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -285,10 +272,9 @@
     SAME THING BY HAND -- THE FLAT-BOTTOM SOLVE, SPELLED OUT
     dials_by_hand = np.linalg.inv(Xc.T @ Xc) @ Xc.T @ y     # (X^T X)^-1 X^T y
 
-    LADDER FOR ONE COLUMN, ALONE -- MATCHES ONLY IF COLUMNS DON'T OVERLAP
+    THE LADDER FOR ONE COLUMN, ALONE -- MATCHES ONLY IF COLUMNS DON'T OVERLAP
     x = Xc[:, 1]                                            # e.g. the bmi column, centred
     ladder_bmi = np.sum(x * y) / np.sum(x * x)              # sum(x*y) / sum(x*x) on centred x
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 4 -- Humble Dials and Wobble Bands):

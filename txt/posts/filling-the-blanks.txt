@@ -33,7 +33,7 @@
      THE FIX: imputation. Estimate the blank by asking the row's nearest neighbours what THEY
      scored that column. A calculated best guess beats zero and beats deletion.
 
-  SHEET FULL OF HOLES
+  THE SHEET FULL OF HOLES
 
            Matrix  Titanic  Alien  Notebook  Rambo
     Ann  [   5       .       4        .        . ]
@@ -343,7 +343,6 @@
   piles, and now hidden tastes.  Name the trick under the costume and the machine has no
   black boxes left in it.
 
-
   COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  Only score the cells you actually have.
@@ -399,9 +398,6 @@
        A hidden blank pockets no truth, so there is nothing to grade against later.
        The 20% you hide must come from cells that actually hold ratings.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     sheet full of holes                   sparse user-item rating matrix
@@ -426,9 +422,6 @@
     the knob (how many builtrows)         the rank
     hide rated cells and grade            validation masking / held-out cells
     un-humble (add the middle back)       un-centring / adding back the item mean
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -486,7 +479,6 @@
     HEAVYWEIGHT TOOLBOX ROUTE (THE SURPRISE PACKAGE: FROM SKLEARN / SURPRISE):
     FROM SKLEARN.DECOMPOSITION IMPORT TRUNCATEDSVD   # FACTOR A FILLED MATRIX
     OR A DEDICATED LIBRARY (E.G. `SURPRISE`) FOR THE HOLEY, REGULARISED CASE
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):

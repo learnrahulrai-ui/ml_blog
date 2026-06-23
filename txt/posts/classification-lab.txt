@@ -21,7 +21,6 @@
   Every term is built from scratch where it appears.
   Plain language first, standard labels at the very bottom.
 
-
   1. WHY CROSS-ENTROPY, NOT MSE
 
   Linear regression is the straight-stick rule: it fits a line to predict a sliding number.
@@ -66,7 +65,6 @@
   KEY: USE LOG-LOSS FOR CLASSIFICATION, MSE FOR REGRESSION
      sklearn's LogisticRegression minimises log-loss by default. MSE has no ceiling on a
      chance output in [0,1], so it produces badly calibrated probabilities.
-
 
   2. THE LEASH: L2 REGULARISATION AND THE C PARAMETER
 
@@ -115,7 +113,6 @@
   It also helps when columns are correlated.
   Correlated columns let dials swing wildly without a check, and the squeeze stops that.
 
-
   3. A SECOND SORTER: LINEAR DISCRIMINANT ANALYSIS
 
   Logistic regression learns its boundary by gradient descent on log-loss.
@@ -160,7 +157,6 @@
       lda     = LinearDiscriminantAnalysis()               # empirical priors, shifted wall
       lda_mid = LinearDiscriminantAnalysis(priors=[0.5,0.5])  # equal priors, midpoint wall
 
-
   4. SETTINGS VS DIALS: HYPERPARAMETERS
 
   Every machine has two kinds of knobs:
@@ -179,7 +175,6 @@
 
     dials    ->  machine finds them   (by gradient descent, or analytically)
     settings ->  YOU find them        (by grid search over a validation set)
-
 
   5. THE GRID HUNT: FINDING THE BEST SETTING
 
@@ -221,7 +216,6 @@
   Then, how many folds to rotate (k).
   And, which score to optimise -- recall, F1, or AUC, all defined in the sections below.
 
-
   6. PINCH-TO-FIT: MIN-MAX SCALING
 
   StandardScaler shifts each column to mean 0, spread 1.
@@ -250,7 +244,6 @@
     use STANDARD (mean 0, spread 1)  when: roughly bell-shaped, no extreme outliers
     use MIN-MAX  (0 to 1)            when: bounded range required, known clean limits,
                                            or feeding a neural network / image model
-
 
   7. THE LIVES-VS-MONEY TRADE: PRECISION AND RECALL IN BUSINESS
 
@@ -288,7 +281,6 @@
      F1 weights precision and recall equally. F-beta with beta > 1 weights recall more
      heavily. F2 (beta=2) counts a miss twice as costly as a false alarm.
 
-
   8. THE TRADE CURVE REVISITED: WHEN AUC MISLEADS
 
   The trade curve, standard name ROC curve, sweeps the cutoff from 1 down to 0.
@@ -324,7 +316,6 @@
      A machine with AUC 0.95 can have precision 0.10 on a 1:100 sick-to-well pile.
      PR curves surface this; ROC curves hide it.
 
-
   9. SKEWED PILES: WHAT GOES WRONG AND HOW TO FIX IT
 
   Skewed classes, also called imbalanced classes, means one label is far rarer than the other.
@@ -353,7 +344,6 @@
 
   The machine sees each rare-class mistake as proportionally more costly.
   So it stops defaulting to the common class.
-
 
   10. COUNTING ACROSS CLASSES: MACRO, MICRO, WEIGHTED
 
@@ -394,9 +384,6 @@
 
           micro = precision_recall_fscore_support(y_test, y_pred, average='micro')
           macro = precision_recall_fscore_support(y_test, y_pred, average='macro')
-
-
-  LABELS, LAST
 
     Plain term used above                  Standard label
     ------------------------------------   -------------------------------------------

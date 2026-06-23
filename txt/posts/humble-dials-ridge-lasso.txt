@@ -47,7 +47,6 @@
      Lasso fixes it more aggressively: it drives one twin dial to exactly zero,
      selecting one column and deleting the other.
 
-
   A NEW SHEET: THE DIABETES PILE
 
     diabetes -- 442 people, 10 body measurements, one answer
@@ -72,7 +71,6 @@
   Nothing new yet.
   What is new is that we no longer trust the machine to set those dials sensibly on its own.
 
-
   DISEASE: HUGE DIALS THAT MEMORISE
 
   Here is the failure, drawn. Give the dials free rein and they grow huge to chase every
@@ -96,7 +94,6 @@
   Good machines sit between the two, and huge dials are the jumpy extreme.
   So we want to FORBID huge dials.
 
-
   LEASH: ADD A FINE
 
   Until now the machine paid only for being wrong.
@@ -116,7 +113,6 @@
   There are two famous fines. On paper they look almost like twins. At the bottom, where it
   counts, they behave completely differently -- and that one difference is the whole point
   of this post.
-
 
   RIDGE: THE SMOOTH SQUEEZE
 
@@ -230,7 +226,6 @@
      carry almost the same information, the untangler grid cannot be inverted and the solve
      blows up.  Adding a*I down the diagonal always makes the grid invertible again.
 
-
   LASSO: THE SHARP SNAP
 
   Lasso's fine is the ABSOLUTE size of each dial -- its size with the sign thrown away.
@@ -284,7 +279,6 @@
      The corner that buys that gift also costs the clean solve.
      Which means Lasso must loop until the dials stop moving.
 
-
   RIDGE VS LASSO, SIDE BY SIDE
 
                      Ridge                  Lasso
@@ -301,7 +295,6 @@
   Ridge squares the dial, so the pull dies at zero, so dials settle near zero but never reach it.
   Lasso takes the absolute size, so the pull stays alive, so weak dials snap to exactly zero.
   Everything else follows from that one choice.
-
 
   PICKING THE KNOB A -- NEVER GUESS IT
 
@@ -334,7 +327,6 @@
      The plot is optional; the numbers behind it are the point.
      The winning a is wherever the curve bottoms out -- the valley above, turned into a row
      of numbers.
-
 
   >> YOUR TURN
      One candidate a was scored by the 5-slice check; its five covered-slice errors
@@ -399,9 +391,6 @@
               together.  The simple slope is a LADDER (a crutch, a first
               picture) -- name it that, never call it "the dial."
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     the leash / a fine for big dials      regularisation
@@ -414,9 +403,6 @@
     the 5-slice check                     k-fold cross-validation
     the valley                            the CV error curve / bias-variance sweet spot
     too stiff vs too jumpy                the bias-variance trade-off
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -494,7 +480,6 @@
      stops storing those values, and the later line ridge_cv.cv_values_ crashes with an
      AttributeError. The fix is to NOT pass cv=kf here; pass store_cv_values=True and let
      RidgeCV use its default. (LassoCV has no such quirk -- cv=5 is fine there.)
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 4 -- Humble Dials and Wobble Bands):

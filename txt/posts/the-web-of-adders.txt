@@ -24,7 +24,6 @@
   rule. If you only want to calculate how a network produces an answer, Part 1 is complete
   on its own.
 
-
   A doctor has photographed cells from a breast lump and measured thirty things about each
   one: the radius, the texture, the smoothness, and twenty-seven other properties. She has
   done this for 569 patients. Every patient's verdict is already confirmed by biopsy:
@@ -70,7 +69,6 @@
      Ask the last layer: "who gave you the bad numbers?" Ask the layer before that.
      Multiply the blame back through the network in ONE pass.
      Every dial's share of the guilt is calculated simultaneously, not sequentially.
-
 
   WHAT PROBLEM WE ARE ACTUALLY SOLVING
 
@@ -133,7 +131,6 @@
   explain in full in "Bending Scores at Zero."
   Following it at the arithmetic level means you can debug it at the arithmetic level.
   That is a skill you will use constantly.
-
 
   SPLITTING EVIDENCE INTO THREE HONEST PILES
 
@@ -201,7 +198,6 @@
   Practice is 25% of those: 364 x 0.25 = 91. Study: 364 - 91 = 273.
   Check: 273 + 91 + 91 = 455. Done.
 
-
   PUTTING EVERY COLUMN ON ONE RULER
 
   Look at two columns: radius (about 7 to 28) and smoothness (about 0.05 to 0.16).
@@ -254,7 +250,6 @@
 
   (11.0 - 15.0) / 2.0 = -4.0 / 2.0 = -2.0. Two spreads below average.
 
-
   BUILDING A ROOM OF CLERKS
 
   A single room has this shape.
@@ -298,7 +293,6 @@
   For all 341 study patients in one pass: 341 x 960 = 327,360 operations. A room of tireless
   clerks handles this before lunch. A single pencil would take months.
 
-
   WHY PLAIN STACKING FALLS APART
 
   IN HAND: Room 1 built (16 clerks, 30 inputs, 496 dials). For one patient, Room 1 does
@@ -337,7 +331,6 @@
   The fix must be a rule that cannot be absorbed into a dial multiplication.
   Multiplying by a dial always produces a smooth straight line through the origin.
   So we need a BEND -- a sharp corner no multiplication can reproduce.
-
 
   BENDING SCORES AT ZERO
 
@@ -379,7 +372,6 @@
   ...
 
   [3.1, 0, 0, 0]. Only the non-negative score passes; the rest become zero.
-
 
   SQUASHING ANY SCORE INTO A PROBABILITY
 
@@ -455,7 +447,6 @@
   ...
 
   e^0 = 1. So 1 / (1 + 1) = 1/2 = 0.50. Exactly on the fence.
-
 
   WALKING ONE PATIENT THROUGH, START TO FINISH
 
@@ -548,7 +539,6 @@
   Clerk 1 would give (1x0.1)+(2x0.2)+(3x0.1)+0.5 = 0.1+0.4+0.3+0.5 = 1.3. Neither is
   negative, so the zero-out rule keeps both. A good sign.
 
-
   HOW WRONG WAS THAT GUESS?
 
   IN HAND: patient [0.5, -1.2], true answer 1. Room 1 raw scores [-0.1, -1.3]; zero-out
@@ -606,7 +596,6 @@
 
   And HOW the dials change to make that loss fall is the whole of the next post.
 
-
   STANDARD NAMES FOR PART 1
 
   Plain terms used above, translated to the labels you will meet in papers and docs:
@@ -629,9 +618,6 @@
 
   (The learning words -- gradient, backpropagation, learning rate, Adam, dropout -- arrive
   in Part 2, where they belong.)
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer: every step was pencil arithmetic a tireless clerk could do.
   This section is for the day you meet one.
@@ -733,7 +719,6 @@
   to fall down the wrongness hill, worked by hand with the chain rule, is Part 2.
 
   --> Continue: [Chapter 7, Part 2: How a Network Learns](how-the-dials-learn.txt)
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 7 -- Building a Neural Network from Scratch):

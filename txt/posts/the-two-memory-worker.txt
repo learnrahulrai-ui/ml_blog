@@ -40,7 +40,6 @@
 
   Pencil out. Pocket A, pocket B, and a row of clerks.
 
-
   TRAIN THE PLAIN WORKER (Q4)
 
   IN HAND: the Part 1 factory -- notepad (320,000 dials), one walking worker (2,080), a
@@ -71,7 +70,6 @@
 
        check your slate: 32,000 / 64 = 500 grabs per loop. 500 x 5 = 2,500 dial-turns.
 
-
   WHY THE PLAIN WORKER FORGETS (THE FADE)
 
   IN HAND: the plain worker's one recipe, every word:
@@ -98,7 +96,6 @@
   fade was first spotted. The keep-or-forget voter was added by Gers, Schmidhuber and
   Cummins in 2000.)
 
-
   TWO MEMORIES
 
   The fix carries TWO memories instead of one. Two pant pockets, A and B, both starting all
@@ -114,7 +111,6 @@
   Keep the two straight: A is the savings account (long, untouched on the carry); B is the
   cash in hand (what gets shown around and fed back in). The plain worker had only one
   pocket, and crushing it every word is what made it forget.
-
 
   FOUR LITTLE MACHINES (ALL READ THE SAME TWO THINGS)
 
@@ -148,7 +144,6 @@
   worker away. It keeps it as ONE of four parts (the fresh candidate value), and wraps three
   0..1 voters around it. LSTM = the old RNN cell + three dimmer knobs.
 
-
   READ IS NOT MULTIPLY (THE KNOT)
 
   This is the single hardest knot in the whole chapter, so it gets its own table. A voter is
@@ -172,7 +167,6 @@
   fresh value). Without A, nothing carries long; A is the thing the votes act ON, even
   though they are decided from B.
 
-
   LOUDNESS IS NOT WORTH
 
   The most natural wrong assumption, worth its own section: a LOUDER fresh value (say +0.9,
@@ -193,7 +187,6 @@
   it down to a whisper before it ever reached memory-A. Loud does not buy a seat; the voter
   sells the seat. This is exactly why the fresh value alone (the plain RNN) is not enough --
   it has loudness but no separate judge of worth.
-
 
   COMBINE, WITH REAL NUMBERS
 
@@ -287,7 +280,6 @@
          new B = 1.0 x 1.0 = 1.0
        Kept half the old long memory (2.0) and admitted all the fresh value (2.0).
 
-
   BUILD AND TRAIN THE LSTM (Q5, Q6) -- ONE WORD CHANGED
 
   IN HAND: Part 1's factory was Input -> Embedding(notepad) -> SimpleRNN(32) -> Dense(1).
@@ -301,7 +293,6 @@
   the LSTM's exam score to be AT LEAST the plain worker's, often a little better: it
   remembers far-back clues ("not ... at all") that the plain worker had let fade. The whole
   point of the extra wiring is that one improvement.
-
 
   READ IT BOTH WAYS: THE BILSTM (Q7)
 
@@ -330,7 +321,6 @@
   This is the only genuinely new idea in Q7, and it is cheap: run the same worker the other
   way and glue. It is NOT a third kind of machine -- it is two LSTMs facing opposite
   directions.
-
 
   ALL FOUR, HEAD TO HEAD, HONESTLY (Q10 PREVIEW)
 
@@ -363,7 +353,6 @@
                     "want", to decide how much of each "give" to blend in. No sequence, no
                     memory chain, no votes. That is a later chapter.
 
-
   HONEST NOTE: ENGINEERED, NOT DERIVED
 
   Worth saying plainly, because it is true and rarely said. The plain worker's fade is a
@@ -379,7 +368,6 @@
   shape is a CHOICE among many that work. Hold the mechanism -- scale-and-add
   a long memory, gate it with dimmer knobs -- and treat the precise count of voters as a
   historical accident, not a law.
-
 
   COMMON TRIPWIRES
 
@@ -453,9 +441,6 @@
     just "nolan". The final B the clerk reads is the whole-review summary -- the last B, which
     swallowed every earlier B. It is not tied to any single word.
 
-
-  NUMBERS, IN PYTHON
-
   Every step above -- training cost, the combine, the dial count -- done by pencil.
   Here the exact numbers are spelled out in Python.
 
@@ -502,9 +487,6 @@
     bilstm_dials = 2 * lstm_dials        # 16,640 (two LSTMs, opposite directions)
     final_clerk_bilstm = 64 + 1          # 65     (glued memory is 64 wide)
 
-
-  LABELS, LAST
-
     plain walking worker             SimpleRNN (vanilla recurrent layer)
     the fade / worn-down memory      vanishing gradient over time steps
     long keep, never crushed         cell state (c_t)
@@ -525,9 +507,6 @@
     A, B, word-note (vectors)        shape (units,) -- 32 numbers each
     W, U (matrices / papers)         shape (input_dim, units) -- 32x32 each
     nudge per machine                bias vector, shape (units,)
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer; this section is for the day you meet one.
 
@@ -584,7 +563,6 @@
   Compare all four val-accuracies and pick the best (Q10) -- one number per factory, read
   off the sealed pile. The Transformer (attention) -- which kills the walk entirely and lets
   every word look straight at every other at once -- is Part 3 of this chapter, next.
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 10 -- Machines That Read Words):

@@ -24,7 +24,6 @@
   caveat when we hit it.) This page shows both, digit by digit, with a pencil. The formula
   appears at the end, after you have already used it.
 
-
   TOY WORLD, REAL RECIPE. One line of honesty up front: start at a lie, lay the same
   two-line rule down again and again, watch it settle -- exact. The WORLD is a toy:
   a tiny stack of spots, simple painted scores, a plan with one fixed arrow per spot. Real
@@ -52,8 +51,7 @@
 
   That single trick turns a circular formula into plain arithmetic you can check by hand.
 
-
-  WORLD (THE PICTURE EVERYTHING LIVES IN)
+  THE WORLD (THE PICTURE EVERYTHING LIVES IN)
 
   A drone hangs in the air over a patch of enemy ground. We want to grade a flight PLAN.
 
@@ -95,7 +93,6 @@
   = the "policy". A spot's worth = its "value" V(s). Painted points = the "reward". The shrink
   = the "discount factor", written gamma. Touching the ground = a "terminal state".
 
-
   WHAT "GRADE THE PLAN" EVEN MEANS -- THE WORTH OF A SPOT
 
   Someone hands you the PLAN (the arrows). You are NOT asked to improve it. You are asked one
@@ -131,7 +128,6 @@
   high worths, a bad plan scores low ones. That is the whole job. Nothing here invents arrows or
   picks a better path. It only SCORES the arrows you were given, on the discounted scale.
 
-
   ONE LAW (DERIVED, NOT DECLARED)
 
   A spot's worth = the DISCOUNTED points the drone collects from here on, obeying the arrows.
@@ -157,7 +153,6 @@
 
   That is the entire law. Two lines. ('next' = the single spot the arrow points to.)
 
-
   WHY THERE IS NO ONE-SHOT FORMULA -- THE CIRCLE
 
   Look hard at the air line:
@@ -176,7 +171,6 @@
   a million-by-million matrix. The walk below is what you actually do by hand and what scales,
   so that is what we build. "No one-shot formula" means none you run down a column with a
   pencil -- not none in all of mathematics.)
-
 
   BREAKING THE CIRCLE -- THE WALK, AND STARTING FROM A LIE
 
@@ -210,7 +204,6 @@
   That is it. There is NO line that checks "is the neighbour ready," no junk-detector. The only
   thing ever measured is "did this walk move anything," and that is the stop rule, nothing finer.
   Just the two-line law, laid down again and again.
-
 
   WHY STARTING FROM A LIE STILL LANDS ON THE TRUTH (THE HEART, WITH NUMBERS)
 
@@ -281,7 +274,6 @@
   > We do not start from a lie and hope. We start from a lie sitting next to ONE painted truth,
   > and plain multiplication drags every spot to that truth, one spot closer per pass.
 
-
   HARDER CASE: A FOREVER-BOUNCE WITH NO GROUND AT ALL
 
   "Fine," you say, "it heals because there is a +5 anchor to climb to. What if the drone never
@@ -307,7 +299,6 @@
 
   It crawls to -1 and holds. No ground was ever touched, yet it settled on a real number. How
   can an endless bounce cost a finite amount? Because of the shrink.
-
 
   WHY THE SHRINK FORCES A FINITE ANSWER (THE MATH CRACKED FROM SCRATCH)
 
@@ -341,7 +332,6 @@
   is in the standard formulation: not as a taste-knob but as the thing that keeps totals finite
   when termination is not guaranteed.
 
-
   WHEN TO STOP -- DELTA AND THETA
 
   Two more words, defined:
@@ -366,7 +356,6 @@
   A safety cap on the number of walks is just a seatbelt so a bug cannot loop forever. The real
   stop is delta < theta.
 
-
   ONLY CHECK IS "DID ANYTHING MOVE" -- THE SETTLING IS EMERGENT
 
   This is the part that feels too small to work. There is no code that spots junk, waits for a
@@ -376,7 +365,6 @@
   of repeating a "+ and *0.9" rule -- nowhere is either one coded. The code looks too simple to
   deserve the result, and that is correct: the work lives in the REPETITION and the 0.9 (the
   geometric squeeze of the last section), not in any clever check.
-
 
   A FULL TABLE, FILLED BY HAND -- AND WHAT IT REVEALS
 
@@ -411,7 +399,6 @@
   the arrows (head toward the runway stack first, THEN drop) -- but re-aiming is a different
   job. Grading the plan we were handed is done.
 
-
   DECODER (JARGON -> PLAIN, MASTER SHEET)
 
       PEACOCK WORD                         WHAT IT ACTUALLY MEANS
@@ -437,7 +424,6 @@
                                                table's current number) instead of from a finished
                                                full count of real points -- here, leaning on the
                                                neighbour's table entry, settled or not
-
 
   PYTHON: THE SETTLING, BY HAND, FOUR WAYS
 

@@ -108,8 +108,7 @@
      deal -- and those left-out people turn out to be a gift (see "The
      Free Exam" below).
 
-
-  WOBBLE BAND
+  THE WOBBLE BAND
 
   IN HAND: one real pile, re-dealt WITH REPEATS into 200 fake piles (the pile stands in
   for the world because the world is where the pile came from), each fake pile refit into
@@ -180,7 +179,6 @@
 
      Same 190 notes in both. Wildly different trust. Never confuse the count with the gap.
 
-
   FREE EXAM (OUT-OF-BAG)
 
   Now the gift. Remember that ~37% of patients sit out of every deal. The machine never saw
@@ -203,8 +201,7 @@
      had been different. Reporting the band instead of the bare number is the difference
      between confidence and honesty.
 
-
-  TUG-OF-WAR BEHIND THE WHOLE CHAPTER
+  THE TUG-OF-WAR BEHIND THE WHOLE CHAPTER
 
   Step all the way back. Everything in this chapter -- the leash in Part 1, the wobble band
   here -- is one single trade-off, and it is easiest to see as two bad drivers:
@@ -223,9 +220,6 @@
   line; the 5-slice valley is how you find the sweet spot; and the wobble band here is how
   you measure the panic that is left over.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     re-deal with repeats                  bootstrap / sampling with replacement
@@ -238,9 +232,6 @@
     stubborn driver / too stiff           high bias
     panicky driver / too jumpy            high variance
     the whole trade                       the bias-variance trade-off
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same steps, spoken in Python.
@@ -323,7 +314,6 @@
      True for everyone who was NOT. Drop the ~ and you grade the machine on the very
      patients it just studied -- the self-graded exam again, fake and over-confident. The
      one little squiggle is the difference between an honest score and a lie.
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 4 -- Humble Dials and Wobble Bands):

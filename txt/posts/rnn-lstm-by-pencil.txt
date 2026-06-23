@@ -45,7 +45,6 @@
   A machine multiplies numbers. It cannot multiply the letter "n". So the first job, before
   any machine runs, is to turn every word in every review into a number.
 
-
   WORDS ARE NOT NUMBERS -- THE FIRST PROBLEM
 
   Two moves turn words into numbers.
@@ -99,7 +98,6 @@
 
   100 rows, each 4 numbers wide. This is the INPUT SHEET. The walking machine now reads it
   one row (one word) at a time, left to right.
-
 
   RNN -- ONE WORKER, ONE MEMORY, WALKING LEFT TO RIGHT
 
@@ -170,7 +168,6 @@
   The verdict worker reads ONLY that final memory. Nolan's information must have survived
   inside memory_2 for it to influence the tick.
 
-
   WHY THE RNN BREAKS -- THE CRUSH KILLS FAR-BACK SIGNALS
 
   The tanh crush looks harmless. It is not. Every word, memory is crushed into -1..+1 and
@@ -208,7 +205,6 @@
   This is NOT a tuning problem. It is structural. The memory is WRITTEN OVER every word
   with a new crushed value. The old value survives only as a weakened echo in U*old_memory,
   and that echo is crushed again on the next word. Far-back words fade to nothing.
-
 
   LSTM -- A SILENT VAULT AND A SPOKEN READOUT
 
@@ -262,7 +258,6 @@
 
   That is the whole LSTM. Two lines.
 
-
   WHY THE VAULT SURVIVES -- THE ARITHMETIC
 
   WORKED EXAMPLE (one number; real machine: all 32 run identically and in parallel):
@@ -307,7 +302,6 @@
   the readout in turn. For "nolan ended": B_1 (after nolan), then B_2 (after ended).
   The tick reads B_2.
 
-
   TWO MEMORIES, SIDE BY SIDE
 
       VAULT (A):   the long-running number that crosses word boundaries uncrushed.
@@ -342,7 +336,6 @@
 
   Two memories, four machines, two lines -- that is the complete LSTM.
 
-
   DECODER
 
       PEACOCK WORD              WHAT IT ACTUALLY MEANS
@@ -358,7 +351,6 @@
       tanh                          the crush that makes any number into a value -1..+1
       recurrent                     "the same dials reused on every word"
       vanishing gradient            the crush-and-scale that kills far-back signals in an RNN
-
 
   PYTHON: THE RNN AND LSTM UPDATE, BY HAND
 

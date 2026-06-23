@@ -50,7 +50,6 @@
   and mutation (resampling a single slot on a coin flip). Each is fully spelled out where it
   first runs.
 
-
   A MACHINE ONLY COMPARES NUMBERS, AND THE CUPCAKE WAS NEVER THE POINT
 
   The setup, drawn before any words:
@@ -88,7 +87,6 @@
   "gene" and a row a "chromosome", but those names carry biology you do not need. The machine
   sees four numbers against four numbers. Nothing else is in the room.
 
-
   ONE NUMBER TELLS YOU HOW WRONG, NEVER WHICH SLOT -- SO THE SEARCH IS BLIND
 
   Score a guess by how far it sits from the target. On each slot take the gap -- the size of
@@ -124,7 +122,6 @@
   it always knows which way to nudge each dial. This method is handed no such thing. It knows
   only a ranking: this guess is worse than that one. Everything below is how a blind ranking,
   plus the freedom to let losers die, is enough.
-
 
   RAW ERROR SCORES BREED BACKWARDS -- SO FLIP TO GOODNESS, THEN SHARE OUT TO ONE
 
@@ -168,7 +165,6 @@
   mentioned again at the end, dodge that; the subtract-the-worst shape is the cleanest to work
   by hand, so it is the one used here.)
 
-
   YOU CANNOT PICK THE BEST TWO AND STOP -- SO SPIN A WEIGHTED WHEEL, TWICE, WITH REPLACEMENT
 
   The temptation is to take the top two guesses and breed only them. That throws away the rest
@@ -194,7 +190,6 @@
   rolls. A guess owning a wide slice gets landed on again and again across the generation; a
   sliver gets landed on rarely; guess 4, owning nothing, never. Roll the wheel twice and you
   have two parents. Say the wheel hands you guess 1 and guess 3.
-
 
   NO ONE KNOWS WHICH HALVES ARE GOOD -- SO CUT BLIND AT ONE POINT AND LET DYING CHOOSE
 
@@ -224,7 +219,6 @@
   clever cut -- it is that next generation it will out-breed worse babies, and the worse ones
   will get zero or near-zero chances and die. The dying does the choosing. The cut is blind.
 
-
   A PILE THAT ONLY BREEDS WILL FREEZE -- SO RESAMPLE ONE SLOT ON A COIN
 
   Crossover only shuffles numbers already present in the population. If no guess anywhere holds
@@ -243,7 +237,6 @@
   whole guess. Too large a probability and the population never settles; too small and it can
   freeze. In our worked thread the coin came up 0.85, so the baby stayed [1, 3, 2, 1] -- still
   the target.
-
 
   BABIES REPLACE EVERYONE -- SO THE GOOD NUMBERS SURVIVE, NOT THE GOOD GUESSES
 
@@ -265,9 +258,6 @@
   Improvement came entirely from three blind forces: better guesses breeding more often,
   worse guesses dying, and random single-slot jiggles. That is evolution -- the idea is
   Darwin's (natural selection, 1859); turning it into this code loop is John Holland's (1970s).
-
-
-  NUMBERS, IN PYTHON
 
   Every score, flip, share, cut, and coin above worked on paper. Here the exact numbers in
   Python -- same moves, same digits. A guess is a plain list (so the cut can glue two pieces);
@@ -325,7 +315,6 @@
   baby = prob.reproduce(pop[0], pop[2])     # seed=0 -> k=3 -> [1,3,2] + [1] = [1,3,2,1]
   recipe_success(baby)                      # 0  -> equals the target
 
-
   HONEST EXTRAS (THREE SHORT)
 
   NO GRADIENT, AND THAT IS THE WHOLE POINT. Gradient descent needs the score to be smooth and
@@ -350,7 +339,6 @@
   so a slot that is rare today but needed tomorrow survives in the pool. The wheel favours the
   fit without exterminating everyone else in one generation.
 
-
   ONE BREATH (CARRY THIS AWAY)
 
   Score every guess by its total gap from the secret and negate it (closer = bigger); flip the
@@ -365,7 +353,6 @@
 
   Secret [1, 3, 2, 1], four guesses in; one generation of score-flip-share-pick-cut-tweak; a
   baby comes out [1, 3, 2, 1]. Every number on this page, by pencil, no metaphor doing the work.
-
 
 ----------------------------------------------------------------------------------------------
   SPECIAL . GENETIC ALGORITHM FROM SCRATCH  (written for Hacker News; standalone)

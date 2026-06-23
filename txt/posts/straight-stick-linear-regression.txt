@@ -33,8 +33,7 @@
      "at what dial value is the slope zero?" -- algebra gives you the exact answer.
      No searching, no luck. The formula you derive IS the bottom of the bowl.
 
-
-  RULE
+  THE RULE
 
     one row of measured things:  [rooms, income, age, ...]
           x
@@ -51,7 +50,6 @@
   columns held fixed. The columns can be squares, logs, or products of raw columns -- the
   rule stays linear in the dials.
 
-
   SQUARED LEFTOVER TO SHRINK
 
       \         /
@@ -65,7 +63,6 @@
 
   J is bowl-shaped -- its second-slope (Hessian) 2*X^T X is never-negative -- so any flat
   point is the global bottom. No local traps, no searching.
-
 
   FINDING THE DIALS: THE FLAT-POINT EQUATIONS
 
@@ -131,7 +128,6 @@
      hits 1, 3, 5 exactly -- every leftover is zero; this stick runs straight through
      all three points.
 
-
   CHECKING THE LEFTOVERS
 
   IN HAND: three rows (x = 1, 2, 3 against y = 2, 3, 5) and the dials the flat-point
@@ -171,7 +167,6 @@
      changes. Fitted dials land in m.coef_, the fixed
      nudge in m.intercept_.
 
-
   WHEN THE STRAIGHT-STICK RULE IS THE BEST POSSIBLE
 
   The Gauss-Markov result: if the leftover has zero average given the rows (E[eps|X] = 0),
@@ -183,7 +178,6 @@
       confidence ranges and t-tests, not for the rule to be the best flat rule.
     - Full column rank means no measured column is a recipe of the others. If one is,
       X^T X is flat (no single solution) and (X^T X)^-1 does not exist.
-
 
   GETTING THE DIALS RIGHT: DON'T FLIP THE SHEET
 
@@ -221,7 +215,6 @@
      when adding a bump, because those care about the size of the dials, which depends on
      scale.
 
-
   ASK-CLOSEST VS. STRAIGHT-STICK
 
   IN HAND: both rules of this chapter, built and checked.  Ask-closest keeps the whole
@@ -244,7 +237,6 @@
   compresses everything into one flat sheet. Neither is "the" answer -- which to reach for
   depends on the pile in front of you, and that judgement is the real craft.
 
-
   GOING DEEPER
 
     - flat-point equations, ordinary least squares -- the solve
@@ -265,7 +257,6 @@
     - Because forming X^T X squares the shakiness, cut the sheet directly (QR or SVD) instead
       of flipping it; and when X^T X is flat (one column is a near-recipe of another) add a
       small bump to the diagonal.
-
 
   COMMON TRIPWIRES I CAUGHT
 
@@ -306,9 +297,6 @@
        WRONG: compare -0.007 per pound directly with -0.04 per horsepower.
        RIGHT: Put every column on one shared ruler first (StandardScaler).
               Then each dial means "answer-units per one-spread step."
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same three rows, spoken in Python.

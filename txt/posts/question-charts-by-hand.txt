@@ -38,8 +38,7 @@
      Pruning does the same thing after the tree is fully grown: it trims back
      branches that do not earn their keep on the hidden pile.
 
-
-  SHEET: TWO NEW PILES
+  THE SHEET: TWO NEW PILES
 
     diabetes -- 442 people, 10 body measurements, one answer
     patient   age   bmi   bp    s1 ... s6  |  answer
@@ -62,7 +61,6 @@
   Build on the 75% (the study pile).
   Grade once on the sealed 25%.
 
-
   BUILD VS USE -- TWO DIFFERENT TIMES
 
   This is where the first confusion lives.
@@ -84,7 +82,6 @@
 
     BUILD:  choose split <-> walk one level <-> choose split <-> ...  (interleaved)
     USE:    chart frozen -> walk each patient top -> bottom in one go  (walk only)
-
 
   INSIDE THE BUILD HUNT, NOTHING HIDDEN
 
@@ -181,7 +178,6 @@
 
       each final pile: average its answer column -> one number.
       that is the guess for any new person who lands in it.
-
 
   A WORKED EXAMPLE: 4 PEOPLE, 1 COLUMN
 
@@ -342,7 +338,6 @@
        -- happens only when the column champions race each other.  A tie
        means someone picks arbitrarily.
 
-
   CORRECTIONS I CAUGHT
 
   Building this by hand exposed five wrong pictures I would have carried forever:
@@ -373,7 +368,6 @@
      Just questions and a number at each end.  The "flexibility knob" is DEPTH: how
      many questions deep before you hit an answer.
 
-
   LEAF -- WHAT SITS AT THE BOTTOM
 
   A leaf = a final pile at the bottom of the chart, where a guess sits.
@@ -398,7 +392,6 @@
   (miss = answer minus guess; square each miss, add them all up.)
   Pick any other guess and that sum gets bigger.
   So the mean sits at the very bottom of that wrongness curve.
-
 
   DEPTH: THE STIFF-VS-JUMPY DIAL OF TREES
 
@@ -427,9 +420,6 @@
     max_depth = 1024 on 331 people?  people run out at ~12.  you never reach 1024.
     max_depth = None?  same thing.   both mean "no real ceiling."
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     question chart                        decision tree
@@ -443,9 +433,6 @@
     depth                                 max_depth hyperparameter
     the chart is lopsided                 the tree is not balanced
     same menu, different winner           greedy, locally optimal splitting
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same work, spoken in Python.
@@ -515,7 +502,6 @@
      midpoint, measures the badness of EACH, and keeps the one with the smallest
      number.  No astrology, no guessing -- just the one that measures cleanest.
      The cost: for each room, (columns x midpoints) trials.  That adds up.
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 5 -- Question Charts and Committees):

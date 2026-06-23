@@ -46,7 +46,6 @@
      The puddle now pushes harder in the direction the compass says is promising.
      It still finds the optimal path (as long as the compass never overestimates).
 
-
   A MACHINE THAT ADDS COSTS -- AND "S→B" IS NOT A NUMBER
 
   A town has five places: S (start), A, B, C, G (goal). Every road has a cost painted on it
@@ -81,7 +80,6 @@
   The goal: find the walk from S to G whose road-costs add to the smallest total. Not the
   walk with the fewest roads -- the walk with the cheapest SUM.
 
-
   FEWEST ROADS IS NOT CHEAPEST -- THEREFORE YOU CANNOT COMMIT TO A ROAD
 
   Two ways to reach B. Direct: S→B costs 4. Via A: S→A costs 1, then A→B costs 1, total 2.
@@ -94,7 +92,6 @@
   Which means you must keep ALL partial routes alive until you can PROVE a place is final.
   That proof only arrives at one specific moment -- spelled out below -- and it relies on the
   costs being ≥ 0. That condition matters; it's the floor the whole argument stands on.
-
 
   THREE PAPERS ON YOUR DESK FORCE THEMSELVES INTO BEING
 
@@ -125,7 +122,6 @@
   'states' is NOT empty at birth. Empty would mean "I've reached nothing." But you're
   standing on S right now, so S is reached for 0.
 
-
   WHEEL: PULL, DISCARD OR STOP OR OPEN
 
   Pull the cheapest slip (cost, place) off the pile. Three cases, in order:
@@ -145,7 +141,6 @@
   Both ADD and REPLACE push a NEW slip onto the pile. You never edit a slip already on the
   pile -- heaps have no eraser. The old pricier slip stays, rides until it surfaces, sees its
   place is already sealed, and gets tossed. Popped many times; sealed exactly once.
-
 
   FULL UCS WALK (SIX POPS, EVERY OFFER SHOWN)
 
@@ -191,7 +186,6 @@
   S→A→B→C→G (1+1+1+2=5). The method found it by keeping all options alive and closing the
   cheapest box in each round.
 
-
   TWO THINGS THE WALK JUST DID, WORTH NAMING
 
   The tab killed the circle. When A offered S back, 1+1=2 lost to states[S]=0. No
@@ -210,7 +204,6 @@
   having a decrease-key operation. In practice this is called "lazy deletion" and it's how
   most real UCS/Dijkstra/A* implementations work (the alternative, an indexed heap with
   decrease-key, trades the ghosts for bookkeeping).
-
 
   WHY THE CHEAPEST POP IS ALREADY FINAL (THE PROOF, WITH NUMBERS)
 
@@ -239,7 +232,6 @@
 
   This correctness argument is due to Dijkstra (1959) and is also why "this IS Dijkstra's
   algorithm" -- see the honest note at the end.
-
 
   A*: THE SAME WHEEL, ONE CHANGE
 
@@ -291,7 +283,6 @@
   its true cost (3.61≤5, 3.16≤4, 2.24≤3, 2.00≤2). Each h is a genuine under-count -- which,
   proved below, is exactly what makes A* safe.
 
-
   FULL A* WALK (FIVE POPS -- ONE FEWER THAN UCS)
 
     start:  pile = [(3.61, 0, S)]   states = {S:0}   prev = {S:None}   sealed = {}
@@ -333,7 +324,6 @@
   one saved discard -- but on a grid with thousands of nodes the savings compound across
   hundreds of pops.
 
-
   GUESS IS AN UNDER-COUNT -- WHICH IS WHY A* RETURNS THE SAME ANSWER AS UCS
 
   The heuristic h(place) is admissible if it never overcounts the true remaining cost:
@@ -363,7 +353,6 @@
   reopen sealed nodes.) In practice: an honest-map Euclidean h gives you both. If you write a
   custom h, check admissibility first, consistency second.
 
-
   HONEST EXTRAS (THREE SHORT)
 
   UCS IS Dijkstra's algorithm. Edsger Dijkstra published this exact method in 1959 for
@@ -391,9 +380,6 @@
   or using the tab to get the cheapest pair -- is the single most common first-implementation
   bug. The pile answers "what should I explore next?"; the tab answers "what is the cheapest
   cost to place P?"
-
-
-  NUMBERS, IN PYTHON
 
   Round-by-round, the same numbers from the walk above, as named variables:
 
@@ -536,7 +522,6 @@
   ucs_path, ucs_cost   = ucs(graph, 'S', 'G')    # ['S','A','B','C','G'], 5
   astar_path, astar_cost = astar(graph, 'S', 'G', pos)  # ['S','A','B','C','G'], 5
 
-
   ONE BREATH (CARRY THIS AWAY)
 
   Keep a pile (min-heap of slips), a tab (cheapest cost per place), and breadcrumbs; pop the
@@ -551,7 +536,6 @@
 
   On this map: UCS found [S,A,B,C,G] cost 5 in 6 pops (5 seals + 1 stale discard).
   A* found the same path and cost in 5 pops (5 seals, stale B never reached the top).
-
 
 ----------------------------------------------------------------------------------------------
   SPECIAL . CHEAPEST WALK: UCS AND A*  (written for Hacker News; standalone)

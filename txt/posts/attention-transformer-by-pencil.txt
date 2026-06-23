@@ -52,7 +52,6 @@
   To do that, every word must first become a number. Then a stick. Then all sticks look
   at each other simultaneously. Only then does the verdict come out.
 
-
   WORDS ARE NOT NUMBERS -- THE FRONT END (SAME AS THE WALKING MACHINE)
 
   A machine multiplies numbers; it cannot multiply letters. So words become numbers first.
@@ -97,7 +96,6 @@
 
       This sheet is what the attention step reads. ALL rows at the same time.
 
-
   WHY THE WALKING MACHINE FADES -- AND WHY WE DROP IT
 
   In the walking machine (the RNN), "nolan" reaches "ended" only through a memory that is
@@ -122,7 +120,6 @@
 
   The price of "no walking" is paid elsewhere: the machine must be told word ORDER
   explicitly. More on that at the end.
-
 
   WHY THREE STICKS -- WANT, HAVE, GIVE
 
@@ -163,7 +160,6 @@
 
   The HAVE and GIVE sticks are produced the same way, each with their own grid.
 
-
   MATCH -- NOLAN'S WANT DOTS EVERY WORD'S HAVE
 
   To score how much nolan cares about a word, take nolan's WANT stick and that word's HAVE
@@ -184,7 +180,6 @@
       One score per word. Higher = nolan cares more about that word.
       (Every word dots against EVERY other word, including itself -- n words -> n scores.)
 
-
   SCALE -- DIVIDE BY THE SQUARE ROOT OF THE STICK WIDTH
 
   Wider sticks produce larger dot sums (more products added). The divisor keeps scores
@@ -199,7 +194,6 @@
 
   The divisor is sqrt(stick width) -- a fixed number. Not a data statistic.
   (Real stick width = 32; divisor = sqrt(32) ~= 5.66.)
-
 
   SOFTMAX -- TURN SCORES INTO FRACTIONS THAT ADD TO 1
 
@@ -229,7 +223,6 @@
   score win decisively: 4 vs 1 -> 0.953 vs 0.047, not 0.8 vs 0.2. That sharpening is
   what softmax does that plain division would not.
 
-
   WEIGHTED SUM -- BUILD NOLAN'S NEW STICK FROM THE GIVE STICKS
 
   Use the fractions to mix the GIVE sticks:
@@ -258,7 +251,6 @@
   ALL AT ONCE. The sheet goes in; a new sheet of the same shape comes out, each row now
   enriched with information from every other row.
 
-
   TWO TEAMS -- MULTI-HEAD ATTENTION
 
   One set of three grids (want/have/give) catches one kind of link. Run TWO sets side by
@@ -282,7 +274,6 @@
   Two teams = "2 heads." The lab uses num_heads=2, key_dim=32 -- two teams, each producing
   sticks of width 32. "key_dim" is the width of the WANT/HAVE/GIVE sticks per team.
 
-
   POSITION -- THE PRICE OF NOT WALKING
 
   Because every word is looked at all-at-once, the raw attention step cannot tell "nolan
@@ -299,7 +290,6 @@
 
   Our lab uses a simplified version that skips the explicit position mark -- flagged here
   so you know the full machine has it.
-
 
   COLLAPSING 100 STICKS TO ONE SUMMARY
 
@@ -321,7 +311,6 @@
 
   The walking machine took its LAST memory as the summary. Here we average all words.
   Same end goal: one stick for the verdict.
-
 
   VERDICT -- PLAIN WORKERS AT THE END
 
@@ -350,7 +339,6 @@
   sigmoid = crush any number to 0..1 (a probability).
   Dropout (zero-a-random-tenth) = forced independence, only during practice, off at exam.
 
-
   DECODER (JARGON -> PLAIN, MASTER SHEET)
 
       PEACOCK WORD              WHAT IT ACTUALLY MEANS
@@ -371,7 +359,6 @@
       sigmoid                       crush any number to 0..1 (a probability)
       dropout                       zero a random fraction of numbers (practice only)
       dense layer                   workers: multiply-add + nudge -> one number each
-
 
   PYTHON: ATTENTION BY HAND, THEN THE FULL MACHINE
 

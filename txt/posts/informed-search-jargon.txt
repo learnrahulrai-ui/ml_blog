@@ -49,8 +49,7 @@
      A compass that always guesses 0 (UCS) is perfectly admissible but gives no speed.
      A good heuristic is as close to the truth as possible without ever going over.
 
-
-  TOWN (THE PICTURE EVERYTHING LIVES IN)
+  THE TOWN (THE PICTURE EVERYTHING LIVES IN)
 
   Four places in a small town. Roads between them. Each road has a cost.
 
@@ -81,7 +80,6 @@
       h(A) = 1     h(B) = 10     h(G) = 0
       (h at the goal is always 0 -- no distance left once you have arrived)
 
-
   ONLY THREE NUMBERS THAT MATTER
 
   Stand at some place. Three numbers describe it.
@@ -109,7 +107,6 @@
   h is a steering wheel. You never pay the guess. (g + h says which road to try next. g says what
   it actually cost.)
 
-
   ONE MACHINE, THREE CHARACTERS
 
   The machine never changes: a cheapest-pile -- a heap that always hands you the place with the
@@ -127,7 +124,6 @@
   "Guided" means the search carries a guess (h) about how far the goal is. A search with no guess
   is "uninformed" (blind). A search with a guess is "informed" (guided). The only line between
   them is whether h appears on the slip.
-
 
   GREEDY GETS FOOLED -- WALKED BY HAND
 
@@ -154,7 +150,6 @@
   to catch the lie.
 
   > Greedy trusts the look of closeness. The look was a lie.
-
 
   A* DOES NOT GET FOOLED -- WALKED BY HAND
 
@@ -188,7 +183,6 @@
   > A* added the toll it had already paid, so the 100-toll trap from A showed up the moment A*
   > looked through A. That is why g + h beats h alone: h steers; g corrects the lie.
 
-
   "ADMISSIBLE" -- THE GUESS NEVER LIES HIGH
 
   A guess is admissible when it never says the goal is FARTHER than it truly is. It may say
@@ -220,7 +214,6 @@
       h(B) = 10. True toll left from B to G = 10.    10 <= 10  OK (exactly tight)
       h(G) = 0.  True toll left at G = 0.             0 <= 0   OK
 
-
   "CONSISTENT" -- THE TRIANGLE RULE
 
   A guess is consistent when it never drops by more than the road you actually walk. Walk one road
@@ -247,7 +240,6 @@
   (2) With a consistent guess, once A* seals a place (locks its cheapest cost), it never has to
       reopen it. No rework. That is the payoff of consistency: efficiency.
 
-
   THREE WAYS A SEARCH BLOWS IT
 
   "Optimal" means returns the cheapest path. "Complete" means returns a path if one exists.
@@ -268,7 +260,6 @@
   Any quiz "failure" fits one of these three buckets. Multiple answers can be correct at once --
   failing the cheapest path has nothing to do with heuristics alone: running forever and a moving
   map kill it just as dead.
-
 
   A* EATS MEMORY -- WHY, AND VS DEPTH-FIRST
 
@@ -294,7 +285,6 @@
   The question "A*'s big disadvantage vs DFS in resources?" has one answer: memory. A* stores
   the spreading frontier of paths. Not bandwidth, not backtracking -- memory.
 
-
   WHAT MAKES A GUESS GOOD (AND WHAT DOESN'T)
 
   A good guess is:
@@ -314,7 +304,6 @@
 
   Slogan: a good guess is honest (admissible), smooth (consistent), and cheap. Boastful, random,
   or slow guesses are the bad ones.
-
 
   DECODER (JARGON -> PLAIN, MASTER SHEET)
 
@@ -341,7 +330,6 @@
       complete                                 returns a path if one exists
       dynamic environment                      the map changes while you search
       computationally intractable              the sums take too long or need too much room
-
 
   PYTHON: TWO SEARCHES, ONE TOWN, BY HAND
 
@@ -393,7 +381,6 @@
   print(f"Greedy was FOOLED. h(A)=1 looked close; A->G actually costs {road_A_to_G}.")
   # Greedy true cost paid: 1 + 100 = 101
 
-
   # =======================================================================
   # CASE 2: A* (slip = g + h)
   # A* asks: what does the full trip look like (spent + guess)?
@@ -434,7 +421,6 @@
   print(f"Round 4: pop G. True cost = g = {astar_true_cost}. Path: S -> B -> G.")
   print(f"\nSummary: Greedy={greedy_true_cost}. A*={astar_true_cost}. A* saves {greedy_true_cost - astar_true_cost}.")
   # Summary: Greedy=101. A*=20. A* saves 81.
-
 
   # =======================================================================
   # CASE 3: ADMISSIBILITY CHECK

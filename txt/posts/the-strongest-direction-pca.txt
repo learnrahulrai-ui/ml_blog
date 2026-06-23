@@ -46,7 +46,7 @@
      possible. The direction with the most spread (variance) preserves the most truth.
      That direction is the first principal component. Crush along that axis.
 
-  SHEET
+  THE SHEET
 
     alcohol, malic_acid, ash, alcalinity_of_ash, magnesium, total_phenols,
     flavanoids, nonflavanoid_phenols, proanthocyanins, color_intensity,
@@ -382,7 +382,6 @@
   Your goal is to lose as little as possible.
   And still be able to draw the picture on flat paper.
 
-
   COMMON TRIPWIRES I CAUGHT
 
     TRIPWIRE 1:  Standardise BEFORE PCA, not after.
@@ -436,9 +435,6 @@
        "spread per dot", a per-head number that is not a fraction at all and
        will not land between 0 and 1.
 
-
-  LABELS, LAST
-
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
     crush a many-wall room to flat        dimensionality reduction
@@ -457,9 +453,6 @@
     standardise before crushing           StandardScaler before PCA
     column importance in the recipe       loading magnitude (absolute value)
     the 13 numbers crunched into 2        2D embedding / projection
-
-
-  CODE, IF YOU WANT IT
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same four wines, the same numbers, in Python.
@@ -530,7 +523,6 @@
     print("PC1 fraction:", round(pca.explained_variance_ratio_[0], 2))   # ~0.36
     print("PC2 fraction:", round(pca.explained_variance_ratio_[1], 2))   # ~0.19
     scores = pca.transform(X_scaled)             # each wine's 13 PC coordinates
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 6 -- Finding Patterns Without Answers):

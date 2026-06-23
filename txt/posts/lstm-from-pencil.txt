@@ -24,7 +24,6 @@
   reader and watch it FORGET, then a two-memory reader that does not. That last reader carries
   a name only at its very end: LSTM.
 
-
   KEY: THE AMNESIA TRAP -- why plain memory overwrites what came before
      An RNN reads word 1, stores it in memory. Reads word 2 -- the memory is updated
      by multiplying and adding the new word. Word 1's trace is mixed in, but weakened.
@@ -54,7 +53,6 @@
 
        check: 2*4 + (-1)*5 + 3 = 8 - 5 + 3 = 6.
 
-
   WORDS ARE NOT NUMBERS, SO HAND EACH WORD A ROW
 
   A clerk multiplies numbers. Word "boring" is not a number. So before any clerk runs, swap
@@ -71,7 +69,6 @@
 
       one number per word:   can hold "lean", OR "flipper"   -- not both   (too thin)
       a row of slots:        slot1 = lean, slot2 = flipper, slot3 = ...    (room for both)
-
 
   ONE CLERK SCORES ONE WORD, BUT LOSES ORDER
 
@@ -93,7 +90,6 @@
     So a plain sum cannot be right. Something must remember word 1 while reading word 2.
 
   That memory is forced on us. Build it next.
-
 
   A CARRIED MEMORY, REWRITTEN EACH WORD
 
@@ -139,7 +135,6 @@
        (That slanted grid is a do-nothing grid. A real grid carries other numbers and mixes
        slots.)
 
-
   WHY A SQUASH SITS AT EACH WORD
 
   Blend gives: word through grid Gw, memory through grid Gm, add a nudge row:
@@ -179,7 +174,6 @@
   "good" with that m. Order is kept; numbers stay in band. A final clerk reads last m and
   stamps liked or not. Done -- for short reviews.
 
-
   THIS READER FORGETS (A RESULT YOU CAN PROVE)
 
   Track one slot of a mark left by word 1. Say word 1 pushes 0.2 into it. Each later word,
@@ -204,7 +198,6 @@
   So a long review that flips on its opening word ("not ... worth ... at all") loses that
   flip. This is not a dial you can tune; it follows from crushing one memory every word. Call
   it a proven failure, and fix its cause.
-
 
   CARRY WITHOUT CRUSHING: A SECOND MEMORY
 
@@ -235,7 +228,6 @@
     on carry -- that was its whole reason. No bend, no -1..+1 cap. A may read 5.0, even 50.
     Letting it grow is exactly how a far-back mark stays alive.
 
-
   A STORE TOO BIG TO READ, SO TAME A READOUT
 
   Memory A now may sit at 50. Feed 50 to a clerk and its bend saturates flat -- useless. So do
@@ -258,7 +250,6 @@
        A_new = 4.62, show = 0.7, tanh(4.62) ~ 1.0. B_new?
 
        check: 0.7 * 1.0 = 0.70. A holds 4.62 in silence; B says 0.70 out loud about it.
-
 
   WHERE KEEP, ADMIT, SHOW, FRESH COME FROM
 
@@ -308,7 +299,6 @@
     Clash: tanh makes a signed value; sigmoid makes a fraction. A slot is one kind or other,
     never both. fresh wants signed content (tanh). keep/admit/show want a fraction (sigmoid).
     One bend each, picked by duty.
-
 
   COMBINE, IN REAL NUMBERS
 
@@ -362,7 +352,6 @@
          B_new = 1.0 * 1.0 = 1.0
        Kept half a long store, admitted all new content.
 
-
   ONE WORD, START TO FINISH
 
   Put it in one block. First word, so A and B are zeros:
@@ -385,7 +374,6 @@
   Term Memory reader -- LSTM. "Long" is store A, riding far without a bend. "Short" is readout
   B, rebuilt every word. Nothing in that name was needed to build it; a number built each part.
 
-
   A WORD ON WHAT WAS A PICK, NOT A PROOF
 
   Forgetting is a result, provable with a pencil, as you did. A COUNT of three fractions named
@@ -405,7 +393,6 @@
   Therefore a link from word 90 back to word 1 neither dies nor blows up.
   That unit carry factor, not luck, is why an added, uncrushed store cures the decay.
   And it is why every gated reader of this kind keeps an additive store at its core.
-
 
   TRAPS, EACH AS A CLASH TO SIT WITH
 
@@ -450,9 +437,6 @@
         clash: B at word 2 already folded in word 2. fix: last B holds every word -- a whole-
         review readout.
 
-
-  NUMBERS, IN PYTHON
-
   Every step above -- the fade, the combine, the 3-slot example -- done by pencil.
   Here in Python so you can check each number.
 
@@ -495,7 +479,6 @@
     nB2 = s2 * tA2   # -0.15
     nB3 = s3 * tA3   # 0.21
 
-
   TWO LINES TO CARRY AWAY
 
   One memory, bent every word: a mark from word 1 wears to nothing by word 90. Proven, not
@@ -504,7 +487,6 @@
   Two memories: a silent store A, only scaled-and-added so a far mark rides far; a spoken
   readout B = show * tanh(A); four machines (fresh + keep/admit/show) reading word + B; same
   dials every word; last B stamps liked or not. That reader is an LSTM.
-
 
 ----------------------------------------------------------------------------------------------
   SEE ALSO (Chapter 10 -- Machines That Read Words):

@@ -31,7 +31,6 @@
      The decoder then unspools that thought into French in whatever ORDER French needs.
      No word-by-word mapping. One full-sentence understanding, then one full-sentence output.
 
-
   ATTENTION IS A GRID: ROW LOOKS, COLUMN IS LOOKED AT
 
   Strip the mechanism down to the one picture that matters now. Lay every token's score in a
@@ -52,7 +51,6 @@
   Each ROW becomes portions adding to 1 via softmax: raise e to each score, divide by the row's
   total. Then each token's new value is the weighted sum of every token's GIVE tag. Nothing new
   yet -- this is Chapter 10's machine. The new question is one word: which cells are ALLOWED?
-
 
   ONE SWITCH: MAY A TOKEN SEE THE FUTURE, OR NOT?
 
@@ -86,7 +84,6 @@
 
        check: token 1 sees only itself → [1.0, 0]. token 2 sees both → [0.5, 0.5].
 
-
   NO BLOCK BUILDS A READER; THE BLOCK BUILDS A WRITER
 
   Read off what each setting is FOR.
@@ -103,7 +100,6 @@
 
       ENCODER : no mask → bidirectional → READS and judges (label, class, fill-the-blank)
       DECODER : future mask → causal → WRITES forward (next token, then the next)
-
 
   NAMES: BERT READS, GPT WRITES
 
@@ -133,7 +129,6 @@
         +-- DECODER  -- future mask → causal → WRITES / generates
               +-- GPT   (words)      ← you did NOT build this
 
-
   WHERE YOUR VIT SITS: YOU BUILT THE READER, NOT THE WRITER
 
   Look back at Part 1's two telling lines.
@@ -157,7 +152,6 @@
       q9_gpt_task       = 'generation'      # GPT writes forward
 
   (Those four strings are the grader's exact keys -- letter-for-letter.)
-
 
   TRAPS, EACH AS A CLASH
 
@@ -184,9 +178,6 @@
   peek at, and it collapses. For judging an input that already exists, both sides are fair game,
   so bidirectional wins there. The task picks the setting; neither is better everywhere.
   ─────────────────────────────────────────────────────────────────────────────────────────
-
-
-  NUMBERS, IN PYTHON
 
   The only calculation in this post is the causal mask turning raw scores into portions.
   Here it is spelled out in Python, using equal raw scores of 1.0 for every allowed cell.
@@ -217,7 +208,6 @@
     ENCODER (NO MASK): ALL NINE CELLS OPEN -> EQUAL PORTIONS EVERYWHERE
     DECODER (CAUSAL):  UPPER TRIANGLE = 0 PORTIONS -> EACH ROW ADDS TO 1 FROM LEFT ONLY
 
-
   ONE BREATH
 
   Attention lays scores in a grid: row looks, column is looked at, each row softmaxed into
@@ -232,7 +222,6 @@
   clusters, neural nets, convolution, the walking RNN and its two-memory cure, attention, the
   vision transformer, and finally the one mask that splits every transformer into the readers
   and the writers.
-
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 11 -- Attention Grows Eyes):
