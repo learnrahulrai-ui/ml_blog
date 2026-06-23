@@ -338,28 +338,42 @@
   dropout or batch-norm. Two numbers, read together -- the sealed score and the gap -- tell
   the whole story: how good, and how honest.
 
-  COMMON TRIPWIRES
+  A few places this lab actually bit, each a real struggle, not an invented one.
 
-  Real struggles from running this lab, not invented ones.
+  Humbling the wrong pile. Dividing pixels by 255 is fine -- that is fixed and needs no
+  pile. But the moment you compute a middle or scatter for humbling, take it from the
+  STUDY pile alone:
 
-  Humbling the wrong pile. Divide pixels by 255 -- fine, that is fixed and needs no pile. But
-  if you ever compute a middle or scatter for humbling, compute it on the STUDY pile only. Use
-  all the data and the sealed pile leaks into training, exactly as in Chapter 7.
+      middle/scatter from STUDY pile   -> applied everywhere    honest
+      middle/scatter from ALL data     -> the sealed pile leaks in (Chapter 7's mistake)
 
-  Leaving dropout on at exam time. If your practice score jumps around wildly every time you
-  evaluate, dropout is still sending clerks home during grading. It must run only during
-  study; every clerk reports for the exam. Most frameworks switch this automatically -- if you
-  grade by hand, switch it off yourself.
+  Leaving dropout on at exam time. If your practice score jumps around every time you
+  grade, dropout is still sending clerks home during the exam:
 
-  Forgetting to rewind after the fire alarm. Early stopping that stops at pass 8 but keeps
-  pass 8's dials has thrown away the whole point. Rewind to the best pass (pass 3 in the
-  example). The flag is restore-best-weights; set it.
+      study:  clerks randomly sent home    (dropout ON)
+      exam:   EVERY clerk reports           (dropout OFF)
 
-  Batch-norm after the exit. Humbling the ten softmax scores destroys them -- they no longer
-  add to 1, no longer read as chances. Humble between hidden floors only, never after the last.
+  Most frameworks flip this for you; if you grade by hand, flip it yourself.
 
-  Judging on a spent pile. The most expensive mistake: reporting the practice score as your
-  final grade. You peeked at it thirty times. Report the sealed pile, opened once.
+  Forgetting to rewind after the fire alarm. Early stopping that halts at pass 8 but
+  keeps pass 8's dials has thrown the whole point away:
+
+      best pass = 3   ->   stop at pass 8   ->   REWIND to pass 3's dials
+
+  The flag is restore_best_weights -- set it.
+
+  Batch-norm after the exit. Humble the ten softmax scores and you destroy them --
+  they no longer add to 1, no longer read as chances:
+
+      ...hidden floor -> humble -> hidden floor -> humble -> softmax   (never humble here)
+
+  Humble between hidden floors only, never after the last.
+
+  Judging on a spent pile. The costliest mistake of all: reporting the practice score
+  as the final grade. You peeked at it thirty times:
+
+      practice pile:  peeked 30x   ->  not a grade
+      sealed pile:    opened ONCE  ->  the honest grade
 
   STANDARD NAMES FOR EVERYTHING ABOVE
 

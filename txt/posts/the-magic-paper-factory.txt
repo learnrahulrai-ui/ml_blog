@@ -206,13 +206,13 @@
        total = -30 + 0 - 30 = -60. A big NEGATIVE -- this magic paper screams "the edge here is
        upside-down from the one I hunt." (After the zero-out rule, -60 becomes 0: not my shape.)
 
-  ONE INSPECTOR, ONE SCAN -- AND THE TRAPS
+  ONE INSPECTOR, ONE SCAN -- AND THREE WRONG PICTURES
 
   One worker carrying one magic paper is an INSPECTOR.
   Here is what an inspector actually does.
   And here are the three wrong pictures everyone (me included) builds first.
 
-  TRAP 1 -- "the magic paper sits on one spot."
+  The first wrong picture: "the magic paper sits on one spot."
   No. The paper is 3 by 3.
   Which means it covers NINE spots at once, centred on one.
   The nine comes from the paper's size, not from the spot.
@@ -224,13 +224,13 @@
       +---+---+---+
       | d | d | d |
 
-  TRAP 2 -- "first one magic paper scans, then a second magic paper scans the next patch."
+  The second: "first one magic paper scans, then a second magic paper scans the next patch."
   No. ONE inspector owns ONE magic paper the whole time -- the same nine dials.
   Moving to the next patch is that same paper SLID over.
   A second magic paper exists only when a second inspector is hired.
   Magic papers used by inspector 1: one, forever.
 
-  TRAP 3 -- "the scan chops the photo into separate 9-spot tiles, so it runs 1024/9 times."
+  The third: "the scan chops the photo into separate 9-spot tiles, so it runs 1024/9 times."
   No. The paper steps ONE spot at a time.
   Which means consecutive patches OVERLAP.
   Each step shares six of its nine spots with the last:
@@ -566,9 +566,7 @@
      check your slate:
        Conv: 28 - 3 + 1 = 26, so 26x26.  Boss: 26 / 2 = 13, so 13x13.
 
-  COMMON TRIPWIRES
-
-  Real snags from building this, each fixed at the spot it bites.
+  A few snags from building this, each fixed at the spot it bites.
 
   ONE PAPER OUT IS ONE NUMBER, NOT A COLOUR TRIPLET
      An inspector's paper is three deep (27 dials), but all 27 multiply-adds collapse to ONE

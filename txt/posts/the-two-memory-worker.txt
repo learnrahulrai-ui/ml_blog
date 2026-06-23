@@ -475,16 +475,23 @@
 
   Vectors flow through; the matrices are the dials they pass.
 
-  TRIPWIRE 13  "keep = 1 minus admit -- what you don't keep, you admit."
-    No. There is NO subtraction here. keep and admit are TWO separate machines, each with its
-    own dials, each landing its own 0..1 fraction. keep 0.9 and admit 0.2 can BOTH be high, or
-    both low -- the slot can hold 90% of the old AND let in 20% of the new at once. (A cousin,
-    the GRU, DOES tie them with a 1-minus; this LSTM does not.)
+  keep and admit look like a seesaw -- whatever you do not keep, you admit. No
+  subtraction ties them:
 
-  TRIPWIRE 14  "The final memory-B is the first word's, or one word's."
-    No. Each B folds in the one before it: B after "nolan ended" has BOTH words baked in, not
-    just "nolan". The final B the clerk reads is the whole-review summary -- the last B, which
-    swallowed every earlier B. It is not tied to any single word.
+      keep 0.9   AND   admit 0.2      both high: hold 90% of the old, let in 20% new
+      keep 0.1   AND   admit 0.1      both low
+
+  They are two separate machines with their own dials, each landing its own 0..1
+  fraction. (A cousin, the GRU, DOES tie them with a 1-minus; this LSTM does not.)
+
+  Last, the final memory-B is not the first word's, nor any single word's. Each B
+  folds in the one before it:
+
+      B after "nolan"        =  nolan
+      B after "nolan ended"  =  nolan + ended, baked together
+       ...                       the last B has swallowed every earlier B
+
+  The B the clerk finally reads is the whole-review summary, tied to no single word.
 
   Every step above -- training cost, the combine, the dial count -- done by pencil.
   Here the exact numbers are spelled out in Python.

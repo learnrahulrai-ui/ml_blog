@@ -353,60 +353,91 @@
   piles, and now hidden tastes.  Name the trick under the costume and the machine has no
   black boxes left in it.
 
-  COMMON TRIPWIRES I CAUGHT
+  A fair few places this bites, each a thing that feels right.
 
-    TRIPWIRE 1:  Only score the cells you actually have.
-       The wrongness sum runs over FILLED ratings only.  Counting the blanks (which
-       have no truth) is meaningless and breaks the whole method.
+  The wrongness sum runs over FILLED ratings only -- count the blanks and you break
+  everything:
 
-    TRIPWIRE 2:  K (number of hidden tastes) is a knob, like everywhere else.
-       Too few hidden tastes and the machine cannot tell sci-fi from romance; too
-       many and it memorises noise in the handful of ratings.  Pick K by holding out
-       some known ratings and checking the guesses -- the Chapter 1 habit, again.
+      Ann [ 5  .  4  .  . ]     score the 5 and the 4; the dots have no truth to miss
+              ^     ^  ^
 
-    TRIPWIRE 3:  Hidden tastes are not labelled "sci-fi" by the machine.
-       The machine finds K useful directions; it never names them.  "Sci-fi" and
-       "romance" are stories WE tell after looking at which movies score high.  Same
-       as PCA loadings -- the math finds the axis; the meaning is our interpretation.
+  A blank carries no answer, so a "miss" on it is meaningless. Sum over present
+  ratings only.
 
-    TRIPWIRE 4:  Cold start is a wall, not a tuning problem.
-       No ratings means no tastes means no honest guess.  Do not fake it with the
-       global average and call it personalised -- it is not.
+  K, the number of hidden tastes, is a knob like everywhere else:
 
-    TRIPWIRE 5:  You still need a leash.
-       A mostly-empty sheet is the easiest thing in the world to overfit.  Without
-       the Chapter 4 penalty on big numbers, predictions in the blanks go wild.
+      K too small  ->  cannot tell sci-fi from romance     (underfit)
+      K too big    ->  memorises noise in a few ratings     (overfit)
 
-    TRIPWIRE 6:  This is unsupervised in spirit, supervised in mechanics.
-       There is no tidy answer column, yet we DO fit to known ratings.  It sits on
-       the border -- learning hidden structure (unsupervised) by predicting observed
-       values (supervised).  Do not box it too hard either way.
+  Pick K by holding out known ratings and checking the guesses -- the Chapter 1 habit,
+  again.
 
-    TRIPWIRE 7:  Humbling SUBTRACTS, and the sign survives.
-       3 - 4 = -1 means "liked it one star LESS than the crowd" -- information, not
-       punishment.  And nobody "gets a negative for not going": blanks are skipped,
-       not humbled.  Only present ratings move; blanks stay blank.
+  The machine finds K useful directions; it never names them:
 
-    TRIPWIRE 8:  The closeness number never gets written into a cell.
-       It only ORDERS people -- most honest twin first.  What gets copied into the
-       blank is the chosen person's VALUE.  Writing the closeness number itself into
-       the sheet confuses the ruler with the thing it measured.
+      taste 1:  high on Alien, Matrix ...   <- WE call this "sci-fi" afterward
+      taste 2:  high on Notebook ...        <- WE call this "romance"
 
-    TRIPWIRE 9:  Verbatim copying poisons the next ranking.
-       Paste a donor's values into your blanks and your difference to him over those
-       cells is 0 BY CONSTRUCTION -- the re-ranking now hears its own echo, not
-       evidence.  This killed the hand recipe.  The machine survives because every
-       mark is blended from the whole sheet, never copied from one donor.
+  Same as PCA loadings -- the maths finds the axis, the meaning is our story laid on
+  top.
 
-    TRIPWIRE 10:  The rebuild edits EVERY cell -- restore the truth each round.
-       After one rebuild a true 0.30 comes back 0.28.  Rated cells are not the
-       machine's to edit: keep a mask sheet ("was this one blank?") and put the
-       truth back after every rebuild.  On the working sheet, the eye cannot tell
-       truth from pencil -- only the mask knows.
+  Cold start is a wall, not a knob to tune. No ratings means no tastes means no honest
+  guess:
 
-    TRIPWIRE 11:  Hide only RATED cells when grading a knob.
-       A hidden blank pockets no truth, so there is nothing to grade against later.
-       The 20% you hide must come from cells that actually hold ratings.
+      brand-new user, 0 ratings  ->  no taste vector  ->  nothing personal to say
+
+  Do not paper over it with the global average and call it personalised. It is not.
+
+  A mostly-empty sheet is the easiest thing in the world to overfit:
+
+      few ratings  +  big free numbers  ->  blanks predicted wildly
+
+  Without the Chapter 4 penalty on big numbers the guesses in the blanks run off. Keep
+  the leash.
+
+  It straddles the line -- no tidy answer column, yet it DOES fit to known ratings:
+
+      unsupervised:  finds the hidden taste structure
+      supervised:    by predicting the ratings you already have
+
+  Do not box it hard either way; it learns structure by predicting observed values.
+
+  Humbling SUBTRACTS the crowd, and the minus sign is information, not punishment:
+
+      3 - 4 = -1   ->   "liked it one star LESS than the crowd"
+
+  And blanks are skipped, never humbled -- nobody scores a negative "for not going".
+  Only present ratings move.
+
+  The closeness number ORDERS people; it never gets written into a blank:
+
+      closeness        ->  rank donors, most honest twin first
+      into the blank   ->  the chosen donor's VALUE, not the closeness number
+
+  Writing the ruler's reading into the sheet confuses the ruler with the thing it
+  measured.
+
+  Paste a donor's values straight into your blanks and your gap to him over those
+  cells is 0 by construction:
+
+      copy donor  ->  diff to donor = 0  ->  re-ranking hears its own echo, not evidence
+
+  This killed the hand recipe. The machine survives because every mark is blended from
+  the whole sheet, never copied from one donor.
+
+  One rebuild edits EVERY cell -- a true 0.30 comes back 0.28 -- so you must restore
+  the truth each round:
+
+      keep a mask:   "was this one blank?"
+      after rebuild: put the real ratings back; let the pencil marks stand only in blanks
+
+  On the working sheet the eye cannot tell truth from pencil -- only the mask knows.
+
+  Last, when you hide 20% to grade a knob, hide only RATED cells:
+
+      hide a real rating  ->  truth pocketed, the guess can be graded later
+      hide a blank        ->  no truth pocketed, nothing to grade against
+
+  The held-out 20% must come from cells that actually hold ratings.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
