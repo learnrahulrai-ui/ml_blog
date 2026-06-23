@@ -105,9 +105,9 @@
   But a single sine wave is not unique. sin(0) = 0, sin(2π) ≈ 0, sin(4π) ≈ 0.
   Positions 0, 6, 13 all get nearly the same mark.
 
-  THE FIX: use many sine and cosine waves at different speeds simultaneously.
-  Position j produces one number per wave; the collection of all those numbers
-  across all waves is the mark.
+  So use many sine and cosine waves at different speeds at once. Position j produces
+  one number per wave; the collection of all those numbers across all waves is the
+  mark.
 
   If all waves run at the same speed they all repeat at the same positions --
   still not unique. You need some waves to be fast (they complete a cycle every
