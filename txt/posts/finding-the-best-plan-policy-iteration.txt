@@ -387,6 +387,12 @@
   # spots: 'G'=runway(ground,+5), 'M'=one up, 'T'=two up. Nudges per air spot:
   # 'down' (toward the pad) and 'up' (away). 'down' from M lands G; from T lands M.
   # 'up' from M lands T; from T lands itself (wall). The peek will prefer 'down'.
+  # the three-spot stack; each air spot can nudge UP or DOWN, the runway is the prize:
+  #
+  #     T  (two up)    up -> stays (ceiling wall)  ;  down -> M
+  #     M  (one up)    up -> T                     ;  down -> G
+  #     G  (runway)    +5, painted -- the only anchor
+  #
   is_ground = {'G': True, 'M': False, 'T': False}
   painted   = {'G': RUNWAY, 'M': None, 'T': None}
   lands     = {                       # (spot, nudge) -> where it lands

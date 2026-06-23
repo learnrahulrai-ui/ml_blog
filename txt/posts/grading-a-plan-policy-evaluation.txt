@@ -528,6 +528,12 @@
   # =======================================================================
   print("\n=== CASE 3: the real engine on the runway stack ===")
 
+  # the three-spot stack, the plan's arrows all pointing down to the runway:
+  #
+  #     T  (two up)    worth 0.0  --arrow-->  M
+  #     M  (one up)    worth 0.0  --arrow-->  G
+  #     G  (runway)    worth 5.0  <- painted, the only anchor
+  #
   # the plan sends each air spot to the spot below it (always Down).
   # spots: 'G' is the runway (ground), 'M' one up, 'T' two up. next[spot]=where its arrow lands.
   is_ground = {'G': True,  'M': False, 'T': False}
