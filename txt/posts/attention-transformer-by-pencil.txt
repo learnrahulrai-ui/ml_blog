@@ -19,16 +19,27 @@
   every other word -- no carrying, no fade. That is attention. The Transformer is what you get
   when you stack this on top of a plain classifier.
 
-  THE FORGOTTEN PRONOUN TRAP -- why a word's meaning depends on the whole sentence
-     "The animal didn't cross the street because it was too tired."
-     "The animal didn't cross the street because it was too wide."
-     The word "it" is identical in both sentences. But "it" means "animal" in the first
-     and "street" in the second. A machine that reads one word at a time with no cross-word
-     connections cannot distinguish these -- "it" maps to the same fixed representation.
-     THE FIX: self-attention. Force "it" to score every other word in the sentence,
-     then blend their representations in proportion to those scores.
-     "It" in sentence 1 blends mostly with "animal". In sentence 2, mostly with "street".
-     The same word gets a different meaning depending on context.
+  Two sentences, one word apart at the very end:
+
+      "The animal didn't cross the street because IT was too tired."
+           |________________________________________^   it = the animal
+
+      "The animal didn't cross the street because IT was too wide."
+                       |___________________________^      it = the street
+
+  Same three letters, "it" -- yet it means the animal in the first line and the
+  street in the second, and the only clue is a word near the end (tired vs wide). A
+  machine that reads one word at a time and freezes each into a fixed code is stuck:
+  its "it" is the identical vector both times, so it cannot tell them apart.
+
+  So let every word look at all the others before it settles its meaning. "It"
+  scores every word in the sentence and blends them in by those scores:
+
+      sentence 1:  it -> {animal 0.7, street 0.1, tired 0.2}  ->  "it" leans ANIMAL
+      sentence 2:  it -> {animal 0.1, street 0.7, wide  0.2}  ->  "it" leans STREET
+
+  The same word now carries a different meaning, pulled from whatever surrounds it.
+  That looking-around and blending is self-attention.
 
   Every attention tutorial either waves its hands ("each word attends to relevant words!") or
   buries you in matrix equations. Neither tells you the three things most worth knowing:

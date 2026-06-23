@@ -28,14 +28,23 @@
   because there is no chain, every word computes at the same time -- parallel -- fast on a GPU.
   That parallelism is precisely why this architecture took over: it scales.
 
-  THE BLIND SPOT TRAP -- why a plain dense layer cannot slide across an image
-     A dense layer wires every pixel to every neuron. The network memorises the position
-     of every feature: it learns "eye is at pixel (100, 50)".
-     If the same face shifts 2 pixels to the left, those wires have never fired together.
-     The network goes blind -- it has literally never seen that configuration of inputs.
-     THE FIX: the convolutional filter. Build one tiny 3x3 window and slide it across
-     the entire image. The same filter detects an eye in the centre AND in the corner.
-     Position stops mattering. The same detector works everywhere.
+  A dense layer wires every pixel to every clerk, so it learns features by their
+  address: "an eye lives at pixel (100, 50)." Fine -- until the same face slides two
+  pixels to the left:
+
+      trained:   eye at (100, 50)   -->  those clerks fire, "face!"
+      shifted:   eye at ( 98, 50)   -->  those exact wires never fired together -->  blind
+
+  Nothing carries over, because the network only ever learned the one position. Move
+  the picture a hair and it has, quite literally, never seen this before.
+
+  So stop wiring by address. Build one tiny 3x3 window that knows what an eye looks
+  like, and slide that same window across the whole image:
+
+      [3x3] -> [3x3] -> [3x3] -> ...      one detector, dragged over every spot
+
+  The very same detector finds the eye dead centre and finds it in the corner.
+  Position stops mattering; one filter works everywhere. That is a convolution.
 
   Worked review throughout: "nolan ended" (2 words, to keep pencil arithmetic short). Tag width
   4 here, 32 in the real lab -- every move is identical. Pencil and scratch paper ready.

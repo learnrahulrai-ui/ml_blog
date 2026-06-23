@@ -22,14 +22,24 @@
   Worked review: "nolan ended" (2 words). Tag width 4 throughout (real width 32 -- identical
   moves). Nothing is named before a number earns the name.
 
-  THE BOTTLENECK TRAP -- why RNNs hit a wall on speed
-     An RNN must read word 99 before it can read word 100. Strictly sequential.
-     You have a supercomputer with 10,000 parallel cores -- 9,999 sit idle, waiting.
-     Processing a sentence of 100 words takes at least 100 serial steps regardless
-     of how much hardware you throw at it. The chain is the limit.
-     THE FIX: the Transformer. Drop the chain entirely. Read ALL 100 words simultaneously.
-     Use positional encoding to tell words apart (word 1 vs word 37) without a chain.
-     All 10,000 cores fire at once. Training that took weeks now takes hours.
+  An RNN can read word 100 only after word 99, which waited on 98, all the way back.
+  The chain is strict:
+
+      w1 -> w2 -> w3 -> ... -> w99 -> w100         100 steps, one after another
+
+  Now aim a 10,000-core machine at it. 9,999 cores sit idle -- there is nothing for
+  them to do until the one core ahead finishes its word. A 100-word sentence takes
+  100 serial steps no matter how much hardware you own. The chain, not the silicon,
+  is the ceiling.
+
+  So cut the chain. Read all 100 words in the same instant, and stamp each with its
+  position (word 1, word 37) so order is not lost just because the chain is gone:
+
+      w1   w2   w3   ...   w100      all on different cores, all firing at once
+        \____\____\___ ... __/        one step, not a hundred
+
+  Every core fires together, and training that crawled for weeks finishes in hours.
+  That is the transformer.
 
   A MACHINE ONLY MULTIPLIES NUMBERS, SO WORDS MUST BECOME NUMBERS FIRST
 

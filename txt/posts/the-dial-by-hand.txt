@@ -155,8 +155,8 @@
     all columns.  The LADDER gives all credit to bmi; the EXACT gives each
     column only its own share.
 
-  It is a lovely first picture of one column in isolation. It is also a TRAP, and here is
-  the exact size of the trap:
+  It is a lovely first picture of one column in isolation. It is also a lie the moment
+  two columns overlap, and here is the exact size of that lie:
 
   THE LADDER EQUALS THE REAL DIAL ONLY WHEN COLUMNS DON'T OVERLAP
      The per-column slope above matches the true dial ONLY when no column overlaps any

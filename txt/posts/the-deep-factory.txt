@@ -405,9 +405,7 @@
   biggest confusion is sensible, not random. (32x32 is the DATA's limit, not a factory
   stupidity -- even a human eye struggles at that resolution.)
 
-  COPY TRAP:
-
-  The test cell checks that the confusion sheet still sums to 10,000. If you zero the
+  One last copy gotcha. The test cell checks that the confusion sheet still sums to 10,000. If you zero the
   diagonal on the REAL sheet to find the biggest miss, the hits vanish, the sum drops
   below 10,000, and the test crashes.
 
