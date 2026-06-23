@@ -404,14 +404,21 @@
     al_murder, al_assault, al_urbanpop = 13.2, 236, 58
     ak_murder, ak_assault, ak_urbanpop = 10.0, 263, 48
 
-    STRAIGHT-LINE (EUCLIDEAN) GAP -- RAW, UNFAIR
-    euclid_raw = math.sqrt((al_murder-ak_murder)2 + (al_assault-ak_assault)2 + (al_urbanpop-ak_urbanpop)**2)
-    SQRT(3.2^2 + 27^2 + 10^2) = SQRT(10.24 + 729 + 100) = SQRT(839.24) = 28.97
+    LINE THE TWO ROWS UP AND SUBTRACT, COLUMN BY COLUMN
+       Alabama  [ 13.2   236    58 ]
+       Alaska   [ 10.0   263    48 ]
+       ---------------------------------
+       gap        3.2    -27    10        (Alabama minus Alaska)
+
+    STRAIGHT-LINE (EUCLIDEAN) GAP -- RAW, UNFAIR: square each gap, add, root
+    euclid_raw = math.sqrt((al_murder-ak_murder)**2 + (al_assault-ak_assault)**2 + (al_urbanpop-ak_urbanpop)**2)
+    #  3.2**2 + 27**2 + 10**2  =  10.24 + 729 + 100  =  839.24
+    #  sqrt(839.24) = 28.97   -- 729 dwarfs the rest, so the raw gap is almost all Assault
     print(round(euclid_raw, 2))   # 28.97
 
-    CITY-BLOCK (MANHATTAN) GAP -- RAW, UNFAIR
+    CITY-BLOCK (MANHATTAN) GAP -- RAW, UNFAIR: add the bare gaps, no squaring
     manhattan_raw = abs(al_murder-ak_murder) + abs(al_assault-ak_assault) + abs(al_urbanpop-ak_urbanpop)
-    3.2 + 27 + 10 = 40.2
+    #  3.2 + 27 + 10 = 40.2
     print(round(manhattan_raw, 1))   # 40.2  (city-block always >= straight-line)
 
     STANDARDISE: Z = (RAW - MEAN) / SPREAD  (MEANS AND SPREADS FROM THE FULL 50-STATE SHEET)
@@ -431,50 +438,55 @@
     print(round(ak_m_z,2), round(ak_a_z,2), round(ak_u_z,2))   # 0.51  1.11 -1.21
 
     FAIR GAP -- STRAIGHT-LINE ON STANDARDISED NUMBERS
-    euclid_fair = math.sqrt((al_m_z-ak_m_z)2 + (al_a_z-ak_a_z)2 + (al_u_z-ak_u_z)**2)
-    SQRT(0.73^2 + 0.33^2 + 0.69^2) = SQRT(0.53+0.11+0.48) = SQRT(1.12) = 1.06
+    #  the standardised gap, column by column:  (1.24-0.51, 0.78-1.11, -0.52-(-1.21))
+    #                                          =  ( 0.73,     -0.33,     0.69 )
+    euclid_fair = math.sqrt((al_m_z-ak_m_z)**2 + (al_a_z-ak_a_z)**2 + (al_u_z-ak_u_z)**2)
+    #  0.73**2 + 0.33**2 + 0.69**2  =  0.53 + 0.11 + 0.48  =  1.12 ;  sqrt(1.12) = 1.06
     print(round(euclid_fair, 2))   # 1.06  (fair: each column gets equal voice)
 
-  Two states, two gaps (raw and fair), every column on its own line.  The toolbox block
-  below runs the same calculation on all 50 pairs:
+  That is one pair by hand.  The same squaring-and-rooting, run over all 50 states,
+  fills a 50x50 sheet of gaps -- every state against every other.  Here is the
+  top-left 5x5 corner, every entry computed exactly as the 28.97 was (the three
+  column-gaps squared, summed, rooted):
 
-  >> NEW TO PYTHON? Each named once:
-       pd.read_csv()         -- load a sheet from a .csv file
-       df.shape              -- (rows, columns)
-       df.columns.tolist()   -- list of column names
-       df.mean()             -- mean of every column
-       df.std(ddof=0)        -- population standard deviation
-       df.max() - df.min()   -- range per column
-       StandardScaler()      -- put every column on mean=0, spread=1
-       np.sqrt()             -- square root
+      RAW DISTANCE SHEET (Euclidean), a corner of the full 50x50:
+
+                   Alabama  Alaska  Arizona  Arkansas  California
+      Alabama         0.00   28.97    62.24     46.90      52.02
+      Alaska         28.97    0.00    44.59     73.04      44.93
+      Arizona        62.24   44.59     0.00    108.24      21.11
+      Arkansas       46.90   73.04   108.24      0.00      95.27
+      California     52.02   44.93    21.11     95.27       0.00
+       ...            ...     ...      ...       ...        ...
+       (50 rows x 50 cols.  the diagonal is 0 -- each state to itself.  the sheet is
+        mirror-symmetric: Alabama-to-Alaska equals Alaska-to-Alabama, both 28.97)
+
+  One worked off-diagonal entry, Arizona-California, so the sheet is not magic:
+
+      Arizona     [  8.1   294    80 ]
+      California  [  9.0   276    91 ]
+      ----------------------------------
+      gap          -0.9    18    -11
+      sqrt(0.9**2 + 18**2 + 11**2) = sqrt(0.81 + 324 + 121) = sqrt(445.81) = 21.11
+
+  To find the closest PAIR, blank out the zero diagonal and hunt the smallest number.
+  In this corner the smallest off-diagonal gap is Arizona-California at 21.11.  On the
+  full standardised sheet -- every column on one ruler first -- the nearest two states
+  come out closer still.
+
+  And the same thing, for the day you meet a computer:
 
     import pandas as pd
-    import numpy as np
+    from scipy.spatial.distance import pdist, squareform
     from sklearn.preprocessing import StandardScaler
 
-    LOAD THE SHEET
-    df = pd.read_csv("us_arrests.csv", index_col=0)
-    print(df.shape)              # (50, 3)
-    print(df.columns.tolist())   # ['Murder', 'Assault', 'UrbanPop']
+    df = pd.read_csv("us_arrests.csv", index_col=0)     # 50 rows x 3 columns
+    raw  = squareform(pdist(df, metric="euclidean"))    # the 50x50 sheet above
+    print(round(raw[0, 1], 2))                          # 28.97  Alabama-Alaska
 
-    SUMMARY STATISTICS
-    means = df.mean().round(2).to_dict()
-    stds  = df.std(ddof=0).round(2).to_dict()
-    ranges = (df.max() - df.min()).round(2).to_dict()
-
-    EUCLIDEAN DISTANCE FUNCTION
-    def euclidean_distance(x, y):
-        return float(np.sqrt(np.sum((x - y) ** 2)).round(3))
-
-    MANHATTAN DISTANCE FUNCTION
-    def manhattan_distance(x, y):
-        return float(np.sum(np.abs(x - y)).round(3))
-
-    DISTANCE BETWEEN ALABAMA AND ALASKA
-    al = df.loc["Alabama"]
-    ak = df.loc["Alaska"]
-    print(euclidean_distance(al, ak))    # 28.97
-    print(manhattan_distance(al, ak))    # 40.2
+    z    = StandardScaler().fit_transform(df)           # each column -> mean 0, spread 1
+    fair = squareform(pdist(z, metric="euclidean"))     # the fair sheet
+    print(round(fair[0, 1], 2))                         # 1.06   Alabama-Alaska, fair
 
     STANDARDISE
     scaler = StandardScaler()
