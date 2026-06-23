@@ -264,8 +264,58 @@
 
   PYTHON: VALUE ITERATION, FULL LOOP
 
-  A 4-spot parking street, three prices, gamma = 0.9, theta = 0.001. The loop runs the
-  VALUE-IT update at every spot until delta < theta, then extracts the plan.
+  A 4-spot parking street, three prices, gamma = 0.9, theta = 0.001. First the die
+  tables by hand, then the loop. The tables drawn -- spot, then price, then a list of
+  (reward, chance), one entry per landing spot. Spot 3 price 1 is the real table from
+  the lesson; the rest are illustrative but consistent (each row's chances sum to 1):
+
+      tables
+       spot 0   price 0: (0.5,.30) (1.0,.40) (0.5,.20) (0.0,.10)
+                price 1: (1.0,.25) (2.0,.40) (1.0,.20) (0.5,.15)
+                price 2: (0.5,.35) (0.5,.35) (1.5,.20) (0.5,.10)
+       spot 1   price 0: (1.0,.20) (1.5,.35) (1.0,.25) (0.5,.20)
+                price 1: (1.5,.20) (2.5,.35) (1.5,.25) (1.0,.20)
+                price 2: (0.5,.25) (1.0,.40) (1.0,.20) (0.5,.15)
+       spot 2   price 0: (1.0,.15) (1.5,.30) (2.0,.35) (1.0,.20)
+                price 1: (1.5,.15) (2.5,.35) (2.5,.30) (1.5,.20)
+                price 2: (0.5,.20) (1.0,.35) (1.5,.30) (1.0,.15)
+       spot 3   price 0: (1.5,.30) (0.5,.25) (2.0,.25) (1.5,.20)
+                price 1: (1.0,.12) (2.0,.15) (3.0,.18) (2.0,.54)   <- the real one
+                price 2: (0.5,.25) (1.0,.30) (1.5,.25) (1.0,.20)
+
+  Start every worth at 0:
+
+      V  =  [  0     0     0     0  ]
+               ^0    ^1    ^2    ^3
+
+  PASS 1.  Every worth is 0, so the 0.9*worth(landing) term vanishes and each score is
+  just chance*reward, summed over the four landings. Spot 3, all three prices:
+
+      price 0:  1.5(.30)+0.5(.25)+2.0(.25)+1.5(.20) = .45+.125+.50+.30 = 1.375
+      price 1:  1.0(.12)+2.0(.15)+3.0(.18)+2.0(.54) = .12+.30+.54+1.08 = 2.040
+      price 2:  0.5(.25)+1.0(.30)+1.5(.25)+1.0(.20) = .125+.30+.375+.20 = 1.000
+      V[3] = max(1.375, 2.040, 1.000) = 2.04   (price 1 wins)
+
+  The other three spots, worked the same way (winning score shown):
+
+      V[0] = max(0.65, 1.325, 0.70) = 1.325
+      V[1] = max(1.075, 1.75,  0.80) = 1.75
+      V[2] = max(1.50,  2.15,  1.05) = 2.15
+
+      V after pass 1:  [ 1.325  1.75   2.15   2.04 ]
+                          ^0     ^1     ^2     ^3
+
+  PASS 2.  The worths are no longer 0, so each landing now adds 0.9*worth(landing).
+  Spot 3, price 1, reusing the pass-1 worths (the four landings hit spots 0,1,2,3):
+
+      0.12*(1.0+0.9*1.325) + 0.15*(2.0+0.9*1.75) + 0.18*(3.0+0.9*2.15) + 0.54*(2.0+0.9*2.04)
+    = 0.12*2.1925 + 0.15*3.575 + 0.18*4.935 + 0.54*3.836
+    = 0.263 + 0.536 + 0.888 + 2.071  =  3.759
+
+  V[3] climbs from 2.04 to ~3.76: pass 2 folded in one move's worth of discounted
+  future. Each later pass folds in one more horizon, the steps shrink, and the worths
+  level off. The runnable loop repeats exactly this until the biggest change drops
+  below theta:
 
   import numpy as np
 
@@ -333,26 +383,16 @@
       best = np.argmax(scores)
       print(f"  spot {s}: price {best}   scores = {np.round(scores, 3)}")
 
-  Sample output:
+  Pass 1 prints the worths we just worked by hand:
 
-     pass  1: V = [1.35  1.975  2.35  2.04]   delta = 2.0400
-     pass  2: V = [2.572  3.503  4.028  4.296] delta = 2.2560
-     pass  3: V = [3.724  4.961  5.630  6.207] delta = 1.9110
-     ...
-     pass 22: V = [13.048  14.572  15.671  16.833]  delta = 0.0012
-     pass 23: V = [13.049  14.573  15.672  16.834]  delta = 0.0010
+     V after pass 1:  [ 1.325  1.75   2.15   2.04 ]
 
-     converged after 23 passes.
-
-     optimal plan:
-       spot 0: price 1   scores = [10.22  13.05  10.41]
-       spot 1: price 1   scores = [11.61  14.57  11.55]
-       spot 2: price 1   scores = [12.41  15.67  12.30]
-       spot 3: price 1   scores = [13.52  16.83  13.19]
-
-  Price 1 wins at every spot (its real die table has the best blend of reward and landing
-  quality). Worths grow with occupancy -- higher occupancy means more activity, which the
-  best pricing captures. The lie (all 0s) heals in ~23 passes.
+  and pass 2 lifts each of them (we did spot 3: 2.04 -> 3.76). The passes keep lifting
+  the worths by smaller and smaller steps until the biggest change drops below theta =
+  0.001; then the loop stops and reads off the plan -- price 1 at every spot, since its
+  die-table carries the best blend of reward and landing. Start at the all-0 lie, apply
+  VALUE-IT everywhere, repeat: the real "+" anchors the worths from below and the truth
+  climbs one horizon per pass until nothing moves.
 
   ---
 
