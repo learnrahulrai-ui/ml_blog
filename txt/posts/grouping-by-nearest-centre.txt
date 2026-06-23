@@ -349,72 +349,101 @@
   There are also machines that fit each pile a lean-and-stretch recipe instead of a
   single centre; these are called Gaussian mixtures.
 
-  COMMON TRIPWIRES I CAUGHT
+  A fair number of places this bites, each a belief that feels right.
 
-    TRIPWIRE 1:  Standardise first -- same as Part 1.
-       K-means lives entirely on the straight-line gap, so a column measured in
-       thousands hijacks every distance.  Put every column on the same ruler
-       (mean 0, spread 1) before the first centre is dropped.
+  K-means lives entirely on the straight-line gap, so a column measured in thousands
+  hijacks every distance:
 
-    TRIPWIRE 2:  K-means needs round, similar-sized clumps.
-       The "nearest centre" rule draws straight walls halfway between centres.  If
-       the real groups are long ribbons or crescents, K-means slices them wrongly.
-       It assumes blobs.  When the shape is weird, the family tree in Part 4 or
-       other methods do better.
+      raw gap  ~  the thousands-column, almost alone
 
-    TRIPWIRE 3:  The answer changes with the random start.
-       Two runs can hand back different piles.  This is not a bug -- it is the
-       unlucky-start problem.  Run several times (n_init) and keep the tightest.
+  Put every column on the same ruler (mean 0, spread 1) before the first centre
+  drops -- same as Part 1.
 
-    TRIPWIRE 4:  K is yours to choose; the machine will obey blindly.
-       Ask for K = 5 on data with 2 real clumps and it WILL hand you 5 piles,
-       happily splitting real groups to do it.  The elbow is your guard against
-       a silly K.
+  That "nearest centre" rule draws straight walls halfway between centres, so it can
+  only cut round blobs:
 
-    TRIPWIRE 5:  Tightness (inertia) always falls as K rises.
-       You cannot pick K by "smallest tightness" -- that just picks the biggest K
-       (one centre per dot, tightness 0, useless).  You pick K at the ELBOW, where
-       the falling stops paying off.  Chasing the "smallest DROP between neighbouring
-       K values" is equally wrong: the smallest drop is always at the far right, where
-       tightness is nearly flat and each extra centre barely moves the needle.  The
-       smallest drop is a way of finding the most useless K, not the most useful one.
+      blobs:   ( o o )   ( x x )       walls fall cleanly between them   -> good
+      ribbon:  o o o o x x x x         one long crescent sliced in half  -> wrong
 
-    TRIPWIRE 6:  A centre is not a real dot.
-       The centre is the MEAN of a pile -- usually a point with no actual row
-       sitting on it.  It is the pile's centre of gravity, not a member.
+  When the real shape is a ribbon or crescent, the family tree (Part 4) or DBSCAN do
+  better. K-means assumes blobs.
 
-    TRIPWIRE 7:  The fit score's b uses the NEAREST other pile, not all of them.
-       With 3+ piles it is tempting to average the gaps to every foreign dot.
-       Wrong -- b is the average gap to the one CLOSEST foreign pile only.  The
-       question is "would next door fit better?", and next door means the nearest
-       neighbour pile, not the whole neighbourhood.
+  Two runs can hand back different piles:
 
-    TRIPWIRE 8:  Tightness is ONE total, not one-per-dot.
-       Each dot gets a pile label; the GROUPING gets a single tightness number
-       (all the squared gaps summed).  The fit score is the opposite: one score
-       per dot first, averaged into one number at the end.  Do not mix the two
-       shapes up.
+      start A  -->  piles {..}
+      start B  -->  piles {..}      differ, because the opening centres landed elsewhere
 
-    TRIPWIRE 9:  .labels_ gives pile number, not distance.
-       After .fit, km.labels_ holds one integer per row -- which pile that
-       row landed in (0, 1, 2 ... K-1).  It tells you WHICH pile, not HOW
-       FAR from its centre.  To get distances, call km.transform(X), which
-       returns a gap-to-every-centre matrix.
+  Not a bug -- the unlucky-start problem. Run it several times (n_init) and keep the
+  tightest.
 
-    TRIPWIRE 10:  STOP means no dot switched pile -- not "distances stopped changing."
-       The loop halts when an entire round produces zero pile-switches: every
-       dot ends in the same pile it was already in.  A dot CAN keep the same
-       label while its distance to the centre changes -- the centre moved
-       because its other pile-mates shifted.  The STOP check is "did this
-       round's assignment exactly match the previous round's?" not "did the
-       distances stop shrinking?"
+  K is yours to set, and the machine obeys blindly. Ask for K = 5 on data with 2 real
+  clumps and it splits real groups to reach the count:
 
-    TRIPWIRE 11:  Distance lives only in the ASSIGN step.
-       Two moves, one loop.  ASSIGN uses the straight-line gap to choose the
-       nearest centre.  UPDATE uses column means to recompute each centre --
-       no distances anywhere.  The UPDATE step averages coordinates; it never
-       measures a gap.  Keeping the two moves separate makes the whole
-       algorithm a lot cleaner to reason about.
+      2 real clumps,  K=5  -->  [ o | o ]  [ x | x | x ]      real groups carved up
+
+  It never argues. The elbow is your guard against a silly K.
+
+  Tightness (inertia) only ever falls as K rises -- so "smallest tightness" just
+  picks the biggest K (one centre per dot, tightness 0, useless):
+
+      tightness
+        |\
+        | \
+        |  \____             <- ELBOW: where the falling stops paying off
+        |       \______
+        +------------------ K
+          1  2  3  4  5  6
+
+  Pick K at the elbow. Chasing the "smallest DROP between neighbours" is just as
+  wrong -- the smallest drop sits at the far right where the curve is flat, the most
+  useless K of all.
+
+  A centre is not a real dot. It is the MEAN of its pile, usually a point with no row
+  sitting on it:
+
+      *        *
+           C                  C is the centre of gravity, a member of nothing
+      *        *
+
+  The fit score's b is the gap to the ONE closest foreign pile, not the average over
+  all of them:
+
+      dot in pile A:   gap to nearest B-dot  = 2.0    <- b uses this
+                       gap to far-off C-dots = 9.0    <- not this
+
+  The question is "would next door fit better?" -- and next door means the single
+  nearest pile, not the whole neighbourhood averaged.
+
+  Two different shapes of number, easy to swap:
+
+      tightness:  ONE total for the whole grouping  (every squared gap summed)
+      fit score:  one per dot first, then averaged into one at the end
+
+  Tightness is summed; the fit score is per-dot-then-averaged. Do not mix the shapes.
+
+  After .fit, km.labels_ holds one integer per row -- WHICH pile, never HOW FAR:
+
+      km.labels_       -> [0, 2, 1, 0, ...]    pile numbers, no distance
+      km.transform(X)  -> gap-to-every-centre matrix    <- distances live here
+
+  For distances, call transform, not labels_.
+
+  The loop stops when a whole round switches no dot -- not when distances stop moving:
+
+      round n:    assignment = [0, 1, 1, 2, 0]
+      round n+1:  assignment = [0, 1, 1, 2, 0]      identical  -> STOP
+
+  A dot can keep its label while its distance shifts (the centre moved as its
+  pile-mates moved). The check is "same assignment as last round?", not "distances
+  stopped shrinking?".
+
+  Last, only one of the two moves measures a gap at all:
+
+      ASSIGN:  straight-line gap to each centre -> pick the nearest   (distance here)
+      UPDATE:  average each pile's coordinates  -> new centre          (no distance)
+
+  UPDATE just averages coordinates; it never measures anything. Keeping the two moves
+  separate keeps the whole thing easy to reason about.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

@@ -374,53 +374,64 @@
        1; can go below 0 on unseen rows.
     5. Guess once, grade twice: the same guesses feed both rulers.
 
-  COMMON TRIPWIRES I CAUGHT
+  A few places these two rulers bite, each a belief that feels right.
 
-    TRIPWIRE 1:  MSE has NO root -- read the name
-       WRONG: mean_squared_error(...) then ** 0.5.
-       RIGHT: MSE = miss -> square -> mean -> STOP.  No root.
-              The tool already squares-and-means.  Do NOT root it.
-              RMSE has the root.  MSE does not.
+  MSE looks like it should end in a root. It does not -- the tool already squares and
+  means:
 
-    TRIPWIRE 2:  leftover is the BAD part, not the good part
-       WRONG: "leftover = 2 -- that's the stick's score."
-       RIGHT: leftover is the misery STILL LEFT after the stick tried.
-              The good part is what the stick ATE: total wobble - leftover.
+      miss -> square -> mean -> STOP            MSE
+      miss -> square -> mean -> sqrt            RMSE  (the R is the root)
 
-    TRIPWIRE 3:  R^2 divide by the WHOLE wobble, not the count
-       WRONG: R^2 = (total wobble - leftover) / 5  (5 rows).
-       RIGHT: R^2 = (total wobble - leftover) / total wobble.
-              Divide by the whole bar, not the row count.
-              The count cancels, which is why R^2 has no units.
+  Call mean_squared_error and then ** 0.5 and you have built RMSE by accident.
 
-    TRIPWIRE 4:  R^2 always rises when you add a column -- on the
-                 training pile only
-       WRONG: "Added a noise column and R^2 went up -- better fit."
-       RIGHT: The old fit is still a candidate, so it can only do at
-              least as well.  Use TEST R^2 or adjusted R^2 to judge.
+  "Leftover = 2, so 2 is the score" runs backwards. The leftover is the misery STILL
+  there after the stick tried; the good part is what it ATE:
 
-    TRIPWIRE 5:  R^2 can go negative on the test pile
-       WRONG: "R^2 < 0 is a bug."
-       RIGHT: On unseen rows, the leftover CAN exceed the wobble.
-              R^2 = 1 - RSS/TSS can dip below 0.  Not a bug -- the
-              line is doing worse than shouting the average.
+      total wobble  =  good part (eaten)  +  leftover (still missed)
 
-    TRIPWIRE 6:  Which pile feeds the rulers
-       WRONG: compute MSE and R^2 on the TRAINING pile.
-       RIGHT: Both MSE and R^2 grade on the SEALED test pile.
-              The training pile was used to set the dials.  Grading
-              on it gives a flattering, false-low mistake.
+  R^2's bottom is the whole wobble, not the row count:
 
-    TRIPWIRE 7:  "Most negative" = MIN, not MAX
-       WRONG: -0.04 looks bigger than -0.007, so it's the strongest.
-       RIGHT: -0.04 is further below zero = SMALLER = most negative.
-              min(dials, key=dials.get) returns the column name.
+      WRONG:  (total wobble - leftover) / 5             (5 rows)
+      RIGHT:  (total wobble - leftover) / total wobble
 
-    TRIPWIRE 8:  Raw dials are NOT comparable across columns
-       WRONG: compare -0.007 per pound with -0.04 per horsepower.
-       RIGHT: Each dial wears its column's own units.  Put every
-              column on one shared ruler first (StandardScaler) for
-              an honest comparison.
+  Dividing by the whole bar is what cancels the units -- which is why R^2 has none.
+
+  Add a noise column, watch R^2 climb, call the fit better? Training pile only:
+
+      training R^2:  add any column  -> can only hold or rise (old fit still a candidate)
+      test R^2:      add noise        -> usually drops
+
+  Judge on the test R^2, or adjusted R^2.
+
+  R^2 below 0 looks like a bug; on unseen rows it is honest:
+
+      train:  leftover <= wobble guaranteed  -> R^2 in [0, 1]
+      test:   leftover CAN exceed wobble      -> R^2 = 1 - RSS/TSS < 0
+
+  Below zero just means the line did worse than shouting the flat average.
+
+  Grade either ruler on the training pile and the number flatters you:
+
+      train pile --> used to set the dials --> grade here?  no, you studied these rows
+      sealed test pile --> never touched     --> grade here: yes
+
+  Both MSE and R^2 read the sealed test pile; scoring on the rows you fitted gives a
+  false-low mistake.
+
+  Hunting the strongest drag, -0.04 against -0.007:
+
+      -0.007 ----|--- 0
+      -0.04 -----|            further below zero = SMALLER = most negative = strongest
+
+  min(dials, key=dials.get) hands back that column's name.
+
+  Last, -0.007 per pound and -0.04 per horsepower cannot be ranked as they stand --
+  each dial wears its own column's units:
+
+      -0.007 per POUND (a tiny step)      -0.04 per HORSEPOWER (a big step)
+
+  Put every column on one shared ruler (StandardScaler) first, and the comparison is
+  honest.
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same moves, spoken in Python.

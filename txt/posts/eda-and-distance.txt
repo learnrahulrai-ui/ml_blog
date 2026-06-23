@@ -309,51 +309,72 @@
   So you just list who is nearby.
   That is the core of unsupervised learning: looking at neighbours without a right answer to check.
 
-  COMMON TRIPWIRES I CAUGHT
+  A few places this lab bites, each a thing that looks right.
 
-    TRIPWIRE 1:  The raw distance is not "wrong," just unfair.
-       The raw Alabama-Alaska gap is 28.97.
-       That number is mathematically correct.
-       But it is practically misleading, because Assault's large units dominate it.
-       Therefore standardisation is not optional for distance-based methods.
+  The raw Alabama-Alaska gap of 28.97 is not wrong -- the arithmetic is exact. It is
+  unfair:
 
-    TRIPWIRE 2:  ddof=0 vs ddof=1 for spread.
-       ddof is a setting that picks the spread formula.
-       The assignment says ddof=0, which is the population standard deviation.
-       This matches sklearn's StandardScaler.
-       ddof=1 gives a slightly different number, the sample standard deviation.
-       That sample number does not match the scaler.
-       So when standardising, the formula must agree.
+      28.97  ~  almost entirely the Assault gap  +  a sliver of everything else
+                (Assault's big units swamp the rest)
 
-    TRIPWIRE 3:  Missing index_col=0 when loading.
-       index_col=0 tells the loader that the first column holds row labels.
-       If you forget index_col=0, the state names become a regular column instead of row labels.
-       Then the shape is (50, 4) instead of (50, 3).
-       And the distance calculations wrongly include the state name column.
+  Mathematically correct, practically misleading. For any distance-based method,
+  standardising first is not optional.
 
-    TRIPWIRE 4:  Euclidean vs Manhattan -- both are valid, different uses.
-       Euclidean is the straight-line gap, and it is the default.
-       Manhattan is the city-block gap, and it handles outliers better.
-       The reason it handles outliers better: no squaring means no single large gap dominates.
-       Neither is "right" or "wrong".
-       They measure different kinds of distance.
+  ddof picks which spread formula you divide by, and the two disagree:
 
-    TRIPWIRE 5:  The diagonal is zero but the minimum should not be zero.
-       The diagonal of the gap sheet is the state-to-self distance, which is 0.
-       When searching for the closest pair, you must exclude the diagonal.
-       So set diagonal entries to infinity before searching for the minimum.
+      ddof=0  ->  divide by n       (population)  -- matches StandardScaler
+      ddof=1  ->  divide by n-1     (sample)      -- a slightly different number
 
-    TRIPWIRE 6:  Manhattan >= Euclidean for the same two points.
-       The straight-line diagonal is the shortest path.
-       City-block, which walks the grid, is always longer or equal.
-       So if your Manhattan is smaller than Euclidean, you made an arithmetic mistake.
+  Standardise with ddof=1 and your z-scores will not match the scaler's. Use ddof=0
+  so the two agree.
 
-    TRIPWIRE 7:  Standardising changes the relative ordering of distances.
-       Two states that were closest in raw numbers might not be closest after standardisation.
-       The reason: a column with large range dominated the raw gap.
-       After standardisation, a different column might matter more.
-       So the ordering changes.
-       That is expected, not a bug.
+  Forget index_col=0 on load and the state names come in as a data column instead of
+  row labels:
+
+      with index_col=0:   shape (50, 3)   state = label, 3 real columns
+      without:            shape (50, 4)   "Alabama" becomes a 4th "number" column
+
+  Then the distance maths tries to subtract state names. Always mark the label
+  column.
+
+  Two rulers, neither right nor wrong, just for different jobs:
+
+      Euclidean:  straight-line gap    sqrt(dx^2 + dy^2)    (the default)
+      Manhattan:  city-block gap       |dx| + |dy|          (handles outliers better)
+
+  No squaring in Manhattan means no single huge gap dominates. Pick by the job, not
+  by "correctness".
+
+  Every state is distance 0 from itself, so the gap sheet's diagonal is all zeros:
+
+           AL   AK   AZ
+      AL [  0   ..   .. ]
+      AK [ ..    0   .. ]    the 0s are state-to-self, not real closest pairs
+      AZ [ ..   ..    0 ]
+
+  Hunt the smallest gap as-is and you "find" a state paired with itself. Set the
+  diagonal to infinity before searching for the minimum.
+
+  The straight diagonal is the shortest way between two points; walking the grid is
+  always at least as long:
+
+           B
+          /|          straight (Euclidean) = 5
+         / |          grid     (Manhattan) = 3 + 4 = 7
+        /  |
+       A---+
+
+  So Manhattan >= Euclidean, every time. If yours comes out smaller, the arithmetic
+  slipped.
+
+  Last, standardising can change which pair is closest -- and that is correct, not a
+  bug:
+
+      raw:           A-B closest    (one big-range column dominated)
+      standardised:  A-C closest    (now every column gets an equal say)
+
+  A different column carries the gap once the scales are fair, so the order moves.
+  Expected.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
