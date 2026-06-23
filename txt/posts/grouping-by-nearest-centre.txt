@@ -471,10 +471,17 @@
 
     DOTS: 1, 2, 3 (PILE A) AND 10, 11, 12 (PILE B);  K=2;  STARTING CENTRES: 2 AND 10
 
+    The six dots on a line, with the two starting centres marked:
+
+        0   1   2   3   4   5   6   7   8   9  10  11  12
+            o   o   o                           o   o   o
+                ^ centre A = 2                      ^ centre B = 10
+            \__ pile A __/                      \__ pile B __/
+
     ROUND 1 -- ASSIGN: GAP FROM EACH DOT TO EACH CENTRE (SQUARED -- ORDER PRESERVED)
-    sq_1_c2, sq_1_c10 = (1-2)2, (1-10)2   # 1, 81 -> pile A (centre 2)
-    sq_3_c2, sq_3_c10 = (3-2)2, (3-10)2   # 1, 49 -> pile A
-    sq_10_c2, sq_10_c10 = (10-2)2, (10-10)2  # 64, 0 -> pile B (centre 10)
+    sq_1_c2, sq_1_c10 = (1-2)**2, (1-10)**2   # 1, 81 -> pile A (centre 2)
+    sq_3_c2, sq_3_c10 = (3-2)**2, (3-10)**2   # 1, 49 -> pile A
+    sq_10_c2, sq_10_c10 = (10-2)**2, (10-10)**2  # 64, 0 -> pile B (centre 10)
     print(sq_1_c2, sq_1_c10, sq_3_c2, sq_3_c10)   # 1 81 1 49
 
     ROUND 1 -- UPDATE: NEW CENTRES = MEAN OF EACH PILE
@@ -485,8 +492,8 @@
     ROUND 2 -- ASSIGN: SAME PILES, NOBODY SWITCHED -> STOP
 
     TIGHTNESS (INERTIA): SQUARED GAP FROM EACH DOT TO ITS OWN CENTRE
-    tight_A = (1-2)2 + (2-2)2 + (3-2)**2    # 1 + 0 + 1 = 2
-    tight_B = (10-11)2 + (11-11)2 + (12-11)**2  # 1 + 0 + 1 = 2
+    tight_A = (1-2)**2 + (2-2)**2 + (3-2)**2       # 1 + 0 + 1 = 2
+    tight_B = (10-11)**2 + (11-11)**2 + (12-11)**2  # 1 + 0 + 1 = 2
     total_tight = tight_A + tight_B              # 4
     print(tight_A, tight_B, total_tight)  # 2 2 4
 
@@ -528,18 +535,24 @@
     centres = km.cluster_centers_    # the 3 centres
     print(km.inertia_)               # the tightness
 
-    ELBOW: TIGHTNESS FOR K = 1..8
+    ELBOW: TIGHTNESS FOR K = 1..8 -- run k-means once per k, keep each tightness
     tightness = []
     for k in range(1, 9):
         km = KMeans(n_clusters=k, n_init=10, random_state=42).fit(X_scaled)
         tightness.append(km.inertia_)
 
-    plt.plot(range(1, 9), tightness, marker="o")
-    plt.xlabel("K (number of piles)")
-    plt.ylabel("tightness (inertia)")
-    plt.title("Elbow: where does adding piles stop helping?")
-    plt.grid(True, linestyle="--", alpha=0.4)
-    plt.show()
+    The list `tightness` now holds one number per k, falling fast then flattening:
+
+        tightness
+          | *                            k=1: one pile, everything lumped -> huge
+          |   *
+          |     *  .                      steep drop as the real groups split out
+          |          *  .  .
+          |                *  .  .  .     the BEND: extra piles stop helping here
+          +----------------------------- k
+            1  2  3  4  5  6  7  8
+
+    plt.plot(range(1, 9), tightness, marker="o"); plt.show()   # draws the curve above
     PICK K AT THE BEND
 
     SECOND RULER: AVERAGE FIT SCORE PER K  (STARTS AT K=2 -- SEE THE NOTE)

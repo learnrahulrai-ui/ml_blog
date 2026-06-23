@@ -293,6 +293,16 @@
   pop = [[1, 3, 2, 4], [1, 3, 4, 4], [2, 1, 2, 1], [4, 4, 4, 4]]
   scores = [recipe_success(g) for g in pop]   # [-3, -5, -3, -9]
 
+  The population: four guesses of four slots, each scored by its gap to the target
+  (every slot's gap added, then negated -- 0 is a perfect match):
+
+      target   [ 1  3  2  1 ]
+      ------------------------------------------------------
+      guess 0  [ 1  3  2  4 ]   gap  0 + 0 + 0 + 3  = 3  ->  score -3
+      guess 1  [ 1  3  4  4 ]   gap  0 + 0 + 2 + 3  = 5  ->  score -5
+      guess 2  [ 2  1  2  1 ]   gap  1 + 2 + 0 + 0  = 3  ->  score -3
+      guess 3  [ 4  4  4  4 ]   gap  3 + 1 + 2 + 3  = 9  ->  score -9
+
   class Problem:
       def __init__(self, population, objective_function, mutation_probability,
                    fitness_goal, gene_min=1, gene_max=4, rng=None):
@@ -328,7 +338,14 @@
 
   # selection by cumulative slices (what the driver does, twice, with replacement)
   cum = np.cumsum(chances)                  # [0.375, 0.625, 1.0, 1.0]
-  # roll 0.20 -> guess 1 ; roll 0.55 -> guess 2 ; roll 0.90 -> guess 3
+
+  The wheel: the four chances laid end to end on 0..1.  Guess 3 has zero width, so it
+  is never picked; the two best guesses (0 and 2, both score -3) own the widest slices:
+
+      0.0       0.375          0.625               1.0
+       |___g0____|______g1______|_________g2________|    (g3: zero width)
+          .375         .25             .375          0
+       a roll of 0.20 lands in g0 ;  0.55 in g1 ;  0.90 in g2
 
   baby = prob.reproduce(pop[0], pop[2])     # seed=0 -> k=3 -> [1,3,2] + [1] = [1,3,2,1]
   recipe_success(baby)                      # 0  -> equals the target
