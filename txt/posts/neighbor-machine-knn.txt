@@ -37,7 +37,7 @@
   Get those wrong and the rule falls apart.
   Get them right and it is hard to beat.
 
-  KEY: THE DROWNING TRAP -- why same-ruler rule is not optional
+  THE DROWNING TRAP -- why same-ruler rule is not optional
      Suppose you measure the gap between two houses using raw columns:
        rooms:  House A=2, House B=3    -> gap = 1    -> squared = 1
        pop:    House A=1000, B=1050    -> gap = 50   -> squared = 2500
@@ -47,7 +47,7 @@
      THE FIX: standardise every column to spread 1 before measuring gaps.
      Then each column speaks with equal volume, and the gap reflects ALL columns.
 
-  KEY: THE K-KNOB TRADE-OFF -- k=1 memorises, k=all ignores local truth
+  THE K-KNOB TRADE-OFF -- k=1 memorises, k=all ignores local truth
      k=1 (jumpy):  guess = exactly one neighbour's answer.
        If that neighbour is a freak outlier, the guess is a freak.
      k=ALL (stiff): guess = average of every row in the working pile.
@@ -144,7 +144,7 @@
   After this, every column contributes equally to the gap. (Squeezing to [0,1] instead of
   unit spread is an alternative that works the same way.)
 
-  !! WARN: LEARN THE RULER ON THE WORKING PILE ONLY
+  LEARN THE RULER ON THE WORKING PILE ONLY
      Computing averages and spreads on the whole pile before splitting leaks hidden-pile
      numbers into the build step. Learn on working, apply to both. Inside rotating folds,
      relearn per round -- the bound pipeline does this.
@@ -362,7 +362,7 @@
     cv = {k: fold_mistake(k, X_train, y_train) for k in candidates}   # k -> its mistake
     best_k = min(cv, key=cv.get)    # the k whose mistake is smallest
 
-  !! WARN: THREE THINGS THAT TRIP PEOPLE UP
+  THREE THINGS THAT TRIP PEOPLE UP
      (1) k (how many neighbours) and the fold count (how many grading rounds) are
          unrelated -- k=25 with 5 folds is fine.
      (2) The toolbox maximises its score, so it negates the mistake; un-negate with

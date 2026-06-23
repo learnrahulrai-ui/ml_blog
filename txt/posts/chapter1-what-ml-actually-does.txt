@@ -28,7 +28,7 @@
   Two later posts then take the two rules apart screw by screw.
   For now, stand back and see the whole thing at once.
 
-  KEY: THE 1950 CONTRACT
+  THE 1950 CONTRACT
      Pretend it is 1950.  Print these pages.  Pencils, graph paper, a blackboard --
      and a room of infinite, tireless clerks for the heavy arithmetic.  No computer,
      no calculator, anywhere in the teaching.  Every number is recomputed where it is
@@ -75,7 +75,7 @@
   Anyone can memorise answers they have been shown.
   The trick is being right about the houses you have not seen.
 
-  KEY: THE CANCEL-OUT TRAP -- why squaring the miss is not optional
+  THE CANCEL-OUT TRAP -- why squaring the miss is not optional
      Suppose you average the raw misses to see how wrong a guesser is.
      House A: truth 120, guess 100  -> miss = +20
      House B: truth  80, guess 100  -> miss = -20
@@ -85,10 +85,6 @@
      The fix: SQUARE every miss before averaging. (+20)^2 = 400. (-20)^2 = 400.
      Average squared miss = 400. The error is exposed. Squaring kills the sign.
      This is why MSE (mean squared error) squares first.
-
-  !! WARN: .shape IS A PAIR, NOT A PRODUCT
-     df.shape returns (n_rows, n_cols) in that fixed order -- (20640, 9) -- never their
-     product.
 
   ONE RULE: HIDE SOME ROWS
 
@@ -120,7 +116,7 @@
   But that rule then stumbles on new rows.
   Which means the drawer is the only number that does not lie.
 
-  KEY: SHUFFLE FIRST
+  SHUFFLE FIRST
      Rows often arrive sorted by district. Shuffle with a fixed starting point so the
      split is reproducible and not ordered. The fixed point controls reproducibility; the
      shuffle removes order bias.
@@ -334,7 +330,7 @@
   Average those five mistakes.
   This gives an honest estimate without ever touching the hidden pile.
 
-  !! WARN: PREPARE NUMBERS INSIDE EACH ROUND
+  PREPARE NUMBERS INSIDE EACH ROUND
      Any prep that learns from the numbers (an average, a spread) must be done on each
      round's building portion only. Doing it on the whole working pile before splitting
      leaks grading-chunk numbers into the build. A bound pipeline (a chain that relearns

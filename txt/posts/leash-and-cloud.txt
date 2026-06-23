@@ -55,7 +55,7 @@
      It is MEDIUM LEASH (C=1.0) vs TIGHTER LEASH (C=0.1).
      To see a genuinely unleashed machine you would have to pass penalty=None explicitly.
 
-  KEY: THE HERO WORSHIP TRAP -- why one loud column makes the machine fragile
+  THE HERO WORSHIP TRAP -- why one loud column makes the machine fragile
      Column 7 (radius) is strongly predictive. The machine loves it and sets dial = 40.
      All other columns now barely matter -- the machine is a one-column dictator.
      A new patient arrives with a slightly unusual radius, and the predicted chance
@@ -134,7 +134,7 @@
 
     check each on the slate:  1/0.1 = 10;  1/1.0 = 1;  1/1000 = 0.001
 
-  !! WARN: C=0.1 IS HEAVY PUNISHMENT, NOT LIGHT
+  C=0.1 IS HEAVY PUNISHMENT, NOT LIGHT
      C is the budget you give the machine to IGNORE the penalty.
      A small budget means little room to ignore it -- a hard squeeze.
      A large C means a large "ignore" budget -- so the penalty barely bites.
@@ -353,7 +353,7 @@
   The extra log(pi1/pi0) term slides the wall toward the rarer class.
   So the machine doesn't over-shout the rarer class.
 
-  !! WARN: THE WALL IS NOT EXACTLY HALFWAY ON IMBALANCED DATA
+  THE WALL IS NOT EXACTLY HALFWAY ON IMBALANCED DATA
      The Wisconsin sheet is roughly 63% well and 37% sick -- not equal.
      So here pi0 (well) = 0.63 and pi1 (sick) = 0.37, which makes log(pi1/pi0) =
      log(0.37/0.63), a negative number, not zero.
@@ -401,7 +401,7 @@
   Two completely different approaches, same result.
   That is not a coincidence.
 
-  KEY: AGREEMENT = CLEAN DATA, GENUINELY SEPARABLE CLASSES
+  AGREEMENT = CLEAN DATA, GENUINELY SEPARABLE CLASSES
      When the two methods agree, the data is telling you the answer.
      The S-curve machine sets dials to make the true bins as likely as it can.
      LDA reads the two cloud shapes instead.

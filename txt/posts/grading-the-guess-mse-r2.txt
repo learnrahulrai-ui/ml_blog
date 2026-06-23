@@ -173,7 +173,7 @@
     shout 5 -> miss^2 = 9 + 1 + 16 + 4 + 4 = 34
     shout 6 -> miss^2 = 16 + 4 + 9 + 9 + 1 = 39   (worse)
 
-  KEY: WHY THE AVERAGE IS THE FLOOR
+  WHY THE AVERAGE IS THE FLOOR
      Shout some number c.
      The total squared miss as c varies is f(c) = sum (y_i - c)^2.
      To find the bottom, set the slope to zero.
@@ -222,7 +222,7 @@
   The stick's total squared miss is .25 + .25 + 1 + .25 + .25 = 2.
   Call that the LEFTOVER.
 
-  !! WARN: LEFTOVER IS THE BAD PART, NOT THE GOOD PART
+  LEFTOVER IS THE BAD PART, NOT THE GOOD PART
      It is tempting to read "leftover = 2" as the stick's score.
      It is the opposite.
      Leftover is the misery STILL LEFT after the stick tried -- the small bad bit it could
@@ -242,7 +242,7 @@
 
       R^2 = (total wobble - leftover) / total wobble = 32 / 34 ~= 0.94
 
-  !! WARN: DIVIDE BY THE WHOLE BAR, NOT THE COUNT
+  DIVIDE BY THE WHOLE BAR, NOT THE COUNT
      The divider is the WHOLE wobble (34), not the row count (5).
      R^2 asks "what fraction of the WHOLE wobble did you eat?"
      That is a slice of a bar, not an average.
@@ -338,14 +338,14 @@
      With several columns it widens to the squared correlation between the answers and the
      stick's guesses.
 
-  !! WARN: R^2 ALWAYS RISES WHEN YOU ADD A COLUMN -- ON THE TRAINING PILE
+  R^2 ALWAYS RISES WHEN YOU ADD A COLUMN -- ON THE TRAINING PILE
      Hand the stick one more column and training R^2 never drops.
      Even if the column is pure noise.
      The old fit is still available, so the stick can only do at least as well.
      Therefore training R^2 is a poor judge of whether a column earns its place.
      Use the TEST R^2 instead, or the adjusted R^2 that docks you for each extra dial.
 
-  KEY: WHERE THE MISS-SIZE COMES FROM (STIFF vs JUMPY)
+  WHERE THE MISS-SIZE COMES FROM (STIFF vs JUMPY)
      Average a guesser's test MSE over many possible training piles and it splits three
      ways: E[MSE] = bias^2 + variance + noise.
      (E[MSE] means the average MSE over those many piles.)

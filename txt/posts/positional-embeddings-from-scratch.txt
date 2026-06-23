@@ -14,7 +14,7 @@
          [Attention and the Transformer by Pencil](attention-transformer-by-pencil.txt).
          Those posts flagged positional encoding as "skipped." This is what was skipped.
 
-  KEY: THE ORDER-BLIND MACHINE
+  THE ORDER-BLIND MACHINE
      score("nolan" looking at "ended")  =  nolan.WANT · ended.HAVE
      score("ended" looking at "nolan")  =  ended.WANT · nolan.HAVE
 

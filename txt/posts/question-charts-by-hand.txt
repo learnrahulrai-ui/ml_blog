@@ -27,7 +27,7 @@
   You keep splitting until each group's answers are tight enough.
   Therefore that group's average is a good guess for anyone who lands in it.
 
-  KEY: THE ENDLESS INTERROGATION TRAP -- when to stop asking questions
+  THE ENDLESS INTERROGATION TRAP -- when to stop asking questions
      If you keep asking yes/no questions, eventually every bucket has exactly 1 person.
      At that point you have built a "perfect" decision tree -- every bucket is pure.
      But you just built a filing cabinet that memorised the study pile.
@@ -128,7 +128,7 @@
       330 midpoints -> 330 badness numbers.
       the SMALLEST badness = bmi's champion (its cleanest cut).
 
-  !! WARN: THE SUM IS NOT AN RMSE
+  THE SUM IS NOT AN RMSE
      There is no root, no division.  Just sum of squared misses.  A huge number.
      You are comparing 330 huge numbers and picking the smallest.  The magnitude does
      not matter -- only the ORDER.
@@ -321,18 +321,18 @@
   Each room then runs its OWN hunt on its own people.
   Therefore each room gets a different question.
 
-  !! WARN: THE SUM IS NOT AN RMSE
+  THE SUM IS NOT AN RMSE
      There is no root, no division.  Just the raw sum of squared misses.
      A huge number that only exists to COMPARE cuts.  RMSE would multiply
      every number by the same constant (1/4, then root).  Order wouldn't
      change.  Waste of ink.
 
-  !! WARN: THE THREE CUTS COMPETE FAIRLY
+  THE THREE CUTS COMPETE FAIRLY
      Each cut is scored against the SAME 4 people.  The sums are in the
      same units.  451.5 and 416 and 739 are all "total wrongness if we
      draw the line here."  The smallest wins.
 
-    !! WARN: THE CHAMPION IS LOCAL, NOT GLOBAL
+    THE CHAMPION IS LOCAL, NOT GLOBAL
        The 0.09 cut is bmi's champion.  Age's champion (40, badness 416)
        ties it exactly.  Column competition -- the champion of champions
        -- happens only when the column champions race each other.  A tie
@@ -363,7 +363,7 @@
            exceed column count.  the real ceiling is PEOPLE running out (a pile
            of 1 cannot be split).
 
-  KEY: THE TREE HAS NO FORMULA AND NO DIALS
+  THE TREE HAS NO FORMULA AND NO DIALS
      There are no multipliers anywhere.  No sum of weighted columns.  No algebra.
      Just questions and a number at each end.  The "flexibility knob" is DEPTH: how
      many questions deep before you hit an answer.
@@ -497,7 +497,7 @@
         print(d, mean_squared_error(y_test, t.predict(X_test)))
     PICK THE DEPTH WITH SMALLEST TEST MSE
 
-  !! WARN: EVERY ROOM'S QUESTION IS FOUND BY BRUTE FORCE
+  EVERY ROOM'S QUESTION IS FOUND BY BRUTE FORCE
      The machine does not guess "try bmi."  It tries EVERY column times EVERY
      midpoint, measures the badness of EACH, and keeps the one with the smallest
      number.  No astrology, no guessing -- just the one that measures cleanest.

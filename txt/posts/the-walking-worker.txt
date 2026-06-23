@@ -34,7 +34,7 @@
   Then we walk one review through the middle floor by hand, one word at a time, until a
   running memory falls out the end.
 
-  KEY: THE PARALYZED WALKER TRAP -- why pure greed never finds the best path
+  THE PARALYZED WALKER TRAP -- why pure greed never finds the best path
      Suppose the agent always picks the action with the highest known reward.
      It finds a $5 reward early and spends every step collecting it -- forever.
      The $100 reward in the next room is never discovered. Greed locks you in.

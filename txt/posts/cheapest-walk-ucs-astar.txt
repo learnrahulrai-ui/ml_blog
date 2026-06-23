@@ -36,7 +36,7 @@
   breadcrumb (a dict of predecessors, used to reconstruct the path at the end). Each is fully
   spelled out where it first appears below.
 
-  KEY: THE BLIND MAZE TRAP -- why a cost-only search wastes time in the wrong direction
+  THE BLIND MAZE TRAP -- why a cost-only search wastes time in the wrong direction
      Uniform cost search spreads like a puddle: it explores every road with equal cost
      before committing to any direction. It WILL find the cheapest path -- but it
      explores the entire map outward in a ring, including all the roads leading away

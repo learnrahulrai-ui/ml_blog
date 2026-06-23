@@ -60,7 +60,7 @@
   Everything is done by hand. The only tools on the desk are pencils, scratch paper, and
   a room of tireless clerks who can add, subtract, multiply and divide on demand.
 
-  KEY: THE BLAME GAME PARADOX -- which of a million dials caused this mistake?
+  THE BLAME GAME PARADOX -- which of a million dials caused this mistake?
      The guess is 10. The truth is 2. The error is 8.
      Did dial #452 cause this? Or dial #999,999? Or all of them together?
      You cannot test each dial one by one -- a network with 1,000,000 dials would take

@@ -21,7 +21,7 @@
   [Chapter 1, Part 3](straight-stick-linear-regression.txt) first did it -- and then it
   catches one honest trap that nobody warns you about until it is too late.
 
-  KEY: THE DUMB ADDER TRAP -- how a machine that only multiplies can adjust its own dials
+  THE DUMB ADDER TRAP -- how a machine that only multiplies can adjust its own dials
      The machine only knows how to multiply and add. It does not "know" calculus.
      Yet gradient descent requires a derivative -- the slope of the loss at the current dial.
      PARADOX: how does a multiplier calculate a slope?
@@ -146,7 +146,7 @@
   It is a lovely first picture of one column in isolation. It is also a TRAP, and here is
   the exact size of the trap:
 
-  !! WARN: THE LADDER EQUALS THE REAL DIAL ONLY WHEN COLUMNS DON'T OVERLAP
+  THE LADDER EQUALS THE REAL DIAL ONLY WHEN COLUMNS DON'T OVERLAP
      The per-column slope above matches the true dial ONLY when no column overlaps any
      other. Real columns always overlap -- bmi and bp and the blood serums all drift
      together -- so these one-at-a-time numbers come out WRONG. The true dials need the
@@ -186,7 +186,7 @@
 
   But that tidy fact rests on a condition that is easy to forget:
 
-  !! WARN: "NUDGE = AVERAGE OF ANSWERS" IS EXACT ONLY ON CENTRED COLUMNS
+  "NUDGE = AVERAGE OF ANSWERS" IS EXACT ONLY ON CENTRED COLUMNS
      It holds because every column on this sheet is already CENTRED -- its own average sits
      at zero, so on average the ten dirty pieces contribute nothing, and the only lift left
      to add is the answer's average. This is NOT a universal law. Un-centre the columns and

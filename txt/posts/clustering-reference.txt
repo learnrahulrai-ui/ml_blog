@@ -18,7 +18,7 @@
   but everybody should: the ethics of sorting people into piles. Plain language first,
   standard labels at the very bottom.
 
-  KEY: THE HIDDEN GALAXY PARADOX -- why round-cluster methods miss elongated shapes
+  THE HIDDEN GALAXY PARADOX -- why round-cluster methods miss elongated shapes
      K-means and hierarchical clustering look for compact, roughly circular groups.
      But some structure is elongated -- a galaxy's arm is a long swooping curve,
      not a ball. K-means would split that arm into 10 separate clusters because
@@ -134,7 +134,7 @@
        to the gap you measured and the columns that drove it.  A secret black box that
        cannot explain its piles is not just unhelpful -- it is unfair.
 
-  KEY: A PILE IS A DECISION ABOUT A PERSON
+  A PILE IS A DECISION ABOUT A PERSON
      The moment a cluster decides who gets the loan, the ad, or the scrutiny, "it is just
      distance" stops being an excuse.  Measure on data you trust, guard what it holds, and
      be ready to explain every wall you used.

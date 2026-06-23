@@ -46,7 +46,7 @@
   the S-curve p = 1 / (1 + e^(-Z)) (at the exit). The loss when the true answer is 1 is
   -ln(p). That is the whole forward machine. Now we run it backward.
 
-  KEY: THE BLINDFOLDED MOUNTAIN CLIMBER -- why step size is the hardest dial to set
+  THE BLINDFOLDED MOUNTAIN CLIMBER -- why step size is the hardest dial to set
      You are blindfolded on a hillside. You want the lowest valley.
      You can only feel the slope directly under your boots.
      If you take a giant leap each time, you may jump clean over the valley and land

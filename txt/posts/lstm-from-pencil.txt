@@ -24,7 +24,7 @@
   reader and watch it FORGET, then a two-memory reader that does not. That last reader carries
   a name only at its very end: LSTM.
 
-  KEY: THE AMNESIA TRAP -- why plain memory overwrites what came before
+  THE AMNESIA TRAP -- why plain memory overwrites what came before
      An RNN reads word 1, stores it in memory. Reads word 2 -- the memory is updated
      by multiplying and adding the new word. Word 1's trace is mixed in, but weakened.
      By word 100, word 1's signal has been multiplied 99 times by numbers less than 1.

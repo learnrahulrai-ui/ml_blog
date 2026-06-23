@@ -26,7 +26,7 @@
   groups blind, and ONLY at the end do we peek at the labels to ask: did the machine's
   blind groups line up with the real cancer types?  That peek is a check, never an input.
 
-  KEY: THE DIMENSIONALITY CRUSH TRAP -- how to see 6,830 dimensions on a flat page
+  THE DIMENSIONALITY CRUSH TRAP -- how to see 6,830 dimensions on a flat page
      A human eye can only see 3 dimensions. You cannot plot 6,830 gene measurements.
      PCA compresses the data: find the 2 directions that spread the dots most widely,
      and project everything down onto those 2 axes.
@@ -134,7 +134,7 @@
   structure, not all of it.  A pure group means those genes really do separate that cancer;
   a muddled group means the gene signal for those types overlaps.
 
-  KEY: PEEKING AT LABELS IS A SCORECARD, NOT A STEP
+  PEEKING AT LABELS IS A SCORECARD, NOT A STEP
      The cancer types never touched the clustering -- they were sealed away the entire
      time.  We only unsealed them at the very end to GRADE the blind groups.  If you let
      the labels influence the grouping, you are no longer doing unsupervised learning; you
@@ -194,7 +194,7 @@
   are identical, 0 when they agree no better than two blindfolded taggers, and goes
   negative when they agree even LESS than random.
 
-  KEY: ONE NUMBER, AND IT DOES NOT CARE WHICH TOOL YOU NAME FIRST
+  ONE NUMBER, AND IT DOES NOT CARE WHICH TOOL YOU NAME FIRST
      The score asks "do these two dots get the same fate in both groupings?" -- a
      question that reads the same backwards.  Swapping the two columns leaves every
      pair's together/apart answer untouched, so the score never changes.  It is a

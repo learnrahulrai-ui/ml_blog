@@ -21,7 +21,7 @@
   WRITES one token at a time (GPT). The whole split rides on a single change to the score grid,
   worked here by hand. Pencil out -- this post is short, and it ties the bow.
 
-  KEY: THE BABEL TRANSLATION TRAP -- why word-by-word translation breaks grammar
+  THE BABEL TRANSLATION TRAP -- why word-by-word translation breaks grammar
      "The red car." in English becomes "La voiture rouge." in French.
      The word "red" appears second in English but LAST in French.
      A machine that outputs one translated word per input word would write

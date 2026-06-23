@@ -68,7 +68,7 @@
                -- mouse moves unpredictably; (3) sequential -- a move now changes what comes
                next; (4) multi-agent -- two players, the mouse actively escapes.
 
-  KEY: THE MYOPIC AGENT TRAP -- how an agent knows if a step was good
+  THE MYOPIC AGENT TRAP -- how an agent knows if a step was good
      The agent takes one step. The game does not end. Was the step good?
      The agent has no idea -- the reward from that step might only arrive 100 moves later.
      THE FIX: the value function. The agent learns to predict the future.

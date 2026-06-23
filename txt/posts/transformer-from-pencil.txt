@@ -22,7 +22,7 @@
   Worked review: "nolan ended" (2 words). Tag width 4 throughout (real width 32 -- identical
   moves). Nothing is named before a number earns the name.
 
-  KEY: THE BOTTLENECK TRAP -- why RNNs hit a wall on speed
+  THE BOTTLENECK TRAP -- why RNNs hit a wall on speed
      An RNN must read word 99 before it can read word 100. Strictly sequential.
      You have a supercomputer with 10,000 parallel cores -- 9,999 sit idle, waiting.
      Processing a sentence of 100 words takes at least 100 serial steps regardless

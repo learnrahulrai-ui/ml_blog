@@ -55,7 +55,7 @@
       row 2:  [ 5 ][45 ][...]  ...
               ...              (32 rows tall)
 
-  KEY: THE LINEAR PRISON TRAP -- why you must bend the straight line
+  THE LINEAR PRISON TRAP -- why you must bend the straight line
      Suppose the factory is all straight additions and multiplications with no bends.
      Layer 1 output = 2 * input.
      Layer 2 output = 3 * (Layer 1) = 6 * input.
@@ -562,28 +562,28 @@
 
   Real snags from building this, each fixed at the spot it bites.
 
-  !! WARN: ONE PAPER OUT IS ONE NUMBER, NOT A COLOUR TRIPLET
+  ONE PAPER OUT IS ONE NUMBER, NOT A COLOUR TRIPLET
      An inspector's paper is three deep (27 dials), but all 27 multiply-adds collapse to ONE
      number per spot. People expect a red-guess, green-guess, blue-guess triplet. No -- one
      number per spot per inspector. A whole floor of 32 inspectors gives 32 numbers per spot,
      and those are 32 different shape-answers, not colours.
 
-  !! WARN: THE PAPER IS ALWAYS SMALL -- NEVER THE SHEET'S SIZE
+  THE PAPER IS ALWAYS SMALL -- NEVER THE SHEET'S SIZE
      On floor 2 the sheets are 16x16, but the paper is still 3x3, not 16x16. A 16x16 paper could
      not move -- one position, no neighbourhoods, no scan. Only the paper's DEPTH grows to match
      the incoming sheets; its width stays the typed (3,3).
 
-  !! WARN: POOLING DOES NOT KEEP COORDINATES
+  POOLING DOES NOT KEEP COORDINATES
      The shrink boss writes a fresh, smaller, FULL sheet -- no holes, no kept dot-addresses.
      Each 2x2 block writes its loudest value at the block's position. Which corner it came from
      is deliberately forgotten. You are not meant to track where the survivor sat.
 
-  !! WARN: COUNT THE PAPER DEPTH FROM WHAT ARRIVES, NOT WHAT YOU TYPE
+  COUNT THE PAPER DEPTH FROM WHAT ARRIVES, NOT WHAT YOU TYPE
      Conv2D(64, (3,3)) on a 16x16x32 stack makes papers that are 3x3x32 = 288 dials each, not
      3x3 = 9. The depth (32) is invisible in the code because it auto-matches the input. Forget
      it and your hand dial-count comes out wildly too low.
 
-  !! WARN: FLATTEN HAS NO DIALS
+  FLATTEN HAS NO DIALS
      Flatten is re-shelving, not arithmetic. It moves zero dials. If your hand count attributes
      any dials to the flatten step, you have miscounted -- the dials are all in the Dense floor
      that READS the flattened line.
@@ -699,7 +699,7 @@
 
     print(model_cnn.count_params())   # 282,250 -- matches our hand count
 
-  !! WARN: input_shape ONLY ON THE FIRST FLOOR
+  input_shape ONLY ON THE FIRST FLOOR
      The first Conv2D must be told the grid size, input_shape=(32, 32, 3). The later floors
      work out their own input size from what the floor below hands them -- never type it twice.
 

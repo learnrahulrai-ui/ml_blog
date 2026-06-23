@@ -36,7 +36,7 @@
   Pruning snips the weak branches after the fact.
   An alpha tax (a charge per leaf) decides which branches to fire.
 
-  KEY: THE PURITY TRAP -- why you need a formula to pick the best question
+  THE PURITY TRAP -- why you need a formula to pick the best question
      Question A: splits 20 patients into [10 sick, 10 well] and [10 sick, 10 well].
      Question B: splits 20 patients into [20 sick, 0 well] and [0 sick, 20 well].
      Both questions split the pile exactly in half. But Question A learned nothing --
@@ -337,7 +337,7 @@
         if 5400 > alpha   -> keep the doctor   (earns its keep)
         if 5400 < alpha   -> FIRE him, merge rooms back   (not worth the tax)
 
-  !! WARN: THIS ALPHA IS ADDED ON, NOT A DENOMINATOR
+  THIS ALPHA IS ADDED ON, NOT A DENOMINATOR
      A straight-stick rule called Ridge also had an alpha.
      Ridge guesses by a weighted sum, one dial (multiplier) per column.
      Ridge's alpha sat in the BOTTOM of a fraction, roughly dial = top / (bottom + alpha).
@@ -349,7 +349,7 @@
      Do not carry the denominator picture across.
      As the tax climbs, the leaf count drops.
 
-  KEY: MAX_DEPTH IS A CEILING; CCP_ALPHA IS A TAX
+  MAX_DEPTH IS A CEILING; CCP_ALPHA IS A TAX
      max_depth: chops ALL corridors at height N.  blunt, same haircut everywhere.
      ccp_alpha: snips weak twigs ANYWHERE, keeps strong deep branches.  smart, uneven.
 
@@ -363,7 +363,7 @@
 
   Between these alphas, nothing changes.  The tree pre-computes them.
 
-  !! WARN: CCP_ALPHAS (THE LIST) vs CCP_ALPHA (THE KNOB)
+  CCP_ALPHAS (THE LIST) vs CCP_ALPHA (THE KNOB)
      ccp_alphas = a list the machine hands you (all the meaningful snip-points)
      ccp_alpha  = a single knob you set on a new tree ("how hard to prune")
      Plural = the menu.  Singular = the setting.
@@ -385,11 +385,11 @@
   branch gets snipped.  The tree doesn't invent alphas -- it reads them
   off its own branches.
 
-  !! WARN: SNIP != REBUILD
+  SNIP != REBUILD
      The tree was ALREADY fully grown.  Pruning collapses rooms; it does
      NOT rebuild from scratch.  No new .fit.  Just room closure.
 
-  !! WARN: ALPHA VALUES COME FROM THE TREE, NOT THE TEACHER
+  ALPHA VALUES COME FROM THE TREE, NOT THE TEACHER
      You do not guess alpha=[0.1, 1, 10].  The tree hands you exact values
      where branches would fire.  Your job is to pick WHICH one works best
      on the exam -- not to make up alphas.

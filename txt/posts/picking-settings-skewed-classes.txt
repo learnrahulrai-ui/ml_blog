@@ -31,7 +31,7 @@
   Fourth: how do you grade a machine that is sorting into not two bins but ten?
   Answer these and you have left the textbook behind and stepped onto the workshop floor.
 
-  KEY: THE DROP IN THE OCEAN TRAP -- why ROC looks great when the machine is terrible
+  THE DROP IN THE OCEAN TRAP -- why ROC looks great when the machine is terrible
      Fraud pile: 99,900 honest transactions, 100 thieves.
      The machine blocks 2,000 honest people (false alarms).
      False alarm rate = 2,000 / 99,900 = 0.02. Just 2%.
@@ -131,7 +131,7 @@
   In code the whole hunt is a Pipeline -- scaler plus classifier -- handed to GridSearchCV;
   that code is at the end of the post, and it carries one subtle trap worth stating now:
 
-  !! WARN: BUILD THE RULER INSIDE EACH FOLD, NOT BEFORE THE HUNT
+  BUILD THE RULER INSIDE EACH FOLD, NOT BEFORE THE HUNT
      A subtle leak hides here.
      The ruler means the rescaling formula, built from a column's mean and spread.
      Suppose you scale all of X_train ONCE up front, then pass that pre-scaled pile in.
@@ -164,7 +164,7 @@
     standard ruler:  x~ = (x - mean) / spread        -> centred at 0, spread ~= 1
     pinch-to-fit:    x~ = (x - min)  / (max - min)   -> bounded in [0, 1]
 
-  !! WARN: PINCH-TO-FIT IS FRAGILE AROUND OUTLIERS
+  PINCH-TO-FIT IS FRAGILE AROUND OUTLIERS
      One outlier stretches the range. Say house areas run 500-3000 sq ft but one mansion
      hits 15000. The (max-min) denominator becomes 14500. Every other house gets squished
      into the bottom 17% of [0, 1]. The outlier sits at 1.0; the rest cluster near 0. The
@@ -208,7 +208,7 @@
     email spam:        ALARM  = real email deleted        -> precision matters more
     fraud detection:   MISSED = fraud slips through -> loss -> recall matters
 
-  KEY: PRECISION REDUCES ALARMS; RECALL REDUCES MISSES
+  PRECISION REDUCES ALARMS; RECALL REDUCES MISSES
      Precision = caught sick rows / all rows the machine calls sick, so it falls when ALARM rises.
      Choosing which to prioritise is a business or clinical decision, not a machine decision.
      The machine gives you a curve of deals.
@@ -280,7 +280,7 @@
 
     area under precision-recall curve -> average precision (AP)
 
-  KEY: USE PRECISION-RECALL CURVES WHEN THE PILE IS SKEWED
+  USE PRECISION-RECALL CURVES WHEN THE PILE IS SKEWED
      Sometimes one class is rare -- fraud, disease in a healthy population, defects on a line.
      Then the precision-recall curve tells you more than the ROC curve.
      The reason: the precision-recall curve does not use the true-negative count (CLEAR) at all.
@@ -358,7 +358,7 @@
     Micro (count-weight)   large classes dominate              overall accuracy on all
                                                                labels matters
 
-  KEY: MACRO WHEN CLASSES ARE EQUALLY IMPORTANT OR PILE IS SKEWED
+  MACRO WHEN CLASSES ARE EQUALLY IMPORTANT OR PILE IS SKEWED
      With a skewed pile, micro averaging is swamped by the majority class. If type C cancer
      (10 patients) scores F1=0.34 and the machine is otherwise excellent on the common
      types, micro averaging buries type C's failure. Macro averaging gives type C equal

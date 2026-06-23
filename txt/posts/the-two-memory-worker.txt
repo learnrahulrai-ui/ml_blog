@@ -29,7 +29,7 @@
   this again where it matters. We build it by hand anyway, because the mechanism is the
   lesson.
 
-  KEY: THE SPLIT BRAIN TRAP -- why one memory channel is not enough
+  THE SPLIT BRAIN TRAP -- why one memory channel is not enough
      If you only have one memory state, every new word partially overwrites the old one.
      You need to remember the subject from 20 words back while reading the verb now.
      But the verb wipes out part of the subject's trace. Context fades.

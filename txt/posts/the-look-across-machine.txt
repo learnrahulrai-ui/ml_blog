@@ -28,7 +28,7 @@
   because there is no chain, every word computes at the same time -- parallel -- fast on a GPU.
   That parallelism is precisely why this architecture took over: it scales.
 
-  KEY: THE BLIND SPOT TRAP -- why a plain dense layer cannot slide across an image
+  THE BLIND SPOT TRAP -- why a plain dense layer cannot slide across an image
      A dense layer wires every pixel to every neuron. The network memorises the position
      of every feature: it learns "eye is at pixel (100, 50)".
      If the same face shifts 2 pixels to the left, those wires have never fired together.

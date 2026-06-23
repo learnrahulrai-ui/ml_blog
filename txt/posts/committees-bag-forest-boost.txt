@@ -35,7 +35,7 @@
     BOOSTING (Line of fixers, tiny stumps):
       stump-1 --> stump-2 (fixes stump-1's leftovers) --> stump-3 --> ... --> SUM
 
-  KEY: THE ECHO CHAMBER TRAP -- why 100 identical trees do not help
+  THE ECHO CHAMBER TRAP -- why 100 identical trees do not help
      If every tree reads the same full dataset and uses the same split rule,
      all 100 trees make the exact same mistake at the exact same time.
      A committee of 100 clones is no smarter than 1 clone.
@@ -69,7 +69,7 @@
 
     bagging's answer for this patient = AVERAGE(150, 162, ..., 158) = ~154
 
-  !! WARN: STICKY NOTE != TREE
+  STICKY NOTE != TREE
      The sticky note is a PILE of people (deals, votes nothing).
      The tree is BUILT from that pile (the cut-lines, casts the vote).
 
@@ -80,7 +80,7 @@
      the 200 trees would be identical and averaging would do nothing.
      The randomness IS the point.
 
-  KEY: ONE TREE = JUMPY GARBAGE. 200 TREES AVERAGED = STEADY AND TRUSTWORTHY.
+  ONE TREE = JUMPY GARBAGE. 200 TREES AVERAGED = STEADY AND TRUSTWORTHY.
      The jumps point in different directions and cancel when averaged.  This is the
      "wisdom of the crowds."  No single tree improved -- only the average did.
 
@@ -111,7 +111,7 @@
      150.  The average steadies the five jumpy votes into one -- and 200 votes
      steady it far more.
 
-  !! WARN: 80 (STICKY NOTE SIZE) != 200 (TREES) != 442 (TOTAL PEOPLE)
+  80 (STICKY NOTE SIZE) != 200 (TREES) != 442 (TOTAL PEOPLE)
      Each sticky note holds ~80 people drawn WITH REPLACEMENT from 354.
      Each sticky note builds exactly ONE tree.
      200 sticky notes -> 200 trees -> 200 votes per patient.
@@ -193,7 +193,7 @@
   Over a whole tree (and 300 trees), every column gets many chances.  No single strong
   column can dominate every cut of every tree.
 
-  !! WARN: THE CUT HIDES COLUMNS, NOT PEOPLE
+  THE CUT HIDES COLUMNS, NOT PEOPLE
      All people are still split up/down.  Nobody is hidden.  The knob limits which
      COLUMNS the cut may consider when choosing its question.
 
@@ -206,11 +206,11 @@
   Fewer columns per cut -> trees differ more -> averaging steadier -> better exam error.
   But too few -> each tree is too weak.  Sweep all three and let the exam-error pick.
 
-  KEY: FOREST = BAGGING + ONE KNOB (max_features)
+  FOREST = BAGGING + ONE KNOB (max_features)
      The only real news is that each cut sees fewer columns.  Everything else --
      bootstrap piles, build trees, average guesses, OOB exam -- is identical to bagging.
 
-  !! WARN: WHY FOREST USES MORE TREES THAN BAGGING
+  WHY FOREST USES MORE TREES THAN BAGGING
      Bagging used 200 trees.  Forest uses 300.  Why?
 
        bagging:  each tree sees all 10 columns at every cut.
@@ -264,7 +264,7 @@
   validation, watch the validation error at each step (staged_predict), pick the
   pass where validation error bottomed out.
 
-  !! WARN: WATCH THE VALIDATION CURVE, NOT THE TRAINING CURVE
+  WATCH THE VALIDATION CURVE, NOT THE TRAINING CURVE
      Training error keeps dropping (the line of fixers keeps fixing its own pile).
      Validation error drops, bottoms out, then RISES -- that bottom is where to stop.
      Beyond it, each new stump is memorising study-pile noise.
@@ -308,7 +308,7 @@
   ones missed.  By round 3, the leftovers are near zero -- the line has learned
   the pattern.
 
-  !! WARN: YOU DO NOT SORT THE LEFTOVER COLUMN
+  YOU DO NOT SORT THE LEFTOVER COLUMN
      Each round, the tree looks at the 10 body measurements (bmi, age, bp, ...)
      and asks "which column gives the cleanest cut on the CURRENT target?"
      The target changes (answer -> leftover1 -> leftover2), but the 10 columns
@@ -420,12 +420,12 @@
 
     The jump = how much the honest score worsens when that column is destroyed.
 
-  !! WARN: SCRAMBLE DOES NOT REBUILD THE FOREST
+  SCRAMBLE DOES NOT REBUILD THE FOREST
      The 300 trees were built ONCE, before any scrambling.  Scramble happens
      on the EXAM pile only.  Trees stay frozen.  You don't rebuild.  You
      don't re-bootstrap.  You don't re-fit.  Just shuffle and re-grade.
 
-  !! WARN: THE JUMP IS NOT "CAUSATION"
+  THE JUMP IS NOT "CAUSATION"
      If radius and perimeter are correlated, scrambling one might make the
      other look more important than it is.  The jump tells you "how much the
      forest relied on this column" -- not "how much this column matters in
@@ -527,13 +527,13 @@
     But some start at 100, some at 120.  ICE shows this spread.
     PDP hides it by averaging into one smooth line.
 
-  !! WARN: PDP HIDES THE MESS.  ICE SHOWS IT.
+  PDP HIDES THE MESS.  ICE SHOWS IT.
      PDP = one line, average of all people at each fake value.
      ICE = 88 lines, one per person, their individual guess at each fake value.
      If the tree had more cuts, different people would jump at different fake
      values -- ICE lines spread apart.  PDP smooths them into a single curve.
 
-  !! WARN: THE COUNT IS FAKE COLUMN VALUES, NOT TREES
+  THE COUNT IS FAKE COLUMN VALUES, NOT TREES
      For each fake bmi value: 88 people each walk 300 trees -> 88 averages.
      You test 20 fake bmi values -> 20 points per person -> 88 lines.
      The trees don't change.  Only the fake column value changes.

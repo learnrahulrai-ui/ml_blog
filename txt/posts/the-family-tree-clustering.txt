@@ -24,7 +24,7 @@
   time, until everyone is in one giant family.  Then you read the tree and cut it wherever
   you like -- and the height of your cut decides how many groups you get.
 
-  KEY: THE CHAIN LINK TRAP -- what "distance between two groups" even means
+  THE CHAIN LINK TRAP -- what "distance between two groups" even means
      Once you marry two countries into a group, how do you measure that group's distance
      to a third country? They are not a point anymore -- they are a shapeless blob.
      Option A (single-linkage): measure the two CLOSEST border towns.
@@ -165,7 +165,7 @@
                         marries the two groups whose joining grows that total the least
                         -> tends to give even, round, similar-sized groups
 
-  KEY: THE LINKAGE IS A REAL CHOICE, NOT A DEFAULT TO IGNORE
+  THE LINKAGE IS A REAL CHOICE, NOT A DEFAULT TO IGNORE
      Single, complete, average, and Ward can build genuinely different trees from the
      SAME sheet of gaps.  Ward is the common default for blob-like data; single linkage
      is the one to reach for when groups are long thin shapes (and the one to fear when

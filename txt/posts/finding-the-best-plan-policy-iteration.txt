@@ -31,7 +31,7 @@
   That collapse is the toy, named again loudly at the end. Trust the recipe; treat the rest as
   a sketchpad.
 
-  KEY: THE INFINITE REGRET TRAP -- how to judge a move whose reward comes 10 steps later
+  THE INFINITE REGRET TRAP -- how to judge a move whose reward comes 10 steps later
      You move a pawn to E4. Ten moves later, you win.
      Was E4 good, or did you just get lucky?
      The immediate reward for E4 is 0. You cannot judge it by that.

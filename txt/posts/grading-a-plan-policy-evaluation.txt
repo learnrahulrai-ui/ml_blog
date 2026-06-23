@@ -33,7 +33,7 @@
   loudly, in the box at the end -- so the one place we hide a sum behind a single arrow is never
   smuggled past you. Trust the recipe; treat the rest as a sketchpad.
 
-  KEY: THE HALL OF MIRRORS TRAP -- why you cannot just calculate worths directly
+  THE HALL OF MIRRORS TRAP -- why you cannot just calculate worths directly
      Spot A's worth depends on spot B's worth. Spot B's worth depends on spot A's worth.
      Worth(A) = reward + Worth(B).  Worth(B) = reward + Worth(A).
      The equations loop back on each other. You cannot solve them in a straight line.

@@ -36,7 +36,7 @@
   We need to know how much it would jump around if the world had dealt us a slightly
   different crowd.
 
-  KEY: THE ONE UNIVERSE TRAP -- how to fake 200 experiments from one dataset
+  THE ONE UNIVERSE TRAP -- how to fake 200 experiments from one dataset
      To know your error margin, you need to run the experiment 1,000 times.
      But you only have money and data for one run.
      THE FIX: the Bootstrap. Treat your one dataset as if it were the entire universe.
@@ -133,7 +133,7 @@
   the machine cannot even tell you whether that column pushes the answer UP or DOWN. The
   honest report is: "this column might be doing nothing at all."
 
-  !! WARN: 95% MEANS CHOP 2.5% EACH END -- NOT 25%
+  95% MEANS CHOP 2.5% EACH END -- NOT 25%
      It is dangerously easy to reach for the quartiles from way back in Chapter 1 and chop
      25% off each end. That is the wrong band by a mile.
 
@@ -161,7 +161,7 @@
      largest;  400 - 10 - 10 = 380 stay in the middle.  More re-deals, a smoother
      band -- but always 2.5% sliced off each tail, never 25%.
 
-  !! WARN: COUNTING NOTES IS NOT MEASURING WIDTH
+  COUNTING NOTES IS NOT MEASURING WIDTH
      Every dial's 95% band keeps the same NUMBER of values in the middle -- 190 of the 200,
      always. That count tells you nothing. The trust is in the WIDTH: the gap between the
      number on the 5th note and the number on the 195th.
@@ -195,7 +195,7 @@
   over-confident, the same self-graded-exam lie from Chapter 1. The left-out third keeps it
   honest for free.
 
-  KEY: THE BAND IS THE REPORT, NOT THE SINGLE NUMBER
+  THE BAND IS THE REPORT, NOT THE SINGLE NUMBER
      One dial value is a point; the wobble band is the truth around it. A wide band on the
      error means the machine itself is shaky -- it would guess differently if the patients
      had been different. Reporting the band instead of the bare number is the difference
@@ -309,7 +309,7 @@
         rmse_oob_ci95 = (float(np.quantile(rmses, 0.025)), float(np.quantile(rmses, 0.975)))
         return rmse_oob_mean, rmse_oob_ci95
 
-  !! WARN: THE ~ IS THE WHOLE FREE EXAM
+  THE ~ IS THE WHOLE FREE EXAM
      np.isin marks True for everyone who WAS drawn into the deal. The ~ flips it, leaving
      True for everyone who was NOT. Drop the ~ and you grade the machine on the very
      patients it just studied -- the self-graded exam again, fake and over-confident. The

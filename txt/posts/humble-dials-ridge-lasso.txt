@@ -36,7 +36,7 @@
   by faking a hundred trips to the hospital.
   Part 3 lifts the hood and shows where the dials come from in the first place.
 
-  KEY: THE TWIN COLUMNS TRAP -- what happens when two columns say the same thing
+  THE TWIN COLUMNS TRAP -- what happens when two columns say the same thing
      Suppose column 1 is "weight in pounds" and column 2 is "weight in ounces."
      They carry identical information -- one is just 16 times the other.
      The machine can set dial-1 = 1,000,000 and dial-2 = -62,500.
@@ -219,7 +219,7 @@
      1.0120 ~= 4.07.  Even a gentle a = 1 drags the plain dial of 343 down to about
      4.1 -- the bump on the bottom does nearly all the work.
 
-  KEY: RIDGE SHRINKS ALL, ZEROES NONE, AND SOLVES IN ONE SHOT
+  RIDGE SHRINKS ALL, ZEROES NONE, AND SOLVES IN ONE SHOT
      The fine's pull dies at zero, so every dial lands small-but-alive.
      The bump-on-the-diagonal makes the solve exact.
      As a bonus it also cures a crash that plain least-squares can hit: when two columns
@@ -273,7 +273,7 @@
 
   At the end you COUNT THE SURVIVORS -- the dials that did not snap to zero.
 
-  KEY: LASSO SHRINKS, SNAPS WEAK DIALS TO ZERO, AND HAS NO FORMULA
+  LASSO SHRINKS, SNAPS WEAK DIALS TO ZERO, AND HAS NO FORMULA
      Because the fine never lets up, Lasso zeroes out weak columns entirely.
      So it tells you which columns earned their keep.
      The corner that buys that gift also costs the clean solve.
@@ -474,7 +474,7 @@
     ridge_cv_mse_mean = ridge_cv.cv_values_.mean(axis=0)
     lasso_cv_mse_mean = lasso_cv.mse_path_.mean(axis=1)
 
-  !! WARN: RIDGECV QUIETLY DROPS THE CURVE IF YOU HAND IT A CUSTOM CV
+  RIDGECV QUIETLY DROPS THE CURVE IF YOU HAND IT A CUSTOM CV
      RidgeCV will only save its error curve (cv_values_) when it uses its own built-in
      leave-one-out check. The moment you pass it a custom splitter -- cv=kf -- it silently
      stops storing those values, and the later line ridge_cv.cv_values_ crashes with an

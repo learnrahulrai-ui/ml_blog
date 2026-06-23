@@ -20,7 +20,7 @@
   that catches this disease, then four machines that each carry a different cure, and we judge
   all five honestly on a pile none of them was allowed to touch.
 
-  KEY: THE MEMORIZER'S CURSE -- why a perfect student fails the exam
+  THE MEMORIZER'S CURSE -- why a perfect student fails the exam
      A machine that memorises every pixel of the study pile scores 100% on that pile.
      But when a new photo arrives with slightly different noise or background,
      the machine has never seen it and has no rule to apply -- only memorised facts.

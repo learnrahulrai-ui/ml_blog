@@ -47,7 +47,7 @@
   Each photo is one of 10 clothing kinds (T-shirt, trouser, pullover, dress, coat, sandal, shirt, sneaker, bag, ankle boot).
   The goal: read a NEW photo, name the kind.
 
-  KEY: THE SHREDDED PHOTO PARADOX -- why you cannot feed pixels one-by-one to a language machine
+  THE SHREDDED PHOTO PARADOX -- why you cannot feed pixels one-by-one to a language machine
      A language transformer reads one token at a time and loses track of early tokens by the end.
      A 28x28 photo has 784 pixels. Feed them one by one: by pixel 784 the machine has forgotten
      pixel 1, and pixel 1 was the top-left corner of the shirt collar.
