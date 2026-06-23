@@ -34,14 +34,26 @@
   That is it.
   Two moves, on a loop.
 
-  THE FROZEN CENTRE TRAP -- why the chicken-and-egg is not a problem
-     The two moves seem circular: to assign dots you need centres, but to find
-     centres you need to know which dots belong together. Where do you start?
-     THE FIX: guess. Drop K centres anywhere at random.
-     The first assignment is rough -- but it gives good enough centres to improve.
-     Each loop can only lower the total gap from each dot to its centre, never raise it.
-     The loop converges because it is always walking downhill. It stops when neither
-     move changes anything. The starting guess is wrong but the loop fixes it.
+  The two moves look circular. To put each dot with a centre you need centres; to
+  place the centres you need to know which dots group together. Chicken, egg:
+
+      need centres --------> to assign dots
+            ^                      |
+            |                      v
+      need grouped dots <----- to place centres
+
+  So break the circle by cheating: drop K centres down anywhere at all. The first
+  sort is sloppy -- but a sloppy grouping still gives better centres than the
+  random ones, and better centres give a less sloppy grouping:
+
+      random centres --> rough piles --> better centres --> tighter piles --> ...
+
+      total gap (each dot to its centre):
+        84  -->  51  -->  38  -->  33  -->  31  -->  31      (stops)
+
+  Each move can only shrink that total gap, never grow it -- the loop always walks
+  downhill, so it has to stop, and it stops when neither move changes a thing. The
+  opening guess is wrong; the loop does not mind, because repairing it is the loop.
 
   JOB
 

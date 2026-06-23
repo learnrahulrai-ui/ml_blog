@@ -27,19 +27,22 @@
   There is the mean, which is the middle value of a column (add every value, divide by how many).
   There is the spread, which is how far the values sit from that middle.
   There is a ruler, which measures the gap between two rows.
-  The trap is also simple.
-  One column measured in hundreds shouts louder than one measured in tens.
-  Which means the gap between two rows gets hijacked by the loudest column.
-  So you must put every column on the SAME ruler first.
+  The catch is also simple. Put two columns side by side -- Murder, which runs 0
+  to about 17, and Assault, which runs 0 to about 292 -- and ask for the gap
+  between two states, Alabama and Arizona:
 
-  THE MISSING TAPE MEASURE PARADOX -- why raw distance fails in many columns
-     If you try to measure distance in 100 dimensions using raw values:
-     one column measured in hundreds (like Assault: 0 to 292) shouts much louder
-     than one measured in tens (like Murder: 0 to 17).
-     The gap between two rows is almost entirely the Assault gap -- Murder is irrelevant.
-     You have secretly built a one-column machine dressed up as a two-column machine.
-     THE FIX: standardise. Shift every column to spread 1 (z-score).
-     Then each column speaks with equal volume, and every dimension contributes to the gap.
+      Murder gap :  13.2  vs   8.1   ->    5.1
+      Assault gap:   236  vs   294   ->     58
+      total gap  =  sqrt(5.1^2 + 58^2) = sqrt(26 + 3364) ~ 58.2
+
+  The 58 from Assault swallows the 5.1 from Murder almost whole -- whatever the
+  two states differ by in murder rate is lost in the rounding. You meant to
+  compare on two columns and secretly compared on one, the loud one, dressed up
+  as two.
+
+  So before measuring any gap, stand every column on the same ruler: shift each
+  to the same spread, a z-score. Now Murder and Assault speak at equal volume and
+  every column casts a real vote in the gap.
 
   THE SHEET
 

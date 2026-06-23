@@ -22,13 +22,31 @@
   it climbs to the answer with NO gradient, no per-slot feedback, nothing but a single
   "how wrong" number per guess and the freedom to let bad guesses die.
 
-  THE INCEST TRAP -- why picking only the best creates a stuck population
-     If you only breed the 2 highest-scoring solutions, their children are nearly identical.
-     In 5 generations the entire population is clones of one small corner of the search space.
-     The machine found a local hill and stopped. The mountain next door goes unexplored.
-     THE FIX: mutation and diverse selection. After breeding, randomly flip some genes.
-     Also pick parents by tournament (best of 3 random candidates), not just top-2 overall.
-     That guarantees some diversity survives. Diversity is what lets the search escape the hill.
+  Suppose you keep only the two best guesses each round and breed them. Their
+  children come out almost identical to them, and those children breed more of
+  the same. Watch the whole population fold into one tiny spot:
+
+      gen 1    *   *    *   *  *      (spread across the land)
+      gen 2      *  **  *
+      gen 3        ***
+      gen 5        #              everyone identical, parked on a small hill
+
+      score
+        ^          _
+        |         / \                  the small hill the crowd froze on
+        |   _____/   \_______
+        |  /                 \      /\
+        |_/                   \____/  \__    the real mountain, never visited
+        +----------------------------------> search space
+
+  The crowd climbed the nearest bump and stopped. Nothing alive carries a gene
+  that points at the mountain next door, so the mountain is never found. Breeding
+  only the best eats its own variety.
+
+  So protect disagreement on purpose. After breeding, randomly flip a few genes;
+  and pick parents by small tournaments -- best of three drawn at random -- instead
+  of crowning the top two. Some oddballs always slip through, and an oddball is the
+  only thing that can wander off the hill and stumble onto the mountain.
 
   TOY NUMBERS, REAL RECIPE. One line of honesty up front: score, flip, share, pick, cut,
   tweak, replace -- exactly a real genetic algorithm, nothing faked or skipped. The NUMBERS

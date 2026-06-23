@@ -18,14 +18,29 @@
   but everybody should: the ethics of sorting people into piles. Plain language first,
   standard labels at the very bottom.
 
-  THE HIDDEN GALAXY PARADOX -- why round-cluster methods miss elongated shapes
-     K-means and hierarchical clustering look for compact, roughly circular groups.
-     But some structure is elongated -- a galaxy's arm is a long swooping curve,
-     not a ball. K-means would split that arm into 10 separate clusters because
-     the dots at opposite ends are far from each other in straight-line distance.
-     THE FIX: density-based clustering (DBSCAN). Instead of measuring centre-to-centre
-     distance, trace connected chains of density. Any region where dots are close enough
-     to each other forms one cluster, regardless of its overall shape.
+  Picture a galaxy's arm: a long curve of dots, each close to its neighbour, but
+  the two ends nowhere near each other.
+
+      *                                       *
+        *                                  *
+          *  *  *  *  *  *  *  *  *  *  *
+      |<--------- one real group ---------->|
+      A                                     Z
+
+  K-means and hierarchical clustering ask only one thing: how far is each dot
+  from a CENTRE, in a straight line? Drop a centre in the middle of that arm and
+  the tips A and Z sit miles from it -- further than dots in a whole separate
+  blob. So the method tears the single arm into ten little balls and calls them
+  ten groups. It knows only round.
+
+  Stop measuring to a centre, then. Measure dot to dot and follow the chain: if A
+  touches its neighbour, and that one touches the next, they are one group no
+  matter how the curve bends:
+
+      A - * - * - * - * - * - * - * - * - Z      one chain held together = one cluster
+
+  That is density-based clustering (DBSCAN): a cluster is any run of dots packed
+  closely enough to hold hands, whatever shape the run happens to make.
 
   HOW MANY PILES? -- THE K YOU PICK
 

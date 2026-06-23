@@ -36,16 +36,26 @@
   by faking a hundred trips to the hospital.
   Part 3 lifts the hood and shows where the dials come from in the first place.
 
-  THE TWIN COLUMNS TRAP -- what happens when two columns say the same thing
-     Suppose column 1 is "weight in pounds" and column 2 is "weight in ounces."
-     They carry identical information -- one is just 16 times the other.
-     The machine can set dial-1 = 1,000,000 and dial-2 = -62,500.
-     The two terms cancel exactly and you get the same prediction.
-     Or it can set dial-1 = a billion. An infinite seesaw with no floor.
-     The machine is unstable -- dials blow up but the guess stays the same.
-     Ridge fixes this by charging a tax on large dials: both get pulled toward zero.
-     Lasso fixes it more aggressively: it drives one twin dial to exactly zero,
-     selecting one column and deleting the other.
+  Suppose two columns secretly say the very same thing -- weight in pounds, and
+  weight in ounces. One is just sixteen times the other, so they move in lockstep:
+
+      pounds :  10    20    30
+      ounces : 160   320   480        always 16x -- not one new fact between them
+
+  Now the machine is sitting on a loose seesaw. Whatever it leans onto pounds it
+  can take back off ounces, and the guess never moves:
+
+      dial_pounds = +1,000,000          term: +10,000,000
+      dial_ounces =    -62,500          term: -10,000,000
+                                        sum:            0      (and 0 either way)
+
+  Both dials can run off to a billion and back while the prediction sits perfectly
+  still. The answer is stable; the dials are wildly unstable -- and unstable dials
+  are fragile dials, ready to swing on the next scrap of noise.
+
+  Ridge bolts the seesaw down by taxing big dials: every dial is pulled toward
+  zero, so neither twin can bloat. Lasso goes harder and drives one twin's dial to
+  exactly zero -- keeping one column and deleting the other outright.
 
   A NEW SHEET: THE DIABETES PILE
 

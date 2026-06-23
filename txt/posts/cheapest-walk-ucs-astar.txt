@@ -36,15 +36,31 @@
   breadcrumb (a dict of predecessors, used to reconstruct the path at the end). Each is fully
   spelled out where it first appears below.
 
-  THE BLIND MAZE TRAP -- why a cost-only search wastes time in the wrong direction
-     Uniform cost search spreads like a puddle: it explores every road with equal cost
-     before committing to any direction. It WILL find the cheapest path -- but it
-     explores the entire map outward in a ring, including all the roads leading away
-     from the goal, before it reaches the goal.
-     THE FIX: A*. Add a compass (h) that estimates the remaining cost to the goal.
-     Each slip on the pile gets scored as cost-so-far + compass-estimate.
-     The puddle now pushes harder in the direction the compass says is promising.
-     It still finds the optimal path (as long as the compass never overestimates).
+  Uniform cost search has one virtue and one vice. It always finds the cheapest
+  path -- but with no idea where the goal is, it looks everywhere first, spreading
+  out from the start like a puddle, one equal-cost ring at a time:
+
+          . . . . .
+        . . . . . . .
+      . . . S . . . . . G      the puddle reaches G only after soaking every
+        . . . . . . .          road around S -- including the ones pointing
+          . . . . .            the wrong way
+
+  Every road leading away from G is walked before G is reached. On a big map that
+  is most of the work spent facing backwards.
+
+  So hand the search a compass: at each spot, an estimate h of how far the goal
+  still is. Score every option as (cost so far) + (compass guess), and the puddle
+  stops being round -- it bulges toward G:
+
+          . . .
+        . . . . .
+      . . . S . . . . . G      same cheapest path, far fewer roads touched,
+        . . . .                because the compass keeps shoving the search
+          . .                  toward the goal
+
+  That is A*. As long as the compass never overestimates the distance left, it
+  still returns the cheapest path -- it just stops wandering to find it.
 
   A MACHINE THAT ADDS COSTS -- AND "S→B" IS NOT A NUMBER
 

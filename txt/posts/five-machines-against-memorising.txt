@@ -20,14 +20,25 @@
   that catches this disease, then four machines that each carry a different cure, and we judge
   all five honestly on a pile none of them was allowed to touch.
 
-  THE MEMORIZER'S CURSE -- why a perfect student fails the exam
-     A machine that memorises every pixel of the study pile scores 100% on that pile.
-     But when a new photo arrives with slightly different noise or background,
-     the machine has never seen it and has no rule to apply -- only memorised facts.
-     Memorising noise is not learning. It is copying.
-     THE FIX: force the machine to FORGET. Drop random connections (Dropout) so it
-     cannot lean on any single clerk. Add noise to the input. Shrink big dials.
-     When you cannot memorise, you are forced to learn the underlying rule instead.
+  A machine big enough can simply memorise the study pile -- every pixel of every
+  photo, filed away beside its answer:
+
+      study photo #1 (cat) --> stored --> recalled: CAT     right
+      study photo #2 (dog) --> stored --> recalled: DOG     right
+          :                                          :      100% on the study pile
+
+  Then a new photo arrives: the same cat, a little more grain, the background
+  shifted a few pixels:
+
+      new photo (cat) --> not in the files --> ??? --> wrong
+
+  A perfect score, and it learned nothing. It holds facts, not a rule, so the
+  first unfamiliar row leaves it blank. Memorising noise is copying, not learning.
+
+  So take the memorising away. Black out random clerks on each pass (dropout) so
+  it cannot lean on any single one; jitter the input; shrink the big dials.
+  Starved of room to store the answers, the machine is forced to find the rule --
+  the thing that still holds in photos it has never seen.
 
   If you have not read Chapter 7, here is all you need. A network is rooms of clerks. A clerk
   multiplies each number it receives by a learned DIAL, adds them with a NUDGE, and either
