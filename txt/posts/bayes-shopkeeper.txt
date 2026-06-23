@@ -445,6 +445,35 @@
   # One loop per visit. Loops here hide the per-patient coin flip, not the Bayes
   # logic -- 100,000 explicit if-statements would say the same thing more slowly.
   # -----------------------------------------------------------------------
+  Nothing above needs a computer -- a head-count of a round 1000 patients gives the
+  exact answer. Visit 4, the rare disease (1% sick, machine catches 90%, glitches 10%):
+
+      1000 patients
+        |
+        +-- 10 sick (1%)      --beep 90%-->    9 true beeps
+        |                     --miss 10%-->    1 walks out clean (into the wild)
+        |
+        +-- 990 well (99%)    --glitch 10%-->  99 false beeps
+                              --quiet 90%-->   891 sent home
+
+      beeps total    = 9 + 99 = 108
+      P(sick | beep) = 9 / 108 = 0.0833
+
+  The 99 false beeps from the huge well crowd swamp the 9 true ones -- the whole rarity
+  illusion, in nine and ninety-nine. Every visit is the same head-count, different dials:
+
+      visit  prevalence  catch  glitch    per 1000:  true  false   P(sick|beep)
+      -----  ----------  -----  ------               ----  -----   ------------
+        4       1%        90%    10%                   9     99       0.0833
+        5      30%        60%    20%                 180    140       0.5625
+        6       2%        80%     5%                  16     49       0.2462
+        9      30%        80%    20%                 240    140       0.6316
+      (visit 7 adds a sniffle, visit 8 runs two machines in series -- same head-count
+       idea, worked in those visits above; theory 0.1306 and 0.7568)
+
+  And for the day you meet a computer, the same answers from a random simulation that
+  converges on those head-counts:
+
   import random
 
   def run_simulation(n=100_000):
@@ -556,29 +585,13 @@
 
   run_simulation()
 
-  Sample output:
+  Sample output -- 100,000 patients, the simulation landing within a hair of each
+  hand head-count:
 
-      Simulating 100,000 patients through the shopkeeper's corridor...
-      ==============================================================
-      Visit 4 (1% disease):  beeps=10834, true=898, glitch=9936, missed->wild=102
-        P(D|Beep)=0.0829   Theory: 0.0833
-      --------------------------------------------------------------
-      Visit 5 (30% disease): beeps=32043, true=18012, glitch=14031, missed->wild=11988
-        P(Sick|Beep)=0.5621   Theory: 0.5625
-      --------------------------------------------------------------
-      Visit 6 (2% disease):  beeps=6808, true=1596, glitch=4660, missed->wild=404
-        P(D|Beep)=0.2345   Theory: 0.2462
-      --------------------------------------------------------------
-      Visit 7 (D+Sniffle):   beeps=72948, disease_beeps=9508, other=63440, missed->wild=497
-        P(D|Beep)=0.1304   Theory: 0.1306
-      --------------------------------------------------------------
-      Visit 8 (two machines): double_beeps=7367, sick=5598, healthy=1769, sick missed->wild=4402
-        P(H|M1,M2)=0.7599   Theory: 0.7568
-      --------------------------------------------------------------
-      Visit 9 (red-coat):    beeps=38012, true=24041, glitch=14060, missed->wild=6049
-        P(D|Beep)=0.6323   Theory: 0.6316
-        (_red_coat was generated but never used -- irrelevant to the answer)
-      ==============================================================
+      Visit 4 (1% disease):   P(D|Beep)    = 0.0829   Theory: 0.0833
+      Visit 5 (30% disease):  P(Sick|Beep) = 0.5621   Theory: 0.5625
+      Visit 6 (2% disease):   P(D|Beep)    = 0.2345   Theory: 0.2462
+      ... (visits 7, 8, 9 likewise within ~0.01 of theory: 0.1306, 0.7568, 0.6316)
 
   FORMULA (IT WAS HERE ALL ALONG)
 
