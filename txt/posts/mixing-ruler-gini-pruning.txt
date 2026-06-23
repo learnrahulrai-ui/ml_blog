@@ -436,52 +436,56 @@
     5 round-errors     --avg-->  alpha score   (rung 3)
     alpha scores       --MIN-->  alpha_hat     (top, not avg)
 
-  COMMON TRIPWIRES I CAUGHT
+  A few wrong pictures I had to untangle, each one a thing that feels right.
 
-  These are the exact wrong pictures I had to untangle -- each one cost me
-  real time until I saw the concrete shape of the mistake:
+  ccp_alphas and ccp_alpha read like one word abbreviated two ways. They are two
+  different things:
 
-    TRIPWIRE 1:  ccp_alphas (the list) == ccp_alpha (the knob)
-       WRONG: they're the same thing, just abbreviated differently.
-       RIGHT: ccp_alphas = a list of numbers the machine hands back (the menu).
-              ccp_alpha  = one number YOU set on a new tree (the setting).
-              Plural = menu.  Singular = knob.  Two different things.
+      ccp_alphas  (plural)   = a list the machine hands back      -- the MENU
+      ccp_alpha   (singular) = one number YOU set on a new tree   -- the KNOB
 
-    TRIPWIRE 2:  pruning_path needs a fitted tree first
-       WRONG: you must .fit a tree, then call pruning_path on it.
-       RIGHT: cost_complexity_pruning_path(X, y) builds its OWN tree
-              internally just to read the menu.  No .fit needed.
-              The call IS the builder.
+  Plural is the menu of options; singular is the dial you pick from it.
 
-    TRIPWIRE 3:  alpha values are invented by the teacher
-       WRONG: someone picked [0, 0.01, 0.1, 1] as reasonable guesses.
-       RIGHT: the tree computes each alpha from its own branches.
-              Each alpha = one branch's saved-mess.  The teacher never
-              touches the numbers.
+  It looks like you must grow a tree, then read its pruning menu off it:
 
-    TRIPWIRE 4:  snip a branch = rebuild the tree
-       WRONG: after pruning, the tree refits from scratch on the pruned
-              structure.
-       RIGHT: the tree was ALREADY fully grown.  ccp_alpha just collapses
-              rooms.  No new .fit.  No rebuild.  Just closure.
+      WRONG:  tree.fit(X, y)  ->  pruning_path(tree)
+      RIGHT:  cost_complexity_pruning_path(X, y)    builds its own tree inside
 
-    TRIPWIRE 5:  in boosting, you sort the leftover column each round
-       WRONG: each round, you re-sort bmi/age/bp against the new leftover
-              column to find the best cut.
-       RIGHT: you sort bmi/age/bp the SAME way every round.  The column
-              order never changes.  Only the TARGET column changes
-              (answer -> leftover1 -> leftover2 -> ...).  Sorting the
-              leftover column is a waste -- the tree asks "which column
-              gives the cleanest cut", and the leftover column is not one
-              of the 10 body measurements.
+  The call IS the builder -- it grows a throwaway tree internally just to read the
+  menu. No separate .fit.
 
-    TRIPWIRE 6:  Rung 2 and Rung 3 are the same type of average
-       WRONG: they're both "mean of some numbers."
-       RIGHT: Rung 2 averages misses ACROSS PEOPLE in one fold.
-              Rung 3 averages fold-errors ACROSS FOLDS for one alpha.
-              Different granularity, different job.  Rung 2 = per-fold,
-              Rung 3 = cross-fold.  Mixing them is the classic cross-val
-              confusion.
+  The alpha values look like reasonable guesses someone typed, [0, 0.01, 0.1, 1]. They
+  are not chosen at all:
+
+      each branch's saved-mess  ->  one alpha
+      the tree computes them from its own branches; the teacher never touches them
+
+  Pruning sounds like it refits the tree from scratch on the smaller shape. It does
+  not:
+
+      grow fully ONCE  -->  ccp_alpha collapses some rooms  -->  done
+                            (no new .fit, no rebuild, just closure)
+
+  The tree was already grown; alpha only folds rooms shut.
+
+  In boosting it feels like you re-sort the columns against the new leftover each
+  round. You do not:
+
+      round 1:  sort bmi/age/bp   ->  target = answer
+      round 2:  sort bmi/age/bp   ->  target = leftover1      (the SAME column sort)
+      round 3:  sort bmi/age/bp   ->  target = leftover2
+
+  Only the TARGET changes (answer -> leftover -> leftover); the column order is fixed,
+  and the leftover is not one of the 10 body columns to sort on anyway.
+
+  Last, both rungs are "a mean of some numbers", so they blur together -- but they
+  average across different things:
+
+      Rung 2:  mean of misses ACROSS PEOPLE, inside one fold       (per-fold)
+      Rung 3:  mean of fold-errors ACROSS FOLDS, for one alpha     (cross-fold)
+
+  Different granularity, different job -- mixing them is the classic cross-validation
+  confusion.
 
   ANY ROOM HAS A WRONGNESS -- NOT JUST LEAVES
 

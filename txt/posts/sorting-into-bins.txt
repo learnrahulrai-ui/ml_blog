@@ -419,80 +419,74 @@
      It tells you how large a share of the sick lumps the machine catches.
      Accuracy tells you nothing about which mistake you are making.
 
-  COMMON TRIPWIRES I CAUGHT
+  A fair few wrong pictures cost me real time here; each one is a thing that looks
+  right. (A few names below belong to later posts, each defined right where it
+  appears.)
 
-  These are the exact wrong pictures that cost me real time.
-  Each one stopped me cold until I drew the concrete shape of the mistake.
-  A few names below belong to later posts; each is defined right where it appears,
-  so nothing here needs another post.
+  Wrap the scaler's input in extra brackets and it sees one dimension too many:
 
-    TRIPWIRE 1:  Extra brackets around the scaler input -> 3D error
-       WRONG: scaler.fit([X_train])
-       RIGHT: scaler.fit(X_train)
-       The error says "Found array with dim 3. StandardScaler expected <= 2."
-       Wrapping X_train in [ ] adds a third layer.
-       The scaler expects a 2D table, rows by columns.
-       It does not expect a 2D table inside a list.
+      scaler.fit([X_train])   ->  3D  ->  "Found array with dim 3. expected <= 2"
+      scaler.fit(X_train)     ->  2D  ->  fine (rows by columns)
 
-    TRIPWIRE 2:  Running the label-swap cell twice -> map fails -> NaN -> crash
-       WRONG: run the M->1, B->0 cell a second time.
-       RIGHT: restart the kernel and run all cells top-to-bottom once.
-       First run: 'M' 'B' 'M' -> map works -> 1 0 1 (whole numbers).
-       Second run: 1 0 1 -> map finds no 'M' or 'B' -> NaN.
-       NaN means "not a number", an empty marker.
-       NaN poisons every later step.
-       There is no shortcut after NaN has landed.
+  The scaler wants a 2D table, not a 2D table tucked inside a list. Drop the [ ].
 
-    TRIPWIRE 3:  Predicting on raw X instead of scaled X
-       WRONG: log_reg.predict(X_test)
-       RIGHT: log_reg.predict(X_test_scaled)
-       Scaled means each column shifted to average 0 and spread 1.
-       The machine set its dials on scaled numbers.
-       Raw numbers send it into a different space.
-       So the dials misfire.
+  Run the M->1, B->0 cell once and it works; run it a second time and it poisons
+  everything:
 
-    TRIPWIRE 4:  confusion_matrix order -- truth first, guess second
-       WRONG: confusion_matrix(y_pred, y_test)
-       RIGHT: confusion_matrix(y_test, y_pred)
-       sklearn always wants the truth first and the guess second.
-       That is the same order as accuracy_score and recall_score.
-       Swapping the two flips the grid.
+      first run:    'M' 'B' 'M'   --map-->   1 0 1      (good)
+      second run:    1   0   1    --map-->   NaN        (no 'M'/'B' left to find)
 
-    TRIPWIRE 5:  predict_proba column 0 vs column 1
-       WRONG: y_proba = model.predict_proba(...)[:, 0]
-       RIGHT: y_proba = model.predict_proba(...)[:, 1]
-       Column 0 = P(well), the chance of well.
-       Column 1 = P(sick), the chance of sick -- the one you want.
-       Using column 0 makes sick people score LOW and well people HIGH.
-       The ROC curve is the plot of true-positive rate against false-positive rate
-       as you slide the cutoff; AUC is the area under that curve, from 0 to 1, where
-       higher is better and 0.5 is coin-flip.
-       Flipping the columns drops the ROC curve below the diagonal, so AUC falls below 0.5.
+  NaN ("not a number") then spreads into every later step, with no recovery. Restart
+  the kernel and run top to bottom once.
 
-    TRIPWIRE 6:  C=0.1 is heavy punishment, not light
-       WRONG: C small = light leash (sounds like "small = mild").
-       RIGHT: lambda is the strength of the penalty that shrinks the dials toward 0.
-       C is sklearn's knob for that penalty, and C = 1/lambda.
-       So small C means large lambda, which means a heavy squeeze.
-       C = 0.1 -> lambda = 10, a tight leash.
-       C = 1000 -> lambda = 0.001, nearly free.
+  The machine set its dials on SCALED numbers, so feed it raw numbers at predict time
+  and the dials misfire:
 
-    TRIPWIRE 7:  Scaling and L2 are not the same thing
-       WRONG: "I scaled the columns, so the dials are already under control."
-       RIGHT: L2 is the penalty that adds the sum of the squared dials to the leftover,
-       which pushes every dial toward 0 so no single one dominates.
-       Scaling fixes the INPUTS, putting columns on one ruler.
-       L2 fixes the DIALS, keeping no single dial from dominating.
-       Even after scaling, a dial can grow huge if the machine over-trusts one column.
-       So both are needed.
+      fit on:      X_scaled        (avg 0, spread 1)
+      predict on:  X_test          WRONG -- a different space
+      predict on:  X_test_scaled   RIGHT -- the space the dials learned in
 
-    TRIPWIRE 8:  predict vs predict_proba
-       WRONG: use predict for the ROC curve (gives only 0 and 1).
-       RIGHT: use predict_proba (gives the raw chance before any cutoff).
-       The ROC curve is the plot of true-positive rate against false-positive rate
-       as the cutoff slides.
-       predict gives two unique values -> the ROC curve has two dots -> useless.
-       predict_proba gives a different number per row -> the full sweep.
+  sklearn always wants truth first, guess second -- swap them and the whole grid
+  flips:
+
+      confusion_matrix(y_test, y_pred)   RIGHT  (truth, guess)
+      confusion_matrix(y_pred, y_test)   WRONG  -- transposes the grid
+
+  Same order as accuracy_score and recall_score: truth, then guess.
+
+  predict_proba returns two columns; grab the wrong one and "sick" scores low:
+
+      [:, 0]  =  P(well)         <- the wrong column
+      [:, 1]  =  P(sick)         <- the one you want
+
+  Take column 0 and sick people score LOW, well people HIGH -- the ROC curve (true-
+  positive rate against false-positive rate as the cutoff slides) drops below the
+  diagonal, and its area, AUC, sinks under the 0.5 coin-flip line.
+
+  C small reads like "small = mild leash". It is the opposite, because C = 1/lambda,
+  and lambda is the strength pulling dials toward 0:
+
+      C = 0.1    ->  lambda = 10       a heavy squeeze, tight leash
+      C = 1000   ->  lambda = 0.001    nearly free
+
+  Small C means big lambda means a hard pull toward zero. Small C is strong, not mild.
+
+  "I scaled the columns, so the dials are already controlled" -- two different jobs:
+
+      scaling:  fixes the INPUTS  -- puts columns on one ruler
+      L2:       fixes the DIALS   -- adds sum of squared dials to the leftover, each pulled toward 0
+
+  Even on scaled inputs a dial can balloon if the machine over-trusts one column. You
+  need both.
+
+  Last, feed plain predict to the ROC curve and it collapses, because predict hands
+  back only 0/1:
+
+      predict        ->  {0, 1}        ->  ROC has 2 dots  ->  useless
+      predict_proba  ->  raw chance     ->  the full cutoff sweep
+
+  The ROC slides a cutoff across the raw chances; hard 0/1 labels leave nothing to
+  slide.
 
   F1: WHY THE HARMONIC MEAN
 
