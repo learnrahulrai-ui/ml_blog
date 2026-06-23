@@ -713,17 +713,25 @@
         Dense(1,  activation='sigmoid'),       # S-curve exit: output is a probability
     ])
 
-    BY-HAND FORWARD PASS, IN CODE (REPRODUCES THE 0.622 FROM ABOVE)
+    BY-HAND FORWARD PASS, UNROLLED -- the three rooms in a row, no loop. One patient,
+    30 measured columns in; watch the shape shrink room by room:
+
+        x [30]  --room 1-->  A1 [16]  --room 2-->  A2 [8]  --room 3-->  out [1]
+                  W1: 30x16            W2: 16x8             W3: 8x1
+                  relu                 relu                 sigmoid
+
     def forward_pass_by_hand(X, weights):
-        A = X.copy()
-        for i in range(0, len(weights) - 2, 2):
-            W, b = weights[i], weights[i+1]
-            Z = A @ W + b
-            A = np.maximum(0.0, Z)             # zero-out rule between rooms
-        W, b = weights[-2], weights[-1]
-        Z = A @ W + b
-        Z = np.clip(Z, -80, 80)                # clip before the S-curve (why: Part 2)
-        return 1.0 / (1.0 + np.exp(-Z))        # S-curve at the exit
+        W1, b1, W2, b2, W3, b3 = weights       # 3 rooms = 3 (dial-sheet, nudge) pairs
+
+        Z1 = X  @ W1 + b1                       # room 1: 30 numbers in -> 16 raw scores
+        A1 = np.maximum(0.0, Z1)               # zero-out rule (relu) between rooms
+
+        Z2 = A1 @ W2 + b2                       # room 2: 16 -> 8
+        A2 = np.maximum(0.0, Z2)
+
+        Z3 = A2 @ W3 + b3                       # room 3: 8 -> 1 raw score
+        Z3 = np.clip(Z3, -80, 80)              # clip before the S-curve (why: Part 2)
+        return 1.0 / (1.0 + np.exp(-Z3))       # S-curve exit -> the 0.622 from above
 
   The model is built but not yet trained -- its dials are still random. Teaching those dials
   to fall down the wrongness hill, worked by hand with the chain rule, is Part 2.

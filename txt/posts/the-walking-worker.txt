@@ -547,6 +547,16 @@
 
   EMBEDDING_DIM = 32
 
+  The shapes flowing through the three floors, one review of 100 word-numbers in:
+
+      [100]          one review: 100 word-numbers (0 = pad)
+        |  floor 1 (notepad): swap each number for its 32-number note
+      [100 x 32]     a sheet -- 100 word-rows, 32 meaning-numbers each
+        |  floor 2 (walking worker): boil the whole sheet down to one memory
+      [32]           the final 32-number memory (the whole review, summarised)
+        |  floor 3 (one clerk + S-curve)
+      [1]            one chance: liked (near 1) or not (near 0)
+
   model_rnn = Sequential()
   model_rnn.add(Input(shape=(MAX_LEN,)))                            # 100 word-numbers in
   model_rnn.add(Embedding(input_dim=VOCAB_SIZE,
