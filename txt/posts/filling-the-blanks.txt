@@ -23,15 +23,25 @@
   empty -- nobody watches everything.  Fill a blank well and you can say "you, who has not
   seen this film, will probably rate it 4.5 stars" -- a recommendation.
 
-  THE ZERO GRAVITY TRAP -- why you cannot ignore blank cells, and cannot fill them with zero
-     If you delete every row with a blank, you throw away most of the data.
-     (A user who rated 3 out of 1,700 films has 1,697 blank cells -- delete the row and
-     you lose that user entirely.)
-     If you fill blanks with 0, you tell the machine this user gave the movie 0 stars --
-     which is a real rating, not a missing one.
-     PARADOX: doing nothing destroys the data. Doing the obvious thing (zero) lies to the machine.
-     THE FIX: imputation. Estimate the blank by asking the row's nearest neighbours what THEY
-     scored that column. A calculated best guess beats zero and beats deletion.
+  A ratings sheet is mostly holes -- a user who rated 3 films out of 1,700 leaves
+  1,697 blanks:
+
+      Ann  [ 5    .    4    .    . ]        . = never rated
+
+  Two obvious moves, both wrong. Delete every row with a blank, and Ann -- with her
+  1,697 gaps -- disappears, and so does nearly everyone else:
+
+      delete rows with blanks  -->  almost the whole sheet is gone
+
+  Fill the blanks with 0 instead, and you have just told the machine Ann gave those
+  films zero stars -- a real, scathing rating she never made:
+
+      Ann  [ 5    0    4    0    0 ]        the 0s are a lie the machine believes
+
+  Doing nothing throws the data away; doing the easy thing invents ratings. So do
+  neither: estimate each blank from the rows most like Ann's -- what did her nearest
+  neighbours score that same film? A calculated guess fills the hole, beating both
+  deletion and a fake zero. That estimate is imputation.
 
   THE SHEET FULL OF HOLES
 

@@ -68,14 +68,24 @@
                -- mouse moves unpredictably; (3) sequential -- a move now changes what comes
                next; (4) multi-agent -- two players, the mouse actively escapes.
 
-  THE MYOPIC AGENT TRAP -- how an agent knows if a step was good
-     The agent takes one step. The game does not end. Was the step good?
-     The agent has no idea -- the reward from that step might only arrive 100 moves later.
-     THE FIX: the value function. The agent learns to predict the future.
-     Instead of grading "did I get a reward THIS step?", it grades "what is the expected
-     total future reward from the state I just entered?"
-     A step looks locally pointless but may lead to a high-value state.
-     The value function lets the agent grade locally without waiting 100 steps to see the end.
+  The agent takes one step. The game does not end, and no reward appears. Was the
+  step any good?
+
+      step --> new state --> (nothing) --> ... 100 moves ... --> +reward?
+
+  Judged on what just happened, the step scores 0 -- but its real payoff might be a
+  hundred moves down the line. Grade only the immediate reward and you punish every
+  move that quietly sets up a later win.
+
+  So have the agent learn to predict the future instead. Rather than "did I get a
+  reward THIS step?", it asks "what total reward can I expect from the state I just
+  landed in?":
+
+      state just entered  -->  value = expected total reward from here to the end
+
+  A move that looks locally pointless can drop the agent into a high-value state,
+  and the value function says so on the spot -- no waiting 100 steps to see the end.
+  That predicted worth is the value function.
 
   THE ROOM
 
