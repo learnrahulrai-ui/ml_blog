@@ -395,18 +395,17 @@
   memory = np.tanh(W * 0.8 + U * 0.0 + nudge)   # word 1: "not" -> signal 0.8
   print(f"word 1 ('not'):  memory = {memory:.4f}")
 
-  for word_num in range(2, 9):
-      memory = np.tanh(W * 0.0 + U * memory + nudge)   # subsequent words: no new content
-      print(f"word {word_num}:          memory = {memory:.4f}")
-  # word 1 ('not'):  memory = 0.6640
-  # word 2:          memory = 0.5810
-  # word 3:          memory = 0.5234
-  # word 4:          memory = 0.4803
-  # word 5:          memory = 0.4465
-  # word 6:          memory = 0.4190
-  # word 7:          memory = 0.3961
-  # word 8:          memory = 0.3766
-  # ... by word 80, the signal from "not" is near zero. The network ticks 1 for "good."
+  # each later word adds no new content (word_stick = 0), so memory = tanh(U * memory):
+  # pure decay, worked one word at a time --
+  memory = np.tanh(U * memory)   # word 2: tanh(0.664) = 0.5810
+  print(f"word 2:  memory = {memory:.4f}")
+  memory = np.tanh(U * memory)   # word 3: tanh(0.581) = 0.5234
+  print(f"word 3:  memory = {memory:.4f}")
+  memory = np.tanh(U * memory)   # word 4: tanh(0.523) = 0.4803
+  print(f"word 4:  memory = {memory:.4f}")
+  # the signal from "not" keeps fading every word:
+  #   word 5 = 0.4465   word 6 = 0.4190   word 7 = 0.3961   word 8 = 0.3766
+  #   ... by word 80 it is near zero -- the net ticks 1 for "good," having forgotten "not".
 
   # =======================================================================
   # CASE 2: ONE LSTM WORD-STEP, HARDCODED.
