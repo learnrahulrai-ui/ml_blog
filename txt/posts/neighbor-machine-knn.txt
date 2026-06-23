@@ -320,8 +320,11 @@
   so you watch the gaps and the guess 2.83 print back:
 
     GAP RULE ON TWO ROWS (NEW ROW AT (3, 2, 5, 4)) -- SUBTRACT, SQUARE, ADD, ROOT
-    gap_A = ((3-4)2 + (2-2)2 + (5-6)2 + (4-3)2) ** 0.5   # sqrt(3)   = 1.73
-    gap_B = ((3-8)2 + (2-9)2 + (5-1)2 + (4-9)2) ** 0.5   # sqrt(115) = 10.72
+       new    [ 3  2  5  4 ]
+       row A  [ 4  2  6  3 ]   gap -1  0 -1  1  ->  sqrt(1+0+1+1)    = sqrt(3)   = 1.73
+       row B  [ 8  9  1  9 ]   gap -5 -7  4 -5  ->  sqrt(25+49+16+25)= sqrt(115) = 10.72
+    gap_A = ((3-4)**2 + (2-2)**2 + (5-6)**2 + (4-3)**2) ** 0.5   # sqrt(3)   = 1.73
+    gap_B = ((3-8)**2 + (2-9)**2 + (5-1)**2 + (4-9)**2) ** 0.5   # sqrt(115) = 10.72
     print(round(gap_A,2), round(gap_B,2))     # 1.73 10.72  -> A is the closer neighbour
 
     ASK THE 3 CLOSEST, ONE COLUMN (INCOME). WORKING PILE, FIVE (INCOME, PRICE) ROWS:
@@ -334,7 +337,16 @@
     g5 = abs(5.0 - 7.3)    # 2.3  -> price 3.5
     print(round(g1,1), round(g2,1), round(g3,1), round(g4,1), round(g5,1))   # 0.6 1.0 1.2 2.5 2.3
 
-    K=3: AVERAGE THE PRICES OF THE THREE SMALLEST GAPS (G1, G2, G3)
+    SORT THE FIVE ROWS BY GAP, NEAREST FIRST; KEEP THE TOP 3:
+
+        gap   price
+        0.6   3.4    <-+
+        1.0   2.7      |  the 3 nearest -> their prices get averaged
+        1.2   2.4    <-+
+        2.3   3.5       (4th, dropped)
+        2.5   1.5       (5th, dropped)
+
+    K=3: AVERAGE THE PRICES OF THE THREE SMALLEST GAPS
     guess = (3.4 + 2.7 + 2.4) / 3     # 8.5 / 3 = 2.83
     print(round(guess, 2))            # 2.83
 
@@ -363,7 +375,7 @@
     knn.fit(X_train, y_train)          # stores pile; learns mu, sd on working rows
     pred = knn.predict(X_test)         # same ruler -> measure gaps -> average
 
-    rmse = mean_squared_error(y_test, pred)  0.5   #  0.5 means square root
+    rmse = mean_squared_error(y_test, pred) ** 0.5   #  ** 0.5 means square root
     print(round(rmse, 3))
 
   And the hunt for the best k -- try each candidate, score it by rotating folds, keep the
