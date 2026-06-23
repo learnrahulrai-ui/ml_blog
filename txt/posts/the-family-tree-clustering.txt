@@ -238,57 +238,82 @@
      sign counts from the end: -1 is the last row, -2 the second-to-last.  Z[-1, 2]
      reads the root's gap without you ever counting the rows.
 
-  COMMON TRIPWIRES I CAUGHT
+  A few places this bites, each a thing that looks right.
 
-    TRIPWIRE 1:  Standardise first -- again.
-       Like every distance method in this chapter, hierarchical clustering reads the
-       sheet of gaps, which is hijacked by a loud column unless you put every column
-       on the same ruler first.
+  Hierarchical clustering reads the sheet of gaps, which a loud column hijacks unless
+  every column shares a ruler:
 
-    TRIPWIRE 2:  The dendrogram HEIGHT is the gap, not the count.
-       The vertical axis is the distance at which two groups married.  It is NOT how
-       many dots are in a group.  A tall bar means "these two were far apart and got
-       married late," not "this is a big group."
+      raw gap  ~  the loud column, almost alone
 
-    TRIPWIRE 3:  Different linkage -> different tree.
-       If your tree looks like one long chain, you are probably on single linkage
-       and seeing chaining.  Switch to Ward or complete for compact groups.  Neither
-       is wrong; they answer different questions.
+  Same as every distance method in this chapter: standardise first.
 
-    TRIPWIRE 4:  No K up front, but you still choose in the end.
-       Hierarchical clustering postpones the K decision -- it does not erase it.  You
-       pick K when you cut the tree.  Cutting just below the biggest vertical gap is
-       the usual rule of thumb.
+  The dendrogram's vertical axis is the distance at which two groups married -- NOT
+  how many dots a group holds:
 
-    TRIPWIRE 5:  It is greedy and permanent.
-       Once two groups marry, they never divorce.  An early wedding made on a small
-       gap is locked in even if it looks wrong later.  Like the decision tree in
-       Chapter 5, every step is locally best, not globally guaranteed.
+      height |    ___________           a TALL bar = married LATE, far apart
+             |   |           |           a SHORT bar = married early, close
+             |  _|_         _|_          height never counts members
+             A   B         C   D
 
-    TRIPWIRE 6:  It does not scale cheaply -- count it.
-       The sheet of gaps holds N x (N-1) / 2 numbers.  50 rows -> 1,225 gaps.
-       150 rows -> 11,175.  10,000 rows -> about 50 MILLION, before the first
-       wedding even happens.  K-means is far cheaper at large scale; the family
-       tree shines when you have a few hundred rows and want the whole hierarchy.
+  A tall bar means "these two were far apart," not "this is a big group."
 
-    TRIPWIRE 7:  An unpaired dot is a SINGLE, not a group of one.
-       After the very first wedding you have N-2 singles and 1 pair.  Every
-       dot that has not yet married is still just itself -- do NOT call it
-       "a group of one."  A GROUP is formed by a wedding; a dot that has not
-       married is a SINGLE.  Calling lone dots "groups" inflates the group
-       count and makes later steps confusing to count.
+  One long chain of a tree usually means single linkage, and chaining:
 
-    TRIPWIRE 8:  The biggest merge gap is always the LAST row, never the first.
-       The diary's gap column (column 2) only grows downward -- closest pairs
-       marry first, far-apart camps marry last.  So the root's gap sits in row
-       -1, and reaching for row 0 gives you the SMALLEST gap (the first twins),
-       the exact opposite of what you wanted.
+      single linkage:   A-B-C-D-E-F      (a straggly chain)
+      Ward / complete:  (A B)  (C D)     (compact balls)
 
-    TRIPWIRE 9:  .idxmax() hands you the NAME; .max() hands you the NUMBER.
-       Describing each group ("which group runs highest on Murder?"), the question
-       wants a group NAME -- that is .idxmax().  Reaching for .max() returns the
-       value itself, a different question, and the two read almost identically in
-       code.  Say out loud which one the question asks for BEFORE typing the dot.
+  Switch to Ward or complete for compact groups. Neither is wrong -- different
+  questions.
+
+  Hierarchical clustering postpones the K decision; it does not erase it. You pick K
+  when you CUT the tree:
+
+      cut high  -> 2 groups
+      cut low   -> 5 groups
+
+  Cut just below the biggest vertical gap -- the usual rule of thumb.
+
+  Once two groups marry, they never divorce:
+
+      early wedding on a small gap  ->  locked in, even if it looks wrong later
+
+  Like the decision tree in Chapter 5, every step is locally best, never globally
+  guaranteed.
+
+  The sheet of gaps holds N x (N-1)/2 numbers, which explodes:
+
+      50 rows     ->        1,225 gaps
+      150 rows    ->       11,175
+      10,000 rows ->  ~50,000,000      before the first wedding
+
+  K-means is far cheaper at scale; the family tree shines at a few hundred rows when
+  you want the whole hierarchy.
+
+  After the first wedding you have N-2 singles and 1 pair -- a lone dot is a SINGLE,
+  not "a group of one":
+
+      o   o   o   (o-o)        three singles + one pair, NOT four groups
+
+  A group is made by a wedding; calling lone dots "groups" inflates the count and
+  muddles every later step.
+
+  The diary's gap column only grows downward -- closest pairs marry first, far camps
+  last:
+
+      row 0:   gap 0.3    <- the FIRST twins (smallest gap)
+       ...
+      row -1:  gap 9.1    <- the root (biggest gap)
+
+  So the root's gap is the last row; reach for row 0 and you grab the smallest gap,
+  the exact opposite of what you wanted.
+
+  Last, "which group runs highest on Murder?" asks for a NAME, not a value:
+
+      .idxmax()  ->  'group 2'     (the NAME -- what the question wants)
+      .max()     ->  9.4           (the value -- a different question)
+
+  The two read almost identically in code. Say out loud which one the question wants
+  before typing the dot.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

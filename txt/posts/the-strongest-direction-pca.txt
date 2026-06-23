@@ -393,58 +393,84 @@
   Your goal is to lose as little as possible.
   And still be able to draw the picture on flat paper.
 
-  COMMON TRIPWIRES I CAUGHT
+  A fair few places this bites, each a thing that feels right.
 
-    TRIPWIRE 1:  Standardise BEFORE PCA, not after.
-       PCA hunts for the direction of greatest SPREAD.  If one column has
-       spread 1000 (proline) and another has spread 1 (ash), PCA fixates
-       on proline and ignores everything else.  Standardise first or the
-       first PC is just "the column with the largest numbers."
+  PCA hunts the direction of greatest SPREAD, so a column with huge numbers grabs it
+  by default:
 
-    TRIPWIRE 2:  Loadings are NOT correlations.
-       The loading tells you the recipe for the PC.  A loading of 0.5 means
-       "half a part of this column goes into the PC."  It does NOT mean
-       "this column correlates 0.5 with the PC."  Those are different numbers.
+      proline spread ~ 1000     ash spread ~ 1
+      PC1  ->  basically "proline", everything else ignored
 
-    TRIPWIRE 3:  PC1 vs PC2 scatter has near-zero correlation.
-       PCA forces every PC to be at RIGHT ANGLES (uncorrelated) with every
-       other PC.  If your PC1 and PC2 are correlated, something is wrong
-       with the fit or the data.
+  Standardise first, or the first PC is just "the column with the biggest numbers".
 
-    TRIPWIRE 4:  More PCs is not always better.
-       Keeping all 13 PCs means MSE=0, but you also kept all the noise.
-       The point of PCA is to drop the noisy dimensions and keep only the
-       strong patterns.  The 80% cumulative threshold is a rule of thumb,
-       not a law.
+  A loading is the recipe for the PC, not a correlation with it:
 
-    TRIPWIRE 5:  Reconstruction gives you standardised data, not raw.
-       When you inverse_transform from PCA, you get back numbers in the
-       standardised space (mean=0, spread=1), not in the original units.
-       To get raw units, you need to reverse the standardisation as well.
+      loading 0.5  ->  "half a part of this column goes INTO the PC"
+      NOT          ->  "this column correlates 0.5 with the PC"
 
-    TRIPWIRE 6:  explained_variance_ratio_ vs explained_variance_.
-       The ratio is the fraction (0 to 1) of total variance.  The raw
-       variance is the actual spread value.  The ratio is what you use for
-       "how much is captured" and for the cumulative plot.
+  Different numbers entirely -- the loading is a mixing weight.
 
-    TRIPWIRE 7:  The furthest dot from the origin on PC1-PC2 is unusual.
-       In the scatter plot, the dot farthest from (0, 0) is the most
-       extreme wine in the 2D crushed view.  It might be an outlier or
-       just a very distinctive chemical profile.  Worth checking.
+  PCA forces every PC to sit at a RIGHT ANGLE to the others, so their scores come out
+  uncorrelated:
 
-    TRIPWIRE 8:  A low kept-fraction means the PICTURE LIES -- do not read groups off it.
-       When PC1+PC2 keep only, say, 40% of the spread, 60% died in the
-       sideways gaps -- and that lost 60% can hold two dots that are far
-       apart in truth but land on the SAME spot in the drawing.  Two real
-       islands can print as one, or one as two.  Trust the islands you see
-       only when the kept fraction is high (close to 1); a low fraction means
-       the flat page is hiding most of the real placement.
+      PC2
+       |   .  . .
+       |  .  . .         cloud shows no tilt -> PC1 and PC2 uncorrelated
+       +----------- PC1
 
-    TRIPWIRE 9:  The kept fraction divides by the TOTAL spread, not the dot count.
-       The fraction is sum(shadow^2) / sum(stick^2) -- a slice of the spread
-       pie over the whole pie.  Dividing by the number of dots instead gives
-       "spread per dot", a per-head number that is not a fraction at all and
-       will not land between 0 and 1.
+  If your PC1 and PC2 come out correlated, the fit or the data is wrong.
+
+  Keep all 13 PCs and reconstruction is perfect (MSE 0) -- but you kept all the noise
+  with it:
+
+      all 13 PCs:   MSE 0, noise and all   (no compression, no point)
+      top few PCs:  small MSE, noise dropped
+
+  The whole point is to drop noisy dimensions. The 80% cumulative line is a rule of
+  thumb, not a law.
+
+  inverse_transform hands the numbers back in the STANDARDISED space, not raw units:
+
+      PCA inverse_transform  ->  mean 0, spread 1   (still standardised)
+      for real units         ->  also undo the standardisation: x*spread + mean
+
+  Skip the second step and your "reconstructed" wine is in z-scores, not the original
+  scale.
+
+  Two cousins, easy to grab the wrong one:
+
+      explained_variance_        =  the raw spread value
+      explained_variance_ratio_  =  the FRACTION (0..1) of total spread
+
+  Use the ratio for "how much is captured" and for the cumulative plot.
+
+  On the PC1-PC2 scatter, the dot farthest from (0, 0) is the most extreme wine in the
+  crushed view:
+
+      PC2
+       |          . <- farthest from origin = most distinctive (or an outlier)
+       |    .  .
+       +----------- PC1
+
+  Worth a look -- it is either an outlier or a very distinctive profile.
+
+  When PC1+PC2 keep only, say, 40% of the spread, the other 60% died in the sideways
+  gaps -- and that lost 60% can drop two truly-far dots onto the same spot:
+
+      truth (high-D):   A .......... B    (far apart)
+      drawing (40%):    A B               (printed on top of each other)
+
+  Two real islands can print as one, or one as two. Trust the islands you see only
+  when the kept fraction is high; a low fraction means the flat page is hiding most of
+  the real placement.
+
+  Last, the kept fraction is a slice of the spread pie over the whole pie, not a
+  per-head number:
+
+      RIGHT:  sum(shadow^2) / sum(stick^2)       -> lands in [0, 1]
+      WRONG:  sum(shadow^2) / (number of dots)   -> "spread per dot", not a fraction
+
+  Divide by the total spread, never the dot count, or it will not sit between 0 and 1.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------

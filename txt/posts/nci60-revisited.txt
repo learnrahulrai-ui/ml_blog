@@ -226,47 +226,70 @@
   clustering carves the crushed cloud into groups.  Looking at either alone tells half the
   story; together they show both the shape AND the groupings.
 
-  COMMON TRIPWIRES I CAUGHT
+  A few places this wide sheet bites, each a thing that feels right.
 
-    TRIPWIRE 1:  More columns than rows flips your gut feeling.
-       With 6,830 walls and 64 dots, distances bunch up -- everything is roughly
-       equally far from everything.  Do not trust a clustering on all raw columns;
-       crush with PCA first or the gaps are mostly noise.
+  With 6,830 columns and only 64 dots, distances bunch up -- everything sits about
+  equally far from everything:
 
-    TRIPWIRE 2:  Standardise the genes before any distance.
-       Same rule as all of Chapter 6.  A handful of loud genes would otherwise drown
-       out thousands of quiet ones.
+      few columns:   gaps SPREAD out, near and far clearly differ
+      6,830 cols:    o o o o o   all gaps ~ the same -> "nearest" is mostly noise
 
-    TRIPWIRE 3:  Clustering and the real labels need not agree.
-       The blind groups are built from gene SPREAD, not from the cancer names.  A
-       mismatch is not a bug -- it means the genes do not cleanly separate those
-       types.  A match is a pleasant confirmation, not a guarantee.
+  Do not trust a clustering on all raw columns when columns far outnumber rows; crush
+  with PCA first, or the gaps are noise.
 
-    TRIPWIRE 4:  Do not feed the labels into the clustering.
-       It is tempting to "help" the machine by sneaking the type in.  That destroys
-       the whole point.  Cluster blind, grade afterward.
+  And a handful of loud genes would drown thousands of quiet ones in any distance:
 
-    TRIPWIRE 5:  PCA-then-cluster vs cluster-on-raw give different groups.
-       Clustering on the top few PCs (denoised) and clustering on all 6,830 raw
-       columns can hand back different piles.  The PCA-first route is usually
-       steadier on wide data, but say which one you did.
+      loud gene (range 0..900)  +  quiet gene (range 0..2)  ->  gap ~ the loud gene alone
 
-    TRIPWIRE 6:  K-means and the family tree can disagree here too.
-       The two grouping methods need not produce the same piles on the same sheet --
-       K-means assumes round blobs; the tree depends on the linkage.  Comparing them
-       is itself informative: agreement is a good sign the groups are real.
+  Same rule as all of Chapter 6: stand every gene on one ruler before any distance.
 
-    TRIPWIRE 7:  Pile numbers are stickers -- never compare them directly.
-       Tool A's "pile 2" and tool B's "pile 1" can be the EXACT same dots.  Lining
-       the two label columns up and checking "2 == 1?" tests the arbitrary names,
-       not the grouping.  Compare PAIRS (together/apart) instead, which is what the
-       adjusted Rand score does under the hood.
+  The blind groups are built from gene SPREAD, never from the cancer names, so they
+  need not line up:
 
-    TRIPWIRE 8:  Raw agreement flatters random labels; re-zero at chance.
-       Most pairs land apart in any grouping, so apart-plus-apart racks up
-       "agreement" by luck -- two random taggers still score fat above zero.  The
-       adjusted Rand score subtracts that luck baseline, so 0 means chance-level and
-       +1 means identical.  Reading the raw fraction makes nonsense look like a match.
+      blind groups (from genes)   vs   real cancer types
+        match -> genes separate those types cleanly   (pleasant, not promised)
+        miss  -> genes do not separate them            (information, not a bug)
+
+  Which is why you must not "help" by slipping the type into the clustering:
+
+      cluster on genes only    -> blind, then graded against types = honest
+      cluster on genes + type  -> it rediscovers the answer you fed it = cheating
+
+  Cluster blind; grade afterward.
+
+  Clustering the top few PCs and clustering all 6,830 raw columns can hand back
+  different piles:
+
+      raw 6,830 cols  -> piles X    (noisier on wide data)
+      top PCs only    -> piles Y    (denoised, usually steadier)
+
+  The PCA-first route is usually steadier when columns far outnumber rows -- just say
+  which one you ran.
+
+  K-means and the family tree can disagree on the same sheet, too:
+
+      K-means      -> assumes round blobs
+      family tree  -> depends on the linkage rule
+
+  Different assumptions, possibly different piles. When they DO agree, that is a good
+  sign the groups are real.
+
+  Pile numbers are arbitrary stickers -- tool A's "pile 2" can be tool B's "pile 1",
+  the exact same dots:
+
+      tool A:  [2, 2, 1, 0]
+      tool B:  [1, 1, 0, 2]      same grouping, renamed -- "2 == 1?" tests the names
+
+  Compare PAIRS (are these two dots together or apart?), not the labels -- which is
+  what the adjusted Rand score does under the hood.
+
+  Last, most pairs land apart in any grouping, so "apart and apart" piles up agreement
+  by luck:
+
+      two RANDOM taggers  ->  raw agreement already fat above 0   (looks like a match!)
+
+  The adjusted Rand score subtracts that luck baseline: 0 = chance, +1 = identical.
+  Reading the raw fraction makes nonsense look like success.
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
