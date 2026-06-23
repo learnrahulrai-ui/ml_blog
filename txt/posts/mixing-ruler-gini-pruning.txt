@@ -526,10 +526,15 @@
   First the Gini ruler by hand -- the exact four counts from the worked example, each side
   on its own line, no loop, so you watch 0.375, 0.32, and 0.344 print back:
 
+    The split, drawn -- 9 people cut into two buckets:
+
+        below:  [ Y Y Y N ]      3 yes, 1 no   (4 people)
+        above:  [ Y N N N N ]    1 yes, 4 no   (5 people)
+
     BELOW SIDE: 3 YES, 1 NO (4 PEOPLE). GINI = CHANCE TWO RANDOM GRABS DISAGREE
-    below = 1 - (3/4)2 - (1/4)2      # 1 - 9/16 - 1/16 = 0.375
+    below = 1 - (3/4)**2 - (1/4)**2      # 1 - 9/16 - 1/16 = 0.375
     ABOVE SIDE: 1 YES, 4 NO (5 PEOPLE)
-    above = 1 - (1/5)2 - (4/5)2      # 1 - 1/25 - 16/25 = 0.32
+    above = 1 - (1/5)**2 - (4/5)**2      # 1 - 1/25 - 16/25 = 0.32
 
     WEIGHTED BADNESS OF THE CUT: WEIGHT EACH SIDE BY ITS HEAD-COUNT (4 OF 9, 5 OF 9)
     cut = (4/9)*below + (5/9)*above
@@ -540,7 +545,7 @@
     CUT RADIUS > 12 : BELOW {WELL, WELL} PURE -> 0 ; ABOVE {SICK, SICK} PURE -> 0
     radius_12 = (2/4)*0.0 + (2/4)*0.0                      # 0.0  <- perfectly clean
     CUT RADIUS > 15 : BELOW {WELL, WELL, SICK} = 1 SICK 2 WELL ; ABOVE {SICK} PURE
-    below_15  = 1 - (1/3)2 - (2/3)2                    # 4/9 = 0.444
+    below_15  = 1 - (1/3)**2 - (2/3)**2                # 4/9 = 0.444
     radius_15 = (3/4)*below_15 + (1/4)*0.0                 # 0.333
     print(round(radius_12,3), round(radius_15,3))         # 0.0 0.333  -> cut>12 wins
 

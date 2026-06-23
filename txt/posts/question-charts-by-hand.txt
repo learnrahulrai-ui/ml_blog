@@ -465,17 +465,17 @@
     CUT AT 0.09: BELOW={C,B}, ABOVE={D,A}  <- CHAMPION
     mean_below_09 = (97 + 121) / 2    # 109
     mean_above_09 = (135 + 151) / 2   # 143
-    badness_09 = ((97  - mean_below_09)2 + (121 - mean_below_09)2
-               + (135 - mean_above_09)2 + (151 - mean_above_09)2)
-    = 144 + 144 + 64 + 64 = 416
+    badness_09 = ((97  - mean_below_09)**2 + (121 - mean_below_09)**2
+               + (135 - mean_above_09)**2 + (151 - mean_above_09)**2)
+    #  = 144 + 144 + 64 + 64 = 416
     print(mean_below_09, mean_above_09, badness_09)      # 109 143 416
 
     CUT AT 0.15: BELOW={C,B,D}, ABOVE={A}
     mean_below_15 = (97 + 121 + 135) / 3  # 117.667
     mean_above_15 = 151                    # one person
-    badness_15 = ((97  - mean_below_15)2 + (121 - mean_below_15)2
-               + (135 - mean_below_15)2 + (151 - mean_above_15)2)
-    = 427.1 + 11.1 + 300.4 + 0 = 738.6
+    badness_15 = ((97  - mean_below_15)**2 + (121 - mean_below_15)**2
+               + (135 - mean_below_15)**2 + (151 - mean_above_15)**2)
+    #  = 427.1 + 11.1 + 300.4 + 0 = 738.6
     print(round(mean_below_15, 1), round(badness_15, 1)) # 117.7 738.6
 
     CHAMPION OF CHAMPIONS: THE CUT WITH SMALLEST BADNESS
