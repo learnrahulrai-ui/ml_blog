@@ -210,7 +210,7 @@
 
       P(D | Beep) = 9 / 108 = 0.0833.  About 8%.
 
-  The rarity trap: the disease is so rare (only 10 sick among 1,000) that the machine's 10%
+  The rarity illusion: the disease is so rare (only 10 sick among 1,000) that the machine's 10%
   glitch rate on the huge healthy crowd (99 false beeps) drowns the true sick pile (9 beeps).
   A beep means disease only 8% of the time -- even though the machine catches 90% of the sick.
   In the wild: 1 sick patient per 1,000 walked home with a clean paper, undiagnosed.
@@ -236,7 +236,7 @@
 
   ─────────────────────────────────────────────────────────────────────────────────────
 
-  VISIT 6 -- rarity trap again, slightly better machine (2%)
+  VISIT 6 -- rarity illusion again, slightly better machine (2%)
   Given: P(D) = 0.02, P(Beep | D) = 0.80, P(Beep | Healthy) = 0.05.
   Find: P(D | Beep).
 
@@ -332,14 +332,14 @@
       P(D | Beep) = 24 / 38 = 0.6316.  About 63%.
 
   The red-coat scribble never appears in the calculation. The count uses only the beep and
-  the disease rate. The trap is spending mental effort on the red-coat variable -- including
+  the disease rate. The mistake is spending mental effort on the red-coat variable -- including
   it in the denominator, trying to condition on it -- when it has no power to change the
-  answer. The head-count makes the trap visible automatically: you counted beepers, not coat
+  answer. The head-count makes that mistake visible automatically: you counted beepers, not coat
   colours.
 
   ─────────────────────────────────────────────────────────────────────────────────────
 
-  VISIT 10 -- the rarity trap in one table (what actually moves the needle)
+  VISIT 10 -- the rarity illusion in one table (what actually moves the needle)
   Visits 4, 6, and 9 in one row each:
 
       Visit  Disease rate  Catch rate  Glitch rate  P(D|Beep)  Missed per 1,000
@@ -422,10 +422,10 @@
   # Visit 6: true_beeps=16, glitch_beeps=49, total=65, P(D|Beep)=0.2462
   # Visit 6: missed into wild = 4 per 1000 patients
 
-  # The rarity trap visible in one comparison:
-  print(f"\nRarity trap: Visit 4 precision={precision_v4:.1%}, "
+  # The rarity illusion visible in one comparison:
+  print(f"\nRarity illusion: Visit 4 precision={precision_v4:.1%}, "
         f"Visit 6 precision={precision_v6:.1%}")
-  # Rarity trap: Visit 4 precision=8.3%, Visit 6 precision=24.6%
+  # Rarity illusion: Visit 4 precision=8.3%, Visit 6 precision=24.6%
   # Doubling prevalence (1%->2%) with a better machine triples precision.
   # Prevalence is the dominant lever, not the machine's catch rate.
 
@@ -437,7 +437,7 @@
       Visit 5: missed into wild = 12 per 100 patients
       Visit 6: true_beeps=16, glitch_beeps=49, total=65, P(D|Beep)=0.2462
       Visit 6: missed into wild = 4 per 1000 patients
-      Rarity trap: Visit 4 precision=8.3%, Visit 6 precision=24.6%
+      Rarity illusion: Visit 4 precision=8.3%, Visit 6 precision=24.6%
 
   # -----------------------------------------------------------------------
   # PART 2: FULL SIMULATION -- 100,000 patients, every visit verified

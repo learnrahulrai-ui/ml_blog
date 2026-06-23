@@ -140,7 +140,7 @@
      clerk, runs a grid hunt, and why the grid's size is a cost you choose.
 
   In code the whole hunt is a Pipeline -- scaler plus classifier -- handed to GridSearchCV;
-  that code is at the end of the post, and it carries one subtle trap worth stating now:
+  that code is at the end of the post, and it carries one subtle catch worth stating now:
 
   BUILD THE RULER INSIDE EACH FOLD, NOT BEFORE THE HUNT
      A subtle leak hides here.

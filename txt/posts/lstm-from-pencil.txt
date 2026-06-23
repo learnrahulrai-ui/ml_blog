@@ -408,7 +408,7 @@
   That unit carry factor, not luck, is why an added, uncrushed store cures the decay.
   And it is why every gated reader of this kind keeps an additive store at its core.
 
-  TRAPS, EACH AS A CLASH TO SIT WITH
+  WRONG LINES, EACH A CLASH TO SIT WITH
 
   Stated as a wrong line, then a clash, then a fix. Read a wrong line, find a clash yourself,
   then check.

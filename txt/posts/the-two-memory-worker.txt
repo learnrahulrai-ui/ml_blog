@@ -170,7 +170,7 @@
     fresh value   word32 + memory-B                  (it IS the value)
 
   Born-from is the SAME for all four (word32 + memory-B). Applied-to is DIFFERENT for each.
-  The trap is to think a voter reads what it scales -- it does not. The keep-voter never
+  The catch is to think a voter reads what it scales -- it does not. The keep-voter never
   looks at memory-A; it looks at today (word + recent), decides "keep 90%", and THEN does
   0.9 x memory-A.
 

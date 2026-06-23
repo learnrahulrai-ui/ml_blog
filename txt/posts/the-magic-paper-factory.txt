@@ -553,7 +553,7 @@
     after Conv2 (64 papers, no pad)   15 - 3 + 1 = 13   ->  (13, 13, 64)
     after Pool2 (boss halves)         13 / 2 = 6        ->  ( 6,  6, 64)   (drop the half)
 
-  Two traps worth flagging. First: a Conv floor does NOT shrink the grid by halving -- that
+  Two snags worth flagging. First: a Conv floor does NOT shrink the grid by halving -- that
   is the boss's job on the next line. With no padding a Conv floor shrinks only by the small
   -2 the formula gives (30, not 16). Second: the depth after a Conv floor is the number of
   inspectors hired there (32, then 64), never the colour count -- colour meaning died at

@@ -27,7 +27,7 @@
 
   This post asks one innocent-looking question of a sheet of cars.
   Which column drags miles per gallon (MPG) down the hardest?
-  It uses that question to spring two traps that catch almost everyone.
+  It uses that question to spring two snags that catch almost everyone.
   One is a trick of arithmetic.
   The other is a trick of units, and it is the kind of mistake that ends up in published
   papers.
@@ -85,7 +85,7 @@
     <-- most negative                      most positive -->
 
   -0.04 IS SMALLER THAN -0.007
-     The trap: the digit 4 LOOKS bigger than the digit 7.
+     The catch: the digit 4 LOOKS bigger than the digit 7.
      So the eye wants -0.04 to be the larger drag and reaches for it.
      But further below zero is the SMALLER value.
      So "most negative" is the MINIMUM, not the maximum.

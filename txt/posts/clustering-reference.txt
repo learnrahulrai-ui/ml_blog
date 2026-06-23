@@ -14,7 +14,7 @@
 
   This is the appendix to Chapter 6 (Finding Patterns Without Answers). The chapter draws
   each idea by hand; this is a flip-to reference for the loose ends the chapter does not
-  stop for -- two more rulers, the traps that bite, and the part nobody puts in the lab
+  stop for -- two more rulers, the pitfalls that bite, and the part nobody puts in the lab
   but everybody should: the ethics of sorting people into piles. Plain language first,
   standard labels at the very bottom.
 
@@ -103,7 +103,7 @@
   SPILLED COFFEE -- MISSING DATA
 
   Real sheets have holes: someone never answered, a sensor failed, coffee erased a cell.
-  Two tempting moves are both traps:
+  Two tempting moves are both dead ends:
 
     DROP the row    ->  you may throw away most of the sheet, and bias what is left
     WRITE A FAKE    ->  guessing the mean fills the hole but RUINS the fair ruler

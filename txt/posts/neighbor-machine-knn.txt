@@ -99,9 +99,9 @@
   IN HAND: one gap rule -- subtract column by column, square, add, root -- worked on a
   new row (3, 2, 5, 4): row A sat at sqrt(1+0+1+1) = sqrt(3) ~= 1.73, row B at
   sqrt(25+49+16+25) = sqrt(115) ~= 10.72, so A is the neighbour.  This section adds the
-  trap hiding inside that sum: columns measured on different rulers.
+  catch hiding inside that sum: columns measured on different rulers.
 
-  Here is the trap that sinks most first attempts. The gap adds up squared per-column
+  Here is the catch that sinks most first attempts. The gap adds up squared per-column
   differences -- and a column measured in thousands (people) simply drowns out one
   measured in single digits (rooms). Not because population matters more, but because its
   numbers are bigger. An accident of units masquerades as importance. On the raw

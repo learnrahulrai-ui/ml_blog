@@ -167,7 +167,7 @@
 
   (Those four strings are the grader's exact keys -- letter-for-letter.)
 
-  TRAPS, EACH AS A CLASH
+  WRONG TURNS, EACH A CLASH
 
   WRONG TURN  "The causal mask deletes the future tokens -- they are gone."
   ─────────────────────────────────────────────────────────────────────────────────────────

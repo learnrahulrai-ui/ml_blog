@@ -19,7 +19,7 @@
   smallest." Fine -- but where do those numbers actually COME from? Not astrology. This
   closing post puts the whole thing on a blank sheet with nothing but a calculator, the way
   [Chapter 1, Part 3](straight-stick-linear-regression.txt) first did it -- and then it
-  catches one honest trap that nobody warns you about until it is too late.
+  catches one honest snag that nobody warns you about until it is too late.
 
   Gradient descent needs the slope of the miss at the current dial -- a derivative.
   But the machine owns exactly two moves, multiply and add, and has never heard of
@@ -172,7 +172,7 @@
     LADDER = a nice first picture of ONE dial, alone, ignoring the others
     EXACT  = (X^T X)^-1 X^T y, all dials at once, untangling the overlap   <- the real machine
 
-  The teaching trap is to show the LADDER, call it "the dial," and bury the "only if columns
+  The teaching mistake is to show the LADDER, call it "the dial," and bury the "only if columns
   don't overlap" as small print after you have already built on it. Don't be fooled, and
   don't fool anyone else: name it EXACT or LADDER up front.
 

@@ -304,7 +304,7 @@
   >> NOTE: THIS LAB WAS SYNTHETIC, SO A FULL ANSWER KEY EXISTED
      The sheet was generated, and the true rating behind every blank sat in a second
      file.  Grading the finished marks against it: agreement around 0.89, typical miss
-     around 0.24, on the humbled scale.  One trap inside that grading: humble the
+     around 0.24, on the humbled scale.  One catch inside that grading: humble the
      answer key with the SAME movie middles as the working sheet, not with its own --
      otherwise the two sheets sit in different frames and the comparison lies.
 

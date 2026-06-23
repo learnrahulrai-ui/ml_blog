@@ -465,7 +465,7 @@
       walkers          serial       through the chain  built into the walk
       Transformer      parallel     direct, no fade    must add position marks
 
-  TRAPS, EACH AS A CLASH
+  WRONG TURNS, EACH A CLASH
 
   WRONG TURN  "WANT, HAVE, GIVE -- which one actually scores the match?"
   ─────────────────────────────────────────────────────────────────────────────────────────

@@ -112,7 +112,7 @@
       through A:   g + h = 1 + 1   = 2
       through B:   g + h = 10 + 10 = 20
 
-  The one trap to burn in: you STEER with g + h, but the answer you REPORT is g alone. The guess
+  The one catch to burn in: you STEER with g + h, but the answer you REPORT is g alone. The guess
   h is a steering wheel. You never pay the guess. (g + h says which road to try next. g says what
   it actually cost.)
 
@@ -189,7 +189,7 @@
 
   Compare: greedy = 101. A* = 20. Difference: 81 tolls saved.
 
-  > A* added the toll it had already paid, so the 100-toll trap from A showed up the moment A*
+  > A* added the toll it had already paid, so the 100-toll surprise from A showed up the moment A*
   > looked through A. That is why g + h beats h alone: h steers; g corrects the lie.
 
   "ADMISSIBLE" -- THE GUESS NEVER LIES HIGH
@@ -209,7 +209,7 @@
       guess never lies high (admissible)  ->  A* always finds the cheapest path  (optimal)
       guess lies high       (inadmissible)->  A* can return a dearer path         (not optimal)
 
-  The trap the quiz always dangles: "a heuristic that consistently underestimates -- is that
+  The catch the quiz always dangles: "a heuristic that consistently underestimates -- is that
   bad?" NO. Underestimating (guess too LOW) keeps A* optimal. The flaw is always OVERestimating.
   Underestimating can only make A* over-explore a little -- it never makes it skip the cheap road.
 

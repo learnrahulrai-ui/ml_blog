@@ -320,7 +320,7 @@
 
   Dropout fires during practice only.
 
-  TRAPS, EACH AS A CLASH
+  WRONG TURNS, EACH A CLASH
 
   WRONG TURN  "Which tag scores? WANT or HAVE?"
   ─────────────────────────────────────────────────────────────────────────────────────────

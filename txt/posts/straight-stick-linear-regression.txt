@@ -75,7 +75,7 @@
       J(beta) = ||X*beta - y||^2 = sum_i (yhat_i - y_i)^2
 
   J is bowl-shaped -- its second-slope (Hessian) 2*X^T X is never-negative -- so any flat
-  point is the global bottom. No local traps, no searching.
+  point is the global bottom. No false bottoms, no searching.
 
   FINDING THE DIALS: THE FLAT-POINT EQUATIONS
 

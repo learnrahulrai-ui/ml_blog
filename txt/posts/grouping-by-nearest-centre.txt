@@ -213,7 +213,7 @@
 
   IN HAND: two moves on a loop, a tightness to score what they settle on (the six-dot
   grouping foots to 1+0+1 = 2 per pile, 2 + 2 = 4 in all), and the warning that an
-  unlucky start can trap the machine in a poor low spot.  This section adds: how to
+  unlucky start can strand the machine in a poor low spot.  This section adds: how to
   choose K itself.
 
   You picked K by hand.

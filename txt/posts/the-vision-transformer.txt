@@ -73,7 +73,7 @@
 
   Fashion-MNIST arrives as a CSV with one row per photo.
   The usual move: drop the 'label' column, take the rest as pixel values.
-  But there is a trap.
+  But there is a catch.
   This dataset's CSV has a SECOND non-pixel column called 'split'.
   'split' is a string marking which training fold the row came from.
   Drop only 'label' and 'split' rides along among the pixel numbers.
