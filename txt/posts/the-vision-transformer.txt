@@ -47,13 +47,25 @@
   Each photo is one of 10 clothing kinds (T-shirt, trouser, pullover, dress, coat, sandal, shirt, sneaker, bag, ankle boot).
   The goal: read a NEW photo, name the kind.
 
-  THE SHREDDED PHOTO PARADOX -- why you cannot feed pixels one-by-one to a language machine
-     A language transformer reads one token at a time and loses track of early tokens by the end.
-     A 28x28 photo has 784 pixels. Feed them one by one: by pixel 784 the machine has forgotten
-     pixel 1, and pixel 1 was the top-left corner of the shirt collar.
-     THE FIX: cut the photo into patches (e.g., 7x7 squares). Flatten each patch into one
-     "word." Now you have only 16 tokens instead of 784. The transformer handles 16 easily.
-     Each token summarises one region of the photo, not one pixel.
+  A language transformer reads one token at a time and, by the end of a long stream,
+  has lost its grip on the first few. Now pour a 28x28 photo in pixel by pixel -- 784
+  of them in a single row:
+
+      pixel 1   pixel 2   pixel 3   ...........   pixel 784
+      (collar)                                    (hem)
+         \________ faded out by here _____________/
+
+  By pixel 784 the machine has forgotten pixel 1 -- and pixel 1 was the top-left of
+  the shirt collar, exactly the scrap it needs to name the garment. A photo is not a
+  long thin queue of pixels.
+
+  So group the pixels before they ever go in. Cut the photo into 7x7 squares and
+  flatten each square into one "word":
+
+      28x28 photo  -->  cut into 7x7 tiles  -->  16 tokens
+
+  Sixteen tokens instead of 784, and the transformer holds all sixteen with room to
+  spare. Each token sums up one patch of the photo, not one lonely pixel.
 
   Pencil out.
 
