@@ -222,48 +222,56 @@
        on one shared ruler first.
      5. When columns move together, a single dial is shaky; treat it as evidence, not proof.
 
-  COMMON TRIPWIRES I CAUGHT
+  A few places this bites, each a thing that looks right.
 
-    TRIPWIRE 1:  The bare row problem -- names torn off
-       WRONG: try to read model.coef_ directly without knowing which
-              number belongs to which column.
-       RIGHT: zip the names onto the numbers:
-              dials = dict(zip(X.columns, model.coef_)).
-              Now each dial has its column's name attached.
+  model.coef_ comes back as a bare row of numbers with the names torn off:
 
-    TRIPWIRE 2:  Most negative = MIN, not MAX
-       WRONG: -0.04 is bigger than -0.007 by the digits 4 vs 7.
-       RIGHT: -0.04 is further below zero = SMALLER = most negative.
-              A negative dial drags the answer DOWN.  The most negative
-              is the STRONGEST drag downward.  Use min(...), not max(...).
+      model.coef_  ->  [-0.01, -0.04, -0.007, 0.02]      which number is which column?
 
-    TRIPWIRE 3:  min(d, key=d.get) vs plain min(d)
-       WRONG: plain min(d) on a shelf of names -> values returns the
-              smallest NAME alphabetically ("accel"), not the smallest value.
-       RIGHT: min(d, key=d.get) returns the KEY (name) whose VALUE is
-              smallest.  It returns a column name, not the dial number.
+  Zip the names back on so each dial carries its label:
 
-    TRIPWIRE 4:  Raw dials are NOT comparable across columns
-       WRONG: compare -0.007 per pound with -0.04 per horsepower.
-       RIGHT: Each dial is "answer-units per ONE unit of its column."
-              Different columns have different-sized "one units."
-              Put every column on the same ruler (StandardScaler) FIRST,
-              then read the dials for an honest comparison.
+      dials = dict(zip(X.columns, model.coef_))
+        -> {'disp': -0.01, 'horse': -0.04, 'weight': -0.007, 'accel': 0.02}
 
-    TRIPWIRE 5:  Scaling does NOT change the fit -- only the dial
-                 readability
-       WRONG: "I scaled the columns, so the guesses change."
-       RIGHT: Rescale a column and its dial rescales inversely.
-              The guesses, MSE, and R^2 stay exactly the same.
-              Scaling only changes whether dials are COMPARABLE.
+  For the strongest downward drag, -0.04 against -0.007:
 
-    TRIPWIRE 6:  "Holding the others fixed" can be a fiction
-       WRONG: trust each individual dial as "the real effect of this
-              column."
-       RIGHT: When columns move together (displacement, horsepower,
-              weight all rise with car size), the rule cannot cleanly
-              separate their pulls.  A single dial can swing wildly or
-              even flip sign.  Read dials as evidence, not proof.
+      -0.007 ----|--- 0
+      -0.04 -----|             further below zero = SMALLER = strongest drag down
+
+  -0.04 wins, even though "4" feels smaller than "7". Use min(...), not max(...).
+
+  Plain min on a shelf of {name: value} grabs the wrong thing:
+
+      d = {'accel': 0.02, 'horse': -0.04, 'disp': -0.01}
+      min(d)              -> 'accel'    (smallest NAME, alphabetically)
+      min(d, key=d.get)   -> 'horse'    (name whose VALUE is smallest)
+
+  You want the name with the smallest value, not the first name in the alphabet.
+
+  Two raw dials cannot be ranked head to head when their columns wear different units:
+
+      -0.007 per POUND         (one pound is a tiny step)
+      -0.04  per HORSEPOWER    (one horsepower is a big step)
+
+  Put every column on the same ruler (StandardScaler) first; then each dial reads in
+  the same per-spread unit and the comparison is honest.
+
+  "I scaled the columns, so the guesses change" -- they do not. Rescale a column and
+  its dial rescales inversely, cancelling out:
+
+      column x10  ->  dial /10  ->  product unchanged
+      guesses, MSE, R^2:  identical before and after
+
+  Scaling changes only whether dials are COMPARABLE, never the fit itself.
+
+  Last, a dial reads as "the effect of this column, holding the others fixed" -- but
+  when columns move together you can never truly hold them fixed:
+
+      disp, horse, weight  all rise together with car size
+        -> the fit cannot split their pulls cleanly
+        -> one dial can swing wildly, or even flip sign
+
+  Read dials as evidence, not proof.
 
   Nothing above needed a computer -- only pencils, clerks, and patience.
   This last section is for the day you meet one: the same moves, spoken in Python.

@@ -346,60 +346,55 @@
      That single 50 is one dot on the valley curve;  the winning a is wherever the
      row of such dots bottoms out.
 
-  COMMON TRIPWIRES I CAUGHT
+  A few wrong pictures I had to untangle, each one a thing that feels right.
 
-  These are the exact wrong pictures I had to untangle.
-  Each one cost me real time until I saw the plain shape of the mistake:
+  A 95% band sounds like it chops 25% off each end -- borrowing from how quartiles
+  cut the middle 50%. It does not. 95% means KEEP the middle 95%, so chop 2.5% off
+  each end:
 
-    TRIPWIRE 1:  25% chop vs 2.5% chop
-       WRONG: the 95% band chops 25% off each end (the way quartiles cut the middle 50%).
-              A quartile is a cut that splits a sorted pile into quarters; chopping 25%
-              off each end keeps only the middle half.
-       RIGHT: 95% means keep the middle 95% -> chop 2.5% off each end.
-              q0.025 and q0.975 (because 100% - 2.5% = 97.5%).
-              For 200 values: 2.5% of 200 = 5.  Keep index 5 through 194
-              (counting from 0).  Chop 5 smallest and 5 largest.
-              Reaching for 0.25 instead of 0.025 gives a band 10x too narrow.
+      |xxxxx|============== keep the middle 95% ==============|xxxxx|
+       2.5%                                                     2.5%
+      q0.025                                                   q0.975
 
-    TRIPWIRE 2:  RidgeCV silently drops the error curve with a custom CV
-       WRONG: pass cv=kf to RidgeCV and later read ridge_cv.cv_values_.
-       RIGHT: RidgeCV only stores cv_values_ when using its own built-in
-              leave-one-out method.  The moment you give it cv=kf (a custom
-              splitter), it stops storing those values.  Later code that
-              reads ridge_cv.cv_values_ crashes with AttributeError.
-              Fix: do NOT pass cv=kf to RidgeCV.  Pass store_cv_values=True
-              and let it use its default.  (LassoCV has no such quirk.)
+  For 200 values, 2.5% of 200 = 5: drop the 5 smallest and 5 largest, keep index
+  5..194. Reach for 0.25 instead of 0.025 and the band comes out 10x too narrow.
 
-    TRIPWIRE 3:  Counting sticky notes vs measuring width
-       WRONG: a 95% band with 190 notes out of 200 is always the same
-              count, so the band tells you nothing.
-       RIGHT: the COUNT of notes is always 190.  The WIDTH is the gap
-              between the number on the 5th note and the 195th note.
-              Two dials can both keep 190 notes but have wildly different
-              widths:
+  Hand RidgeCV a custom splitter, then read its stored curve, and it crashes:
 
-                bmi-dial:  0.42 to 0.58  -> width 0.16  (tight, trustworthy)
-                s5-dial:  -0.80 to +0.90 -> width 1.70  (wide, crosses 0, useless)
+      cv=kf   +   later ridge_cv.cv_values_   ->   AttributeError (nothing was stored)
 
-              Same 190 notes.  Different trust.  Never confuse count with gap.
+  RidgeCV keeps cv_values_ only when it runs its own built-in leave-one-out. Give it
+  cv=kf and it quietly stops storing them. Pass store_cv_values=True and let it use
+  its default instead. (LassoCV has no such quirk.)
 
-    TRIPWIRE 4:  The ~ symbol is the whole free exam
-       WRONG: np.isin marks the picked people.  Grade on them.
-       RIGHT: np.isin gives True for picked people.  The ~ flips to NOT.
-              Grade on the NOT-picked people.  Without the ~, you grade
-              the machine on the very patients it just studied -- a fake,
-              over-confident score.  One squiggle is the difference between
-              an honest score and a lie.
+  A 95% band always keeps the same COUNT of notes, so the count says nothing -- the
+  WIDTH is the whole story:
 
-    TRIPWIRE 5:  LADDER vs EXACT dials
-       WRONG: the per-column slope (sum((x-xbar)(y-ybar)) / sum((x-xbar)^2))
-              is the true dial.
-       RIGHT: that slope is the correct dial ONLY when no column overlaps
-              another.  Real columns always overlap (bmi, bp, blood serums
-              all drift together).  The true dial needs the untangler
-              (X^T X)^-1 X^T y to share credit between columns that move
-              together.  The simple slope is a LADDER (a crutch, a first
-              picture) -- name it that, never call it "the dial."
+      bmi-dial:   0.42 .. 0.58    -> width 0.16     tight, trustworthy
+      s5-dial:   -0.80 .. +0.90   -> width 1.70     wide, crosses 0, useless
+                  \___ both keep exactly 190 of 200 notes ___/
+
+  Same 190 notes, opposite trust. The width is the gap between the 5th and 195th
+  note, never the count.
+
+  np.isin marks the people you PICKED. Grade on those and you test the machine on the
+  very patients it studied:
+
+      np.isin(...)    -> True for the picked      grading here = open-book = a lie
+      ~np.isin(...)   -> True for the NOT-picked   grading here = honest
+
+  The ~ flips picked to not-picked. That one squiggle is the whole difference between
+  an honest score and an over-confident one.
+
+  Last, the per-column slope, sum((x-xbar)(y-ybar)) / sum((x-xbar)^2), looks like the
+  true dial. It is the true dial ONLY when no column overlaps another:
+
+      columns independent:        ladder slope == real dial
+      columns overlap (bmi, bp, serums drift together):   ladder slope =/= real dial
+
+  Real columns always overlap, so the true dial needs the untangler (X^T X)^-1 X^T y
+  to share credit between columns that move together. Call the lone slope a LADDER --
+  a first picture, a crutch -- never "the dial".
 
     Plain term used above                 Standard label
     -----------------------------------   ------------------------------------------
