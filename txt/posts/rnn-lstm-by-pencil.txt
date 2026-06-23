@@ -33,14 +33,27 @@
       "boring and a total waste of time"  -->   [  ???  ]  --> 0  (hated)
       "not good at all , skip it"         -->   [  ???  ]  --> ???
 
-  THE VANISHING GRADIENT TRAP -- why plain memory crushes the signal
-     A mistake happens on word 100 of a review. Backpropagating through 100 steps
-     means multiplying the error signal by some number (say 0.5) one hundred times:
-     0.5^100 = 0.0000000000000000000000000000008.
-     By step 1, the error has shrunk to zero. The early words learn nothing.
-     THE FIX: additive memory (LSTM). Instead of MULTIPLYING memory at each step,
-     ADD to a running total. Gradients flow straight backwards through addition
-     without shrinking -- so words 1 and 100 both receive the error signal.
+  A mistake lands on word 100 of a review. To teach the early words, the error has
+  to travel back 100 steps -- and plain memory multiplies it by some factor (say
+  0.5) at every step along the way:
+
+      word 100   word 99   word 98              word 2    word 1
+        8.0  -->   4.0  -->  2.0  -->  ...  -->   ~0  -->   ~0
+                   x0.5 each step:  0.5^100 = 0.0000...0008
+
+  By the time the signal reaches word 1 it has shrunk to nothing. The early words --
+  often the very ones that set the meaning of the whole sentence -- never hear about
+  the mistake, and never learn.
+
+  So stop multiplying the memory and start ADDING to it. If each step adds onto a
+  running total instead of scaling it, the error walks back through the additions
+  undimmed:
+
+      word 100    word 99           word 1
+        8.0  ---+--- 8.0 ---+--- ... ---+--- 8.0      (addition does not shrink it)
+
+  Now word 1 and word 100 feel the same correction. That additive memory is the
+  heart of the LSTM.
 
   A machine multiplies numbers. It cannot multiply the letter "n". So the first job, before
   any machine runs, is to turn every word in every review into a number.

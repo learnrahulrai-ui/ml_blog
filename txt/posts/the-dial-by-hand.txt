@@ -21,14 +21,26 @@
   [Chapter 1, Part 3](straight-stick-linear-regression.txt) first did it -- and then it
   catches one honest trap that nobody warns you about until it is too late.
 
-  THE DUMB ADDER TRAP -- how a machine that only multiplies can adjust its own dials
-     The machine only knows how to multiply and add. It does not "know" calculus.
-     Yet gradient descent requires a derivative -- the slope of the loss at the current dial.
-     PARADOX: how does a multiplier calculate a slope?
-     THE FIX: the derivative is derived once by a human and written out as a plain
-     multiply-and-add rule. The machine follows that rule mechanically at each step.
-     It is not doing calculus -- it is following a static recipe that HAPPENS to encode
-     the slope. The math is pre-cooked; the machine just executes it.
+  Gradient descent needs the slope of the miss at the current dial -- a derivative.
+  But the machine owns exactly two moves, multiply and add, and has never heard of
+  calculus. So how can a thing that only multiplies find a slope?
+
+      what the machine can do:      a * b,   a + b          (the whole toolkit)
+      what the step seems to need:  d(miss) / d(dial)        (calculus -- not in it)
+
+  The escape: nobody asks the machine to do calculus. A human works the derivative
+  out ONCE, on paper, and for a squared miss it collapses into the machine's own two
+  moves:
+
+      slope = 2 * (guess - truth) * input          <- only multiplies and adds
+
+  Hand the machine that one line and it runs the slope without knowing what a slope
+  is:
+
+      (guess - truth)  -->  * input  -->  * 2  -->  the slope
+
+  The calculus is pre-cooked into a recipe; the machine only ever multiplies and
+  adds, and the slope drops out the end.
 
   THE SHEET, THE GOAL
 

@@ -60,15 +60,25 @@
   Everything is done by hand. The only tools on the desk are pencils, scratch paper, and
   a room of tireless clerks who can add, subtract, multiply and divide on demand.
 
-  THE BLAME GAME PARADOX -- which of a million dials caused this mistake?
-     The guess is 10. The truth is 2. The error is 8.
-     Did dial #452 cause this? Or dial #999,999? Or all of them together?
-     You cannot test each dial one by one -- a network with 1,000,000 dials would take
-     longer than a lifetime to adjust one dial at a time.
-     THE FIX: backpropagation (the chain rule). Start at the mistake and walk backwards.
-     Ask the last layer: "who gave you the bad numbers?" Ask the layer before that.
-     Multiply the blame back through the network in ONE pass.
-     Every dial's share of the guilt is calculated simultaneously, not sequentially.
+  The guess came out 10; the truth was 2; the miss is 8. Now, which dial caused it
+  -- #452? #999,999? all of them, in what shares? The brute way: nudge one dial,
+  re-run the whole network, see if the miss shrank, put it back, try the next.
+
+      1,000,000 dials  x  one full re-run each  =  longer than a lifetime
+
+  Testing dials one at a time is hopeless. But blame flows backwards along the very
+  wires the numbers came forward on. Stand at the miss and walk back through the
+  layers, handing each its share:
+
+      miss = 8
+        |   "last layer -- who fed you bad numbers, and how much?"
+        v
+      [layer 3]  -->  [layer 2]  -->  [layer 1]
+        split the 8 among its inputs, then split each share again, and again
+
+  One backward sweep multiplies the blame down through every layer at once, so all
+  million dials learn their share of the guilt together, not one after another.
+  That backward sweep is backpropagation -- the chain rule, walked in reverse.
 
   WHAT PROBLEM WE ARE ACTUALLY SOLVING
 

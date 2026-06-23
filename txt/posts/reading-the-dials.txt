@@ -32,14 +32,21 @@
   The other is a trick of units, and it is the kind of mistake that ends up in published
   papers.
 
-  THE TANGLED WIRES PARADOX -- why reading one dial in isolation is a lie
-     Suppose dial A = +5. Does that mean column A pushes the answer up hard?
-     Not necessarily. Suppose column A and column B are highly correlated (near identical).
-     The machine may set dial A = +5 and dial B = -4 because they fight each other to
-     cancel out noise -- their individual values are meaningless but their SUM is stable.
-     Reading dial A alone says "+5, huge positive effect." The truth is "we don't know."
-     THE FIX: only compare dials after putting every column on the same ruler
-     (same spread), or use regularisation to untangle the correlated columns first.
+  Dial A reads +5. So column A shoves the answer up, hard -- right? Not so fast.
+  Suppose columns A and B move almost identically, near-duplicates. The machine can
+  pin them against each other:
+
+      dial_A = +5  --.
+                      >--  on every row, +5*A - 4*B ~ a small steady amount
+      dial_B = -4  --'      the SUM is stable; each dial ALONE is arbitrary
+
+  Read dial A by itself and you announce "+5, a huge positive push." Read both and
+  the honest answer is "cannot say" -- the two mean something only together. Nudge
+  the data a hair and the pair could flip to +9 and -8 with the same result.
+
+  So never read a dial in isolation. Put every column on the same ruler (same
+  spread) before comparing dials, or use a leash (regularisation) to untangle the
+  duplicated columns first. Then a dial's size means what you think it means.
 
   ONE DIAL PER COLUMN
 
@@ -93,9 +100,9 @@
   The most-negative hunt crowns horse (-0.04) the hardest drag.
   This section shows that crown is counterfeit until the columns share a ruler.
 
-  TRAP UNDERNEATH: DIALS WEAR THEIR COLUMN'S UNITS
+  DIALS WEAR THEIR COLUMN'S UNITS
 
-  Here is the deeper trap, the one the easy version walks straight into.
+  Here is the deeper catch, the one the easy version walks straight into.
   A dial is "answer-units per ONE unit of its column."
   And every column is measured on its own ruler, with its own idea of how big "one unit"
   is:

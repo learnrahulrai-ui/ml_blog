@@ -29,14 +29,27 @@
   this again where it matters. We build it by hand anyway, because the mechanism is the
   lesson.
 
-  THE SPLIT BRAIN TRAP -- why one memory channel is not enough
-     If you only have one memory state, every new word partially overwrites the old one.
-     You need to remember the subject from 20 words back while reading the verb now.
-     But the verb wipes out part of the subject's trace. Context fades.
-     THE FIX: two channels. Short-term memory (h) carries what just arrived --
-     it changes with every word. Long-term memory (c) is a conveyor belt -- it only
-     changes when the forget gate explicitly opens a trapdoor to dump old content.
-     New information and old context travel on separate wires and do not fight.
+  Give the worker a single memory slot and every new word has to write into it,
+  smearing whatever was already there:
+
+      read "dog"  -->  mem: [dog]
+      read "the"  -->  mem: [the..]      ("dog" already fading)
+      read "ran"  -->  mem: [ran...]     ("dog" nearly gone)
+
+  But to handle "the dog that chased the cat ... RAN", you must still be holding
+  "dog" twenty words later when "ran" arrives -- and the one slot overwrote it long
+  ago. With a single channel, old context always loses to the newest word.
+
+  So run two memories on separate wires. A short-term note (h) holds what just
+  arrived and is rewritten every word. A long-term belt (c) carries old context
+  untouched, and changes only when a gate deliberately opens a trapdoor to dump
+  something:
+
+      h:  rewritten every word      ----[the]--[dog]--[ran]-->   (fast, churns)
+      c:  changes only on the gate   ===[ dog held .........]==>  (slow, protected)
+
+  New information rides h; old context rides c; the two no longer fight over one
+  slot.
 
   Pencil out. Pocket A, pocket B, and a row of clerks.
 
