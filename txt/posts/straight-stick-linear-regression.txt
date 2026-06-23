@@ -271,45 +271,63 @@
       of flipping it; and when X^T X is flat (one column is a near-recipe of another) add a
       small bump to the diagonal.
 
-  COMMON TRIPWIRES I CAUGHT
+  A few places that bit me, each one a thing that looks right.
 
-    TRIPWIRE 1:  MSE has NO root in Lab 2
-       WRONG: tack on ** 0.5 to mean_squared_error(...).
-       RIGHT: MSE = miss -> square -> mean -> STOP.  No root.
-              RMSE has the root.  MSE does not.  Read the name.
+  MSE looks like it ought to end in a square root. It does not:
 
-    TRIPWIRE 2:  leftover is the BAD part, not the good part
-       WRONG: "leftover = 2, that's the stick's score."
-       RIGHT: leftover is the misery STILL LEFT after the stick tried.
-              The good part is total wobble - leftover.
-              R^2 = (total wobble - leftover) / total wobble.
+      miss -> square -> mean -> STOP            MSE
+      miss -> square -> mean -> sqrt            RMSE  (the root is the R)
 
-    TRIPWIRE 3:  R^2 divide by the WHOLE BAR, not the count
-       WRONG: R^2 = (total wobble - leftover) / 5  (row count).
-       RIGHT: R^2 = (total wobble - leftover) / total wobble.
-              The count cancels, which is WHY R^2 has no units.
+  Tack ** 0.5 onto mean_squared_error and you have quietly built RMSE instead. Read
+  the name -- the R is the root.
 
-    TRIPWIRE 4:  R^2 always rises when you add a column -- on the training
-                 pile only
-       WRONG: "I added a noise column and R^2 went up -- the machine is better."
-       RIGHT: On the training pile, the old fit is still available, so it can
-              only do at least as well.  Use the TEST R^2 or adjusted R^2.
+  "Leftover = 2, so 2 is the stick's score" runs backwards. The leftover is the
+  misery STILL there after the stick tried:
 
-    TRIPWIRE 5:  R^2 can go negative on the test pile
-       WRONG: "R^2 < 0 must be a bug."
-       RIGHT: On unseen rows, no right-angle guarantee holds.  The leftover
-              CAN exceed the wobble.  R^2 = 1 - RSS/TSS can dip below 0.
+      total wobble  =  good part  +  leftover
+                       (explained)   (still missed)
 
-    TRIPWIRE 6:  "Most negative" dragging column = MIN, not MAX
-       WRONG: -0.04 is bigger than -0.007 by the number 4 vs 7.
-       RIGHT: -0.04 is further below zero = SMALLER = most negative.
-              min(dials, key=dials.get) returns the column NAME.
+      R^2 = (total wobble - leftover) / total wobble      <- the GOOD part's share
 
-    TRIPWIRE 7:  Raw dials are NOT comparable across columns (different
-                 units)
-       WRONG: compare -0.007 per pound directly with -0.04 per horsepower.
-       RIGHT: Put every column on one shared ruler first (StandardScaler).
-              Then each dial means "answer-units per one-spread step."
+  And R^2's bottom is the whole wobble, never the row count:
+
+      WRONG:  (total wobble - leftover) / 5             (the 5 rows)
+      RIGHT:  (total wobble - leftover) / total wobble
+
+  Dividing by wobble is what makes the units cancel -- which is exactly why R^2 has
+  none.
+
+  Add a column of pure noise, watch R^2 tick UP, and call the machine better? Only on
+  the TRAINING pile:
+
+      training R^2:  add any column  -> can only stay flat or rise (old fit still there)
+      test R^2:      add noise        -> usually FALLS
+
+  Judge on the test R^2 (or adjusted R^2); training R^2 always rewards more columns.
+
+  R^2 below 0 looks like a bug, but on unseen rows it is real:
+
+      train:  the right-angle fit forces leftover <= wobble  -> R^2 in [0, 1]
+      test:   no such guarantee  -> leftover CAN exceed wobble -> R^2 = 1 - RSS/TSS < 0
+
+  A negative R^2 just means the stick did worse than guessing the flat average.
+
+  Hunting the hardest-dragging column, -0.04 against -0.007:
+
+      -0.007  ----|--- 0
+      -0.04  -----|             further below zero = SMALLER = drags hardest
+
+  -0.04 is the more-negative one, even though "4" feels smaller than "7". Use
+  min(dials, key=dials.get) to fetch that column's NAME.
+
+  Last, two raw dials cannot be ranked head to head when their columns wear
+  different units:
+
+      -0.007 per POUND         (a pound is a tiny step)
+      -0.04  per HORSEPOWER    (a horsepower is a big step)
+
+  Stand every column on one shared ruler (StandardScaler) first; then each dial reads
+  "answer-units per one-spread step" and the comparison is finally fair.
 
   Nothing above needed a computer -- only pencils, clerks, and patience.  This last
   section is for the day you meet one: the same three rows, spoken in Python.
