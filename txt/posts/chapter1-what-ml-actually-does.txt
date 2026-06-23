@@ -75,16 +75,26 @@
   Anyone can memorise answers they have been shown.
   The trick is being right about the houses you have not seen.
 
-  THE CANCEL-OUT TRAP -- why squaring the miss is not optional
-     Suppose you average the raw misses to see how wrong a guesser is.
-     House A: truth 120, guess 100  -> miss = +20
-     House B: truth  80, guess 100  -> miss = -20
-     Raw average miss = (+20 + -20) / 2 = 0.
-     The guesser looks perfect -- zero average miss -- but it was off by 20 both times.
-     The plus and minus cancelled and hid the truth.
-     The fix: SQUARE every miss before averaging. (+20)^2 = 400. (-20)^2 = 400.
-     Average squared miss = 400. The error is exposed. Squaring kills the sign.
-     This is why MSE (mean squared error) squares first.
+  First you need a way to say HOW wrong a guess is, and the obvious way quietly
+  lies. Take two houses, both guessed at 100:
+
+     House A   truth 120, guess 100   miss = +20   (guessed too low)
+     House B   truth  80, guess 100   miss = -20   (guessed too high)
+
+  Average those raw misses and the two slide toward each other and meet at zero:
+
+        -20             0            +20
+         |--------------+--------------|
+       House B                      House A
+         \____________ + ____________/
+                       = 0
+
+  Zero. The guesser looks flawless -- yet it was off by 20 on both houses. The
+  plus and the minus ate each other and hid the damage. So raw misses are out.
+
+  Square each miss first and the sign has nothing left to cancel with:
+  (+20)^2 = 400, (-20)^2 = 400, average 400. Both errors now count as size, not
+  direction. That squaring is the whole reason mean squared error squares first.
 
   ONE RULE: HIDE SOME ROWS
 
@@ -364,40 +374,58 @@
     5. Pick settings by rotating folds, preparing numbers inside each round.
     6. Refit on all of working pile; read the hidden pile exactly once.
 
-  COMMON TRIPWIRES I CAUGHT
+  A handful of these bit me while writing the code. Each is a belief that feels
+  right and is not.
 
-    TRIPWIRE 1:  .shape is a PAIR, not a product
-       df.shape in Python returns TWO numbers wrapped together: (n_rows, n_cols).
-       To read either number separately: X.shape[0] = 20640 (rows), X.shape[1] = 8 (cols).
-       WRONG: treat 20640 x 9 as one number, 185760.
-       RIGHT: df.shape = (20640, 9).  Row count first. Column count second. Always.
+  You reach for the size of the sheet and your hand wants one number:
 
-    TRIPWIRE 2:  random_state is a starting seed for any random operation
-       Python's shuffles and splits need a "seed" number so the random choices
-       are the same every time you run the code.
-       WRONG: use random_state=1 here and random_state=42 there.
-       RIGHT: set RANDOM_STATE = 42 once at the top and use it everywhere.
-              Same seed -> same shuffle -> your splits match mine exactly.
+      20640 rows  x  9 cols   -->   185760 ?
 
-    TRIPWIRE 3:  k (neighbour count) and n_splits (fold count) are unrelated knobs
-       k is how many neighbours the ask-closest rule consults per guess.
-       n_splits is how many chunks the rotating-folds check cuts the working pile into.
-       WRONG: "k=25 with 5 folds sounds wrong."
-       RIGHT: they are completely separate numbers for completely separate jobs.
+  But .shape never multiplies. It hands back the two counts side by side, rows
+  first, always:
 
-    TRIPWIRE 4:  cross_val_score returns NEGATIVE mistake numbers
-       Python's scoring tools are built to maximise, not minimise.
-       A smaller RMSE is better, but maximise wants bigger numbers.
-       Solution: negate. score = -RMSE. Closest to zero = smallest mistake = best.
-       WRONG: -0.74 looks bigger than -0.66, so pick -0.74.
-       RIGHT: -0.66 is closer to zero = smaller RMSE = better rule.
-              Un-negate with -scores.mean() to get the actual RMSE to compare.
+      df.shape == (20640, 9)
+                    |      |
+                  rows   cols        rows = shape[0],  cols = shape[1]
 
-    TRIPWIRE 5:  Pipeline makes the scaler relearn inside each fold
-       StandardScaler() learns a centre and spread from the data it sees.
-       If you scale the whole working pile before splitting, the grading chunks
-       leak their numbers into the build. A Pipeline chains scaler + rule so the
-       scaler relearns fresh from each fold's build portion only.
+  Read them apart; never fold them into one product.
+
+  Next: a shuffle cuts the pile differently every run, unless you pin its seed.
+  Pin a different seed in each place and your splits quietly drift apart:
+
+      random_state = 1   here    -->  split P
+      random_state = 42  there   -->  split Q        P =/= Q, nothing lines up
+
+  So set one seed once at the top and reuse it -- same seed, same shuffle, your
+  splits match mine exactly:  RANDOM_STATE = 42.
+
+  Two knobs are both small counts, so they get mistaken for one:
+
+      k        =  neighbours each guess consults      (the ask-closest rule)
+      n_splits =  chunks the working pile is cut into  (the rotating-folds check)
+
+  k = 25 with 5 folds is no contradiction -- separate numbers for separate jobs,
+  and they never need to agree.
+
+  The scorer trips you the other way. Python's scoring is built to want BIGGER,
+  but a smaller RMSE is better -- the two pull opposite ways. So flip the sign
+  and let "bigger" mean "better":
+
+      RMSE:    0.66    0.74          (smaller is better)
+      score:  -0.66   -0.74          (bigger is better  ->  -0.66 wins)
+              closer to 0  =  smaller RMSE  =  best rule
+
+  Un-negate with -scores.mean() to read the real RMSE back.
+
+  Last one, and it is the dangerous one. Scale the whole working pile once and
+  THEN split for grading, and the grading rows have already leaked their centre
+  and spread into the build:
+
+      scale ALL --> split           grading rows already seen   (leak)
+      split --> scale each build     grading rows stay unseen    (clean)
+
+  A Pipeline chains scaler + rule so the scaler relearns fresh inside each fold's
+  build portion only.
 
   Now that you have built the thing, here are the proper names.
   Every post on this blog ends this way.

@@ -35,14 +35,38 @@
     BOOSTING (Line of fixers, tiny stumps):
       stump-1 --> stump-2 (fixes stump-1's leftovers) --> stump-3 --> ... --> SUM
 
-  THE ECHO CHAMBER TRAP -- why 100 identical trees do not help
-     If every tree reads the same full dataset and uses the same split rule,
-     all 100 trees make the exact same mistake at the exact same time.
-     A committee of 100 clones is no smarter than 1 clone.
-     THE FIX: Random Forest. Blindfold each tree -- force it to see only a random
-     subset of the columns and a random bag of the rows. Now each tree makes
-     DIFFERENT mistakes. When they vote, the unique mistakes cancel out,
-     and only what all trees agree on (the truth) survives.
+  Before trusting any of these, kill the obvious shortcut. If two hundred trees
+  are good, why not build the same tree two hundred times? Hand every tree the
+  same pile and the same split rule, and watch what comes back:
+
+      same pile --> tree 1   --> guess 7.2
+      same pile --> tree 2   --> guess 7.2
+      same pile --> tree 3   --> guess 7.2
+          :                        :
+      same pile --> tree 200 --> guess 7.2
+                                -------
+                       average:   7.2     (the truth was 9.0)
+
+  Same rows in, same habit learned, same row missed -- two hundred times over.
+  Average two hundred identical answers and you get that one answer straight back.
+  You paid two hundredfold and bought nothing: there is nothing to outvote when
+  every vote is the same vote.
+
+  Averaging only pays off when the trees can DISAGREE. So they must be forced
+  apart -- each blindfolded to a random bag of rows and a random handful of the
+  columns:
+
+      rows A, cols {bmi,age} --> tree 1   --> 9.4
+      rows B, cols {bp,s5}   --> tree 2   --> 8.1
+      rows C, cols {bmi,bp}  --> tree 3   --> 9.6
+          :                        :
+                                -------
+                       average:   9.0     (truth)
+
+  Now each tree trips on a different row. The stray misses scatter high and low
+  and cancel in the average; what the trees lean toward together -- the truth --
+  is what survives. That one idea, disagreement on purpose, is the whole move
+  from bagging to a random forest.
 
   Each builds on the previous.  The ideas are small.  The power is in the pile-up.
 
