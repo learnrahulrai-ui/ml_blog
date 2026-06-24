@@ -12,7 +12,7 @@
 
   PATH . post 40/40 . part 4 of 4 in Chapter 13 -- Sample-based Learning
     <- prev:  [Chapter 13, Part 3: Dyna-Q by Pencil](dyna-q-by-pencil.txt)
-       next:  (more posts coming)
+       next:  [Chapter 13 Reference: The Sample-based Map](sample-based-reference.txt) ->
 
   ---
 
@@ -201,7 +201,8 @@
     [Part 1 -- TD(0) Built by Pencil](td-zero-by-pencil.txt) .
     [Part 2 -- Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt) .
     [Part 3 -- Dyna-Q by Pencil](dyna-q-by-pencil.txt) .
-    Part 4 (this post)
+    Part 4 (this post) .
+    [Reference -- The Sample-based Map](sample-based-reference.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

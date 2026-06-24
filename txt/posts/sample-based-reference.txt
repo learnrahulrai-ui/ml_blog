@@ -1,0 +1,269 @@
+@title The Sample-based Map: MC, TD, DP, and the Sarsa Family by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  APPENDIX . SAMPLE-BASED LEARNING REFERENCE
+  The Sample-based Map: MC, TD, DP, and the Sarsa Family by Pencil
+  Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, temporal-difference, monte-carlo, sarsa, q-learning, by-hand
+  ============================================================================================
+
+  PATH . Chapter 13 reference card -- Sample-based Learning
+
+  This is a flip-to reference for the ideas Chapter 13 leans on -- the ones that tangle
+  together and make the quizzes hard. It assumes you remember nothing; every word is
+  built from scratch where it appears, every number worked by hand. Plain language
+  first, the textbook labels at the very bottom.
+
+  The words, once: a spot = one place in the world. A move = a direction you can pick.
+  A reward = a number the world pays you on a move. A worth = a number saying how good
+  something is, counting the rewards you expect from there on. The nudge that fixes a
+  worth, used everywhere below (crawl a fraction `size` toward a target):
+
+      new worth = old worth + size x ( target - old worth )
+
+  Everything that follows is one question: what goes in the target?
+
+  ---
+
+  PREDICTION vs CONTROL -- GRADE A RULE, OR REWRITE IT
+
+  A rule = which move to take at each spot (the arrows). Two completely different jobs
+  get done with worths, and they are easy to confuse:
+
+      PREDICTION  the arrows are FIXED. You only fill in the worths.
+                  arrows stay:  spot0 -> right,  spot1 -> up,  spot2 -> right
+                  you write:    V[0]=2.1,  V[1]=3.4,  V[2]=0.5
+                  the question: "how good is THIS fixed rule?"
+
+      CONTROL     you REWRITE the arrows to find the best one.
+                  you re-point:  spot0 -> right   becomes   spot0 -> up
+                  the question: "what is the BEST move at each spot?"
+
+  The trap: filling in worth-numbers is PREDICTION, not control. Control is moving the
+  arrows. So TD(0) -- which leaves the arrows alone and only fills worths -- is
+  prediction; Q-learning and the Sarsa family -- which steer toward better arrows -- are
+  control.
+
+  ---
+
+  WHICH RAISES THE REAL QUESTION: WHAT GOES IN THE TARGET? THREE ANSWERS
+
+  Three ways to build the target a worth crawls toward. They split on two yes/no
+  questions, and every method in this chapter is one combination of the two.
+
+  First question -- does the target LEAN on another guess (the textbook word is
+  bootstrap)? Walk it:
+
+      MONTE CARLO (MC): walk ALL the way to the end, add the REAL rewards
+          spot --+2--> --+1--> --+3--> [END]
+          target = 2 + 1 + 3 = 6          all real, NO guess inside  ->  does NOT lean
+
+      TD(0): take ONE move, then grab your GUESS of the next spot
+          spot --(-1)--> next
+          target = -1 + 0.9 x V[next]     V[next] is a guess you wrote earlier  ->  LEANS
+
+  So MC waits for the whole real total and leans on nothing; TD leans a guess on a guess.
+
+  Second question -- does the target use ALL the next-spots, or just the ONE that
+  happened?
+
+      EXPECTED update: average over every next-spot the world could roll (needs the
+      world's full odds -- a model):
+          the die says  30% -> A ,  70% -> B
+          target = reward + 0.9 x ( 0.30 x V[A] + 0.70 x V[B] )    every branch, weighted
+
+      SAMPLE update: use the ONE next-spot a real move actually landed on:
+          you moved, landed on B
+          target = reward + 0.9 x V[B]                             only the branch you got
+
+  Drawn, the two shapes:
+
+      EXPECTED (a wide fan):   spot --30%--> A
+                                    --70%--> B        both branches, via the model
+
+      SAMPLE  (one line):      spot --------> B        the one branch that happened
+
+  ---
+
+  SO THE THREE METHODS ARE THREE CORNERS OF ONE MAP
+
+  Put the two questions together and the whole landscape is three points:
+
+      method        leans? (bootstrap)     branches used        needs a model?
+      ----------    ------------------     ---------------      --------------
+      Monte Carlo   no  (real total)       the one real path    no
+      TD(0)         yes (guess of next)    the one real next    no
+      DP            yes (guess of next)    ALL, weighted        yes (the die)
+
+  DP and TD share one thing and differ in another, which is exactly why they feel
+  confusing: BOTH lean on a guessed worth of the next spot (both bootstrap), but DP sums
+  over every branch with the model's odds (expected) while TD uses the single landing
+  the world handed back (sample). MC is the odd one out -- it leans on nothing because
+  it waited for the whole real total.
+
+      shared (DP, TD): both have  gamma x V[next]   ->  both LEAN
+      differs:         DP sums  p x ...  over all landings ;  TD uses one V[next]
+
+  ---
+
+  THE SARSA FAMILY: SAME NUDGE, ONE PIECE DIFFERENT
+
+  In control you keep a worth per (spot, move) -- a table q, where q[spot] is the row of
+  move-worths at a spot. Three machines correct the move just made with the very same
+  nudge; they differ ONLY in the PEEK -- the single number they read off the landing's
+  row for "the future from here":
+
+      q[prev][move] = q[prev][move] + size x ( reward + dilute x PEEK - q[prev][move] )
+
+      SARSA          PEEK = q[landing][a_next]   the ONE move you will actually take next
+      Q-LEARNING     PEEK = max(q[landing])      the BIGGEST move-worth in the row
+      EXPECTED SARSA PEEK = sum(odds x q[landing]) the AVERAGE, weighted by pick-odds
+
+  The pick-odds are epsilon-greedy: the biggest move gets (1 - epsilon) + epsilon/4, the
+  others get epsilon/4 each. Worked on one landing row q[landing] = [0, 0.2, 0, 0], with
+  epsilon = 0.1 (so the greedy move's odds are 0.9 + 0.025 = 0.925, the others 0.025):
+
+      SARSA           PEEK = 0.2 if the next pick is the greedy move,  or 0 if it wanders
+                             -> ONE of the row's values, chosen by the actual roll
+      Q-LEARNING      PEEK = max(0, 0.2, 0, 0) = 0.2                  -> always the biggest
+      EXPECTED SARSA  PEEK = 0.925 x 0.2 + 0.025 x 0 x 3 = 0.185      -> the steady average
+
+  Sarsa follows the policy it actually plays (it peeks the move it will really take);
+  Q-learning dreams it will play the best move (the max); Expected Sarsa is honest about
+  the wander and averages by the real odds. Sarsa is "on-policy" (the peeked move IS the
+  played move); Q-learning is "off-policy" (it learns about the greedy rule while
+  wandering). All three are control -- they push the arrows toward better moves.
+
+  ---
+
+  BUT AT THE GOAL THEY ALL AGREE -- THE ANCHOR
+
+  A spot where the game ends is an anchor: there is no next spot, so the dilute x PEEK
+  piece has nothing to grab. Drop it -- for all three machines (and for TD(0) too). The
+  target becomes the reward alone:
+
+      mid-game:  target = reward + dilute x PEEK
+      anchor  :  target = reward                  (game over -- no landing, no PEEK)
+
+  So on a move into the goal, Sarsa, Q-learning, and Expected Sarsa all use the same
+  target -- reward only. They differ only when there IS a next spot to peek at.
+
+  ---
+
+  WHICH ONE WHEN: THE TRADE-OFFS, EACH FROM THE TARGET
+
+  Three honest differences fall straight out of what each target is made of.
+
+  NOISE (variance) -- how much the target jumps run to run. MC's target is a sum of many
+  random rewards all the way to the end, so it swings a lot; TD's is one reward plus a
+  steady guess, so it barely moves:
+
+      MC  target = +2 +1 +3 +... (many random rolls)  ->  HIGH variance (jumpy)
+      TD  target = reward + steady guess               ->  LOW variance (calm)
+
+  And inside the family: Sarsa's PEEK is one randomly-picked next move (jumpy); Expected
+  Sarsa's PEEK is the average over all of them (calm) -- so Expected Sarsa has the lower-
+  variance target, at the cost of more arithmetic (it touches all four moves, not one).
+
+  WHEN IT CAN RUN -- a task is episodic if it ends, continuing if it never does:
+
+      episodic   : start -->-->--> [END]      has an end
+      continuing : start -->-->-->--> ...      never ends
+
+  TD fires on every move and needs only reward + dilute x guess, so it runs in both. MC
+  needs the whole total to the end, so it works only when there IS an end -- episodic
+  only, never continuing.
+
+  WHEN IT UPDATES -- online means mid-run, offline means after the run ends. TD updates
+  every move (online); MC must wait for the end to know the total (offline).
+
+  ---
+
+  THE TD ERROR, AND WHY THE ANCHOR DROPS A PIECE
+
+  The "how wrong" inside the nudge -- target minus old worth -- has a name: the TD error.
+  Non-terminal and terminal differ only in whether the next-spot piece survives:
+
+      non-terminal:  how wrong = ( reward + dilute x V[next] ) - V[last]
+      terminal     :  how wrong = ( reward                 ) - V[last]
+
+  The terminal form is not a different rule -- it is the same rule with V[next] = 0,
+  because the game ended and there is no next spot to be worth anything. The dilute only
+  ever multiplied V[next]; with V[next] gone, the whole piece is gone.
+
+  ---
+
+  A FULL TD(0) TRACE BY HAND -- SO THE NUDGE IS NOT MAGIC
+
+  Two spots A and B, both worth 1.0 to start. size = 1 (crawl the whole way, so the
+  steps are plain), dilute = 0.5. One run: A --0--> B --1--> B --0--> [END]. The line is
+  V[last] += size x (reward + dilute x V[next] - V[last]); at the end, drop the V[next].
+
+      call 1 -- left A, reward 0, landed B (not the end):
+          V[A] = 1.0 + 1 x ( 0 + 0.5 x 1.0 - 1.0 ) = 1.0 + ( -0.5 ) = 0.5
+          (V[B] is only READ here -- still 1.0)
+
+      call 2 -- left B, reward 1, landed B (not the end):
+          V[B] = 1.0 + 1 x ( 1 + 0.5 x 1.0 - 1.0 ) = 1.0 + 0.5 = 1.5
+
+      call 3 -- left B, reward 0, landed the END (anchor, no next):
+          V[B] = 1.5 + 1 x ( 0 - 1.5 ) = 1.5 - 1.5 = 0
+
+      final:  V(A) = 0.5 ,  V(B) = 0
+
+  The one thing to hold onto: each call WRITES only the spot you LEFT; the next spot is
+  only READ, so it sits unchanged until a later move leaves it.
+
+  ---
+
+  ONE BREATH
+
+  Every method here builds the same nudge -- new = old + size x (target - old) -- and
+  differs only in the target. Prediction fills worths under fixed arrows; control
+  rewrites the arrows. The target splits on two questions: does it LEAN on a guessed
+  next-worth (MC no; TD and DP yes), and does it use ALL branches via a model (DP) or the
+  ONE real landing (TD). In control the Sarsa family shares the nudge and differs only in
+  the PEEK at the landing's row: Sarsa takes the move it will really play, Q-learning the
+  max, Expected Sarsa the odds-weighted average -- and at the goal all of them drop the
+  peek and use the reward alone. MC's all-the-way total is high-noise and episodic-only;
+  TD's one-step lean is low-noise, online, and runs forever.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   spot                 = state  (standard: s)
+  >>   move / arrow         = action  (a)
+  >>   worth                = value: V(s) per spot, or Q(s,a) per (spot,move)
+  >>   the rule / the arrows = the policy  (pi)
+  >>   grade a fixed rule   = prediction / policy evaluation
+  >>   rewrite the arrows   = control
+  >>   lean on a guess      = bootstrapping
+  >>   whole real total Gt  = the Monte Carlo return
+  >>   reward + dilute x V(next) = the TD target ; (target - old) = the TD error (delta)
+  >>   all branches via a model  = expected update (DP)
+  >>   one real landing          = sample update (TD)
+  >>   dilute               = discount factor  (gamma)
+  >>   size                 = step size / learning rate  (alpha)
+  >>   wander odds          = epsilon-greedy policy
+  >>   PEEK = q[next][a_next]      = Sarsa (on-policy)
+  >>   PEEK = max(q[next])         = Q-learning (off-policy, greedy target)
+  >>   PEEK = sum(odds x q[next])  = Expected Sarsa
+  >>   anchor (game ended)  = terminal state (target = reward alone)
+  >>   jumpy vs calm target = high vs low variance ; mid-run vs after-end = online vs offline
+
+----------------------------------------------------------------------------------------------
+  COMPANION TO CHAPTER 13 -- Sample-based Learning:
+    [Part 1 -- TD(0) Built by Pencil](td-zero-by-pencil.txt) .
+    [Part 2 -- Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt) .
+    [Part 3 -- Dyna-Q](dyna-q-by-pencil.txt) .
+    [Part 4 -- Dyna-Q+](dyna-q-plus-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

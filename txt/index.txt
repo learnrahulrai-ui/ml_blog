@@ -616,6 +616,19 @@
     move's reward stays untouched. Ends with the whole chapter in five lines and the honest
     model-based-vs-model-free tradeoff.
 
+  [Reference -- The Sample-based Map: MC, TD, DP, and the Sarsa Family](posts/sample-based-reference.txt)
+    reference . 2026-06-24 . companion to Chapter 13 . monte-carlo, td, dp, sarsa, q-learning, by-hand
+    The flip-to decoder for the ideas Chapter 13 leans on -- the ones the quizzes tangle.
+    Prediction (grade a fixed rule, fill worths) vs control (rewrite the arrows). The
+    MC/TD/DP triangle split by two questions: does the target LEAN on a guessed next-worth
+    (MC no, TD and DP yes), and does it use ALL branches via a model (DP) or the ONE real
+    landing (TD). The Sarsa family -- same nudge, differing only in the PEEK at the landing:
+    Sarsa = the move actually taken next (on-policy), Q-learning = max (off-policy greedy),
+    Expected Sarsa = the odds-weighted average -- all three collapsing to reward-alone at the
+    goal. Plus the trade-offs straight from each target (MC high-variance/episodic/offline vs
+    TD low-variance/continuing/online), the TD-error terminal-vs-non-terminal, and a full
+    TD(0) trace by hand to V(A)=0.5, V(B)=0. Adds plain on-policy Sarsa, which Part 2 left out.
+
 
 ----------------------------------------------------------------------------------------------
   the method: ban the jargon . draw it first . solve by pencil . then write the code
