@@ -574,8 +574,8 @@
     the worth of the spot you LEFT, toward target = reward + dilute x worth(landing) -- a
     guess leaning on a guess, which heals because every sample carries a real reward. Both
     cases worked by hand on Cliff Walking (4x12, 48 spots): a mid-game move (target -0.01,
-    new worth -0.001) and the anchor where the game ends (target = reward alone, new worth
-    -10). Three real lab failures shown: forgetting the "=" that stores the result back (the
+    new worth -0.001) and the anchor where the game ends (target = reward alone, the bare
+    -1 -> new worth -0.1). Three real lab failures shown: forgetting the "=" that stores back (the
     table stays a sheet of zeros), nudging the landed spot instead of the left one, and
     keeping the discount piece at the anchor. Assumes zero background.
 

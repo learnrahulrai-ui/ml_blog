@@ -30,7 +30,7 @@
       new guess = old guess + size x ( reward - old guess )
 
   Here size is a small fraction, say 0.1 -- you crawl that fraction of the way toward
-  the reward, never jumping all the way. Many crawls settle the guess on the truth.
+  the reward, never jumping all the way. Many crawls pull the guess toward the truth.
 
   The drone recipe (Chapter 12, Part 3) says what a spot is worth: the reward you grab
   leaving it, plus the worth of where you land, diluted because later counts a little
@@ -42,7 +42,9 @@
 
   In Chapter 12 you also had THE DIE: env.transitions handed you every spot the world
   could send you to and the chance of each, so you AVERAGED the drone recipe over all
-  of them at once. That die is what this chapter takes away.
+  of them at once. Value iteration -- the post just before this -- leaned on that die
+  for every single update. That die is the one thing this chapter throws away: from
+  here on the agent learns from what actually happens, not from the world's odds.
 
   ---
 
@@ -170,28 +172,30 @@
   reward, alone.
 
   A spot where the game ends is an anchor: its target is just its own reward, no
-  diluted future. The numbers:
+  diluted future. Use the SAME -1 an ordinary move pays, so you can see exactly what
+  the missing landing changes:
 
       worth(last) = 0       (still the starting lie)
-      reward      = -100    (illustrative big payout, to make the step visible)
+      reward      = -1      (the move into the goal still costs you 1)
       size        = 0.1
       (NO worth(next) -- the game ended, there is no landing)
 
   Drawn, before and after:
 
       BEFORE:   worth(last) = 0
-      target  = reward only = -100        (anchor: nothing to lean on)
+      target  = reward only = -1          (anchor: no landing to add 0.99 of)
 
-      how wrong = target - worth(last) = -100 - 0 = -100
+      how wrong = target - worth(last) = -1 - 0 = -1
 
-      new worth(last) = 0 + 0.1 x ( -100 ) = -10
+      new worth(last) = 0 + 0.1 x ( -1 ) = -0.1
 
-      AFTER:    worth(last) = -10
+      AFTER:    worth(last) = -0.1
 
-  The only difference between the two cases is the target: a move mid-game uses
-  reward + dilute x worth(next); a move that ends the game (the anchor) uses reward
-  alone. Same nudge, same size, same "how wrong = target - old"; only the target's
-  second piece appears or vanishes.
+  Look at what the missing landing did. Mid-game the SAME -1 reward had 0.99 x worth(1)
+  = 0.99 added on top, which nearly cancelled it -- target -0.01, nudge to -0.001. At
+  the anchor there is no landing to add, so the bare -1 stands -- target -1, nudge to
+  -0.1, a hundred times larger. That is the whole difference between the two cases: a
+  mid-game move uses reward + dilute x worth(next); the anchor uses reward alone.
 
   ---
 
@@ -289,13 +293,13 @@
       print(V[last])    # -0.001
 
   THE ANCHOR CASE BY HAND (the move ended the game): peasant left spot 0, grabbed
-  reward -100, no landing -- so drop the discount piece.
+  reward -1, no landing -- so drop the discount piece.
 
       V = [0.0] * 48
-      target    = -100                             # anchor: reward alone, no landing
-      how_wrong = target - V[last]                 # -100 - 0       = -100
-      V[last]   = V[last] + step_size * how_wrong   # 0 + 0.1*-100  = -10
-      print(V[last])    # -10
+      target    = -1                               # anchor: reward alone, no landing
+      how_wrong = target - V[last]                 # -1 - 0        = -1
+      V[last]   = V[last] + step_size * how_wrong   # 0 + 0.1*-1    = -0.1
+      print(V[last])    # -0.1
 
   Then the agent, the same two lines wrapped for any spot. The grader runs these:
 
@@ -324,7 +328,7 @@
       RIGHT:  values[last] = values[last] + step_size * how_wrong   # the "=" puts it back
 
   Without the write, the whole table sits at its starting lie of 0 forever. The grader
-  expects -0.001 (or -10), reads 0 -- nowhere near -- and stops with AssertionError.
+  expects -0.001 (or -0.1), reads 0 -- nowhere near -- and stops with AssertionError.
   The "=" that stores it back is the whole update.
 
   You nudge the wrong spot. Correct self.last_state (the spot you LEFT), not state (the
