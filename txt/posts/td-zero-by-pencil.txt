@@ -10,9 +10,9 @@
   Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, temporal-difference, td-zero, policy-evaluation, by-hand
   ============================================================================================
 
-  PATH . post 37/37 . part 1 of 4 in Chapter 13 -- Sample-based Learning
+  PATH . post 37/40 . part 1 of 4 in Chapter 13 -- Sample-based Learning
     <- prev:  [Chapter 12, Part 5: Value Iteration Built by Pencil](value-iteration-by-pencil.txt)
-       next:  (more posts coming)
+       next:  [Chapter 13, Part 2: Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt) ->
 
   ---
 
@@ -332,9 +332,9 @@
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):
     Part 1 (this post) .
-    Part 2 -- Q-learning and Expected Sarsa (coming) .
-    Part 3 -- Dyna-Q (coming) .
-    Part 4 -- Dyna-Q+ (coming)
+    [Part 2 -- Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt) .
+    [Part 3 -- Dyna-Q](dyna-q-by-pencil.txt) .
+    [Part 4 -- Dyna-Q+](dyna-q-plus-by-pencil.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

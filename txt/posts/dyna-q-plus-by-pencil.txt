@@ -1,0 +1,210 @@
+@title A Clock for Curiosity: Dyna-Q+ by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 13 . SAMPLE-BASED LEARNING . PART 4 OF 4
+  A Clock for Curiosity: Dyna-Q+ by Pencil
+  Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, dyna-q-plus, exploration, changing-world, by-hand
+  ============================================================================================
+
+  PATH . post 40/40 . part 4 of 4 in Chapter 13 -- Sample-based Learning
+    <- prev:  [Chapter 13, Part 3: Dyna-Q by Pencil](dyna-q-by-pencil.txt)
+       next:  (more posts coming)
+
+  ---
+
+  The companion post, [Dyna-Q by Pencil](dyna-q-by-pencil.txt), kept a notebook of what
+  the world did and rehearsed from it -- replaying remembered moves in its head to fix
+  worths without real footsteps.
+
+  A spot = one place in the world. A move / arrow = a direction you pick. A reward = a
+  number the world pays on a move. A worth = a number saying how good a (spot, move) is,
+  kept in a table q[spot][move]. The notebook (the model) is a page per spot, a line per
+  move, each line holding the (landing, reward) that move once produced; a rehearsal reads
+  one line and crawls the matching worth.
+
+  Dyna-Q has one blind spot. Once it finds a decent path, it stops poking around -- it
+  keeps walking the route it already trusts. If the world then CHANGES -- a wall falls and
+  a brand-new shortcut opens -- Dyna-Q never notices, because it has no reason to wander
+  back toward the spots it long ago wrote off.
+
+  ---
+
+  WHICH NEEDS A WAY TO MAKE STALE MOVES TEMPTING AGAIN: A CLOCK
+
+  Add a third piece of paper -- a clock. One number per (spot, move), the same shape as
+  the worth table, all starting at 0. Each clock counts the turns since that move was last
+  actually walked in the real world:
+
+      clock tau[spot][move] = turns since this move was last really taken
+
+  Two rules keep it ticking:
+
+      every turn        :  every move's clock ticks up by 1
+      the move you just
+      really walked     :  its clock resets to 0
+
+  So a move you took a moment ago has a tiny clock; a move you have not touched in ages
+  has a big one. Drawn, after walking spot 7's "right" while everything else sat idle:
+
+      BEFORE this turn:   tau[7][right] = 40    tau[7][up] = 40    tau[3][down] = 12
+      you walk (7,right), then every clock +1, then reset the one you walked:
+      AFTER:              tau[7][right] = 0     tau[7][up] = 41    tau[3][down] = 13
+
+  The clock measures staleness -- exactly the thing Dyna-Q ignores.
+
+  ---
+
+  SO TURN STALENESS INTO A FAKE REWARD: THE BONUS
+
+  During a rehearsal ONLY (never a real move), a recalled move gets a small fake reward
+  for being stale, on top of the real reward the notebook stored. The staler the move, the
+  bigger the fake bonus:
+
+      bonus  = kappa x sqrt( tau[spot][move] )
+      target = ( reward + bonus ) + dilute x ( best worth at the landing )
+
+  Here kappa is a tiny knob (say 0.001) that sets how strong curiosity is, and the square
+  root keeps a huge clock from exploding the bonus. Worked, a recalled move whose real
+  stored reward is 1, that has sat untried for tau = 9 turns, with kappa = 0.001:
+
+      bonus  = 0.001 x sqrt(9) = 0.001 x 3 = 0.003
+      target = ( 1 + 0.003 ) + dilute x peek = 1.003 + dilute x peek
+
+  Tiny at tau = 9. But the bonus grows with the square root of the clock, so a move left
+  untried far longer gets a real push -- at tau = 2500, sqrt(2500) = 50, and the bonus is
+  0.001 x 50 = 0.05, fifty times larger. Rehearsing that stale move again and again pumps
+  its worth up, until the chooser -- which picks the biggest worth -- finally re-tries it
+  in the real world. That real re-try is when a newly-opened shortcut gets discovered.
+
+  ---
+
+  BUT A NEVER-TRIED MOVE HAS NO NOTEBOOK LINE TO REHEARSE
+
+  The bonus only helps moves the notebook remembers. A move never tried has no line, so a
+  rehearsal can never pick it, so curiosity can never reach it. The fix: the first time you
+  ever visit a spot, record ALL of its moves at once -- the one you really took with its
+  real result, and the others as harmless placeholders that just say "this move leads back
+  here for reward 0":
+
+      first visit to spot 0, arrow 2 really taken (landed 0, reward 1):
+
+      model[0] = { 2 -> (0, 1),     <- the real one: arrow 2's true landing + reward
+                   0 -> (0, 0),     -.
+                   1 -> (0, 0),      |  placeholders: back to spot 0, reward 0
+                   3 -> (0, 0) }    -'
+
+  Now the notebook has a line for every move at spot 0, even the three never walked. A
+  rehearsal can grab one of those placeholders, find its clock ticking up turn after turn
+  (it is never reset, because it is never really walked), and pile the growing stale-bonus
+  onto it -- until the chooser re-tries it for real. Without the placeholders, an untried
+  move stays invisible to curiosity forever.
+
+  ---
+
+  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+
+  Nothing above needed a computer. This last section is for the day you meet one.
+
+  THE CLOCK, ONE TURN BY HAND (tick everything, reset the move walked):
+
+      # before: tau[7]["right"] = 40, tau[7]["up"] = 40, tau[3]["down"] = 12
+      tau[7]["right"] = 40 + 1              # 41   (tick every clock up by 1;
+      tau[7]["up"]    = 40 + 1              # 41    shown for three -- every other
+      tau[3]["down"]  = 12 + 1              # 13    clock ticks the same way)
+      tau[7]["right"] = 0                   # then reset ONLY the move walked this turn
+
+  THE STALE-BONUS IN A REHEARSAL BY HAND (recalled reward 1, tau 9, kappa 0.001,
+  q all 0, size 0.1, dilute 1.0, an ordinary landing whose best worth is 0):
+
+      bonus   = 0.001 * (9 ** 0.5)          # 0.001 * 3   = 0.003
+      peek    = 0                           # best worth at the landing
+      target  = (1 + bonus) + 1.0 * peek    # 1.003 + 0   = 1.003
+      q_cell  = 0 + 0.1 * (target - 0)      # 0.1 * 1.003 = 0.1003
+
+  The same move with no bonus would have landed at 0.1; the stale-bonus nudged it a hair
+  higher, to 0.1003 -- and that hair grows as the clock climbs.
+
+  FIRST-VISIT RECORDING, ALL FOUR ARROWS (real arrow 2 -> (0,1); the rest placeholders):
+
+      if state not in self.model:
+          self.model[state] = { a: (state, 0) for a in range(4) }   # 4 placeholders, reward 0
+      self.model[state][action] = (landing, reward)                 # overwrite the real one
+      # model[0] -> { 0:(0,0), 1:(0,0), 2:(0,1), 3:(0,0) }
+
+  Two places this bites, each a real lab failure, not invented:
+
+  You add the bonus to a REAL move's target, not just rehearsals. The bonus is a curiosity
+  trick for the imagination only -- a real reward is a real reward. Add it on the world's
+  fresh reward and you teach the worths a lie:
+
+      rehearsal target :  (reward + kappa*sqrt(tau)) + dilute*peek     RIGHT
+      real-move target :   reward + dilute*peek                        RIGHT (no bonus)
+
+  You reset the wrong clock, or forget to tick first. Tick EVERY clock up by 1 each turn,
+  THEN reset only the move you actually walked to 0 -- reset before ticking and the move
+  you just took wrongly shows a clock of 1.
+
+  ---
+
+  THE WHOLE CHAPTER, ONE LINE EACH
+
+  Four posts, one thread -- learn a worth from a sample, then squeeze more from memory:
+
+      TD(0)          : worth per SPOT, corrected from one real sample (no die)
+      Q-learning     : worth per (spot, move); target peeks the MAX of the landing's row
+      Expected Sarsa : same, but the peek is the AVERAGE weighted by pick-odds (honest)
+      Dyna-Q         : + a notebook + rehearsal -- free imaginary corrections from memory
+      Dyna-Q+        : + a clock + a stale-bonus -- re-tries old moves, finds new shortcuts
+
+  The cost of Dyna-Q+ is honest: it spends some real moves re-checking paths that turn out
+  unchanged, a little waste, bought in exchange for noticing the day the world does change.
+  And the deeper split: a model-based machine (Dyna) learns faster per real footstep than a
+  model-free one (Q-learning alone) -- but only as far as its notebook is accurate.
+
+  ---
+
+  ONE BREATH
+
+  Dyna-Q stops exploring once it trusts a path, so it misses a shortcut that opens LATER.
+  Dyna-Q+ adds a CLOCK -- one number per (spot, move), ticking up every turn, reset to 0
+  on the move actually walked -- so staleness is measured. During a rehearsal ONLY, a
+  recalled move earns a fake bonus kappa x sqrt(tau) added to its stored reward, so the
+  longer a move sits untried the more its worth gets pumped, until the chooser re-tries it
+  for real and discovers the new shortcut. So that even never-walked moves can be tempted,
+  the first visit to a spot records all four arrows -- the real one plus three harmless
+  placeholders -- giving curiosity a line to grab. The bonus belongs to the imagination
+  only; a real move's reward stays untouched.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   spot                = state  (standard: s)
+  >>   move / arrow        = action  (a)
+  >>   worth table q       = action-value function  (Q)
+  >>   the notebook        = the model  (a learned model of the world)
+  >>   rehearsal           = planning / a planning step (simulated experience)
+  >>   the clock tau       = time-since-last-tried, per (state, action)
+  >>   stale-bonus         = the exploration bonus  kappa * sqrt(tau)
+  >>   kappa               = the exploration-bonus weight
+  >>   placeholders        = optimistic model init for untried actions (back-to-self, reward 0)
+  >>   size 0.1            = step size / learning rate  (alpha)
+  >>   dilute              = discount factor  (gamma)
+  >>   Dyna-Q+             = Dyna-Q with the bonus, for non-stationary (changing) worlds
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):
+    [Part 1 -- TD(0) Built by Pencil](td-zero-by-pencil.txt) .
+    [Part 2 -- Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt) .
+    [Part 3 -- Dyna-Q by Pencil](dyna-q-by-pencil.txt) .
+    Part 4 (this post)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

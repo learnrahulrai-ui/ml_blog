@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in thirteen chapters (thirty-seven posts),
-  meant to be read top to bottom. Each post opens with a "post N of 37" path header and a
+  This is not a pile of loose articles -- it is a short BOOK in thirteen chapters (forty posts),
+  meant to be read top to bottom. Each post opens with a "post N of 40" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 37:
+  >> NEW HERE? Start at post 1 of 40:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -566,7 +566,7 @@
   -----------------------------------------------------------------------------
 
   [Part 1 -- No Die, Just a Sample: TD(0) Built by Pencil](posts/td-zero-by-pencil.txt)
-    post 37/37 . 2026-06-24 . part 1 of 4 . reinforcement-learning, temporal-difference, td-zero, policy-evaluation, by-hand
+    post 37/40 . 2026-06-24 . part 1 of 4 . reinforcement-learning, temporal-difference, td-zero, policy-evaluation, by-hand
     Chapter 12 graded a plan WITH the die -- averaging the drone recipe over every landing
     at once. Take the die away and each move hands back one landing and one reward, no table
     of chances. TD(0) folds that single sample in with the bandit nudge (new = old + size x
@@ -578,6 +578,43 @@
     -10). Three real lab failures shown: forgetting the "=" that stores the result back (the
     table stays a sheet of zeros), nudging the landed spot instead of the left one, and
     keeping the discount piece at the anchor. Assumes zero background.
+
+  [Part 2 -- Max or Honest Average: Q-Learning and Expected Sarsa by Pencil](posts/q-learning-expected-sarsa-by-pencil.txt)
+    post 38/40 . 2026-06-24 . part 2 of 4 . reinforcement-learning, q-learning, expected-sarsa, control, by-hand
+    Part 1 graded a fixed plan; now nobody hands you the arrows, so you must FIND the best
+    move at each spot -- which forces a worth per (spot, move), a table q, not a row. Pick
+    mostly the biggest cell (greedy), wander 10% (epsilon). Fix the cell of the move you just
+    made by the bandit crawl, toward reward + dilute x (future from the landing). That future
+    is the only fork: Q-learning takes the MAX of the landing's row (dreams you play best);
+    Expected Sarsa takes the AVERAGE weighted by pick-odds (honest you wander) -- worked by
+    hand to 0.02 for one and 0.0185 for the other on the same cell. The anchor (game over)
+    drops the future piece for both. Three lab failures: nudging the new spot, leaking the
+    just-picked move into the target, keeping the discount at the anchor.
+
+  [Part 3 -- A Notebook and a Rehearsal: Dyna-Q by Pencil](posts/dyna-q-by-pencil.txt)
+    post 39/40 . 2026-06-24 . part 3 of 4 . reinforcement-learning, dyna-q, planning, model-based, by-hand
+    Q-learning fixes one worth per real footstep. Dyna-Q keeps a second paper -- a NOTEBOOK
+    (the model), a page per spot and a line per move, each line holding the (landing, reward)
+    that move once produced (the two-layer dict drawn in full, with the blank-page guard).
+    After every real move it REHEARSES: grab a remembered move, read its stored pair, and run
+    the exact same crawl -- a free correction fed by memory instead of the world. The prize,
+    worked by hand: a reward spreads BACKWARD along remembered moves with no footsteps -- the
+    goal's +1 reaching spot 0 through two rehearsals, zero walking. One real footstep, six
+    beats: correct, record, rehearse, pick, slide, hand back. A rehearsed move that ended the
+    game drops the future piece (the Part 1 anchor).
+
+  [Part 4 -- A Clock for Curiosity: Dyna-Q+ by Pencil](posts/dyna-q-plus-by-pencil.txt)
+    post 40/40 . 2026-06-24 . part 4 of 4 . reinforcement-learning, dyna-q-plus, exploration, changing-world, by-hand
+    Dyna-Q stops exploring once it trusts a path, so it misses a shortcut that opens LATER.
+    Dyna-Q+ adds a CLOCK -- one number per (spot, move), ticking up every turn, reset to 0 on
+    the move actually walked -- so staleness is measured. During a rehearsal only, a recalled
+    move earns a fake bonus kappa x sqrt(tau) on its stored reward (tau 9, kappa 0.001 ->
+    0.003; tau 2500 -> 0.05), so the longer a move sits untried the more its worth is pumped,
+    until the chooser re-tries it for real and finds the new shortcut. So even never-walked
+    moves can be tempted, the first visit to a spot records all four arrows -- the real one
+    plus three back-to-self placeholders. The bonus belongs to the imagination only; a real
+    move's reward stays untouched. Ends with the whole chapter in five lines and the honest
+    model-based-vs-model-free tradeoff.
 
 
 ----------------------------------------------------------------------------------------------

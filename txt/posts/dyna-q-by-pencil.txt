@@ -1,0 +1,291 @@
+@title A Notebook and a Rehearsal: Dyna-Q by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 13 . SAMPLE-BASED LEARNING . PART 3 OF 4
+  A Notebook and a Rehearsal: Dyna-Q by Pencil
+  Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, dyna-q, planning, model-based, by-hand
+  ============================================================================================
+
+  PATH . post 39/40 . part 3 of 4 in Chapter 13 -- Sample-based Learning
+    <- prev:  [Chapter 13, Part 2: Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt)
+       next:  [Chapter 13, Part 4: Dyna-Q+ by Pencil](dyna-q-plus-by-pencil.txt) ->
+
+  ---
+
+  The companion post, [Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt),
+  corrected one worth per real move. You take a step, the world answers, you fix one cell,
+  you take another step. Every correction costs a real footstep.
+
+  A spot = one place in the world. A move / arrow = a direction you pick. A reward = a
+  number the world pays on a move. A worth = a number saying how good a (spot, move) is.
+  The worth table is q -- one cell q[spot][move] per stand-here-pick-this, all starting
+  at the lie of 0, and the bandit crawl that fixes a cell:
+
+      q[spot][move] = q[spot][move] + size x ( target - q[spot][move] )
+
+  where size is the step (a small fraction) and the target is reward + dilute x (best
+  worth at the landing). Real footsteps are slow. Dyna-Q squeezes far more learning out
+  of each one by remembering what the world did, then reliving those moves in its head.
+
+  ---
+
+  WHICH MEANS A SECOND PIECE OF PAPER: A NOTEBOOK OF WHAT THE WORLD DID
+
+  Two papers now, side by side. The first is the worth table you already have. The
+  second is new -- a notebook (the textbook calls it the model):
+
+      PAPER A -- the worth table q[spot][move]   : you CORRECT these (the crawl above)
+      PAPER B -- the notebook  model[spot][move] : you RECORD facts of what the world did
+
+  After every real move, you jot one fact into the notebook: from this spot, this move
+  landed me there and paid that. Later, with no real move at all, you flip the notebook
+  open, pick a remembered move, and run the SAME crawl again -- a free correction bought
+  from memory instead of from a footstep.
+
+      REAL move:   you -> world -> (landing, reward)   -> jot it in the notebook
+      REHEARSAL:   flip notebook -> relive an old (landing, reward) -> crawl a worth again
+
+  ---
+
+  SO WHAT SHAPE IS THE NOTEBOOK? TWO LAYERS, DRAWN IN FULL
+
+  The notebook is a page per spot, and a line per move on that page. Each line holds a
+  PAIR -- where that move landed and what it paid:
+
+      model  (the whole notebook)
+      +-----------------------------------------------------------+
+      |  spot 7  -->  page:  { right -> (8, -1),  up -> (7, -1) }  |   spot 7's page
+      |  spot 3  -->  page:  { up    -> (3, -1) }                  |   spot 3's page
+      +-----------------------------------------------------------+
+          ^               ^               ^
+       outer key       inner key        the answer
+      (the spot)      (the move)      (landing, reward)
+
+  Read it at two depths. The outer key is the spot -- it picks which PAGE. The inner key
+  is the move -- it picks which LINE on that page. The line holds a pair: the landing AND
+  the reward. (Keep BOTH. Drop the reward and a rehearsal has nothing to crawl toward.)
+
+  It feels like a 2D table, model[spot][move], double-indexed. One difference, and it is
+  the whole reason for the guard below: a real 2D table has every slot waiting from the
+  start; this notebook holds only the moves you have actually tried, and grows as you go:
+
+      a 2D table (every slot pre-made)      the notebook (only what you lived)
+        up left down right                    spot 7 -> { right:(8,-1), up:(7,-1) }
+      0  .   .    .    .                       spot 3 -> { up:(3,-1) }
+      1  .   .    .    .                       (spots 0,1,2,4,... not here yet)
+      ...
+
+  ---
+
+  SO RECORDING IS PURE BOOKKEEPING -- BUT A FRESH PAGE DOES NOT EXIST YET
+
+  Writing a fact does no arithmetic at all. You are handed four numbers and you file
+  them: the spot you left, the move you took, where you landed, what it paid. No worths,
+  no crawl -- just write the line.
+
+  The one snag: the notebook starts empty. The first time you file under spot 7, page 7
+  does not exist yet, and you cannot write a line onto a missing page:
+
+      model = { }
+      model[7][right] = (8, -1)        <- no page "7" yet  ->  error
+
+  So if the page is missing, start a blank page first, THEN write the line. Drawn,
+  starting from an empty notebook:
+
+      write (7, right -> 8, -1):
+        page 7 missing?  yes  ->  model[7] = {}            (start a blank page)
+                               ->  model[7][right] = (8,-1)  (write the line)
+        model is now:  { 7: { right:(8,-1) } }
+
+      write (7, up -> 7, -1):     (a wall -- stayed put)
+        page 7 missing?  no   ->  skip the blank-page start
+                               ->  model[7][up] = (7,-1)     (a second line, same page)
+        model is now:  { 7: { right:(8,-1), up:(7,-1) } }
+
+  Start the blank page ONLY when the page is missing. Do it every time and you wipe the
+  lines already written -- the guard is what protects spot 7's first line when its second
+  is filed.
+
+  ---
+
+  SO NOW THE REHEARSAL: THE SAME CRAWL, FED BY MEMORY
+
+  A rehearsal is one correction with no real move. Four beats: grab a remembered spot and
+  a remembered move at random, read the pair the notebook stored there, then crawl the
+  worth -- the exact same nudge as a real move, only the reward and landing come from the
+  page instead of the world:
+
+      (1) grab a remembered spot, then a remembered move on its page   (two random picks)
+      (2) read the line  ->  (landing, reward)
+      (3) crawl q[spot][move] toward  reward + dilute x (best worth at landing)
+      (4) the fork: did that remembered move end the game?
+
+  Beat 4 is the anchor rule from Part 1, recalled here: a move that ended the game stored
+  its landing as a dummy -1 (there is no real spot to read a row from). So:
+
+      landing is -1 (the move ended the game) :  target = reward alone
+      otherwise (an ordinary landing)         :  target = reward + dilute x max(q[landing])
+
+  One rehearsal by hand. Notebook holds one line, model = { 3: { down -> (15, -1) } };
+  the table q is all 0; size = 0.1, dilute = 1.0:
+
+      grab:    spot 3, move down
+      read:    (landing 15, reward -1)
+      ended?   landing is 15, not -1  ->  ordinary, keep the future piece
+      peek:    max(q[15]) = 0
+      target = reward + dilute x 0 = -1 + 0 = -1
+      q[3][down] = 0 + 0.1 x ( -1 - 0 ) = -0.1
+
+  No footstep was taken. The worth of "stand at spot 3, go down" moved from 0 to -0.1,
+  paid for entirely out of memory.
+
+  ---
+
+  WHICH IS WHY IT WINS: THE GOAL'S REWARD SPREADS BACKWARD WITH NO FOOTSTEPS
+
+  One real footstep buys dozens of these free corrections, and -- the real prize -- a
+  reward spreads BACKWARD along remembered moves without walking them again. Watch it,
+  with size = 1 and dilute = 1 so the crawl jumps the whole way and the spread is plain.
+
+  The notebook holds two remembered moves: from spot 0 going right landed on spot 1 for
+  reward 0; from spot 1 going right ended the game (the goal) for reward 1:
+
+      model = { 0: { right -> (1, 0) },   1: { right -> (-1, 1) } }
+                                                       ^^ -1 = ended the game
+
+  q starts all 0. Rehearse the goal move first:
+
+      rehearse (1, right):  landing is -1 (ended)  ->  target = reward = 1
+                            q[1][right] = 0 + 1 x ( 1 - 0 ) = 1
+
+  Now rehearse the earlier move, which lands on spot 1 -- whose best worth is now 1:
+
+      rehearse (0, right):  landing 1 (ordinary)   ->  target = 0 + 1 x max(q[1]) = 0 + 1 = 1
+                            q[0][right] = 0 + 1 x ( 1 - 0 ) = 1
+
+  The goal's +1 has crawled all the way back to spot 0 -- two cells lit up, zero real
+  footsteps. A model-free machine would have to physically walk that path twice to spread
+  the reward two spots back. Dyna-Q walks it once and rehearses the rest.
+
+  ---
+
+  SO ONE REAL FOOTSTEP DOES SIX BEATS
+
+  Putting the real move and the rehearsals together, a single real footstep runs this:
+
+      (1) CORRECT the move you just made, from the world's fresh reward + landing
+      (2) RECORD that fact into the notebook
+      (3) REHEARSE: replay remembered facts, crawling worths again -- no world touched
+      (4) PICK the next arrow (mostly the biggest worth, 10% random -- the Part 2 wander)
+      (5) SLIDE the labels: the landing becomes the new "spot you left"
+      (6) hand the arrow back to the world
+
+  Beats 1 and 3 are the SAME crawl. The only difference is where the reward and landing
+  come from: beat 1 reads them off the world; beat 3 reads them off the notebook. That is
+  the whole trick -- imaginary corrections are real corrections, fed by memory.
+
+  ---
+
+  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+
+  Nothing above needed a computer. This last section is for the day you meet one.
+
+  RECORDING a fact (the blank-page guard, then the line):
+
+      def update_model(self, past_state, past_action, state, reward):
+          if past_state not in self.model:
+              self.model[past_state] = {}                  # page missing -> start blank
+          self.model[past_state][past_action] = (state, reward)   # write the line
+
+  ONE REHEARSAL BY HAND (the notebook holds 3->down->(15,-1); q all 0; size 0.1, dilute 1.0):
+
+      chosen_spot = 3
+      chosen_move = "down"
+      landing, reward = self.model[3]["down"]              # (15, -1)
+      # landing 15 is not -1 -> ordinary, keep the future piece
+      peek    = max(self.q[15])                            # 0
+      target  = reward + self.discount * peek              # -1 + 1.0*0 = -1
+      self.q[3]["down"] += self.step_size * (target - self.q[3]["down"])   # 0 + 0.1*(-1-0) = -0.1
+
+  ONE REAL agent_step BY HAND (past_state 0, past_action 1, reward 1, landing 2;
+  q all 0; size 0.125, dilute 0.95):
+
+      # beat 1 -- correct from the world
+      peek      = max(self.q[2])                           # 0
+      target    = 1 + 0.95 * peek                          # 1 + 0.95*0 = 1
+      self.q[0][1] += 0.125 * (target - self.q[0][1])      # 0 + 0.125*(1-0) = 0.125
+
+      # beat 2 -- record the fact
+      # model[0][1] = (2, 1)
+
+      # beat 3 -- rehearse THAT same move, now reward+landing come from the notebook
+      target    = 1 + 0.95 * max(self.q[2])                # still 1 (q[2] still all 0)
+      self.q[0][1] += 0.125 * (target - self.q[0][1])      # 0.125 + 0.125*(1-0.125) = 0.234
+
+  After one real footstep plus one rehearsal, q[0][1] climbed 0 -> 0.125 -> 0.234 -- two
+  corrections, one footstep.
+
+  Three places this bites, each a real lab failure, not invented:
+
+  You start a blank page when one already exists, wiping it. Guard with "if the page is
+  missing" -- otherwise the second line filed under a spot erases its first:
+
+      if past_state not in self.model:        RIGHT  (only when the page is missing)
+          self.model[past_state] = {}
+      self.model[past_state] = {}             WRONG  (every time -- wipes the old lines)
+
+  You slide the label too early. The "spot you left" must become the landing only AFTER
+  the correction is done -- move it first and beat 1 corrects the wrong cell.
+
+  You keep the future piece for a remembered move that ended the game. Its landing was
+  stored as the dummy -1; there is no q[-1] row to peek at, so the target is the reward
+  alone -- the same anchor rule from Part 1.
+
+  ---
+
+  ONE BREATH
+
+  Q-learning fixed one worth per real footstep. Dyna-Q keeps a NOTEBOOK -- a page per
+  spot, a line per move, each line holding (landing, reward) -- and after every real move
+  it REHEARSES: pick a remembered move, read its stored pair, and run the exact same crawl
+  q[spot][move] += size x (reward + dilute x best-at-landing - q[spot][move]), fed by
+  memory instead of the world. Recording is pure bookkeeping (start a blank page only if
+  the spot has none); a rehearsed move that ended the game drops the future piece, the
+  Part 1 anchor. The prize: a reward spreads BACKWARD along remembered moves with no
+  footsteps -- the goal's +1 reaching spot 0 through two rehearsals, zero walking. One
+  real footstep, six beats: correct, record, rehearse, pick, slide, hand back.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   spot                = state  (standard: s)
+  >>   move / arrow        = action  (a)
+  >>   worth table q       = action-value function  (Q)
+  >>   the notebook        = the model  (a learned model of the world)
+  >>   recording a fact    = update_model
+  >>   rehearsal           = planning / a planning step (simulated experience)
+  >>   real move vs rehearsal = direct RL vs planning (Dyna's two streams)
+  >>   reward + dilute x best-at-landing = the Q-learning target (used in both streams)
+  >>   dummy landing -1    = terminal flag (the move ended the game -> target = reward alone)
+  >>   size 0.1            = step size / learning rate  (alpha)
+  >>   dilute              = discount factor  (gamma)
+  >>   wander 10%          = epsilon-greedy exploration
+  >>   model-based         = learns and plans from a model (Dyna); model-free = Q-learning alone
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):
+    [Part 1 -- TD(0) Built by Pencil](td-zero-by-pencil.txt) .
+    [Part 2 -- Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt) .
+    Part 3 (this post) .
+    [Part 4 -- Dyna-Q+](dyna-q-plus-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

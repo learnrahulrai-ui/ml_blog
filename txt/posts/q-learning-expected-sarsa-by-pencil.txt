@@ -1,0 +1,321 @@
+@title Max or Honest Average: Q-Learning and Expected Sarsa by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 13 . SAMPLE-BASED LEARNING . PART 2 OF 4
+  Max or Honest Average: Q-Learning and Expected Sarsa by Pencil
+  Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, q-learning, expected-sarsa, control, by-hand
+  ============================================================================================
+
+  PATH . post 38/40 . part 2 of 4 in Chapter 13 -- Sample-based Learning
+    <- prev:  [Chapter 13, Part 1: TD(0) Built by Pencil](td-zero-by-pencil.txt)
+       next:  [Chapter 13, Part 3: Dyna-Q by Pencil](dyna-q-by-pencil.txt) ->
+
+  ---
+
+  The companion post, [TD(0) Built by Pencil](td-zero-by-pencil.txt), GRADED a fixed
+  plan. Someone handed you the arrows -- the safe walk -- and you only filled in the
+  worth of each spot under that plan, one number per spot.
+
+  A spot = one place in the world. A move = a direction you can pick (here four: up,
+  left, down, right). A reward = a number the world pays you on a move. A worth = a
+  number saying how good something is, counting the rewards you expect from there on.
+
+  Nobody hands you the arrows now. The job changes from grading a given plan to FINDING
+  the best move at every spot. So one number per spot is no longer enough: a spot is not
+  good or bad on its own -- it depends on which move you pick there. You need a worth per
+  spot AND per move.
+
+  ---
+
+  WHICH FORCES A TABLE, NOT A ROW: ONE WORTH PER (SPOT, MOVE)
+
+  In Part 1 the worth was one number per spot -- a row:
+
+      spot:   0    1    2
+      V    [  0 ,  0 ,  0  ]
+
+  Now it is one number per spot AND per move -- a table. The small world here has 3
+  spots and 4 moves, so 12 numbers, all starting at the lie of 0:
+
+              move0  move1  move2  move3
+      spot0  [   0  ,   0  ,   0  ,   0   ]
+      spot1  [   0  ,   0  ,   0  ,   0   ]
+      spot2  [   0  ,   0  ,   0  ,   0   ]
+
+  Call this table q. One cell is one (spot, move) worth:
+
+      q[0][1] = the worth of: stand at spot 0, pick move 1
+      q[spot] = a whole ROW = the four move-worths at that spot
+
+  (The full lab runs this on Cliff Walking from Part 1 -- 48 spots, 4 moves, a 48x4
+  table. The 3-spot world here is the small test, every number checkable by hand.)
+
+  ---
+
+  SO HOW DO YOU PICK A MOVE? MOSTLY THE BIGGEST, SOMETIMES A WANDER
+
+  At a spot you read its row and pick the biggest worth -- the greedy move. But always
+  picking the biggest known worth locks you onto a decent-but-maybe-not-best move and you
+  never discover better. So you wander a little. Roll a number between 0 and 1:
+
+      roll < 0.1   -->  pick a RANDOM move          (the 10% wander)
+      roll >= 0.1  -->  pick the biggest in the row  (the 90% greedy)
+
+  That 0.1 is epsilon. "Biggest in the row" hands back the INDEX of the largest worth
+  (ties broken fairly). This is the same lock-and-wander from the bandit in Chapter 12:
+  pure greed freezes on the first decent thing; a little randomness keeps you looking.
+
+  ---
+
+  THE NUDGE: FIX THE MOVE YOU JUST MADE
+
+  You stood at a spot (call it `prev`), picked a move (call it `move`), got a reward, and
+  landed on a new spot (call it `landing`). Drawn:
+
+      q[prev][move]  --(reward)-->  landing
+      (we fix THIS cell)            (we only read its row)
+
+  You fix the worth of the move you JUST MADE -- the cell q[prev][move] -- toward a
+  target, in the same bandit shape from Part 1 (crawl a fraction `size` of the way):
+
+      q[prev][move] = q[prev][move] + size x ( target - q[prev][move] )
+
+  Here size is the step (here 0.1) and the target is one sample of the drone recipe:
+
+      target = reward + dilute x ( future worth from the landing )
+
+  Here dilute is the discount (here 1.0). Everything so far is Part 1 with a two-index
+  cell instead of a one-index spot. The whole new question is the last piece -- the
+  "future worth from the landing" -- and it is the ONE place the two machines split.
+
+  ---
+
+  THE FORK: A DREAMED MAX, OR AN HONEST AVERAGE
+
+  The landing has a whole row of four move-worths. What single number stands for "the
+  future from here"? Two answers, and that is the entire difference between the two
+  machines:
+
+      Q-LEARNING      future = the BIGGEST worth in the landing's row   (max)
+                      -- dreams you will play the best move next.
+
+      EXPECTED SARSA  future = the AVERAGE worth in the landing's row,
+                      weighted by how often you would actually pick each move
+                      -- honest that you wander 10% of the time.
+
+  Q-learning is optimistic: it assumes next move is the best one. Expected Sarsa is
+  honest: it knows that 10% of the time it will roll a random move, so it averages the
+  row by the real pick-odds. Same nudge, same size, same target shape -- only this
+  "future" number differs. Now both, by hand, on the same two moves.
+
+  ---
+
+  Q-LEARNING BY HAND -- THE MAX
+
+  size = 0.1, dilute = 1.0, the table starts all 0. Start at spot 0, pick move 1, so
+  prev = 0 and move = 1.
+
+  FIRST MOVE -- reward 2, land at spot 1. The landing's row is q[1] = [0,0,0,0], so its
+  biggest is 0:
+
+      target = reward + dilute x max(q[1])
+             =   2    +  1.0   x   0        = 2
+      q[0][1] = 0 + 0.1 x ( 2 - 0 ) = 0.1 x 2 = 0.2
+
+  The table now:
+
+      spot0  [ 0 , 0.2 , 0 , 0 ]
+      spot1  [ 0 ,  0  , 0 , 0 ]
+      spot2  [ 0 ,  0  , 0 , 0 ]
+
+  Now prev = 1, move = 3.
+
+  SECOND MOVE -- reward 0, land at spot 0. The landing's row is q[0] = [0, 0.2, 0, 0],
+  so its biggest is 0.2:
+
+      target = reward + dilute x max(q[0])
+             =   0    +  1.0   x  0.2       = 0.2
+      q[1][3] = 0 + 0.1 x ( 0.2 - 0 ) = 0.1 x 0.2 = 0.02
+
+  The table now:
+
+      spot0  [ 0 , 0.2 , 0 ,  0   ]
+      spot1  [ 0 ,  0  , 0 , 0.02 ]
+      spot2  [ 0 ,  0  , 0 ,  0   ]
+
+  The +2 reward that landed at spot 0's move 1 has begun crawling backward: spot 1's
+  move 3 now knows that move leads somewhere worth 0.2.
+
+  ---
+
+  EXPECTED SARSA BY HAND -- THE SAME TRACE, ONLY THE FUTURE CHANGES
+
+  Same world, same two moves, size 0.1, dilute 1.0, table all 0. The only swap: the
+  "future from the landing" is now the weighted average of the row, not its max.
+
+  The weights are the real pick-odds at the landing, the same epsilon-greedy rule from
+  above. With epsilon = 0.1 and 4 moves: every move gets a base share epsilon/4 =
+  0.1/4 = 0.025, and the greedy move (the biggest in the row) gets an extra
+  1 - epsilon = 0.9 on top. So the greedy move's weight is 0.9 + 0.025 = 0.925, and the
+  other three are 0.025 each (check: 0.925 + 0.025 + 0.025 + 0.025 = 1.0).
+
+  FIRST MOVE -- reward 2, land at spot 1. Row q[1] = [0,0,0,0]: every worth is 0, so the
+  average is 0 whatever the weights:
+
+      target = reward + dilute x 0 = 2 + 0 = 2
+      q[0][1] = 0 + 0.1 x ( 2 - 0 ) = 0.2
+
+  Same as Q-learning here, because an all-zero row has the same max and average. Now
+  prev = 1, move = 3.
+
+  SECOND MOVE -- reward 0, land at spot 0. Row q[0] = [0, 0.2, 0, 0]. The biggest is
+  move 1, so move 1 is the greedy one and gets weight 0.925; the others get 0.025:
+
+      average = 0.925 x 0.2  +  0.025 x 0  +  0.025 x 0  +  0.025 x 0
+              = 0.185        +     0       +     0       +     0
+              = 0.185
+      target  = reward + dilute x 0.185 = 0 + 0.185 = 0.185
+      q[1][3] = 0 + 0.1 x ( 0.185 - 0 ) = 0.0185
+
+  The table now:
+
+      spot0  [ 0 , 0.2 , 0 ,   0    ]
+      spot1  [ 0 ,  0  , 0 , 0.0185 ]
+      spot2  [ 0 ,  0  , 0 ,   0    ]
+
+  Q-learning wrote 0.02 into that same cell; Expected Sarsa wrote 0.0185. The honest
+  average is a touch lower than the dreamed max, because it mixes the best move's 0.2
+  with a small chance of the three zeros -- it does not assume you will always take the
+  best.
+
+  ---
+
+  BUT THE GAME ENDS SOMETIMES: THE ANCHOR, SAME AS PART 1
+
+  Reach the goal and the game ENDS -- there is no landing to read a row from. So the
+  future piece has nothing to grab. Drop it. The target becomes the reward alone, the
+  same anchor rule as Part 1, and it is identical for both machines:
+
+      mid-game:  target = reward + dilute x (future from landing)
+      anchor  :  target = reward                 (game over -- no landing)
+
+      q[prev][move] = q[prev][move] + size x ( reward - q[prev][move] )
+
+  ---
+
+  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+
+  Nothing above needed a computer. This last section is for the day you meet one: the
+  same two cells, spoken in Python.
+
+  The table is a grid of zeros, 3 spots by 4 moves:
+
+      q = [ [0, 0, 0, 0],     # spot 0
+            [0, 0, 0, 0],     # spot 1
+            [0, 0, 0, 0] ]    # spot 2
+
+  Q-LEARNING, THE TWO MOVES BY HAND:
+
+      size, dilute = 0.1, 1.0
+
+      # first move: prev 0, move 1, reward 2, land at spot 1
+      target  = 2 + dilute * max(q[1])           # 2 + 1.0*0   = 2
+      q[0][1] = q[0][1] + size * (target - q[0][1])   # 0 + 0.1*(2-0)   = 0.2
+
+      # second move: prev 1, move 3, reward 0, land at spot 0
+      target  = 0 + dilute * max(q[0])           # 0 + 1.0*0.2 = 0.2
+      q[1][3] = q[1][3] + size * (target - q[1][3])   # 0 + 0.1*(0.2-0) = 0.02
+
+  EXPECTED SARSA, THE SECOND MOVE -- only the "future" line changes:
+
+      epsilon = 0.1
+      base    = epsilon / 4                       # 0.025 to every move
+      # the greedy move (biggest of q[0]) is move 1; it gets +0.9 on top:
+      weights = [0.025, 0.925, 0.025, 0.025]      # sums to 1.0
+      future  = (weights[0]*q[0][0] + weights[1]*q[0][1]
+                 + weights[2]*q[0][2] + weights[3]*q[0][3])   # 0.925*0.2 = 0.185
+      target  = 0 + dilute * future               # 0 + 1.0*0.185 = 0.185
+      q[1][3] = q[1][3] + size * (target - q[1][3])   # 0 + 0.1*(0.185-0) = 0.0185
+
+  Then the agent the grader runs. The new move is picked BEFORE the update, so be sure
+  the target does NOT use the move you just picked -- it uses max (Q-learning) or the
+  weighted average (Expected Sarsa) of the whole landing row:
+
+      def agent_step(self, reward, state):           # Q-learning
+          # nudge the cell for the move JUST MADE, toward reward + discount*max(landing row)
+          self.q[self.prev_state, self.prev_action] += self.step_size * (
+              reward + self.discount * np.max(self.q[state])
+              - self.q[self.prev_state, self.prev_action])
+          action = self.choose(state)                # epsilon-greedy, picked AFTER the update
+          self.prev_state, self.prev_action = state, action
+          return action
+
+      def agent_end(self, reward):                   # both machines: anchor, no landing
+          self.q[self.prev_state, self.prev_action] += self.step_size * (
+              reward - self.q[self.prev_state, self.prev_action])
+
+  Three places this bites, each a real lab failure, not invented:
+
+  You nudge the wrong cell. Correct q[prev_state, prev_action] (the move you JUST MADE),
+  never q[state, ...] (the new spot) -- the reward was paid for the move out of `prev`:
+
+      q[prev_state, prev_action] += ...     RIGHT  (the cell the reward teaches)
+      q[state, ...]              += ...     WRONG  (the new spot, only read for its row)
+
+  The picked action leaks into the target. The next move is chosen before the update,
+  but the target must NOT use it -- Q-learning uses max of the row, Expected Sarsa the
+  weighted average. Letting the just-picked action into the target turns these into a
+  different, weaker machine.
+
+  You forget the anchor has no landing. agent_end has NO discount * (future) piece --
+  the game ended, there is no row to read. The only gap between the two machines is that
+  one "future" number: max for Q-learning, weighted average for Expected Sarsa.
+
+  ---
+
+  ONE BREATH
+
+  A worth per spot was enough to GRADE a plan; to FIND one you need a worth per (spot,
+  move) -- a table q, one cell per stand-here-pick-this. Pick mostly the biggest cell in
+  the row (greedy), wander 10% of the time (epsilon) so you keep discovering. Fix the
+  cell of the move you JUST MADE, by the bandit crawl q[prev][move] += size x (target -
+  q[prev][move]), with target = reward + dilute x (future from the landing). That future
+  is the ONLY fork: Q-learning takes the MAX of the landing's row (dreams you will play
+  best); Expected Sarsa takes the AVERAGE weighted by pick-odds (honest that you wander)
+  -- which is why the same cell came out 0.02 for one and 0.0185 for the other. At the
+  goal the game ends, there is no landing, so the target is the reward alone.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   spot                = state  (standard: s)
+  >>   move / arrow        = action  (a)
+  >>   the "+" / reward    = reward  (R or r)
+  >>   worth per (spot,move) = action value  (Q, or q(s,a))
+  >>   the table q         = the Q-table / action-value function
+  >>   biggest in the row  = the greedy action  (argmax_a q(s,a))
+  >>   wander 10%          = epsilon-greedy exploration  (epsilon)
+  >>   size 0.1            = step size / learning rate  (alpha)
+  >>   dilute 1.0          = discount factor  (gamma)
+  >>   future = max of landing row    = Q-learning (off-policy control)
+  >>   future = weighted average      = Expected Sarsa (the pick-odds are the policy)
+  >>   anchor (game ended) = terminal state  (target = reward alone)
+  >>   the world here      = Cliff Walking control (Sutton & Barto)
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):
+    [Part 1 -- TD(0) Built by Pencil](td-zero-by-pencil.txt) .
+    Part 2 (this post) .
+    [Part 3 -- Dyna-Q](dyna-q-by-pencil.txt) .
+    [Part 4 -- Dyna-Q+](dyna-q-plus-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
