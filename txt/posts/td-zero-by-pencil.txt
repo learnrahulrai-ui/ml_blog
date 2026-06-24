@@ -64,6 +64,15 @@
       time, and let the SIZE do the averaging over many samples instead of the die
       doing it all at once.
 
+  The same leap as equations -- TD(0) is the bandit nudge with a better target:
+
+      bandit nudge :  new = old + size x ( reward - old )
+                                            ^^^^^^ a bare reward
+      swap that bare reward for ONE sample of the drone recipe (reward + diluted landing):
+                      reward   ->   reward + dilute x worth(next)
+      TD(0)        :  new worth(last) = old + size x ( reward + dilute x worth(next) - old )
+                                                       \_________ the new target _________/
+
   That single swap -- die-average becomes one-sample-plus-a-slow-crawl -- is TD(0).
   The rest of this post is what to nudge, toward what, and the two cases by hand.
 
