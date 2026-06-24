@@ -1,0 +1,343 @@
+@title No Die, Just a Sample: TD(0) Built by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 13 . SAMPLE-BASED LEARNING . PART 1 OF 4
+  No Die, Just a Sample: TD(0) Built by Pencil
+  Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, temporal-difference, td-zero, policy-evaluation, by-hand
+  ============================================================================================
+
+  PATH . post 37/37 . part 1 of 4 in Chapter 13 -- Sample-based Learning
+    <- prev:  [Chapter 12, Part 5: Value Iteration Built by Pencil](value-iteration-by-pencil.txt)
+       next:  (more posts coming)
+
+  ---
+
+  You already own both halves of this post. Chapter 12 built them.
+
+  A spot = one place in a world. A reward = a number the world pays you when you make
+  a move. A worth = one number per spot: how good that spot is to be in, counting the
+  rewards you expect to collect from there on.
+
+  Two tools from Chapter 12, restated here so nothing is assumed:
+
+  The bandit nudge (Chapter 12, Part 1) folds a fresh reward into a running guess by a
+  fraction, instead of storing every past reward:
+
+      new guess = old guess + size x ( reward - old guess )
+
+  Here size is a small fraction, say 0.1 -- you crawl that fraction of the way toward
+  the reward, never jumping all the way. Many crawls settle the guess on the truth.
+
+  The drone recipe (Chapter 12, Part 3) says what a spot is worth: the reward you grab
+  leaving it, plus the worth of where you land, diluted because later counts a little
+  less:
+
+      worth(spot) = reward + dilute x worth(landing)
+
+  Here dilute is a fraction near 1, say 0.99 -- a landing's worth counts x0.99.
+
+  In Chapter 12 you also had THE DIE: env.transitions handed you every spot the world
+  could send you to and the chance of each, so you AVERAGED the drone recipe over all
+  of them at once. That die is what this chapter takes away.
+
+  ---
+
+  WHICH MEANS: WITHOUT THE DIE, YOU GET ONE SAMPLE, NOT AN AVERAGE
+
+  No table of chances now. You just act, and the world hands back ONE thing:
+
+      you pick a move  -->  the world gives back  -->  ( one landing , one reward )
+
+  One landing. One reward. Not the average over every landing the die could have
+  rolled -- only the single one that actually happened. You cannot average the drone
+  recipe over landings any more, because you only saw one landing.
+
+  So the leap of this whole chapter, in one line:
+
+      keep the bandit nudge and the drone recipe -- but feed them ONE sample at a
+      time, and let the SIZE do the averaging over many samples instead of the die
+      doing it all at once.
+
+  That single swap -- die-average becomes one-sample-plus-a-slow-crawl -- is TD(0).
+  The rest of this post is what to nudge, toward what, and the two cases by hand.
+
+  ---
+
+  THE WORLD: A CLIFF TO WALK ALONG (THE PICTURE EVERYTHING LIVES IN)
+
+  The world here is a grid, 4 rows tall and 12 columns wide. Count the rows with x
+  (x=0 top, x=3 bottom) and the columns with y (y=0 left, y=11 right). Each of the 48
+  squares gets one number, read left-to-right, top-to-bottom:
+
+      spot number = 12 x (the row x) + (the column y)
+
+      Worked:   (3, 0)  -> 12x3 + 0  = 36   <- S, the start
+                (3,11)  -> 12x3 + 11 = 47   <- G, the goal
+                (2, 0)  -> 12x2 + 0  = 24
+
+  Drawn, with the four corners that matter:
+
+           y=0   y=1   y=2  ...  y=10  y=11
+      x=0   0     1     2   ...   10    11      top row
+      x=1  12    13    14   ...   22    23
+      x=2  24    25    26   ...   34    35
+      x=3  36    37    38   ...   46    47      bottom row
+            S   cliff cliff...cliff    G
+
+  The bottom row is a cliff. Step onto spots 37..46 and the world pays -100 and drags
+  you back to S (the game does NOT end -- you keep walking). Every ordinary move pays
+  -1 (walking costs you). Reach G (spot 47) and the game ENDS.
+
+  We are not choosing moves here. We are GRADING a fixed plan -- the safe walk: up the
+  left wall, right along the top, down the right wall, well clear of the cliff. The job
+  is to fill in the worth of every spot under that plan. This is exactly Chapter 12,
+  Part 3 (grading a plan) -- but now graded from real walks, with no die.
+
+  ---
+
+  SO: WHAT DO YOU NUDGE, AND TOWARD WHAT?
+
+  You just took one move. You LEFT a spot -- call it spot `last`. You grabbed a reward.
+  You LANDED on a new spot -- call it spot `next`. Drawn:
+
+      spot `last`  --(reward)-->  spot `next`
+       worth here                 worth there
+       (we fix THIS one)          (we only read this one)
+
+  What you nudge: the worth of the spot you LEFT, worth(last). NOT the new spot. The
+  reward was paid for the move OUT of `last`, so `last` is the guess that move teaches.
+  (Same rule as the bandit: correct the arm you just pulled, not the next one.)
+
+  Toward what -- the target: one single sample of the drone recipe, using the one
+  landing you actually got:
+
+      target = reward + dilute x worth(next)
+
+  But you cannot see the TRUE worth(next) -- nobody handed it to you. So you use your
+  own current guess of it. A guess leaning on a guess. (The textbook word for leaning
+  on your own guess is bootstrapping.)
+
+  Now nudge worth(last) toward that target, in the bandit's exact shape:
+
+      how wrong = target - worth(last)
+      new worth(last) = worth(last) + size x ( how wrong )
+
+  That "how wrong" -- target minus old guess -- has a textbook name too: the TD error.
+  Put the target inside and you have the entire TD(0) update. Two cases follow, because
+  the target changes when the game ends.
+
+  ---
+
+  THE FIRST CASE: THE MOVE DID NOT END THE GAME
+
+  The numbers, all on the table before any arithmetic:
+
+      worth(last) = 0       (the guess starts as a lie -- every spot starts at 0)
+      reward      = -1      (an ordinary move costs you 1)
+      worth(next) = 1       (your current guess of where you landed)
+      size        = 0.1
+      dilute      = 0.99
+
+  Drawn, before and after:
+
+      BEFORE:   worth(last) = 0
+      target  = reward + dilute x worth(next)
+              =  -1   + 0.99  x  1
+              =  -1   + 0.99
+              =  -0.01
+
+      how wrong = target - worth(last) = -0.01 - 0 = -0.01
+
+      new worth(last) = 0 + 0.1 x ( -0.01 ) = -0.001
+
+      AFTER:    worth(last) = -0.001     (worth(next) = 1 is untouched)
+
+  So one walk nudged worth(last) a tiny step, from 0 down to -0.001. Tiny on purpose:
+  size 0.1 eases one noisy sample in gently, so a single unlucky landing cannot wreck
+  the guess. The other spot's guess (the 1) is not touched -- you only ever correct the
+  spot you LEFT.
+
+  ---
+
+  BUT THAT BREAKS AT THE GOAL: THE ANCHOR CASE
+
+  Reach G and the game ENDS. There is no next spot to land on -- so the
+  dilute x worth(next) piece has nothing to grab. Drop it. The target becomes the
+  reward, alone.
+
+  A spot where the game ends is an anchor: its target is just its own reward, no
+  diluted future. The numbers:
+
+      worth(last) = 0       (still the starting lie)
+      reward      = -100    (illustrative big payout, to make the step visible)
+      size        = 0.1
+      (NO worth(next) -- the game ended, there is no landing)
+
+  Drawn, before and after:
+
+      BEFORE:   worth(last) = 0
+      target  = reward only = -100        (anchor: nothing to lean on)
+
+      how wrong = target - worth(last) = -100 - 0 = -100
+
+      new worth(last) = 0 + 0.1 x ( -100 ) = -10
+
+      AFTER:    worth(last) = -10
+
+  The only difference between the two cases is the target: a move mid-game uses
+  reward + dilute x worth(next); a move that ends the game (the anchor) uses reward
+  alone. Same nudge, same size, same "how wrong = target - old"; only the target's
+  second piece appears or vanishes.
+
+  ---
+
+  WHICH RAISES THE OBVIOUS WORRY: ISN'T A GUESS-OFF-A-GUESS A SCAM?
+
+  Leaning on your own guess of `next` feels like cheating -- you corrected a guess
+  using another guess you also made up. It self-corrects, for three reasons, each a
+  thing you already saw in Chapter 12:
+
+      every sample carries a REAL reward -- a true number the world paid -- and that
+      real number gets folded in on every walk. The guesses are not pure invention;
+      each nudge is anchored to a real "+".
+
+      the guesses start as lies (all 0) and crawl toward truth as real rewards keep
+      arriving -- exactly the drone's worths climbing 0 -> -0.1 -> -0.19 -> 3.86 in
+      Part 3, and the bandit's running average settling onto an arm's true mean in
+      Part 1.
+
+      the size eases each single noisy sample in slowly, so one freak landing moves
+      the guess only a hair. Over many walks the freaks mostly wash out and the real
+      signal stacks up.
+
+  So a guess leaning on a guess, fed real rewards and crawled in slowly, climbs toward
+  the truth. That is the whole reason TD(0) works without a die.
+
+  ---
+
+  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+
+  Nothing above needed a computer. This last section is for the day you meet one: the
+  same two cases, spoken in Python.
+
+  First the worth table. One number per spot, all starting at the lie of 0:
+
+      values = [ V[0],  V[1],  V[2],  ...,  V[47] ]
+                  0      0      0            0
+              (48 slots, one per spot -- not a history, just the latest guess)
+
+  THE FIRST CASE BY HAND (the move did not end the game): peasant left spot 0, grabbed
+  reward -1, landed on spot 1, whose current guess is 1.
+
+      step_size, discount = 0.1, 0.99
+      last, reward, landed = 0, -1, 1
+      V = [0.0] * 48
+      V[landed] = 1.0                              # the landing's current guess is 1
+
+      target    = reward + discount * V[landed]    # -1 + 0.99*1   = -0.01
+      how_wrong = target - V[last]                 # -0.01 - 0     = -0.01
+      V[last]   = V[last] + step_size * how_wrong   # 0 + 0.1*-0.01 = -0.001
+      print(V[last])    # -0.001
+
+  THE ANCHOR CASE BY HAND (the move ended the game): peasant left spot 0, grabbed
+  reward -100, no landing -- so drop the discount piece.
+
+      V = [0.0] * 48
+      target    = -100                             # anchor: reward alone, no landing
+      how_wrong = target - V[last]                 # -100 - 0       = -100
+      V[last]   = V[last] + step_size * how_wrong   # 0 + 0.1*-100  = -10
+      print(V[last])    # -10
+
+  Then the agent, the same two lines wrapped for any spot. The grader runs these:
+
+      def agent_step(self, reward, state):
+          # the move did NOT end the game: target leans on the landing's guess
+          self.values[self.last_state] += self.step_size * (
+              reward + self.discount * self.values[state] - self.values[self.last_state])
+          action = self.rand_generator.choice(
+              range(self.policy.shape[1]), p=self.policy[state])
+          self.last_state = state
+          return action
+
+      def agent_end(self, reward):
+          # the move ENDED the game (anchor): no landing, drop the discount piece
+          self.values[self.last_state] += self.step_size * (
+              reward - self.values[self.last_state])
+
+  Three places this bites, each a real lab failure, not invented:
+
+  You compute the target and the "how wrong" but forget to STORE the result back into
+  the table. The line reads the table but never writes it:
+
+      WRONG:  target = reward + discount * values[state]      # computed, then thrown away
+              how_wrong = target - values[last]
+              # ... and nothing writes values[last]
+      RIGHT:  values[last] = values[last] + step_size * how_wrong   # the "=" puts it back
+
+  Without the write, the whole table sits at its starting lie of 0 forever. The grader
+  expects -0.001 (or -10), reads 0 -- nowhere near -- and stops with AssertionError.
+  The "=" that stores it back is the whole update.
+
+  You nudge the wrong spot. Correct self.last_state (the spot you LEFT), not state (the
+  one you landed on) -- and put the update line BEFORE you pick the next move:
+
+      values[last_state] += ...      RIGHT  (the move taught the spot you left)
+      values[state]      += ...      WRONG  (that spot's guess is only read, never nudged here)
+
+  You forget that the anchor has no landing. agent_end has NO discount * values[...]
+  piece -- the game ended, there is no next spot to lean on:
+
+      agent_step:  target = reward + discount * values[next]
+      agent_end:   target = reward                            (anchor: stop here)
+
+  ---
+
+  ONE BREATH
+
+  A worth = one number per spot: how good that spot is to be in. In Chapter 12 you had
+  the die and AVERAGED the drone recipe (reward + dilute x worth-of-landing) over every
+  landing at once. Take the die away and you get ONE landing and ONE reward per move --
+  so you fold that single sample in with the bandit nudge (new = old + size x (target -
+  old)) and let many small crawls do the averaging the die used to do. You nudge the
+  worth of the spot you LEFT, toward target = reward + dilute x worth(landing) -- a
+  guess leaning on a guess, which heals because every sample carries a real reward and
+  the size eases the noise in slowly. At an anchor (the game ended) there is no landing,
+  so the target is the reward alone. And the "=" that stores the result back into the
+  table is the whole update -- forget it and the table stays a sheet of zeros.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   spot           = state  (standard: s)
+  >>   move / arrow    = action  (a)
+  >>   the "+" / reward = reward  (R or r)
+  >>   worth           = state value under a policy  (V, or v_pi)
+  >>   the plan        = policy  (pi)
+  >>   grade a plan    = policy evaluation / prediction
+  >>   dilute 0.99     = discount factor  (gamma)
+  >>   size 0.1        = step size / learning rate  (alpha)
+  >>   one sample, no die = model-free / sample-based learning
+  >>   guess leans on a guess = bootstrapping
+  >>   how wrong = target - old guess = the TD error  (delta)
+  >>   target = reward + gamma x V(next) = the TD target
+  >>   anchor (game ended) = terminal state  (target = reward alone)
+  >>   TD(0)           = one-step temporal-difference policy evaluation
+  >>   the world here  = Cliff Walking (Sutton & Barto)
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):
+    Part 1 (this post) .
+    Part 2 -- Q-learning and Expected Sarsa (coming) .
+    Part 3 -- Dyna-Q (coming) .
+    Part 4 -- Dyna-Q+ (coming)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
