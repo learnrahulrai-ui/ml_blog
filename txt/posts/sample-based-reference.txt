@@ -11,6 +11,8 @@
   ============================================================================================
 
   PATH . Chapter 13 reference card -- Sample-based Learning
+    <- prev:  [Chapter 13, Part 4: Dyna-Q+ by Pencil](dyna-q-plus-by-pencil.txt)
+       next:  [Chapter 14, Part 1: State Aggregation by Pencil](state-aggregation-by-pencil.txt) ->
 
   This is a flip-to reference for the ideas Chapter 13 leans on -- the ones that tangle
   together and make the quizzes hard. It assumes you remember nothing; every word is

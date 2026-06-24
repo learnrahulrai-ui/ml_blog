@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in thirteen chapters (forty posts),
-  meant to be read top to bottom. Each post opens with a "post N of 40" path header and a
+  This is not a pile of loose articles -- it is a short BOOK in fourteen chapters (forty-one posts),
+  meant to be read top to bottom. Each post opens with a "post N of 41" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 40:
+  >> NEW HERE? Start at post 1 of 41:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -628,6 +628,26 @@
     goal. Plus the trade-offs straight from each target (MC high-variance/episodic/offline vs
     TD low-variance/continuing/online), the TD-error terminal-vs-non-terminal, and a full
     TD(0) trace by hand to V(A)=0.5, V(B)=0. Adds plain on-policy Sarsa, which Part 2 left out.
+
+
+  CHAPTER 14 . FUNCTION APPROXIMATION -- when there are too many spots for a table
+  --------------------------------------------------------------------------------
+
+  [Part 1 -- Too Many Spots for a Table: State Aggregation by Pencil](posts/state-aggregation-by-pencil.txt)
+    post 41/41 . 2026-06-24 . part 1 of 4 . reinforcement-learning, function-approximation, state-aggregation, semi-gradient-td, by-hand
+    Every RL post so far kept one worth per spot in a table -- which dies when a world has
+    500 spots (or millions), and learns each spot alone. So GROUP the spots: 500 spots into
+    10 groups of 50, ONE weight per group, and every spot in a group moves together (the
+    speed-up the textbook calls generalization). A spot's feature is a one-hot pointing at
+    its group; its worth is weights . feature -- just that group's weight, no table at all.
+    The weights learn by the exact TD(0) nudge from Chapter 13, the one-hot steering the
+    whole nudge onto the single group-weight of the spot you left (worked by hand: how-wrong
+    12.4, w0 -1.5 -> -0.26, the other nine untouched). Then the one genuinely subtle thing --
+    why it is called SEMI-gradient: the target ALSO rides on the weights, yet we tweak only
+    the worth(left) half of the slope and throw the target half away (here -1.116 on w2),
+    treating the target as a fixed label because that is simpler and steadier. Ends with all
+    500 worths read out at once as runs of duplicates, hard-coded code, and the coarse-fast
+    vs fine-exact-but-slow trade. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------

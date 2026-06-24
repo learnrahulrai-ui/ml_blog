@@ -1,0 +1,317 @@
+@title Too Many Spots for a Table: State Aggregation by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 14 . FUNCTION APPROXIMATION . PART 1 OF 4
+  Too Many Spots for a Table: State Aggregation by Pencil
+  Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, function-approximation, state-aggregation, semi-gradient-td, by-hand
+  ============================================================================================
+
+  PATH . post 41/41 . part 1 of 4 in Chapter 14 -- Function Approximation
+    <- prev:  [Chapter 13 Reference: The Sample-based Map](sample-based-reference.txt)
+       next:  (more posts coming)
+
+  ---
+
+  Every reinforcement-learning post so far kept one number per spot in a table.
+
+  A spot = one place in the world. A move = a direction you pick. A reward = a number
+  the world pays on a move. A worth = one number saying how good a spot is, counting the
+  rewards you expect from there on. Until now those worths lived in a table: spot 1's
+  worth, spot 2's worth, all the way down.
+
+  That table is fine for a 48-square grid. But picture a long line of 500 spots:
+
+      worth:  [ V[1] , V[2] , V[3] , ... , V[500] ]      500 separate numbers
+
+  Two problems, both fatal once the world gets big. First, 500 numbers is a lot to
+  learn -- and a real world (a board position, a screen of pixels) has millions or more.
+  Second, each spot learns ALONE: visiting spot 250 teaches you nothing about spot 251,
+  even though they are next-door neighbours. The table has no way to share.
+
+  ---
+
+  SO GROUP THE SPOTS: ONE NUMBER PER GROUP, NOT PER SPOT
+
+  Take the 500 spots and bundle them into 10 groups of 50. Keep ONE number per group:
+
+      spots   1.. 50  -->  group 0
+      spots  51..100  -->  group 1
+      spots 101..150  -->  group 2
+        ...
+      spots 451..500  -->  group 9
+
+      keep one number per group:   weights = [ w0, w1, ..., w9 ]      only 10 numbers
+
+  500 worths collapse to 10 weights. Every spot in a group SHARES its group's number, so
+  the moment you learn anything about one spot, all 50 of its group-mates move with it.
+  That sharing -- 50 spots learning together -- is the whole speed-up. (The textbook word
+  is generalization.)
+
+  ---
+
+  WHICH NEEDS A WAY TO SAY "WHICH GROUP": A ONE-HOT POINTER
+
+  How does a spot point at its group? With a feature: a row of 10 numbers, all 0 except
+  a single 1 in its group's slot. Drawn for three spots:
+
+      spot   1  (group 0):  feature = [ 1,0,0,0,0,0,0,0,0,0 ]
+      spot  51  (group 1):  feature = [ 0,1,0,0,0,0,0,0,0,0 ]
+      spot 250  (group 4):  feature = [ 0,0,0,0,1,0,0,0,0,0 ]
+
+  The feature is a row of switches, one per group, with exactly ONE switch on. Its length
+  is the number of GROUPS (10), never the number of spots. The 1's position says which
+  group; the value is always just 1, a marker -- never the spot number.
+
+  To turn a feature into a worth, dot it with the weights (multiply slot by slot, add):
+
+      worth(spot 51) = weights . feature
+                     = [w0,w1,...,w9] . [0,1,0,0,0,0,0,0,0,0]
+                     = w0*0 + w1*1 + (rest)*0
+                     = w1
+
+  The one-hot just PICKS OUT that group's weight. So the feature is a selector; the
+  weight is the value.
+
+  Which group does a spot land in? Floor-divide (spots are numbered from 1, so subtract 1
+  first):
+
+      group of a spot = (spot - 1) // (spots per group)
+
+  Worked on a tiny world -- 10 spots, 5 groups, 2 spots per group:
+
+      spot 1  -> (1-1)//2 = 0 -> [1,0,0,0,0]
+      spot 3  -> (3-1)//2 = 1 -> [0,1,0,0,0]
+      spot 6  -> (6-1)//2 = 2 -> [0,0,1,0,0]
+      spot 10 -> (10-1)//2 = 4 -> [0,0,0,0,1]
+
+  ---
+
+  WHICH MEANS THERE IS NO TABLE OF WORTHS ANY MORE
+
+  This is the real break from every earlier post. There is no list of 500 worths to look
+  up. There are only 10 weights, and a spot's worth is BUILT from them on the spot:
+
+      OLD (a table):  look up V[120] in a 500-long list.
+      NEW (here):     worth(120) = weights . feature(120) = the weight of 120's group.
+
+  Worked, with weights = [-1.5, 0.5, 1.0, -0.5, 1.5, -0.5, 1.5, 0.0, -0.5, -1.0]:
+
+      worth(50)  : spot 50  is group (50-1)//50  = 0  ->  w0 = -1.5
+      worth(120) : spot 120 is group (120-1)//50 = 2  ->  w2 =  1.0
+
+  Ten weights GENERATE all 500 worths. Change one weight and all 50 spots that share it
+  move at once.
+
+  ---
+
+  SO HOW DO THE WEIGHTS LEARN? THE SAME TD NUDGE, AIMED AT A WEIGHT
+
+  Chapter 13's TD(0) nudge went like this: you left a spot, grabbed a reward, landed on a
+  next spot, and you crawled the LEFT spot's worth a fraction toward a target:
+
+      target = reward + dilute x worth(next)
+      how wrong (the TD error) = target - worth(left)
+      worth(left) = worth(left) + size x (how wrong)
+
+  Here size is the step (a small fraction, here 0.1) and dilute is the discount (here
+  0.9). Nothing changes except the last line: there is no worth(left) cell to write into
+  any more -- worth(left) is weights . feature(left). So instead of writing a cell, we
+  nudge the WEIGHTS, and the one-hot feature steers the nudge onto exactly one weight:
+
+      how wrong = reward + dilute x worth(next) - worth(left)
+      weights = weights + size x (how wrong) x feature(left)
+
+  Because feature(left) is a one-hot, "x feature(left)" zeroes out every weight except
+  the left spot's group -- only that one weight moves. At a terminal spot (the game
+  ended, no next) drop the dilute x worth(next) piece, exactly the anchor rule from
+  Chapter 13: target = reward alone.
+
+  ---
+
+  THE WHOLE THING BY HAND -- ONE STEP, EVERY NUMBER
+
+  weights = [-1.5, 0.5, 1.0, -0.5, 1.5, -0.5, 1.5, 0.0, -0.5, -1.0], size 0.1, dilute 0.9.
+  You leave spot 50, grab reward 10, land on spot 120.
+
+  First, the two worths, each a dot of weights with a one-hot (so each is just one weight):
+
+      spot 50  is group (50-1)//50  = 0  ->  worth(left) = w0 = -1.5
+      spot 120 is group (120-1)//50 = 2  ->  worth(next) = w2 =  1.0
+
+  Then the TD error:
+
+      how wrong = reward + dilute x worth(next) - worth(left)
+                =  10   +  0.9   x   1.0       - ( -1.5 )
+                =  10   +  0.9              + 1.5
+                =  12.4
+
+  Then the nudge -- the left spot's feature is the group-0 one-hot [1,0,0,...], so only
+  w0 moves:
+
+      w0 = w0 + size x (how wrong) x 1
+         = -1.5 + 0.1 x 12.4 x 1
+         = -1.5 + 1.24
+         = -0.26
+
+  Drawn, before and after (only group 0's weight changed):
+
+      group:     0      1     2     3     4    ...
+      BEFORE:  -1.5    0.5   1.0  -0.5   1.5   ...
+      AFTER:   -0.26   0.5   1.0  -0.5   1.5   ...
+               ^^^^^ moved                       (every other weight untouched)
+
+  And because spots 1..50 ALL share w0, all fifty of their worths just rose from -1.5 to
+  -0.26 in one step. That is the generalization, paid for.
+
+  ---
+
+  WHY IT IS CALLED "SEMI"-GRADIENT -- THE PIECE WE THROW AWAY
+
+  The honest name for this update is semi-gradient TD, and "semi" -- half -- is a
+  confession worth unpacking, because it is the one genuinely subtle thing here.
+
+  We are trying to make worth(left) match its target, reward + dilute x worth(next). The
+  miss is (target - worth(left)). To shrink that miss by tweaking the weights, you ask
+  how the miss changes as each weight changes -- its slope. The miss has TWO parts that
+  ride on the weights, not one:
+
+      worth(left)  = weights . feature(left)    -- rides on the weights (slope = feature(left))
+      worth(next)  = weights . feature(next)    -- ALSO rides on the weights! it is inside
+                                                   the target, and the target is reward +
+                                                   dilute x worth(next)
+
+  So a TRUE gradient step would move the weights by size x (how wrong) x BOTH slopes:
+
+      true step  =  size x (how wrong) x ( feature(left)  -  dilute x feature(next) )
+
+  With our numbers (left = group-0 one-hot, next = group-2 one-hot, how wrong 12.4):
+
+      w0 piece : +0.1 x 12.4 x 1            = +1.24      (from feature(left))
+      w2 piece : +0.1 x 12.4 x ( -0.9 x 1 ) = -1.116     (from -dilute x feature(next))
+
+  Semi-gradient KEEPS the first piece and THROWS AWAY the second. It pretends the target
+  is a fixed label -- a number to chase -- and ignores that worth(next) also slides when
+  the weights slide. So it moves only w0 by +1.24 (to -0.26) and leaves w2's -1.116 on
+  the floor:
+
+      true gradient  :  w0 += 1.24 ,  w2 -= 1.116      (chases a target that is moving too)
+      semi-gradient  :  w0 += 1.24                      (treats the target as standing still)
+                        \____ the dropped -1.116 on w2 is the "missing half" ____/
+
+  Why drop a real piece of the slope on purpose? Because chasing a target while also
+  differentiating it -- letting the thing you aim at shift toward you as you move -- is
+  unstable and tangled; treating the target as a fixed label is simpler, steadier, and is
+  what works in practice. The "semi" is just the blunt admission: we took the worth(left)
+  half of the gradient and skipped the target half.
+
+  ---
+
+  EVERY SPOT'S WORTH AT ONCE -- A STACK OF SWITCHES
+
+  To read out all 500 worths together, stack every spot's one-hot into one block (a row
+  per spot) and dot the block with the weights. A tiny 4-spot, 3-group version:
+
+      weights = [ 2, 5, -1 ]            (group 0, 1, 2)
+
+      spot 1: [1,0,0]   -> peek group 0 -> 2
+      spot 2: [1,0,0]   -> peek group 0 -> 2     (same group, same worth)
+      spot 3: [0,1,0]   -> peek group 1 -> 5
+      spot 4: [0,0,1]   -> peek group 2 -> -1
+                                              -> worths = [ 2, 2, 5, -1 ]
+
+  On the real 500-spot line the stack is RUNS of identical rows -- the first 50 rows are
+  all [1,0,...], then 50 rows of [0,1,0,...], and so on -- so the 500 worths come out as
+  ten distinct numbers, each repeated fifty times: [ w0 x50, w1 x50, ..., w9 x50 ].
+
+  ---
+
+  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+
+  Nothing above needed a computer. This last section is for the day you meet one.
+
+  THE FEATURE for a spot (one-hot pointing at its group):
+
+      import numpy as np
+      num_groups, spots_per_group = 10, 50
+
+      def feature(spot):
+          f = np.zeros(num_groups)            # [0,0,0,0,0,0,0,0,0,0]
+          f[(spot - 1) // spots_per_group] = 1   # flip ONE switch on
+          return f
+      # feature(120) -> group (120-1)//50 = 2 -> [0,0,1,0,0,0,0,0,0,0]
+
+  ONE STEP BY HAND (leave spot 50, reward 10, land spot 120; size 0.1, dilute 0.9):
+
+      weights = np.array([-1.5, 0.5, 1.0, -0.5, 1.5, -0.5, 1.5, 0.0, -0.5, -1.0])
+      x_left  = feature(50)                          # group 0 one-hot
+      x_next  = feature(120)                         # group 2 one-hot
+
+      worth_left = np.dot(weights, x_left)           # w0    = -1.5
+      worth_next = np.dot(weights, x_next)           # w2    =  1.0
+      how_wrong  = 10 + 0.9 * worth_next - worth_left  # 10 + 0.9 - (-1.5) = 12.4
+      weights    = weights + 0.1 * how_wrong * x_left  # only w0: -1.5 + 1.24 = -0.26
+      print(weights[0])    # -0.26
+
+  THE ANCHOR STEP (the move ended the game -- drop the next piece):
+
+      how_wrong = reward - np.dot(weights, x_left)     # target = reward alone
+      weights   = weights + 0.1 * how_wrong * x_left
+
+  ALL 500 WORTHS AT ONCE (stack the one-hots, dot with weights):
+
+      worths = np.dot(all_features, weights)   # (500,10) . (10,) -> (500,)
+      # order matters: stack FIRST, weights SECOND -- (10,).(500,10) is a shape mismatch
+
+  ---
+
+  ONE BREATH
+
+  A table keeps one worth per spot, which dies when the spots run to millions and learns
+  each spot alone. So GROUP the spots and keep one weight per group; a spot's feature is
+  a one-hot that points at its group, and its worth is weights . feature -- just that
+  group's weight. There is no table now: every worth is computed from the weights. The
+  weights learn by the exact TD(0) nudge from Chapter 13 -- how wrong = reward + dilute x
+  worth(next) - worth(left), then weights += size x how-wrong x feature(left) -- where the
+  one-hot steers the whole nudge onto the one group-weight of the spot you left (others
+  untouched, anchor drops the next piece). It is called SEMI-gradient because the target
+  also rides on the weights, yet we tweak only the worth(left) half of the slope and throw
+  the target half (here -1.116 on w2) away -- treating the target as a fixed label, which
+  is simpler and steadier. Coarse groups learn fast but rough; push the groups toward one
+  spot each and you are back to an exact, slow table.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   spot                  = state  (standard: s)
+  >>   worth                 = value  (V or v-hat)
+  >>   the table             = a tabular value function (one entry per state)
+  >>   group the spots       = state aggregation
+  >>   one weight per group  = the weight vector  (w)
+  >>   one-hot pointer       = the feature vector x(s) (here, an aggregation feature)
+  >>   worth = weights . feature = v-hat(s, w) = w . x(s)  (a linear value function)
+  >>   share across a group  = generalization
+  >>   size 0.1              = step size / learning rate  (alpha)
+  >>   dilute 0.9            = discount factor  (gamma)
+  >>   how wrong             = the TD error  (delta)
+  >>   weights += size x delta x feature  = the semi-gradient TD(0) update
+  >>   feature = the slope of v-hat        = the gradient of v-hat (here, x(s) itself)
+  >>   anchor (game ended)   = terminal state (target = reward alone)
+  >>   the dropped target-half = the term true gradient keeps, semi-gradient drops
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 14 -- Function Approximation):
+    Part 1 (this post) .
+    Part 2 -- coming .
+    Part 3 -- coming .
+    Part 4 -- coming
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
