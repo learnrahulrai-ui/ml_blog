@@ -219,6 +219,45 @@
 
   ---
 
+  THE ONE DIAL BETWEEN MC AND TD: HOW FAR YOU WALK BEFORE YOU LEAN
+
+  MC and TD are not two rival ideas -- they are the two ends of a single dial: how many
+  REAL steps you take before you lean on a guess. Take one short run from spot S0, with
+  rewards 2, then 1, then 3, into the end. Use dilute 1.0 and current worth-guesses
+  V(S1) = 10 and V(S2) = 10 (lies written earlier):
+
+      S0 --2--> S1 --1--> S2 --3--> [END]
+                V=10      V=10
+
+  Walk ONE real step, then lean on the guess at S1 -- this is TD(0):
+      target = 2 + 1.0 x V(S1) = 2 + 10 = 12
+
+  Walk TWO real steps, then lean on the guess at S2:
+      target = 2 + 1 + 1.0 x V(S2) = 3 + 10 = 13
+
+  Walk THREE real steps -- you hit the end, nothing left to guess -- this is MC:
+      target = 2 + 1 + 3 = 6           all real rewards, NO guess
+
+  Drawn, the same S0 target as the dial turns:
+
+      steps walked before leaning:    1         2         3 (= the end)
+      target for S0:                  12        13         6
+                                    \__guess-heavy__/    \_all real_/
+                                     steady, low-noise,    truer, but
+                                     but swallows the      one noisy roll
+                                     lie 10 (-> 12, 13)    (the pure 6)
+
+  So TD(0) is "walk 1, then lean"; MC is "walk all the way, never lean"; every whole
+  number in between is an n-step target. The dial trades two things: a SMALL n leans hard
+  on the guesses (steady and low-noise, but it swallows whatever lie a guess holds --
+  here the false 10 leaks into 12 and 13); a LARGE n uses more real rewards (truer, but
+  each is one noisy roll). The usual sweet spot is neither end but a few steps in -- and
+  TD(lambda) blends ALL the n-step targets at once, weighting each by a fading lambda, so
+  you never have to pick one n by hand. MC and TD(0) are just the two posts this dial
+  swings between.
+
+  ---
+
   ONE BREATH
 
   Every method here builds the same nudge -- new = old + size x (target - old) -- and

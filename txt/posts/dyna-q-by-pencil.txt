@@ -190,6 +190,45 @@
 
   ---
 
+  WHY A REHEARSAL EQUALS A REAL FOOTSTEP: SAME TARGET, SAME DESTINATION
+
+  A rehearsal feels like cheating -- you moved a worth without moving in the world. Here
+  is why it is honest. The notebook stored the very (landing, reward) the world handed
+  back, so a rehearsal runs the identical nudge with the identical numbers.
+
+  Watch one cell q[s][move], start 0. The world gave reward 1 onto a landing whose best
+  worth is 0; size 0.5, dilute 1.0. The target -- the number the nudge aims at -- is:
+
+      target = reward + dilute x (best worth at landing) = 1 + 1.0 x 0 = 1.0
+
+  The real correction (numbers from the world):
+      q[s][move] = 0 + 0.5 x ( 1.0 - 0 ) = 0.5
+
+  Now rehearse the SAME move (read (landing, reward) back off the notebook -- still 1):
+      target     = 1 + 1.0 x 0 = 1.0                       (same numbers -> same target)
+      q[s][move] = 0.5 + 0.5 x ( 1.0 - 0.5 ) = 0.75
+  And once more:
+      q[s][move] = 0.75 + 0.5 x ( 1.0 - 0.75 ) = 0.875
+
+  Drawn, each correction -- real or rehearsed -- halves the gap to the SAME target 1.0:
+
+      0 ---> 0.5 ---> 0.75 ---> 0.875 ---> ... ---> 1.0
+       \real/  \reh/    \reh/                        ^ target = reward + dilute x best-at-landing
+        every step, world or page, aims at the same 1.0
+
+  The target never moves: it is always reward + dilute x (best at landing), whether those
+  numbers came from the world or the page. So one rehearsal does exactly what one more
+  real visit would do -- the table cannot tell them apart. Rehearsals do not change WHERE
+  the worth lands (the fixed point, where the nudge size x (target - q) becomes 0, is
+  q = target); they change only HOW FAST it gets there: many corrections per footstep
+  instead of one.
+
+  The one condition: the notebook must still be TRUE. If the world quietly changed and a
+  page is stale, every rehearsal now drags the worth toward a target that is no longer
+  real -- which is the exact hole Part 4, Dyna-Q+, plugs.
+
+  ---
+
   THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
 
   Nothing above needed a computer. This last section is for the day you meet one.

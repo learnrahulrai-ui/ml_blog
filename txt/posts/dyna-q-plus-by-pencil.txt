@@ -105,6 +105,47 @@
 
   ---
 
+  WHY THE SQUARE ROOT -- NOT tau ITSELF, NOT ITS LOGARITHM
+
+  The bonus was kappa x sqrt(tau): kappa a tiny weight (say 0.001), tau the turns since a
+  move was last really walked. Why a square root? Line up the three obvious "grows with
+  staleness" shapes at a spread of clocks and read off what each does. kappa = 0.001:
+
+      tau              1      4      25     100     2500
+      -----------    ----   ----   ----   -----   ------
+      tau itself       1      4      25     100     2500     x kappa  ->  up to 2.5
+      sqrt(tau)        1      2       5      10       50     x kappa  ->  up to 0.05
+      log(tau)       0.0    1.4     3.2     4.6      7.8     x kappa  ->  up to 0.008
+
+  Now weigh each against a real reward of about 1:
+
+      tau itself :  bonus reaches 2.5 -- it DWARFS the reward. The agent ditches a good
+                    path to re-check anything slightly old. It thrashes.
+      log(tau)   :  bonus reaches 0.008 -- it FLATTENS. A move untried for 2500 turns
+                    barely twitches, so a shortcut that opened long ago is never re-found.
+      sqrt(tau)  :  bonus reaches 0.05 -- it keeps GROWING (so any move, however stale,
+                    eventually earns a push big enough to re-try) yet stays well under a
+                    real reward of 1 (so it never swamps the true signal).
+
+  Drawn, the three from the same start:
+
+      bonus
+        |               . tau  (explodes -- swamps the real reward)
+        |           .
+        |        .              ____ sqrt(tau)  (grows, but gently)
+        |      .          ____/
+        |   .  ___----/  . . . . . . . log(tau)  (flattens -- stale moves ignored)
+        +------------------------------------- tau
+
+  The square root is the only one of the three that does BOTH: unbounded (every stale
+  move is re-checked some day) and sub-linear (it never drowns the real rewards). The
+  deeper reason it is a ROOT: how SURE you are of a stored value fades like
+  1 / sqrt(turns-since-checked), so how UNSURE you are -- which is what the bonus pays
+  for -- grows like sqrt(turns-since-checked). The bonus is a confidence-width, and that
+  width carries the same square root the UCB bandit rule uses to pick which arm to probe.
+
+  ---
+
   THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
 
   Nothing above needed a computer. This last section is for the day you meet one.

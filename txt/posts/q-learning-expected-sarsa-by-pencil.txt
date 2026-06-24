@@ -207,6 +207,46 @@
 
   ---
 
+  WHICH TABLE DO YOU END UP WITH? THE PEEK DECIDES
+
+  The peek is not just a number in one update -- it picks WHICH table the whole process
+  settles on. Take one landing row where move 0 is great and the other three are poor:
+
+      q[landing] = [ 10 , 2 , 2 , 2 ]
+                     ^move 0 great    ^moves 1-3 poor
+
+  Q-learning's peek is the max, 10. It leans on the BEST move every single time, no
+  matter what you actually do next. So whatever random wandering you behave with, the
+  number it keeps climbing toward is "the worth IF you always took the best move":
+
+      Q-learning peek = max(q[landing]) = 10        -> learns the BEST-PLAY table
+
+  Sarsa's peek is the move you will ACTUALLY take next, drawn from your real wandering.
+  With a 10% wander over 4 moves, the greedy move 0 is taken with odds
+  (1 - 0.1) + 0.1/4 = 0.925, and each poor move with 0.1/4 = 0.025 (three of them =
+  0.075). Over many samples its peek averages to:
+
+      Sarsa peek -> 0.925 x 10 + 0.075 x 2 = 9.25 + 0.15 = 9.4   -> learns YOUR-ACTUAL table
+
+  Drawn, the same landing, two different futures leaned on:
+
+      Q-learning :  always grabs the 10         -> 10.0   (dreams the perfect next move)
+      Sarsa      :  grabs what you'll really do  ->  9.4   (counts the 10% fumbles)
+
+  That 0.6 gap is the whole on-policy / off-policy split. Q-learning is OFF-policy: the
+  table it learns (best-play, worth 10) is NOT the wandering it follows -- it learns the
+  optimal worths while behaving randomly. Sarsa is ON-policy: it learns the worth of the
+  very wandering it does, fumbles and all (worth 9.4).
+
+  The famous consequence, on the cliff world of Part 1: the shortest path runs right
+  along the cliff edge. Q-learning learns that edge-path is best -- its peek dreams you
+  never slip -- yet while wandering it sometimes steps off. Sarsa's table COUNTS those
+  slips, so the edge-path's worth comes out below a path one row back, and Sarsa walks
+  the SAFE route. Same world, two honest answers: optimal-if-perfect (Q-learning) vs
+  best-for-who-you-actually-are (Sarsa).
+
+  ---
+
   THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
 
   Nothing above needed a computer. This last section is for the day you meet one: the

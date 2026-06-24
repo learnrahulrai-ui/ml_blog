@@ -219,6 +219,51 @@
 
   ---
 
+  BUT DOES THE WOBBLE EVER STOP? IT DEPENDS ON THE SIZE
+
+  "Climbs toward the truth" hides a real question: does it ever ARRIVE, or just twitch
+  near it forever? Take one spot whose true worth is 10, fed noisy targets that bounce
+  between 8 and 12 (the world is chancy). Use a fixed size = 0.5 (crawl half the gap),
+  and start sitting exactly on the truth, 10:
+
+      target 12:  V = 10    + 0.5 x (12 - 10)    = 10 + 1.000  = 11.0
+      target  8:  V = 11.0  + 0.5 x ( 8 - 11.0)  = 11 - 1.500  =  9.5
+      target 12:  V = 9.5   + 0.5 x (12 - 9.5)   = 9.5 + 1.250 = 10.75
+      target  8:  V = 10.75 + 0.5 x ( 8 - 10.75) = 10.75 - 1.375 = 9.375
+
+  Started on the truth, it walked AWAY. Drawn, it just bounces in a band around 10:
+
+      8         9       10       11        12
+      |---------|----*---|----*---|---------|
+                  9.375   10.75    11.0       ... and on, forever
+
+  A fixed size keeps reacting to every noisy target at full half-strength, so a freak 8
+  or 12 always knocks it off by the same swing. It orbits the truth; it never lands.
+
+  So shrink the size as you go -- 1/1, then 1/2, then 1/3, then 1/4 (the running-average
+  size from the bandit in Chapter 12). Same noisy targets 12, 8, 12, 8, now starting at
+  a lie of 0:
+
+      size 1/1, target 12:  V = 0      + 1.000 x (12 - 0)      = 12.0
+      size 1/2, target  8:  V = 12.0   + 0.500 x ( 8 - 12.0)   = 10.0
+      size 1/3, target 12:  V = 10.0   + 0.333 x (12 - 10.0)   = 10.667
+      size 1/4, target  8:  V = 10.667 + 0.250 x ( 8 - 10.667) = 10.0
+
+  Drawn, the swing SHRINKS each step -- it spirals inward and lands:
+
+      8         9       10       11        12
+      |---------|------> 10 <-----|---------|
+                steps getting smaller, closing on 10 (the true mean of 8 and 12)
+
+  Each later target moves the guess less, so the noise dies and the guess settles on the
+  true 10 (the average of 8 and 12 is exactly 10). The rule behind it: the sizes must
+  add to infinity (so you can still travel any distance from a bad start) yet their
+  squares must add to a finite number (so the noise fades). 1/n does both; a fixed 0.5
+  does the first but not the second -- which is precisely why the fixed size wobbles for
+  ever and the shrinking size converges.
+
+  ---
+
   THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
 
   Nothing above needed a computer. This last section is for the day you meet one: the
