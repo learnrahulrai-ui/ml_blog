@@ -12,7 +12,7 @@
 
   PATH . post 44/44 . part 4 of 4 in Chapter 14 -- Function Approximation
     <- prev:  [Letting the Car Choose: Sarsa Control by Pencil](sarsa-control-by-pencil.txt)
-       next:  (Chapter 15 -- coming)
+       next:  [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt) ->
 
   ---
 
@@ -264,7 +264,8 @@
     Part 1 -- [State Aggregation by Pencil](state-aggregation-by-pencil.txt) .
     Part 2 -- [Tile Coding by Pencil](tile-coding-by-pencil.txt) .
     Part 3 -- [Sarsa Control by Pencil](sarsa-control-by-pencil.txt) .
-    Part 4 (this post) -- the chapter closes here; teaching the net (backprop) opens Chapter 15.
+    Part 4 (this post) -- the chapter closes here; teaching the net opens
+                          [Chapter 15: Backpropagation by Pencil](backprop-by-pencil.txt).
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

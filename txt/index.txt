@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in fourteen chapters (forty-four posts),
+  This is not a pile of loose articles -- it is a short BOOK in fifteen chapters (forty-five posts),
   meant to be read top to bottom. Each post opens with a "post N of 41" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 44:
+  >> NEW HERE? Start at post 1 of 45:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -695,6 +695,26 @@
     4.42 - 5.5 = -1.08, a row zero but for the fired engine: [-1.08,0,0,0]. Ends on the sting
     that opens Chapter 15: one number must correct ~1,300 dials with no feature to point the
     way. Forward pass and target as hard-coded code. Assumes zero background.
+
+
+  CHAPTER 15 . TRAINING THE Q-NETWORK -- how one miss teaches a thousand dials
+  ---------------------------------------------------------------------------
+
+  [Part 1 -- One Miss, a Thousand Nudges: Backpropagation by Pencil](posts/backprop-by-pencil.txt)
+    post 45/45 . 2026-06-30 . part 1 of 2 . reinforcement-learning, deep-rl, backpropagation, neural-network, by-hand
+    Chapter 14 closed on a sting: the net guessed an engine worth 5.5, the target said 4.42,
+    the miss was one number -1.08 -- and it must fix ~1,300 dials with no feature to point the
+    way. This post walks that one number backward to every dial by pencil. Ask each dial its
+    PULL on the fired worth (how much raising it raises that worth) and nudge by size x how-
+    wrong x pull -- Part 1's fair-share rule with "feature" swapped for "pull." Chase the pull
+    back through the 2->3->4 toy of Chapter 14: it starts as a single 1 in the fired engine's
+    slot; sheet C's pull is x dropped into that ONE column (the other three engines sleep, dead
+    middle rows zero); the bend becomes a gate open only where psi>0, killing the blame headed
+    for dead numbers ([2,1,-1] x [1,0,0] = [2,0,0]); sheet A's pull is input s times the
+    surviving blame ([[2,0,0],[4,0,0]]). Every stage's grad is the same shape -- input times
+    signal. Spend the miss at step 0.01: five of 25 dials move, the biggest to the hardest
+    pusher, and the fired worth slides 5.5 -> 5.166 toward 4.42. The zeros are the lesson.
+    Hard-coded forward-and-back code. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------
