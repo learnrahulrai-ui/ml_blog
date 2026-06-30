@@ -1,0 +1,298 @@
+@title Letting the Car Choose: Sarsa Control by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 14 . FUNCTION APPROXIMATION . PART 3 OF 4
+  Letting the Car Choose: Sarsa Control by Pencil
+  Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, function-approximation, sarsa, control, tile-coding, by-hand
+  ============================================================================================
+
+  PATH . post 43/43 . part 3 of 4 in Chapter 14 -- Function Approximation
+    <- prev:  [Sharp From Blurry: Tile Coding by Pencil](tile-coding-by-pencil.txt)
+       next:  [Two Stages and a Bend: A Q-Network by Pencil](q-network-by-pencil.txt) ->
+
+  ---
+
+  Part 2 built a worth for a STATE -- light eight tiles, sum their weights. But the car in
+  the valley does not want to know how good a SPOT is. It wants to know which way to PUSH.
+
+  A move = one of three pushes: left, coast, right. A worth-per-spot cannot rank them: it
+  hands back one number for "here," and the car needs three -- one per push -- to choose. So
+  the spot-worth from Part 2 is the wrong shape. We need a worth for the PAIR (spot, move).
+  Everything else from Part 2 -- the shifted rulers, the eight active tiles, the sum, the TD
+  nudge -- carries over untouched. Only the bookkeeping grows one notch.
+
+  (To keep every number on the page, this post keeps Part 2's tiny stand-in: one dial,
+  position on [0,1], read by two coarse rulers. Ruler A has tiles A0=[0,0.5), A1=[0.5,1.0);
+  ruler B is shifted a quarter-unit, tiles B0=[-0.25,0.25), B1=[0.25,0.75), B2=[0.75,1.25).
+  A spot lights one tile per ruler. The real car does all of this in 2-D with eight tilings;
+  the arithmetic below is the same, just longer.)
+
+  ---
+
+  SO GIVE EACH MOVE ITS OWN ROW OF WEIGHTS
+
+  Part 2 had one row of weights, one per tile. Stack THREE such rows -- one per push -- into
+  a table. Same five tiles across the top; a separate weight in each move's row:
+
+      move \ tile :   A0     A1     B0     B1     B2
+      ----------------------------------------------------
+      left        :  -2.0   -3.0    0.0   -2.5    0.0
+      coast       :  -1.0   -2.0    0.0   -1.5    0.0
+      right       :  -0.5   -1.0    0.0   -0.8    0.0
+
+  (The weights are negative because the car is fined -1 every step until it escapes -- more
+  on that at the end. Just read them as "how good," less-negative is better.)
+
+  A worth is still a sum of the active tiles -- you just read it off the chosen MOVE's row.
+  At position 0.3 the two active tiles are A0 and B1 (0.3 sits in A0=[0,0.5) and in
+  B1=[0.25,0.75)). So:
+
+      worth(0.3, left ) = w[left ][A0] + w[left ][B1] = -2.0 + (-2.5) = -4.5
+      worth(0.3, coast) = w[coast][A0] + w[coast][B1] = -1.0 + (-1.5) = -2.5
+      worth(0.3, right) = w[right][A0] + w[right][B1] = -0.5 + (-0.8) = -1.3
+
+  Three rows, three worths, same two tiles -- one number per push, exactly what choosing
+  needs.
+
+  ---
+
+  WHICH LETS THE CAR RANK ITS MOVES AND PICK -- BUT KEEP WANDERING
+
+  With a worth per push, the car ranks and grabs the best. At 0.3 the three worths are
+  -4.5, -2.5, -1.3, so "right" (least-negative) wins. That is the GREEDY pick.
+
+  But greedy alone is a trap you have met since the bandits of Chapter 12: a move that has
+  never been tried keeps a stale worth, so the car never tries it, so it never finds out.
+  The fix is the same -- wander a small slice of the time. Roll a die: with chance epsilon
+  (say 0.1) push a RANDOM way; otherwise push greedy. Ties are split by a coin.
+
+      most of the time:  push argmax of [ worth(s,left), worth(s,coast), worth(s,right) ]
+      epsilon of time :  push a random one of the three  (so every move keeps getting tried)
+
+  This wandering is not noise to be tolerated -- in a moment it will turn out to be part of
+  what the car is learning to grade.
+
+  ---
+
+  SO THE NUDGE CHASES THE MOVE IT WILL ACTUALLY MAKE NEXT -- THAT IS SARSA
+
+  The TD nudge is the one from Chapter 13, now aimed at a (spot, move) worth. You are AT a
+  spot, you PUSH a move, you collect a reward, you LAND on the next spot, and -- here is the
+  one new beat -- you pick the move you will ACTUALLY push next, and grade against that:
+
+      target    = reward + dilute x worth(next spot, next move)
+      how wrong = target - worth(this spot, this move)
+      for each active tile of (this spot, this move):
+          w[this move][tile] = w[this move][tile] + size x (how wrong)
+
+  The "next move" in the target is the move epsilon-greedy actually hands you for the next
+  spot -- wander and all. That is the whole meaning of the name: State, Action, Reward, next
+  State, next Action -- SARSA -- the five things the nudge needs, the last being the move you
+  are about to make, not the best move you could imagine. (Split the step the Part 2 way,
+  size = alpha / tilings, so the active tiles together move the worth by one step.)
+
+  ---
+
+  THE WHOLE STEP BY HAND -- ONE FOOTSTEP, EVERY NUMBER
+
+  Start AT position 0.3, and the car pushes RIGHT (its greedy pick). The world fines it -1
+  and rolls it to position 0.6. alpha 0.2 over 2 tilings, so size 0.1; dilute 0.9.
+
+  First, what move will the car push NEXT, at 0.6? Read all three worths there. Position 0.6
+  lights tiles A1 and B1 (0.6 sits in A1=[0.5,1.0) and in B1=[0.25,0.75)):
+
+      worth(0.6, left ) = w[left ][A1] + w[left ][B1] = -3.0 + (-2.5) = -5.5
+      worth(0.6, coast) = w[coast][A1] + w[coast][B1] = -2.0 + (-1.5) = -3.5
+      worth(0.6, right) = w[right][A1] + w[right][B1] = -1.0 + (-0.8) = -1.8
+
+  Greedy at 0.6 is RIGHT (-1.8 wins), and the die did not call a wander, so the next move is
+  right. Now the Sarsa target and the miss:
+
+      target    = reward + dilute x worth(0.6, right)
+                =  -1    +  0.9   x   (-1.8)
+                =  -1    -  1.62
+                =  -2.62
+
+      how wrong = target - worth(0.3, right)
+                = -2.62 - (-1.3)
+                = -1.32
+
+  The car's old worth for (0.3, right) was -1.3, too rosy; the harsher target -2.62 pulls it
+  down. Nudge the two active tiles of (0.3, right) -- A0 and B1 in the RIGHT row only -- each
+  by size x how-wrong = 0.1 x (-1.32) = -0.132:
+
+      w[right][A0] : -0.5 + (-0.132) = -0.632
+      w[right][B1] : -0.8 + (-0.132) = -0.932
+
+  Drawn, before and after -- only two cells in the RIGHT row moved; the left and coast rows,
+  and the other tiles, never lit:
+
+      right row:   A0      A1     B0    B1      B2
+      BEFORE:    -0.5    -1.0    0.0  -0.8     0.0
+      AFTER:     -0.632  -1.0    0.0  -0.932   0.0
+                 ^^^^^^               ^^^^^^             (left & coast rows untouched)
+
+  New worth(0.3, right) = -0.632 + (-0.932) = -1.564, down 0.264 from -1.3 -- two tiles,
+  -0.132 each, the one step you asked for, toward the target. And the Part 2 ramp still pays
+  out, but now ONLY in the right row: a neighbour at 0.4 (also tiles A0,B1) sees worth(0.4,
+  right) drop to -1.564 in full; a spot at 0.1 (tiles A0,B0) shares only A0, so worth(0.1,
+  right) slips from -0.5 to -0.632; and worth(anything, left) and worth(anything, coast)
+  do not budge. The lesson spread across nearby SPOTS but stayed inside the move it was
+  about.
+
+  ---
+
+  AND AT THE FLAG THERE IS NO NEXT MOVE -- THE ANCHOR
+
+  The episode ends when the car tops the hill. There is no next spot, so no next move, so the
+  "dilute x worth(next, next move)" piece has nothing to point at. Drop it -- exactly the
+  terminal anchor from Chapter 13:
+
+      target    = reward alone
+      how wrong = reward - worth(this spot, this move)
+
+  Every escape pins the worths of the last push to the bare reward, and that truth then
+  crawls backward, footstep by footstep, into the pushes that led there.
+
+  ---
+
+  WHY THIS IS CALLED "ON-POLICY" -- AND WHERE Q-LEARNING WOULD DIFFER
+
+  Look again at the target: it used worth(0.6, RIGHT) because right is the move the car will
+  actually push next -- the move its own epsilon-greedy habit handed it. It grades each push
+  against the habit it really follows, wander included. That is what ON-POLICY means: the
+  worths it learns are the worths of the policy it is actually running, jitter and all.
+
+  Chapter 13 drew the fork. Swap that one peek for the BEST next worth --
+
+      Sarsa     :  target = reward + dilute x worth(next, the move actually taken next)
+      Q-learning:  target = reward + dilute x max over moves of worth(next, move)
+
+  -- and you are learning the worths of a car that always plays perfectly, even while this
+  car is still wandering. Same tiles, same table, same nudge; the only change is which next
+  worth you reach for. (Expected Sarsa, also from Chapter 13, reaches for the odds-weighted
+  average of the next worths -- another single swap.)
+
+  ---
+
+  THE EPISODE, MOVE BY MOVE
+
+  Three handles run a whole drive. At the start, look at the spot, pick a push, and REMEMBER
+  the push and its active tiles. On each later step, fold in the reward and new spot, pick
+  the next push, nudge the REMEMBERED push's tiles toward the Sarsa target, then remember
+  the new push. At the flag, do the anchor nudge and stop.
+
+      agent_start(spot):  tiles = tilecode(spot); a = epsilon_greedy(tiles)
+                          remember (tiles, a); return a
+      agent_step(r,spot): tiles' = tilecode(spot); a' = epsilon_greedy(tiles')
+                          how_wrong = r + dilute x worth(tiles',a') - worth(tiles,a)
+                          nudge remembered (tiles, a) by size x how_wrong
+                          remember (tiles', a'); return a'
+      agent_end(r):       how_wrong = r - worth(tiles,a)      (no next piece)
+                          nudge remembered (tiles, a) by size x how_wrong
+
+  On Mountain Car the world pays -1 every single step until the car escapes, so EVERY worth
+  is deeply negative -- a stand-in for how many -1's still lie between here and freedom -- and
+  less-negative means closer to free. Pushing
+  toward the hill when too slow only stalls, so at first the car flails and every worth sinks
+  toward a big negative. But the anchor leaks the truth backward, the tiles share it across
+  near-identical spots, and the greedy pick slowly bends into the only thing that works:
+  push WITH the motion to pump the swing higher each pass, until one rock carries it over.
+
+  ---
+
+  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+
+  Nothing above needed a computer. This last section is for the day you meet one. The table
+  is now two-dimensional -- a row per move -- and a worth sums the active tiles along one row.
+
+      import numpy as np
+      n_tilings = 2
+      # tiles: A0 A1 B0 B1 B2  (the Part 2 coder, reused)
+      def active_tiles(p):
+          a = int((p - 0.0 ) // 0.5)        # ruler A
+          b = int((p + 0.25) // 0.5)        # ruler B, shifted
+          return [a, 2 + b]                 # e.g. 0.3 -> [0, 3] == A0, B1
+
+      # weight table: 3 moves (0=left,1=coast,2=right) x 5 tiles
+      W = np.array([[-2.0, -3.0, 0.0, -2.5, 0.0],     # left
+                    [-1.0, -2.0, 0.0, -1.5, 0.0],     # coast
+                    [-0.5, -1.0, 0.0, -0.8, 0.0]])    # right
+
+      def worth(p, move):
+          return W[move, active_tiles(p)].sum()   # sum the active tiles in that move's row
+
+      def epsilon_greedy(p, eps=0.1):
+          if np.random.rand() < eps:
+              return np.random.randint(3)                       # wander
+          qL, qC, qR = worth(p, 0), worth(p, 1), worth(p, 2)    # -4.5, -2.5, -1.3  at 0.3
+          return int(np.argmax([qL, qC, qR]))                   # -> 2 (right)
+
+  ONE STEP BY HAND (at 0.3 push right, reward -1, land 0.6, next push right; size 0.1):
+
+      size, dilute = 0.2 / n_tilings, 0.9                       # size = 0.1
+      how_wrong = -1 + dilute * worth(0.6, 2) - worth(0.3, 2)   # -1 + 0.9*(-1.8) - (-1.3) = -1.32
+      a, b = active_tiles(0.3)                                  # tiles A0, B1 -> 0, 3
+      W[2, a] += size * how_wrong                               # right A0: -0.5 + 0.1*(-1.32) = -0.632
+      W[2, b] += size * how_wrong                               # right B1: -0.8 + 0.1*(-1.32) = -0.932
+      print(W[2])      # [-0.632 -1.  0.  -0.932  0. ]
+
+  THE ANCHOR STEP (the push topped the hill -- drop the next piece):
+
+      how_wrong = reward - worth(p, move)                       # target = reward alone
+      a, b = active_tiles(p)
+      W[move, a] += size * how_wrong
+      W[move, b] += size * how_wrong
+
+  ---
+
+  ONE BREATH
+
+  A spot-worth cannot rank moves, so give every push its OWN row of weights: worth(spot,
+  move) is the sum of that spot's active tiles read along the move's row. The car ranks its
+  three worths and pushes the best, but wanders epsilon of the time so no move goes stale.
+  The nudge is Chapter 13's, now grading each push against the move it will ACTUALLY make
+  next -- target = reward + dilute x worth(next spot, next move), how-wrong = target -
+  worth(this spot, this move), and only the taken move's active tiles move (split size =
+  alpha / tilings). That "next move it really makes" is what makes it SARSA and on-policy;
+  swap it for the best next worth and you have Q-learning, for the odds-weighted average and
+  you have Expected Sarsa. The flag has no next move, so the anchor grades against the bare
+  reward and the truth crawls backward. On Mountain Car, every step costs -1, so the worths
+  count steps-to-freedom and the greedy pick bends into pumping the swing until one pass
+  clears the hill.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   spot                       = state  (s)
+  >>   push / move                 = action  (a)
+  >>   worth(spot, move)           = the action-value q-hat(s, a, w)
+  >>   a row of weights per move    = a separate weight block per action (stacked weight vector)
+  >>   worth = sum of active tiles  = q-hat(s,a,w) = w_a . x(s)  (linear action-value)
+  >>   greedy pick                  = argmax_a q-hat(s, a)
+  >>   wander epsilon of the time   = epsilon-greedy exploration
+  >>   how wrong                    = the TD error  (delta)
+  >>   the move actually taken next = the on-policy action a'  (this is the second A in SARSA)
+  >>   w[move] += size x delta x x(s) = the episodic semi-gradient Sarsa update
+  >>   the anchor (topped the hill) = terminal update (target = reward alone)
+  >>   max over next moves          = Q-learning's target (off-policy)
+  >>   odds-weighted next worths    = Expected Sarsa's target
+  >>   fined -1 each step           = Mountain Car's reward (escape the valley as fast as you can)
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 14 -- Function Approximation):
+    Part 1 -- [State Aggregation by Pencil](state-aggregation-by-pencil.txt) .
+    Part 2 -- [Tile Coding by Pencil](tile-coding-by-pencil.txt) .
+    Part 3 (this post) .
+    Part 4 -- [A Q-Network by Pencil](q-network-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

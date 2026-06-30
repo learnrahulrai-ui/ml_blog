@@ -1,0 +1,273 @@
+@title Two Stages and a Bend: A Q-Network by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 14 . FUNCTION APPROXIMATION . PART 4 OF 4
+  Two Stages and a Bend: A Q-Network by Pencil
+  Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, function-approximation, neural-network, expected-sarsa, deep-rl, by-hand
+  ============================================================================================
+
+  PATH . post 44/44 . part 4 of 4 in Chapter 14 -- Function Approximation
+    <- prev:  [Letting the Car Choose: Sarsa Control by Pencil](sarsa-control-by-pencil.txt)
+       next:  (Chapter 15 -- coming)
+
+  ---
+
+  Every worth in this chapter has been a SUM of weights you chose where to put -- one per
+  group, one per tile, one per tile-and-move. That is a straight ruler, and a straight ruler
+  draws only straight walls.
+
+  Tile coding (Part 2, 3) made YOU lay the grids by hand. It works on a car with two dials,
+  but the standard next toy is a lander -- a little rocket easing onto a pad -- and its state
+  is EIGHT dials at once: across, up, sideways speed, falling speed, tilt, spin, and a
+  left/right foot-touch flag. Hand-laying tiles across eight dials is hopeless, and even if
+  you did, a sum of tiles can only ADD their separate votes -- it can never say "fire the
+  engine only when falling fast AND tilted AND low," a bent, joined-up shape. We want a worth
+  that BUILDS its own features and can bend. That is the whole reason for this post.
+
+  (To keep every number on the page, the lander's 8 -> 100 -> 4 shrinks here to a pencil
+  toy: 2 dials in, 3 middle numbers, 4 engine-worths out. The arithmetic is identical, just
+  shorter.)
+
+  ---
+
+  SO STACK TWO STRAIGHT STAGES AND LET THE MIDDLE INVENT FEATURES
+
+  Run the state through one straight stage to make a row of MIDDLE numbers, then a second
+  straight stage to turn those into the four worths. Each stage is the Chapter 7 move: a
+  sheet of dials times the row, plus a nudge.
+
+      state s        sheet A          middle psi       sheet C        worths Q
+      [s1 s2]  --->  (2 x 3)   --->  [p1 p2 p3]  --->  (3 x 4)  --->  [Q1 Q2 Q3 Q4]
+       1 x 2         + b1 (1x3)        1 x 3            + b2 (1x4)       1 x 4
+
+      psi = s A + b1          (each middle number = the state dotted with one column of A)
+      Q   = psi C + b2        (each worth = the middle row dotted with one column of C)
+
+  The middle row is the network's OWN features -- it was not handed a single tile; it gets
+  to invent three combinations of the two input dials and grade the engines off those.
+
+  ---
+
+  BUT A STACK OF STRAIGHT STAGES IS STILL ONE STRAIGHT STAGE -- SO BEND THE MIDDLE
+
+  Push the two stages together and watch them collapse. Q = (sA + b1)C + b2 = s(AC) +
+  (b1 C + b2). The product AC is just one sheet -- multiply our toy's A by C and a single
+  2 x 4 falls out:
+
+              A (2x3)               C (3x4)                 D = A C  (2 x 4)
+          [ 1  -2  0.5 ]      [  2  -1   0   1 ]
+          [ 0.5  1  -1 ]  x   [  1   1  -1   0 ]   =   [ -0.5  -2   2.5  0.5 ]
+                             [ -1   2   1  -1 ]        [  3   -1.5  -2   1.5 ]
+
+  So Q = sD + e -- a SINGLE straight stage, 2 -> 4, the middle three numbers vanished. Two
+  straight stages bought nothing; a hundred would buy nothing. Stacking is wasted unless
+  something between them is NOT straight.
+
+  The cheapest bend there is: after the first stage, flatten every negative middle number to
+  zero and leave the rest alone. That is the zero-out rule from Chapter 7 (ReLU):
+
+      x = max(psi, 0)        -- each middle number kept if positive, knocked to 0 if negative
+
+  Now Q = max(sA + b1, 0) C + b2, and there is NO single sheet D that reproduces it -- the
+  flattening cannot be folded into a multiply. The bend is what makes two stages worth more
+  than one, and what lets the worth turn corners instead of drawing one flat wall.
+
+  ---
+
+  THE FORWARD PASS, EVERY NUMBER
+
+  Take the state s = [1, 2]. Sheet A, nudge b1:
+
+      A = [ 1   -2   0.5 ]      b1 = [ 0.5  -0.5  1.0 ]
+          [ 0.5  1  -1   ]
+
+  First stage, each middle number is the state dotted with a column of A, plus b1:
+
+      p1 = (1)(1)   + (2)(0.5) + 0.5  = 1 + 1 + 0.5  =  2.5
+      p2 = (1)(-2)  + (2)(1)   - 0.5  = -2 + 2 - 0.5 = -0.5
+      p3 = (1)(0.5) + (2)(-1)  + 1.0  = 0.5 - 2 + 1  = -0.5
+      psi = [ 2.5, -0.5, -0.5 ]
+
+  The bend -- flatten the two negatives to zero:
+
+      x = max(psi, 0) = [ 2.5, 0, 0 ]
+
+  Notice what the bend just did: two of the three middle numbers went DEAD. They will pass
+  nothing on. Sheet C, nudge b2:
+
+      C = [  2  -1   0   1 ]      b2 = [ 0.5  1.0  0.0  -0.5 ]
+          [  1   1  -1   0 ]
+          [ -1   2   1  -1 ]
+
+  Second stage, each worth is x dotted with a column of C, plus b2. Because x = [2.5, 0, 0],
+  only C's FIRST row survives -- the two dead middle numbers erase their rows:
+
+      Q1 = (2.5)(2)  + 0 + 0 + 0.5 =  5.0 + 0.5 =  5.5
+      Q2 = (2.5)(-1) + 0 + 0 + 1.0 = -2.5 + 1.0 = -1.5
+      Q3 = (2.5)(0)  + 0 + 0 + 0.0 =  0.0 + 0.0 =  0.0
+      Q4 = (2.5)(1)  + 0 + 0 - 0.5 =  2.5 - 0.5 =  2.0
+      Q = [ 5.5, -1.5, 0.0, 2.0 ]
+
+  ---
+
+  WHICH GIVES FOUR ENGINE-WORTHS, COMPUTED NOT LOOKED UP
+
+  Q is four numbers -- one worth per engine (fire-left, fire-main, fire-right, coast) -- the
+  same shape Part 3 gave each move on the car, but now CONJURED from twelve-odd dials instead
+  of stored in a table. Choosing is unchanged: push the greedy best (here engine 1, worth
+  5.5), and wander epsilon of the time so no engine goes stale. There is no table of states
+  anywhere -- the sheets A, C and the two nudges (on the real lander, 8x100 + 100x4 + 100 + 4
+  = about 1,300 dials) GENERATE the four worths of EVERY state, including states never seen.
+
+  ---
+
+  SO WHAT DO WE GRADE Q AGAINST? THE SAME SARSA TARGET, AVERAGED
+
+  The net guessed Q(s, engine1) = 5.5. Was that right? Grade it the Chapter 13 way: take a
+  real move, see the reward and where you land, and build a target out of what actually
+  happened plus the net's own read of the next spot. The lander's policy is a spread of
+  chances over engines (it wanders), so instead of betting on ONE next move, average the next
+  worths by how likely each move is -- the Expected Sarsa target from Chapter 13:
+
+      y = reward + dilute x SUM over next engines a' of  chance(a') x Q(next state, a')
+
+  Worked. We fired engine 1, got reward 1, and landed at s'. Run the net forward on s' the
+  same way (its own sheets, its own bend) and read off its four worths; say they come out
+
+      Q(s') = [ 3, 5, 1, 2 ]        and the policy's chances are  [ 0.1, 0.6, 0.1, 0.2 ]
+
+  The averaged next-worth, then the target (dilute 0.9):
+
+      averaged next = (0.1)(3) + (0.6)(5) + (0.1)(1) + (0.2)(2)
+                    =  0.3 + 3.0 + 0.1 + 0.4
+                    =  3.8
+
+      y = reward + dilute x averaged next
+        =   1    +  0.9   x   3.8
+        =   1    +  3.42
+        =   4.42
+
+  (Swap that average for the single best next worth and it is Q-learning; for the one move
+  actually taken next, plain Sarsa -- the exact fork from Chapter 13. The averaged form is
+  what the lander assignment uses.)
+
+  ---
+
+  AND THE MISS LIVES IN ONE SLOT -- THE ENGINE WE ACTUALLY FIRED
+
+  We have a guess and a target, so the miss is their difference -- the same "how wrong" as
+  every post before:
+
+      how wrong = target - worth of the move we took
+                = y - Q(s, engine1)
+                = 4.42 - 5.5
+                = -1.08
+
+  The net was 1.08 too high on engine 1. And it is ONLY about engine 1: we fired engine 1, so
+  only engine 1's worth was put to the test. The other three were never tried this step, so we
+  have nothing to say about them. Write the miss as a row that is zero everywhere except the
+  fired engine's slot:
+
+      how-wrong row = [ -1.08, 0, 0, 0 ]
+                         ^^^^^ engine 1 only; the other three untested, so 0
+
+  ---
+
+  WHICH LEAVES THE HARD QUESTION FOR NEXT TIME
+
+  Here is where the table-free machine bites back. On the car, "how wrong" landed on the two
+  active tiles and the job was done -- the feature told you EXACTLY which weights to nudge.
+  Here there is no such pointer. One number, -1.08, has to correct the whole pile: sheet A
+  (2x3), sheet C (3x4), and the two nudges -- and on the real lander, about 1,300 dials. One
+  number cannot tell 1,300 dials how to move; the correction must somehow spread back through
+  the bend and across both sheets, each dial getting its own share by how much it pushed the
+  guess. How a single miss becomes 1,300 separate nudges -- backpropagation, by pencil -- is
+  the whole of the next post. This one built the machine and weighed its guess; the next one
+  teaches it.
+
+  ---
+
+  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+
+  Nothing above needed a computer. This last section is for the day you meet one. The forward
+  pass is two dot-and-add stages with a flatten between; the target is one weighted average.
+
+      import numpy as np
+
+      s  = np.array([1.0, 2.0])
+      A  = np.array([[1.0, -2.0, 0.5], [0.5, 1.0, -1.0]])   # 2 x 3
+      b1 = np.array([0.5, -0.5, 1.0])
+      C  = np.array([[2.0,-1.0,0.0,1.0],[1.0,1.0,-1.0,0.0],[-1.0,2.0,1.0,-1.0]])  # 3 x 4
+      b2 = np.array([0.5, 1.0, 0.0, -0.5])
+
+      def q_values(s):
+          psi = s @ A + b1            # [ 2.5, -0.5, -0.5 ]
+          x   = np.maximum(psi, 0)    # [ 2.5,  0,    0   ]  -- the bend
+          return x @ C + b2           # [ 5.5, -1.5,  0,  2.0 ]
+
+      Q = q_values(s)
+      print(Q)                        # [ 5.5 -1.5  0.   2. ]   -> greedy engine 1
+
+  THE EXPECTED-SARSA TARGET AND THE MISS (fired engine 1, reward 1, landed s'):
+
+      reward, dilute = 1.0, 0.9
+      Qn      = np.array([3.0, 5.0, 1.0, 2.0])     # q_values(s_next)
+      chances = np.array([0.1, 0.6, 0.1, 0.2])     # the policy's spread over engines
+      y         = reward + dilute * np.dot(chances, Qn)   # 1 + 0.9*3.8 = 4.42
+      how_wrong = y - Q[0]                                 # 4.42 - 5.5 = -1.08
+      hw_row    = np.zeros(4); hw_row[0] = how_wrong       # [-1.08, 0, 0, 0]
+      print(how_wrong, hw_row)
+
+  THE ANCHOR (the move landed the rocket -- no next state): y = reward alone, then the same
+  one-slot how-wrong. Teaching the sheets from that row is the next post.
+
+  ---
+
+  ONE BREATH
+
+  A sum of hand-laid tiles is a straight ruler -- fine for two dials, hopeless for the lander's
+  eight, and unable to bend. So stack two straight stages and let the MIDDLE row invent its own
+  features: psi = sA + b1, then Q = (middle)C + b2. But two straight stages collapse to one
+  (Q = sD + e, D = AC), so put a BEND between them -- flatten negatives to zero, x = max(psi,0)
+  -- which no single sheet can mimic. Worked on a 2->3->4 toy: s=[1,2] -> psi=[2.5,-0.5,-0.5]
+  -> x=[2.5,0,0] (two middles dead) -> Q=[5.5,-1.5,0,2], four engine-worths conjured from a
+  dozen dials, no table. Grade the fired engine against the Expected-Sarsa target y = reward +
+  dilute x (chance-weighted next worths) = 4.42, so how-wrong = 4.42 - 5.5 = -1.08, a row zero
+  but for the fired engine: [-1.08,0,0,0]. The sting: that ONE number must now correct ~1,300
+  dials with no feature to point the way -- spreading it back through the bend and both sheets
+  is backpropagation, the next post.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   the lander                  = LunarLander  (8-D state, 4 discrete engine actions)
+  >>   two stacked stages           = a two-layer (one-hidden-layer) neural network
+  >>   sheet A, sheet C             = the weight matrices (W of each layer)
+  >>   nudge b1, b2                 = the bias vectors
+  >>   middle numbers psi           = the pre-activations
+  >>   the bend, max(psi,0)         = the ReLU activation (the non-linearity)
+  >>   x (after the bend)           = the hidden activations / the learned features
+  >>   Q = four engine-worths        = the action-value head q-hat(s, a, w) for all actions at once
+  >>   the collapse Q = sD + e       = why a linear stack has no more power than one linear map
+  >>   chance-weighted next worths   = the Expected Sarsa target, sum_a' pi(a'|s') q-hat(s',a')
+  >>   how wrong (one slot)          = the TD error delta, placed only in the taken action's column
+  >>   the anchor (rocket landed)    = terminal target (reward alone, no bootstrap)
+  >>   ~1,300 dials from one number  = the credit-assignment problem backpropagation solves
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 14 -- Function Approximation):
+    Part 1 -- [State Aggregation by Pencil](state-aggregation-by-pencil.txt) .
+    Part 2 -- [Tile Coding by Pencil](tile-coding-by-pencil.txt) .
+    Part 3 -- [Sarsa Control by Pencil](sarsa-control-by-pencil.txt) .
+    Part 4 (this post) -- the chapter closes here; teaching the net (backprop) opens Chapter 15.
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

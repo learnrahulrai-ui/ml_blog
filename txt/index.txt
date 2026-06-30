@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in fourteen chapters (forty-one posts),
+  This is not a pile of loose articles -- it is a short BOOK in fourteen chapters (forty-four posts),
   meant to be read top to bottom. Each post opens with a "post N of 41" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 41:
+  >> NEW HERE? Start at post 1 of 44:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -648,6 +648,53 @@
     treating the target as a fixed label because that is simpler and steadier. Ends with all
     500 worths read out at once as runs of duplicates, hard-coded code, and the coarse-fast
     vs fine-exact-but-slow trade. Assumes zero background.
+
+  [Part 2 -- Sharp From Blurry: Tile Coding by Pencil](posts/tile-coding-by-pencil.txt)
+    post 42/42 . 2026-06-30 . part 2 of 4 . reinforcement-learning, function-approximation, tile-coding, coarse-coding, by-hand
+    Part 1's one-hot forced an either/or: coarse groups share but blur, fine groups sharpen
+    but stop sharing. The fix on the car-in-a-valley toy, whose state is two real dials
+    (position, velocity) a table cannot hold: lay the same COARSE ruler down several times,
+    each shifted. A point lights one tile per ruler -- a k-hot, several switches on, not one --
+    and its worth is the SUM of the active weights. Worked on one line with two half-width
+    rulers offset by 0.25: the shifted walls carve quarter-unit cells out of half-unit tiles
+    (sharp from blurry), and two states share exactly the tiles they have in common -- full
+    for 0.3 vs 0.4, half for 0.6, none for 0.9, a smooth ramp where Part 1 had a cliff. The
+    same TD nudge learns, the k-hot steering it onto the active tiles, the step split size =
+    alpha / tilings so the several tiles sum to one step (how-wrong 0.5, two tiles +0.05 each,
+    neighbours rising by shared-tile count). Ends with the real Mountain Car -- 2-D square
+    tiles, eight hashed grids, the eight-camera picture -- and hard-coded code. Control (one
+    tile-block per move) is Part 3. Assumes zero background.
+
+  [Part 3 -- Letting the Car Choose: Sarsa Control by Pencil](posts/sarsa-control-by-pencil.txt)
+    post 43/43 . 2026-06-30 . part 3 of 4 . reinforcement-learning, function-approximation, sarsa, control, tile-coding, by-hand
+    Part 2's tiles gave a worth for a STATE, but the car must rank its three pushes (left,
+    coast, right) -- so give every push its OWN row of weights: worth(spot, move) is the sum
+    of that spot's active tiles read along the move's row. The car pushes the greedy best but
+    wanders epsilon of the time so no move goes stale. The Chapter 13 nudge returns, now
+    grading each push against the move it will ACTUALLY make next: target = reward + dilute x
+    worth(next spot, next move), and only the taken move's active tiles move. Worked footstep
+    by hand on the Part 2 toy: at 0.3 push right, fined -1, land 0.6, next push right ->
+    how-wrong -1.32, the two right-row tiles slide -0.5->-0.632 and -0.8->-0.932, the lesson
+    spreading across nearby spots but staying inside that move. That "move it really makes" is
+    what makes it on-policy SARSA; one swap to the max gives Q-learning, one to the odds-
+    weighted average gives Expected Sarsa. The flag has no next move (the anchor: target =
+    reward alone), and the -1-per-step fine bends the greedy pick into pumping the swing.
+    agent_start/step/end and hard-coded code. Assumes zero background.
+
+  [Part 4 -- Two Stages and a Bend: A Q-Network by Pencil](posts/q-network-by-pencil.txt)
+    post 44/44 . 2026-06-30 . part 4 of 4 . reinforcement-learning, function-approximation, neural-network, expected-sarsa, deep-rl, by-hand
+    Parts 1-3 kept the worth a straight ruler -- a sum of weights you chose where to put. A
+    straight ruler draws only straight walls, hopeless on the lander's EIGHT dials and unable
+    to bend. So stack two straight stages and let the MIDDLE row invent its own features:
+    psi = sA + b1, then Q = (middle)C + b2. But two straight stages collapse to one (Q = sD +
+    e with D = AC, shown by hand), so put a BEND between -- flatten negatives to zero, the
+    ReLU x = max(psi,0) -- which no single sheet can mimic. Worked on a 2->3->4 toy: s=[1,2]
+    -> psi=[2.5,-0.5,-0.5] -> x=[2.5,0,0] (two middles dead) -> Q=[5.5,-1.5,0,2], four engine-
+    worths conjured from a dozen dials, no table. Grade the fired engine against the Expected-
+    Sarsa target y = reward + dilute x (chance-weighted next worths) = 4.42, so how-wrong =
+    4.42 - 5.5 = -1.08, a row zero but for the fired engine: [-1.08,0,0,0]. Ends on the sting
+    that opens Chapter 15: one number must correct ~1,300 dials with no feature to point the
+    way. Forward pass and target as hard-coded code. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------

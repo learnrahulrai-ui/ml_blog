@@ -12,7 +12,7 @@
 
   PATH . post 41/41 . part 1 of 4 in Chapter 14 -- Function Approximation
     <- prev:  [Chapter 13 Reference: The Sample-based Map](sample-based-reference.txt)
-       next:  (more posts coming)
+       next:  [Sharp From Blurry: Tile Coding by Pencil](tile-coding-by-pencil.txt) ->
 
   ---
 
@@ -306,7 +306,7 @@
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 14 -- Function Approximation):
     Part 1 (this post) .
-    Part 2 -- coming .
+    Part 2 -- [Tile Coding by Pencil](tile-coding-by-pencil.txt) .
     Part 3 -- coming .
     Part 4 -- coming
 
