@@ -6,7 +6,7 @@
 ----------------------------------------------------------------------------------------------
 
   ABOUT THIS BLOG
-  Last updated: 2026-06-06
+  Last updated: 2026-07-01
 
 
   Who Am I
@@ -53,8 +53,10 @@
 
   What's Here
   -----------
-  A short book in six chapters (twenty-one posts), plus an appendix and a glossary. Read it
-  top to bottom -- each chapter draws its ideas by hand, then gathers the Python at the end.
+  A short book in sixteen chapters (forty-seven posts), plus references, standalone specials,
+  and a glossary. Read it top to bottom -- each chapter draws its ideas by hand, then gathers
+  the Python at the end. (Chapters 1-11 are classic ML and deep learning; Chapters 12-16 are
+  reinforcement learning, from bandits through a neural-net agent and policy gradient.)
 
     - CHAPTER 1 -- Predicting House Prices: two estimators from scratch (ask-closest and
       straight-stick) on the California housing pile, by hand.
@@ -102,6 +104,69 @@
         [part 5](posts/nci60-revisited.txt) .
         [part 6](posts/filling-the-blanks.txt)
 
+    - CHAPTER 7 -- Building a Neural Network From Scratch: stacked rooms of clerks with a
+      non-linear bend, the forward pass walked by hand, then backpropagation -- rolling the
+      dials downhill by the chain rule, every slope checked against a brute-force wiggle.
+        [part 1](posts/the-web-of-adders.txt) .
+        [part 2](posts/how-the-dials-learn.txt)
+
+    - CHAPTER 8 -- Keeping a Network Honest: five cures for memorising on a sheet of clothing
+      photos -- an L2 tax, dropout, early stopping, and batch norm -- judged on one sealed pile.
+        [post](posts/five-machines-against-memorising.txt)
+
+    - CHAPTER 9 -- Machines That Look at Pictures: convolution and pooling by hand -- a tiny
+      window slid over a photo, built one worker at a time, then the deep factory with batch
+      norm, dropout, and a confusion sheet. (CIFAR-10.)
+        [part 1](posts/the-magic-paper-factory.txt) .
+        [part 2](posts/the-deep-factory.txt)
+
+    - CHAPTER 10 -- Machines That Read Words: words into numbers, the walking worker (RNN), the
+      two-memory worker (LSTM), and the look-across machine (attention/transformer) -- each cell
+      walked by hand. (IMDB sentiment.)
+        [part 1](posts/the-walking-worker.txt) .
+        [part 2](posts/the-two-memory-worker.txt) .
+        [part 3](posts/the-look-across-machine.txt)
+
+    - CHAPTER 11 -- Attention Grows Eyes: the vision transformer (a photo cut into strips that
+      look at each other, LayerNorm, positional encoding) and the one mask that splits a reader
+      (BERT) from a writer (GPT).
+        [part 1](posts/the-vision-transformer.txt) .
+        [part 2](posts/encoder-or-decoder.txt)
+
+    - CHAPTER 12 -- Reinforcement Learning: agents, rewards, and plans by hand -- the agent
+      ladder, bandits and exploration, the Bellman recipe, and grading then finding the best
+      plan (policy and value iteration).
+        [intro](posts/the-agent-ladder.txt) .
+        [part 1](posts/bandits-and-exploration.txt) .
+        [part 2](posts/worth-and-bellman-from-zero.txt) .
+        [part 3](posts/grading-a-plan-policy-evaluation.txt) .
+        [part 4](posts/finding-the-best-plan-policy-iteration.txt) .
+        [part 5](posts/value-iteration-by-pencil.txt)
+
+    - CHAPTER 13 -- Sample-based Learning: learning a worth from one sample, no die -- TD(0),
+      Q-learning and Expected Sarsa, and Dyna-Q/Dyna-Q+ (a notebook and a clock), on Cliff
+      Walking.
+        [part 1](posts/td-zero-by-pencil.txt) .
+        [part 2](posts/q-learning-expected-sarsa-by-pencil.txt) .
+        [part 3](posts/dyna-q-by-pencil.txt) .
+        [part 4](posts/dyna-q-plus-by-pencil.txt)
+
+    - CHAPTER 14 -- Function Approximation: when there are too many spots for a table -- state
+      aggregation, tile coding, Sarsa control on Mountain Car, and a first neural-net Q-function.
+        [part 1](posts/state-aggregation-by-pencil.txt) .
+        [part 2](posts/tile-coding-by-pencil.txt) .
+        [part 3](posts/sarsa-control-by-pencil.txt) .
+        [part 4](posts/q-network-by-pencil.txt)
+
+    - CHAPTER 15 -- Training the Q-Network: how one miss teaches a thousand dials --
+      backpropagation by pencil, then a smarter step (Adam) and experience replay. (LunarLander.)
+        [part 1](posts/backprop-by-pencil.txt) .
+        [part 2](posts/adam-and-replay-by-pencil.txt)
+
+    - CHAPTER 16 -- Policy Gradient: learning the policy itself instead of a worth -- an
+      actor-critic with a softmax policy and a critic baseline, on the pendulum.
+        [post](posts/actor-critic-by-pencil.txt)
+
     - APPENDIX A -- Classification Reference: all of Chapter 3's concepts in one flip-to page:
       cross-entropy vs MSE, C parameter, LDA with priors, grid search fold safety,
       min-max scaling, precision vs recall in business, PR curves, and averaging.
@@ -111,6 +176,12 @@
       Mahalanobis distance, missing-data traps, why crush a room, and the ethics of sorting
       people into piles (bias, privacy, transparency) plus customer segmentation.
         [clustering reference](posts/clustering-reference.txt)
+
+    - MORE REFERENCES & STANDALONE SPECIALS: flip-to decoders for the later chapters (the
+      LSTM, Transformer, and Vision-Transformer katas, and the Sample-based Map), plus
+      self-contained pieces written for Hacker News (a genetic algorithm, UCS/A* search, Bayes
+      by head-count, the RNN/LSTM and attention katas, positional encoding, and the agent
+      ladder). The full list, in reading order, is in the [archive](archive.txt).
 
     - Glossary / Decoder Ring -- every plain term on this blog mapped to its textbook
       buzzword, and back again. The whole "ban the jargon" idea, in one table.

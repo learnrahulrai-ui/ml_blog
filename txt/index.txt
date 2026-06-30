@@ -10,7 +10,7 @@
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
   This is not a pile of loose articles -- it is a short BOOK in sixteen chapters (forty-seven posts),
-  meant to be read top to bottom. Each post opens with a "post N of 41" path header and a
+  meant to be read top to bottom. Each post opens with a "post N" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.

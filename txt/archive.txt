@@ -5,7 +5,8 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 13 chapters, every number worked by hand.
+  ALL POSTS -- a book in 16 chapters (47 posts), plus references and standalone specials,
+  every number worked by hand.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
 
@@ -28,8 +29,6 @@
   post 7    [Part 2 -- The Trade Curve: Sliding the Cutoff and What AUC Measures](posts/the-trade-curve.txt)
   post 8    [Part 3 -- Leash and Cloud: L2 Punishment and the Two-Cloud Wall](posts/leash-and-cloud.txt)
   post 9    [Part 4 -- Picking Settings, Skewed Piles, and Averaging Many Classes](posts/picking-settings-skewed-classes.txt)
-  by hand:  [Bayes by Head-Count -- The Greedy Shopkeeper, His Faulty Machine, and the Sick in the Wild](posts/bayes-shopkeeper.txt)
-  ref:      [Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)
 
 
   CHAPTER 4 -- HUMBLE DIALS AND WOBBLE BANDS (2026)
@@ -54,7 +53,6 @@
   post 19   [Part 4 -- The Family Tree: Hierarchical Clustering and the Dendrogram](posts/the-family-tree-clustering.txt)
   post 20   [Part 5 -- Both Tools on NCI60: PCA and Clustering on Real Gene Data](posts/nci60-revisited.txt)
   post 21   [Part 6 -- Filling the Blanks: Recommender Systems and Matrix Factorisation](posts/filling-the-blanks.txt)
-  ref:      [Distance and Clustering Reference -- Rulers, Traps, and Ethics](posts/clustering-reference.txt)
 
 
   CHAPTER 7 -- BUILDING A NEURAL NETWORK FROM SCRATCH (2026)
@@ -79,8 +77,8 @@
   post 27   [Part 1 -- Words Into a Machine: The Notepad and the Walking Worker](posts/the-walking-worker.txt)
   post 28   [Part 2 -- The Two-Memory Worker: How an LSTM Remembers Far-Back Words](posts/the-two-memory-worker.txt)
   post 29   [Part 3 -- The Look-Across Machine: Attention and the Transformer by Pencil](posts/the-look-across-machine.txt)
-  by hand:  [RNN and LSTM From Zero -- The Walking Machine and the Vault](posts/rnn-lstm-by-pencil.txt)
-  by hand:  [LSTM From Pencil -- Every Gate, Every Number](posts/lstm-from-pencil.txt)
+  by hand:  [The Walking Machine and the Vault -- RNN and LSTM by Pencil](posts/rnn-lstm-by-pencil.txt)
+  by hand:  [LSTM From Pencil -- RNN and LSTM From Scratch, Nothing But a Pencil](posts/lstm-from-pencil.txt)
 
 
   CHAPTER 11 -- ATTENTION GROWS EYES (2026)
@@ -89,22 +87,70 @@
   post 31   [Part 2 -- Encoder or Decoder: The One Mask That Splits BERT From GPT](posts/encoder-or-decoder.txt)
   by hand:  [Transformer From Pencil -- Attention From Scratch, One Number at a Time](posts/transformer-from-pencil.txt)
   by hand:  [Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
+  by hand:  [The Mark That Tells a Transformer Where It Is -- Positional Encoding Built From Scratch](posts/positional-embeddings-from-scratch.txt)
+  by hand:  [Transformers With Pencil -- A Whole Block Worked by Hand, One Line at a Time](posts/transformerforhn.txt)
   by hand:  [Vision Transformer From Pencil -- Strips, Seat-Stamps, and Masks by Hand](posts/vit-from-pencil.txt)
 
 
   CHAPTER 12 -- REINFORCEMENT LEARNING (2026)
-  --------------------------------------------
+  -------------------------------------------
   intro:    [The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
-  post 32   [Part 1 -- Bandits and Exploration: How a Blind Gambler Learns Which Machine Pays](posts/bandits-and-exploration.txt)
-  post 33   [Part 2 -- Grading a Plan by Pencil: A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
-  post 34   [Part 3 -- Finding the Best Plan by Pencil: How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
+  post 32   [Part 1 -- Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines](posts/bandits-and-exploration.txt)
+  post 33   [Part 2 -- Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches](posts/worth-and-bellman-from-zero.txt)
+  post 34   [Part 3 -- Grading a Plan by Pencil: A Table of Lies That Heals Into the Truth](posts/grading-a-plan-policy-evaluation.txt)
+  post 35   [Part 4 -- Finding the Best Plan by Pencil: How Good Arrows Spread From the Runway](posts/finding-the-best-plan-policy-iteration.txt)
+  post 36   [Part 5 -- No Map in the Arguments: Value Iteration Built by Pencil](posts/value-iteration-by-pencil.txt)
 
 
-  CHAPTER 13 -- SEARCH AND OPTIMIZATION (2026)
-  --------------------------------------------
-  post 35   [Part 1 -- Informed Search Jargon: One Machine, Three Slips, Every Word Debunked](posts/informed-search-jargon.txt)
-  post 36   [Part 2 -- Cheapest Walk: UCS and A*, Every Pop Shown, the Proof Included](posts/cheapest-walk-ucs-astar.txt)
-  post 37   [Part 3 -- Genetic Algorithm From Scratch: Optimising With No Gradient](posts/genetic-algorithm-from-scratch.txt)
+  CHAPTER 13 -- SAMPLE-BASED LEARNING (2026)
+  ------------------------------------------
+  post 37   [Part 1 -- No Die, Just a Sample: TD(0) Built by Pencil](posts/td-zero-by-pencil.txt)
+  post 38   [Part 2 -- Max or Honest Average: Q-Learning and Expected Sarsa by Pencil](posts/q-learning-expected-sarsa-by-pencil.txt)
+  post 39   [Part 3 -- A Notebook and a Rehearsal: Dyna-Q by Pencil](posts/dyna-q-by-pencil.txt)
+  post 40   [Part 4 -- A Clock for Curiosity: Dyna-Q+ by Pencil](posts/dyna-q-plus-by-pencil.txt)
+  ref:      [The Sample-based Map: MC, TD, DP, and the Sarsa Family](posts/sample-based-reference.txt)
+
+
+  CHAPTER 14 -- FUNCTION APPROXIMATION (2026)
+  -------------------------------------------
+  post 41   [Part 1 -- Too Many Spots for a Table: State Aggregation by Pencil](posts/state-aggregation-by-pencil.txt)
+  post 42   [Part 2 -- Sharp From Blurry: Tile Coding by Pencil](posts/tile-coding-by-pencil.txt)
+  post 43   [Part 3 -- Letting the Car Choose: Sarsa Control by Pencil](posts/sarsa-control-by-pencil.txt)
+  post 44   [Part 4 -- Two Stages and a Bend: A Q-Network by Pencil](posts/q-network-by-pencil.txt)
+
+
+  CHAPTER 15 -- TRAINING THE Q-NETWORK (2026)
+  -------------------------------------------
+  post 45   [Part 1 -- One Miss, a Thousand Nudges: Backpropagation by Pencil](posts/backprop-by-pencil.txt)
+  post 46   [Part 2 -- A Smarter Step: Adam and Replay by Pencil](posts/adam-and-replay-by-pencil.txt)
+
+
+  CHAPTER 16 -- POLICY GRADIENT (2026)
+  ------------------------------------
+  post 47   [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
+
+
+  REFERENCES -- flip-to decoders, one per cluster of chapters
+  -----------------------------------------------------------
+  ref:      [A. Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)   (companion to Chapter 3)
+  ref:      [B. Distance and Clustering Reference -- Rulers, Traps, and Ethics](posts/clustering-reference.txt)   (companion to Chapter 6)
+  ref:      [C. LSTM From Pencil -- RNN and LSTM From Scratch](posts/lstm-from-pencil.txt)   (companion to Chapter 10)
+  ref:      [D. Transformer From Pencil -- Attention From Scratch](posts/transformer-from-pencil.txt)   (companion to Chapter 10)
+  ref:      [E. Vision Transformer From Pencil -- Strips, Seat-Stamps, and Masks](posts/vit-from-pencil.txt)   (companion to Chapter 11)
+  ref:      [The Sample-based Map -- MC, TD, DP, and the Sarsa Family](posts/sample-based-reference.txt)   (companion to Chapter 13)
+
+
+  STANDALONE SPECIALS -- written for Hacker News, each self-contained
+  ------------------------------------------------------------------
+  special:  [Genetic Algorithm From Scratch -- Optimising With No Gradient](posts/genetic-algorithm-from-scratch.txt)
+  special:  [Cheapest Walk: UCS and A* -- Every Pop Shown, the Proof Included](posts/cheapest-walk-ucs-astar.txt)
+  special:  [Informed Search Jargon -- One Machine, Three Slips, Every Word Debunked](posts/informed-search-jargon.txt)
+  special:  [Bayes by Head-Count -- The Greedy Shopkeeper and His Faulty Machine](posts/bayes-shopkeeper.txt)
+  special:  [The Walking Machine and the Vault -- RNN and LSTM by Pencil](posts/rnn-lstm-by-pencil.txt)
+  special:  [Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
+  special:  [The Mark That Tells a Transformer Where It Is -- Positional Encoding From Scratch](posts/positional-embeddings-from-scratch.txt)
+  special:  [The Agent Ladder -- Five Cats, One New Power Each](posts/the-agent-ladder.txt)
+  special:  [Transformers With Pencil -- A Whole Block Worked by Hand](posts/transformerforhn.txt)
 
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
