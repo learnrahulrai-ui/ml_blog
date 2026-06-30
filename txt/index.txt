@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in fifteen chapters (forty-six posts),
+  This is not a pile of loose articles -- it is a short BOOK in sixteen chapters (forty-seven posts),
   meant to be read top to bottom. Each post opens with a "post N of 41" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 46:
+  >> NEW HERE? Start at post 1 of 47:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -731,6 +731,25 @@
     draw's target rebuilt with the current net (Chapter 13's Dyna-Q rehearsal, now on real
     stored moves). Ends with the whole deep-RL loop -- read, pick, act, store, grab, backprop,
     Adam step, slide -- and hard-coded code. Assumes zero background.
+
+
+  CHAPTER 16 . POLICY GRADIENT -- learning the policy itself, not a worth
+  ----------------------------------------------------------------------
+
+  [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
+    post 47/47 . 2026-06-30 . Chapter 16 . reinforcement-learning, policy-gradient, actor-critic, softmax, average-reward, by-hand
+    Every machine so far learned a WORTH and grabbed the biggest -- which needs a max (bad for
+    a real-valued move like a steering angle), jolts when two worths cross, and can never say a
+    MIXED best policy. So learn the policy directly. Keep a PREFERENCE per move (a sum of
+    weights at the active tiles, Chapter 14) and softmax preferences into chances ([-1,1,2] ->
+    [0.0351, 0.2595, 0.7054]); SAMPLE from those, never argmax. To judge a taken move, keep a
+    CRITIC -- a worth per spot as a baseline -- and on the never-ending pendulum measure each
+    step by the DIFFERENTIAL TD error how-wrong = reward - R-bar + V(landing) - V(left) (worked
+    to 0.6). That one number drives three crawls: R-bar toward the reward, the critic's worth
+    toward how-wrong, and each move's preference by size x how-wrong x (took-it? - pi) -- shoving
+    the taken move UP by (1 - its chance) and the rest down by their odds, so a good surprise
+    makes its cause more likely (right's preference 2.0 -> 2.035). Actor proposes, critic grades,
+    both learn from the same gap. Hard-coded code. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------

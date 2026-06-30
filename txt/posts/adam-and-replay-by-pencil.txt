@@ -12,7 +12,7 @@
 
   PATH . post 46/46 . part 2 of 2 in Chapter 15 -- Training the Q-Network
     <- prev:  [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt)
-       next:  (more posts coming)
+       next:  [Propose and Grade: Actor-Critic by Pencil](actor-critic-by-pencil.txt) ->
 
   ---
 
