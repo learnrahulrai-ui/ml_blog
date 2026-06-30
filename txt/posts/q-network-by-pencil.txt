@@ -20,13 +20,17 @@
   group, one per tile, one per tile-and-move. That is a straight ruler, and a straight ruler
   draws only straight walls.
 
-  Tile coding (Part 2, 3) made YOU lay the grids by hand. It works on a car with two dials,
-  but the standard next toy is a lander -- a little rocket easing onto a pad -- and its state
-  is EIGHT dials at once: across, up, sideways speed, falling speed, tilt, spin, and a
-  left/right foot-touch flag. Hand-laying tiles across eight dials is hopeless, and even if
-  you did, a sum of tiles can only ADD their separate votes -- it can never say "fire the
-  engine only when falling fast AND tilted AND low," a bent, joined-up shape. We want a worth
-  that BUILDS its own features and can bend. That is the whole reason for this post.
+  Tile coding (Part 2, 3) made YOU lay the grids by hand, and the worth was a SUM over the
+  tiles you placed. It works on a car with two dials, but the standard next toy is a lander --
+  a little rocket easing onto a pad -- and its state is EIGHT dials at once: across, up,
+  sideways speed, falling speed, tilt, spin, and a left/right foot-touch flag. Now the hand-
+  laid tile is trapped both ways. Tile all eight dials JOINTLY (so one tile can mean "falling
+  fast AND tilted AND low") and the count explodes -- a dozen bins per dial is 12^8, billions
+  of tiles, one weight each. Tile each dial on its OWN to dodge the blow-up and the worth can
+  only add per-dial votes, blind to any such joint condition. Lay them joined and they
+  explode; lay them apart and they cannot join up. We want a worth that LEARNS its own handful
+  of features -- few, joint, reshapable -- instead of you laying a fixed grid at all. That is
+  the whole reason for this post.
 
   (To keep every number on the page, the lander's 8 -> 100 -> 4 shrinks here to a pencil
   toy: 2 dials in, 3 middle numbers, 4 engine-worths out. The arithmetic is identical, just
@@ -229,8 +233,10 @@
 
   ONE BREATH
 
-  A sum of hand-laid tiles is a straight ruler -- fine for two dials, hopeless for the lander's
-  eight, and unable to bend. So stack two straight stages and let the MIDDLE row invent its own
+  A sum of hand-laid tiles uses features fixed where you place them -- fine for two dials, but
+  across the lander's eight they either explode (join the dials and the tile count is 12^8) or
+  go blind to joint conditions (split the dials and you only add per-dial votes), and they
+  never learn a feature of their own. So stack two straight stages and let the MIDDLE row invent its own
   features: psi = sA + b1, then Q = (middle)C + b2. But two straight stages collapse to one
   (Q = sD + e, D = AC), so put a BEND between them -- flatten negatives to zero, x = max(psi,0)
   -- which no single sheet can mimic. Worked on a 2->3->4 toy: s=[1,2] -> psi=[2.5,-0.5,-0.5]

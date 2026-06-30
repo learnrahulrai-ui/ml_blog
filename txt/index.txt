@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in fifteen chapters (forty-five posts),
+  This is not a pile of loose articles -- it is a short BOOK in fifteen chapters (forty-six posts),
   meant to be read top to bottom. Each post opens with a "post N of 41" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 45:
+  >> NEW HERE? Start at post 1 of 46:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -683,9 +683,10 @@
 
   [Part 4 -- Two Stages and a Bend: A Q-Network by Pencil](posts/q-network-by-pencil.txt)
     post 44/44 . 2026-06-30 . part 4 of 4 . reinforcement-learning, function-approximation, neural-network, expected-sarsa, deep-rl, by-hand
-    Parts 1-3 kept the worth a straight ruler -- a sum of weights you chose where to put. A
-    straight ruler draws only straight walls, hopeless on the lander's EIGHT dials and unable
-    to bend. So stack two straight stages and let the MIDDLE row invent its own features:
+    Parts 1-3 kept the worth a sum over FIXED features you laid by hand. Across the lander's
+    EIGHT dials that traps you both ways -- join the dials and the tiles explode (12^8), split
+    them and the worth goes blind to joint conditions. So stack two straight stages and let
+    the MIDDLE row LEARN its own features:
     psi = sA + b1, then Q = (middle)C + b2. But two straight stages collapse to one (Q = sD +
     e with D = AC, shown by hand), so put a BEND between -- flatten negatives to zero, the
     ReLU x = max(psi,0) -- which no single sheet can mimic. Worked on a 2->3->4 toy: s=[1,2]
@@ -715,6 +716,21 @@
     signal. Spend the miss at step 0.01: five of 25 dials move, the biggest to the hardest
     pusher, and the fired worth slides 5.5 -> 5.166 toward 4.42. The zeros are the lesson.
     Hard-coded forward-and-back code. Assumes zero background.
+
+  [Part 2 -- A Smarter Step: Adam and Replay by Pencil](posts/adam-and-replay-by-pencil.txt)
+    post 46/46 . 2026-06-30 . part 2 of 2 . reinforcement-learning, deep-rl, adam, momentum, experience-replay, by-hand
+    Part 1's nudge was right but spent crudely -- a flat 0.01 step for every dial, and each
+    move's experience used once in order. Adam fixes the STEP with two per-dial memories: m,
+    the average of recent pulls (so a dial pulled the same way builds speed, one yanked both
+    ways cancels), and v, the average of squared pulls (so dividing by sqrt(v) makes big- and
+    small-pull dials move at one pace), both bias-corrected by 1 - beta^t because they start at
+    zero -> dial -= alpha x m-hat/sqrt(v-hat). Worked by hand: a steady dial (+0.2,+0.2) keeps
+    the full 0.1 stride, a flip-flop dial (+0.2,-0.2) shrinks to 0.005. The replay BIN fixes
+    the DATA: store every (s,a,r,s'), then learn from a RANDOM batch drawn out of it -- breaking
+    the streak that makes the net forget, and squeezing many lessons from one footstep, each
+    draw's target rebuilt with the current net (Chapter 13's Dyna-Q rehearsal, now on real
+    stored moves). Ends with the whole deep-RL loop -- read, pick, act, store, grab, backprop,
+    Adam step, slide -- and hard-coded code. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------

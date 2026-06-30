@@ -12,7 +12,7 @@
 
   PATH . post 45/45 . part 1 of 2 in Chapter 15 -- Training the Q-Network
     <- prev:  [Two Stages and a Bend: A Q-Network by Pencil](q-network-by-pencil.txt)
-       next:  (more posts coming)
+       next:  [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt) ->
 
   ---
 
@@ -281,8 +281,10 @@
   >> If you read other RL material after this page:
   >>   how wrong (one slot)        = the TD error delta, in the taken action's slot only
   >>   a dial's PULL on the worth    = the partial derivative of Q_fired with respect to that dial
-  >>   the seed [1,0,0,0]           = dL/dQ for a one-action loss (gradient of the fired worth wrt Q)
-  >>   pull on a sheet = input (x) signal = the weight gradient, an outer product input^T . delta
+  >>   the seed [1,0,0,0]           = the gradient of Q_fired wrt the worth row Q (the loss gradient
+  >>                                  dL/dQ is this seed times the miss (Q_fired - target))
+  >>   pull on a sheet = input (x) signal = the gradient of Q_fired wrt that sheet (input^T outer
+  >>                                  signal); times the miss it is the usual weight gradient dL/dW
   >>   the bend gate (psi > 0)       = the derivative of ReLU (1 where active, 0 where dead)
   >>   pull on psi = (signal . C^T) gate = backprop through the layer, delta . W^T then gated
   >>   walking the miss backward     = backpropagation (reverse-mode automatic differentiation)
@@ -294,7 +296,7 @@
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
     Part 1 (this post) .
-    Part 2 -- coming (a smarter step: momentum, Adam, and experience replay)
+    Part 2 -- [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

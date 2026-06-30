@@ -1,0 +1,261 @@
+@title A Smarter Step: Adam and Replay by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 15 . TRAINING THE Q-NETWORK . PART 2 OF 2
+  A Smarter Step: Adam and Replay by Pencil
+  Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, adam, momentum, experience-replay, by-hand
+  ============================================================================================
+
+  PATH . post 46/46 . part 2 of 2 in Chapter 15 -- Training the Q-Network
+    <- prev:  [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt)
+       next:  (more posts coming)
+
+  ---
+
+  Part 1 spread one miss across every dial. Each dial got a PULL -- how much it moved the
+  fired worth -- and a nudge of size x how-wrong x pull. The nudges were right. The way we
+  SPENT them was crude, in two separate ways, and this post fixes both.
+
+  A dial = one learned number in the network. A pull = how much raising that dial raises the
+  worth we are grading (its share of the blame). How-wrong = target minus guess, the one miss.
+  In Part 1 we multiplied pull by a flat size of 0.01 -- the SAME tiny step for every dial,
+  on every move, forever. Two things are dumb about that. The step ignores each dial's own
+  history and scale; and we used each move's experience ONCE, in the order it happened, then
+  threw it away. Fix the step first, then the data.
+
+  ---
+
+  SO GIVE THE STEP A MEMORY: AVERAGE EACH DIAL'S RECENT PULLS
+
+  A flat step treats every nudge as a surprise. But a dial that gets pulled the SAME way move
+  after move is clearly being told something steady -- it should pick up speed, not inch. A
+  dial yanked one way then the other is getting mixed messages -- it should hold still. So keep,
+  per dial, a running average of its recent pulls. Call it m (for momentum):
+
+      m = beta1 x m + (1 - beta1) x pull            (beta1 = 0.9: m is nine-tenths old, one-tenth new)
+
+  m is the dial's smoothed direction. A dial pulled +0.2, +0.2, +0.2 builds an m near +0.2 --
+  steady push. A dial pulled +0.2, -0.2, +0.2 builds an m near 0 -- the yanks cancel. Drawn:
+
+      pulls in:   +0.2   +0.2   +0.2   ->  m climbs toward +0.2   (steady -> full speed)
+      pulls in:   +0.2   -0.2   +0.2   ->  m hovers near  0       (mixed -> crawl)
+
+  ---
+
+  WHICH STILL NEEDS SCALING, BECAUSE DIALS COME IN DIFFERENT SIZES
+
+  One dial's pulls might run around 0.2; another's around 50. A single step size cannot suit
+  both -- 0.01 x 50 lurches, 0.01 x 0.2 dawdles. So keep a SECOND running average per dial: the
+  average of its SQUARED pulls. Call it v:
+
+      v = beta2 x v + (1 - beta2) x pull^2          (beta2 = 0.999: v is a slow, long memory)
+
+  The square throws away the sign and keeps only the SIZE, so sqrt(v) is roughly how big this
+  dial's pulls typically are. Divide the step by sqrt(v) and every dial moves at the same
+  measured pace, whatever its raw scale:
+
+      step for a dial  ~  m / sqrt(v)        (smoothed direction, divided by its typical size)
+
+  A big-pull dial and a small-pull dial both end up taking a step of about the same length --
+  the size is normalized away, only the direction and steadiness remain.
+
+  ---
+
+  AND BECAUSE BOTH START AT ZERO, UNDO THE EARLY LOWBALL
+
+  m and v both start at 0 (no history yet). On the first few moves that 0 drags the average
+  DOWN -- after one pull of 0.2, m = 0.1 x 0.2 = 0.02, far below the real 0.2. So divide each
+  by how much of the old zero is still in it, which is beta^t after t moves:
+
+      m-hat = m / (1 - beta1^t)        v-hat = v / (1 - beta2^t)
+
+  This bias-correction blows the early estimates back up to true size. The full step, with a
+  base size alpha and a hair epsilon so you never divide by zero:
+
+      dial = dial - alpha x  m-hat / ( sqrt(v-hat) + epsilon )
+
+  That whole machine -- momentum m, scaler v, both bias-corrected -- is Adam. (The minus sign
+  is just descent: pull points uphill on the wrongness, so step the other way.)
+
+  ---
+
+  ADAM BY HAND -- TWO DIALS, THE STEADY ONE AND THE FLIP-FLOP
+
+  alpha = 0.1, beta1 = 0.9, beta2 = 0.999, epsilon a hair (ignore it). Both dials start with
+  m = 0, v = 0. Watch a STEADY dial (pull +0.2 every move) beside a FLIP-FLOP dial (+0.2 then
+  -0.2).
+
+  MOVE 1 -- both get pull +0.2, so both do the identical thing:
+
+      m = 0.9 x 0 + 0.1 x 0.2   = 0.02
+      v = 0.999 x 0 + 0.001 x (0.2)^2 = 0.001 x 0.04 = 0.00004
+      m-hat = 0.02 / (1 - 0.9)   = 0.02 / 0.1   = 0.2          (bias-corrected back to true 0.2)
+      v-hat = 0.00004 / (1 - 0.999) = 0.00004 / 0.001 = 0.04   ->  sqrt(v-hat) = 0.2
+      step  = alpha x m-hat / sqrt(v-hat) = 0.1 x 0.2 / 0.2 = 0.1
+
+  The first step is the full alpha = 0.1, and notice WHY: m-hat / sqrt(v-hat) = 0.2 / 0.2 = 1,
+  the magnitude cancels and only the SIGN survives. Adam's first move is alpha-sized whatever
+  the pull's raw size -- big pulls and small pulls start out equal.
+
+  MOVE 2 -- here the two dials part. The STEADY dial gets +0.2 again:
+
+      m = 0.9 x 0.02 + 0.1 x 0.2 = 0.018 + 0.02 = 0.038
+      m-hat = 0.038 / (1 - 0.81) = 0.038 / 0.19 = 0.2
+      v = 0.999 x 0.00004 + 0.001 x 0.04 = 0.00007996
+      v-hat = 0.00007996 / (1 - 0.998001) = 0.00007996 / 0.001999 = 0.04  ->  sqrt = 0.2
+      step  = 0.1 x 0.2 / 0.2 = 0.1                       (full stride again)
+
+  The FLIP-FLOP dial gets -0.2 on move 2 instead:
+
+      m = 0.9 x 0.02 + 0.1 x (-0.2) = 0.018 - 0.02 = -0.002
+      m-hat = -0.002 / 0.19 = -0.0105
+      v = 0.00007996 (same -- squaring kills the sign)   ->  sqrt(v-hat) = 0.2
+      step  = 0.1 x (-0.0105) / 0.2 = -0.005              (a twentieth of the steady stride)
+
+  Drawn, the two dials after move 2:
+
+      STEADY    (+0.2, +0.2) :  step  0.1    (m held its direction -> full speed)
+      FLIP-FLOP (+0.2, -0.2) :  step  0.005  (m nearly cancelled -> near standstill)
+
+  Same base alpha, same scaler; the only difference is whether the pulls AGREED. Consistent
+  pulls compound into speed; contradictory pulls cancel into caution. That is the whole gift
+  of Adam over the flat 0.01.
+
+  ---
+
+  BUT THE STEP IS ONLY HALF THE WASTE -- THE OTHER HALF IS THE DATA
+
+  Adam fixed HOW we spend a gradient. The second crude thing was the DATA: in Part 1 the net
+  learned from each move once, the instant it happened, in the order it happened. Two costs.
+
+  First, a real run is a STREAK -- the lander drifts through a long stretch of near-identical
+  states, so the net sees the same kind of situation again and again and forgets the ones from
+  a minute ago (it overwrites its dials to fit the streak). Second, one move is one lesson,
+  then gone -- expensive footsteps, learned from once.
+
+  ---
+
+  WHICH IS WHY YOU KEEP A BIN OF PAST MOVES AND DRAW FROM IT AT RANDOM
+
+  Keep a bin -- a buffer -- of recent experiences. After every real move, drop its four-tuple
+  in: the spot you left, the move you took, the reward, the spot you landed on.
+
+      buffer:  [ (s, a, r, s') ,  (s, a, r, s') ,  ...  ]      newest pushed in, oldest dropped
+
+  Then, to LEARN, do not use the move you just made. Reach into the bin and pull out a RANDOM
+  handful -- a batch -- of old experiences, mixed from all over the run, and take one Adam step
+  on their averaged gradient:
+
+      real move  ->  drop (s,a,r,s') in the bin
+      to learn   ->  grab a random batch from the bin  ->  forward, target, backprop, Adam step
+
+  Two wins at once. The random grab MIXES far-apart moves into one batch, so no single streak
+  dominates -- the correlation is broken. And every experience sits in the bin to be drawn many
+  times, so one costly footstep teaches over and over.
+
+  Each time an old (s, a, r, s') is drawn, its target y is rebuilt with the CURRENT net -- the
+  same Expected-Sarsa target from Chapter 14, y = reward + dilute x (chance-weighted next
+  worths from the net's read of s'). The transition is fixed, but the net has moved since, so
+  the target is fresh every draw. (This is Chapter 13's Dyna-Q rehearsal, with one change: the
+  replayed move is a REAL stored transition, not one a learned model dreamed up.)
+
+  ---
+
+  SO THE WHOLE TRAINING LOOP, ONE REAL MOVE AT A TIME
+
+  Everything from Chapter 14 and this chapter, in one beat-by-beat loop:
+
+      (1) READ  the worths Q(s) from the net (forward pass: psi = sA+b1, x = max(psi,0), Q = xC+b2)
+      (2) PICK  a move -- mostly the biggest worth, epsilon of the time a wander
+      (3) ACT, and the world hands back (reward, next spot s')
+      (4) STORE (s, a, r, s') in the bin
+      (5) GRAB  a random batch from the bin
+      (6) for each (s,a,r,s') in the batch: build target y, backprop the one-slot how-wrong,
+          add up each dial's pull
+      (7) STEP  every dial once with Adam, using the batch's averaged pulls
+      (8) SLIDE: s' becomes the new s; repeat
+
+  Beats 1, 2, 6 are Chapter 14 (forward, choose, target). Beat 6's backprop is Part 1. Beats 4
+  and 5 are the bin; beat 7 is Adam. That loop, run on the lander, is a complete deep-RL agent.
+
+  ---
+
+  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+
+  Nothing above needed a computer. This last section is for the day you meet one.
+
+  ONE ADAM STEP FOR ONE DIAL, BY HAND (move 1, pull 0.2, all the numbers above):
+
+      import numpy as np
+      alpha, beta1, beta2, eps = 0.1, 0.9, 0.999, 1e-8
+      m, v, t = 0.0, 0.0, 1                    # m, v start at zero; t = move count
+      pull = 0.2
+
+      m = beta1 * m + (1 - beta1) * pull       # 0.1*0.2          = 0.02
+      v = beta2 * v + (1 - beta2) * pull**2    # 0.001*0.04       = 0.00004
+      m_hat = m / (1 - beta1**t)               # 0.02 / 0.1       = 0.2
+      v_hat = v / (1 - beta2**t)               # 0.00004 / 0.001  = 0.04
+      step  = alpha * m_hat / (np.sqrt(v_hat) + eps)   # 0.1 * 0.2 / 0.2 = 0.1
+      dial  = 1.0 - step                       # a dial of 1.0 steps down to 0.9
+      print(step)                              # 0.1
+
+  THE REPLAY BIN (drop on every move, grab a random batch to learn):
+
+      from collections import deque
+      import random
+      buffer = deque(maxlen=100000)            # oldest fall out when full
+
+      buffer.append((s, a, r, s_next))         # beat 4: store the real move
+      batch = random.sample(buffer, 8)         # beat 5: 8 random past moves, mixed
+      # beat 6: for each (s,a,r,s_next) in batch -> forward, target, backprop (Part 1),
+      #         summing each dial's pull; beat 7: one Adam step on the averaged pulls.
+
+  THE ANCHOR, unchanged: a stored move that ended the episode has no next spot, so its target
+  is the reward alone -- exactly the terminal rule carried since Chapter 13.
+
+  ---
+
+  ONE BREATH
+
+  Part 1's nudge was right but spent crudely: a flat step for every dial, and each experience
+  used once in order. Adam fixes the step with two per-dial memories -- m, the average of recent
+  pulls (so a dial pulled the same way builds speed and one yanked both ways cancels), and v,
+  the average of squared pulls (so dividing by sqrt(v) makes big-pull and small-pull dials move
+  at the same pace) -- both bias-corrected by 1 - beta^t because they start at zero, giving
+  dial -= alpha x m-hat / sqrt(v-hat). Worked: a steady dial keeps the full 0.1 stride, a
+  flip-flop dial shrinks to 0.005. The replay BIN fixes the data: store every (s,a,r,s'), then
+  learn from a RANDOM batch drawn out of it -- breaking the streak that makes the net forget,
+  and squeezing many lessons from one footstep, each draw's target rebuilt with the current net
+  (Chapter 13's rehearsal, now on real stored moves). Forward, choose, store, grab, backprop,
+  Adam step, slide -- that loop on the lander is a whole deep-RL agent.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   a dial's pull               = the gradient of the worth wrt that dial (Part 1)
+  >>   m (average of pulls)         = the first moment / momentum  (Adam's m)
+  >>   v (average of squared pulls) = the second moment / per-parameter scale  (Adam's v)
+  >>   beta1, beta2 (0.9, 0.999)    = the moment decay rates
+  >>   divide by (1 - beta^t)       = bias correction (m, v start at zero)
+  >>   dial -= alpha x m-hat/sqrt(v-hat) = the Adam update; alpha = the base learning rate
+  >>   the bin / buffer             = the experience replay buffer
+  >>   a random batch               = a minibatch sampled to break correlation
+  >>   target rebuilt each draw      = recomputing the TD target with the current network
+  >>   replay vs Dyna rehearsal      = replaying REAL transitions vs a learned model's simulated ones
+  >>   the whole loop on the lander  = deep RL (a neural-net value agent, e.g. on LunarLander)
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
+    Part 1 -- [Backpropagation by Pencil](backprop-by-pencil.txt) .
+    Part 2 (this post) -- the chapter closes here
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
