@@ -21,7 +21,8 @@ Outputs, next to where each .txt maps (txt/index.txt -> index.html,
 txt/posts/foo.txt -> posts/foo.html), plus, at the repo root:
   sitemap.xml   every page, for search engines
   feed.xml      RSS 2.0 feed of the posts, in reading order
-No JavaScript, no web fonts, no frameworks -- on purpose.
+No JavaScript, no external CSS, no web fonts, no frameworks -- on purpose: one
+HTTP request per page, a few hundred bytes of inline style, readable on GPRS.
 """
 
 import html
@@ -39,35 +40,35 @@ AUTHOR = "Rahul Rai"
 SITE_DESC = (
     "Machine learning worked out by hand: every rule stripped of jargon, "
     "drawn as a picture, solved with a pencil, then written in code. "
-    "A short book in ten chapters -- no hype, no frameworks, no JavaScript."
+    "A short book in sixteen chapters -- no hype, no frameworks, no JavaScript."
 )
 
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 DATE_RE = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
 
+# The entire stylesheet. One rule: cap and centre the 100-column frame so it
+# does not hug the left edge on a wide screen. Dark mode is HTML, not CSS (the
+# color-scheme meta below), so it costs zero bytes. Everything else -- monospace,
+# preserved whitespace, no wrapping -- is already the browser default for <pre>.
+# Inlined, so the page is a single HTTP request: readable on a GPRS connection.
+STYLE = "pre{max-width:100ch;margin:0 auto;padding:1em}"
+
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>{title}</title>
 <meta name="description" content="{desc}">
-<meta name="author" content="{author}">
 <link rel="canonical" href="{url}">
-<meta property="og:type" content="{og_type}">
-<meta property="og:site_name" content="{site_name}">
-<meta property="og:title" content="{title}">
-<meta property="og:description" content="{desc}">
-<meta property="og:url" content="{url}">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="{title}">
-<meta name="twitter:description" content="{desc}">
-<link rel="icon" href="{icon}" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="{site_name}" href="{feed}">
-<link rel="stylesheet" href="{css}">
+<style>{style}</style>
 </head>
 <body>
+<main>
 <pre>{body}</pre>
+</main>
 </body>
 </html>
 """
@@ -189,13 +190,10 @@ def build_one(txt_path: Path, blurbs: dict[str, dict]) -> dict:
         TEMPLATE.format(
             title=html.escape(title, quote=True),
             desc=html.escape(desc, quote=True),
-            author=html.escape(AUTHOR, quote=True),
             site_name=html.escape(SITE_NAME, quote=True),
             url=html.escape(url, quote=True),
-            og_type="article" if is_post else "website",
-            css=prefix + "style.css",
-            icon=prefix + "favicon.svg",
             feed=prefix + "feed.xml",
+            style=STYLE,
             body=body,
         ),
         encoding="utf-8",
