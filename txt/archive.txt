@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 16 chapters (48 posts), plus references and standalone specials,
+  ALL POSTS -- a book in 17 chapters (50 posts), plus references and standalone specials,
   every number worked by hand.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
@@ -129,6 +129,12 @@
   CHAPTER 16 -- POLICY GRADIENT (2026)
   ------------------------------------
   post 48   [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
+
+
+  CHAPTER 17 -- TWO THE SAMPLE-BASED MAP SKIPPED (2026)
+  -----------------------------------------------------
+  post 49   [Part 1 -- Wait for the Whole Trip: Monte Carlo by Pencil](posts/monte-carlo-by-pencil.txt)
+  post 50   [Part 2 -- Fix the Biggest Surprise First: Priority Sweeping by Pencil](posts/priority-sweeping-by-pencil.txt)
 
 
   REFERENCES -- flip-to decoders, one per cluster of chapters

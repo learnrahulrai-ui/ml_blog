@@ -53,10 +53,11 @@
 
   What's Here
   -----------
-  A short book in sixteen chapters (forty-eight posts), plus references, standalone specials,
+  A short book in seventeen chapters (fifty posts), plus references, standalone specials,
   and a glossary. Read it top to bottom -- each chapter draws its ideas by hand, then gathers
-  the Python at the end. (Chapters 1-11 are classic ML and deep learning; Chapters 12-16 are
-  reinforcement learning, from bandits through a neural-net agent and policy gradient.)
+  the Python at the end. (Chapters 1-11 are classic ML and deep learning; Chapters 12-17 are
+  reinforcement learning, from bandits through a neural-net agent, policy gradient, and two
+  methods the sample-based chapter skipped.)
 
     - CHAPTER 1 -- Predicting House Prices: two estimators from scratch (ask-closest and
       straight-stick) on the California housing pile, by hand.
@@ -159,13 +160,20 @@
         [part 4](posts/q-network-by-pencil.txt)
 
     - CHAPTER 15 -- Training the Q-Network: how one miss teaches a thousand dials --
-      backpropagation by pencil, then a smarter step (Adam) and experience replay. (LunarLander.)
+      backpropagation by pencil, then a smarter step (Adam) and experience replay, then a batch
+      of misses graded against a frozen target twin. (LunarLander.)
         [part 1](posts/backprop-by-pencil.txt) .
-        [part 2](posts/adam-and-replay-by-pencil.txt)
+        [part 2](posts/adam-and-replay-by-pencil.txt) .
+        [part 3](posts/batch-td-error-by-pencil.txt)
 
     - CHAPTER 16 -- Policy Gradient: learning the policy itself instead of a worth -- an
       actor-critic with a softmax policy and a critic baseline, on the pendulum.
         [post](posts/actor-critic-by-pencil.txt)
+
+    - CHAPTER 17 -- Two the Sample-based Map Skipped: Monte Carlo (wait for the whole trip,
+      lean on nothing) and priority sweeping (fix the biggest surprise first).
+        [part 1](posts/monte-carlo-by-pencil.txt) .
+        [part 2](posts/priority-sweeping-by-pencil.txt)
 
     - APPENDIX A -- Classification Reference: all of Chapter 3's concepts in one flip-to page:
       cross-entropy vs MSE, C parameter, LDA with priors, grid search fold safety,

@@ -12,7 +12,7 @@
 
   PATH . post 48/48 . Chapter 16 -- Policy Gradient
     <- prev:  [Chapter 15, Part 3: The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt)
-       next:  (more posts coming)
+       next:  [Chapter 17, Part 1: Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt) ->
 
   ---
 
@@ -247,8 +247,8 @@
 
 ----------------------------------------------------------------------------------------------
   CHAPTER 16 -- Policy Gradient:
-    [Propose and Grade: Actor-Critic by Pencil] (this post) .
-    more coming
+    [Propose and Grade: Actor-Critic by Pencil] (this post) -- the chapter closes here .
+    Next: [Chapter 17 -- Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
