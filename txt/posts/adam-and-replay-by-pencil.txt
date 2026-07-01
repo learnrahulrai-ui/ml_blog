@@ -5,12 +5,12 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  CHAPTER 15 . TRAINING THE Q-NETWORK . PART 2 OF 3
+  CHAPTER 15 . TRAINING THE Q-NETWORK . PART 2 OF 4
   A Smarter Step: Adam and Replay by Pencil
   Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, adam, momentum, experience-replay, by-hand
   ============================================================================================
 
-  PATH . post 46/46 . part 2 of 3 in Chapter 15 -- Training the Q-Network
+  PATH . post 46/46 . part 2 of 4 in Chapter 15 -- Training the Q-Network
     <- prev:  [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt)
        next:  [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt) ->
 
@@ -253,7 +253,8 @@
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
     Part 1 -- [Backpropagation by Pencil](backprop-by-pencil.txt) .
     Part 2 (this post) .
-    Part 3 -- [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt)
+    Part 3 -- [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt) .
+    Part 4 -- [The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

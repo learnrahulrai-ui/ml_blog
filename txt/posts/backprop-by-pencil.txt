@@ -5,12 +5,12 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  CHAPTER 15 . TRAINING THE Q-NETWORK . PART 1 OF 2
+  CHAPTER 15 . TRAINING THE Q-NETWORK . PART 1 OF 4
   One Miss, a Thousand Nudges: Backpropagation by Pencil
   Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, backpropagation, neural-network, by-hand
   ============================================================================================
 
-  PATH . post 45/45 . part 1 of 2 in Chapter 15 -- Training the Q-Network
+  PATH . post 45/45 . part 1 of 4 in Chapter 15 -- Training the Q-Network
     <- prev:  [Two Stages and a Bend: A Q-Network by Pencil](q-network-by-pencil.txt)
        next:  [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt) ->
 
@@ -296,7 +296,9 @@
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
     Part 1 (this post) .
-    Part 2 -- [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt)
+    Part 2 -- [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt) .
+    Part 3 -- [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt) .
+    Part 4 -- [The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

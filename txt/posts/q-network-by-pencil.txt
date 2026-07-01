@@ -51,8 +51,10 @@
       psi = s A + b1          (each middle number = the state dotted with one column of A)
       Q   = psi C + b2        (each worth = the middle row dotted with one column of C)
 
-  The middle row is the network's OWN features -- it was not handed a single tile; it gets
-  to invent three combinations of the two input dials and grade the engines off those.
+  The middle row is the network's OWN features -- not handed a single tile from outside. And it is
+  not fixed: during learning the network changes the sheet A until those three middle numbers turn
+  into useful combinations of the two input dials, then grades the engines off those. The features
+  are LEARNED, not chosen by us -- that is the whole point of the middle stage.
 
   ---
 
@@ -171,10 +173,10 @@
                 = 4.42 - 5.5
                 = -1.08
 
-  The net was 1.08 too high on engine 1. And it is ONLY about engine 1: we fired engine 1, so
-  only engine 1's worth was put to the test. The other three were never tried this step, so we
-  have nothing to say about them. Write the miss as a row that is zero everywhere except the
-  fired engine's slot:
+  The net was 1.08 too high on engine 1. And it is ONLY about engine 1: the net offered four
+  guesses, but the world graded just one -- we fired engine 1, so only engine 1's worth was put to
+  the test. The other three were never tried this step, so we have nothing to say about them. That
+  is why the miss is a row zero everywhere except the fired engine's slot:
 
       how-wrong row = [ -1.08, 0, 0, 0 ]
                          ^^^^^ engine 1 only; the other three untested, so 0

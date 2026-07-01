@@ -10,7 +10,7 @@
   Posted: 2026-07-01 . Author: Rahul Rai . Tags: reinforcement-learning, monte-carlo, prediction, return, episodic, by-hand
   ============================================================================================
 
-  PATH . post 49/50 . part 1 of 2 in Chapter 17 -- Two the Sample-Based Map Skipped
+  PATH . post 50/51 . part 1 of 2 in Chapter 17 -- Two the Sample-Based Map Skipped
     <- prev:  [Chapter 16, Propose and Grade: Actor-Critic by Pencil](actor-critic-by-pencil.txt)
        next:  [Fix the Biggest Surprise First: Priority Sweeping by Pencil](priority-sweeping-by-pencil.txt) ->
 

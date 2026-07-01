@@ -260,6 +260,13 @@
   at the threshold in fewer total spot-updates. Both provably reach V* when the dilute is
   under 1. The worths they produce are the same; the paths to get there are not.
 
+  Here is the tighter way to see the link. GRADE run to convergence is MANY Bellman passes over
+  the spots; VALUE-IT is exactly ONE such pass, with a max standing in for the plan-average. So
+  value iteration is policy iteration with the GRADE cut short to a single pass -- evaluate once,
+  and the max folds the improve step right into that same pass. Do not let the grading finish;
+  take one backup and move on. That single cut -- stop GRADE after one sweep instead of running it
+  to convergence -- is the whole difference between the two.
+
   ---
 
   PYTHON: VALUE ITERATION, FULL LOOP
