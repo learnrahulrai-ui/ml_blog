@@ -10,8 +10,8 @@
   Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, policy-gradient, actor-critic, softmax, average-reward, by-hand
   ============================================================================================
 
-  PATH . post 49/51 . Chapter 16 -- Policy Gradient
-    <- prev:  [Chapter 15, Part 4: The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt)
+  PATH . post 50/52 . Chapter 16 -- Policy Gradient
+    <- prev:  [Chapter 15, Part 5: From Eight Dials to a Soft Landing: The Whole Agent by Pencil](the-whole-agent-by-pencil.txt)
        next:  [Chapter 17, Part 1: Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt) ->
 
   ---

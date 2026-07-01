@@ -1,0 +1,502 @@
+@title From Eight Dials to a Soft Landing: The Whole Agent by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 15 . TRAINING THE Q-NETWORK . PART 5 OF 5
+  From Eight Dials to a Soft Landing: The Whole Agent by Pencil
+  Posted: 2026-07-02 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, expected-sarsa, neural-network, adam, experience-replay, by-hand
+  ============================================================================================
+
+  PATH . post 49/52 . part 5 of 5 in Chapter 15 -- Training the Q-Network
+    <- prev:  [Chapter 15, Part 4: The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt)
+       next:  [Chapter 16: Propose and Grade: Actor-Critic by Pencil](actor-critic-by-pencil.txt) ->
+
+  ---
+
+  Every earlier part of this chapter forged ONE piece in isolation: the two-sheet network that
+  scores the engines, the backward walk that spreads a miss to every dial, the smarter step that
+  is Adam, the notebook of old moves, the three calls the world makes on an agent. This post lights
+  them all at once. We take ONE real instant of a falling rocket -- eight numbers coming off it --
+  and follow those eight numbers the whole way to a nudge of the dials, touching every piece in the
+  order the machine touches it. Then we step back and watch the same loop, run three hundred times,
+  teach the rocket to land.
+
+  Nothing here leans on the earlier parts. Every piece is rebuilt from nothing where it is first
+  needed, every number worked on the page. If you have never read a line of this chapter, you can
+  still follow the whole machine from here.
+
+  ---
+
+  THE EIGHT NUMBERS, AND THE FOUR THINGS TO DO ABOUT THEM
+
+  The rocket is a lander -- a little pod easing down onto a pad between two flags. At any instant
+  the world hands the agent its state: EIGHT numbers, each a dial reading off the pod.
+
+      state = [ across , up , sideways-speed , falling-speed , tilt , spin , left-foot , right-foot ]
+                 x        y      vx               vy            angle   w      (0 or 1)   (0 or 1)
+
+  And there are FOUR things the agent can do -- four engines to fire:
+
+      engine 0 = fire left     engine 1 = fire main (down-thrust)
+      engine 2 = fire right     engine 3 = coast (fire nothing)
+
+  So the job of the machine is a mapping: turn eight numbers into a SCORE for each of the four
+  engines -- "how good is it to fire this one, here?" -- then act on those scores. Everything below
+  is that mapping, and the slow bending of it toward scores worth trusting.
+
+  To keep every number on the page, the eight dials shrink here to a pocket toy of TWO, and the
+  hidden middle shrinks to THREE. The real lander runs 8 -> 256 -> 4; our page runs 2 -> 3 -> 4.
+  The arithmetic is letter-for-letter the same, just shorter to write. Take the pocket state
+
+      s = [ 1 , 2 ]
+
+  and carry it all the way through.
+
+  ---
+
+  SO SCORE THE FOUR ENGINES: TWO SHEETS AND A BEND
+
+  A score is built in two straight stages with a bend wedged between them. The first stage turns
+  the two state numbers into three MIDDLE numbers; the bend flattens the negatives; the second
+  stage turns the three survivors into four engine-scores.
+
+      state s        sheet A         middle       bend        x        sheet C       scores Q
+      [s1 s2]  -->   (2 x 3)   -->  [p1 p2 p3] --> max(.,0) --> [.. ] -->  (3 x 4) -->  [Q0 Q1 Q2 Q3]
+       1 x 2         + b1 (1x3)      1 x 3                      1 x 3     + b2 (1x4)     1 x 4
+
+  A "sheet" is a grid of dials (a weight matrix); a "nudge" is a short row added on afterward (a
+  bias). Each stage is: dot the incoming row against each column of the sheet, then add the nudge.
+  Here are the toy's dials:
+
+      A  = [ 1   -2   0.5 ]     b1 = [ 0.5  -0.5  1.0 ]
+           [ 0.5  1  -1   ]
+
+      C  = [  2  -1   0   1 ]   b2 = [ 0.5  1.0  0.0  -0.5 ]
+           [  1   1  -1   0 ]
+           [ -1   2   1  -1 ]
+
+  First stage -- each middle number is the state dotted with one column of A, plus that column's
+  nudge:
+
+      p1 = (1)(1)   + (2)(0.5) + 0.5  =  1 + 1 + 0.5  =  2.5
+      p2 = (1)(-2)  + (2)(1)   - 0.5  = -2 + 2 - 0.5  = -0.5
+      p3 = (1)(0.5) + (2)(-1)  + 1.0  =  0.5 - 2 + 1  = -0.5
+      psi = [ 2.5, -0.5, -0.5 ]
+
+  The bend flattens every negative middle number to zero and leaves the rest alone:
+
+      x = max(psi, 0) = [ 2.5, 0, 0 ]        <- two middle numbers went DEAD (they were negative)
+
+  Second stage -- each engine-score is the bent row dotted with one column of C, plus its nudge.
+  Because x = [2.5, 0, 0], only C's FIRST row survives; the two dead middle numbers erase their
+  rows:
+
+      Q0 = (2.5)(2)  + 0 + 0 + 0.5 =  5.0 + 0.5 =  5.5
+      Q1 = (2.5)(-1) + 0 + 0 + 1.0 = -2.5 + 1.0 = -1.5
+      Q2 = (2.5)(0)  + 0 + 0 + 0.0 =  0.0 + 0.0 =  0.0
+      Q3 = (2.5)(1)  + 0 + 0 - 0.5 =  2.5 - 0.5 =  2.0
+      Q = [ 5.5, -1.5, 0.0, 2.0 ]
+
+  Four scores, one per engine, CONJURED from two state numbers -- no table of states anywhere. The
+  middle row is the machine's OWN invented features: during learning it will bend sheet A until
+  those three middle numbers become useful combinations of the input dials. They are learned, not
+  chosen by us.
+
+  WHY THE BEND EARNS ITS KEEP. Take it out and watch the machine collapse. Without the flatten,
+  Q = (sA + b1)C + b2 = s(AC) + (b1 C + b2). But AC is just one sheet -- multiply A by C and a
+  single 2 x 4 falls out -- so Q = sD + e, a SINGLE straight stage. Two stages bought nothing; a
+  hundred would buy nothing. The flatten is the one thing no single sheet can copy, and it is what
+  lets the scores turn corners instead of drawing one flat wall.
+
+  ONE MORE HONEST DETAIL: the sheets do not start as tiny random scribbles. They start ORTHOGONAL
+  -- each column pulling in its own square-cornered direction, none a stretched copy of another
+  (built once with a standard trick that need not detain us). Tiny-random starts let the signal
+  through the two stages shrink or blow up before learning even begins; the square-cornered start
+  keeps every middle number's size sane on the very first pass, so the miss we compute next is
+  worth listening to.
+
+  ---
+
+  WHICH ENGINE TO FIRE? ROLL, DON'T GRAB
+
+  We have four scores, [5.5, -1.5, 0.0, 2.0]. The greedy move is to fire the biggest (engine 0).
+  But grab-the-biggest never tries the others, so a score that is wrong-but-low stays untested
+  forever. Instead turn the scores into CHANCES and roll a die against them -- an engine with a
+  fair score keeps a fair slice of the roll.
+
+  Turn scores into chances with the softmax. First divide every score by a knob called the
+  TEMPERATURE, here written t; leave t = 1 for now. Then subtract the biggest (5.5) so the next
+  step never overflows -- it cancels out and changes no chance. Then lift each by e (the flatten's
+  opposite: e makes everything positive), and divide by the total so the four add to 1:
+
+      scores / t          = [ 5.5, -1.5, 0.0, 2.0 ]        (t = 1, so unchanged)
+      minus the max 5.5   = [ 0.0, -7.0, -5.5, -3.5 ]
+      lift by e           = [ 1,  ~0.0009,  ~0.0041,  ~0.0302 ]      (e^0 = 1, e^-7 ~ 0.0009, ...)
+      total               = 1 + 0.0009 + 0.0041 + 0.0302 = 1.0352
+
+      chance(engine 0) = 1      / 1.0352 = 0.966
+      chance(engine 1) = 0.0009 / 1.0352 = 0.001
+      chance(engine 2) = 0.0041 / 1.0352 = 0.004
+      chance(engine 3) = 0.0302 / 1.0352 = 0.029      (check: 0.966+0.001+0.004+0.029 = 1.0)
+
+  So the roll lands on engine 0 about 966 times in a thousand, but the other three still come up.
+  Now the temperature earns its name. Small t exaggerates the gaps -- at t = 0.001 the biggest
+  score swamps the rest and the roll is all but certain, near-greedy. Large t flattens the gaps
+  toward equal, all-but-random. It is one dial from careful to reckless, and unlike the epsilon of
+  the tabular machines the wandering here is shaped BY the scores: a close-second engine gets a
+  real slice, a hopeless one gets almost none.
+
+  Lay the four chances end to end on a 0-to-1 line, drop a random number, and take whichever slice
+  it lands in. Engine 0 holds 966 thousandths of the line, so the roll almost surely lands on it --
+  fire engine 0, and follow its grading the rest of the way.
+
+  ---
+
+  THE WORLD ANSWERS -- SO WRITE IT IN A NOTEBOOK
+
+  We fired an engine. The world takes its turn and hands back two things: a REWARD (one number --
+  a little fuel-cost penalty each step, a big prize for landing in the flags, a big loss for
+  crashing) and the NEXT state (the eight dials, read again after the pod moved). One turn of the
+  world, start to finish, is a five-part note:
+
+      ( state , engine fired , reward , ended? , next state )
+
+  where "ended?" is 0 if the pod is still flying and 1 if this move finished the episode (landed or
+  crashed). We do NOT learn from this note straight away. We drop it into a NOTEBOOK -- a long list
+  of the last many-thousand such notes -- and learn later, from a random handful.
+
+      notebook (newest at the bottom, oldest falls off the top when full):
+          ( s_old , e , r , 0 , s_new )
+          ( ...   , . , . , . , ...   )
+          ( ...   , . , . , . , ...   )   <- this move's note, just added
+
+  Two reasons for the notebook instead of learning on the spot. First, one lander episode is a
+  long run of moves that look almost alike frame to frame -- learning from them in order would
+  drum the same near-identical lesson over and over; a random draw from the notebook mixes old and
+  new, near and far, so no streak dominates. Second, a hard-won note (a rare good landing) can be
+  drawn again and again over the pod's lifetime instead of being used once and thrown away. To
+  learn, we SAMPLE a small batch of notes at random -- say a handful -- and grade each one.
+
+  ---
+
+  SO GRADE THE GUESS: A TARGET FROM A FROZEN TWIN
+
+  Pick one note out of the sampled batch: we were at s, fired engine 0, got reward r, landed at the
+  next state s'. The network guessed Q(s, engine 0) = 5.5 for that move at the time (read it off
+  the scores above). Was that guess right? We cannot know the true worth, but we can build a better
+  standard than the guess itself -- a TARGET -- out of what actually happened plus the machine's own
+  read of where it landed.
+
+  The target is the reward, plus a discounted look at how good the next spot s' is:
+
+      target = reward + discount x (worth of the next spot s')
+
+  The worth of the next spot is itself a question -- worth if we do WHAT next? The lander's policy
+  is a spread of chances over the four engines (it rolls, it does not commit), so instead of betting
+  on one next engine we AVERAGE the four next-scores by how likely each engine is. That average is
+  the Expected-Sarsa worth of s'.
+
+  Here is the piece the whole chapter turns on. To read the four scores at s', we do NOT use the
+  network as it stands -- because we are about to change the network many times in a moment, and a
+  target that shifts every time we nudge is a target that chases its own tail. Instead we PHOTOCOPY
+  the network first -- freeze a TWIN, held fixed -- and read s' off the twin. The live network will
+  be nudged; the twin will not, for the whole burst of updates.
+
+  Worked. Freeze the twin, hand it s', and say its four scores come out
+
+      twin's scores at s' :  [ 3 , 5 , 1 , 2 ]         and the policy's chances over them : [ 0.1, 0.6, 0.1, 0.2 ]
+
+  Average the next-scores by the chances -- the worth of the next spot:
+
+      worth(s') = (0.1)(3) + (0.6)(5) + (0.1)(1) + (0.2)(2)
+                =  0.3 + 3.0 + 0.1 + 0.4
+                =  3.8
+
+  Then the target (discount 0.9, reward 1):
+
+      target = reward + discount x worth(s')
+             =   1    +   0.9    x   3.8
+             =   1    +   3.42
+             =   4.42
+
+  ONE GUARD before we move on: if this note had ENDED the episode (ended? = 1), there IS no next
+  spot -- the pod is on the ground -- so its worth is zero and the target is the bare reward. We
+  enforce that by multiplying worth(s') by (1 - ended?): still 3.8 while flying, knocked to 0 the
+  instant the episode ends. Here the pod is still flying, so 3.8 stands.
+
+  (Average the four next-scores and you get Expected Sarsa, the lander's method. Swap the average
+  for the single biggest next-score and it is Q-learning; for the one engine actually fired next,
+  plain Sarsa. Same skeleton, three different ways to guess the future.)
+
+  ---
+
+  AND THE MISS LIVES IN ONE COLUMN
+
+  We have a guess and a better standard, so the miss is their difference -- the same "how wrong" as
+  every post in this book:
+
+      how wrong = target - guessed worth of the move we made
+                = target - Q(s, engine 0)
+                = 4.42 - 5.5
+                = -1.08
+
+  The guess of 5.5 was 1.08 too HIGH: firing engine 0 here turned out a little worse than the network
+  thought, so every dial that pushed Q0 UP wants easing back. And the miss is ONLY about engine 0.
+  The network offered four scores, but the world graded exactly one -- we fired engine 0, so only
+  engine 0's score was put to the test. The other three were never tried this move; we have nothing
+  to say about them. So the miss is a row that is zero everywhere except the fired slot:
+
+      miss row = [ -1.08, 0, 0, 0 ]
+                    ^^^^^ engine 0 only; the other three untested, so 0
+
+  This one-in-a-row is the whole instruction the network gets. Everything from here is spreading
+  that single number back to the dials that earned it.
+
+  ---
+
+  SO WALK THE MISS BACK TO EVERY DIAL
+
+  Sheet C is twelve dials, sheet A is six, the two nudge-rows are seven more -- twenty-five dials on
+  the toy, about two hundred thousand on the real lander. You cannot hand "-1.08" to twenty-five
+  dials and call it an instruction; they did not all push equally. So ask each dial one question:
+  if I raise this dial a hair, how much does the fired score Q0 move? Call that its PULL. Then a
+  dial that pushed hard takes a big share of the miss, a dial with no pull is left alone.
+
+  Start where the miss is born, at the scores, and hand each score its pull on Q0. Only Q0 matters,
+  so its pull on itself is 1 and the other three are bystanders:
+
+      seed = [ 1, 0, 0, 0 ]        (Q0 cares about Q0; the rest are off the hook)
+
+  Sheet C sits right behind the scores. A score is Q_k = (x dotted with column k of C) + nudge, so
+  the dial C[i,k] is multiplied by the middle number x_i on its way in. Raise C[i,k] a hair and
+  score k rises by x_i -- so its pull is x_i, but only on score k. Only the fired column (engine 0's)
+  carries anything; with x = [2.5, 0, 0] the pull-sheet for C is x dropped into that one column:
+
+      pull on C :   col0   col1   col2   col3           (col0 = the fired engine)
+            row0 [  2.5     0      0      0   ]          row i = middle number x_i
+            row1 [   0      0      0      0   ]
+            row2 [   0      0      0      0   ]
+
+  Rows 1 and 2 are zero because the two dead middle numbers carried nothing in -- their dials get no
+  blame. To reach sheet A we pass back through the middle numbers and the bend. A middle number x_i
+  pulls on Q0 by C[i, fired column] = column 0 of C = [ 2, 1, -1 ]. But x came from the pre-bend
+  middle psi through the flatten: a middle number that was POSITIVE passed straight through (pull 1),
+  one that was flattened to zero is stuck flat (pull 0). With psi = [2.5, -0.5, -0.5] the gate is
+  open only at the first:
+
+      bend gate = [ 1, 0, 0 ]
+      pull on psi = (column 0 of C) x gate = [ 2, 1, -1 ] x [ 1, 0, 0 ] = [ 2, 0, 0 ]
+
+  The dead middle numbers slam the gate: whatever blame was heading for them hits the floor. Last
+  sheet: a middle number is psi_j = (s dotted with column j of A) + nudge, so dial A[i,j] is
+  multiplied by input s_i. Its pull is s_i times the blame on psi_j, with s = [1, 2]:
+
+      pull on A :   col0       col1   col2
+            row0 [ (1)(2) = 2    0      0 ]
+            row1 [ (2)(2) = 4    0      0 ]
+
+  Same shape every stage: the pull-sheet for a stage is (the input that fed it) times (the blame
+  arriving at it), one product per dial. That single shape, applied stage by stage from the scores
+  backward, IS the backward walk. And a dial's raw grade -- how much it wants to move -- is its pull
+  times the miss. For the corner dial C[row0, fired column], pull 2.5:
+
+      grade of C[row0,col0] = pull x how-wrong = 2.5 x (-1.08) = -2.7
+
+  Twenty-five such grades fall out, most of them zero, one per dial. Now, how far to actually step
+  each dial?
+
+  ---
+
+  BUT STEP SMART, NOT FLAT: ADAM
+
+  The blunt way is a flat step: move every dial by a small size times its grade. It works, but it
+  treats a dial that has screamed the same direction for a hundred moves exactly like a dial that
+  just twitched once, and it lets a single loud grade yank a dial too far. Adam fixes both by
+  keeping TWO running memories per dial and stepping by their ratio.
+
+  The first memory, m, is the average DIRECTION of the grades -- a smoothed heading, like momentum:
+
+      m = 0.9 x (old m) + 0.1 x (this grade)
+
+  The second, v, is the average SIZE of the grades, squared so the sign drops out -- how big and how
+  jittery this dial's grades have been:
+
+      v = 0.999 x (old v) + 0.001 x (this grade)^2
+
+  Both memories start at zero. Take one dial -- the corner of sheet C whose grade we just worked out:
+  its pull 2.5 times the miss -1.08, a grade of g = -2.7. First memories at zero:
+
+      m = 0.9 x 0 + 0.1 x (-2.7)      = -0.27
+      v = 0.999 x 0 + 0.001 x (-2.7)^2 = 0.001 x 7.29 = 0.00729
+
+  Because both started at zero they are biased small on the first move -- a tenth of the grade, a
+  thousandth of the square. Undo that bias by dividing by (1 minus the memory's decay, this move):
+
+      m-hat = m / (1 - 0.9)   = -0.27  / 0.1   = -2.7
+      v-hat = v / (1 - 0.999) = 0.00729 / 0.001 = 7.29
+
+  And step the dial by size x m-hat / (root of v-hat), with a whisker eps in the bottom so it never
+  divides by zero (size 0.001, eps tiny):
+
+      step = 0.001 x (-2.7) / ( root(7.29) + eps )
+           = 0.001 x (-2.7) / ( 2.7 )
+           = 0.001 x (-1)
+           = -0.001
+
+  Look what the ratio did on this first move: m-hat / root(v-hat) = -2.7 / 2.7 = -1, exactly minus
+  one. The size of the grade CANCELLED -- a grade of -2.7 and a grade of -27 would both step this
+  dial by the same -0.001. Adam's first step on any dial is just plus-or-minus the size, a cautious,
+  even footstep in the grade's DIRECTION, deaf to its magnitude. That is the point: no single loud
+  grade gets to yank a dial across the room. (The flat way, by contrast, would have moved this dial
+  by size x grade -- a much bigger, magnitude-driven lurch.) Over many moves m and v fill in, and
+  the ratio becomes a true adaptive step -- big where a dial's grades agree and stay small, small
+  where they are large and quarrelsome.
+
+  ---
+
+  AND DO IT MANY TIMES ON ONE STEP: THE REPLAY PASSES
+
+  One note graded, one set of dials nudged. But a single note is a thin lesson, so on EVERY move of
+  the pod we do this not once but a handful of times -- several REPLAY PASSES. Each pass draws a
+  fresh random batch of notes from the notebook, grades every note in the batch, averages their
+  grades dial by dial (twenty-five averaged grades), and takes one Adam step.
+
+      one move of the pod:
+        pass 1:  draw a batch  ->  grade each note against the FROZEN twin  ->  average  ->  Adam step
+        pass 2:  draw a batch  ->  grade each note against the FROZEN twin  ->  average  ->  Adam step
+        ...      (a handful of passes)
+
+  And here is why the twin was frozen back at the target. Across this whole handful of passes the
+  live network is changing -- pass 1 nudges it, pass 2 nudges it again. If we read the next-spot
+  worth off the LIVE network, the target would drift under our feet between passes, and we would be
+  chasing a number that moves because WE moved it. Freezing one twin at the start of the move, and
+  reading every note's next-spot worth off that fixed twin for all the passes, holds the target
+  still while the live network walks toward it. One frozen standard, many steps toward it, then --
+  next move -- photocopy a fresh twin from the now-improved network and repeat.
+
+  ---
+
+  THE THREE CALLS THAT ACTUALLY RUN IT
+
+  The world drives the agent through exactly three calls, and everything above slots into them.
+
+  The FIRST call, at the start of an episode, hands over the opening state. The agent reads its four
+  scores, rolls the softmax, remembers the state it saw and the engine it picked, and returns that
+  engine. Nothing to grade yet -- there is no reward and no next state until the world moves.
+
+      first call (state given):
+          score the state, roll an engine
+          remember: last-state = this state, last-engine = this engine
+          return the engine
+
+  The MIDDLE call, once per move thereafter, hands over the reward for the LAST engine and the new
+  state. This is where a whole move happens. Watch the timing carefully, because it is the easiest
+  thing in the machine to get wrong: the reward arriving now is the pay for the engine fired LAST
+  call, from the state seen LAST call -- NOT for whatever we are about to pick. So the note we file
+  pairs the reward with the OLD state and OLD engine:
+
+      middle call (reward, new state given):
+          file the note ( last-state , last-engine , reward , 0 , new state )    <- still flying, so 0
+          if the notebook has enough: freeze a twin, run the handful of replay passes
+          score the new state, roll the next engine
+          remember: last-state = new state, last-engine = next engine
+          return the next engine
+
+  File the reward against the engine you just PICKED instead of the one that earned it, and every
+  note in the notebook is a lie -- the machine learns to credit the wrong move. The whole agent
+  turns on filing the note before you overwrite what "last" means.
+
+  The LAST call comes when the episode ends -- the pod has landed or crashed -- handing over the
+  final reward and no new state at all. There is nothing to roll (the episode is over) and no next
+  spot to look at, so the note's next-state is a row of zeros and its "ended?" flag is 1 -- and since
+  the target multiplies the next spot's worth by (1 - ended?), that worth is knocked to zero: the
+  target for this last note is the bare reward. File it, run the replay passes once more, return nothing.
+
+      last call (final reward given):
+          file the note ( last-state , last-engine , reward , 1 , all-zeros )    <- ended, so 1
+          if the notebook has enough: freeze a twin, run the handful of replay passes
+          return nothing
+
+  ---
+
+  AND THREE HUNDRED TIMES, IT LEARNS TO LAND
+
+  That is one move: eight numbers in, a roll, the world's answer filed, a twin frozen, a handful of
+  passes each grading a batch and taking one careful Adam step. Chain the moves into an episode,
+  from the first call to the last; chain the episodes one after another, the notebook carrying
+  hard-won notes across all of them; and watch what the sheets learn.
+
+      early episodes:   the pod fires almost at random and CRASHES within seconds -- big negative
+                        rewards pour into the notebook, and the scores for "fire into the ground"
+                        start bending down.
+      middle episodes:  it learns the cheap safety of NOT crashing -- it hovers, burning fuel, high
+                        above the pad, trading the crash penalty for a slow drip of fuel cost.
+      late episodes:    the fuel drip finally outweighs the fading crash fear, and the only way left
+                        to score well is to come DOWN, slow, and settle between the flags. Around
+                        three hundred episodes in, it lands.
+
+  No line of that behaviour was written down. It fell out of one loop -- score, roll, file, freeze a
+  twin, grade a batch, step -- turned often enough that the sheets bent into scores worth trusting.
+  Every earlier part of this chapter was one gear; this is the whole clock, ticking.
+
+  ---
+
+  ONE BREATH
+
+  The world hands the agent EIGHT dials off a falling pod and asks for a score on FOUR engines. A
+  two-sheet network with a bend between (psi = sA + b1, flatten to x, Q = xC + b2) turns the dials
+  into four scores -- worked on a 2->3->4 toy, s = [1,2] -> Q = [5.5, -1.5, 0, 2] -- the bend the one
+  thing that keeps two stages from collapsing into one. Turn the scores into chances with a softmax
+  at temperature t (t small = near-greedy, t large = near-random) and ROLL, never grab. File the
+  world's answer as a five-part note (state, engine, reward, ended?, next) in a notebook and learn
+  later from random batches, so no streak dominates and hard notes get reused. To grade a note,
+  freeze a TWIN of the network and read the next spot off it -- worth(s') = chance-weighted average
+  of the twin's four next-scores = 3.8 -- so target = reward + discount x worth = 1 + 0.9(3.8) = 4.42
+  (or the bare reward if the episode ended). The miss (target minus the fired score) lands in ONE
+  column -- the world graded one engine -- and the backward walk spreads it to every dial by its
+  PULL (input times signal, stage by stage). Step each dial not flat but with Adam: memory m for
+  direction, v for size, bias-undone, step = size x m-hat / root(v-hat) -- whose first move is a
+  size-blind plus-or-minus the step. Do a handful of replay passes per move, all reading the SAME
+  frozen twin so the target holds still; wire it into the world's three calls (start: roll and
+  remember; step: file the note against the LAST engine, replay, roll again; end: file the terminal
+  note, replay, stop). Turn that loop three hundred times and the pod learns to land.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   eight dials off the pod      = the LunarLander state (8-D continuous observation)
+  >>   four engine-scores           = the action-value head q-hat(s, a, w) for all four actions
+  >>   two sheets and a bend        = a one-hidden-layer neural network with a ReLU
+  >>   the square-cornered start    = orthogonal weight initialisation (keeps signal scale stable)
+  >>   temperature t, roll not grab = a softmax policy with temperature (a stochastic policy)
+  >>   the five-part note           = a transition (state, action, reward, terminal, next_state)
+  >>   the notebook                 = the experience replay buffer (sample random minibatches)
+  >>   the frozen twin              = the fixed target network (held constant across replay updates)
+  >>   chance-weighted average worth = the Expected Sarsa target, sum_a' pi(a'|s') q-hat(s',a')
+  >>   times (1 - ended?)           = zeroing the bootstrap on terminal transitions
+  >>   the miss in one column       = the TD error placed only in the taken action's slot (delta_mat)
+  >>   a dial's PULL, input x signal = the gradient of the score wrt a weight (backpropagation)
+  >>   memory m (direction)         = Adam's first moment (momentum)
+  >>   memory v (size)              = Adam's second moment (per-dial adaptive scaling)
+  >>   bias-undone (1 - decay^t)    = Adam's bias correction for the zero-started memories
+  >>   a handful of replay passes    = num_replay_updates_per_step minibatch updates per environment step
+  >>   the three calls              = agent_start / agent_step / agent_end (the RL-Glue agent interface)
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
+    Part 1 -- [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt) .
+    Part 2 -- [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt) .
+    Part 3 -- [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt) .
+    Part 4 -- [The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt) .
+    Part 5 (this post) -- the chapter closes here; the whole agent, assembled and run.
+              Next: [Chapter 16: Propose and Grade: Actor-Critic by Pencil](actor-critic-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 17 chapters (51 posts), plus references and standalone specials,
+  ALL POSTS -- a book in 17 chapters (52 posts), plus references and standalone specials,
   every number worked by hand.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
@@ -125,17 +125,18 @@
   post 46   [Part 2 -- A Smarter Step: Adam and Replay by Pencil](posts/adam-and-replay-by-pencil.txt)
   post 47   [Part 3 -- The Frozen Twin: A Batch of Misses at Once](posts/batch-td-error-by-pencil.txt)
   post 48   [Part 4 -- The World Calls Three Times: Wiring the Agent by Pencil](posts/wiring-the-agent-by-pencil.txt)
+  post 49   [Part 5 -- From Eight Dials to a Soft Landing: The Whole Agent by Pencil](posts/the-whole-agent-by-pencil.txt)
 
 
   CHAPTER 16 -- POLICY GRADIENT (2026)
   ------------------------------------
-  post 49   [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
+  post 50   [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
 
 
   CHAPTER 17 -- TWO THE SAMPLE-BASED MAP SKIPPED (2026)
   -----------------------------------------------------
-  post 50   [Part 1 -- Wait for the Whole Trip: Monte Carlo by Pencil](posts/monte-carlo-by-pencil.txt)
-  post 51   [Part 2 -- Fix the Biggest Surprise First: Priority Sweeping by Pencil](posts/priority-sweeping-by-pencil.txt)
+  post 51   [Part 1 -- Wait for the Whole Trip: Monte Carlo by Pencil](posts/monte-carlo-by-pencil.txt)
+  post 52   [Part 2 -- Fix the Biggest Surprise First: Priority Sweeping by Pencil](posts/priority-sweeping-by-pencil.txt)
 
 
   REFERENCES -- flip-to decoders, one per cluster of chapters

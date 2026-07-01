@@ -5,12 +5,12 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  CHAPTER 15 . TRAINING THE Q-NETWORK . PART 3 OF 4
+  CHAPTER 15 . TRAINING THE Q-NETWORK . PART 3 OF 5
   The Frozen Twin: A Batch of Misses at Once
   Posted: 2026-07-01 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, expected-sarsa, target-network, td-error, by-hand
   ============================================================================================
 
-  PATH . post 47/51 . part 3 of 4 in Chapter 15 -- Training the Q-Network
+  PATH . post 47/51 . part 3 of 5 in Chapter 15 -- Training the Q-Network
     <- prev:  [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt)
        next:  [The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt) ->
 
@@ -280,7 +280,8 @@
     Part 1 -- [Backpropagation by Pencil](backprop-by-pencil.txt) .
     Part 2 -- [Adam and Replay by Pencil](adam-and-replay-by-pencil.txt) .
     Part 3 (this post) .
-    Part 4 -- [The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt)
+    Part 4 -- [The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt) .
+    Part 5 -- [From Eight Dials to a Soft Landing: The Whole Agent by Pencil](the-whole-agent-by-pencil.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

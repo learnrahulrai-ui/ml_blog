@@ -6,7 +6,7 @@
 ----------------------------------------------------------------------------------------------
 
   ABOUT THIS BLOG
-  Last updated: 2026-07-01
+  Last updated: 2026-07-02
 
 
   Who Am I
@@ -53,7 +53,7 @@
 
   What's Here
   -----------
-  A short book in seventeen chapters (fifty-one posts), plus references, standalone specials,
+  A short book in seventeen chapters (fifty-two posts), plus references, standalone specials,
   and a glossary. Read it top to bottom -- each chapter draws its ideas by hand, then gathers
   the Python at the end. (Chapters 1-11 are classic ML and deep learning; Chapters 12-17 are
   reinforcement learning, from bandits through a neural-net agent, policy gradient, and two
@@ -162,11 +162,12 @@
     - CHAPTER 15 -- Training the Q-Network: how one miss teaches a thousand dials --
       backpropagation by pencil, then a smarter step (Adam) and experience replay, then a batch
       of misses graded against a frozen target twin, then wiring the three calls into a running
-      agent. (LunarLander.)
+      agent, and finally the whole agent assembled and run to a landing. (LunarLander.)
         [part 1](posts/backprop-by-pencil.txt) .
         [part 2](posts/adam-and-replay-by-pencil.txt) .
         [part 3](posts/batch-td-error-by-pencil.txt) .
-        [part 4](posts/wiring-the-agent-by-pencil.txt)
+        [part 4](posts/wiring-the-agent-by-pencil.txt) .
+        [part 5](posts/the-whole-agent-by-pencil.txt)
 
     - CHAPTER 16 -- Policy Gradient: learning the policy itself instead of a worth -- an
       actor-critic with a softmax policy and a critic baseline, on the pendulum.

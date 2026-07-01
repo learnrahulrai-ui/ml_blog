@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in seventeen chapters (fifty-one posts),
+  This is not a pile of loose articles -- it is a short BOOK in seventeen chapters (fifty-two posts),
   meant to be read top to bottom. Each post opens with a "post N" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 51:
+  >> NEW HERE? Start at post 1 of 52:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -702,7 +702,7 @@
   ---------------------------------------------------------------------------
 
   [Part 1 -- One Miss, a Thousand Nudges: Backpropagation by Pencil](posts/backprop-by-pencil.txt)
-    post 45/45 . 2026-06-30 . part 1 of 4 . reinforcement-learning, deep-rl, backpropagation, neural-network, by-hand
+    post 45/45 . 2026-06-30 . part 1 of 5 . reinforcement-learning, deep-rl, backpropagation, neural-network, by-hand
     Chapter 14 closed on a sting: the net guessed an engine worth 5.5, the target said 4.42,
     the miss was one number -1.08 -- and it must fix ~1,300 dials with no feature to point the
     way. This post walks that one number backward to every dial by pencil. Ask each dial its
@@ -718,7 +718,7 @@
     Hard-coded forward-and-back code. Assumes zero background.
 
   [Part 2 -- A Smarter Step: Adam and Replay by Pencil](posts/adam-and-replay-by-pencil.txt)
-    post 46/46 . 2026-06-30 . part 2 of 4 . reinforcement-learning, deep-rl, adam, momentum, experience-replay, by-hand
+    post 46/46 . 2026-06-30 . part 2 of 5 . reinforcement-learning, deep-rl, adam, momentum, experience-replay, by-hand
     Part 1's nudge was right but spent crudely -- a flat 0.01 step for every dial, and each
     move's experience used once in order. Adam fixes the STEP with two per-dial memories: m,
     the average of recent pulls (so a dial pulled the same way builds speed, one yanked both
@@ -733,7 +733,7 @@
     Adam step, slide -- and hard-coded code. Assumes zero background.
 
   [Part 3 -- The Frozen Twin: A Batch of Misses at Once](posts/batch-td-error-by-pencil.txt)
-    post 47/51 . 2026-07-01 . part 3 of 4 . reinforcement-learning, deep-rl, expected-sarsa, target-network, td-error, by-hand
+    post 47/51 . 2026-07-01 . part 3 of 5 . reinforcement-learning, deep-rl, expected-sarsa, target-network, td-error, by-hand
     Part 2 grabbed a random batch from the bin and waved at two things: how the batch's miss is
     computed all at once, and which net computes it. Both, worked by hand on a batch of two lander
     moves. The FROZEN twin reads every landing s' into a worth-row per record; softmax turns each
@@ -749,7 +749,7 @@
     net; grade with the frozen twin. Hard-coded code. Assumes zero background.
 
   [Part 4 -- The World Calls Three Times: Wiring the Agent by Pencil](posts/wiring-the-agent-by-pencil.txt)
-    post 48/51 . 2026-07-01 . part 4 of 4 . reinforcement-learning, deep-rl, agent, experience-replay, terminal, by-hand
+    post 48/51 . 2026-07-01 . part 4 of 5 . reinforcement-learning, deep-rl, agent, experience-replay, terminal, by-hand
     Parts 1-3 built the machine that TRAINS a Q-network -- backprop, Adam, replay, the frozen twin --
     but a pile of functions is not an agent. The world runs the loop and CALLS the agent at three kinds
     of moment: agent_start (first spot, no reward -- pick a move by softmax over the net's worths and
@@ -762,12 +762,27 @@
     makes the ended move's target the bare reward via Part 3's (1 - terminal). Strung together over a
     few hundred runs, the three calls are a lander that learns to fly. Assumes zero background.
 
+  [Part 5 -- From Eight Dials to a Soft Landing: The Whole Agent by Pencil](posts/the-whole-agent-by-pencil.txt)
+    post 49/52 . 2026-07-02 . part 5 of 5 . reinforcement-learning, deep-rl, expected-sarsa, adam, experience-replay, by-hand
+    Parts 1-4 forged the pieces -- backprop, Adam, replay, the frozen twin, the three agent calls --
+    each alone. This capstone lights them all at once, following ONE instant of a falling rocket (eight
+    state dials) the whole way to a nudge of the dials, then the same loop 300 times to a landing. No
+    Python: every piece rebuilt from nothing in plain pencil, one 2->3->4 toy carried end to end. Score
+    four engines through two sheets and a bend (s=[1,2] -> Q=[5.5,-1.5,0,2]); ROLL an engine by softmax
+    at temperature t (near-greedy at t=0.001), never grab; file the world's answer as a five-part note
+    in a notebook and learn later from random batches; grade a note against a FROZEN twin (worth of the
+    next spot = chance-weighted average of the twin's scores = 3.8, target = 1 + 0.9x3.8 = 4.42); the
+    miss (4.42 - 5.5 = -1.08) lands in ONE column; walk it back to every dial by its pull; step not flat
+    but with Adam, whose first move is a size-blind +/- the step (grade -2.7 -> step -0.001). A handful
+    of replay passes per move, all reading the same frozen twin; wired into agent_start/step/end; 300
+    times, the pod learns to land. The whole clock, ticking. Assumes zero background.
+
 
   CHAPTER 16 . POLICY GRADIENT -- learning the policy itself, not a worth
   ----------------------------------------------------------------------
 
   [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
-    post 49/51 . 2026-06-30 . Chapter 16 . reinforcement-learning, policy-gradient, actor-critic, softmax, average-reward, by-hand
+    post 50/52 . 2026-06-30 . Chapter 16 . reinforcement-learning, policy-gradient, actor-critic, softmax, average-reward, by-hand
     Every machine so far learned a WORTH and grabbed the biggest -- which needs a max (bad for
     a real-valued move like a steering angle), jolts when two worths cross, and can never say a
     MIXED best policy. So learn the policy directly. Keep a PREFERENCE per move (a sum of
@@ -786,7 +801,7 @@
   ------------------------------------------------------------------------------------------------
 
   [Part 1 -- Wait for the Whole Trip: Monte Carlo by Pencil](posts/monte-carlo-by-pencil.txt)
-    post 50/51 . 2026-07-01 . part 1 of 2 . reinforcement-learning, monte-carlo, prediction, return, episodic, by-hand
+    post 51/52 . 2026-07-01 . part 1 of 2 . reinforcement-learning, monte-carlo, prediction, return, episodic, by-hand
     Chapter 13's TD graded the spot you left with one reward plus the GUESSED worth of the spot you
     landed on -- a guess leaning on a guess. Monte Carlo leans on nothing: wait for the whole run
     (the episode) to END, then grade each spot by its RETURN -- every reward that followed, faded 0.9
@@ -799,7 +814,7 @@
     walks all the way and never leans; the rest of the family lives between. Assumes zero background.
 
   [Part 2 -- Fix the Biggest Surprise First: Priority Sweeping by Pencil](posts/priority-sweeping-by-pencil.txt)
-    post 51/51 . 2026-07-01 . part 2 of 2 . reinforcement-learning, priority-sweeping, planning, model-based, dyna, by-hand
+    post 52/52 . 2026-07-01 . part 2 of 2 . reinforcement-learning, priority-sweeping, planning, model-based, dyna, by-hand
     Chapter 13's Dyna rehearsed remembered moves at RANDOM to spread worth with no real footstep, and
     wasted most early rehearsals on moves whose landing was still 0 (copying a 0 back teaches nothing).
     Priority sweeping spends every rehearsal well: give each spot a PRIORITY -- how far its worth would
