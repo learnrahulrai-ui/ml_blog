@@ -53,7 +53,7 @@
 
   What's Here
   -----------
-  A short book in sixteen chapters (forty-seven posts), plus references, standalone specials,
+  A short book in sixteen chapters (forty-eight posts), plus references, standalone specials,
   and a glossary. Read it top to bottom -- each chapter draws its ideas by hand, then gathers
   the Python at the end. (Chapters 1-11 are classic ML and deep learning; Chapters 12-16 are
   reinforcement learning, from bandits through a neural-net agent and policy gradient.)

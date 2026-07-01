@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in sixteen chapters (forty-seven posts),
+  This is not a pile of loose articles -- it is a short BOOK in sixteen chapters (forty-eight posts),
   meant to be read top to bottom. Each post opens with a "post N" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 47:
+  >> NEW HERE? Start at post 1 of 48:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -702,7 +702,7 @@
   ---------------------------------------------------------------------------
 
   [Part 1 -- One Miss, a Thousand Nudges: Backpropagation by Pencil](posts/backprop-by-pencil.txt)
-    post 45/45 . 2026-06-30 . part 1 of 2 . reinforcement-learning, deep-rl, backpropagation, neural-network, by-hand
+    post 45/45 . 2026-06-30 . part 1 of 3 . reinforcement-learning, deep-rl, backpropagation, neural-network, by-hand
     Chapter 14 closed on a sting: the net guessed an engine worth 5.5, the target said 4.42,
     the miss was one number -1.08 -- and it must fix ~1,300 dials with no feature to point the
     way. This post walks that one number backward to every dial by pencil. Ask each dial its
@@ -718,7 +718,7 @@
     Hard-coded forward-and-back code. Assumes zero background.
 
   [Part 2 -- A Smarter Step: Adam and Replay by Pencil](posts/adam-and-replay-by-pencil.txt)
-    post 46/46 . 2026-06-30 . part 2 of 2 . reinforcement-learning, deep-rl, adam, momentum, experience-replay, by-hand
+    post 46/46 . 2026-06-30 . part 2 of 3 . reinforcement-learning, deep-rl, adam, momentum, experience-replay, by-hand
     Part 1's nudge was right but spent crudely -- a flat 0.01 step for every dial, and each
     move's experience used once in order. Adam fixes the STEP with two per-dial memories: m,
     the average of recent pulls (so a dial pulled the same way builds speed, one yanked both
@@ -732,12 +732,28 @@
     stored moves). Ends with the whole deep-RL loop -- read, pick, act, store, grab, backprop,
     Adam step, slide -- and hard-coded code. Assumes zero background.
 
+  [Part 3 -- The Frozen Twin: A Batch of Misses at Once](posts/batch-td-error-by-pencil.txt)
+    post 47/48 . 2026-07-01 . part 3 of 3 . reinforcement-learning, deep-rl, expected-sarsa, target-network, td-error, by-hand
+    Part 2 grabbed a random batch from the bin and waved at two things: how the batch's miss is
+    computed all at once, and which net computes it. Both, worked by hand on a batch of two lander
+    moves. The FROZEN twin reads every landing s' into a worth-row per record; softmax turns each
+    row into chances (e^0/e^2 worked, [0.096,0.711,0.096,0.096]); chances-dotted-into-worths gives
+    the Expected-Sarsa landing worth (1.42 and 4.0); times (1 - done) zeroes the crashed record
+    (else its dead placeholder leaks +2.6 and a crash scores as a reward); target = r + dilute x
+    that = [3.28, -1.0]. The LIVE net reads every left-spot and -- since the move taken is stored --
+    picks JUST that column as the guess [2.5, 0.5]. Subtract straight across: the whole batch's
+    how-wrong in one sweep, [0.78, -1.5], each riding Part 1's backprop into Part 2's one Adam step.
+    Then why TWO nets: across the several replay passes after one real move the live net moves every
+    pass, so a target read off IT would flee as fast as you chase it -- photocopy the net before the
+    passes, freeze the copy, grade every pass against it, refresh between bursts. Guess with the live
+    net; grade with the frozen twin. Hard-coded code. Assumes zero background.
+
 
   CHAPTER 16 . POLICY GRADIENT -- learning the policy itself, not a worth
   ----------------------------------------------------------------------
 
   [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
-    post 47/47 . 2026-06-30 . Chapter 16 . reinforcement-learning, policy-gradient, actor-critic, softmax, average-reward, by-hand
+    post 48/48 . 2026-06-30 . Chapter 16 . reinforcement-learning, policy-gradient, actor-critic, softmax, average-reward, by-hand
     Every machine so far learned a WORTH and grabbed the biggest -- which needs a max (bad for
     a real-valued move like a steering angle), jolts when two worths cross, and can never say a
     MIXED best policy. So learn the policy directly. Keep a PREFERENCE per move (a sum of

@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 16 chapters (47 posts), plus references and standalone specials,
+  ALL POSTS -- a book in 16 chapters (48 posts), plus references and standalone specials,
   every number worked by hand.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
@@ -123,11 +123,12 @@
   -------------------------------------------
   post 45   [Part 1 -- One Miss, a Thousand Nudges: Backpropagation by Pencil](posts/backprop-by-pencil.txt)
   post 46   [Part 2 -- A Smarter Step: Adam and Replay by Pencil](posts/adam-and-replay-by-pencil.txt)
+  post 47   [Part 3 -- The Frozen Twin: A Batch of Misses at Once](posts/batch-td-error-by-pencil.txt)
 
 
   CHAPTER 16 -- POLICY GRADIENT (2026)
   ------------------------------------
-  post 47   [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
+  post 48   [Propose and Grade: Actor-Critic by Pencil](posts/actor-critic-by-pencil.txt)
 
 
   REFERENCES -- flip-to decoders, one per cluster of chapters
