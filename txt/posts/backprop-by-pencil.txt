@@ -167,6 +167,30 @@
 
   ---
 
+  BUT IS A PULL REALLY THE RIGHT NUMBER? WIGGLE ONE DIAL AND SEE
+
+  Those pulls were chased back through two sheets and a bend by algebra, and algebra can hide a
+  slipped sign. Before spending the miss on them, check one the blunt way -- move a single dial
+  a hair and watch the fired worth by brute force. A pull was DEFINED as "if I raise this dial a
+  hair, how much does Q1 rise," so that is exactly what to measure.
+
+  Take A[1,0] -- row 1, column 0 of sheet A, currently 0.5 -- the dial the backward walk said
+  pulls hardest, with a pull of 4. Nudge it a whisker, 0.5 -> 0.501, leave every other dial put,
+  and run the forward pass again. Only the first middle number uses column 0 of A, so only it
+  changes:
+
+      psi1 = (1)(1) + (2)(0.501) + 0.5 = 1 + 1.002 + 0.5 = 2.502   (still positive: gate open)
+      x1   = 2.502
+      Q1   = (2.502)(2) + 0.5 = 5.004 + 0.5 = 5.504
+
+  Q1 climbed from 5.5 to 5.504 -- a rise of 0.004 for a wiggle of 0.001. Rise per unit wiggle is
+  0.004 / 0.001 = 4, the very pull the algebra claimed. The backward walk was no trick: a pull IS
+  how far the worth moves when you lean on the dial. (The same test on C[0,0], pull 2.5: nudging
+  2.0 -> 2.001 lifts Q1 by 0.0025, and 0.0025 / 0.001 = 2.5 -- it checks too.) With one pull
+  confirmed by hand, trust the rest and spend the miss.
+
+  ---
+
   SO NUDGE EVERY DIAL BY ITS SHARE OF THE MISS
 
   Now spend the miss. Pick a small step size 0.01 (small because many dials move at once, and
@@ -246,6 +270,11 @@
       pull_A  = np.outer(s, pull_psi)                # input s (x) signal pull_psi -> [[2,0,0],[4,0,0]]
       pull_b1 = pull_psi                             # [2, 0, 0]
 
+      # ---- check one pull the blunt way: wiggle a dial, measure Q1's rise ----
+      A_wig = A.copy(); A_wig[1, 0] += 0.001         # nudge the hardest puller a hair
+      Q1_wig = (np.maximum(s @ A_wig + b1, 0) @ C + b2)[0]
+      print((Q1_wig - Q[fired]) / 0.001)             # 4.0 == pull_A[1,0]; the algebra was right
+
       # ---- nudge every dial by size x how_wrong x its pull ----
       size = 0.01
       A  = A  + size * how_wrong * pull_A            # A[0,0]->0.9784, A[1,0]->0.4568
@@ -285,6 +314,7 @@
   >>                                  dL/dQ is this seed times the miss (Q_fired - target))
   >>   pull on a sheet = input (x) signal = the gradient of Q_fired wrt that sheet (input^T outer
   >>                                  signal); times the miss it is the usual weight gradient dL/dW
+  >>   the wiggle check (rise/wiggle) = a numerical gradient (finite difference), used to verify backprop
   >>   the bend gate (psi > 0)       = the derivative of ReLU (1 where active, 0 where dead)
   >>   pull on psi = (signal . C^T) gate = backprop through the layer, delta . W^T then gated
   >>   walking the miss backward     = backpropagation (reverse-mode automatic differentiation)
