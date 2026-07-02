@@ -68,7 +68,6 @@
   10,000 words × 4 numbers = 40,000 entries total. These start as junk and get tuned by
   training until "boring" and "dull" drift close, "nolan" and "the" drift far.
 
-    >> YOUR TURN
        The word "qxzbr" ranked 400,000th -- outside the top 10,000. What number does it get
        in the padded review row?
 
@@ -126,7 +125,6 @@
       nolan.HAVE = [1, 0, 0, 0]    nolan.GIVE = [2, 0, 0, 1]
       ended.HAVE = [3, 0, 2, 0]    ended.GIVE = [0, 3, 1, 0]
 
-    >> YOUR TURN
        WANT-grid row [0, 1, 0, 0] times nolan's stick [2, 1, 1, 0] = ?
 
        check: 0·2 + 1·1 + 0·1 + 0·0 = 1.
@@ -144,7 +142,6 @@
 
   A word dots EVERY word, including itself. Match row has n entries (here 2), not n−1.
 
-    >> YOUR TURN
        nolan.WANT = [2, 0, 1, 0]. Some word's HAVE = [1, 0, 1, 0]. Match = ?
 
        check: 2·1 + 0·0 + 1·1 + 0·0 = 3.
@@ -167,7 +164,6 @@
 
       nolan's scaled row: [1, 4]
 
-    >> YOUR TURN
        Match of 10, tag width 4. Scaled = ?
 
        check: 10 / 2 = 5.
@@ -193,7 +189,6 @@
 
   nolan listens 0.953 to "ended", 0.047 to itself.
 
-    >> YOUR TURN
        Two words, both scaled score 0. Softmax = ?
 
        check: e^0 = 1 both. Total = 2. Each portion = 0.5.
@@ -218,7 +213,6 @@
   nolan's new stick is mostly "ended"'s give (0.953 weight). Every word builds its own new
   stick at the same time.
 
-    >> YOUR TURN
        Portions (0.5, 0.5). GIVE sticks: [4, 0] and [0, 4]. Result = ?
 
        check: 0.5·[4,0] + 0.5·[0,4] = [2,0]+[0,2] = [2,2].
@@ -302,7 +296,6 @@
       word 2 = [0.2, 1.0, 0.5, 0.4]
       average = [0.1, 1.9, 0.7, 0.2]    (add, divide by 2)
 
-    >> YOUR TURN
        Sticks [4, 2] and [0, 0]. Average = ?
 
        check: (4+0)/2=2, (2+0)/2=1 → [2, 1].

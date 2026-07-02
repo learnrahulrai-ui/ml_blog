@@ -167,7 +167,7 @@
       no rulebook, run NEVER ends, spots           differential actor-critic (50) --
         continuous, choose                         subtract the average, fade nothing
 
-  YOUR TURN (SORT A FRESH WORLD)
+  SORT A FRESH WORLD
 
   A greenhouse heater must hold 20 degrees through days and nights that never stop.
   Its spot is two smooth dials (inside temperature, outside temperature); its moves
@@ -182,7 +182,7 @@
       out. Bottom row of the map: the differential machine of post 50 -- grade each
       minute against the crawling average R-bar, keep chances on the three settings.
 
-  YOUR TURN (SORT ANOTHER)
+  SORT ANOTHER
 
   A tiny dice board game has 5 squares, and the full die table is printed on the
   box lid: for every square and move, each landing's chance and payout. You want
@@ -226,7 +226,7 @@
   next, and the 300 averages form the honest learning curve -- luck's spread
   shrinks (it never vanishes) as the 30 runs vote it down.
 
-  YOUR TURN (COUNT A SMALLER BOX)
+  COUNT A SMALLER BOX
 
   Two temperatures, three step sizes, 20 runs per pair, 100 episodes per run. How
   many settings pairs, how many runs in all, how many totals in the box?

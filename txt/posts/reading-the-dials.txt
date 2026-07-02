@@ -180,7 +180,6 @@
     One-spread step of horsepower changes it by -2.1 mpg.
     Same currency, honest comparison.
 
-  >> YOUR TURN
      A weight dial reads -0.005 mpg per pound (made-up), and weight's spread is 800
      pounds.  Convert it to the shared currency: mpg per one-spread step.
 
@@ -200,7 +199,6 @@
     strongest_drag = "horse"
     accel (+0.12) is the only one PUSHING mpg up.
 
-  >> YOUR TURN
      A different shelf (made-up), already on a shared ruler:  cyl +0.05, disp -0.02,
      horse -0.06, accel +0.09.  Name the strongest drag.
 

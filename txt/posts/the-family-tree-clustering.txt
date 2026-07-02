@@ -97,7 +97,6 @@
        marry at height 7.
        ->  {1,2,6,8}   one family.  done.
 
-  >> YOUR TURN
      Re-run WEDDING 3 under SINGLE linkage (closest cross-pair) and AVERAGE linkage
      (mean of the four cross-pairs |1-6|=5, |1-8|=7, |2-6|=4, |2-8|=6) instead of
      complete.
@@ -135,7 +134,6 @@
     cut MID (height 3):    2 groups -> {1,2} {6,8}
     cut HIGH (height 8):   1 group  -> everybody
 
-  >> YOUR TURN
      The three weddings sit at heights 1, 2, and 7.  Slide your cut to height 5.  How
      many groups fall out?
 

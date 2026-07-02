@@ -158,7 +158,7 @@
       landing stored    S                                a dead placeholder spot
       returns           a move for the world to run      nothing (episode done)
 
-  YOUR TURN -- one whole tiny run, played out. The world makes four calls:
+  One whole tiny run, played out. The world makes four calls:
 
       agent_start(S0)      -> the agent samples engine 2
       agent_step(+5,  S1)  -> the agent samples engine 1

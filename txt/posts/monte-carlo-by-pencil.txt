@@ -65,7 +65,7 @@
       spot:      S       A       B
       return:   6.04    5.6      4         (rewards-that-followed, each faded 0.9 per step)
 
-  YOUR TURN -- total one fresh run backward. The courier runs:
+  Total one fresh run backward. The courier runs:
 
       S  --(+2)-->  A  --(+1)-->  B  --(+3)-->  END
 
@@ -137,7 +137,7 @@
   reward + 0.9 x worth(next spot), a target holding a GUESS; Monte Carlo nudges toward the whole
   real total that actually followed, a target holding no guess.
 
-  YOUR TURN -- a third run ends, and it hands S a return of 7.0 (S's count so far is 2,
+  A third run ends, and it hands S a return of 7.0 (S's count so far is 2,
   its average 5.77 from above). Bump the count and nudge. What is V(S) now?
 
       CHECK: count = 3 ;  V(S) = 5.77 + (1/3) x (7.0 - 5.77)

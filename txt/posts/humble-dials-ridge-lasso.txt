@@ -221,7 +221,6 @@
   Squaring each "bmi-avg" gives the "bottom" piece for each person.
   Adding up all four "bottom" pieces gives 0.0036 + 0.0016 + 0.0004 + 0.0064 = 0.0120.
 
-  >> YOUR TURN
      Same column (top = 4.12, bottom = 0.0120).  Set the knob to a = 1 and work the
      ridge dial on the slate.
 
@@ -338,7 +337,6 @@
      The winning a is wherever the curve bottoms out -- the valley above, turned into a row
      of numbers.
 
-  >> YOUR TURN
      One candidate a was scored by the 5-slice check; its five covered-slice errors
      came out 52, 48, 55, 50, 45 (made-up).  Turn them into that a's one score.
 

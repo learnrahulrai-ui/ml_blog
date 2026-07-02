@@ -192,7 +192,7 @@
     hand knows them. A tiny 4x4 photo cut into strips (fold/swap/glue, and the all-black bug a
     missing swap causes), the sine/cosine seat-stamp worked at three seats, the attention grid
     on two strips, LayerNorm on one row (45, √125, [0.45, 1.34, -0.45, -1.34]), and the causal
-    mask triangle of -inf that splits reader from writer. YOUR TURN drills throughout. No code.
+    mask triangle of -inf that splits reader from writer. Drills throughout. No code.
 
   [SPECIAL. Genetic Algorithm From Scratch -- Optimising With No Gradient, Every Number Shown](posts/genetic-algorithm-from-scratch.txt)
     special . 2026-06-18 . standalone . genetic-algorithm, optimisation, evolution, by-hand

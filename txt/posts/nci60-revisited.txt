@@ -136,7 +136,6 @@
   are melanoma -- 8 / 10 = 0.8, four-fifths pure.  Group 2's row: 0 + 6 + 0 + 0 = 6
   samples, all leukemia -- 6 / 6 = 1, dead pure.
 
-  >> YOUR TURN
      Grade group 3 the same way.  Add its row across, then take the melanoma-... no,
      take its biggest pile over its total.
 
@@ -184,7 +183,6 @@
   Walk every pair, count how often the two tools AGREE (both "together" or both
   "apart"), divide by the number of pairs.  That fraction is the raw agreement.
 
-  >> YOUR TURN
      The third pair is (dot 2, dot 3).  Read it off the little table above -- K-means
      gave dot 2 a "2" and dot 3 a "0"; the tree gave dot 2 a "1" and dot 3 a "3".  Do
      the two tools agree on this pair?  And with 3 dots, how many pairs are there in

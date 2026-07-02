@@ -121,7 +121,6 @@
   After this EVERY review is a line of exactly 100 numbers.
   Now the factory can eat them, all the same shape.
 
-    >> YOUR TURN
        MAX_LEN = 5. The review "the movie was boring" numbers to [1, 2, 3, 4].
        What is the padded row? And what does "the the the the the the the" (7 words) become?
 
@@ -236,7 +235,6 @@
 
   That stacked sheet -- 100 rows of 32 -- is what floor 2 reads.
 
-    >> YOUR TURN
        Notepad width 4 (not 32). Three words kept. "good" = row 2 with note
        [0.9, 0.0, 0.1, -0.2]. A review numbers to [2, 0]. What sheet does floor 1 produce,
        and how tall x wide is it if MAX_LEN = 3?
@@ -349,7 +347,6 @@
   (Keras reports a SimpleRNN(32) sitting on a 32-wide note as exactly 2,080 -- it counts
   (32 + 32) x 32 + 32. Same arithmetic, same answer.)
 
-    >> YOUR TURN
        Memory width 2 (not 32). Old memory = [0, 0] (first word). The word's 2 numbers are
        [1, 2]. word-dials = [[1, 0], [0, 1]] (the do-nothing paper), memory-dials anything,
        nudge = [0, 0]. tanh(1) ~ 0.76, tanh(2) ~ 0.96. What is the new memory?

@@ -187,7 +187,7 @@
   times the blame on psi. That single shape, applied stage by stage from the output
   back, IS backpropagation.
 
-  YOUR TURN -- run the whole backward walk again, same state, same dials, but this
+  Run the whole backward walk again, same state, same dials, but this
   time the lander fired ENGINE 3 (worth Q3 = 2.0 on the forward pass above). The
   seed becomes [0, 0, 0, 1]. Chase it: pull on C, pull on b2, pull on x (column 3 of
   C is [1, 0, -1]), the gate (psi = [2.5, -0.5, -0.5] as before), pull on psi, pull
@@ -223,7 +223,7 @@
   unit wiggle is 0.004 / 0.001 = 4, the very pull the algebra claimed. The backward
   walk was no trick: a pull IS how far the worth moves when you lean on the dial.
 
-  YOUR TURN -- check a second pull the same blunt way. The walk said C[0,0] (currently
+  Check a second pull the same blunt way. The walk said C[0,0] (currently
   2.0) has pull 2.5. Wiggle it to 2.001, rerun only what changes (x = [2.5, 0, 0]
   stays put -- sheet A was not touched), and compute rise over wiggle.
 

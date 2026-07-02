@@ -16,7 +16,7 @@
   pencil, graph paper, a few coat pockets. No computer, at any point.
 
   How to read this page. Nothing is named before a number builds it. Every time a term first
-  shows up, a calculation right above it earned it. At each ">> YOUR TURN", cover everything
+  shows up, a calculation right above it earned it. At each drill, cover everything
   below that line, do it on your own paper, THEN look. If your answer fights a "WRONG TURN"
   box, sit with that clash before reading on -- a clash you feel once you never forget.
 
@@ -62,7 +62,6 @@
   between training runs, which this page never does. Everything past here is clerks, nothing
   more.
 
-    >> YOUR TURN
        Dials p = 2, q = -1, nudge b = 3. Inputs a = 4, c = 5. Out?
 
        check: 2*4 + (-1)*5 + 3 = 8 - 5 + 3 = 6.
@@ -92,7 +91,6 @@
       "not good"   ->  row(not) + row(good)
       "good not"   ->  row(good) + row(not)
 
-    >> YOUR TURN
        Addition does not care about order: x + y equals y + x. Do both sums land on one
        same row?
 
@@ -138,7 +136,6 @@
   That summing of paired products -- row of G against r -- is a dot. It is one clerk per grid
   row. A grid cannot multiply a single number; it multiplies a ROW into a new ROW.
 
-    >> YOUR TURN
        G = [ [1,0,0], [0,1,0], [0,0,1] ] (ones down a slant, zero elsewhere). r = [5, 7, 2].
        Apply G to r.
 
@@ -164,7 +161,6 @@
 
       0.5^100 = so small it is zero on any page.
 
-    >> YOUR TURN
        Over just 10 words, a slot multiplies by 2 each word starting from 1. Value after 10?
 
        check: 2^10 = 1024. Ten more words: past a million. It runs away.
@@ -203,7 +199,6 @@
                      |     |     |     |     |          |
                     w1    w2    w3    w4    w5         w30
 
-    >> YOUR TURN
        Roughly how many halvings drive 0.2 below 0.001?
 
        check: 0.2 -> 0.1 -> 0.05 -> 0.025 -> 0.0125 -> 0.006 -> 0.003 -> 0.0016 -> 0.0008.
@@ -230,7 +225,6 @@
                            ( + ) ---> A_new
       fresh --[ x admit ]-/
 
-    >> YOUR TURN
        Rule (slot-by-slot): A_new = keep * A_old + admit * fresh.
        A_old = 5.0, keep = 1.0, admit = 0.0, fresh = anything. A_new? After 90 more such words?
 
@@ -260,7 +254,6 @@
       A = silent store. Never read by a clerk. Only scaled-and-added. May grow past 1.
       B = spoken readout. What clerks read next word. A bent, partial view of A.
 
-    >> YOUR TURN
        A_new = 4.62, show = 0.7, tanh(4.62) ~ 1.0. B_new?
 
        check: 0.7 * 1.0 = 0.70. A holds 4.62 in silence; B says 0.70 out loud about it.
@@ -356,7 +349,6 @@
       B_new:  0.7*1.00 = 0.70 ,  0.2*-0.76 = -0.15 ,  1.0*0.21 = 0.21
       B_new = [ 0.70 , -0.15 , 0.21 ]
 
-    >> YOUR TURN
        Rules (slot-by-slot): A_new = keep * A_old + admit * fresh, then B_new = show * tanh(A_new).
        One slot: A_old = 4.0, keep = 0.5, fresh = 2.0, admit = 1.0, show = 1.0,
        tanh(A_new) ~ 1.0. Find A_new, then B_new.

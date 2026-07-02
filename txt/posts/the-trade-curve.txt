@@ -187,7 +187,6 @@
     then bends right.  The curve is ABOVE the diagonal -- the machine
     is doing real work.
 
-  >> YOUR TURN
      At some cutoff (made-up) the four-box holds, out of 4 sick and 6 well: CAUGHT 3,
      MISSED 1, ALARM 2, CLEAR 4.  Work the catch-rate and false-alarm rate.
 
@@ -226,7 +225,6 @@
   Its area is its width times its average height: (FPR gap) x (the two TPR heights averaged).
   Add up every strip and you have the whole area under the curve.
 
-  >> YOUR TURN
      Two neighbouring ROC dots (made-up): (FPR 0.2, TPR 0.6) then (FPR 0.5, TPR 0.9).
      Work the area of the trapezoid strip between them: width x average height.
 

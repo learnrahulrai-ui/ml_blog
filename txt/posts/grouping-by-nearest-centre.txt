@@ -137,7 +137,6 @@
   The machine found the two obvious clumps on its own.
   It used no answer key.
 
-  >> YOUR TURN
      A seventh dot walks in at 5.  The settled centres are 2 and 11.  Which pile does
      ASSIGN hand it to?  Compare squared gaps -- no roots needed.
 
@@ -174,7 +173,6 @@
      3       3 - 2 =  1          1
                       pile A sum = 2
 
-  >> YOUR TURN
      Foot pile B the same way (dots 10, 11, 12; centre mean(10,11,12) = 33/3 = 11),
      then add the two piles into one tightness for the whole grouping.
 

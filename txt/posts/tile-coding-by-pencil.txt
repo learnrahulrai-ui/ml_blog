@@ -110,7 +110,7 @@
   overlap gets eighth-of-a-tile sharp -- from eight coarse grids, no fine grid
   anywhere.
 
-  YOUR TURN -- two points, read off both rulers (ruler A's walls at 0.5; ruler B's at
+  Two points, read off both rulers (ruler A's walls at 0.5; ruler B's at
   0.25 and 0.75). Which pair of tiles does 0.8 light? Which does 0.2 light? Write
   both features (five slots: A0 A1 B0 B1 B2).
 
@@ -215,7 +215,7 @@
   the target loses its future piece: target = reward alone -- the anchor, the one
   target with no guess inside it.)
 
-  YOUR TURN -- the next step of the same walk. The weights now read
+  The next step of the same walk. The weights now read
   [1.05, -0.5, 0.0, 0.55, 0.0]. You leave position 0.6 (tiles A1, B1), grab reward 0,
   land on position 0.9 (tiles A1, B2). dilute 0.9, size 0.1. Which two weights move,
   and to what?

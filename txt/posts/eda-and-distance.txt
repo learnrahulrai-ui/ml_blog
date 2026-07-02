@@ -176,7 +176,6 @@
   This holds for the same two points every time.
   The reason: the diagonal is shorter than the L-shaped walk.
 
-  >> YOUR TURN
      Two more states (made-up).
      State X has Murder 6.0, Assault 200, UrbanPop 50.
      State Y has Murder 9.0, Assault 240, UrbanPop 60.
@@ -272,7 +271,6 @@
   The raw gap was dominated by Assault's units, which run into the hundreds.
   The fair gap treats every column equally.
 
-  >> YOUR TURN
      A state (made-up) has Murder = 16.0.
      Murder's mean is 7.79.
      Murder's spread is 4.36.

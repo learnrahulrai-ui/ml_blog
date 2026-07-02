@@ -115,7 +115,7 @@
       Q3 = (2.5)(1)  + 0 + 0 - 0.5 =  2.5 - 0.5 =  2.0
       Q = [ 5.5, -1.5, 0.0, 2.0 ]
 
-  YOUR TURN -- the same net, a different state. Run s = [2, 0] through the same
+  The same net, a different state. Run s = [2, 0] through the same
   sheets (A, b1, C, b2 exactly as drawn above): the three middles, the bend, the four
   worths. Which engine wins?
 
@@ -192,7 +192,7 @@
       how-wrong row = [ -1.08, 0, 0, 0 ]
                          ^^^^^ engine 0 only; the other three untested, so 0
 
-  YOUR TURN -- a different step, same recipe. This time the lander fired engine 3
+  A different step, same recipe. This time the lander fired engine 3
   (its worth on the main pass above was Q3 = 2.0), the world paid reward -2, and at
   the landing the net reads Q(s') = [2, 1, 0, 1] with chances [0.25, 0.25, 0.25,
   0.25]. dilute 0.9. Compute the averaged next, the target, the miss, and the

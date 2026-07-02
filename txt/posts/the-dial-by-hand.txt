@@ -137,7 +137,6 @@
 
     LADDER dial = 4.12 / 0.0120 ~ 343
 
-  >> YOUR TURN
      One person on a one-column sheet (made-up) sits at x - xbar = 0.05 and
      y - ybar = 20.  Give this person's contribution to the "top" and to the "bottom".
 
@@ -188,7 +187,6 @@
 
     nudge = the average of the study answers
 
-  >> YOUR TURN
      On a centred sheet, four study answers (made-up) are 100, 120, 140, 160.  What is
      the nudge?
 

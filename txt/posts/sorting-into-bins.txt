@@ -165,7 +165,6 @@
     e^0.5 ~= 1.649 and e^0.1 ~= 1.105, so e^0.6 = e^0.5 * e^0.1
     ~= 1.649 * 1.105 ~= 1.822.  That is close enough for the picture.
 
-  >> YOUR TURN
      A fifth person E walks in (made-up): bmi 0.10, same dials (b0 = 1.2, b1 = -30).
      Compute the dial sum z and the squashed chance on your slate.  Hint:
      e^1.8 = e^0.6 * e^0.6 * e^0.6, and e^0.6 ~= 1.822 from the note above.
@@ -340,7 +339,6 @@
     Look at the bottom-left box, ALARM, and you see the cost in plain light.
     It is not buried inside a single percentage.
 
-  >> YOUR TURN
      A bigger exam pile (made-up): 10 lumps land as CAUGHT 4, MISSED 1, ALARM 2,
      CLEAR 3.  Work all four scores on your slate before reading on.
 

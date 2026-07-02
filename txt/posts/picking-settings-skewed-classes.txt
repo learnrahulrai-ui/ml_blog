@@ -131,7 +131,6 @@
     luck and shows the true tendency: C=0.1 is slightly better
     at recall on this sheet.
 
-  >> YOUR TURN
      A grid pairs 4 candidate C-values with 3 candidate k-values, and scores every
      pair by 5-fold rotation (made-up).  How many full model-fits is that?
 
@@ -337,7 +336,6 @@
 
     macro F1 = (0.89 + 0.67 + 0.34) / 3 = 0.63
 
-  >> YOUR TURN
      Three classes score F1 of 0.80, 0.60, 0.40 (made-up).  Work the macro F1 -- the
      equal-weight average.
 

@@ -141,7 +141,7 @@
   No footstep was taken. The worth of "stand at spot 3, go down" moved from 0 to -0.1,
   paid for entirely out of memory.
 
-  YOUR TURN -- one rehearsal, one already-lit landing. The papers read:
+  One rehearsal, one already-lit landing. The papers read:
 
       model = { 2: { up -> (0, 3) } }             q[0] = [ 0.5 , 0 , 0 , 0 ]
       size = 0.1, dilute = 1.0                    every other q cell = 0
@@ -180,7 +180,7 @@
   footsteps. A machine with no notebook would have to physically walk that path twice
   to spread the reward two spots back. Dyna-Q walks it once and rehearses the rest.
 
-  YOUR TURN -- stretch the chain one spot further. Add a third remembered move: from
+  Stretch the chain one spot further. Add a third remembered move: from
   spot 9, going right landed on spot 0 and paid 0. The papers now read:
 
       model = { 0: { right -> (1, 0) },  1: { right -> (-1, 1) },  9: { right -> (0, 0) } }

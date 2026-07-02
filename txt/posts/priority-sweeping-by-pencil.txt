@@ -109,7 +109,7 @@
       1        2        3        4
       0.729    0.81     0.9      1        (the goal's reward, faded one step per spot back)
 
-  YOUR TURN -- stretch the corridor one spot left. A spot 0 leads into spot 1 (its
+  Stretch the corridor one spot left. A spot 0 leads into spot 1 (its
   right-move lands on 1, paying 0), and the sweep above just finished: V(1) = 0.729,
   V(0) still 0. What priority does spot 0 get pushed with?
 
@@ -135,7 +135,7 @@
   0.001, so all four were queued; deep in a long chain, where the faded jumps shrink below the floor,
   the sweep simply stops spending effort on changes too small to matter.
 
-  YOUR TURN -- one gatekeeping call. A predecessor's update works out to new V =
+  One gatekeeping call. A predecessor's update works out to new V =
   0.4213 against an old V of 0.4209; theta = 0.001. Does it enter the queue?
 
       CHECK: priority = | 0.4213 - 0.4209 | = 0.0004 < 0.001  ->  no. The change is

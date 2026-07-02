@@ -78,7 +78,6 @@
   steps must happen IN ORDER -- word 2 needs word 1's memory. Hold that fact; it is the
   whole reason for the chapter's bottleneck and the eventual Transformer.
 
-    >> YOUR TURN
        Study pile of 32,000 reviews, grab size 64, 5 loops. How many dial-turns?
 
        check your slate: 32,000 / 64 = 500 grabs per loop. 500 x 5 = 2,500 dial-turns.
@@ -282,8 +281,7 @@
 
   (Keras reports LSTM(32) on a 32-wide note as exactly 8,320. Four little RNN cells.)
 
-    >> YOUR TURN  (one slot, by hand)
-       memory-A slot = 4.0, keep-frac = 0.5, fresh value = 2.0, admit-frac = 1.0.
+    >> One slot, by hand:       memory-A slot = 4.0, keep-frac = 0.5, fresh value = 2.0, admit-frac = 1.0.
        What is the new memory-A slot? Then with show-frac = 1.0 and tanh(new A) ~ 1.0
        (since new A will be large), what is the new memory-B slot?
 

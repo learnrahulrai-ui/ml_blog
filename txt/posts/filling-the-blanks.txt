@@ -148,7 +148,6 @@
     the person who said 5  ->  5 - 4 = +1     liked it MORE than the crowd
     the person who said 4  ->  4 - 4 =  0     exactly the crowd
 
-  >> YOUR TURN
      A sixth person rated this same movie a 2.  Its middle is still 4 (the middle is
      fixed from the present values; a new low rating does not change the worked middle
      here).  Humble his 2.
@@ -264,7 +263,6 @@
 
     strength = (1x2 + 2x4 + 3x6 + 4x8) / (4 + 16 + 36 + 64) = 60 / 120 = 1/2   correct.
 
-  >> YOUR TURN
      Same corner, same strengths (1, 1/2, -1).  Now build the SECOND entry of the
      builtrow from the second column (+4, +2, -4).  Do the top, the bottom, and divide.
 
@@ -323,7 +321,6 @@
   Worked once: a blank came back with mark +1, and that movie's middle is 4.  Stars =
   1 + 4 = 5, already inside 1..5, so it stands at 5 -- a strong recommendation.
 
-  >> YOUR TURN
      Another blank for the same movie (middle 4) came back with mark -3.5.  Un-humble it,
      then clamp into 1..5.
 

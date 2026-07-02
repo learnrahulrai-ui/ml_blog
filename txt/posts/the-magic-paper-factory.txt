@@ -191,7 +191,6 @@
   Then they get tuned downhill -- nudged the way that lowers wrongness -- loop after loop.
   They keep being nudged until they settle on patterns worth looking for.
 
-  >> YOUR TURN
      The same top-edge magic paper (dials: row of 1s, row of 0s, row of -1s) lands on a patch
      that is dark on top and bright below -- the OPPOSITE of an edge it likes:
 
@@ -297,7 +296,6 @@
   So the paper's depth always auto-matches whatever arrives.
   Hold that line; it is the key to the second floor.
 
-  >> YOUR TURN
      A magic paper has all nine BLUE-dials set to 1 and all red- and green-dials 0 (a sky-finder).
      Lay it on the same sky patch (red 0.1, green 0.2, blue 0.9 at every spot). What score?
 
@@ -343,7 +341,6 @@
   From here on, depth means "how many different shapes we are tracking."
   It no longer means "how many colours."
 
-  >> YOUR TURN
      Conv2D(32, (3,3)) on a 32x32x3 photo. How many separate 3-by-3 magic papers exist on this
      floor, and how many score-sheets come out?
 
@@ -396,7 +393,6 @@
   So throwing scratch paper away is not forgetting the lesson.
   It is clearing the desk for the next photo.
 
-  >> YOUR TURN
      A 16-by-16 score-sheet goes through one more MaxPooling2D((2,2)). What size comes out?
 
      check your slate:
@@ -516,7 +512,6 @@
   entire genius of a picture network. It is why a machine can look at a million-pixel image
   without needing a billion dials: the eye is small and moves, rather than huge and fixed.
 
-  >> YOUR TURN
      Suppose floor 1 hired 16 inspectors instead of 32 (still 3x3 papers, still colour photos).
      How many dials would floor 1 hold?
 
@@ -559,7 +554,6 @@
   inspectors hired there (32, then 64), never the colour count -- colour meaning died at
   floor 1.
 
-  >> YOUR TURN
      A bare 3x3 paper (no padding) scans a 28x28 grid. Then a 2x2 boss halves it. Give both
      output sizes (ignore depth).
 

@@ -63,7 +63,7 @@
   back the middle) before the table can use it. And a spread of exactly zero (a column
   that never varies) would divide by zero, so each spread is floored at 0.000001.
 
-  YOUR TURN -- re-rule a block height of 338.3 (T y column: middle 272.4, spread 65.9).
+  Re-rule a block height of 338.3 (T y column: middle 272.4, spread 65.9).
  
       CHECK: (338.3 - 272.4) / 65.9 = 65.9 / 65.9 = 1.0 -- exactly one spread above.
 
@@ -103,7 +103,7 @@
   moves of two numbers. Same sixteen numbers, re-boxed 16 -> 8 x 2 -- the numbers never
   change, only the container -- so guess and recorded answer line up number for number.
 
-  YOUR TURN -- count the dials-and-nudges of a small web: 3 inputs -> 4 units -> 2
+  Count the dials-and-nudges of a small web: 3 inputs -> 4 units -> 2
   outputs.
 
       CHECK: 3 x 4 + 4 = 16 ;  4 x 2 + 2 = 10 ;  total 26.
@@ -166,7 +166,7 @@
   Every miss is in there; none is reported separately. The meter is a melter: many
   numbers in, ONE out.
 
-  YOUR TURN -- guess [1.0, 2.0] against truth [2.0, 0.0]. Meter?
+  Guess [1.0, 2.0] against truth [2.0, 0.0]. Meter?
 
       CHECK: misses -1.0 and 2.0 ; squares 1.0 and 4.0 ; meter = 5.0 / 2 = 2.5.
 

@@ -68,7 +68,7 @@
   The policy is now a smooth dial: shift a preference a hair and the chances slide a
   hair -- no jolt.
 
-  YOUR TURN -- another spot, preferences h = [2, 0, 1]. Shift, lift by e, divide.
+  Another spot, preferences h = [2, 0, 1]. Shift, lift by e, divide.
   What are the three chances?
 
       CHECK: shifted = [0, -2, -1];  e^0 = 1,  e^(-2) = 0.1353,  e^(-1) = 0.3679
@@ -186,7 +186,7 @@
   while an unlikely move that pays off gets a big promotion. That is the actor
   learning a policy directly.
 
-  YOUR TURN -- the same spot, but a BAD step: how-wrong = -0.5 (the move came in
+  The same spot, but a BAD step: how-wrong = -0.5 (the move came in
   below the running average). Chances still [0.0351, 0.2595, 0.7054], right taken,
   size 0.1. Compute the three shoves.
 

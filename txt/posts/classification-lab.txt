@@ -47,7 +47,6 @@
     ~= 2 x 2.303 = 4.606, so -log(0.01) ~= 4.6.  The near-miss: -log(0.99) ~= 0.01,
     since shaving 1% off 1 barely moves the log.
 
-  >> YOUR TURN
      A truly-sick lump (y = 1) is handed chance p = 0.5 by a hedging machine.  Work its
      cross-entropy fine.
 
@@ -91,7 +90,6 @@
     C = 10     loose
     C = 1000   nearly free -- almost no squeeze
 
-  >> YOUR TURN
      A machine has just two dials, 2 and 3, under a tight leash C = 0.1 (made-up).
      Work the leash's slice of the cost, (1/C) * sum(beta^2).
 

@@ -82,7 +82,7 @@
       spot 6  -> (6-1)//2 = 2 -> [0,0,1,0,0]
       spot 10 -> (10-1)//2 = 4 -> [0,0,0,0,1]
 
-  YOUR TURN -- back on the 500-spot line (10 groups of 50). Which group holds spot
+  Back on the 500-spot line (10 groups of 50). Which group holds spot
   337? Which holds spot 500? Draw spot 337's feature.
 
       CHECK: spot 337 -> (337-1)//50 = 336//50 = 6 -> group 6
@@ -167,7 +167,7 @@
   And because spots 1..50 ALL share w0, all fifty of their worths just rose from -1.5
   to -0.26 in one step. That is the generalization, paid for.
 
-  YOUR TURN -- the next step of the same walk. The weights now read
+  The next step of the same walk. The weights now read
   [-0.26, 0.5, 1.0, -0.5, 1.5, -0.5, 1.5, 0.0, -0.5, -1.0] (only w0 changed above).
   You leave spot 120, grab reward -3, land on spot 480. size 0.1, dilute 0.9. Which
   weight moves, and to what?

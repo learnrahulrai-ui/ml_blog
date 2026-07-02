@@ -130,7 +130,6 @@
       x=2:  yhat = 0.333 + 1.5*2 = 3.333
       x=3:  yhat = 0.333 + 1.5*3 = 4.833
 
-  >> YOUR TURN
      New pile (made-up), same recipe:  x = 1, 2, 3 and y = 1, 3, 5.  Build the four
      sums, write the two flat-point equations, and solve for the dials.
 
@@ -161,7 +160,6 @@
     RMSE, worked: the exact leftovers are 1/6, -1/3, 1/6;  squares 1/36 + 4/36 + 1/36
     = 6/36 = 1/6;  mean = (1/6) / 3 = 1/18 ~= 0.0556;  RMSE = sqrt(1/18) ~= 0.236
 
-  >> YOUR TURN
      Verify the second right-angle check on your own slate: multiply each leftover by
      its x and add.  Use the exact fractions: leftovers 1/6, -1/3, 1/6.
 

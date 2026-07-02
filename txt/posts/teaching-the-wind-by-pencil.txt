@@ -89,7 +89,7 @@
   right answer at every tau along this particular noise-to-truth line: the wind for
   one (truth, noise) couple does not bend.
 
-  YOUR TURN -- same A = [0.50, 0.60] and N = [0.10, 0.80], but the dial rolls
+  Same A = [0.50, 0.60] and N = [0.10, 0.80], but the dial rolls
   tau = 0.7. What is M? And what is the teaching answer now?
 
       CHECK: M = [0.7 x 0.50 + 0.3 x 0.10 ,  0.7 x 0.60 + 0.3 x 0.80]
@@ -131,7 +131,7 @@
   and tau = 0.88 three meals later, against different noise each time. One recorded
   answer therefore teaches the wind along MANY lines, one line per noise pull.
 
-  YOUR TURN -- truth A = [0.9, 0.1], noise N = [0.5, 0.5]. The teaching answer at
+  Truth A = [0.9, 0.1], noise N = [0.5, 0.5]. The teaching answer at
   tau = 0.2? At tau = 0.9?
 
       CHECK: A - N = [0.4, -0.4], both times -- tau places M on the line;

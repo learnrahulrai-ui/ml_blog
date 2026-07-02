@@ -198,7 +198,6 @@
 
     The average (5) gives the smallest total.  Any other number misses more.
 
-  >> YOUR TURN
      Same answers (2, 4, 9, 3, 7).  Try the constant shout c = 3 and see where it
      lands against the average's 34.
 
@@ -249,7 +248,6 @@
      The count sits on top and bottom and cancels.
      Which is the very reason R^2 carries no units.
 
-  >> YOUR TURN
      A clumsier stick (made-up) guesses 3, 5, 8, 2, 6 for the same truths
      (2, 4, 9, 3, 7).  The fool's total wobble is still 9 + 1 + 16 + 4 + 4 = 34.
      Work this stick's leftover and its R^2.

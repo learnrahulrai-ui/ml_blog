@@ -125,7 +125,7 @@
   Consistent grades compound into speed; contradictory grades cancel into caution.
   That is the whole gift of Adam over the flat 0.01.
 
-  YOUR TURN -- move 3 of the STEADY dial (a third grade of +0.2 arrives; m = 0.038
+  Move 3 of the STEADY dial (a third grade of +0.2 arrives; m = 0.038
   and v = 0.00007996 from move 2 above). Compute m, m-hat, and the step.
 
       CHECK: m = 0.9 x 0.038 + 0.1 x 0.2 = 0.0342 + 0.02 = 0.0542
@@ -179,7 +179,7 @@
   change: the replayed move is a REAL stored transition, not one a learned model
   dreamed up.)
 
-  YOUR TURN -- one note, drawn twice. The note says (s, move 0, reward 1, ended? 0,
+  One note, drawn twice. The note says (s, move 0, reward 1, ended? 0,
   s'), dilute 0.9, chances at s' = [0.1, 0.6, 0.1, 0.2]. On the first draw the net
   reads Q(s') = [3, 5, 1, 2]. By the second draw the net has learned a little and
   reads Q(s') = [3, 4, 1, 2]. Compute both targets.

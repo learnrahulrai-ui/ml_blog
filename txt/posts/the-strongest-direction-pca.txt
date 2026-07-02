@@ -201,7 +201,6 @@
   The dots spread far more along PC1 than PC2.
   Which means PC1 captures the stronger pattern.
 
-  >> YOUR TURN
      A fifth wine E (made-up) lands at alcohol_z = 1.0 and color_z = 1.0.
      Work its PC1 and PC2 from the two recipes above.
      PC1 recipe: PC1 = 0.71 * alcohol_z + 0.71 * color_z.
@@ -266,8 +265,7 @@
   Take one dot and the line it casts its shadow on.
   Draw three lengths:
 
-  >> YOUR TURN (do this one after reading the three lengths just below)
-     A dot's shadow on the line is 4 long.
+  >> Do this one after reading the three lengths just below:     A dot's shadow on the line is 4 long.
      Its perp (the walk off the line to the dot) is 3 long.
      How long is the stick from the origin to the dot?
 

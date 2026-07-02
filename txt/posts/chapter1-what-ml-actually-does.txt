@@ -33,7 +33,7 @@
      and a room of infinite, tireless clerks for the heavy arithmetic.  No computer,
      no calculator, anywhere in the teaching.  Every number is recomputed where it is
      needed (no page assumes you remember the last one), every worked example is
-     followed by a YOUR TURN drill for your slate, and every cost is counted in
+     followed by a drill for your slate, and every cost is counted in
      clerk-steps.  Your attention is the scarce thing; arithmetic is free.
 
   >> HOW THIS BOOK IS LAID OUT (read once, then forget)
@@ -191,8 +191,7 @@
     If k=1, the guess is the single closest row's price.
     If k=3, we average the 3 smallest-gap rows' prices.
 
-  >> YOUR TURN (one clerk, one slate)
-     Same new row (rooms=4, income=3).  A third working row sits at (rooms=4,
+  >> One clerk, one slate:     Same new row (rooms=4, income=3).  A third working row sits at (rooms=4,
      income=7).  Compute its gap before reading on.
 
      check your slate:  rooms 4-4 = 0, square 0;  income 3-7 = -4, square 16;
@@ -276,7 +275,6 @@
     The fool scored RMSE = 1.05.
     So 1.05 / 0.24 ~ 4, meaning our rule beats the fool about four times over.
 
-  >> YOUR TURN
      Person E walks in: truth 2.0, our rule guesses 2.4.  Add him to OUR table
      (sum r^2 was 0.23 over 4 people) and recompute the rule's RMSE.
 

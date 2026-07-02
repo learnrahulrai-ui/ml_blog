@@ -182,7 +182,6 @@
     column.  C=1.0 pulls it to 3.1.  C=0.1 pulls it to 1.4.  The tighter
     the leash, the more the machine spreads trust across all 3 columns.
 
-  >> YOUR TURN
      Charge the FREE machine's dials (+8.2, -5.7, +0.3) the fine the tight leash
      charges: lambda = 10 times the sum of squared dials.  Work it on the slate
      before reading on.
@@ -340,7 +339,6 @@
     lump with bmi=0.10, bp=0.70: w^T x = -0.01 + 0.28 = 0.270 > 0.260 -> sick.
     The wall is the midpoint because both classes have equal counts here.
 
-  >> YOUR TURN
      Same wall: w = (-0.10, 0.400), and a lump sits on the sick side when w^T x beats
      0.260.  A new lump walks in (made-up): bmi = 0.08, bp = 0.60.  Score it.
 

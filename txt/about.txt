@@ -42,7 +42,7 @@
        each post is a museum exhibit -- for the day you meet a computer.
     2. Every number is recomputed where it is needed.  No page assumes you remember
        the previous one.
-    3. Every worked example is followed by a YOUR TURN drill -- do it on your slate
+    3. Every worked example is followed by a drill -- do it on your slate
        before reading on; the checked answer is printed right after.
     4. Cost is counted in clerk-steps, not seconds: how many subtractions, how many
        squarings, done by lunch or done by Christmas.

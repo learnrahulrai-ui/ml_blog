@@ -270,7 +270,6 @@
   But there is also age.
   And age deserves its own hunt.
 
-  >> YOUR TURN
      A made-up cut splits four answers into below {100, 120} and above {150, 170}.
      Work its badness (squared misses around each side's own mean).
 
@@ -279,7 +278,6 @@
      = 320 / 2 = 160;  misses 150 - 160 = -10 (sq 100), 170 - 160 = 10 (sq 100).
      badness = 100 + 100 + 100 + 100 = 400.
 
-  >> YOUR TURN
      A leaf at the bottom of the chart holds three people with answers 130, 140, 180.
      What single number does the chart guess for anyone who lands there?
 

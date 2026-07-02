@@ -160,7 +160,7 @@
   different training pairs. Overlap is not double-counting; each window asks a DIFFERENT
   question (a different starting situation).
 
-  YOUR TURN -- game 2 of the real diary runs from line 161 up to (not including) line
+  Game 2 of the real diary runs from line 161 up to (not including) line
   279. How many moments is that, and how many windows of 8 does it yield?
 
       CHECK: length = 279 - 161 = 118 moments
@@ -199,7 +199,7 @@
   and slice: question = situation at that line, answer = that line's decision and the
   next seven.
 
-  YOUR TURN -- the whole diary again, from scratch: 25,650 moments, 206 games, windows
+  The whole diary again, from scratch: 25,650 moments, 206 games, windows
   of 8, no window crossing a seam. How many pairs?
 
       CHECK: each game loses 7 starts -> 25,650 - 206 x 7 = 25,650 - 1,442 = 24,208

@@ -108,7 +108,6 @@
   small (0.61 is near 1.0); if they gave cat only 0.05, the wrongness is huge. That
   wrongness is exactly what drives every dial-turn. No back-answer, no learning.
 
-    >> YOUR TURN
        Study pile of 50,000 cards, grab size 100, three loops. How many dial-turns?
 
        check your slate: 50,000 / 100 = 500 grabs per loop. 500 x 3 = 1,500 dial-turns.
@@ -241,7 +240,6 @@
 
   Steady FIRST. Then shrink. Then silence.
 
-  >> YOUR TURN
      Inspector 2: settled middle = 10, settled scatter = 4, stretch = 1, shift = 0.
      A number in the pile reads 18. What does the humbler write in its place?
 
@@ -288,7 +286,6 @@
   through unchanged. No coins, no zeroing, no scaling. The humbler's remembered middle and
   scatter take over for steady scaling; send-home simply steps aside.
 
-  >> YOUR TURN
      Six entries: [4, -2, 8, 0, 3, 6]. Coin results in order: tails, heads, heads, tails,
      heads, tails. Send-home rate 25%, scale factor 4/3. What is the output?
 

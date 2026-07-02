@@ -167,7 +167,6 @@
      The number on the 5th index (0.42) is the lower edge.  The number on the
      194th index (0.58) is the upper edge.  The band = 0.42 to 0.58.
 
-  >> YOUR TURN
      Suppose you ran 400 re-deals instead of 200 (made-up).  How many dial values do
      you chop off EACH end for the 95% band, and how many stay in the middle?
 
@@ -183,7 +182,6 @@
        bmi-dial:  0.42 to 0.58   -> width 0.16  (narrow, steady, trustworthy)
        s5-dial:  -0.80 to +0.90  -> width 1.70  (wide, crosses 0, untrustworthy)
 
-  >> YOUR TURN
      Two more dials (made-up):  age-dial band 0.20 to 0.60;  bp-dial band -0.30 to
      +0.50.  Work each width, and say which you can trust.
 

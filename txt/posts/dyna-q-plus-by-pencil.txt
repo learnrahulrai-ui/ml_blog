@@ -59,7 +59,7 @@
 
   The clock measures staleness -- exactly the thing Dyna-Q ignores.
 
-  YOUR TURN -- one turn of clock-keeping. The sheet reads tau[5][left] = 24,
+  One turn of clock-keeping. The sheet reads tau[5][left] = 24,
   tau[5][right] = 3, tau[8][up] = 99, and this turn you really walk (5, right).
   What do the three clocks say after?
 
@@ -89,7 +89,7 @@
   row -- finally re-tries it in the real world. That real re-try is when a newly
   opened shortcut gets discovered.
 
-  YOUR TURN -- one rehearsal with the bonus. A recalled move stored (landing, reward)
+  One rehearsal with the bonus. A recalled move stored (landing, reward)
   where the reward is -1; its clock reads tau = 100; kappa = 0.001; the landing's best
   worth is 2; dilute = 1.0; the cell being fixed holds 0; size = 0.1. Compute the
   bonus, the target, and the new cell.

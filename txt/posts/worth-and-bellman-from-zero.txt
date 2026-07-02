@@ -74,7 +74,6 @@
   If a machine pays random amounts each use, its true average (the mean reward per use) is
   exactly this: each possible payout × its probability, added.
 
-  >> YOUR TURN
      A move pays 0 (chance ¼) or +4 (chance ¾). What is the average reward?
 
      check your work:   0 × ¼  +  4 × ¾  =  0  +  3  =  3
@@ -271,7 +270,6 @@
 
       =  6.5
 
-  >> YOUR TURN
      Same setup. But landing on spot X is now worth 5 (not 10). Landing on Y still worth 0.
      Both outcomes still reward +2 with chance ½. γ = 0.9. Compute Q( HERE, → ).
 

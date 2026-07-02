@@ -86,7 +86,6 @@
     row A: (4, 2, 6, 3)   gaps (1, 0, 1, 1)   gap = sqrt(1+0+1+1)    = sqrt(3)   ~= 1.73
     row B: (8, 9, 1, 9)   gaps (5, 7, 4, 5)   gap = sqrt(25+49+16+25)= sqrt(115) ~= 10.72
 
-  >> YOUR TURN
      Same new row (3, 2, 5, 4).  A row C sits at (3, 4, 5, 2) (made-up).  Compute its
      gap before reading on.
 
@@ -215,7 +214,6 @@
     3 closest right-answers: 3.4, 2.7, 2.4
     guess = (3.4 + 2.7 + 2.4) / 3 = 8.5 / 3 ~= 2.83
 
-  >> YOUR TURN
      Same five-row pile.  A new row walks in at income 3.0 (made-up), k = 3.  Work the
      gaps, pick the 3 closest, average their prices.
 

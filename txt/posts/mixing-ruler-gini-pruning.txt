@@ -136,7 +136,6 @@
 
   There it is.  4 counts -> one number (0.344) for this cut.
 
-  >> YOUR TURN
      A different side holds 2 yes and 3 no (made-up).  Work its Gini on the slate.
 
      check your slate:  shares -- yes 2/5 = 0.4, no 3/5 = 0.6;  Gini = 1 - 0.4^2 -
@@ -224,7 +223,6 @@
   This section shows that the formula 1 - p^2 - q^2 is no magic spell.
   (p = share of yes, q = share of no, on one side.)
 
-  >> YOUR TURN
      A cut drops the parent's mixing from 0.48 down to a weighted-children 0.30 (both
      made-up).  How much did the cut buy -- its information gain?
 

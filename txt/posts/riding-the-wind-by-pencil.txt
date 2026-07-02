@@ -85,12 +85,12 @@
   is unchanged from the copier's: look once, walk one envelope, act eight ticks blind,
   look again.
 
-  YOUR TURN -- one rung by hand: current = [0.5, 0.5], the machine prints wind
+  One rung by hand: current = [0.5, 0.5], the machine prints wind
   [-0.2, 0.4], rung count n = 4. Where is the walker next?
 
       CHECK: [0.5 + 0.25 x (-0.2) , 0.5 + 0.25 x 0.4] = [0.45, 0.60]
 
-  YOUR TURN -- n = 5 rungs. The step size, and the tau ladder?
+  Take n = 5 rungs. The step size, and the tau ladder?
 
       CHECK: step 1/5 = 0.2 ;  tau: 0 -> 0.2 -> 0.4 -> 0.6 -> 0.8 -> 1.0
              (five rungs; the last STARTS at 0.8 and LANDS on 1.0)
@@ -141,7 +141,7 @@
   calls), that is 16 passes for the copier against 16 x 10 = 160 for the rider. The
   price of reaching every truth is ten thinks where one used to do.
 
-  YOUR TURN -- rung count n = 10, a game needing 16 envelope calls: how many web passes
+  Rung count n = 10, a game needing 16 envelope calls: how many web passes
   for the copier, how many for the rider?
 
       CHECK: copier 16 x 1 = 16 ;  rider 16 x 10 = 160.

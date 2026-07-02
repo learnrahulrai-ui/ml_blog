@@ -62,7 +62,7 @@
   Three rows, three worths, same two tiles -- one number per push, exactly what
   choosing needs.
 
-  YOUR TURN -- the three worths at position 0.9. Position 0.9 lights tiles A1 (0.9
+  The three worths at position 0.9. Position 0.9 lights tiles A1 (0.9
   sits in [0.5,1.0)) and B2 (0.9 sits in [0.75,1.25)). Read the table above. Which
   push wins?
 
@@ -156,7 +156,7 @@
   -0.632; and worth(anything, left) and worth(anything, coast) do not budge. The
   lesson spread across nearby SPOTS but stayed inside the move it was about.
 
-  YOUR TURN -- the next footstep of the same drive. The table is exactly as drawn
+  The next footstep of the same drive. The table is exactly as drawn
   above (right row [-0.632, -1.0, 0.0, -0.932, 0.0]; left and coast rows unchanged).
   At 0.6 the car pushes RIGHT as decided; the world fines it -1 and rolls it to 0.9
   (tiles A1, B2). At 0.9 the spinner stays greedy. size 0.1, dilute 0.9. What is the
