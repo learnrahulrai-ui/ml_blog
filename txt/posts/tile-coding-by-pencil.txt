@@ -279,36 +279,35 @@
   When I first built this machine on the real car, four walls stopped me. Each wall,
   the number that broke it, and the rule I carry now.
 
-  THE TRAP: "the ruler reads the raw position, right?" I fed the coder a raw position
-  and it pointed at a tile that did not exist. THE NUMBER THAT BROKE IT: the car's
-  track runs from -1.2 to 0.6 (a stretch of 1.8). Position -0.3 with 4 tiles, fed
-  raw: -0.3 x 4 = -1.2, floor -2 -- tile "minus two". Scaled first: fraction =
-  (-0.3 - (-1.2)) / 1.8 = 0.9 / 1.8 = 0.5, then 0.5 x 4 = 2 -- tile 2, real. THE FIX:
-  always squeeze the dial into [0, 1] first -- subtract the LOW end, divide by the
-  STRETCH -- and only then talk to tiles.
+  "The ruler reads the raw position, right?" I fed the coder a raw position and it
+  pointed at a tile that did not exist. The car's track runs from -1.2 to 0.6 (a
+  stretch of 1.8). Position -0.3 with 4 tiles, fed raw: -0.3 x 4 = -1.2, floor -2 --
+  tile "minus two". Scaled first: fraction = (-0.3 - (-1.2)) / 1.8 = 0.9 / 1.8 = 0.5,
+  then 0.5 x 4 = 2 -- tile 2, real. Always squeeze the dial into [0, 1] first --
+  subtract the LOW end, divide by the STRETCH -- and only then talk to tiles.
 
-  THE TRAP: "the car starts at -1.2 and ends at 0.5... right?" I asked four times,
-  because three different numbers were wearing the same coat. THE NUMBERS THAT BROKE
-  IT: -1.2 is the LEFT WALL of the track (the far end of the back-swing); 0.6 is the
-  RIGHT WALL; 0.5 is the GOAL LINE painted just before it; and the car STARTS each
-  run near the valley floor, around -0.5. Wall, wall, finish line, starting stall --
-  four numbers, four different jobs. THE FIX: before coding any world, write its
+  "The car starts at -1.2 and ends at 0.5... right?" I asked four times, because
+  three different numbers were wearing the same coat, and the untangling was the
+  answer: -1.2 is the LEFT WALL of the track (the far end of the back-swing); 0.6 is
+  the RIGHT WALL; 0.5 is the GOAL LINE painted just before it; and the car STARTS
+  each run near the valley floor, around -0.5. Wall, wall, finish line, starting
+  stall -- four numbers, four different jobs. Before coding any world, write its
   numbers down with their JOBS next to them, not just their values.
 
-  THE TRAP: "surely I need one FINE ruler -- these fat tiles will never be precise."
-  I kept trying to chop finer. THE NUMBER THAT BROKE IT: two rulers of HALF-unit
-  tiles already read at QUARTER-unit resolution (the walk-the-line table above:
+  "Surely I need one FINE ruler -- these fat tiles will never be precise." I kept
+  trying to chop finer, but the coarse pair was already beating me: two rulers of
+  HALF-unit tiles read at QUARTER-unit resolution (the walk-the-line table above:
   four distinct pair-readings), and eight rulers read at eighth-tile resolution --
   while a single fine ruler with the same total tile count shares nothing between
-  neighbours. THE FIX: sharpness comes from the OVERLAP of coarse cuts stacked one
-  ahead of the other, not from fineness. Never build the fine ruler.
+  neighbours. Sharpness comes from the OVERLAP of coarse cuts stacked one ahead of
+  the other, not from fineness. Never build the fine ruler.
 
-  THE TRAP: "two tiles are on, so nudge both by the full step." My worths kept
-  jumping past their targets. THE NUMBER THAT BROKE IT: asking for a step of
+  "Two tiles are on, so nudge both by the full step." My worths kept jumping past
+  their targets, and the overshoot was exactly a factor of two: asking for a step of
   alpha x how-wrong = 0.2 x 0.5 = 0.1 but moving BOTH live tiles by 0.1 moved the
-  worth (their SUM) by 0.2 -- exactly double the ask. THE FIX: split the step:
-  size = alpha / rulers = 0.2 / 2 = 0.1 per tile, so the team of live tiles together
-  moves the worth by the one step you meant.
+  worth (their SUM) by 0.2 -- double the ask. Split the step: size = alpha / rulers
+  = 0.2 / 2 = 0.1 per tile, so the team of live tiles together moves the worth by
+  the one step you meant.
 
   ---
 

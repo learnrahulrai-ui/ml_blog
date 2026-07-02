@@ -224,31 +224,31 @@
   When I first built this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "a bonus is a bonus -- I added it to real moves too." THE NUMBER THAT
-  BROKE IT: a real move paying 1 with tau = 9 got taught as 1.003, and the crawl's
+  "A bonus is a bonus" -- so I added it to real moves too. The damage showed up as
+  one number: a real move paying 1 with tau = 9 got taught as 1.003, and the crawl's
   resting point (where size x (target - q) = 0) moved to 1.003 with it -- a permanent
-  lie of 0.003, growing with every clock. THE FIX: the bonus lives in the imagination
-  only. Real target: reward + dilute x peek. Rehearsal target: (reward + kappa x
-  sqrt(tau)) + dilute x peek. Two different lines, never merged.
+  lie of 0.003, growing with every clock. The bonus lives in the imagination only.
+  Real target: reward + dilute x peek. Rehearsal target: (reward + kappa x sqrt(tau))
+  + dilute x peek. Two different lines, never merged.
 
-  THE TRAP: "reset the walked move's clock, then tick everything." THE NUMBER THAT
-  BROKE IT: reset-then-tick leaves the move you JUST walked at tau = 1, not 0 -- so
-  the freshest move in the world already earns a bonus of 0.001 x sqrt(1) = 0.001 --
-  and every move you walk, forever after, reads 1 at its freshest instead of 0. THE
-  FIX: tick every clock +1 first, THEN reset the one move actually walked to 0.
+  "Reset the walked move's clock, then tick everything." That order leaves the move
+  you JUST walked at tau = 1, not 0 -- so the freshest move in the world already
+  earns a bonus of 0.001 x sqrt(1) = 0.001, and every move you walk, forever after,
+  reads 1 at its freshest instead of 0. Tick every clock +1 first, THEN reset the one
+  move actually walked to 0.
 
-  THE TRAP: "I rehearsed (3, down) fifty times, surely its clock resets." THE NUMBER
-  THAT BROKE IT: if rehearsals reset clocks, a much-rehearsed move would keep
-  tau ~ 0, bonus ~ 0 -- and the exact moves curiosity most needs to chase are the ones
-  it would silence. Rehearsing (3, down) fifty times leaves tau[3][down] exactly where
-  feet left it. THE FIX: clocks obey FEET only. Paper corrections never touch them.
+  "I rehearsed (3, down) fifty times, surely its clock resets." Follow that belief to
+  its end: if rehearsals reset clocks, a much-rehearsed move would keep tau ~ 0,
+  bonus ~ 0 -- and the exact moves curiosity most needs to chase are the ones it
+  would silence. Rehearsing (3, down) fifty times leaves tau[3][down] exactly where
+  feet left it. Clocks obey FEET only. Paper corrections never touch them.
 
-  THE TRAP: "the bonus will find the new shortcut by itself." I waited; it never did.
-  THE NUMBER THAT BROKE IT: the never-walked move had no notebook line, so the
-  rehearsal lottery could not even name it -- no line, no rehearsal, no bonus, no
-  matter how big its clock grew. THE FIX: on the FIRST visit to a spot, file all four
-  moves -- the real one plus three back-to-here-reward-0 placeholders -- so curiosity
-  has a line to grab.
+  "The bonus will find the new shortcut by itself." I waited; it never did, and the
+  reason was structural: the never-walked move had no notebook line, so the rehearsal
+  lottery could not even name it -- no line, no rehearsal, no bonus, no matter how
+  big its clock grew. On the FIRST visit to a spot, file all four moves -- the real
+  one plus three back-to-here-reward-0 placeholders -- so curiosity has a line to
+  grab.
 
   ---
 

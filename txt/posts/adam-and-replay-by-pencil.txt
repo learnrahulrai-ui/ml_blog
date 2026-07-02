@@ -235,35 +235,34 @@
   When I first built this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "m and v are two averages of the same thing -- why keep both?" THE
-  NUMBER THAT BROKE IT: feed the flip-flop (+0.2, -0.2) into each. m goes 0.02 then
-  -0.002 -- it SEES the disagreement and stalls. v goes 0.00004 then 0.00007996 --
-  identical to the steady dial's v, because squaring erased every sign. v cannot see
-  disagreement; m cannot see scale. THE FIX: m answers "which way, and do the
-  grades agree?"; v answers "how big are they, usually?" Two questions, two
-  memories.
+  "m and v are two averages of the same thing -- why keep both?" Feed the flip-flop
+  (+0.2, -0.2) into each and they split: m goes 0.02 then -0.002 -- it SEES the
+  disagreement and stalls. v goes 0.00004 then 0.00007996 -- identical to the steady
+  dial's v, because squaring erased every sign. v cannot see disagreement; m cannot
+  see scale. m answers "which way, and do the grades agree?"; v answers "how big are
+  they, usually?" Two questions, two memories.
 
-  THE TRAP: "my first grade was huge, so the first step should be huge." THE NUMBER
-  THAT BROKE IT: give one dial a first grade of 0.2 and another 50. The small one:
-  m-hat = 0.2, sqrt(v-hat) = 0.2, step = 0.1 x 1 = 0.1. The big one: m-hat = 50,
-  v-hat = 2500, sqrt = 50, step = 0.1 x 50/50 = 0.1. Identical. On move one,
-  m-hat / sqrt(v-hat) is ALWAYS +1 or -1 -- Adam is size-blind at birth and only
-  learns a dial's scale as history accumulates. THE FIX: alpha alone sets the first
-  stride; choose it as "the biggest step I am happy to take blind."
+  "My first grade was huge, so the first step should be huge." Give one dial a first
+  grade of 0.2 and another 50, and watch. The small one: m-hat = 0.2, sqrt(v-hat) =
+  0.2, step = 0.1 x 1 = 0.1. The big one: m-hat = 50, v-hat = 2500, sqrt = 50, step
+  = 0.1 x 50/50 = 0.1. Identical. On move one, m-hat / sqrt(v-hat) is ALWAYS +1 or
+  -1 -- Adam is size-blind at birth and only learns a dial's scale as history
+  accumulates. Alpha alone sets the first stride; choose it as "the biggest step I
+  am happy to take blind."
 
-  THE TRAP: "the bias correction looks like magic -- where does beta^t come from?"
-  THE NUMBER THAT BROKE IT: after one move, m = 0.9 x 0 + 0.1 x 0.2 = 0.02 -- the
-  average is 90% made of the fake zero start, and only 1 - 0.9^1 = 0.1 of it is real
-  signal. Divide by exactly that: 0.02 / 0.1 = 0.2, the true grade. After two moves
-  the real share is 1 - 0.9^2 = 0.19; check: 0.038 / 0.19 = 0.2 again. THE FIX: the
-  correction divides by the fraction of the average that is real. Nothing else.
+  "The bias correction looks like magic -- where does beta^t come from?" From one
+  honest fraction. After one move, m = 0.9 x 0 + 0.1 x 0.2 = 0.02 -- the average is
+  90% made of the fake zero start, and only 1 - 0.9^1 = 0.1 of it is real signal.
+  Divide by exactly that: 0.02 / 0.1 = 0.2, the true grade. After two moves the real
+  share is 1 - 0.9^2 = 0.19; check: 0.038 / 0.19 = 0.2 again. The correction divides
+  by the fraction of the average that is real. Nothing else.
 
-  THE TRAP: "I stored the target y in the note -- it saves recomputing." THE NUMBER
-  THAT BROKE IT: the drill above -- the same note honestly graded 4.42 on one draw
-  and 3.88 a while later, because the net's read of the landing had moved. A stored
-  4.42 would teach the old net's opinion forever, long after it stopped being held.
-  THE FIX: a note stores FACTS (s, a, r, ended?, s'). Opinions -- targets -- are
-  rebuilt from the current net at every draw.
+  "I stored the target y in the note -- it saves recomputing." The drill above is
+  the counterexample: the same note honestly graded 4.42 on one draw and 3.88 a
+  while later, because the net's read of the landing had moved. A stored 4.42 would
+  teach the old net's opinion forever, long after it stopped being held. A note
+  stores FACTS (s, a, r, ended?, s'). Opinions -- targets -- are rebuilt from the
+  current net at every draw.
 
   ---
 

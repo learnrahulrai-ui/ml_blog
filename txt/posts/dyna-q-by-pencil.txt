@@ -270,35 +270,35 @@
   When I first built this machine, four walls stopped me. Here is each wall, the
   number that broke it, and the rule I carry now.
 
-  THE TRAP: "so how is this machine even different from the last one? I kept hunting
-  for the new update formula." THE NUMBER THAT BROKE IT: there isn't one. The real
-  correction computed 0 + 0.5 x (1.0 - 0) = 0.5 and the rehearsal computed
-  0.5 + 0.5 x (1.0 - 0.5) = 0.75 -- the identical crawl, the identical target shape.
-  THE FIX: Dyna-Q adds no new arithmetic. It adds a notebook and a habit: after each
-  real correction, run the same correction a few more times from memory. The novelty
-  is the SOURCE of the numbers, never the formula.
+  "So how is this machine even different from the last one?" I kept hunting for the
+  new update formula, and there isn't one. The real correction computed
+  0 + 0.5 x (1.0 - 0) = 0.5 and the rehearsal computed 0.5 + 0.5 x (1.0 - 0.5) = 0.75
+  -- the identical crawl, the identical target shape. Dyna-Q adds no new arithmetic.
+  It adds a notebook and a habit: after each real correction, run the same correction
+  a few more times from memory. The novelty is the SOURCE of the numbers, never the
+  formula.
 
-  THE TRAP: "rehearse a move? did the world just airlift me to that spot?" A rehearsal
-  names a spot I am not standing on, and that felt like teleporting. THE NUMBER THAT
-  BROKE IT: the rehearsal of (3, down) above changed q[3][down] to -0.1 while I stood
-  somewhere else entirely -- and nothing in the world moved. THE FIX: a rehearsal
-  never moves you. You are a clerk at a desk re-reading an old receipt; only the
-  PENCIL side (the worth table) changes, never your feet.
+  "Rehearse a move? Did the world just airlift me to that spot?" A rehearsal names a
+  spot I am not standing on, and that felt like teleporting -- until I watched what
+  actually changed. The rehearsal of (3, down) above changed q[3][down] to -0.1 while
+  I stood somewhere else entirely, and nothing in the world moved. A rehearsal never
+  moves you. You are a clerk at a desk re-reading an old receipt; only the PENCIL
+  side (the worth table) changes, never your feet.
 
-  THE TRAP: "the notebook looks like a 2D table, so every slot exists." I indexed a
-  page that was never written and the machine fell over. THE NUMBER THAT BROKE IT:
-  after the two writes above, the notebook holds exactly 2 pages (spots 7 and 3) --
-  not 48. Ask page 5 for anything and there is no page 5. THE FIX: the notebook only
-  holds what you lived. Start a blank page only when the page is missing -- and never
-  when it exists, or the fresh blank wipes every line already on it.
+  "The notebook looks like a 2D table, so every slot exists." Believing that, I
+  indexed a page that was never written and the machine fell over. After the two
+  writes above, the notebook holds exactly 2 pages (spots 7 and 3) -- not 48. Ask
+  page 5 for anything and there is no page 5. The notebook only holds what you lived.
+  Start a blank page only when the page is missing -- and never when it exists, or
+  the fresh blank wipes every line already on it.
 
-  THE TRAP: "won't I just bounce between two spots forever at the start?" All worths
-  are 0, I step right, step back left, and it looked like a loop with no exit. THE
-  NUMBER THAT BROKE IT: in a world that pays -1 per step, the bounce writes
+  "Won't I just bounce between two spots forever at the start?" All worths are 0, I
+  step right, step back left, and it looked like a loop with no exit. Then I let the
+  arithmetic run: in a world that pays -1 per step, the bounce writes
   q = 0 + 0.1 x (-1 + 0 - 0) = -0.1 onto each bounced move; the next bounce writes
   -0.19; the untried moves still sit at 0. The greedy pick reads the row, and -0.19
-  loses to 0 -- the bounce digs its own grave and the walk moves on. THE FIX: bad
-  loops punish themselves in the table; you do not have to break them by hand.
+  loses to 0 -- the bounce digs its own grave and the walk moves on. Bad loops punish
+  themselves in the table; you do not have to break them by hand.
 
   ---
 

@@ -258,29 +258,28 @@
   When I first built this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "weights is what? where are my 500 worths?" I kept hunting for the big
-  list. THE NUMBER THAT BROKE IT: worth(120) = w2 = 1.0 was COMPUTED the moment I
-  asked -- a pick, not a lookup. There is no list; there are 10 weights and a recipe.
-  THE FIX: a weight is not a worth. Worths are built on demand: weights . feature,
+  "Weights is what? Where are my 500 worths?" I kept hunting for the big list, until
+  one computation showed me there is none: worth(120) = w2 = 1.0 was COMPUTED the
+  moment I asked -- a pick, not a lookup. There is no list; there are 10 weights and
+  a recipe. A weight is not a worth. Worths are built on demand: weights . feature,
   fresh every time you need one.
 
-  THE TRAP: "for spot 120 the feature must be 500 long... or hold the number 120
-  somewhere." THE NUMBER THAT BROKE IT: feature(120) = [0,0,1,0,0,0,0,0,0,0] -- TEN
-  slots (one per group), and the entry is a plain 1 sitting in slot (120-1)//50 = 2.
-  No 120 anywhere, no 500 anywhere. THE FIX: the feature's length counts GROUPS, and
-  its 1 is a marker, never a value.
+  "For spot 120 the feature must be 500 long... or hold the number 120 somewhere."
+  Write it out and the belief dies on the page: feature(120) = [0,0,1,0,0,0,0,0,0,0]
+  -- TEN slots (one per group), and the entry is a plain 1 sitting in slot
+  (120-1)//50 = 2. No 120 anywhere, no 500 anywhere. The feature's length counts
+  GROUPS, and its 1 is a marker, never a value.
 
-  THE TRAP: "the game ended, the reward goes away, there is no going back -- so no
-  update, right?" Backwards, and it cost me an evening. THE NUMBER THAT BROKE IT: the
-  ending kills the FUTURE piece, not the update. Leave a group-6 spot (w6 = 1.5) and
-  the game ends with reward -35: how wrong = -35 - 1.5 = -36.5, and w6 = 1.5 + 0.1 x
-  (-36.5) = -2.15. The last update still runs -- it is the anchor, the one built from
-  plain paid fact. THE FIX: game over means target = reward alone, never "no target".
+  "The game ended, the reward goes away, there is no going back -- so no update,
+  right?" Backwards, and it cost me an evening. The ending kills the FUTURE piece,
+  not the update. Leave a group-6 spot (w6 = 1.5) and the game ends with reward -35:
+  how wrong = -35 - 1.5 = -36.5, and w6 = 1.5 + 0.1 x (-36.5) = -2.15. The last
+  update still runs -- it is the anchor, the one built from plain paid fact. Game
+  over means target = reward alone, never "no target".
 
-  THE TRAP: "spots 1 to 50 are in the same group, so they all have the same worth...
-  wait, ALWAYS?" THE NUMBER THAT BROKE IT: yes -- worth(1) = worth(50) = w0, forever,
-  even if the TRUE worths climb steadily from spot 1 to spot 50. The guess is a
-  staircase; the truth is a ramp:
+  "Spots 1 to 50 are in the same group, so they all have the same worth... wait,
+  ALWAYS?" Yes -- worth(1) = worth(50) = w0, forever, even if the TRUE worths climb
+  steadily from spot 1 to spot 50. The guess is a staircase; the truth is a ramp:
 
       true worth                 ___
                             ___/      <- the guess: one flat step per group
@@ -288,9 +287,9 @@
                    ___/. . . . . . . <- the truth: rising smoothly inside each group
                                         (the step can only match its AVERAGE)
 
-  THE FIX: sharing buys speed and pays in blur. Inside a group the machine is blind.
-  That blur is not a bug to fix here -- it is the price, and the NEXT post (tile
-  coding) is the machine that buys the speed without going blind.
+  Sharing buys speed and pays in blur. Inside a group the machine is blind. That
+  blur is not a bug to fix here -- it is the price, and the NEXT post (tile coding)
+  is the machine that buys the speed without going blind.
 
   ---
 

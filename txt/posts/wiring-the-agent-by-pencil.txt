@@ -136,6 +136,13 @@
   grades -- and repeat for the several replay passes of this burst. One real move in,
   several stored moves rehearsed out.
 
+  One gate guards the whole LEARN block: it runs only when the bin holds MORE notes
+  than one batch draws. The real lander draws batches of 8, so its first eight
+  note-filing calls learn nothing at all -- the first burst fires on the call that
+  files note 9, and every call learns from then on. The gate is not caution for its
+  own sake: drawing 8 notes from a bin of 3 would just re-teach the same few moments
+  and call them the world. The machine waits until a draw can actually vary.
+
   ---
 
   BUT THE LAST CALL HAS NO NEXT SPOT, SO ITS NOTE IS MARKED ENDED
@@ -208,33 +215,32 @@
   When I first wired this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "where is MY loop? I kept writing a main loop to drive the lander." THE
-  FACT THAT BROKE IT: the simulator already owns the loop -- it calls agent_start
-  once, agent_step a few hundred times, agent_end once, and there is no place for a
-  second driver. My job is three door-answers, not an engine room. THE FIX: the
-  world calls; the agent only ever ANSWERS. If you are writing a while-loop around
-  the lander, you are building a second world.
+  "Where is MY loop? I kept writing a main loop to drive the lander." But the
+  simulator already owns the loop -- it calls agent_start once, agent_step a few
+  hundred times, agent_end once, and there is no place for a second driver. My job
+  is three door-answers, not an engine room. The world calls; the agent only ever
+  ANSWERS. If you are writing a while-loop around the lander, you are building a
+  second world.
 
-  THE TRAP: "agent_start should store a note too -- it did something!" THE NUMBER
-  THAT BROKE IT: a note has five parts, and at the first call I hold exactly one of
-  them (S0). No reward has been paid, nothing has ended, nothing has been landed on.
-  The drill above: four calls, three notes. THE FIX: a note records a CONSEQUENCE,
-  and the first call has none yet; its move gets its note at the NEXT call.
+  "agent_start should store a note too -- it did something!" Count what the first
+  call holds: a note has five parts, and at that moment I hold exactly one of them
+  (S0). No reward has been paid, nothing has ended, nothing has been landed on. The
+  drill above: four calls, three notes. A note records a CONSEQUENCE, and the first
+  call has none yet; its move gets its note at the NEXT call.
 
-  THE TRAP: "the zero-spot placeholder will poison the learning -- the twin reads
-  worths off a fake spot!" THE NUMBER THAT BROKE IT: it does read them -- say it
-  reads [4, 4, 4, 4] off the zeros -- and then the target multiplies that whole
-  future by (1 - ended?) = 0, so the fat 4s vanish and the target is the bare
-  reward. The placeholder exists only so the note keeps five parts; its worths are
-  born condemned. THE FIX: do not fear a garbage value that a mask is about to
-  erase; fear a missing flag.
+  "The zero-spot placeholder will poison the learning -- the twin reads worths off
+  a fake spot!" It does read them -- say it reads [4, 4, 4, 4] off the zeros -- and
+  then the target multiplies that whole future by (1 - ended?) = 0, so the fat 4s
+  vanish and the target is the bare reward. The placeholder exists only so the note
+  keeps five parts; its worths are born condemned. Do not fear a garbage value that
+  a mask is about to erase; fear a missing flag.
 
-  THE TRAP: "I stored the note AFTER picking and remembering." Then the note read
+  "I stored the note AFTER picking and remembering." Then the note read
   (S, A_new, R, ...) -- the fresh pick blamed for the old reward, the same lie as
-  the forgotten remember-lines, one line later. THE FIX: the order inside a middle
-  call is fixed and means something: STORE first (the old pair earns its note while
-  it still IS the old pair), LEARN, then PICK, then REMEMBER the new pair. Two of
-  the four would happily swap; those two never can.
+  the forgotten remember-lines, one line later. The order inside a middle call is
+  fixed and means something: STORE first (the old pair earns its note while it
+  still IS the old pair), LEARN, then PICK, then REMEMBER the new pair. Two of the
+  four would happily swap; those two never can.
 
   ---
 
@@ -264,7 +270,9 @@
 
   No loops, no functions -- one whole tiny run, written flat, every value hard-coded
   (two-dial toy spots so the numbers fit). Four calls arrive; three notes get filed;
-  the learn-burst runs inside every call after the first.
+  the learn-burst runs inside every call after the first. (One waiver: the pencil
+  half's bin-gate would keep a run this short from ever learning, so this exhibit
+  waives it to keep every LEARN line on the page.)
 
       bin_notes = []
 

@@ -67,12 +67,31 @@
   ONE NUMBER CANNOT INSTRUCT A SHEET -- SO ASK EACH DIAL WHAT IT DID
 
   Sheet C alone is 12 dials; sheet A is 6; with the two bias rows that is 25 dials on
-  this toy (about 1,300 on the real lander). You cannot hand "-1.08" to 25 dials and
-  call it an instruction -- they did not all push equally. The fix is the fair-share
-  rule that has run this whole blog, first met where a one-hot feature steered a
-  nudge onto one weight (nudge each weight by how-wrong times its feature). Here the
-  same rule, one word swapped: nudge each dial in proportion to HOW MUCH IT MOVED THE
-  THING WE GRADED.
+  this toy (3,332 on the real lander: 8 dials -> 256 middles -> 4 engines). You
+  cannot hand "-1.08" to 25 dials and call it an instruction -- they did not all push
+  equally. Watch the lazy answer fail on just the four dials that feed Q0 directly
+  (sheet C's first column, values 2, 1, -1, plus its bias 0.5, fed by the bent row
+  x = [2.5, 0, 0]):
+
+      hand the whole -1.08 to each of the four:  Q0 moves by (2.5 + 0 + 0 + 1) x (-1.08) = -3.78
+                                                 -- asked to drop 1.08, dropped 3.5 times that
+
+  and two of the four moved for NOTHING: their middles are dead (the second and third
+  numbers of x are 0), so changing those two dials cannot touch Q0 today -- yet WILL
+  corrupt tomorrow's states, where those middles wake up.
+
+  Worse: even among splits that land the drop exactly, there are infinitely many. Put
+  it all on the bias (lower it 1.08); put it all on the top dial (lower it
+  1.08 / 2.5 = 0.432); any mixture in between. Every one of them repairs THIS state's
+  guess. The machine needs a reason to pick ONE.
+
+  The reason is the fair-share rule that has run this whole blog, first met where a
+  one-hot feature steered a nudge onto one weight (nudge each weight by how-wrong
+  times its feature). Here the same rule, one word swapped: nudge each dial in
+  proportion to HOW MUCH IT MOVED THE THING WE GRADED. The repair then lands where
+  the cause was -- big pushers pay big shares, dials that could not touch Q0 are left
+  alone -- so everything the dials know about OTHER states is disturbed as little as
+  possible while this miss shrinks.
 
   So for every dial ask one question: if I raise this dial a hair, how much does Q0
   (the fired engine's worth) rise? Call that number the dial's PULL on Q0. Then nudge
@@ -282,34 +301,34 @@
   When I first walked a miss backward, four walls stopped me. Each wall, the number
   that broke it, and the rule I carry now.
 
-  THE TRAP: "partial derivatives... so this needs real calculus, which I don't
-  have." The WORD stopped me a full evening before the thing did. THE NUMBER THAT
-  BROKE IT: wiggle A[1,0] by 0.001 and Q0 rises by 0.004; the ratio 0.004 / 0.001 =
-  4 IS the partial derivative -- rise per unit wiggle, holding the other dials
-  still. Nothing more was ever meant by the words. THE FIX: whenever a symbol
-  frightens, ask what single division it stands for.
+  "Partial derivatives... so this needs real calculus, which I don't have." The WORD
+  stopped me a full evening before the thing did. Then one division dissolved it:
+  wiggle A[1,0] by 0.001 and Q0 rises by 0.004; the ratio 0.004 / 0.001 = 4 IS the
+  partial derivative -- rise per unit wiggle, holding the other dials still. Nothing
+  more was ever meant by the words. Whenever a symbol frightens, ask what single
+  division it stands for.
 
-  THE TRAP: "how can I compute pulls FIRST, when I don't yet know what was wrong?"
-  The order felt backwards -- surely blame needs a crime. THE NUMBER THAT BROKE IT:
-  A[1,0]'s pull is 4 no matter what the target says -- the pull is a fact about the
-  MACHINE (wiggle in, rise out), not about the miss. Only the SPENDING needs the
-  miss: nudge = 0.01 x (-1.08) x 4. THE FIX: pulls first (the machine's anatomy),
-  miss second (the day's verdict), product last (the correction).
+  "How can I compute pulls FIRST, when I don't yet know what was wrong?" The order
+  felt backwards -- surely blame needs a crime. But A[1,0]'s pull is 4 no matter what
+  the target says: the pull is a fact about the MACHINE (wiggle in, rise out), not
+  about the miss. Only the SPENDING needs the miss: nudge = 0.01 x (-1.08) x 4.
+  Pulls first (the machine's anatomy), miss second (the day's verdict), product last
+  (the correction).
 
-  THE TRAP: "the pull-sheet duplicates my numbers -- why does x show up in a whole
-  column?" The outer product looked like a copying bug. THE NUMBER THAT BROKE IT: a
-  SHEET of dials needs a SHEET of pulls -- one per dial. Input times signal builds
-  it: with x = [2.5, 0, 0] and seed [1, 0, 0, 0], every (input, signal) pair gets
+  "The pull-sheet duplicates my numbers -- why does x show up in a whole column?"
+  The outer product looked like a copying bug until I counted what it builds: a
+  SHEET of dials needs a SHEET of pulls, one per dial. Input times signal builds it.
+  With x = [2.5, 0, 0] and seed [1, 0, 0, 0], every (input, signal) pair gets
   multiplied and only C[0,0]'s pair is non-zero: 2.5 x 1 = 2.5. No copying -- twelve
-  small multiplications, eleven of them zero. THE FIX: one dial, one pull, always;
-  a sheet's pulls just come out sheet-shaped.
+  small multiplications, eleven of them zero. One dial, one pull, always; a sheet's
+  pulls just come out sheet-shaped.
 
-  THE TRAP: "every new symbol felt invented -- grads, W, 0, 1 -- I could not say how
-  many things I was even tuning." THE NUMBER THAT BROKE IT: count the dials FIRST:
-  sheet A has 2 x 3 = 6, its bias 3, sheet C has 3 x 4 = 12, its bias 4 -- 25 dials,
-  full stop. Every symbol in this post is one of those 25, or one of the fixed rows
-  (s, psi, x, Q) the forward pass makes. THE FIX: before learning any machine, count
-  its movable parts; then no symbol can be a stranger.
+  "Every new symbol felt invented -- grads, W, 0, 1 -- I could not say how many
+  things I was even tuning." The cure was to count the dials FIRST: sheet A has
+  2 x 3 = 6, its bias 3, sheet C has 3 x 4 = 12, its bias 4 -- 25 dials, full stop.
+  Every symbol in this post is one of those 25, or one of the fixed rows (s, psi, x,
+  Q) the forward pass makes. Before learning any machine, count its movable parts;
+  then no symbol can be a stranger.
 
   ---
 

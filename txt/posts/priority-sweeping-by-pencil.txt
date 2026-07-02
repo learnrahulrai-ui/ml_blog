@@ -12,7 +12,7 @@
 
   PATH . post 52/52 . part 2 of 2 in Chapter 17 -- Two the Sample-Based Map Skipped
     <- prev:  [Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt)
-       next:  (more posts coming)
+       next:  [Four Questions Before Any Arithmetic: Which Machine for Which World](which-machine-for-which-world.txt) ->
 
   ---
 
@@ -161,29 +161,29 @@
   When I first built this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "random rehearsal was already free -- why rank anything?" THE NUMBER
-  THAT BROKE IT: on the fresh corridor, only ONE of the four rehearsals teaches
-  anything (spot 4's; the other three copy 0.9 x 0 = 0 back onto a 0). A random grab
-  finds it one time in four; the queue finds it every time. THE FIX: free work is
-  still wasted work if the number it writes is the number already there.
+  "Random rehearsal was already free -- why rank anything?" Count the useful ones:
+  on the fresh corridor, only ONE of the four rehearsals teaches anything (spot 4's;
+  the other three copy 0.9 x 0 = 0 back onto a 0). A random grab finds it one time
+  in four; the queue finds it every time. Free work is still wasted work if the
+  number it writes is the number already there.
 
-  THE TRAP: "I pushed the spot I had just fixed." It felt like the changed spot was
-  the busy one. THE NUMBER THAT BROKE IT: right after applying V(4) = 1, spot 4's
-  own priority is | 1 - 1 | = 0 -- it is DONE. The stale ones are its PREDECESSORS:
-  spot 3's priority is | 0.9 x 1 - 0 | = 0.9. THE FIX: a change ripples BACKWARD,
-  to the spots whose moves land on the one that changed -- never to itself.
+  "I pushed the spot I had just fixed." It felt like the changed spot was the busy
+  one, but right after applying V(4) = 1, spot 4's own priority is | 1 - 1 | = 0 --
+  it is DONE. The stale ones are its PREDECESSORS: spot 3's priority is
+  | 0.9 x 1 - 0 | = 0.9. A change ripples BACKWARD, to the spots whose moves land
+  on the one that changed -- never to itself.
 
-  THE TRAP: "priority is the worth -- rehearse the richest spot first." THE NUMBER
-  THAT BROKE IT: a spot worth 100 whose update reads 100.0001 has priority 0.0001 --
-  nothing to do -- while a spot worth 0 about to become 0.9 has priority 0.9. THE
-  FIX: the queue ranks SURPRISES (|new - old|), not riches. A rich, settled spot is
-  boring; a poor spot mid-jump is urgent.
+  "Priority is the worth -- rehearse the richest spot first." Two spots settle it:
+  a spot worth 100 whose update reads 100.0001 has priority 0.0001 -- nothing to do
+  -- while a spot worth 0 about to become 0.9 has priority 0.9. The queue ranks
+  SURPRISES (|new - old|), not riches. A rich, settled spot is boring; a poor spot
+  mid-jump is urgent.
 
-  THE TRAP: "my model could not answer 'who leads into 4?'" The forward model
-  (spot, move) -> (landing, reward) was all I kept, and the sweep died after one
-  pop: queue empty, worths [0, 0, 0, 1]. THE FIX: priority sweeping needs the model
-  READ BACKWARD too -- keep a reverse index (landing -> the spots that lead in),
-  filed at the same moment each forward fact is recorded.
+  "My model could not answer 'who leads into 4?'" The forward model (spot, move) ->
+  (landing, reward) was all I kept, and the sweep died after one pop: queue empty,
+  worths [0, 0, 0, 1]. Priority sweeping needs the model READ BACKWARD too -- keep
+  a reverse index (landing -> the spots that lead in), filed at the same moment
+  each forward fact is recorded.
 
   ---
 
@@ -266,6 +266,7 @@
   IN THIS CHAPTER (Chapter 17 -- Two the Sample-Based Map Skipped):
     Part 1 -- [Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt) .
     Part 2 (this post) -- the chapter closes here
+  NEXT CHAPTER: [Four Questions Before Any Arithmetic: Which Machine for Which World](which-machine-for-which-world.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------

@@ -34,7 +34,7 @@
   features -- few, joint, reshapable -- instead of you laying a fixed grid at all.
   That is the whole reason for this post.
 
-  (To keep every number on the page, the lander's 8 -> 100 -> 4 shrinks here to a
+  (To keep every number on the page, the lander's 8 -> 256 -> 4 shrinks here to a
   pencil toy: 2 dials in, 3 middle numbers, 4 engine-worths out. The arithmetic is
   identical, just shorter.)
 
@@ -148,8 +148,8 @@
   Choosing is unchanged: fire the greedy best (here engine 0, worth 5.5), and wander
   epsilon of the time so no engine goes stale. There is no table of states anywhere
   -- the same 25 dials GENERATE the four worths of EVERY state, including states
-  never seen (the real lander's 8 -> 100 -> 4 needs 8x100 + 100 + 100x4 + 4 = about
-  1,300 dials).
+  never seen (the real lander's 8 -> 256 -> 4 needs 8x256 + 256 + 256x4 + 4 = 3,332
+  dials).
 
   ---
 
@@ -225,10 +225,10 @@
   the two lit tiles and the job was done -- the feature told you EXACTLY which
   weights to nudge. Here there is no such pointer. One number, -1.08, has to correct
   the whole pile: sheet A (2x3), sheet C (3x4), and the two nudge rows -- 25 dials in
-  the toy, about 1,300 on the real lander. One number cannot tell 1,300 dials how to
+  the toy, 3,332 on the real lander. One number cannot tell 3,332 dials how to
   move; the correction must somehow spread back through the bend and across both
   sheets, each dial getting its own share by how much it pushed the guess. How a
-  single miss becomes 1,300 separate nudges -- backpropagation, by pencil -- is the
+  single miss becomes 3,332 separate nudges -- backpropagation, by pencil -- is the
   whole of the next post. This one built the machine and weighed its guess; the next
   one teaches it.
 
@@ -236,36 +236,46 @@
 
   WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  When I first built this machine, four walls stopped me. Each wall, the number that
+  When I first built this machine, five walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "s, psi, x... which one is 'the state'?" Three rows wearing similar
-  coats, and I kept handing sheet C the wrong one. THE NUMBERS THAT BROKE IT:
+  "s, psi, x... which one is 'the state'?" Three rows wearing similar coats, and I
+  kept handing sheet C the wrong one. Lay them side by side and the coats come off:
   s = [1, 2] is the world's dials; psi = [2.5, -0.5, -0.5] is the middle BEFORE the
   bend; x = [2.5, 0, 0] is the middle AFTER the bend -- and only x ever touches
-  sheet C. Three different rows, three different jobs. THE FIX: name them out loud
-  every pass: state in, psi made, x bent, Q out.
+  sheet C. Three different rows, three different jobs. Name them out loud every
+  pass: state in, psi made, x bent, Q out.
 
-  THE TRAP: "a zeroed middle still passes SOMETHING on, surely." THE NUMBER THAT
-  BROKE IT: in Q1 = (2.5)(-1) + (0)(1) + (0)(2) + 1.0, the two dead middles
-  contribute (0)(1) = 0 and (0)(2) = 0 -- a dead middle erases its entire ROW of C
-  from the sum, exactly as if the row were not there. THE FIX: after the bend, a
-  dead middle is not "small" -- it is absent. (Which middles die changes with the
-  state: [1,2] killed p2 and p3; [2,0] killed only p2.)
+  "A zeroed middle still passes SOMETHING on, surely." It passes exactly nothing: in
+  Q1 = (2.5)(-1) + (0)(1) + (0)(2) + 1.0, the two dead middles contribute (0)(1) = 0
+  and (0)(2) = 0 -- a dead middle erases its entire ROW of C from the sum, as if the
+  row were not there. After the bend, a dead middle is not "small" -- it is absent.
+  (Which middles die changes with the state: [1,2] killed p2 and p3; [2,0] killed
+  only p2.)
 
-  THE TRAP: "the net made four guesses, so the world graded four." I wanted to
-  correct all four worths from one move. THE NUMBER THAT BROKE IT: the world paid
-  reward 1 for firing engine 0 -- it said nothing about engines 1, 2, 3. The only
-  honest miss row is [-1.08, 0, 0, 0]: one tested slot, three untested zeros. THE
-  FIX: a move tests exactly one worth. The other engines' turn comes when they are
-  fired.
+  "The net made four guesses, so the world graded four." I wanted to correct all
+  four worths from one move, but the world paid reward 1 for firing engine 0 -- it
+  said nothing about engines 1, 2, 3. The only honest miss row is [-1.08, 0, 0, 0]:
+  one tested slot, three untested zeros. A move tests exactly one worth. The other
+  engines' turn comes when they are fired.
 
-  THE TRAP: "fine, but WHERE are the worths stored?" I kept hunting for the table.
-  THE NUMBER THAT BROKE IT: the same 25 dials produced Q([1,2]) = [5.5, -1.5, 0, 2]
-  AND Q([2,0]) = [3.5, 2.5, 2.0, 0] -- two states, eight worths, zero cells. Every
-  worth of every state -- infinitely many states -- flows out of the same 25
-  numbers. THE FIX: there is no table. The dials ARE the knowledge, and a worth is a
-  computation, not an address.
+  "Somewhere outside sits an answer sheet -- y tells me which engine was RIGHT." I
+  pictured the target as a verdict mailed in by the world, a 1 stamped under the
+  correct engine. But look where the -1.1 above actually came from: the machine
+  built it ITSELF, from a paid fact and its own opinion -- y = -2 + 0.9 x 1.0, a
+  reward the world paid plus the dilute times a chance-weighted average the machine
+  computed from its OWN four landing worths. Nobody outside knows the right engine;
+  there is no answer sheet to be near. Which also kills the twin belief that the
+  machine "picks the engine closest to y": y exists only at grading time, for the
+  one engine already fired. Picking always reads the four Q numbers, and grading
+  always builds y fresh -- two different moments, two different jobs.
+
+  "Fine, but WHERE are the worths stored?" I kept hunting for the table, and the
+  machine answered with two rows: the same 25 dials produced Q([1,2]) =
+  [5.5, -1.5, 0, 2] AND Q([2,0]) = [3.5, 2.5, 2.0, 0] -- two states, eight worths,
+  zero cells. Every worth of every state -- infinitely many states -- flows out of
+  the same 25 numbers. There is no table. The dials ARE the knowledge, and a worth
+  is a computation, not an address.
 
   ---
 
@@ -284,7 +294,7 @@
   Expected-Sarsa target y = reward + dilute x (chance-weighted next worths) = 1 +
   0.9 x 3.8 = 4.42, so how-wrong = 4.42 - 5.5 = -1.08, a row zero but for the fired
   engine: [-1.08, 0, 0, 0]. The sting: that ONE number must now correct 25 dials --
-  1,300 on the real lander -- with no feature to point the way; spreading it back
+  3,332 on the real lander -- with no feature to point the way; spreading it back
   through the bend and both sheets is backpropagation, the next post.
 
   ---

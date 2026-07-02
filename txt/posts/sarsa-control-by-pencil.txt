@@ -250,35 +250,33 @@
   When I first built this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "-4.5 is the biggest number here, so left wins." All the worths are
-  negative, and my eye kept grabbing the longest bar. THE NUMBER THAT BROKE IT: at
-  0.3 the worths are -4.5, -2.5, -1.3. The fines-still-to-come reading says -1.3
-  means "about one fine left" and -4.5 means "about four and a half" -- so -1.3 is
-  the GOOD one. THE FIX: with all-negative worths, greedy means LEAST negative.
-  Read worths as distances-to-freedom, not sizes.
+  "-4.5 is the biggest number here, so left wins." All the worths are negative, and
+  my eye kept grabbing the longest bar. But at 0.3 the worths are -4.5, -2.5, -1.3,
+  and the fines-still-to-come reading says -1.3 means "about one fine left" while
+  -4.5 means "about four and a half" -- so -1.3 is the GOOD one. With all-negative
+  worths, greedy means LEAST negative. Read worths as distances-to-freedom, not
+  sizes.
 
-  THE TRAP: "the target should use the BEST next worth -- surely I grade against
-  perfection." THE NUMBER THAT BROKE IT: suppose at 0.6 the spinner HAD called a
-  wander and handed the car LEFT (worth -5.5). Sarsa's target would truly be
-  -1 + 0.9 x (-5.5) = -5.95 -- not the greedy -2.62 -- because the car really is
-  about to push left, and honest grading counts it. Use the max instead and you have
-  quietly built the other machine (Q-learning). THE FIX: the second A in SARSA is
-  the move you actually make. The wander belongs in the target.
+  "The target should use the BEST next worth -- surely I grade against perfection."
+  Suppose at 0.6 the spinner HAD called a wander and handed the car LEFT (worth
+  -5.5). Sarsa's target would truly be -1 + 0.9 x (-5.5) = -5.95 -- not the greedy
+  -2.62 -- because the car really is about to push left, and honest grading counts
+  it. Use the max instead and you have quietly built the other machine (Q-learning).
+  The second A in SARSA is the move you actually make. The wander belongs in the
+  target.
 
-  THE TRAP: "I nudged the pair I am standing on." The fresh spot is the one in my
-  hand, so I graded it. THE NUMBER THAT BROKE IT: the reward -1 was paid for the
-  push OUT of 0.3 -- the sticky-note pair (0.3, right). Nudging (0.6, right) instead
-  writes the fine onto a push that has not been graded yet and leaves the guilty one
-  untouched. THE FIX: the nudge always lands on the sticky notes; the fresh pair
-  only feeds the target.
+  "I nudged the pair I am standing on." The fresh spot is the one in my hand, so I
+  graded it -- but the reward -1 was paid for the push OUT of 0.3, the sticky-note
+  pair (0.3, right). Nudging (0.6, right) instead writes the fine onto a push that
+  has not been graded yet and leaves the guilty one untouched. The nudge always
+  lands on the sticky notes; the fresh pair only feeds the target.
 
-  THE TRAP: "I forgot to overwrite the sticky notes." Every step kept nudging the
-  SAME first pair. THE NUMBER THAT BROKE IT: without the overwrite, footstep two
-  nudges (0.3, right) again -- 0.1 x (its new miss) onto tiles A0, B1 -- while
-  (0.6, right), the pair that actually just acted, never learns at all. One line of
-  bookkeeping, and skipping it makes the whole drive teach a single pair. THE FIX:
-  nudge first, THEN slide: the new tiles and the new push become the notes before
-  the world is answered.
+  "I forgot to overwrite the sticky notes," and every step kept nudging the SAME
+  first pair. Without the overwrite, footstep two nudges (0.3, right) again --
+  0.1 x (its new miss) onto tiles A0, B1 -- while (0.6, right), the pair that
+  actually just acted, never learns at all. One line of bookkeeping, and skipping it
+  makes the whole drive teach a single pair. Nudge first, THEN slide: the new tiles
+  and the new push become the notes before the world is answered.
 
   ---
 

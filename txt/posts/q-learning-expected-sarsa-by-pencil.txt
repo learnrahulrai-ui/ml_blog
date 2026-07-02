@@ -336,43 +336,40 @@
   When I first built these two machines, the same five walls stopped me, some for
   hours. Here is each wall, the number that broke it, and the rule I carry now.
 
-  THE TRAP: "the target is... a spot? an arrow? I think it is a reward."
-  I asked this three times. And the arithmetic feeds the confusion: the first target
-  above came out 2 -- and there IS a spot 2. THE NUMBER THAT BROKE IT: target =
-  2 + 1.0 x 0 = 2 is measured in REWARD-TO-COME, not in addresses. Later in training,
-  when the landing's best cell holds 2.02, the same move's target = 2 + 1.0 x 2.02 =
-  4.02 -- and no spot 4.02 exists. THE FIX: a target is a worth -- a number of future
-  reward. It could never name a place.
+  "The target is... a spot? an arrow? I think it is a reward." I asked this three
+  times, and the arithmetic feeds the confusion: the first target above came out 2,
+  and there IS a spot 2. One later number ended it. When the landing's best cell holds
+  2.02, the same move's target = 2 + 1.0 x 2.02 = 4.02 -- and no spot 4.02 exists. A
+  target is a worth, a number of reward-to-come; it could never name a place.
 
-  THE TRAP: "why would I update the spot I LEFT? I'm not there anymore."
-  It felt like paying rent on a house after moving out. THE NUMBER THAT BROKE IT: the
-  reward 2 was paid FOR the jump out of spot 0 by move 1. Try writing it anywhere
-  else: at the landing, q[1][?] -- which move column? You have made no move AT spot 1
-  yet. There is exactly one cell that earned that 2, and it is q[0][1]. THE FIX: the
-  reward belongs to the (spot, move) pair that caused it -- always the one just left.
+  "Why would I update the spot I LEFT? I'm not there anymore." It felt like paying
+  rent on a house after moving out. So I tried writing the reward 2 somewhere else --
+  at the landing, q[1][?] -- and the question collapsed on its own: which move column?
+  You have made no move AT spot 1 yet. The reward 2 was paid FOR the jump out of spot
+  0 by move 1; exactly one cell earned it, and that cell is q[0][1]. A reward belongs
+  to the (spot, move) pair that caused it -- always the one just left.
 
-  THE TRAP: "so the table remembers my history, right? values are last-reward history?"
-  THE NUMBER THAT BROKE IT: after two moves the whole machine is [0, 0.2, 0, 0 /
-  0, 0, 0, 0.02 / 0, 0, 0, 0]. Twelve numbers. Which spot you came from, what was
-  paid when -- gone. THE FIX: the table IS the memory, all of it. Each cell is a
-  running summary, not a diary; the crawl (size 0.1) is what folds each new fact into
-  the summary without keeping the fact.
+  "So the table remembers my history, right? Values are last-reward history?" Count
+  what exists after two moves: the whole machine is [0, 0.2, 0, 0 / 0, 0, 0, 0.02 /
+  0, 0, 0, 0] -- twelve numbers. Which spot you came from, what was paid when: gone.
+  The table IS the memory, all of it. Each cell is a running summary, not a diary;
+  the crawl (size 0.1) is what folds each new fact into the summary without keeping
+  the fact.
 
-  THE TRAP: "the 10% wander picks among the three NON-greedy moves... so each gets
-  0.1/3." I split the wander over the losers only. THE NUMBER THAT BROKE IT: the
-  spinner is rolled BEFORE looking at the row -- wander means all FOUR equally, so
-  greedy = 0.9 + 0.025 = 0.925, not 0.9. On the row [0, 0.2, 0, 0] the wrong weights
-  give an average of 0.9 x 0.2 = 0.18; the true one is 0.925 x 0.2 = 0.185. An error
-  of 0.005 -- too small to see in one update, and the broken weights carry it into
-  every update whose landing row is not all equal. THE FIX:
-  wander is blind. The greedy move also gets its wander share.
+  "The 10% wander picks among the three NON-greedy moves... so each gets 0.1/3." I
+  split the wander over the losers only. But the spinner is rolled BEFORE looking at
+  the row -- wander means all FOUR moves equally -- so greedy gets 0.9 + 0.025 =
+  0.925, not 0.9. On the row [0, 0.2, 0, 0] my broken weights gave an average of
+  0.9 x 0.2 = 0.18; the true one is 0.925 x 0.2 = 0.185. An error of 0.005: too small
+  to see in one update, and carried into every update whose landing row is not all
+  equal. Wander is blind. The greedy move also gets its wander share.
 
-  THE TRAP: "who even tells me the game ended? Maybe I didn't notice I reached the
-  goal." THE NUMBER THAT BROKE IT: nothing to compute -- that was the point. The WORLD
-  announces the ending (there is simply no landing spot in its message), and that
-  announcement is what switches the target from reward + dilute x future to reward
-  alone. THE FIX: the ending is the world's news, not your deduction; your only job on
-  hearing it is to drop the future piece.
+  "Who even tells me the game ended? Maybe I didn't notice I reached the goal." Here
+  there was nothing to compute -- that was the answer. The WORLD announces the ending;
+  there is simply no landing spot in its message, and that announcement is what
+  switches the target from reward + dilute x future to reward alone. The ending is
+  the world's news, not your deduction; your only job on hearing it is to drop the
+  future piece.
 
   ---
 

@@ -230,39 +230,37 @@
   When I first built this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "one net can do both jobs -- why keep a copy?" My misses refused to
-  shrink across the replay passes, and I blamed the step size first. THE NUMBER THAT BROKE
-  IT: with one net, every pass moves the mark by the very step just taken -- guess V1
-  aims at target(V1) and becomes V2; V2 aims at target(V2); the gap you are closing
-  reopens as fast as you close it. Freeze the twin and all four passes aim at the
-  same V1 mark. THE FIX: the grader holds still inside a burst; it is refreshed only
-  between bursts.
+  "One net can do both jobs -- why keep a copy?" My misses refused to shrink across
+  the replay passes, and I blamed the step size first. The real culprit: with one
+  net, every pass moves the mark by the very step just taken -- guess V1 aims at
+  target(V1) and becomes V2; V2 aims at target(V2); the gap you are closing reopens
+  as fast as you close it. Freeze the twin and all four passes aim at the same V1
+  mark. The grader holds still inside a burst; it is refreshed only between bursts.
 
-  THE TRAP: "softmax blew up on big worths." A worth-row like [500, 502, 500, 500]
-  asks for e^502 -- a number with 219 digits; the machine chokes. THE NUMBER THAT
-  BROKE IT: the drill above -- softmax reads only the GAPS. Subtract the row's
-  biggest worth first: [500, 502, 500, 500] - 502 = [-2, 0, -2, -2], and
-  e^-2 = 0.135, e^0 = 1, total 1.41, chances [0.096, 0.711, 0.096, 0.096] -- the
-  exact same chances as the row [0, 2, 0, 0]. Nothing changed but the arithmetic
-  stopped exploding. THE FIX: always shift a row so its biggest worth is 0 before
-  raising e to it. The chances cannot tell the difference; the machine can.
+  "Softmax blew up on big worths." A worth-row like [500, 502, 500, 500] asks for
+  e^502 -- a number with 219 digits; the machine chokes. But softmax reads only the
+  GAPS. Subtract the row's biggest worth first: [500, 502, 500, 500] - 502 =
+  [-2, 0, -2, -2], and e^-2 = 0.135, e^0 = 1, total 1.41, chances
+  [0.096, 0.711, 0.096, 0.096] -- the exact same chances as the row [0, 2, 0, 0].
+  Nothing changed but the arithmetic stopped exploding. Always shift a row so its
+  biggest worth is 0 before raising e to it. The chances cannot tell the
+  difference; the machine can.
 
-  THE TRAP: "I gathered the TAKEN column on the target side too." Symmetry felt
-  right: pick the stored move everywhere. THE NUMBER THAT BROKE IT: on note 1 that
-  reads q_next's column 1 -> worth 2, instead of the averaged 1.42 -- but the stored
-  move is the move you took at s, and nothing says the habit will repeat it at s'.
-  The future is unchosen, so it gets the AVERAGE; the past is on record, so it gets
-  the PICK. THE FIX: average where you do not know (the landing), pick where you do
-  (the move taken). The asymmetry is the design.
+  "I gathered the TAKEN column on the target side too." Symmetry felt right: pick
+  the stored move everywhere. On note 1 that reads q_next's column 1 -> worth 2,
+  instead of the averaged 1.42 -- but the stored move is the move you took at s,
+  and nothing says the habit will repeat it at s'. The future is unchosen, so it
+  gets the AVERAGE; the past is on record, so it gets the PICK. Average where you
+  do not know (the landing), pick where you do (the move taken). The asymmetry is
+  the design.
 
-  THE TRAP: "I wrote 'the twin is the net' instead of photocopying it." One line of
+  "I wrote 'the twin is the net' instead of photocopying it." One line of
   bookkeeping -- point a second name at the same sheets -- and my "frozen" twin
-  moved with every nudge, because both names were holding the same paper. THE NUMBER
-  THAT BROKE IT: after pass 1 the "twin" already read V2, and the fleeing-mark
-  disease came back wearing a twin costume. THE FIX: the twin is a PHOTOCOPY -- a
-  full copy of every dial made before the burst -- never a second label on the live
-  sheets. (In the code below, that is deepcopy, and it is the whole reason the word
-  appears.)
+  moved with every nudge, because both names were holding the same paper: after
+  pass 1 the "twin" already read V2, and the fleeing-mark disease came back wearing
+  a twin costume. The twin is a PHOTOCOPY -- a full copy of every dial made before
+  the burst -- never a second label on the live sheets. (In the code below, that is
+  deepcopy, and it is the whole reason the word appears.)
 
   ---
 

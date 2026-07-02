@@ -181,31 +181,30 @@
   When I first built this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "I graded S the moment I stepped off it." THE NUMBER THAT BROKE IT: at
-  that moment I held +1 of what turned out to be a 6.04 return -- more than four
-  fifths of S's grade had not happened yet. Monte Carlo has nothing to write until
-  the run ends. THE FIX: in this machine a spot is graded by what FOLLOWED it, and
-  "what followed" is a fact only the finish line can settle.
+  "I graded S the moment I stepped off it." At that moment I held +1 of what turned
+  out to be a 6.04 return -- more than four fifths of S's grade had not happened
+  yet. Monte Carlo has nothing to write until the run ends. In this machine a spot
+  is graded by what FOLLOWED it, and "what followed" is a fact only the finish line
+  can settle.
 
-  THE TRAP: "every spot in the run gets the episode's total." I gave A the whole
-  trip's takings. THE NUMBER THAT BROKE IT: A's return is 2 + 0.9 x 4 = 5.6 -- it
-  counts the +2 and the +4 that came AFTER A, and never the +1 paid before A
-  existed in the story. Grades start where the spot stands, not where the run
-  started. THE FIX: total BACKWARD from the end; the backward walk cannot even see
-  the rewards before a spot.
+  "Every spot in the run gets the episode's total." I gave A the whole trip's
+  takings, but A's return is 2 + 0.9 x 4 = 5.6 -- it counts the +2 and the +4 that
+  came AFTER A, and never the +1 paid before A existed in the story. Grades start
+  where the spot stands, not where the run started. Total BACKWARD from the end;
+  the backward walk cannot even see the rewards before a spot.
 
-  THE TRAP: "a run visited A twice, so I averaged both its returns as two samples."
-  THE NUMBER THAT BROKE IT: one run is ONE sample of a spot's worth -- the two
-  returns inside a single run share every reward after the second visit and are not
-  independent tries. The rule pinned above: take the return from the FIRST time you
-  stood there in that run, one number per run. THE FIX: samples are counted per
-  RUN, not per visit (first-visit Monte Carlo).
+  "A run visited A twice, so I averaged both its returns as two samples." But one
+  run is ONE sample of a spot's worth -- the two returns inside a single run share
+  every reward after the second visit and are not independent tries. The rule
+  pinned above: take the return from the FIRST time you stood there in that run,
+  one number per run. Samples are counted per RUN, not per visit (first-visit
+  Monte Carlo).
 
-  THE TRAP: "I pointed Monte Carlo at a task that never ends and waited." THE
-  NUMBER THAT BROKE IT: there is none -- and that is the point. No end, no total,
-  no return, ever; the machine is not slow there, it is undefined. THE FIX: Monte
-  Carlo is for episodic tasks only. A never-ending task needs a machine that leans
-  (TD) or an average-per-step yardstick -- waiting is not an option.
+  "I pointed Monte Carlo at a task that never ends and waited." No number ever
+  came, and that IS the finding: no end, no total, no return, ever. The machine is
+  not slow there, it is undefined. Monte Carlo is for episodic tasks only. A
+  never-ending task needs a machine that leans (TD) or an average-per-step
+  yardstick -- waiting is not an option.
 
   ---
 

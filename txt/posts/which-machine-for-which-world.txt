@@ -1,0 +1,365 @@
+@title Four Questions Before Any Arithmetic: Which Machine for Which World :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 18 . CHOOSING THE MACHINE . PART 1 OF 1
+  Four Questions Before Any Arithmetic: Which Machine for Which World
+  Posted: 2026-07-02 . Author: Rahul Rai . Tags: reinforcement-learning, episodic, continuing, model-based, prediction, control, by-hand
+  ============================================================================================
+
+  PATH . post 53/53 . part 1 of 1 in Chapter 18 -- Choosing the Machine
+    <- prev:  [Fix the Biggest Surprise First: Priority Sweeping by Pencil](priority-sweeping-by-pencil.txt)
+       next:  (the book closes here)
+
+  ---
+
+  Six chapters of this book built a shelf of learning machines, each solved by pencil.
+  And on every fresh problem since, my first real mistake happened BEFORE any
+  arithmetic: I reached for the wrong machine. I pointed the wait-for-the-end grader
+  at a task with no end (its answer is not slow there -- it is undefined). I tried to
+  fade a future on a run that never finishes (the faded pile blows up: a steady 1 per
+  step, faded by 0.9, piles to 1/(1-0.9) = 10; fade by 0.99 and it piles to 100; push
+  the fade toward 1 and the pile grows without bound). I burned real footsteps
+  learning what a printed rulebook already told me for free.
+
+  Every one of those mistakes was a fit error, not a math error. So this closing page
+  is the fitting guide: the questions that sort any new world, the shelf that answers
+  each sorting, and -- because picking right is not the same as proving it worked --
+  how a finished machine is honestly graded.
+
+  ---
+
+  THE WORLD DECIDES -- SO INTERROGATE THE WORLD FIRST
+
+  A world, in this book's sense, is anything that repeats: you stand at a SPOT (the
+  numbers describing where you are), make a MOVE, and the world pays a REWARD and
+  hands you the next spot. Before any machine touches such a world, four questions
+  sort it:
+
+      the fresh world
+           |
+           v
+      [1] does the run END?  ----------------- never ends --> subtract-the-average land
+           | ends
+           v
+      [2] do you HOLD the rulebook? ---------- yes --------> compute, walk nothing
+           | no rulebook: you must walk
+           v
+      [3] can you LIST every spot? ----------- no ---------> shared dials (groups,
+           | yes: a table fits                               tiles, or a network)
+           v
+      [4] GRADE a habit, or CHOOSE moves? ---- grade ------> worth-per-spot machines
+           | choose
+           v
+      worth-per-(spot, move) machines
+
+  Each question kills part of the shelf. Walk them one at a time, with the numbers
+  that make each split real.
+
+  ---
+
+  DOES THE RUN END? -- THE QUESTION THAT KILLS QUIETLY
+
+  A run ENDS when the world announces it: the lander touches down, the courier
+  reaches the dock, the game says game over. A run that ends is called episodic; the
+  finish line is what makes two whole families of arithmetic legal.
+
+  The wait-for-the-end grader (Monte Carlo, post 51) grades a spot by its RETURN --
+  every reward that followed it, totalled backward from the finish. No finish, no
+  total, no return: on a never-ending task the machine is not slow, it has nothing
+  defined to write. And the fade trick that keeps totals finite (multiply each later
+  reward by 0.9 again and again) buys finiteness at a price that grows as the fade
+  nears 1: a steady reward of 1 per step piles to 1/(1-0.9) = 10, to 1/(1-0.99) =
+  100, and onward without bound -- on an endless run there is no honest place to set
+  it.
+
+  A world with NO finish line (a thermostat, a pendulum held upright, a server
+  balancing load -- called a continuing task) therefore needs the other yardstick:
+  grade each step against the AVERAGE step. Keep a crawling estimate R-bar of the
+  average reward per step, and score each moment by reward - R-bar plus the change
+  in worth -- the differential error of post 50, which stays small forever because
+  it never piles anything.
+
+      run ends      -> returns and faded totals are legal: posts 37-49, 51-52 all live here
+      run never ends-> subtract the average instead: differential actor-critic (post 50)
+
+  ---
+
+  WHICH MEANS: IF THE RUN ENDS, ASK WHO HOLDS THE RULEBOOK
+
+  The rulebook (the world's die table) is the complete list: for every spot and
+  every move, the chance of each landing and the reward it pays. Chapter 12 held
+  one -- printed odds for the drone's winds -- and that changes everything, because
+  a held rulebook can be COMPUTED over, no walking at all:
+
+      grade a fixed plan     -> lay the worth-law down until the lies heal   (post 34)
+      find the best plan     -> the grade-improve loop                       (post 35)
+      skip plans, take max   -> the no-plan max walk                         (post 36)
+
+  (All three live in Chapter 12: [grading a plan](grading-a-plan-policy-evaluation.txt),
+  [finding the best plan](finding-the-best-plan-policy-iteration.txt), and
+  [the no-plan max walk](value-iteration-by-pencil.txt).)
+
+  No rulebook -- the usual case -- and every number must be EARNED by walking: one
+  move, one sample, one crawl of the worth toward reward + fade x (worth at the
+  landing). That is the whole sample-based family: TD(0) for grading (post 37),
+  Q-learning and Expected Sarsa for choosing (post 38).
+
+  And one shelf sits deliberately between the two: a walker that WRITES ITS OWN
+  rulebook as it goes. Dyna-Q (post 39) files each real move's landing and reward in
+  a notebook, then rehearses remembered moves between footsteps; Dyna-Q+ (post 40)
+  adds a staleness bonus so old pages get re-tried; priority sweeping (post 52)
+  spends each rehearsal on the biggest pending surprise instead of a random page.
+  Reach for that shelf when real footsteps are the expensive part -- a robot that
+  breaks, a customer that leaves -- and paper rehearsals are free.
+
+  ---
+
+  BUT A TABLE NEEDS A LIST OF SPOTS -- CAN YOU WRITE ONE?
+
+  Everything above keeps one number per spot (or per spot-move pair) in a table.
+  That works exactly when the spots can be LISTED: the cliff walk had 48, the
+  corridor had 4. The moment a spot is made of dials that vary smoothly -- a car's
+  position anywhere in [-1.2, 0.6], a lander's eight measurements -- the list is
+  infinite and the table dies.
+
+  Then the worth must be BUILT, not looked up, from parts that many spots share:
+
+      a few coarse groups, one weight each      -> state aggregation (post 41): fast, blurry
+      several shifted rulers, k weights lit     -> tile coding (post 42): fast AND sharp
+      one row per move over the lit tiles       -> Sarsa control on tiles (post 43)
+      let the machine invent its own features   -> the Q-network (post 44), trained by
+                                                   backprop + Adam + replay + the frozen
+                                                   twin (posts 45-48), assembled whole in
+                                                   post 49
+
+  The price of sharing is always the same: spots that share parts share fate. The
+  gain is always the same too: one footstep teaches every spot that shares a part
+  with the one you stood on.
+
+  ---
+
+  LAST QUESTION: ARE YOU GRADING, OR CHOOSING?
+
+  Some jobs only ask HOW GOOD -- grade this fixed habit, attach a worth to every
+  spot. One number per spot is enough, and the graders are TD(0) (lean after every
+  step, post 37), Monte Carlo (wait for the end, post 51), and their shared-dial
+  versions (posts 41-42). A grader picks nothing. Ask it "which move?" and it has
+  no column to answer from.
+
+  Choosing needs a worth PER MOVE -- q(spot, move), the table of posts 38 and 43,
+  the network's four engine-worths of post 44 -- or, most directly, a POLICY
+  learned as its own object with a critic grading it (post 50). If a job must act,
+  its machine must carry one of those; if it must only judge, the per-move
+  machinery is dead weight.
+
+  ---
+
+  THE MAP, WHOLE
+
+  The four questions, laid flat -- find your world's row, and the shelf is on the
+  right:
+
+      THE WORLD                                    THE SHELF (and its post)
+      -------------------------------------------  ---------------------------------------
+      rulebook held, spots listable                grade: lay the law (34)
+                                                   choose: grade-improve loop (35),
+                                                           no-plan max walk (36)
+      no rulebook, run ends, spots listable,       TD(0) (37); Monte Carlo (51)
+        grade a habit
+      no rulebook, run ends, spots listable,       Q-learning / Expected Sarsa / Sarsa (38)
+        choose                                     + notebook rehearsal when footsteps are
+                                                   dear: Dyna-Q (39), Dyna-Q+ (40),
+                                                   priority sweeping (52)
+      no rulebook, run ends, spots continuous,     semi-gradient TD on groups (41) or
+        grade a habit                              tiles (42)
+      no rulebook, run ends, spots continuous,     Sarsa on tiles (43); the Q-network
+        choose                                     agent (44-49)
+      no rulebook, run NEVER ends, spots           differential actor-critic (50) --
+        continuous, choose                         subtract the average, fade nothing
+
+  ---
+
+  YOUR TURN (SORT A FRESH WORLD)
+
+  A greenhouse heater must hold 20 degrees through days and nights that never stop.
+  Its spot is two smooth dials (inside temperature, outside temperature); its moves
+  are three heater settings; every minute the world pays a reward (closeness to 20).
+  Which row of the map, and which shelf? Cross machines off with the questions, in
+  order, before peeking.
+
+      CHECK: the run never ends -- that alone kills the wait-for-the-end grader (no
+      finish, no return) and the faded pile (no honest fade near 1: the 1-per-step
+      pile grows as 1/(1-fade), so 10 at 0.9, 100 at 0.99, unbounded beyond). Smooth
+      dials kill the table. It must CHOOSE among three settings, so pure graders are
+      out. Bottom row of the map: the differential machine of post 50 -- grade each
+      minute against the crawling average R-bar, keep chances on the three settings.
+
+  YOUR TURN (SORT ANOTHER)
+
+  A tiny dice board game has 5 squares, and the full die table is printed on the
+  box lid: for every square and move, each landing's chance and payout. You want
+  the best plan before playing a single round. Which shelf?
+
+      CHECK: the rulebook is HELD, so walking is a waste -- no samples needed, ever.
+      Five squares list in one breath, so a table fits. You want a PLAN (choosing).
+      Top row: the grade-improve loop of post 35, or the no-plan max walk of post
+      36. Both compute the best arrows from the box lid alone; the machines of
+      chapters 13-17 would spend real rounds learning odds that were printed all
+      along.
+
+  ---
+
+  ONE GOOD RUN IS NOT A GRADE -- SO COUNT WHAT AN HONEST GRADE COSTS
+
+  Picking the right machine is half the closing move. The other half: proving it
+  worked. One run proves almost nothing -- post 38's spinner is still in the loop,
+  so one run can be lucky, and the same agent re-run with a different spinner can
+  land 80 points apart. An honest grade is a BOX of numbers:
+
+           settings pairs (which temperature, which step size)
+             /
+            /     runs (fresh spinner each)
+           /       /
+          +------------------+
+          |  one cell = one  |     episodes (1st, 2nd, ... 300th)
+          |  episode's total |    /
+          |  reward          |   /
+          +------------------+--
+
+  Say the lander's trainer tries 3 softmax temperatures and 4 Adam step sizes --
+  3 x 4 = 12 settings pairs. Each pair is trained 30 separate times (30 runs, each
+  with its own spinner seed), and each run lasts 300 episodes, each episode writing
+  down ONE number, its total reward. The box then holds
+
+      12 pairs x 30 runs x 300 episodes = 360 runs = 108,000 totals.
+
+  Count it before running it: 108,000 landings' worth of work is the price of the
+  word "works". Reading the box is two moves. FIX one settings pair: what remains
+  is a 30 x 300 sheet, one row per run, one column per episode. AVERAGE down each
+  column: 30 first-episode totals become one number, 30 second-episode totals the
+  next, and the 300 averages form the honest learning curve -- luck's spread
+  shrinks (it never vanishes) as the 30 runs vote it down.
+
+  YOUR TURN (COUNT A SMALLER BOX)
+
+  Two temperatures, three step sizes, 20 runs per pair, 100 episodes per run. How
+  many settings pairs, how many runs in all, how many totals in the box?
+
+      CHECK: 2 x 3 = 6 pairs; 6 x 20 = 120 runs; 120 x 100 = 12,000 totals.
+
+  ---
+
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
+
+  When I first sorted worlds, three walls stopped me. Each wall, the number or fact
+  that broke it, and the rule I carry now.
+
+  "Dyna shows up on two rows -- that must be a mistake." It shows up twice because
+  it plays two parts: it WALKS like a sample machine (no rulebook given), and it
+  COMPUTES like a rulebook machine (off the rulebook it writes itself -- the
+  notebook). Handed a real rulebook, its rehearsals run just as well off the print.
+  The map sorts worlds, not egos; a machine that changes what it holds changes
+  rows.
+
+  "So which move does Monte Carlo pick?" I asked it of a grader, and a grader picks
+  nothing: it keeps one worth per SPOT, and choosing needs a worth per (spot, move)
+  -- ask "which move" of a per-spot table and there is no column to read. Half the
+  shelf answers HOW GOOD, the other half answers WHICH MOVE; know which question
+  the job is asking before touching the shelf.
+
+  "My agent landed! I called it done." One run later it crashed, because the first
+  run was the spinner's gift. The honest version cost 30 runs of 300 episodes for
+  the pair I had picked -- 9,000 totals, averaged down the runs -- and the averaged
+  curve, not the lucky run, is what earned the word "works". One run is an
+  anecdote; the box is the grade.
+
+  ---
+
+  ONE BREATH
+
+  Before any arithmetic, interrogate the world with four questions. Does the run
+  END? -- if never, fade nothing and grade each step against the crawling average
+  (differential actor-critic); if it ends, returns and faded totals are legal. Do
+  you HOLD the rulebook? -- if yes, compute the plan without walking (lay the law,
+  grade-improve, or the max walk); if no, walk and crawl worths from samples -- and
+  if footsteps are dear, write your own rulebook and rehearse it (Dyna, priority
+  sweeping). Can you LIST the spots? -- if yes a table serves; if they are smooth
+  dials, build worths from shared parts (groups, tiles, or a network that invents
+  its features). And is the job to GRADE or to CHOOSE? -- graders keep a worth per
+  spot (TD, Monte Carlo); choosers keep a worth per move (Q-learning, Expected
+  Sarsa, Sarsa on tiles, the Q-network agent) or learn the policy itself. Then
+  prove the pick with a box, not an anecdote: settings pairs x runs x episodes, one
+  total per episode (3 x 4 pairs x 30 runs x 300 episodes = 108,000 totals), fix a
+  pair, average down the runs, and let the curve -- not the luckiest run -- say
+  whether it works.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the smallest honest scoreboard, written flat: ONE
+  settings pair, TWO runs (two spinner seeds), THREE episodes each. Six totals go
+  in; three averaged points come out. Count the strokes: 3 adds + 3 halvings = 6
+  strokes for the averaging; the full lander box would repeat this shape
+  12 x 30 x 300 = 108,000 cells wide.
+
+      # the box for one settings pair: 2 runs x 3 episodes, totals from the trainer
+      run_a_ep1 = -180.0                 # run A, episode 1 total reward
+      run_a_ep2 =  -95.0                 # run A, episode 2 total reward
+      run_a_ep3 =  -30.0                 # run A, episode 3 total: looks nearly landed!
+      run_b_ep1 = -220.0                 # run B, episode 1 total (same settings, new seed)
+      run_b_ep2 =  -35.0                 # run B, episode 2 total
+      run_b_ep3 =  -80.0                 # run B, episode 3 total: got WORSE -- luck swings
+
+      # average down the runs, one episode column at a time
+      avg_ep1 = (run_a_ep1 + run_b_ep1) / 2    # (-180 + -220) / 2 = -200.0
+      avg_ep2 = (run_a_ep2 + run_b_ep2) / 2    # ( -95 +  -35) / 2 =  -65.0
+      avg_ep3 = (run_a_ep3 + run_b_ep3) / 2    # ( -30 +  -80) / 2 =  -55.0
+
+      print(avg_ep1, avg_ep2, avg_ep3)         # -200.0 -65.0 -55.0
+
+      # read the three stories:
+      #   run A alone : -180 -> -95 -> -30   ("done! ship it!")
+      #   run B alone : -220 -> -35 -> -80   ("it broke at the end")
+      #   the average : -200 -> -65 -> -55   (a slow, honest climb -- the real grade)
+      # the real box just repeats this column-average:
+      #   12 pairs x 30 runs x 300 episodes = 108000 cells   # 12*30*300 = 108000
+      #   per pair: 300 columns, each averaging 30 totals    # 29 adds + 1 divide each
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other RL material after this page:
+  >>   a run that ends / never ends     = an episodic / continuing task
+  >>   the rulebook (die table)         = the model of the environment, p(s', r | s, a)
+  >>   rulebook held -> compute         = dynamic programming / planning
+  >>   no rulebook -> walk and crawl    = model-free learning
+  >>   write your own rulebook          = model-based RL (learned model, Dyna-style)
+  >>   grade a habit / choose moves     = prediction / control
+  >>   spots listable -> table          = the tabular setting
+  >>   smooth dials -> shared parts     = function approximation
+  >>   lay the law (post 34)            = iterative policy evaluation
+  >>   grade-improve loop (post 35)     = policy iteration
+  >>   no-plan max walk (post 36)       = value iteration
+  >>   subtract-the-average grading     = the average-reward / differential setting
+  >>   settings pairs x runs x episodes = a parameter sweep (grid search) over seeds
+  >>   the averaged curve               = the learning curve, averaged over runs (seeds)
+  >>   one run is an anecdote           = variance across seeds; report the mean
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 18 -- Choosing the Machine):
+    Part 1 (this post) -- the book closes here
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

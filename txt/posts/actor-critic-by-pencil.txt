@@ -215,35 +215,33 @@
   When I first built this machine, four walls stopped me. Each wall, the number that
   broke it, and the rule I carry now.
 
-  THE TRAP: "where did dilute go? I kept trying to discount." THE NUMBER THAT BROKE
-  IT: the pendulum never ends, and a discounted pile on an endless run blows up as
-  the discount nears 1 -- a steady reward of 1 per step is worth 1/(1-0.9) = 10, then
-  1/(1-0.99) = 100, then unbounded. The differential error stays small forever:
-  1 - 0.5 + 0.2 - 0.1 = 0.6. THE FIX: when the game never ends, grade each step
-  against the AVERAGE step (subtract R-bar) instead of fading a future that never
-  arrives.
+  "Where did dilute go? I kept trying to discount." The pendulum never ends, and a
+  discounted pile on an endless run blows up as the discount nears 1 -- a steady
+  reward of 1 per step is worth 1/(1-0.9) = 10, then 1/(1-0.99) = 100, then
+  unbounded. The differential error stays small forever: 1 - 0.5 + 0.2 - 0.1 = 0.6.
+  When the game never ends, grade each step against the AVERAGE step (subtract
+  R-bar) instead of fading a future that never arrives.
 
-  THE TRAP: "the untaken moves did nothing -- why do their preferences move at all?"
-  THE NUMBER THAT BROKE IT: the three shoves were +0.0177, -0.0156, -0.0021 -- and
-  they sum to exactly 0, because (took-it? - pi) always does. Chances must keep
-  summing to 1, so pushing one move up IS pulling the others down; the formula just
-  does it in proportion to their odds. THE FIX: a policy is one pie. Nobody gets a
-  bigger slice unless someone gives some up.
+  "The untaken moves did nothing -- why do their preferences move at all?" Add up
+  what actually moved: the three shoves were +0.0177, -0.0156, -0.0021, and they
+  sum to exactly 0, because (took-it? - pi) always does. Chances must keep summing
+  to 1, so pushing one move up IS pulling the others down; the formula just does it
+  in proportion to their odds. A policy is one pie. Nobody gets a bigger slice
+  unless someone gives some up.
 
-  THE TRAP: "my winner was already at 0.7054 -- shouldn't winning make it grow just
-  as fast as ever?" THE NUMBER THAT BROKE IT: the taken move's shove carries
-  (1 - its chance): at chance 0.7054 the factor is 0.2946; at chance 0.99 it would be
-  0.01 -- thirty times smaller for the same good news. THE FIX: the promotion is
-  sized by how SURPRISED the policy was to be right. Near-certain moves have almost
-  nothing left to learn from their own success -- which is also what stops the policy
-  slamming into all-or-nothing.
+  "My winner was already at 0.7054 -- shouldn't winning make it grow just as fast
+  as ever?" The taken move's shove carries (1 - its chance): at chance 0.7054 the
+  factor is 0.2946; at chance 0.99 it would be 0.01 -- thirty times smaller for the
+  same good news. The promotion is sized by how SURPRISED the policy was to be
+  right. Near-certain moves have almost nothing left to learn from their own
+  success -- which is also what stops the policy slamming into all-or-nothing.
 
-  THE TRAP: "R-bar is a third learner?! I set it once and left it." THE NUMBER THAT
-  BROKE IT: suppose the true average climbs to 1 while R-bar sits frozen at 0.5.
-  Every step now reads 1 - 0.5 + (about 0) = +0.5 "better than expected" -- forever
-  -- and every taken move keeps getting promoted, good or not; the yardstick itself
-  is lying by 0.5. THE FIX: R-bar crawls too (R-bar += size x how-wrong), so
-  "better than expected" keeps meaning something as expectations rise.
+  "R-bar is a third learner?! I set it once and left it." Suppose the true average
+  climbs to 1 while R-bar sits frozen at 0.5. Every step now reads
+  1 - 0.5 + (about 0) = +0.5 "better than expected" -- forever -- and every taken
+  move keeps getting promoted, good or not; the yardstick itself is lying by 0.5.
+  R-bar crawls too (R-bar += size x how-wrong), so "better than expected" keeps
+  meaning something as expectations rise.
 
   ---
 
