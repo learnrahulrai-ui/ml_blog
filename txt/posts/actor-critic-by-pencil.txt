@@ -14,8 +14,6 @@
     <- prev:  [Chapter 15, Part 5: From Eight Dials to a Soft Landing: The Whole Agent by Pencil](the-whole-agent-by-pencil.txt)
        next:  [Chapter 17, Part 1: Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt) ->
 
-  ---
-
   Every machine in this book so far learned a WORTH and then acted greedy on it. The
   worth was always a middleman: you wanted a policy -- what to DO -- but you learned a
   number and read the policy off it by grabbing the biggest. This post drops the
@@ -30,8 +28,6 @@
   from one to the other, a jolt. And sometimes the best policy is honestly MIXED --
   "go left 70% of the time" -- which a grab-the-biggest rule can never say. So learn
   the policy as its own thing, a set of knobs you can tune smoothly.
-
-  ---
 
   SO KEEP A PREFERENCE PER MOVE, AND SOFTMAX IT INTO CHANCES
 
@@ -73,14 +69,12 @@
   hair -- no jolt.
 
   YOUR TURN -- another spot, preferences h = [2, 0, 1]. Shift, lift by e, divide.
-  What are the three chances? Slate first, then check:
+  What are the three chances?
 
       CHECK: shifted = [0, -2, -1];  e^0 = 1,  e^(-2) = 0.1353,  e^(-1) = 0.3679
              total = 1 + 0.1353 + 0.3679 = 1.5032
              pi = [ 1/1.5032 , 0.1353/1.5032 , 0.3679/1.5032 ]
                 = [ 0.665 , 0.090 , 0.245 ]        (sums to 1.000)
-
-  ---
 
   WHICH YOU SAMPLE FROM, NOT ARGMAX
 
@@ -95,8 +89,6 @@
   Most rolls land in right (it owns 70% of the line), but stay and left still come up
   sometimes. The wandering is built into the policy itself, not bolted on like the
   epsilon of the value machines -- and it is exactly what the next nudge will tune.
-
-  ---
 
   BUT TO NUDGE A PREFERENCE YOU NEED A YARDSTICK -- A CRITIC
 
@@ -115,8 +107,6 @@
 
       V(0.3) = critic[A0] + critic[B1] =  0.2 + (-0.1) = 0.1     (worth of the spot we left)
       V(0.6) = critic[A1] + critic[B1] =  0.3 + (-0.1) = 0.2     (worth of the spot we landed on)
-
-  ---
 
   WHICH MEASURES "BETTER THAN EXPECTED": THE DIFFERENTIAL TD ERROR
 
@@ -140,8 +130,6 @@
   A positive 0.6: this step earned more than the running average and landed on a
   slightly better spot than it left. Better than expected. That single number now
   drives BOTH learners.
-
-  ---
 
   SO NUDGE BOTH: THE CRITIC TOWARD THE TRUTH, THE ACTOR TOWARD WHAT BEAT THE AVERAGE
 
@@ -200,7 +188,7 @@
 
   YOUR TURN -- the same spot, but a BAD step: how-wrong = -0.5 (the move came in
   below the running average). Chances still [0.0351, 0.2595, 0.7054], right taken,
-  size 0.1. Compute the three shoves. Slate first, then check:
+  size 0.1. Compute the three shoves.
 
       CHECK: right (taken):  0.1 x (-0.5) x (1 - 0.7054) = -0.05 x 0.2946 = -0.0147  -> DOWN
              stay         :  0.1 x (-0.5) x (0 - 0.2595) = +0.0130                    -> up
@@ -208,12 +196,7 @@
              Every sign flipped: a below-average step demotes its cause and hands
              the freed odds to the untried moves. (And the three still sum to 0.)
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first built this machine, four walls stopped me. Each wall, the number that
-  broke it, and the rule I carry now.
+  WHERE DID DILUTE GO? -- FOUR HABITS THE ENDLESS PENDULUM BROKE
 
   "Where did dilute go? I kept trying to discount." The pendulum never ends, and a
   discounted pile on an endless run blows up as the discount nears 1 -- a steady
@@ -242,101 +225,6 @@
   move keeps getting promoted, good or not; the yardstick itself is lying by 0.5.
   R-bar crawls too (R-bar += size x how-wrong), so "better than expected" keeps
   meaning something as expectations rise.
-
-  ---
-
-  ONE BREATH
-
-  Every earlier machine learned a worth and grabbed the biggest; this one learns the
-  POLICY itself, dodging the max (bad for real-valued moves), the all-or-nothing
-  jolt, and the can't-be-mixed limit. Keep a PREFERENCE per move (a sum of weights at
-  the lit tiles) and softmax preferences into chances ([-1,1,2] -> [0.0351, 0.2595,
-  0.7054], shifting by the biggest first since softmax reads only gaps); SAMPLE from
-  those, never argmax. To know whether a taken move deserves promoting, keep a CRITIC
-  -- a worth per spot -- as a baseline, and on the never-ending pendulum measure each
-  step by the differential how-wrong = reward - R-bar + V(landing) - V(left) (= 0.6
-  here). That one number drives three crawls: R-bar toward the reward, the critic's
-  worth toward how-wrong (the linear value nudge), and each move's preference by
-  size x how-wrong x (took-it? - pi) -- shoving the taken move up by (1 - its chance)
-  and the rest down by their odds, the three shoves always summing to zero. A bad
-  step flips every sign. Actor proposes, critic grades, both learn from the same gap.
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- the step above, line by line, every number hard-coded.
-  Count one full step: 3 preference sums (2 picks + 1 add each), softmax (3
-  exponentials, 2 adds, 3 divides), the roll (2 compares), the how-wrong (2 picks +
-  1 add each for two worths, then 3 adds/subtracts), three shoves (3 multiplies
-  each), 8 weight-writes (R-bar, 2 critic tiles, 2 tiles x 3 moves... of which all 6
-  actor writes happen) -- about 40 strokes, 9 writes.
-
-      # ---- the three preferences at position 0.3 (lit tiles A0, B1)
-      h_left  = -1.0 + 0.0                     # -1.0
-      h_stay  =  0.0 + 1.0                     #  1.0
-      h_right =  1.0 + 1.0                     #  2.0
-
-      # ---- softmax (shift by the biggest, 2.0, first -- gaps only)
-      e_left  = 2.71828 ** (-1.0 - 2.0)        # 0.0498
-      e_stay  = 2.71828 ** ( 1.0 - 2.0)        # 0.3679
-      e_right = 2.71828 ** ( 2.0 - 2.0)        # 1.0
-      total   = e_left + e_stay + e_right      # 1.4177
-      pi_left, pi_stay, pi_right = e_left/total, e_stay/total, e_right/total
-      # 0.0351, 0.2595, 0.7054
-
-      # ---- the roll: cumulative line [0.0351, 0.2946, 1.0], draw r = 0.63
-      # 0.63 > 0.0351 (not left), 0.63 > 0.2946 (not stay) -> RIGHT taken
-
-      # ---- the differential how-wrong (reward 1, R_bar 0.5, V(left) 0.1, V(landing) 0.2)
-      how_wrong = 1 - 0.5 + 0.2 - 0.1          # 0.6
-
-      # ---- crawl 1: the average-reward guess
-      R_bar = 0.5 + 0.1 * how_wrong            # 0.56
-
-      # ---- crawl 2: the critic, on the LEFT spot's lit tiles
-      critic_A0 =  0.2 + 0.1 * how_wrong       #  0.26
-      critic_B1 = -0.1 + 0.1 * how_wrong       # -0.04
-
-      # ---- crawl 3: the actor, every move's shove on both lit tiles
-      shove_right = 0.1 * how_wrong * (1 - pi_right)   #  0.0177  (taken -> up)
-      shove_stay  = 0.1 * how_wrong * (0 - pi_stay)    # -0.0156  (down)
-      shove_left  = 0.1 * how_wrong * (0 - pi_left)    # -0.0021  (down a hair)
-      # shove_right + shove_stay + shove_left = 0.0 exactly
-      actor_right_A0 =  1.0 + shove_right      # 1.0177
-      actor_right_B1 =  1.0 + shove_right      # 1.0177
-      actor_stay_A0  =  0.0 + shove_stay       # -0.0156
-      actor_stay_B1  =  1.0 + shove_stay       # 0.9844
-      actor_left_A0  = -1.0 + shove_left       # -1.0021
-      actor_left_B1  =  0.0 + shove_left       # -0.0021
-      # re-read at 0.3: h_right = 2.035, h_stay = 0.969, h_left = -1.004
-
-  There is no anchor here: the pendulum never ends, so no terminal move and no
-  reward-alone case exists -- the differential how-wrong runs every single step,
-  forever.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   preference per move        = the action preference  h(s, a) = w_actor . x(s)
-  >>   softmax preferences->chances = the softmax policy  pi(a|s) = e^h(a) / sum_b e^h(b)
-  >>   shift by the biggest first   = the max-subtraction trick (numerical stability)
-  >>   sample, not argmax          = a stochastic policy (vs greedy)
-  >>   the preference-keeper        = the ACTOR (the policy parameters)
-  >>   the worth-keeper / baseline  = the CRITIC (a state-value estimate V(s))
-  >>   R-bar                        = the average-reward estimate (continuing tasks)
-  >>   how wrong = r - R-bar + V(land) - V(left) = the differential TD error (delta)
-  >>   critic nudge w += size x delta x x(s)     = semi-gradient TD value update
-  >>   actor nudge w += size x delta x (1[a]-pi) = the softmax policy-gradient update
-  >>   (1[a] - pi(a))               = the score / eligibility (gradient of log pi)
-  >>   the shoves sum to zero       = the score function has zero mean under pi
-  >>   the pendulum                 = a continuing control task (swing up and balance)
-  >>   actor + critic together      = actor-critic (policy gradient with a learned baseline)
 
 ----------------------------------------------------------------------------------------------
   CHAPTER 16 -- Policy Gradient:

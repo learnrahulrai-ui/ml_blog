@@ -14,9 +14,7 @@
     <- prev:  [Chapter 13, Part 3: Dyna-Q by Pencil](dyna-q-by-pencil.txt)
        next:  [Chapter 13 Reference: The Sample-based Map](sample-based-reference.txt) ->
 
-  ---
-
-  Everything this page uses, rebuilt from a blank sheet. A spot = one place in a small
+  A spot = one place in a small
   world where you can stand. A move / arrow = a direction you pick there (four: up,
   left, down, right). A reward = a number the world pays on a move. A worth = a number
   saying how much reward you expect to gather from a choice onward, kept in a table --
@@ -37,8 +35,6 @@
   keeps walking the route it already trusts. If the world then CHANGES -- a wall falls
   and a brand-new shortcut opens -- Dyna-Q never notices, because it has no reason to
   wander back toward the spots it long ago wrote off.
-
-  ---
 
   WHICH NEEDS A WAY TO MAKE STALE MOVES TEMPTING AGAIN: A CLOCK
 
@@ -65,12 +61,10 @@
 
   YOUR TURN -- one turn of clock-keeping. The sheet reads tau[5][left] = 24,
   tau[5][right] = 3, tau[8][up] = 99, and this turn you really walk (5, right).
-  What do the three clocks say after? Slate first, then check:
+  What do the three clocks say after?
 
       CHECK: tick all three: 25, 4, 100. Reset only the walked one:
       tau[5][left] = 25 ,  tau[5][right] = 0 ,  tau[8][up] = 100
-
-  ---
 
   SO TURN STALENESS INTO A FAKE REWARD: THE BONUS
 
@@ -98,13 +92,11 @@
   YOUR TURN -- one rehearsal with the bonus. A recalled move stored (landing, reward)
   where the reward is -1; its clock reads tau = 100; kappa = 0.001; the landing's best
   worth is 2; dilute = 1.0; the cell being fixed holds 0; size = 0.1. Compute the
-  bonus, the target, and the new cell. Slate first, then check:
+  bonus, the target, and the new cell.
 
       CHECK: bonus  = 0.001 x sqrt(100) = 0.001 x 10 = 0.01
       target = ( -1 + 0.01 ) + 1.0 x 2 = -0.99 + 2 = 1.01
       cell   = 0 + 0.1 x ( 1.01 - 0 ) = 0.101
-
-  ---
 
   BUT A NEVER-TRIED MOVE HAS NO NOTEBOOK LINE TO REHEARSE
 
@@ -126,8 +118,6 @@
   turn (it is never reset, because it is never really walked), and pile the growing
   stale-bonus onto it -- until the chooser re-tries it for real. Without the
   placeholders, an untried move stays invisible to curiosity forever.
-
-  ---
 
   WHY THE SQUARE ROOT -- NOT tau ITSELF, NOT ITS LOGARITHM
 
@@ -169,8 +159,6 @@
   for -- grows like sqrt(turns-since-checked). The bonus is a confidence-width. (The
   bandit post on this blog meets the same square root under the name UCB; nothing from
   there is needed here.)
-
-  ---
 
   THE DAY THE WALL FALLS: WHAT EACH MACHINE ACTUALLY DOES
 
@@ -217,12 +205,7 @@
   re-checking paths that are exactly as dead as remembered, and its curve sits a hair
   below Dyna-Q's. The bonus buys insurance, and insurance costs a premium.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first built this machine, four walls stopped me. Each wall, the number that
-  broke it, and the rule I carry now.
+  THE BONUS LIVES IN IMAGINATION ONLY, AND THREE MORE BURNS THAT TAUGHT ME
 
   "A bonus is a bonus" -- so I added it to real moves too. The damage showed up as
   one number: a real move paying 1 with tau = 9 got taught as 1.003, and the crawl's
@@ -250,8 +233,6 @@
   one plus three back-to-here-reward-0 placeholders -- so curiosity has a line to
   grab.
 
-  ---
-
   THE WHOLE CHAPTER, ONE LINE EACH
 
   Four posts, one thread -- learn a worth from a sample, then squeeze more from
@@ -265,88 +246,6 @@
 
   And the deeper split: a model-based machine (Dyna) learns faster per real footstep
   than a model-free one (Q-learning alone) -- but only as far as its notebook is true.
-
-  ---
-
-  ONE BREATH
-
-  Dyna-Q stops exploring once it trusts a path, so it misses a shortcut that opens
-  LATER. Dyna-Q+ adds a CLOCK -- one number per (spot, move), ticking up every turn,
-  reset to 0 only on the move actually walked -- so staleness is measured. During a
-  rehearsal ONLY, a recalled move earns a fake bonus kappa x sqrt(tau) added to its
-  stored reward (0.001 x sqrt(2500) = 0.05 on a long-untried move), so the longer a
-  move sits untried the more its worth gets pumped, until the greedy chooser re-tries
-  it for real and discovers the new 7-step way where 15 steps used to be the truth.
-  So that even never-walked moves can be tempted, the first visit to a spot records
-  all four arrows -- the real one plus three harmless placeholders -- giving curiosity
-  a line to grab. The bonus belongs to the imagination only; a real move's reward
-  stays untouched.
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- the traces above, line by line, every number hard-coded.
-  Moves are numbered 0=up, 1=left, 2=down, 3=right. One Dyna-Q+ rehearsal costs a
-  plain rehearsal's 8 pencil strokes (3 compares, 2 multiplies, 2 adds, 1 subtract)
-  plus 3 more for the bonus (1 square root, 1 multiply, 1 add) -- 11 strokes, 1 write.
-
-      # ---- THE CLOCK, ONE TURN: you really walked (7, right); three clocks shown,
-      #      every other clock in the sheet ticks the same way
-      tau_7_right = 40 + 1                  # 41   tick every clock up by 1...
-      tau_7_up    = 40 + 1                  # 41
-      tau_3_down  = 12 + 1                  # 13
-      tau_7_right = 0                       # ...THEN reset only the move walked
-
-      # ---- ONE REHEARSAL WITH THE BONUS: stored (landing, reward) has reward 1,
-      #      tau = 9, kappa = 0.001, landing's best worth 0, size 0.1, dilute 1.0
-      bonus  = 0.001 * (9 ** 0.5)           # 0.001 * 3   = 0.003
-      peek   = 0                            # best worth at the landing (all 0 here)
-      target = (1 + bonus) + 1.0 * peek     # 1.003 + 0   = 1.003
-      q_cell = 0 + 0.1 * (target - 0)       # 0.1 * 1.003 = 0.1003
-      # the same rehearsal without the bonus lands at 0.1; the hair of extra height
-      # (0.0003) grows as the clock climbs
-
-      # ---- FIRST-VISIT RECORDING, ALL FOUR ARROWS WRITTEN FLAT (no loop, no
-      #      comprehension): arrow 2 really taken from spot 0 -> landed 0, reward 1
-      model_page_0 = {}                     # page 0 was missing -> start it blank
-      model_page_0[0] = (0, 0)              # placeholder: up    -> back to 0, reward 0
-      model_page_0[1] = (0, 0)              # placeholder: left  -> back to 0, reward 0
-      model_page_0[2] = (0, 1)              # THE REAL LINE: down -> landed 0, paid 1
-      model_page_0[3] = (0, 0)              # placeholder: right -> back to 0, reward 0
-      # 4 lines filed from ONE footstep; the three placeholders exist so the
-      # rehearsal lottery can someday name them
-
-      # ---- THE TWO TARGETS, SIDE BY SIDE (the trap that bites hardest):
-      #      real move   : reward + dilute * peek            -> 1 + 1.0*0 = 1.0
-      #      rehearsal   : (reward + bonus) + dilute * peek  -> 1.003
-      #      the bonus NEVER appears on the real-move line
-
-  Writes in this whole exhibit: 4 clock writes, 1 worth write, 4 notebook lines. The
-  worth write is the only arithmetic heavier than +1.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   spot                = state  (standard: s)
-  >>   move / arrow        = action  (a)
-  >>   worth table q       = action-value function  (Q)
-  >>   the crawl rule      = the incremental update  (new = old + alpha x (target - old))
-  >>   the notebook        = the model  (a learned model of the world)
-  >>   rehearsal           = planning / a planning step (simulated experience)
-  >>   the clock tau       = time-since-last-tried, per (state, action)
-  >>   stale-bonus         = the exploration bonus  kappa * sqrt(tau)
-  >>   kappa               = the exploration-bonus weight
-  >>   placeholders        = optimistic model init for untried actions (back-to-self, reward 0)
-  >>   the wall-falls world = the shortcut maze (Sutton & Barto, Dyna-Q+ experiment)
-  >>   size 0.1            = step size / learning rate  (alpha)
-  >>   dilute              = discount factor  (gamma)
-  >>   Dyna-Q+             = Dyna-Q with the bonus, for non-stationary (changing) worlds
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):

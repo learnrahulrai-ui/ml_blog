@@ -14,8 +14,6 @@
     <- prev:  [Chapter 13, Part 1: TD(0) Built by Pencil](td-zero-by-pencil.txt)
        next:  [Chapter 13, Part 3: Dyna-Q by Pencil](dyna-q-by-pencil.txt) ->
 
-  ---
-
   Here is the whole game, from a blank sheet. There is a tiny world of three places you
   can stand -- call each one a spot. At every spot you can walk one of four directions --
   call each a move. When you make a move, the world pays you a number -- the reward --
@@ -40,8 +38,6 @@
   good or bad on its own -- it depends on which move you pick there. You need a worth
   per spot AND per move. A worth = a number saying how much reward you expect to gather
   from that choice onward.
-
-  ---
 
   WHICH FORCES A TABLE, NOT A ROW: ONE WORTH PER (SPOT, MOVE)
 
@@ -68,8 +64,6 @@
   a 4x12 cliff grid, drawn near the end of this post -- 48 spots x 4 moves = 192 cells.
   The 3-spot world keeps every number checkable by pencil.)
 
-  ---
-
   SO HOW DO YOU PICK A MOVE? MOSTLY THE BIGGEST, SOMETIMES A WANDER
 
   At a spot you read its row of four worths and pick the biggest -- the greedy move.
@@ -86,8 +80,6 @@
   That 0.1 is epsilon -- the wander share. Note the order of operations: the spinner is
   rolled FIRST, blind; only the greedy branch reads the row. "Biggest in the row" hands
   back the INDEX of the largest worth (ties broken by a fair pick among the tied).
-
-  ---
 
   THE NUDGE: FIX THE MOVE YOU JUST MADE
 
@@ -113,8 +105,6 @@
   machine. The whole remaining question is the last piece -- the "future worth read at
   the landing" -- and it is the ONE place the two machines in the title split.
 
-  ---
-
   THE FORK: A DREAMED MAX, OR AN HONEST AVERAGE
 
   The landing has a whole row of four move-worths. What single number stands for "the
@@ -132,8 +122,6 @@
   is honest: it knows the spinner will send it wandering 10% of the time, so it
   averages the row by the real pick-odds. Same nudge, same size, same target shape --
   only this "future" number differs. Now both, by hand, on the same trace.
-
-  ---
 
   Q-LEARNING BY HAND -- THE MAX
 
@@ -187,8 +175,6 @@
       target  = 2 + 1.0 x 0.02 = 2.02
       q[0][1] = 0.2 + 0.1 x ( 2.02 - 0.2 ) = 0.2 + 0.1 x 1.82 = 0.2 + 0.182 = 0.382
 
-  ---
-
   EXPECTED SARSA BY HAND -- THE SAME TRACE, ONLY THE FUTURE CHANGES
 
   Same world, same trace, size 0.1, dilute 1.0, table reset to all 0. The only swap:
@@ -241,14 +227,12 @@
                         ^ biggest                                   others 0.025 each
 
   With dilute 1.0 and size 0.1, the cell being fixed currently holds 0. Compute the
-  weighted average, the target, and the new cell. Slate first, then check:
+  weighted average, the target, and the new cell.
 
       CHECK: average = 0.925 x 3 + 0.025 x 1 + 0.025 x 1 + 0.025 x 1
                      = 2.775 + 0.025 + 0.025 + 0.025 = 2.85
       target  = 0 + 1.0 x 2.85 = 2.85
       new cell = 0 + 0.1 x ( 2.85 - 0 ) = 0.285
-
-  ---
 
   BUT THE GAME ENDS SOMETIMES: THE ANCHOR
 
@@ -267,8 +251,6 @@
   This last update is the anchor: the one target with no guess inside it -- a plain
   paid fact. Every other cell's worth is a guess leaning on a guess; the chain of
   leaning ends here, which is what lets the whole table heal toward truth.
-
-  ---
 
   WHICH TABLE DO YOU END UP WITH? THE PEEK DECIDES
 
@@ -329,12 +311,7 @@
   walks the safe route. Same world, two honest answers: optimal-if-perfect
   (Q-learning) vs best-for-who-you-actually-are (Sarsa).
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first built these two machines, the same five walls stopped me, some for
-  hours. Here is each wall, the number that broke it, and the rule I carry now.
+  FIVE WALLS: A TARGET THAT IS NOT A PLACE, A TABLE THAT IS NOT A DIARY
 
   "The target is... a spot? an arrow? I think it is a reward." I asked this three
   times, and the arithmetic feeds the confusion: the first target above came out 2,
@@ -370,93 +347,6 @@
   switches the target from reward + dilute x future to reward alone. The ending is
   the world's news, not your deduction; your only job on hearing it is to drop the
   future piece.
-
-  ---
-
-  ONE BREATH
-
-  A worth per spot was enough to GRADE a plan; to FIND one you need a worth per (spot,
-  move) -- a table q, one cell per stand-here-pick-this, and that table is the
-  machine's entire memory. Pick mostly the biggest cell in the row (greedy), wander
-  10% of the time (epsilon, rolled blind over all four moves) so you keep discovering.
-  Fix the cell of the move you JUST MADE, by the crawl q[prev][move] += size x
-  (target - q[prev][move]), with target = reward + dilute x (future read at the
-  landing). That future is the ONLY fork: Q-learning takes the MAX of the landing's
-  row (dreams you will play best); Expected Sarsa takes the AVERAGE weighted by the
-  real pick-odds, greedy 0.925 and 0.025 each for the rest (honest that you wander) --
-  which is why the same cell came out 0.02 for one and 0.0185 for the other. At the
-  goal the game ends, there is no landing, so the target is the reward alone -- the
-  anchor of plain fact the whole leaning table heals toward.
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- the trace above, line by line, every number hard-coded.
-  One Q-learning nudge costs: 3 compares (to find the biggest of 4), 2 multiplies,
-  2 adds, 1 subtract -- 8 pencil strokes -- and 1 write into the table. One Expected
-  Sarsa nudge costs: 3 compares, 6 multiplies, 5 adds, 1 subtract -- 15 strokes -- and
-  1 write. On the full cliff table (48 spots x 4 moves = 192 cells) it is still ONE
-  cell written per move made; the other 191 sit untouched.
-
-      q_spot0 = [0, 0, 0, 0]                      # the twelve cells, all starting at 0
-      q_spot1 = [0, 0, 0, 0]
-      q_spot2 = [0, 0, 0, 0]
-      size    = 0.1                               # crawl fraction
-      dilute  = 1.0                               # future-shrinker
-
-      # ---- Q-LEARNING, first move: stood at 0, picked move 1, reward 2, landed on 1
-      biggest = max(q_spot1[0], q_spot1[1], q_spot1[2], q_spot1[3])   # max(0,0,0,0) = 0
-      target  = 2 + dilute * biggest                                  # 2 + 1.0*0    = 2.0
-      q_spot0[1] = q_spot0[1] + size * (target - q_spot0[1])          # 0 + 0.1*(2-0) = 0.2
-
-      # ---- Q-LEARNING, second move: stood at 1, picked move 3, reward 0, landed on 0
-      biggest = max(q_spot0[0], q_spot0[1], q_spot0[2], q_spot0[3])   # max(0,0.2,0,0) = 0.2
-      target  = 0 + dilute * biggest                                  # 0 + 1.0*0.2    = 0.2
-      q_spot1[3] = q_spot1[3] + size * (target - q_spot1[3])          # 0 + 0.1*0.2    = 0.02
-
-      # ---- EXPECTED SARSA runs its own fresh table. Its first move writes the same 0.2
-      #      (an all-zero row has max = average), so after that move it holds:
-      es_spot0 = [0, 0.2, 0, 0]
-      es_spot1 = [0, 0,   0, 0]
-      # second move: stood at 1, picked move 3, reward 0, landed on 0.
-      # greedy move at the landing = biggest of [0, 0.2, 0, 0] = move 1
-      w0, w1, w2, w3 = 0.025, 0.925, 0.025, 0.025    # 0.1/4 each + 0.9 on the greedy; sum 1.0
-      average = (w0 * es_spot0[0] + w1 * es_spot0[1]
-                 + w2 * es_spot0[2] + w3 * es_spot0[3])               # 0.925*0.2 = 0.185
-      target  = 0 + dilute * average                                  # 0.185
-      es_spot1[3] = es_spot1[3] + size * (target - es_spot1[3])       # 0 + 0.1*0.185 = 0.0185
-
-      # ---- BOTH MACHINES, the game ends: reward 5 arrives, no landing exists
-      q_spot2[0] = q_spot2[0] + size * (5 - q_spot2[0])               # 0 + 0.1*(5-0) = 0.5
-
-  Count of table-writes in this whole exhibit: 4. Count of cells ever read: 8 for the
-  two maxes, 4 for the average, 4 for the old values -- a pencil could do the day's
-  work here, which is the point.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   spot                = state  (standard: s)
-  >>   move / arrow        = action  (a)
-  >>   the "+" / reward    = reward  (R or r)
-  >>   worth per (spot,move) = action value  (Q, or q(s,a))
-  >>   the table q         = the Q-table / action-value function
-  >>   biggest in the row  = the greedy action  (argmax_a q(s,a))
-  >>   wander 10%          = epsilon-greedy exploration  (epsilon)
-  >>   size 0.1            = step size / learning rate  (alpha)
-  >>   dilute 1.0          = discount factor  (gamma)
-  >>   the crawl rule      = the incremental update  (new = old + alpha x (target - old))
-  >>   future = max of landing row    = Q-learning (off-policy control)
-  >>   future = weighted average      = Expected Sarsa (the pick-odds are the policy)
-  >>   future = the next move's cell  = Sarsa (on-policy control)
-  >>   anchor (game ended) = terminal state  (target = reward alone)
-  >>   the 4x12 world      = Cliff Walking (Sutton & Barto)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):

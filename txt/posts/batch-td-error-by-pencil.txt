@@ -14,8 +14,6 @@
     <- prev:  [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt)
        next:  [The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt) ->
 
-  ---
-
   The previous post grabbed a random handful of past moves out of a bin -- a BATCH --
   and said: for each one, rebuild its target with the current net, then take one Adam
   step on the averaged miss. It waved at two things to keep moving. First, it never
@@ -40,8 +38,6 @@
   coast -- so a worth-row has four numbers. Note 1 fired the MAIN engine and lived;
   note 2 fired the RIGHT engine and crashed. The job: one how-wrong number per note.
   The rest is where each number comes from.
-
-  ---
 
   THE TARGET NEEDS THE LANDING'S WORTH, BUT WHICH MOVE COMES NEXT?
 
@@ -88,7 +84,7 @@
 
   YOUR TURN -- one more landing row. The twin reads worths [1, 1, 3, 1] at some
   landing. Softmax it (e^1 = 2.72, e^3 = 20.09) and dot the chances back into the
-  worths. Slate first, then check:
+  worths.
 
       CHECK: total = 2.72 + 2.72 + 20.09 + 2.72 = 28.25
              chances ~ [ 0.096 , 0.096 , 0.711 , 0.096 ]  -- the SAME chances as the
@@ -96,8 +92,6 @@
              only reads the GAPS between worths, not their heights.
              worth = 0.096x1 + 0.096x1 + 0.711x3 + 0.096x1 = 0.288 + 2.133 ~ 2.42
              -- one higher than that row's 1.42, because every worth is one higher.
-
-  ---
 
   BUT A CRASH HAS NO LANDING WORTH, SO ZERO THE ENDED ONES
 
@@ -125,8 +119,6 @@
   a crash scored as a REWARD, because the dead placeholder's worth leaked into it.
   The zeroing is what keeps a game-ending move graded on its final reward alone.
 
-  ---
-
   THE PREDICTION IS THE MOVE YOU REALLY MADE, SO PICK JUST THAT ONE
 
   The target is what the move SHOULD have been worth. Now the guess: what did the net
@@ -152,8 +144,6 @@
 
       q_took  =  [ 2.5 ,  0.5 ]        (the worth of the engine actually fired, one per note)
 
-  ---
-
   SUBTRACT, AND THE WHOLE BATCH'S MISS FALLS OUT AT ONCE
 
   Target minus guess, straight across -- how wrong the live net was on each note you
@@ -175,15 +165,13 @@
   YOUR TURN -- a third note joins the batch: (s3, took engine 0, reward 0.5,
   ended? 0, s3'). The frozen twin reads the landing s3' as [2, 2, 2, 2]; the live
   net reads the left-spot s3 as [1.8, 0, 0, 0]. dilute 0.9. Compute the landing's
-  worth, the target, the guess, and the miss. Slate first, then check:
+  worth, the target, the guess, and the miss.
 
       CHECK: equal worths -> equal chances [0.25 x 4] -> landing worth = 2.0
              still flying -> x (1 - 0) keeps the 2.0
              target = 0.5 + 0.9 x 2.0 = 2.3
              guess  = pick column 0 of [1.8, 0, 0, 0] = 1.8
              miss   = 2.3 - 1.8 = 0.5   (lowballed -- pull engine 0 up a little)
-
-  ---
 
   WHY TWO NETS -- THE ONE THAT GRADES MUST HOLD STILL
 
@@ -223,12 +211,7 @@
   uses the twin; and because the twin does not budge while the batch is swept, the
   miss you compute is a miss against a fixed mark, not a mirage.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first built this machine, four walls stopped me. Each wall, the number that
-  broke it, and the rule I carry now.
+  ONE NET FOR BOTH JOBS, AND A MARK THAT KEPT FLEEING
 
   "One net can do both jobs -- why keep a copy?" My misses refused to shrink across
   the replay passes, and I blamed the step size first. The real culprit: with one
@@ -261,109 +244,6 @@
   a twin costume. The twin is a PHOTOCOPY -- a full copy of every dial made before
   the burst -- never a second label on the live sheets. (In the code below, that is
   deepcopy, and it is the whole reason the word appears.)
-
-  ---
-
-  ONE BREATH
-
-  The previous post scooped a random batch from the bin and waved at how its miss is
-  computed and at which net computes it. Both, now. For a batch of five-part notes
-  (s, a, r, ended?, s'), the FROZEN twin reads every landing s' at once into a
-  worth-row per note; softmax turns each row into chances that add to 1 (shift the
-  row so its biggest is 0 first -- chances read gaps, and e^502 chokes);
-  chances-dotted-into-worths gives each landing's Expected-Sarsa worth; times
-  (1 - ended?) zeroes the ended ones (else a crash's dead placeholder leaks a fat
-  worth into its target); and target = r + dilute x that. The LIVE net reads every
-  left-spot s into its own worth-rows, and -- since the move taken is stored -- picks
-  just that one column as the guess: average where you do not know, pick where you
-  do. Subtract, straight across, and the whole batch's how-wrong falls out in one
-  sweep: [0.78, -1.5]. Each rides the backprop machine, averaged into one Adam step.
-  Two nets because the grader must hold still: across the several replay passes taken
-  after one real move, the live net moves every pass, so a target read off IT would
-  flee as fast as you chase it -- photocopy the net before the passes (a real copy,
-  never a second name on the same sheets), grade every pass against the copy, refresh
-  between bursts. Guess with the live net; grade with the frozen twin.
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- the batch above, line by line, every number hard-coded.
-  The two nets are black boxes here: the rows they output are the rows drawn above
-  (the Q-network post built the real forward pass psi = sA+b1, x = max(psi,0),
-  Q = xC+b2 that lives inside each). Count one note's grading: 4 exponentials + 3
-  adds + 4 divides (softmax), 4 multiplies + 3 adds (the dot), 1 multiply (the mask),
-  1 multiply + 1 add (the target), 1 pick, 1 subtract -- 23 strokes; the batch of two
-  is 46, done in one sweep.
-
-      dilute = 0.9
-
-      # ---- TARGET SIDE: the FROZEN twin reads the LANDINGS ----
-      # note 1 landing worths [0,2,0,0]; note 2 landing worths [4,4,4,4]
-      # softmax note 1's row (shift by its biggest, 2, first):
-      e0 = 2.71828 ** (0 - 2)              # 0.135
-      e1 = 2.71828 ** (2 - 2)              # 1.0
-      e2 = 2.71828 ** (0 - 2)              # 0.135
-      e3 = 2.71828 ** (0 - 2)              # 0.135
-      total   = e0 + e1 + e2 + e3          # 1.406
-      c0, c1, c2, c3 = e0/total, e1/total, e2/total, e3/total   # 0.096 0.711 0.096 0.096
-      v_next1 = c0*0 + c1*2 + c2*0 + c3*0  # 1.42  (chances dotted into worths)
-      # note 2's row is all-equal -> chances 0.25 each -> worth:
-      v_next2 = 0.25*4 + 0.25*4 + 0.25*4 + 0.25*4                # 4.0
-
-      # ---- THE ENDED? MASK, then the targets ----
-      v_next1 = v_next1 * (1 - 0)          # still flying: keeps 1.42
-      v_next2 = v_next2 * (1 - 1)          # crashed: 0.0
-      target1 = 2  + dilute * v_next1      # 2 + 0.9*1.42 = 3.28
-      target2 = -1 + dilute * v_next2      # -1 + 0       = -1.0
-
-      # ---- GUESS SIDE: the LIVE net reads the LEFT-SPOTS ----
-      # network's rows: s1 -> [1.0, 2.5, 0.5, 1.5] ; s2 -> [0.0, 1.0, 0.5, -0.5]
-      q_took1 = 2.5                        # note 1 took engine 1 -> pick column 1
-      q_took2 = 0.5                        # note 2 took engine 2 -> pick column 2
-
-      # ---- SUBTRACT: the whole batch's miss in one sweep ----
-      how_wrong1 = target1 - q_took1       # 3.28 - 2.5 = 0.78
-      how_wrong2 = target2 - q_took2       # -1.0 - 0.5 = -1.5
-      # each rides backprop through its taken column; the two grades are AVERAGED
-      # into one Adam step
-
-      # ---- THE FROZEN TWIN: a real photocopy, made once per burst ----
-      # from copy import deepcopy
-      # current_q = deepcopy(network)      # copy V1's every dial -- NOT current_q = network,
-      #                                    # which is a second name on the same sheets
-      # pass 1: batch graded against current_q (V1); Adam steps network V1 -> V2
-      # pass 2: fresh batch, same V1 grader; network V2 -> V3
-      # pass 3: network V3 -> V4          (current_q still V1)
-      # pass 4: network V4 -> V5          (current_q still V1)
-      # next real move: current_q = deepcopy(network) again, now copying V5
-
-  The anchor, unchanged since the tables: a note whose move ended the game has
-  ended? = 1, so (1 - ended?) = 0 zeroes its landing worth and its target is the bare
-  reward -- here the crash's -1.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   the frozen twin / current_q      = the target network (the fixed Q_t used for targets)
-  >>   the live net / network           = the online network (Q_{t+1}, the one being trained)
-  >>   photocopy before the passes       = freezing / syncing the target network (deepcopy)
-  >>   the five-part note                = a transition (s, a, r, terminal, s')
-  >>   q_next (worths at the landings)   = action-values Q(s', .) from the target network
-  >>   softmax of a worth-row            = the Boltzmann policy pi(.|s') over the actions
-  >>   shift by the row's biggest first  = the max-subtraction trick (numerical stability)
-  >>   chances-dotted-into-worths        = the Expected-Sarsa state value sum_a' pi(a'|s') Q(s',a')
-  >>   times (1 - ended?)                = the terminal mask (no bootstrap past episode end)
-  >>   target = r + dilute x v_next      = the Expected-Sarsa TD target; dilute = gamma
-  >>   pick the taken column (q_took)    = gathering Q(s,a) for the action actually taken
-  >>   how-wrong = target - q_took        = the TD error (delta), one per transition
-  >>   the several replay passes          = the replay updates per step (num_replay)
-  >>   the whole batch at once            = the vectorised / minibatch TD-error computation
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):

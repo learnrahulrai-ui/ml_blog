@@ -14,8 +14,6 @@
     <- prev:  [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt)
        next:  [Chapter 15, Part 5: From Eight Dials to a Soft Landing: The Whole Agent by Pencil](the-whole-agent-by-pencil.txt) ->
 
-  ---
-
   This chapter built the pieces that TRAIN a Q-network: a net that reads a spot and
   hands back a worth per move; backprop, which walks one miss back to every dial;
   Adam, which spends each dial's nudge well; and the replay bin plus the frozen twin,
@@ -30,8 +28,6 @@
   dials right now. The replay bin = a list of past moves, each stored as a five-part
   note: the spot left, the move taken, the reward, whether that move ENDED the run
   (1 yes / 0 no), and the spot landed on.
-
-  ---
 
   SO THE WORLD DOES NOT RUN THE AGENT -- IT CALLS IT, AT THREE KINDS OF MOMENT
 
@@ -53,8 +49,6 @@
   (nothing has happened). At every middle moment it hands a reward and the new spot
   its last move produced. At the last moment the run is over -- it hands the final
   reward and there is no new spot. Three moments, three functions.
-
-  ---
 
   WHICH MEANS THE FIRST CALL ONLY PICKS A MOVE AND REMEMBERS IT
 
@@ -82,8 +76,6 @@
 
   last_move is not a move already carried out. It is the move the world is ABOUT to
   carry out next. Why that matters is the next section.
-
-  ---
 
   BECAUSE THE NEXT CALL MUST STORE last_move AS THE CAUSE OF THE REWARD IT RECEIVES
 
@@ -113,8 +105,6 @@
   That is the entire reason last_move is saved on every call: it must always hold the
   move whose reward the next call will receive.
 
-  ---
-
   SO A MIDDLE CALL DOES FOUR THINGS: STORE, LEARN, PICK, REMEMBER
 
   With the timing settled, the middle call is straightforward. agent_step gets
@@ -142,8 +132,6 @@
   files note 9, and every call learns from then on. The gate is not caution for its
   own sake: drawing 8 notes from a bin of 3 would just re-teach the same few moments
   and call them the world. The machine waits until a draw can actually vary.
-
-  ---
 
   BUT THE LAST CALL HAS NO NEXT SPOT, SO ITS NOTE IS MARKED ENDED
 
@@ -179,7 +167,7 @@
 
   Write every note the bin receives, in order -- five parts each. Then: which engine
   gets blamed for the -100, and what will that note's target be when it is replayed
-  (dilute 0.9)? Slate first, then check:
+  (dilute 0.9)?
 
       CHECK: note 1 (at step 1):  ( S0 , 2 , +5   , 0 , S1 )
              note 2 (at step 2):  ( S1 , 1 , -3   , 0 , S2 )
@@ -188,8 +176,6 @@
              happened yet). The -100 blames engine 3 -- the move picked at step 2,
              the last move actually executed. Its replayed target: -100 + 0.9 x
              (whatever the twin reads off the zero-spot) x (1 - 1) = -100 exactly.
-
-  ---
 
   SO STRUNG TOGETHER, THE THREE CALLS ARE A LANDER THAT LEARNS TO FLY
 
@@ -208,12 +194,7 @@
   a complete deep-RL agent flying LunarLander -- and the next post assembles every
   dial of it, end to end, on one page.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first wired this machine, four walls stopped me. Each wall, the number that
-  broke it, and the rule I carry now.
+  WHERE IS MY LOOP? -- THE WIRING MISTAKES BEFORE THE FIRST CLEAN EPISODE
 
   "Where is MY loop? I kept writing a main loop to drive the lander." But the
   simulator already owns the loop -- it calls agent_start once, agent_step a few
@@ -241,86 +222,6 @@
   fixed and means something: STORE first (the old pair earns its note while it
   still IS the old pair), LEARN, then PICK, then REMEMBER the new pair. Two of the
   four would happily swap; those two never can.
-
-  ---
-
-  ONE BREATH
-
-  The chapter's parts -- backprop, Adam, replay, the frozen twin -- become an agent
-  only when the world can CALL them. The world runs the loop and knocks at three
-  kinds of moment: agent_start (first spot, no reward -- pick a move by softmax over
-  the net's worths and remember last_spot, last_move), agent_step (every middle
-  moment -- STORE the five-part note (last_spot, last_move, reward, ended? 0, new
-  spot), LEARN by the replay burst, PICK the next move, REMEMBER the new pair), and
-  agent_end (run over -- store the note with ended? 1 and a dead placeholder spot,
-  learn once more, return nothing). last_move must always hold the move whose reward
-  the NEXT call receives, or a reward gets pinned on a move that did not cause it --
-  the two remember-lines and the store-first order both exist for that one law. The
-  ended? flag makes the final note's replayed target the bare reward via
-  (1 - ended?). Four calls, three notes, one law of blame -- strung over a few
-  hundred runs, that is a lander learning to fly.
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- one whole tiny run, written flat, every value hard-coded
-  (two-dial toy spots so the numbers fit). Four calls arrive; three notes get filed;
-  the learn-burst runs inside every call after the first. (One waiver: the pencil
-  half's bin-gate would keep a run this short from ever learning, so this exhibit
-  waives it to keep every LEARN line on the page.)
-
-      bin_notes = []
-
-      # ---- the world calls agent_start( S0 = [0.1, 1.4] )
-      last_spot = [0.1, 1.4]
-      last_move = 2                      # softmax over the worths at S0 sampled engine 2
-      # (nothing stored: a note needs five parts and only S0 exists yet)
-      # -> hand engine 2 back; the world executes it
-
-      # ---- the world calls agent_step( reward +5, S1 = [0.3, 1.1] )
-      bin_notes.append(([0.1, 1.4], 2, 5, 0, [0.3, 1.1]))   # note 1 blames engine 2
-      # LEARN: photocopy the net -> frozen twin; then the replay burst
-      #   (batch -> misses -> backprop -> one Adam step, several passes)
-      last_spot = [0.3, 1.1]
-      last_move = 1                      # sampled engine 1 for the world to run next
-      # -> hand engine 1 back
-
-      # ---- the world calls agent_step( reward -3, S2 = [0.2, 0.7] )
-      bin_notes.append(([0.3, 1.1], 1, -3, 0, [0.2, 0.7]))  # note 2 blames engine 1
-      # LEARN again (fresh photocopy, fresh burst)
-      last_spot = [0.2, 0.7]
-      last_move = 3                      # sampled engine 3
-      # -> hand engine 3 back
-
-      # ---- the world calls agent_end( reward -100 )        (engine 3 crashed it)
-      bin_notes.append(([0.2, 0.7], 3, -100, 1, [0.0, 0.0]))  # note 3: ended, dead spot
-      # LEARN one last time; nothing is returned -- the run is over
-      # when note 3 is ever drawn: target = -100 + 0.9 * (twin's read) * (1-1) = -100
-
-      # the run in numbers: 4 calls, 3 notes, 3 learn-bursts, 1 crash filed at -100
-      # (the real code wraps exactly these lines into three defs named agent_start,
-      #  agent_step, agent_end -- the world knows those three names and no others)
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   agent_start / step / end        = the agent's episode interface (start, step, end)
-  >>   the world calls the agent        = the environment-agent loop (RL-Glue / Gym style)
-  >>   a spot (eight dials)             = a state s (the observation vector)
-  >>   pick a move by softmax + sample  = the Boltzmann / softmax behaviour policy
-  >>   last_spot / last_move            = the stored previous state and action
-  >>   the five-part note in the bin    = a transition (s, a, r, terminal, s') in the replay buffer
-  >>   the ended? flag                  = the done / terminal bit
-  >>   ended? 1 -> target is reward     = no bootstrap at episode end (the (1 - terminal) mask)
-  >>   the learn-burst                  = the replay updates per step (num_replay minibatches)
-  >>   store, learn, pick, remember     = the agent_step body, in its required order
-  >>   the three calls over many runs   = a full deep-RL control agent (e.g. on LunarLander)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):

@@ -14,8 +14,6 @@
     <- prev:  [Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt)
        next:  [Four Questions Before Any Arithmetic: Which Machine for Which World](which-machine-for-which-world.txt) ->
 
-  ---
-
   Chapter 13 kept a second paper beside the worth-table -- a MODEL, a note of what each move once
   produced (which spot it landed on, what reward it paid) -- and REHEARSED off it: grab a remembered
   move, re-run its stored result as if it had just happened, and let the worth-table learn from the
@@ -28,8 +26,6 @@
   lookup: for a move out of a spot, it hands back the spot you land on and the reward paid. Rehearse
   = redo a stored move's result to refresh a worth, no real step taken. Everything here is that same
   rehearsal, only chosen by size-of-change instead of at random.
-
-  ---
 
   SO DRAW A WORLD WHERE ONE REWARD HAS JUST BEEN FOUND AND MUST TRAVEL BACK
 
@@ -47,8 +43,6 @@
 
       new V(4) = 1 + 0.9 x V(GOAL) = 1 + 0.9 x 0 = 1
 
-  ---
-
   WHICH MEANS THE THING WORTH REHEARSING IS THE ONE WHOSE WORTH WOULD MOVE MOST
 
   Spot 4's worth would jump from 0 to 1. Call that jump its PRIORITY -- how far its worth would move
@@ -64,8 +58,6 @@
       QUEUE (biggest priority on top):
         spot 4   priority 1.0
         ----------------------
-
-  ---
 
   SO POP THE BIGGEST, APPLY IT, THEN WAKE WHOEVER LED INTO IT
 
@@ -119,13 +111,11 @@
 
   YOUR TURN -- stretch the corridor one spot left. A spot 0 leads into spot 1 (its
   right-move lands on 1, paying 0), and the sweep above just finished: V(1) = 0.729,
-  V(0) still 0. What priority does spot 0 get pushed with? Slate first, then check:
+  V(0) still 0. What priority does spot 0 get pushed with?
 
       CHECK: new V(0) = 0 + 0.9 x V(1) = 0.9 x 0.729 = 0.6561
              priority(0) = | 0.6561 - 0 | = 0.6561   -- well over the floor, so queued;
              one more pop and the goal's reward is five spots from home.
-
-  ---
 
   SO EVERY POP DID REAL WORK, WHICH IS THE WHOLE WIN OVER GRABBING AT RANDOM
 
@@ -136,8 +126,6 @@
   Priority sweeping never spends a pop on a no-jump: it works straight down the line of spots whose
   worth actually moves, always the biggest jump first, waking each predecessor exactly when its turn
   to move arrives.
-
-  ---
 
   BUT NOT EVERY NUDGE DESERVES THE QUEUE, SO SET A FLOOR
 
@@ -154,12 +142,7 @@
       real but too small to spend a pop on; the floor is what keeps a long chain from
       queueing forever over dust.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first built this machine, four walls stopped me. Each wall, the number that
-  broke it, and the rule I carry now.
+  FREE WORK IS NOT USEFUL WORK, AND THREE MORE QUEUE MISTAKES
 
   "Random rehearsal was already free -- why rank anything?" Count the useful ones:
   on the fresh corridor, only ONE of the four rehearsals teaches anything (spot 4's;
@@ -185,13 +168,7 @@
   a reverse index (landing -> the spots that lead in), filed at the same moment
   each forward fact is recorded.
 
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
+  THE SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the sweep above, pop by pop, every number hard-coded. The
   model is the deterministic corridor (each spot's right-move lands on the next,
@@ -231,36 +208,6 @@
   THE ANCHOR, unchanged since Chapter 13: the GOAL is a finished spot worth 0, so the move into it
   fades nothing extra -- spot 4's worth is the bare +1, and every spot behind it is that +1 faded one
   more step.
-
-  ---
-
-  ONE BREATH
-
-  Chapter 13's Dyna rehearsed remembered moves at RANDOM to spread worth with no real footstep, and
-  wasted most early rehearsals on moves whose landing was still 0 (copying a 0 back teaches nothing).
-  Priority sweeping spends every rehearsal well: give each spot a PRIORITY -- how far its worth would
-  jump if rehearsed, | new V - old V | with new V = reward + 0.9 x worth(landing) -- and keep a queue
-  that hands back the biggest jump first. Pop it, apply the update, then wake its PREDECESSORS (the
-  spots whose move lands on it), pushing each with its own freshly-computed jump. On a four-spot
-  corridor where the goal's +1 was just found, the sweep pops 4 (worth -> 1), then 3 (0.9), then 2
-  (0.81), then 1 (0.729) -- four pops, four real moves, the reward walked all the way back with none
-  wasted, where random grabbing would have spent most picks on no-jumps. A small floor theta drops
-  jumps too tiny to bother queuing. Effort follows the change, biggest surprise first.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   a worth, V of a spot           = the state-value function V(s)
-  >>   the model (landing + reward)     = the learned model p(s', r | s, a)
-  >>   rehearse a remembered move       = a planning / model backup (Dyna-style)
-  >>   new V = reward + 0.9 x V(landing) = the Bellman (optimality) update; 0.9 = gamma
-  >>   priority = | new V - old V |       = the size of the pending Bellman update
-  >>   the queue, biggest on top         = the priority queue / max-heap
-  >>   who leads into a spot             = the predecessors of a state
-  >>   wake the predecessors             = pushing predecessors after a value change
-  >>   the floor theta                   = the priority threshold (skip negligible updates)
-  >>   effort follows the change         = prioritized sweeping (Moore & Atkeson / Sutton-Barto)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 17 -- Two the Sample-Based Map Skipped):

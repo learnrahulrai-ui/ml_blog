@@ -14,8 +14,6 @@
     <- prev:  [Four Questions Before Any Arithmetic: Which Machine for Which World](which-machine-for-which-world.txt)
        next:  [The Copying Machine by Pencil](the-copying-machine-by-pencil.txt) ->
 
-  ---
-
   Every learning machine in this book so far taught itself from a REWARD -- a number the
   world pays out, one step at a time, while the machine stumbles around finding out what
   works. That is the hard road. But some jobs come with a shortcut: a human already knows
@@ -27,8 +25,6 @@
   before any machine can copy, the recorded diary has to be re-cut into a shape a machine
   can actually use, and that re-cutting has its own arithmetic. Get the food wrong and
   both machines starve.
-
-  ---
 
   THE GAME, BECAUSE THE NUMBERS MEAN NOTHING WITHOUT IT
 
@@ -51,7 +47,7 @@
   goal patch is marked. The job: push the T-shaped block until it covers the goal patch.
   The world keeps a score between 0 and 1 that rises with how much of the goal patch the
   block covers -- full cover scores 1. (This little game is a standard research test bed;
-  its usual name is in the jargon note at the end.)
+  researchers publish it under the name Push-T.)
 
   At every moment, the world reports the whole situation as exactly FIVE numbers. Here is
   the first recorded moment of the first recorded game -- real numbers from the diary this
@@ -71,8 +67,6 @@
 
   Five numbers, and the whole table is known. Nothing else exists for the machine.
 
-  ---
-
   AND THE HUMAN ANSWERS WITH TWO NUMBERS
 
   The human plays through a screen: at each moment they point at a TARGET SPOT on the
@@ -86,8 +80,6 @@
   Hand at (222, 97), and the human says "slide toward (233, 71)" -- a little right, a
   little up the page. One line of the diary is exactly this pair: five numbers of
   situation, two numbers of answer.
-
-  ---
 
   THE DIARY: 206 GAMES, 25,650 LINES
 
@@ -111,8 +103,6 @@
   That ledger is the entire teaching material. No reward column is needed anywhere in
   it -- the human's own decision IS the right answer, and learning here means: given the
   five situation numbers, produce the two numbers the human would have produced.
-
-  ---
 
   BUT A LIVE MACHINE IS SLOW, WHICH FORCES THE EIGHT ENVELOPES
 
@@ -144,8 +134,6 @@
   last batch of envelopes is only partly used) instead of 124 looks. Eight times less
   thinking, and smoother pushing.
 
-  ---
-
   WHICH MEANS THE DIARY IS THE WRONG SHAPE, SO RE-CUT IT INTO WINDOWS
 
   The diary stores one decision per line -- the human never knew about envelopes. The
@@ -173,12 +161,10 @@
   question (a different starting situation).
 
   YOUR TURN -- game 2 of the real diary runs from line 161 up to (not including) line
-  279. How many moments is that, and how many windows of 8 does it yield? Slate first:
+  279. How many moments is that, and how many windows of 8 does it yield?
 
       CHECK: length = 279 - 161 = 118 moments
              windows = 118 - 8 + 1 = 111
-
-  ---
 
   AND A WINDOW MUST NEVER CROSS A GAME SEAM
 
@@ -214,11 +200,9 @@
   next seven.
 
   YOUR TURN -- the whole diary again, from scratch: 25,650 moments, 206 games, windows
-  of 8, no window crossing a seam. How many pairs? Slate first:
+  of 8, no window crossing a seam. How many pairs?
 
       CHECK: each game loses 7 starts -> 25,650 - 206 x 7 = 25,650 - 1,442 = 24,208
-
-  ---
 
   TWO MEANINGS OF "SKIPPED", BECAUSE THEY BIT ME
 
@@ -247,9 +231,7 @@
   Study reads every line; live play goes blind seven ticks out of eight. Keep the two
   clocks apart and the rest of the chapter stays simple.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
+  SEVEN SKIPPED STATES THAT WEREN'T, AND A SLOT THAT IS NOT A LINE
 
   "If the machine goes blind for 7 moments, the diary reader should jump by 8 too." I
   wanted study time to copy live play's rhythm -- start a window every eighth line. But
@@ -276,13 +258,7 @@
   eight-at-once shape is an invention for the machine's benefit, cut at study time, and
   the same recorded decision reappears in up to eight different windows because of it.
 
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same cutting in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
+  THE SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the toy 12-moment game and the real diary's first seam,
   line by line, every count hard-coded. About 10 subtractions total, nothing more.
@@ -314,47 +290,6 @@
       # answer   = the decisions at lines 161..168  (8 rows x 2 numbers = 16 numbers)
 
       print(toy_windows, total_pairs)                  # 5 24208
-
-  THE ANCHOR: the minus-7 is the whole seam rule in one number -- a window of 8 has 8
-  possible last lines inside a game but only (length - 7) legal first lines, so every
-  game, long or short, donates exactly 7 fewer pairs than it has moments.
-
-  ---
-
-  ONE BREATH
-
-  A human played a pushing game 206 times while every moment was written down: 25,650
-  ledger lines, each line five situation numbers (hand x, hand y, block x, block y,
-  block twist) and the human's two-number answer (a target spot the hand slides toward).
-  A live machine is slow, so it will answer eight ticks at once -- eight sealed
-  envelopes, 8 x 2 = 16 numbers per answer -- which means the one-decision-per-line
-  diary must be re-cut: for every line, question = that line's situation, answer = that
-  line's decision plus the next seven. Every line starts its own window (overlap is the
-  food), no window may cross a game seam (each game loses its last 7 starts), so the
-  diary yields 25,650 - 206 x 7 = 24,208 question-answer pairs, addressed through a
-  safe-list that hops the seams (slot 154 holds line 161). Study time reads every line;
-  live play goes blind seven ticks out of eight. Next page: the machine that eats these
-  pairs.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other material after this page:
-  >>   learning by copying a diary       = imitation learning / learning from demonstrations
-  >>   the diary of played games         = the demonstration dataset (this one: Push-T,
-  >>                                        a standard benchmark -- a 2-D block-pushing task)
-  >>   one recorded moment               = a transition / a (state, action) pair
-  >>   the five situation numbers        = the state / observation (agent x, y; block x, y;
-  >>                                        block angle in radians)
-  >>   the two answer numbers            = the action (a target position for the pusher)
-  >>   one whole game                    = an episode; its last line + 1 = the episode end
-  >>   the eight envelopes               = an action chunk (chunk size 8) / action chunking
-  >>   the window cutting                = a sliding window over each episode
-  >>   the safe-list                     = the valid start indices (no chunk crosses an
-  >>                                        episode boundary)
-  >>   act 8 ticks without looking       = open-loop execution of the chunk; looking every
-  >>                                        tick would be closed-loop
-  >>   the 0..1 goal-patch score          = the environment's coverage-based reward
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 19 -- Learning by Copying):

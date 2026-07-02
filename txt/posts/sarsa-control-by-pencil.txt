@@ -14,9 +14,7 @@
     <- prev:  [Sharp From Blurry: Tile Coding by Pencil](tile-coding-by-pencil.txt)
        next:  [Two Stages and a Bend: A Q-Network by Pencil](q-network-by-pencil.txt) ->
 
-  ---
-
-  Everything this page uses, from a blank sheet. The world is a car in a valley, too
+  The world is a car in a valley, too
   weak to climb straight out. A spot = where the car is (its position along the
   valley). A move = one of three pushes: left, coast, right. A reward = a number the
   world pays on a move (here a fine of -1 every step until the car escapes). A worth
@@ -36,8 +34,6 @@
   shape. We need a worth for the PAIR (spot, move). Everything else -- the rulers,
   the lit tiles, the sum, the nudge -- carries over untouched. Only the bookkeeping
   grows one notch.
-
-  ---
 
   SO GIVE EACH MOVE ITS OWN ROW OF WEIGHTS
 
@@ -68,13 +64,11 @@
 
   YOUR TURN -- the three worths at position 0.9. Position 0.9 lights tiles A1 (0.9
   sits in [0.5,1.0)) and B2 (0.9 sits in [0.75,1.25)). Read the table above. Which
-  push wins? Slate first, then check:
+  push wins?
 
       CHECK: worth(0.9, left ) = -3.0 + 0.0 = -3.0
              worth(0.9, coast) = -2.0 + 0.0 = -2.0
              worth(0.9, right) = -1.0 + 0.0 = -1.0     -> right wins (least negative)
-
-  ---
 
   WHICH LETS THE CAR RANK ITS MOVES AND PICK -- BUT KEEP WANDERING
 
@@ -92,8 +86,6 @@
 
   This wandering is not noise to be tolerated -- in a moment it turns out to be part
   of what the car is learning to grade.
-
-  ---
 
   SO THE NUDGE CHASES THE MOVE IT WILL ACTUALLY MAKE NEXT -- THAT IS SARSA
 
@@ -115,8 +107,6 @@
   imagine. And because several tiles are lit at once, split the step across them --
   size = alpha / rulers (here 0.2 / 2 = 0.1) -- so the lit tiles together move the
   worth by the one step you meant.
-
-  ---
 
   THE WHOLE STEP BY HAND -- ONE FOOTSTEP, EVERY NUMBER
 
@@ -170,7 +160,7 @@
   above (right row [-0.632, -1.0, 0.0, -0.932, 0.0]; left and coast rows unchanged).
   At 0.6 the car pushes RIGHT as decided; the world fines it -1 and rolls it to 0.9
   (tiles A1, B2). At 0.9 the spinner stays greedy. size 0.1, dilute 0.9. What is the
-  next move, the target, the miss, and the two new weights? Slate first, then check:
+  next move, the target, the miss, and the two new weights?
 
       CHECK: at 0.9: left -3.0+0 = -3.0, coast -2.0+0 = -2.0, right -1.0+0 = -1.0
              -> next move = right (least negative)
@@ -181,8 +171,6 @@
              each lit tile of (0.6, right): +0.1 x 0.032 = +0.0032
              w[right][A1] = -1.0   + 0.0032 = -0.9968
              w[right][B1] = -0.932 + 0.0032 = -0.9288
-
-  ---
 
   AND AT THE FLAG THERE IS NO NEXT MOVE -- THE ANCHOR
 
@@ -196,8 +184,6 @@
 
   Every escape pins the worths of the last push to the bare reward, and that truth
   then crawls backward, footstep by footstep, into the pushes that led there.
-
-  ---
 
   WHY THIS IS CALLED "ON-POLICY" -- AND WHERE Q-LEARNING WOULD DIFFER
 
@@ -218,8 +204,6 @@
   same nudge; the only change is which next worth you reach for. (A third sibling,
   Expected Sarsa, reaches for the odds-weighted average of the next worths --
   another single swap.)
-
-  ---
 
   THE EPISODE, MOVE BY MOVE -- THREE HANDLES AND TWO STICKY NOTES
 
@@ -243,12 +227,7 @@
   spots, and the greedy pick slowly bends into the only thing that works: push WITH
   the motion to pump the swing higher each pass, until one rock carries it over.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first built this machine, four walls stopped me. Each wall, the number that
-  broke it, and the rule I carry now.
+  LEAST NEGATIVE WINS, AND THREE MORE LESSONS THE CLIFF CHARGED FOR
 
   "-4.5 is the biggest number here, so left wins." All the worths are negative, and
   my eye kept grabbing the longest bar. But at 0.3 the worths are -4.5, -2.5, -1.3,
@@ -277,104 +256,6 @@
   actually just acted, never learns at all. One line of bookkeeping, and skipping it
   makes the whole drive teach a single pair. Nudge first, THEN slide: the new tiles
   and the new push become the notes before the world is answered.
-
-  ---
-
-  ONE BREATH
-
-  A spot-worth cannot rank moves, so give every push its OWN row of weights:
-  worth(spot, move) is the sum of that spot's lit tiles read along the move's row
-  (at 0.3: right = -0.5 + (-0.8) = -1.3, the least negative of three, so right
-  wins). The car pushes the greedy best but wanders epsilon of the time so no move
-  goes stale. The nudge grades each push against the move it will ACTUALLY make
-  next -- target = reward + dilute x worth(next spot, next move), miss = target -
-  worth(this spot, this move) -- and only the taken move's lit tiles move, each by
-  size = alpha / rulers times the miss. That "next move it really makes" is what
-  makes it SARSA and on-policy; swap the peek for the best next worth and you have
-  Q-learning, for the odds-weighted average and you have Expected Sarsa. The flag
-  has no next move, so the anchor grades against the bare reward and the truth
-  crawls backward. On Mountain Car every step costs -1, so worths count
-  steps-to-freedom, and the greedy pick bends into pumping the swing until one pass
-  clears the hill.
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- the drive above, line by line, every number hard-coded.
-  Count one footstep first: three next-worths (2 picks + 1 add each = 9 strokes), the
-  target (1 multiply + 1 add), the old worth (2 picks + 1 add), the miss (1 subtract),
-  the shared step (1 multiply), two tile writes (2 adds) -- about 17 strokes, 2
-  writes, whatever the world's size.
-
-      # the table: one row of five tile-weights per push
-      w_left  = [-2.0, -3.0, 0.0, -2.5, 0.0]      # A0 A1 B0 B1 B2
-      w_coast = [-1.0, -2.0, 0.0, -1.5, 0.0]
-      w_right = [-0.5, -1.0, 0.0, -0.8, 0.0]
-      size    = 0.2 / 2                            # alpha 0.2 over 2 rulers = 0.1
-      dilute  = 0.9
-
-      # ---- FOOTSTEP ONE: at 0.3 (tiles A0,B1 = slots 0,3) push right; reward -1; land 0.6
-      # rank the pushes at the landing 0.6 (tiles A1,B1 = slots 1,3):
-      q_left  = w_left[1]  + w_left[3]             # -3.0 + -2.5 = -5.5
-      q_coast = w_coast[1] + w_coast[3]            # -2.0 + -1.5 = -3.5
-      q_right = w_right[1] + w_right[3]            # -1.0 + -0.8 = -1.8
-      # spinner stayed greedy -> next push = right (least negative: -1.8)
-      target    = -1 + dilute * q_right            # -1 + 0.9*(-1.8) = -2.62
-      old_worth = w_right[0] + w_right[3]          # -0.5 + -0.8    = -1.3
-      how_wrong = target - old_worth               # -2.62 - (-1.3) = -1.32
-      step = size * how_wrong                      # 0.1 * (-1.32)  = -0.132
-      w_right[0] = w_right[0] + step               # A0: -0.5 - 0.132 = -0.632
-      w_right[3] = w_right[3] + step               # B1: -0.8 - 0.132 = -0.932
-      # sticky notes slide: now remembering (tiles 1,3 ; push right)
-
-      # ---- FOOTSTEP TWO: at 0.6 push right; reward -1; land 0.9 (tiles A1,B2 = slots 1,4)
-      q_left  = w_left[1]  + w_left[4]             # -3.0 + 0 = -3.0
-      q_coast = w_coast[1] + w_coast[4]            # -2.0 + 0 = -2.0
-      q_right = w_right[1] + w_right[4]            # -1.0 + 0 = -1.0   -> next push = right
-      target    = -1 + dilute * q_right            # -1 + 0.9*(-1.0)  = -1.9
-      old_worth = w_right[1] + w_right[3]          # -1.0 + (-0.932)  = -1.932
-      how_wrong = target - old_worth               # -1.9 - (-1.932)  = +0.032
-      step = size * how_wrong                      # 0.1 * 0.032      = 0.0032
-      w_right[1] = w_right[1] + step               # A1: -1.0   + 0.0032 = -0.9968
-      w_right[3] = w_right[3] + step               # B1: -0.932 + 0.0032 = -0.9288
-
-      # ---- THE FLAG: at 0.9 push right; the car tops the hill; reward -1; no next
-      old_worth = w_right[1] + w_right[4]          # -0.9968 + 0 = -0.9968
-      how_wrong = -1 - old_worth                   # -1 + 0.9968 = -0.0032
-      step = size * how_wrong                      # -0.00032
-      w_right[1] = w_right[1] + step               # -0.9968 - 0.00032 = -0.99712
-      w_right[4] = w_right[4] + step               #  0.0    - 0.00032 = -0.00032
-      # the miss is nearly zero: after two footsteps the right row has almost
-      # healed to the truth along this little drive
-
-  Tile-writes in this whole exhibit: 6, all in the right row; the left and coast rows
-  never lit and never moved. With eight rulers instead of two, each count above swaps
-  its 2 for an 8 -- still pocket change per footstep.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   spot                       = state  (s)
-  >>   push / move                 = action  (a)
-  >>   worth(spot, move)           = the action-value q-hat(s, a, w)
-  >>   a row of weights per move    = a separate weight block per action (stacked weight vector)
-  >>   worth = sum of lit tiles     = q-hat(s,a,w) = w_a . x(s)  (linear action-value)
-  >>   greedy pick (least negative) = argmax_a q-hat(s, a)
-  >>   wander epsilon of the time   = epsilon-greedy exploration
-  >>   the sticky notes             = prev_state (its tiles) and prev_action
-  >>   how wrong                    = the TD error  (delta)
-  >>   the move actually taken next = the on-policy action a'  (the second A in SARSA)
-  >>   w[move] += size x delta x x(s) = the episodic semi-gradient Sarsa update
-  >>   the anchor (topped the hill) = terminal update (target = reward alone)
-  >>   max over next moves          = Q-learning's target (off-policy)
-  >>   odds-weighted next worths    = Expected Sarsa's target
-  >>   fined -1 each step           = Mountain Car's reward (escape the valley as fast as you can)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 14 -- Function Approximation):

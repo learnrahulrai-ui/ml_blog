@@ -14,19 +14,14 @@
     <- prev:  [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt)
        next:  [One Question, Two Right Answers: Where Copying Breaks](one-question-two-right-answers.txt) ->
 
-  ---
-
   On the desk sit 24,208 question-answer pairs, cut from a diary of a human playing a
   block-pushing game 206 times. Each pair: a QUESTION of five numbers (hand x, hand y,
   block x, block y, block twist -- the whole table at one moment) and an ANSWER of
   sixteen numbers (the human's next eight target points, two numbers each, sealed
   together). Something must learn to turn any five such numbers into the sixteen the
-  human would have produced. This page builds that something with a pencil: its food
-  prep, its wiring, its wrongness meter, and one dial-turn of its learning -- ending
-  with a number about the real machine that a pencil can predict before training even
-  starts.
-
-  ---
+  human would have produced. Build it with a pencil --
+  down to a number about the real machine that the pencil can call before training
+  even starts.
 
   RAW NUMBERS CHOKE SMALL DIALS, SO RE-RULE EVERY COLUMN FIRST
 
@@ -69,11 +64,8 @@
   that never varies) would divide by zero, so each spread is floored at 0.000001.
 
   YOUR TURN -- re-rule a block height of 338.3 (T y column: middle 272.4, spread 65.9).
-  Slate first:
-
+ 
       CHECK: (338.3 - 272.4) / 65.9 = 65.9 / 65.9 = 1.0 -- exactly one spread above.
-
-  ---
 
   NOW THE MACHINE: A WEB THAT WIDENS, MIXES, AND NARROWS
 
@@ -112,11 +104,9 @@
   change, only the container -- so guess and recorded answer line up number for number.
 
   YOUR TURN -- count the dials-and-nudges of a small web: 3 inputs -> 4 units -> 2
-  outputs. Slate first:
+  outputs.
 
       CHECK: 3 x 4 + 4 = 16 ;  4 x 2 + 2 = 10 ;  total 26.
-
-  ---
 
   A TINY TWIN BY PENCIL, BECAUSE 137,232 DIALS HIDE THE ARITHMETIC
 
@@ -148,9 +138,7 @@
 
   The tiny twin answers [0.7, 0.7]. Seventeen dials-and-nudges (2x3+3 = 9 and 3x2+2 = 8)
   did all of it, and one middle died at the squash -- its whole row of wires going out
-  carries nothing this pass. Hold that thought; it returns at the dial-turn.
-
-  ---
+  carries nothing this pass.
 
   HOW WRONG WAS IT? SUBTRACT, SQUARE, AVERAGE
 
@@ -178,11 +166,9 @@
   Every miss is in there; none is reported separately. The meter is a melter: many
   numbers in, ONE out.
 
-  YOUR TURN -- guess [1.0, 2.0] against truth [2.0, 0.0]. Meter? Slate first:
+  YOUR TURN -- guess [1.0, 2.0] against truth [2.0, 0.0]. Meter?
 
       CHECK: misses -1.0 and 2.0 ; squares 1.0 and 4.0 ; meter = 5.0 / 2 = 2.5.
-
-  ---
 
   LEARNING IS A DIAL-TURN, AND THE WIGGLE TEST PRICES EACH DIAL
 
@@ -208,7 +194,7 @@
 
       new dial = 1.0 - 0.1 x 0.48 = 1.0 - 0.048 = 0.952
 
-  Now the held thought: wiggle o0's SECOND dial (0.5, the wire from the squashed-dead
+  Now the dial the squash hid: wiggle o0's SECOND dial (0.5, the wire from the squashed-dead
   m1). The output changes by 0.001 x m1 = 0.001 x 0 = 0. The meter does not move. Pull
   = 0. A dead middle hides every wire that leaves it -- this pass teaches those dials
   nothing, and only a different question that wakes m1 can reach them.
@@ -219,8 +205,6 @@
   steps each dial against its pull. The step sizes are managed by a tuner named Adam --
   a per-dial step-size picker; this page turns dials with a plain fixed step because
   the pull, not the tuner, is the idea.
-
-  ---
 
   THE FEEDING SCHEDULE, AT REAL SCALE
 
@@ -239,8 +223,6 @@
   Random handfuls matter: the diary is stored game by game, and 128 neighbours from one
   game would all say nearly the same thing. A random handful mixes early game 12 with
   late game 187, and every meal pulls the dials toward copying EVERYWHERE at once.
-
-  ---
 
   AND THE FIRST METER READING IS PREDICTABLE BY PENCIL
 
@@ -261,9 +243,7 @@
   whose recorded answers agree. That last clause is a crack, and the next page widens
   it into the chapter's real problem.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
+  A MACHINE THAT SEES NO TABLE, A METER THAT MELTS, A BADNESS I COULD PREDICT
 
   "The machine sees the table." It sees five numbers, and at raw scale even those
   poison it: 222.0 through a newborn +-0.1 dial shouts in the tens while the twist 0.67
@@ -294,13 +274,7 @@
   was 0.9885. When a number is predictable before the experiment, the machine has
   stopped being magic -- that is the whole point of the pencil.
 
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
+  THE SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the re-ruling, the tiny twin's forward pass, the meter, one
   wiggle-priced dial-turn, and the real machine's schedule arithmetic. Count the twin's
@@ -344,49 +318,6 @@
       melted   = 128 * 8 * 2                 # 2048 misses per meter reading
 
       print(o0, o1, meter)                   # 0.7 0.7 4.68
-
-  THE ANCHOR: the whole learner is four verbs -- re-rule, forward, meter, turn -- and
-  only "turn" changes anything. 75,600 turns, each priced by pulls, each pull just
-  miss x what-fed-the-dial, is the entire course.
-
-  ---
-
-  ONE BREATH
-
-  The 24,208 diary pairs (question: five table numbers; answer: eight recorded moves =
-  sixteen numbers) feed a web of 137,232 dials shaped 5 -> 256 -> 256 -> 256 -> 16 with
-  a squash between layers. Every column is re-ruled first -- subtract the middle, divide
-  by the spread, so [222.0, 97.0, 223.0, 381.6, 3.0] becomes [-0.07, -2.03, -0.37,
-  1.66, 0.67] and all columns speak at one volume -- and every printed answer is
-  de-ruled on the way out. A tiny 2 -> 3 -> 2 twin ran the whole life cycle by pencil:
-  forward to [0.7, 0.7], meter = (0.36 + 9.00) / 2 = 4.68, wiggle a dial to price its
-  pull (0.6 x 0.8 = 0.48), step against it (1.0 -> 0.952), and a squash-dead middle
-  prices every wire it feeds at 0. At scale: handfuls of 128, 189 handfuls per read of
-  the diary, 400 reads = 75,600 dial-turns, a meter that melts 2,048 squared misses
-  into one number -- and that meter's first reading is predictable by pencil: re-ruled
-  answers spread 1, newborn prints near 0, so about 1.0. Measured: 0.9885, falling to
-  0.128 by turn 60. Copying works -- wherever the diary speaks with one voice.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other material after this page:
-  >>   the web of dials and adders       = a neural network; an MLP (multi-layer perceptron)
-  >>   a dial / a nudge                  = a weight / a bias; together, the parameters
-  >>   the squash (negatives -> 0)        = ReLU activation
-  >>   re-ruling (subtract middle,        = normalization / standardization
-  >>     divide by spread)                  (mean and standard deviation per feature)
-  >>   de-ruling the printed answer      = de-normalizing the action
-  >>   the meter (subtract-square-avg)   = the mean squared error (MSE) loss
-  >>   a handful of 128                  = a (mini-)batch, batch size 128
-  >>   one full read of the diary        = one epoch (189 batches here; leftovers dropped)
-  >>   one dial-turn                     = one training / gradient step
-  >>   a dial's pull                     = its gradient (the wiggle test = a finite
-  >>                                        difference; the backward sweep = backprop)
-  >>   the step-size tuner Adam          = the Adam optimizer
-  >>   16 -> 8 x 2 re-boxing              = reshaping the flat output to (chunk, action)
-  >>   the meter's diary over turns      = the training loss curve
-  >>   dials frozen while playing         = evaluation mode (no learning during rollouts)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 19 -- Learning by Copying):

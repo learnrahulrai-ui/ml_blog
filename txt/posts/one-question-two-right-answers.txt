@@ -14,8 +14,6 @@
     <- prev:  [The Copying Machine by Pencil](the-copying-machine-by-pencil.txt)
        next:  [Teaching the Wind: Flow Matching by Pencil](teaching-the-wind-by-pencil.txt) ->
 
-  ---
-
   A copying machine learns a pushing game from a human's diary: given the five numbers
   describing the table (hand position, block position, block twist), print the sixteen
   numbers the human printed (the next eight target points, two numbers each). Its
@@ -26,8 +24,6 @@
   shortage of dials, not too little training. It is arithmetic -- the meter's own
   arithmetic -- and a pencil can locate the crash before the machine ever plays. This
   page is that pencil work.
-
-  ---
 
   THE QUESTION WITH TWO TRUTHS
 
@@ -54,8 +50,6 @@
 
   So: same question, two truths. What does a machine graded by subtract-square-average
   print when its diary says two things?
-
-  ---
 
   STRIP IT TO ONE DIMENSION, WHERE THE WHOLE CRASH FITS ON A SLATE
 
@@ -94,20 +88,18 @@
   the tell that the question itself has no single right answer -- the machine is being
   graded against a split truth.
 
-  YOUR TURN -- same two answers, print g = 0.2. Total? Slate first:
+  YOUR TURN -- same two answers, print g = 0.2. Total?
 
       CHECK: (0.2-1)^2 + (0.2+1)^2 = 0.64 + 1.44 = 2.08
       (and g = -0.2 gives 1.44 + 0.64 = 2.08 -- the valley is symmetric around 0)
 
   YOUR TURN -- one question, THREE recorded answers: 2, 4, and 9. Which single print
-  has the smallest total of squared misses -- try 4 and 5. Slate first:
+  has the smallest total of squared misses -- try 4 and 5.
 
       CHECK: at 4: (4-2)^2+(4-4)^2+(4-9)^2 = 4+0+25 = 29
              at 5: (5-2)^2+(5-4)^2+(5-9)^2 = 9+1+16 = 26  -- smaller.
              5 is the average (2+4+9)/3. The bottom is ALWAYS the average of the
              recorded answers; more answers just move the average.
-
-  ---
 
   NOW PUT THE AVERAGE BACK ON THE TABLE
 
@@ -131,11 +123,9 @@
   it".
 
   YOUR TURN -- two recorded first moves (200, 280) and (240, 280). The meter's
-  favourite print? Slate first:
+  favourite print?
 
       CHECK: ((200+240)/2, (280+280)/2) = (220, 280) -- a lane neither human drove.
-
-  ---
 
   AND NO AMOUNT OF TRAINING ESCAPES A VALLEY WHOSE BOTTOM IS THE CRASH
 
@@ -164,9 +154,7 @@
   starting point, walk to ONE truth, a different truth on a different day. Building
   that walker is the next page.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
+  IT WILL JUST PICK A SIDE -- NO, AND 2g^2 + 2 SAYS WHY NOT
 
   "It will learn both paths and the popular one will win." The meter has no shelf to
   keep two answers on. Every candidate print is one point g, graded (g - 1)^2 +
@@ -188,13 +176,7 @@
   mis-stated, competence makes the failure crisper -- the meter reads a comfortable
   2.0 while the hand parks itself inside the block at (230, 300).
 
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same crash in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
+  THE SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the candidate table and the on-table crash, hard-coded.
   Eight squares, six adds, two averages: the entire failure.
@@ -216,43 +198,6 @@
       # the meter's favourite print (230.0, 300.0) == the block's own centre: a stall
 
       print(total_at_0, (avg_move_x, avg_move_y))      # 2 (230.0, 300.0)
-
-  THE ANCHOR: 2g^2 + 2 is the whole post. One bottom, at the average, at height 2 --
-  a valley that punishes truths and rewards the point between them.
-
-  ---
-
-  ONE BREATH
-
-  The copying machine grades a print g against every recorded answer by
-  subtract-square-average, so on a question with two truths +1 and -1 its total is
-  (g-1)^2 + (g+1)^2 = 2g^2 + 2: printing a truth costs 4, printing the average 0 --
-  a number nobody answered -- costs 2, and the valley's bottom can never reach 0. On
-  the real table the two truths are "swing above" (230, 260) and "swing below"
-  (230, 340), and their average (230, 300) is the block's own centre: the best-scoring
-  print drives the hand into the obstacle. Longer training, more dials, more reads all
-  aim more precisely at that same bottom, because the bottom IS the least-squared-miss
-  print, and squared grading has no way to choose a side (from g = 0.9 it walks AWAY
-  from the nearby truth, back to the middle). The disease is the question shape: one
-  print graded against a pile of answers lands on the pile's average, which can sit
-  outside every member. The cure, next page, is to print no answer at all -- learn a
-  field of arrows that can WALK to one member of the pile, a different member from a
-  different random start.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other material after this page:
-  >>   a question with a pile of truths  = a multimodal action distribution
-  >>   one member of the pile            = a mode
-  >>   the crash into the average        = mode averaging / mean collapse (the known
-  >>                                        failure of MSE behavior cloning on
-  >>                                        multimodal demonstrations)
-  >>   single-truth questions            = unimodal (where MSE copying is fine)
-  >>   the valley bottom = the average   = the minimizer of squared error is the
-  >>                                        conditional mean
-  >>   bottom height 2, never 0          = irreducible loss (the variance of the
-  >>                                        answers around their mean)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 19 -- Learning by Copying):

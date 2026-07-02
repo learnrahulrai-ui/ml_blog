@@ -14,22 +14,17 @@
     <- prev:  [Chapter 16, Propose and Grade: Actor-Critic by Pencil](actor-critic-by-pencil.txt)
        next:  [Fix the Biggest Surprise First: Priority Sweeping by Pencil](priority-sweeping-by-pencil.txt) ->
 
-  ---
-
   Chapter 13 learned a worth from single samples, and its very first move leaned on a GUESS: to
   grade the spot you left, it took the one reward the world handed back plus the current, unfinished
   worth of the spot you landed on -- a guess propping up a guess (that was TD, temporal difference).
   It works, but it starts life leaning. There is an opposite way that leans on nothing at all, named
   on Chapter 13's map and never worked here: wait for the episode to END, then grade every spot by
-  the WHOLE real total of rewards that actually followed. That is Monte Carlo, and this post walks it
-  by pencil.
+  the WHOLE real total of rewards that actually followed. That is Monte Carlo.
 
   A worth (write it V of a spot) means the total future reward you expect to collect starting from
   that spot. "Expect" = average over many tries. Monte Carlo takes that definition literally: run a
   whole try to its end, add up the real rewards, and average those totals. No formula for the world,
   no guessed next-worth -- just completed trips and their real totals.
-
-  ---
 
   SO RUN ONE WHOLE TRIP FIRST, BECAUSE THERE IS NOTHING TO GRADE UNTIL IT ENDS
 
@@ -42,8 +37,6 @@
   Read it left to right: leaving S paid +1, leaving A paid +2, leaving B paid +4, then the run ended.
   Nothing is graded yet -- Monte Carlo cannot grade a spot until the run it belongs to is finished,
   because it grades by what actually followed, and "what followed" is only known at the end.
-
-  ---
 
   WHICH MEANS THE GRADE OF A SPOT IS THE REWARDS THAT CAME AFTER IT, FADED
 
@@ -76,13 +69,11 @@
 
       S  --(+2)-->  A  --(+1)-->  B  --(+3)-->  END
 
-  With the same fade of 0.9 per step, what are the three returns? Slate first:
+  With the same fade of 0.9 per step, what are the three returns?
 
       CHECK: return(B) = 3
              return(A) = 1 + 0.9 x 3   = 1 + 2.7  = 3.7
              return(S) = 2 + 0.9 x 3.7 = 2 + 3.33 = 5.33
-
-  ---
 
   SO ONE FINISHED TRIP IS ONE HONEST SAMPLE OF EACH SPOT'S WORTH
 
@@ -95,8 +86,6 @@
   One rule to pin down, in case a run visits the same spot twice: grade a spot by the return from
   the FIRST time you stood on it in that run (first-visit). Episode 1 visited each spot once, so the
   rule changes nothing here -- but it is why V(S) uses return(S) = 6.04 and not some later number.
-
-  ---
 
   BUT ONE TRIP IS NOISY, SO RUN ANOTHER AND AVERAGE THE TOTALS
 
@@ -128,8 +117,6 @@
       spot:      S       A       B
       worth:    5.77    5.3      4        (average of the returns seen from each spot)
 
-  ---
-
   WHICH IS THE SAME RUNNING AVERAGE FROM THE BANDIT CHAPTER, FED WHOLE RETURNS
 
   You do not have to store every past total to average them. Chapter 12's shopkeeper averaged a
@@ -151,12 +138,10 @@
   real total that actually followed, a target holding no guess.
 
   YOUR TURN -- a third run ends, and it hands S a return of 7.0 (S's count so far is 2,
-  its average 5.77 from above). Bump the count and nudge. What is V(S) now? Slate first:
+  its average 5.77 from above). Bump the count and nudge. What is V(S) now?
 
       CHECK: count = 3 ;  V(S) = 5.77 + (1/3) x (7.0 - 5.77)
                                 = 5.77 + (1/3) x 1.23 = 5.77 + 0.41 = 6.18
-
-  ---
 
   SO WHAT WAITING BUYS, AND WHAT IT COSTS
 
@@ -174,12 +159,7 @@
   and lean on the next spot's guessed worth -- that is TD. Walk ALL the way to the end and lean on
   nothing -- that is Monte Carlo. Everything between (walk n steps, then lean) is the same family.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first built this machine, four walls stopped me. Each wall, the number that
-  broke it, and the rule I carry now.
+  GRADED TOO SOON, PAID TOO MUCH, COUNTED TWICE, WAITED FOREVER
 
   "I graded S the moment I stepped off it." At that moment I held +1 of what turned
   out to be a 6.04 return -- more than four fifths of S's grade had not happened
@@ -206,13 +186,7 @@
   never-ending task needs a machine that leans (TD) or an average-per-step
   yardstick -- waiting is not an option.
 
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
+  THE SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the two episodes above, line by line, every number
   hard-coded; the return is totalled backward. Count one episode of three legs: 2
@@ -243,42 +217,6 @@
       # B untouched this episode: V["B"] stays 4.0, count["B"] stays 1
 
       print(V)          # {'S': 5.77, 'A': 5.3, 'B': 4.0}
-
-  THE ANCHOR: there is no separate end-of-game rule to remember here. The return already stops at the
-  end of the run -- B's return was the bare +4 because nothing followed it -- so the episode's finish
-  is baked into the backward total, not bolted on.
-
-  ---
-
-  ONE BREATH
-
-  Chapter 13's TD graded the spot you left with one reward plus the guessed worth of the spot you
-  landed on -- a guess leaning on a guess. Monte Carlo leans on nothing: wait for the whole run (the
-  episode) to END, then grade each spot by its RETURN -- every reward that followed, each faded 0.9
-  per step, totalled backward as reward + 0.9 x next-return. One finished run is one real sample of a
-  spot's worth (S: 6.04, A: 5.6, B: 4 in run one); a worth is the AVERAGE of those samples over runs,
-  and a second run (S: 5.5, A: 5) pulls them to V(S)=5.77, V(A)=5.3, V(B)=4. That averaging is
-  Chapter 12's running-average nudge new = old + (1/count) x (return - old), fed a whole return
-  instead of one payout -- a target with no guess in it. The price of leaning on nothing: the run
-  must end (episodic only), the long total is noisy (many runs to settle), and it learns offline at
-  the end. TD walks one step then leans; Monte Carlo walks all the way and never leans; the rest of
-  the family lives between.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   a worth, V of a spot          = the state-value function V(s)
-  >>   a run with a definite end       = an episode (an episodic task)
-  >>   the return of a spot            = the return G_t (discounted sum of following rewards)
-  >>   dilute (0.9)                    = the discount factor gamma
-  >>   total backward, r + 0.9 x next  = the recursive return G_t = r_{t+1} + gamma G_{t+1}
-  >>   grade by the FIRST visit         = first-visit Monte Carlo
-  >>   average the returns              = the Monte Carlo value estimate
-  >>   new = old + (1/count)(G - old)   = incremental sample-average update (constant step -> tracking)
-  >>   target = the whole return G       = the Monte Carlo target (no bootstrapping)
-  >>   TD's target r + gamma V(next)     = the bootstrapped target (leans on a guessed next-worth)
-  >>   walk-1-then-lean vs walk-all      = the TD -- Monte Carlo ends of the n-step dial
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 17 -- Two the Sample-Based Map Skipped):

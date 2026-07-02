@@ -14,8 +14,6 @@
     <- prev:  [Fix the Biggest Surprise First: Priority Sweeping by Pencil](priority-sweeping-by-pencil.txt)
        next:  [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt) ->
 
-  ---
-
   Six chapters of this book built a shelf of learning machines, each solved by pencil.
   And on every fresh problem since, my first real mistake happened BEFORE any
   arithmetic: I reached for the wrong machine. I pointed the wait-for-the-end grader
@@ -29,8 +27,6 @@
   is the fitting guide: the questions that sort any new world, the shelf that answers
   each sorting, and -- because picking right is not the same as proving it worked --
   how a finished machine is honestly graded.
-
-  ---
 
   THE WORLD DECIDES -- SO INTERROGATE THE WORLD FIRST
 
@@ -59,8 +55,6 @@
   Each question kills part of the shelf. Walk them one at a time, with the numbers
   that make each split real.
 
-  ---
-
   DOES THE RUN END? -- THE QUESTION THAT KILLS QUIETLY
 
   A run ENDS when the world announces it: the lander touches down, the courier
@@ -85,8 +79,6 @@
 
       run ends      -> returns and faded totals are legal: posts 37-49, 51-52 all live here
       run never ends-> subtract the average instead: differential actor-critic (post 50)
-
-  ---
 
   WHICH MEANS: IF THE RUN ENDS, ASK WHO HOLDS THE RULEBOOK
 
@@ -116,8 +108,6 @@
   Reach for that shelf when real footsteps are the expensive part -- a robot that
   breaks, a customer that leaves -- and paper rehearsals are free.
 
-  ---
-
   BUT A TABLE NEEDS A LIST OF SPOTS -- CAN YOU WRITE ONE?
 
   Everything above keeps one number per spot (or per spot-move pair) in a table.
@@ -140,8 +130,6 @@
   gain is always the same too: one footstep teaches every spot that shares a part
   with the one you stood on.
 
-  ---
-
   LAST QUESTION: ARE YOU GRADING, OR CHOOSING?
 
   Some jobs only ask HOW GOOD -- grade this fixed habit, attach a worth to every
@@ -155,8 +143,6 @@
   learned as its own object with a critic grading it (post 50). If a job must act,
   its machine must carry one of those; if it must only judge, the per-move
   machinery is dead weight.
-
-  ---
 
   THE MAP, WHOLE
 
@@ -180,8 +166,6 @@
         choose                                     agent (44-49)
       no rulebook, run NEVER ends, spots           differential actor-critic (50) --
         continuous, choose                         subtract the average, fade nothing
-
-  ---
 
   YOUR TURN (SORT A FRESH WORLD)
 
@@ -210,8 +194,6 @@
       36. Both compute the best arrows from the box lid alone; the machines of
       chapters 13-17 would spend real rounds learning odds that were printed all
       along.
-
-  ---
 
   ONE GOOD RUN IS NOT A GRADE -- SO COUNT WHAT AN HONEST GRADE COSTS
 
@@ -251,12 +233,7 @@
 
       CHECK: 2 x 3 = 6 pairs; 6 x 20 = 120 runs; 120 x 100 = 12,000 totals.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first sorted worlds, three walls stopped me. Each wall, the number or fact
-  that broke it, and the rule I carry now.
+  DYNA ON TWO ROWS, A GRADER ASKED TO PICK, ONE LUCKY LANDING
 
   "Dyna shows up on two rows -- that must be a mistake." It shows up twice because
   it plays two parts: it WALKS like a sample machine (no rulebook given), and it
@@ -276,83 +253,6 @@
   the pair I had picked -- 9,000 totals, averaged down the runs -- and the averaged
   curve, not the lucky run, is what earned the word "works". One run is an
   anecdote; the box is the grade.
-
-  ---
-
-  ONE BREATH
-
-  Before any arithmetic, interrogate the world with four questions. Does the run
-  END? -- if never, fade nothing and grade each step against the crawling average
-  (differential actor-critic); if it ends, returns and faded totals are legal. Do
-  you HOLD the rulebook? -- if yes, compute the plan without walking (lay the law,
-  grade-improve, or the max walk); if no, walk and crawl worths from samples -- and
-  if footsteps are dear, write your own rulebook and rehearse it (Dyna, priority
-  sweeping). Can you LIST the spots? -- if yes a table serves; if they are smooth
-  dials, build worths from shared parts (groups, tiles, or a network that invents
-  its features). And is the job to GRADE or to CHOOSE? -- graders keep a worth per
-  spot (TD, Monte Carlo); choosers keep a worth per move (Q-learning, Expected
-  Sarsa, Sarsa on tiles, the Q-network agent) or learn the policy itself. Then
-  prove the pick with a box, not an anecdote: settings pairs x runs x episodes, one
-  total per episode (3 x 4 pairs x 30 runs x 300 episodes = 108,000 totals), fix a
-  pair, average down the runs, and let the curve -- not the luckiest run -- say
-  whether it works.
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- the smallest honest scoreboard, written flat: ONE
-  settings pair, TWO runs (two spinner seeds), THREE episodes each. Six totals go
-  in; three averaged points come out. Count the strokes: 3 adds + 3 halvings = 6
-  strokes for the averaging; the full lander box would repeat this shape
-  12 x 30 x 300 = 108,000 cells wide.
-
-      # the box for one settings pair: 2 runs x 3 episodes, totals from the trainer
-      run_a_ep1 = -180.0                 # run A, episode 1 total reward
-      run_a_ep2 =  -95.0                 # run A, episode 2 total reward
-      run_a_ep3 =  -30.0                 # run A, episode 3 total: looks nearly landed!
-      run_b_ep1 = -220.0                 # run B, episode 1 total (same settings, new seed)
-      run_b_ep2 =  -35.0                 # run B, episode 2 total
-      run_b_ep3 =  -80.0                 # run B, episode 3 total: got WORSE -- luck swings
-
-      # average down the runs, one episode column at a time
-      avg_ep1 = (run_a_ep1 + run_b_ep1) / 2    # (-180 + -220) / 2 = -200.0
-      avg_ep2 = (run_a_ep2 + run_b_ep2) / 2    # ( -95 +  -35) / 2 =  -65.0
-      avg_ep3 = (run_a_ep3 + run_b_ep3) / 2    # ( -30 +  -80) / 2 =  -55.0
-
-      print(avg_ep1, avg_ep2, avg_ep3)         # -200.0 -65.0 -55.0
-
-      # read the three stories:
-      #   run A alone : -180 -> -95 -> -30   ("done! ship it!")
-      #   run B alone : -220 -> -35 -> -80   ("it broke at the end")
-      #   the average : -200 -> -65 -> -55   (a slow, honest climb -- the real grade)
-      # the real box just repeats this column-average:
-      #   12 pairs x 30 runs x 300 episodes = 108000 cells   # 12*30*300 = 108000
-      #   per pair: 300 columns, each averaging 30 totals    # 29 adds + 1 divide each
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   a run that ends / never ends     = an episodic / continuing task
-  >>   the rulebook (die table)         = the model of the environment, p(s', r | s, a)
-  >>   rulebook held -> compute         = dynamic programming / planning
-  >>   no rulebook -> walk and crawl    = model-free learning
-  >>   write your own rulebook          = model-based RL (learned model, Dyna-style)
-  >>   grade a habit / choose moves     = prediction / control
-  >>   spots listable -> table          = the tabular setting
-  >>   smooth dials -> shared parts     = function approximation
-  >>   lay the law (post 34)            = iterative policy evaluation
-  >>   grade-improve loop (post 35)     = policy iteration
-  >>   no-plan max walk (post 36)       = value iteration
-  >>   subtract-the-average grading     = the average-reward / differential setting
-  >>   settings pairs x runs x episodes = a parameter sweep (grid search) over seeds
-  >>   the averaged curve               = the learning curve, averaged over runs (seeds)
-  >>   one run is an anecdote           = variance across seeds; report the mean
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 18 -- Choosing the Machine):

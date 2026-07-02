@@ -14,9 +14,7 @@
     <- prev:  [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt)
        next:  [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt) ->
 
-  ---
-
-  Everything this page uses, from a blank sheet. A dial = one learned number in a
+  A dial = one learned number in a
   network. A worth = the network's guess of how much reward a move still brings.
   How-wrong = target minus guess, one number per graded move (say -1.08: the guess
   was 1.08 too high). A dial's pull = how much raising that dial raises the graded
@@ -31,8 +29,6 @@
   for every dial, on every move, forever -- ignoring each dial's history and scale.
   The data: each move's experience used ONCE, in the order it happened, then thrown
   away. Fix the step first, then the data.
-
-  ---
 
   SO GIVE THE STEP A MEMORY: AVERAGE EACH DIAL'S RECENT GRADES
 
@@ -50,8 +46,6 @@
 
       grades in:  +0.2   +0.2   +0.2   ->  m climbs toward +0.2   (steady -> full speed)
       grades in:  +0.2   -0.2   +0.2   ->  m hovers near  0       (mixed -> crawl)
-
-  ---
 
   WHICH STILL NEEDS SCALING, BECAUSE DIALS COME IN DIFFERENT SIZES
 
@@ -71,8 +65,6 @@
   same length -- the size is normalized away, only the direction and steadiness
   remain.
 
-  ---
-
   AND BECAUSE BOTH START AT ZERO, UNDO THE EARLY LOWBALL
 
   m and v both start at 0 (no history yet). On the first few moves that 0 drags the
@@ -90,8 +82,6 @@
   That whole machine -- momentum m, scaler v, both bias-corrected -- is Adam. The
   direction is already inside the grade (a negative grade makes m negative and the
   step negative), so the update simply ADDS, exactly like the previous post's nudge.
-
-  ---
 
   ADAM BY HAND -- TWO DIALS, THE STEADY ONE AND THE FLIP-FLOP
 
@@ -136,8 +126,7 @@
   That is the whole gift of Adam over the flat 0.01.
 
   YOUR TURN -- move 3 of the STEADY dial (a third grade of +0.2 arrives; m = 0.038
-  and v = 0.00007996 from move 2 above). Compute m, m-hat, and the step. Slate
-  first, then check:
+  and v = 0.00007996 from move 2 above). Compute m, m-hat, and the step.
 
       CHECK: m = 0.9 x 0.038 + 0.1 x 0.2 = 0.0342 + 0.02 = 0.0542
              m-hat = 0.0542 / (1 - 0.9^3) = 0.0542 / 0.271 = 0.2   -- exactly 0.2 again
@@ -146,8 +135,6 @@
              A perfectly steady dial strides the full alpha every single move -- the
              bias correction keeps m-hat pinned at the true 0.2 while m itself is
              still crawling up (0.02, 0.038, 0.0542, ...).
-
-  ---
 
   BUT THE STEP IS ONLY HALF THE WASTE -- THE OTHER HALF IS THE DATA
 
@@ -160,8 +147,6 @@
   and forgets the ones from a minute ago (it overwrites its dials to fit the
   streak). Second, one move is one lesson, then gone -- expensive footsteps, learned
   from once.
-
-  ---
 
   WHICH IS WHY YOU KEEP A BIN OF PAST MOVES AND DRAW FROM IT AT RANDOM
 
@@ -197,7 +182,7 @@
   YOUR TURN -- one note, drawn twice. The note says (s, move 0, reward 1, ended? 0,
   s'), dilute 0.9, chances at s' = [0.1, 0.6, 0.1, 0.2]. On the first draw the net
   reads Q(s') = [3, 5, 1, 2]. By the second draw the net has learned a little and
-  reads Q(s') = [3, 4, 1, 2]. Compute both targets. Slate first, then check:
+  reads Q(s') = [3, 4, 1, 2]. Compute both targets.
 
       CHECK: draw 1: averaged = 0.1x3 + 0.6x5 + 0.1x1 + 0.2x2 = 3.8
                      y = 1 + 0.9 x 3.8 = 4.42
@@ -206,8 +191,6 @@
              Same note, two different targets -- the note never changes, the net's
              read of the landing does. That is why the target is rebuilt per draw,
              never stored.
-
-  ---
 
   SO THE WHOLE TRAINING LOOP, ONE REAL MOVE AT A TIME
 
@@ -228,12 +211,7 @@
   deep-RL agent -- the remaining posts of this chapter batch it, wire it to the
   world's three calls, and run it to a landing.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first built this machine, four walls stopped me. Each wall, the number that
-  broke it, and the rule I carry now.
+  TWO AVERAGES OF ONE GRADE, A HUGE FIRST STEP, AND OTHER MISREADINGS
 
   "m and v are two averages of the same thing -- why keep both?" Feed the flip-flop
   (+0.2, -0.2) into each and they split: m goes 0.02 then -0.002 -- it SEES the
@@ -263,100 +241,6 @@
   teach the old net's opinion forever, long after it stopped being held. A note
   stores FACTS (s, a, r, ended?, s'). Opinions -- targets -- are rebuilt from the
   current net at every draw.
-
-  ---
-
-  ONE BREATH
-
-  The backprop post's nudge was right but spent crudely: a flat step for every dial,
-  and each experience used once in order. Call how-wrong x pull a dial's GRADE (the
-  signed "raise me / lower me" for this move). Adam fixes the step with two per-dial
-  memories -- m, the average of recent grades (a dial graded the same way builds
-  speed; one yanked both ways cancels to a crawl), and v, the average of squared
-  grades (dividing by sqrt(v) makes big-grade and small-grade dials move at the same
-  pace) -- both bias-corrected by 1 - beta^t because they start at zero, giving
-  dial += alpha x m-hat / sqrt(v-hat); the first step is always exactly alpha-sized,
-  because m-hat/sqrt(v-hat) starts at plus-or-minus 1. Worked: a steady dial keeps
-  the full 0.1 stride every move; a flip-flop shrinks to a twentieth. The replay BIN
-  fixes the data: store a five-part note (s, a, r, ended?, s'), then learn from a
-  RANDOM batch drawn out of it -- breaking the streak that makes the net forget, and
-  squeezing many lessons from one footstep, each draw's target rebuilt with the
-  current net (4.42 one draw, 3.88 a later one -- facts stored, opinions rebuilt).
-  Read, pick, act, store, grab, backprop, Adam step, slide -- that loop on the
-  lander is a whole deep-RL agent.
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- the two dials and the bin above, line by line, every
-  number hard-coded. One Adam step for one dial costs 11 strokes: 2 multiplies + 1
-  add for m, 3 for v (one is the squaring), 2 divides for the hats, 1 square root,
-  1 divide, 1 multiply for the step, 1 add into the dial.
-
-      alpha, beta1, beta2 = 0.1, 0.9, 0.999
-
-      # ---- THE STEADY DIAL, move 1 (grade +0.2; m and v start at 0)
-      m = beta1 * 0.0 + (1 - beta1) * 0.2          # 0.1*0.2   = 0.02
-      v = beta2 * 0.0 + (1 - beta2) * 0.2**2       # 0.001*0.04 = 0.00004
-      m_hat = m / (1 - beta1**1)                   # 0.02/0.1     = 0.2
-      v_hat = v / (1 - beta2**1)                   # 0.00004/0.001 = 0.04
-      step  = alpha * m_hat / (v_hat ** 0.5)       # 0.1*0.2/0.2  = 0.1
-      dial  = 1.0 + step                           # 1.0 -> 1.1  (the grade said "raise me")
-
-      # ---- THE STEADY DIAL, move 2 (grade +0.2 again)
-      m = beta1 * 0.02 + (1 - beta1) * 0.2         # 0.018+0.02 = 0.038
-      v = beta2 * 0.00004 + (1 - beta2) * 0.04     # 0.00007996
-      m_hat = m / (1 - beta1**2)                   # 0.038/0.19    = 0.2
-      v_hat = v / (1 - beta2**2)                   # /0.001999     = 0.04
-      step  = alpha * m_hat / (v_hat ** 0.5)       # 0.1           (full stride held)
-
-      # ---- THE FLIP-FLOP DIAL, move 2 (its move 1 was identical; now grade -0.2)
-      m = beta1 * 0.02 + (1 - beta1) * -0.2        # 0.018-0.02 = -0.002
-      v = beta2 * 0.00004 + (1 - beta2) * 0.04     # 0.00007996  (square killed the sign)
-      m_hat = m / (1 - beta1**2)                   # -0.002/0.19 = -0.0105  (4 dp)
-      v_hat = v / (1 - beta2**2)                   # 0.04
-      step  = alpha * m_hat / (v_hat ** 0.5)       # 0.1*(-0.0105)/0.2 = -0.0053 (4 dp)
-
-      # ---- THE BIN: five-part notes; facts in, opinions never
-      bin_notes = [
-          ([1.0, 2.0], 0,  1.0, 0, [0.5, 1.8]),    # note 0: mid-flight move
-          ([0.5, 1.8], 3, -2.0, 0, [0.4, 1.5]),    # note 1
-          ([0.4, 1.5], 1,  0.5, 0, [0.4, 1.1]),    # note 2
-          ([0.4, 1.1], 1, 10.0, 1, [0.0, 0.0]),    # note 3: ENDED -- landing is a dummy
-      ]
-      # the lottery names three notes for this batch -- say it drew 2, 0, 3:
-      batch = [bin_notes[2], bin_notes[0], bin_notes[3]]
-      # per note: y = r + 0.9 * (chance-weighted worths at s') * (1 - ended?)
-      #   note 3's future piece: * (1 - 1) = 0 -> its target is the bare 10.0
-      # then backprop each one-slot miss (previous post) and ONE Adam step on the average
-
-  The bin holds facts only. Note 3's ended? flag is what zeroes its future piece --
-  nothing else in the note could say so.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   a dial's pull               = the gradient of the worth wrt that dial
-  >>   a dial's grade = how-wrong x pull = the ascent direction on the worth (what the code's
-  >>                                  td_update carries; textbooks feed the LOSS gradient,
-  >>                                  which is minus this, and subtract -- same arithmetic)
-  >>   m (average of grades)        = the first moment / momentum  (Adam's m)
-  >>   v (average of squared grades) = the second moment / per-parameter scale  (Adam's v)
-  >>   beta1, beta2 (0.9, 0.999)    = the moment decay rates
-  >>   divide by (1 - beta^t)       = bias correction (m, v start at zero)
-  >>   dial += alpha x m-hat/sqrt(v-hat) = the Adam update; alpha = the base learning rate
-  >>   the bin / five-part note     = the experience replay buffer; (s, a, r, terminal, s')
-  >>   a random batch               = a minibatch sampled to break correlation
-  >>   times (1 - ended?)           = the terminal mask on the bootstrap term
-  >>   target rebuilt each draw      = recomputing the TD target with the current network
-  >>   replay vs Dyna rehearsal      = replaying REAL transitions vs a learned model's simulated ones
-  >>   the whole loop on the lander  = deep RL (a neural-net value agent, e.g. on LunarLander)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):

@@ -14,8 +14,6 @@
     <- prev:  [Two Stages and a Bend: A Q-Network by Pencil](q-network-by-pencil.txt)
        next:  [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt) ->
 
-  ---
-
   The previous chapter closed on a sting. A network guessed an engine was worth 5.5;
   the grading target said 4.42; the miss was one number, -1.08. And that one number
   has to fix a whole pile of dials.
@@ -25,8 +23,6 @@
   output, but the dials that caused it sit two sheets back, behind a bend. This post
   walks that one number backward to every dial, by pencil -- which is the whole of
   what backpropagation is.
-
-  ---
 
   THE MACHINE AND THE MISS, REBUILT FROM SCRATCH
 
@@ -61,8 +57,6 @@
   written as a row that is zero except in the fired engine's slot:  [ -1.08, 0, 0, 0 ].
   The guess was 1.08 too HIGH, so every dial that pushed Q0 up wants pulling down a
   little.
-
-  ---
 
   ONE NUMBER CANNOT INSTRUCT A SHEET -- SO ASK EACH DIAL WHAT IT DID
 
@@ -103,8 +97,6 @@
   The pull has to be CHASED back through two sheets and a bend -- that chase is the
   rest of this post.
 
-  ---
-
   SO WALK THE MISS BACKWARD, OUTPUT FIRST
 
   Start where the miss is born: the worths Q. Only the fired engine matters -- Q0 --
@@ -114,8 +106,6 @@
 
   This single 1-in-a-row is the seed. Every pull below is this seed multiplied
   backward.
-
-  ---
 
   WHICH HANDS SHEET C ITS SHARE -- AND ONLY THE FIRED COLUMN MOVES
 
@@ -143,8 +133,6 @@
 
       pull on b2 = [ 1, 0, 0, 0 ]
 
-  ---
-
   WHICH MEANS THE BEND DECIDES WHAT GETS THROUGH
 
   To reach sheet A we must pass back through the middle numbers x, and through the
@@ -170,8 +158,6 @@
 
   The dead middle numbers slam the gate: whatever blame was heading for them (the 1
   and the -1) hits the floor. Only the live number p1 carries blame onward.
-
-  ---
 
   WHICH HANDS SHEET A ITS SHARE -- THROUGH THE ONE LIVE NUMBER
 
@@ -205,7 +191,7 @@
   time the lander fired ENGINE 3 (worth Q3 = 2.0 on the forward pass above). The
   seed becomes [0, 0, 0, 1]. Chase it: pull on C, pull on b2, pull on x (column 3 of
   C is [1, 0, -1]), the gate (psi = [2.5, -0.5, -0.5] as before), pull on psi, pull
-  on A, pull on b1. Slate first, then check:
+  on A, pull on b1.
 
       CHECK: pull on C = x dropped into column 3: C[0,3] gets 2.5, all else 0
              pull on b2 = [ 0, 0, 0, 1 ]
@@ -215,8 +201,6 @@
              pull on b1 = [ 1, 0, 0 ]
              Same doors, different column: the fired column of C changes, the gate
              does not care which engine fired.
-
-  ---
 
   BUT IS A PULL REALLY THE RIGHT NUMBER? WIGGLE ONE DIAL AND SEE
 
@@ -241,14 +225,12 @@
 
   YOUR TURN -- check a second pull the same blunt way. The walk said C[0,0] (currently
   2.0) has pull 2.5. Wiggle it to 2.001, rerun only what changes (x = [2.5, 0, 0]
-  stays put -- sheet A was not touched), and compute rise over wiggle. Slate first:
+  stays put -- sheet A was not touched), and compute rise over wiggle.
 
       CHECK: Q0 = (2.5)(2.001) + 0.5 = 5.0025 + 0.5 = 5.5025
              rise = 5.5025 - 5.5 = 0.0025 ;  0.0025 / 0.001 = 2.5. It checks.
 
   With two pulls confirmed by hand, trust the rest and spend the miss.
-
-  ---
 
   SO NUDGE EVERY DIAL BY ITS SHARE OF THE MISS
 
@@ -282,8 +264,6 @@
   sheets slowly bend into worths that need almost no correction. That is a network
   learning.
 
-  ---
-
   WHAT LEARNED AND WHAT SLEPT
 
   Read back what just moved, because the zeros are the lesson. Of 25 dials, FIVE
@@ -294,12 +274,7 @@
   path it came forward, and nowhere else. Credit, and blame, went only where they
   were earned.
 
-  ---
-
-  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
-
-  When I first walked a miss backward, four walls stopped me. Each wall, the number
-  that broke it, and the rule I carry now.
+  THE WORD "DERIVATIVE" SCARED ME LONGER THAN THE ARITHMETIC DID
 
   "Partial derivatives... so this needs real calculus, which I don't have." The WORD
   stopped me a full evening before the thing did. Then one division dissolved it:
@@ -329,121 +304,6 @@
   Every symbol in this post is one of those 25, or one of the fixed rows (s, psi, x,
   Q) the forward pass makes. Before learning any machine, count its movable parts;
   then no symbol can be a stranger.
-
-  ---
-
-  ONE BREATH
-
-  A network's miss is one number born at the output, but the dials that caused it
-  sit two sheets back behind a bend, with no feature to point at them. So ask each
-  dial its PULL on the fired worth -- how much raising it raises that worth -- and
-  nudge it by size x how-wrong x pull, the fair-share rule with "feature" swapped
-  for "pull." Chase the pull backward: it starts as a single 1 in the fired engine's
-  slot (engine 0 here); sheet C's pull is x dropped into that one column (only the
-  fired column ever moves, dead middle rows zero); through the bend, a gate open
-  only where psi was positive kills the blame heading for dead numbers; sheet A's
-  pull is input s times the surviving blame. Every stage's grad is the same shape --
-  input times signal, one product per dial -- and any pull can be checked by brute
-  force: wiggle the dial 0.001, watch the worth, divide (A[1,0]: 0.004/0.001 = 4).
-  Spend the miss with a small step (0.01): five of the toy's 25 dials move, the
-  biggest to the hardest pusher, and the fired worth slides 5.5 -> 5.166, toward its
-  4.42 target. The zeros are the lesson -- blame went only where it was earned.
-  Next: a smarter step than a flat 0.01 (momentum and Adam), and reusing old moves
-  (experience replay).
-
-  ---
-
-  ==========================================================================================
-    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
-    for the day you meet a computer. Nothing below teaches anything new; every number
-    below was already computed above by hand.
-  ==========================================================================================
-
-  No loops, no functions -- the walk above, line by line, every number hard-coded.
-  Count the backward walk first: pull on C is 3 multiplies (one per live-or-dead row
-  into the fired column), pull on x is 3 picks, the gate 3 checks, pull on psi 3
-  multiplies, pull on A 6 multiplies, then 5 live nudges at 2 strokes each -- about
-  25 strokes to teach 25 dials from one miss.
-
-      s1, s2 = 1.0, 2.0
-
-      # ---- FORWARD (kept from the previous post; psi and x are remembered) ----
-      p1 = s1*1.0  + s2*0.5  + 0.5      #  2.5
-      p2 = s1*-2.0 + s2*1.0  - 0.5      # -0.5
-      p3 = s1*0.5  + s2*-1.0 + 1.0      # -0.5
-      x1, x2, x3 = max(p1,0), max(p2,0), max(p3,0)     # 2.5, 0, 0
-      Q0 = x1*2.0  + x2*1.0  + x3*-1.0 + 0.5           #  5.5   <- fired
-      Q1 = x1*-1.0 + x2*1.0  + x3*2.0  + 1.0           # -1.5
-      Q2 = x1*0.0  + x2*-1.0 + x3*1.0  + 0.0           #  0.0
-      Q3 = x1*1.0  + x2*0.0  + x3*-1.0 - 0.5           #  2.0
-
-      how_wrong = 4.42 - Q0                            # -1.08
-
-      # ---- BACKWARD: the seed is a 1 in the fired engine's slot ----
-      seed0, seed1, seed2, seed3 = 1.0, 0.0, 0.0, 0.0
-
-      # pull on C = input x times the seed, one product per dial (fired column only)
-      pull_C00 = x1 * seed0             # 2.5*1 = 2.5   (the one live dial of C)
-      pull_C10 = x2 * seed0             # 0*1   = 0     (dead middle -> no blame)
-      pull_C20 = x3 * seed0             # 0*1   = 0
-      # ...columns 1-3: nine more products, every one times seed 0 -> all 0
-      pull_b2 = [seed0, seed1, seed2, seed3]           # [1, 0, 0, 0]
-
-      # pull on x = the fired column of C, then the bend gates it
-      pull_x1, pull_x2, pull_x3 = 2.0, 1.0, -1.0       # column 0 of C
-      g1, g2, g3 = 1.0, 0.0, 0.0        # gate: psi = [2.5,-0.5,-0.5] -> open, shut, shut
-      pull_p1 = pull_x1 * g1            # 2*1  = 2
-      pull_p2 = pull_x2 * g2            # 1*0  = 0
-      pull_p3 = pull_x3 * g3            # -1*0 = 0
-
-      # pull on A = input s times the surviving blame, one product per dial
-      pull_A00 = s1 * pull_p1           # 1*2 = 2
-      pull_A10 = s2 * pull_p1           # 2*2 = 4      (the hardest puller)
-      pull_A01 = s1 * pull_p2           # 1*0 = 0
-      pull_A11 = s2 * pull_p2           # 2*0 = 0
-      pull_A02 = s1 * pull_p3           # 1*0 = 0
-      pull_A12 = s2 * pull_p3           # 2*0 = 0
-      pull_b1  = [pull_p1, pull_p2, pull_p3]           # [2, 0, 0]
-
-      # ---- THE WIGGLE CHECK: brute-force one pull before trusting the walk ----
-      p1_wig = s1*1.0 + s2*0.501 + 0.5                 # 2.502  (A[1,0] nudged 0.001)
-      Q0_wig = max(p1_wig,0)*2.0 + 0.5                 # 5.504
-      slope  = (Q0_wig - Q0) / 0.001                   # 0.004/0.001 = 4.0 == pull_A10
-
-      # ---- SPEND THE MISS: dial += size * how_wrong * pull  (size 0.01) ----
-      A00 = 1.0 + 0.01 * how_wrong * pull_A00          # 1.0 - 0.0216 = 0.9784
-      A10 = 0.5 + 0.01 * how_wrong * pull_A10          # 0.5 - 0.0432 = 0.4568
-      b10 = 0.5 + 0.01 * how_wrong * pull_p1           # 0.5 - 0.0216 = 0.4784
-      C00 = 2.0 + 0.01 * how_wrong * pull_C00          # 2.0 - 0.027  = 1.973
-      b20 = 0.5 + 0.01 * how_wrong * seed0             # 0.5 - 0.0108 = 0.4892
-      # the other 20 dials: pull 0, so size * how_wrong * 0 = 0 -- they stand still
-
-      # ---- FORWARD AGAIN, to see the step land ----
-      p1_new = s1*A00 + s2*A10 + b10                   # 0.9784 + 0.9136 + 0.4784 = 2.3704
-      Q0_new = max(p1_new,0)*C00 + b20                 # 2.3704*1.973 + 0.4892 = 5.166 (3 dp)
-      # 5.5 -> 5.166, toward the target 4.42: one miss taught 5 dials their share
-
-  THE ANCHOR (the move landed the rocket -- no next state): the target is the reward
-  alone, so how_wrong = reward - Q0; the backward walk is letter-for-letter the same.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   how wrong (one slot)        = the TD error delta, in the taken action's slot only
-  >>   a dial's PULL on the worth    = the partial derivative of Q_fired with respect to that dial
-  >>   the seed [1,0,0,0]           = the gradient of Q_fired wrt the worth row Q (the loss gradient
-  >>                                  dL/dQ is this seed times the miss (Q_fired - target))
-  >>   pull on a sheet = input (x) signal = the gradient of Q_fired wrt that sheet (input^T outer
-  >>                                  signal); times the miss it is the usual weight gradient dL/dW
-  >>   the wiggle check (rise/wiggle) = a numerical gradient (finite difference), used to verify backprop
-  >>   the bend gate (psi > 0)       = the derivative of ReLU (1 where active, 0 where dead)
-  >>   pull on psi = (signal . C^T) gate = backprop through the layer, delta . W^T then gated
-  >>   walking the miss backward     = backpropagation (reverse-mode automatic differentiation)
-  >>   dial += size x how-wrong x pull = one gradient-descent step on the squared TD error
-  >>   size 0.01                     = the learning rate (alpha)
-  >>   dead middle number            = an inactive ReLU unit (passes no gradient)
-  >>   the anchor (rocket landed)    = terminal step (target = reward alone)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
