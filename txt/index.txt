@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in eighteen chapters (fifty-three posts),
+  This is not a pile of loose articles -- it is a short BOOK in nineteen chapters (fifty-eight posts),
   meant to be read top to bottom. Each post opens with a "post N" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 53:
+  >> NEW HERE? Start at post 1 of 58:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -842,6 +842,67 @@
     good run is an anecdote, not a grade -- the proof is a box, settings pairs x runs x episodes
     (3 x 4 x 30 x 300 = 108,000 totals), fix a pair, average down the runs, read the curve.
     Assumes zero background.
+
+
+  CHAPTER 19 . LEARNING BY COPYING -- a human already knows how
+  -----------------------------------------------------------------------------
+
+  [Part 1 -- The Diary and the Eight Envelopes: Learning by Copying](posts/the-diary-and-the-eight-envelopes.txt)
+    post 54/58 . 2026-07-03 . part 1 of 5 . imitation-learning, behavior-cloning, action-chunking, dataset, by-hand
+    Every machine so far learned from a reward trickle -- but a human already knows how to push
+    the T-shaped block home, and 25,650 recorded moments of showing beat stumbling. One diary
+    line = five situation numbers (hand x, y; block x, y; block twist) and the human's
+    two-number answer (a target point). A live machine is slow, so it answers eight ticks at
+    once: eight sealed envelopes, 8 x 2 = 16 numbers. That forces the re-cut: every line starts
+    its own eight-move window, none may cross a game seam, so 206 games yield 25,650 - 206 x 7
+    = 24,208 question-answer pairs through a safe-list that hops the seams (slot 154 holds line
+    161). Study reads every line; live play goes blind seven ticks of eight. Assumes zero background.
+
+  [Part 2 -- The Copying Machine by Pencil](posts/the-copying-machine-by-pencil.txt)
+    post 55/58 . 2026-07-03 . part 2 of 5 . imitation-learning, behavior-cloning, neural-network, mse, by-hand
+    Raw table numbers (222.0 next to 3.0) choke newborn dials, so every column is re-ruled:
+    subtract the middle, divide by the spread -- [222.0, 97.0, 223.0, 381.6, 3.0] becomes
+    [-0.07, -2.03, -0.37, 1.66, 0.67]. Then the web: 5 -> 256 -> 256 -> 256 -> 16, counted to
+    137,232 dials, and a tiny 2 -> 3 -> 2 twin runs the whole life by pencil -- forward to
+    [0.7, 0.7], meter (0.36 + 9.00) / 2 = 4.68, one dial wiggle-priced (pull 0.6 x 0.8 = 0.48)
+    and turned (1.0 -> 0.952), a squash-dead middle pricing its wires at 0. At scale: handfuls
+    of 128, 189 per read, 400 reads = 75,600 turns -- and the first meter reading is
+    pencil-predictable: about 1.0. Measured: 0.9885, falling to 0.128 by turn 60. Assumes zero
+    background.
+
+  [Part 3 -- One Question, Two Right Answers: Where Copying Breaks](posts/one-question-two-right-answers.txt)
+    post 56/58 . 2026-07-03 . part 3 of 5 . imitation-learning, multimodal, mse, mean-collapse, by-hand
+    The diary can hold TWO right answers to one question -- swing above the block or below,
+    both recorded, both perfect. Graded by squared misses against both, a single print g costs
+    (g-1)^2 + (g+1)^2 = 2g^2 + 2: printing a truth costs 4, printing the average 0 -- a number
+    nobody answered -- costs 2, and the bottom can never reach 0. On the table the average of
+    (230, 260) and (230, 340) is (230, 300): the block's own centre, a stall. Longer training,
+    more dials, more reads all aim at the same bottom, because the bottom IS the least-miss
+    print. The disease is the question shape; the cure is to stop printing answers. Assumes
+    zero background.
+
+  [Part 4 -- Teaching the Wind: Flow Matching by Pencil](posts/teaching-the-wind-by-pencil.txt)
+    post 57/58 . 2026-07-03 . part 4 of 5 . imitation-learning, flow-matching, noise, mixing, by-hand
+    Learn arrows, not answers. Each lesson is manufactured by three rolls -- a truth A =
+    [0.50, 0.60] from the diary, a noise pull N = [0.10, 0.80] from a spread-1 jar, a dial
+    tau = 0.4 -- mixed to M = tau A + (1 - tau) N = [0.26, 0.72], with teaching answer the
+    wind A - N = [0.40, -0.20]: walk the remaining 0.6 of it and land exactly on A. The
+    machine reads 22 wires (5 question + 16 mixture + tau), prints 16 wind numbers through
+    141,584 dials, graded by the same subtract-square-average meter. Tau earns its wire: at
+    (M = 0.5, tau = 0) the honest wind is the undecided -0.5; at tau = 0.9 it commits to 5.0.
+    First meter reading pencil-called at 1 + 1 = 2; measured 2.1136. Assumes zero background.
+
+  [Part 5 -- Riding the Wind: From Noise to an Answer](posts/riding-the-wind-by-pencil.txt)
+    post 58/58 . 2026-07-03 . part 5 of 5 . imitation-learning, flow-matching, euler, sampling, by-hand
+    Answering time has no truth, so the answer is walked: pull a dust speck from the jar and
+    take n equal rungs, current = current + (1/n) x wind while tau climbs 0 -> 1. A full
+    4-rung walk by pencil: [0.10, 0.80] -> [0.20, 0.75] -> [0.275, 0.725] -> [0.325, 0.700]
+    -> [0.3625, 0.680], de-ruled to the table move (265.0, 359.3). Two specks cure the
+    two-truths crash: one rides to the above-swing (height 255.6), the other to the
+    below-swing (342.0) -- the old crash point 298.8 exists only if finished answers are
+    merged, which the rider never does. Cost: ten web passes per envelope instead of one
+    (16 vs 160 per game). Exam: frozen dials, 100 fresh games, average of per-game best
+    coverage. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------

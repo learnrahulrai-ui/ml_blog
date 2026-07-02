@@ -12,7 +12,7 @@
 
   PATH . post 53/53 . part 1 of 1 in Chapter 18 -- Choosing the Machine
     <- prev:  [Fix the Biggest Surprise First: Priority Sweeping by Pencil](priority-sweeping-by-pencil.txt)
-       next:  (the book closes here)
+       next:  [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt) ->
 
   ---
 
@@ -356,7 +356,9 @@
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 18 -- Choosing the Machine):
-    Part 1 (this post) -- the book closes here
+    Part 1 (this post) -- the reward-learning shelf closes here
+
+  NEXT CHAPTER: [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt)
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
