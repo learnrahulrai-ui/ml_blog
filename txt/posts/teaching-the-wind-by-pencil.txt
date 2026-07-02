@@ -1,0 +1,348 @@
+@title Teaching the Wind: Flow Matching by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 19 . LEARNING BY COPYING . PART 4 OF 5
+  Teaching the Wind: Flow Matching by Pencil
+  Posted: 2026-07-03 . Author: Rahul Rai . Tags: imitation-learning, flow-matching, noise, mixing, by-hand
+  ============================================================================================
+
+  PATH . post 57/58 . part 4 of 5 in Chapter 19 -- Learning by Copying
+    <- prev:  [One Question, Two Right Answers: Where Copying Breaks](one-question-two-right-answers.txt)
+       next:  [Riding the Wind: From Noise to an Answer](riding-the-wind-by-pencil.txt) ->
+
+  ---
+
+  A machine that copies a human's game diary crashes on one kind of question: where the
+  diary holds TWO right answers (swing above the block, swing below -- both recorded,
+  both perfect), a machine graded by squared misses is forced to print the AVERAGE of
+  the truths, and the average of "go around this side" and "go around that side" is
+  "walk into it". The failure is the question shape: one printed answer, graded against
+  a pile of truths, lands on the pile's average.
+
+  So stop printing answers. This page teaches a machine something different: at every
+  point BETWEEN random noise and recorded truth, the direction toward truth -- a wind.
+  A machine that knows the wind everywhere never prints a destination; it can be
+  DROPPED anywhere and blown home. Dropped twice in different places, it blows to
+  different truths -- which is exactly what a pile of right answers needs. This page
+  is the teaching; the next page does the blowing.
+
+  ---
+
+  THREE PILES AND A MIXING DIAL
+
+      noise jar                    mixtures                   truth pile
+      (random dust)                (in between)               (recorded answers)
+
+       .  .   .                 .    *    .                      * *
+      .   .  .   .   <------- one straight line ------->        * * *
+       .  .    .                                                  *
+
+      tau = 0                   tau between                    tau = 1
+      pure noise                                               pure truth
+
+  Three characters, all living in re-ruled answer units (each answer column re-ruled to
+  middle 0, spread 1 -- the same food prep every machine in this chapter eats):
+
+  The TRUTH PILE: the diary's recorded answers. For pencil work, one answer here is a
+  one-move envelope -- two numbers, a target point -- standing in for the real
+  machine's eight-move, sixteen-number envelope. Same arithmetic, shorter lines.
+
+  The NOISE JAR: pure randomness. A pull from the jar is two numbers drawn from a bell
+  curve centred at 0 with spread 1 -- dust with no meaning at all.
+
+  The MIXING DIAL tau: a number from 0 to 1 that says how far a point sits along the
+  straight line from a noise pull toward a truth. At tau = 0 you hold pure noise; at
+  tau = 1, pure truth; at tau = 0.4, a 40/60 blend.
+
+  ---
+
+  ONE TRAINING PAIR, EVERY STROKE WRITTEN
+
+  A training pair is manufactured, not stored. Three rolls make one:
+
+  Roll a truth from the diary:        A = [0.50, 0.60]
+  Roll a pull from the noise jar:     N = [0.10, 0.80]
+  Roll the dial anywhere in 0..1:     tau = 0.4
+
+  Mix: the point 40% of the way from noise to truth,  M = tau x A + (1 - tau) x N:
+
+      M[1] = 0.4 x 0.50 + 0.6 x 0.10 = 0.20 + 0.06 = 0.26
+      M[2] = 0.4 x 0.60 + 0.6 x 0.80 = 0.24 + 0.48 = 0.72
+
+      M = [0.26, 0.72]
+
+      N = [0.10, 0.80]
+        \
+         \    M = [0.26, 0.72]          <- 40% of the way along
+          \  /
+           \/_____________  A = [0.50, 0.60]
+
+  And the TEACHING ANSWER -- what the machine should say when standing at M -- is the
+  wind: the arrow pointing from the noise end toward the truth end,
+
+      wind = A - N = [0.50 - 0.10,  0.60 - 0.80] = [0.40, -0.20].
+
+  Check the wind with feet. Standing at M with 1 - tau = 0.6 of the line still ahead,
+  walking that remaining fraction of the wind should land exactly on the truth:
+
+      M[1] + 0.6 x wind[1] = 0.26 + 0.6 x 0.40   = 0.26 + 0.24 = 0.50 = A[1]   yes
+      M[2] + 0.6 x wind[2] = 0.72 + 0.6 x (-0.20) = 0.72 - 0.12 = 0.60 = A[2]   yes
+
+  It lands. And because the mixing is a straight line, the SAME arrow A - N is the
+  right answer at every tau along this particular noise-to-truth line: the wind for
+  one (truth, noise) couple does not bend.
+
+  YOUR TURN -- same A = [0.50, 0.60] and N = [0.10, 0.80], but the dial rolls
+  tau = 0.7. What is M? And what is the teaching answer now? Slate first:
+
+      CHECK: M = [0.7 x 0.50 + 0.3 x 0.10 ,  0.7 x 0.60 + 0.3 x 0.80]
+               = [0.35 + 0.03 , 0.42 + 0.24] = [0.38, 0.66]
+             teaching answer: still A - N = [0.40, -0.20] -- the dial moved M along
+             the line; the line's arrow did not change.
+
+  ---
+
+  WHAT THE MACHINE READS AND PRINTS
+
+  The wind machine is the same web-of-dials species as the copier -- only its mouth and
+  its job change. It must judge the wind FROM three things: which table situation the
+  answer is for, where along the mixing it is standing, and how far the dial has
+  turned. So its input is all three, side by side:
+
+      5  re-ruled question numbers   (the table: hand x, hand y, block x, y, twist)
+   + 16  mixed-envelope numbers      (M, the real eight-move envelope flattened)
+   +  1  the dial reading tau
+   = 22  wires in            ->  256 -> 256 -> 256 ->  16 wires out (the wind)
+
+  Count its dials the same way as any web -- (inputs x units) + units per box:
+
+      box 1:  22 x 256 + 256 =  5,632 + 256 =   5,888
+      box 2: 256 x 256 + 256 =                 65,792
+      box 3: 256 x 256 + 256 =                 65,792
+      box 4: 256 x  16 +  16 =                  4,112
+                                       total = 141,584
+
+  141,584 dials -- 4,352 more than the copier, all of them in box 1's wider mouth.
+
+  And the grading is the copier's meter, unchanged: subtract, square, average. Only
+  WHAT is graded changed -- printed wind against teaching wind. Say the machine, young
+  and half-trained, prints [0.30, -0.10] where the teaching answer is [0.40, -0.20]:
+
+      misses: 0.30 - 0.40 = -0.10       -0.10 - (-0.20) = 0.10
+      meter:  ((-0.10)^2 + (0.10)^2) / 2 = (0.01 + 0.01) / 2 = 0.01
+
+  Every meal re-rolls everything: a fresh truth from the diary, a fresh pull from the
+  jar, a fresh dial reading -- the same diary envelope might train at tau = 0.13 today
+  and tau = 0.88 three meals later, against different noise each time. One recorded
+  answer therefore teaches the wind along MANY lines, one line per noise pull.
+
+  YOUR TURN -- truth A = [0.9, 0.1], noise N = [0.5, 0.5]. The teaching answer at
+  tau = 0.2? At tau = 0.9? Slate first:
+
+      CHECK: A - N = [0.4, -0.4], both times -- tau places M on the line;
+             the teaching arrow belongs to the line itself.
+
+  ---
+
+  THEN WHY TELL THE MACHINE TAU AT ALL?
+
+  The teaching answer never used tau -- so feeding tau to the machine looks like waste.
+  It is not, and one worked example shows why. The machine never sees which couple
+  (truth, noise) built its M; it sees only the POINT M and must answer for every
+  couple that could have built it. Different dial readings change which couples those
+  are.
+
+  Strip to one number. The truth pile holds two answers, +1 and -1 (the two-truths
+  question). The machine stands at M = 0.5 and must print a wind. Two cases:
+
+  Dial reads tau = 0. Then M IS the noise pull (at tau = 0, M = N), and noise carries
+  no hint about which truth this line runs to -- both are equally possible. The two
+  couples through this point:
+
+      couple (A = +1, N = 0.5):  wind = +1 - 0.5 = +0.5
+      couple (A = -1, N = 0.5):  wind = -1 - 0.5 = -1.5
+
+  Graded by squared misses against both, the best single print is their average
+  (that is the valley-bottom fact from the previous page, now working FOR us):
+
+      best wind at (M = 0.5, tau = 0) = (0.5 + (-1.5)) / 2 = -0.5
+
+  Dial reads tau = 0.9. Now M = 0.9 x A + 0.1 x N, so the noise that explains M
+  depends on the truth:
+
+      if A = +1:  N = (0.5 - 0.9 x 1) / 0.1 = -0.4 / 0.1 =  -4.0
+      if A = -1:  N = (0.5 + 0.9)     / 0.1 =  1.4 / 0.1 = +14.0
+
+  A jar pull of -4.0 is rare (four spreads out) but happens; a pull of +14.0 is
+  fourteen spreads out -- beyond any real chance. So at tau = 0.9, standing at 0.5,
+  essentially the only couple is (A = +1, N = -4.0), and the wind commits:
+
+      wind = +1 - (-4.0) = 5.0
+      feet-check: 0.5 + (1 - 0.9) x 5.0 = 0.5 + 0.5 = 1.0 = the +1 truth.  it lands.
+
+  Same point M = 0.5, two dial readings, two different right winds: -0.5 (undecided,
+  leaning toward the pile's middle) versus 5.0 (committed to the +1 truth). A machine
+  not told tau would have to average those too. Told tau, it can answer each case
+  correctly -- that is why tau gets a wire.
+
+  And this example quietly answers the previous page's disease. The meter still
+  averages -- at tau = 0 the best wind, -0.5, IS an average. But averaging ARROWS
+  mid-journey is survivable: an undecided early arrow just drifts the walker, and as
+  the dial grows the couples separate and the arrows commit to one truth. The average
+  moved from the DESTINATION (fatal: the hand parks inside the block) to the
+  DIRECTION EARLY ON (harmless: the walk still ends at a real truth). The next page
+  shows the ending.
+
+  ---
+
+  AND THIS FIRST METER READING IS PREDICTABLE TOO
+
+  The copier's first meter reading was callable before training: about 1.0. Call this
+  one. The teaching answer is wind = A - N: truth columns re-ruled to spread 1, jar
+  pulls drawn with spread 1, the two rolled independently. The spread of a DIFFERENCE
+  of two independent spread-1 quantities obeys spreads-square-then-add:
+
+      spread^2 of (A - N) = 1^2 + 1^2 = 2
+
+  A newborn machine prints near 0, so each squared miss averages about 2, and the
+  first meter reading should sit near
+
+      meter ~ 2.0    before any learning.
+
+  Measured, on one real run: 2.1136 at the first meal, then 1.583 by turn 20, 1.189
+  by turn 40, 1.123 by turn 60. The pencil called this one too -- and called the GAP:
+  the wind machine's meter opens twice as high as the copier's (2 versus 1) because
+  its teaching answer carries two spread-1 ingredients, not one.
+
+  ---
+
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
+
+  "So the machine learns to print the envelope after all." In study it never prints an
+  envelope, not once. Its output [0.40, -0.20] is an ARROW -- a direction and a rate
+  -- and only a walker who follows arrows rung by rung ever arrives at an envelope.
+  Confuse the two and the whole design collapses back into the previous page's
+  single-print machine.
+
+  "Tau is a dial the machine tunes." Tau is ROLLED, fresh every meal, from 0..1 -- the
+  machine reads it like weather, never sets it. The trainable dials are the 141,584
+  in the web; tau is the 22nd input wire, and its value this meal was dice.
+
+  "The noise ruins the data." The noise IS half the data. Every teaching arrow is
+  truth MINUS noise; without the jar there is no line, no M to stand on, and nothing
+  to learn between tau = 0 and tau = 1. Flour is not dirt in a bakery -- the jar is
+  an ingredient, not contamination.
+
+  "The teaching answer ignores tau, so the tau wire is waste." The ANSWER for one
+  couple ignores tau; the MACHINE answers for all couples through its M, and tau
+  decides which those are. At (M = 0.5, tau = 0) the honest answer is the undecided
+  -0.5; at (M = 0.5, tau = 0.9) it is the committed 5.0, because the only believable
+  noise behind that M is -4.0 (the -1 truth would need a fourteen-spread pull that
+  never comes). Cut the tau wire and the machine must average -0.5 with 5.0 -- one
+  more mean collapse, this time in the wind itself.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same teaching in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- one manufactured training pair, its grade, and a second
+  dial roll on the same truth. Per pair: 4 multiplies + 2 adds for the mix, 2
+  subtracts for the wind, then the meter's 2 subtracts, 2 squares, 1 average.
+
+      # --- three rolls make one training pair ---
+      A   = [0.50, 0.60]                  # a truth from the diary (re-ruled)
+      N   = [0.10, 0.80]                  # a pull from the noise jar
+      tau = 0.4                           # the mixing dial, rolled from 0..1
+
+      M1 = tau * A[0] + (1 - tau) * N[0]  # 0.4*0.50 + 0.6*0.10 = 0.26
+      M2 = tau * A[1] + (1 - tau) * N[1]  # 0.4*0.60 + 0.6*0.80 = 0.72
+
+      wind1 = A[0] - N[0]                 # 0.50 - 0.10 =  0.40
+      wind2 = A[1] - N[1]                 # 0.60 - 0.80 = -0.20
+      # feet-check: M + (1 - tau) * wind lands on A:
+      land1 = M1 + 0.6 * wind1            # 0.26 + 0.24 = 0.50  = A[0]
+      land2 = M2 + 0.6 * wind2            # 0.72 - 0.12 = 0.60  = A[1]
+
+      # machine input  = [5 question numbers] + [M, flattened] + [tau]  -> 22 wires
+      # machine output = its printed wind; grade with the same old meter:
+      print1, print2 = 0.30, -0.10        # a half-trained machine's print
+      meter = ((print1 - wind1)**2 + (print2 - wind2)**2) / 2
+      #     = ((-0.10)**2 + (0.10)**2) / 2 = 0.01
+
+      # --- same truth, next meal: everything re-rolls ---
+      N_b   = [-0.30, 0.20]               # fresh jar pull
+      tau_b = 0.9                         # fresh dial
+      M1_b  = 0.9 * 0.50 + 0.1 * -0.30    # 0.45 - 0.03 = 0.42
+      M2_b  = 0.9 * 0.60 + 0.1 *  0.20    # 0.54 + 0.02 = 0.56
+      wind1_b = 0.50 - -0.30              # 0.80  -- new line, new arrow
+      wind2_b = 0.60 -  0.20              # 0.40
+
+      # --- the scale ledger, arithmetic only ---
+      dials = 22*256+256 + 256*256+256 + 256*256+256 + 256*16+16    # 141584
+
+      print(M1, M2, wind1, wind2, meter)  # 0.26 0.72 0.4 -0.2 0.01
+
+  THE ANCHOR: the pair is manufactured -- roll a truth, roll a noise, roll a dial --
+  so the diary never runs out of wind lessons: one recorded answer times endless jar
+  pulls times endless dial readings.
+
+  ---
+
+  ONE BREATH
+
+  Printing answers crashes on piles of truths, so this machine prints ARROWS instead.
+  Study time manufactures each lesson from three rolls: a truth A from the diary
+  ([0.50, 0.60]), a noise pull N from a spread-1 jar ([0.10, 0.80]), a dial reading
+  tau from 0..1 (0.4); the mixture M = tau x A + (1 - tau) x N = [0.26, 0.72] is where
+  the machine stands, and the teaching answer is the wind A - N = [0.40, -0.20] --
+  walk the remaining (1 - tau) of it from M and you land exactly on A. The machine
+  reads 22 wires (5 table numbers + 16 mixture numbers + tau), prints a 16-number
+  wind through 141,584 dials, and is graded by the same subtract-square-average meter
+  (a print of [0.30, -0.10] scores 0.01). Tau earns its wire because the same point M
+  means different things at different dial readings: at (M = 0.5, tau = 0) the honest
+  wind is the undecided -0.5, at (M = 0.5, tau = 0.9) it is the committed 5.0 -- the
+  mean collapse is pushed out of the destination and into harmless early directions.
+  Even the first meter reading is pencil-callable: wind = A - N carries two
+  independent spread-1 ingredients, spread^2 = 1 + 1 = 2, so about 2.0 -- measured
+  2.1136. The machine now knows the wind everywhere; the next page rides it.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other material after this page:
+  >>   teaching the wind                 = flow matching (training a continuous
+  >>                                        normalizing flow by regression)
+  >>   the wind                          = the velocity field v(x, t)
+  >>   the noise jar (spread-1 bell)     = a standard gaussian, N(0, I)
+  >>   the mixing M = tau A + (1-tau) N  = linear interpolation between noise and data
+  >>                                        (the rectified-flow / linear path choice)
+  >>   the dial tau                      = the flow time t in [0, 1]
+  >>   teaching answer A - N             = the regression target (the path's constant
+  >>                                        velocity)
+  >>   the 5 question numbers riding in  = conditioning (a conditional flow model)
+  >>   best print = average of couples   = the learned field is the conditional
+  >>                                        expectation of velocities
+  >>   the noisier cousin                = diffusion models / diffusion policy (same
+  >>                                        walk-from-noise idea, stochastic path)
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 19 -- Learning by Copying):
+    Part 1 -- [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt)
+    Part 2 -- [The Copying Machine by Pencil](the-copying-machine-by-pencil.txt)
+    Part 3 -- [One Question, Two Right Answers: Where Copying Breaks](one-question-two-right-answers.txt)
+    Part 4 (this post) .
+    Part 5 -- [Riding the Wind: From Noise to an Answer](riding-the-wind-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

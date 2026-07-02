@@ -1,0 +1,269 @@
+@title One Question, Two Right Answers: Where Copying Breaks :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 19 . LEARNING BY COPYING . PART 3 OF 5
+  One Question, Two Right Answers: Where Copying Breaks
+  Posted: 2026-07-03 . Author: Rahul Rai . Tags: imitation-learning, multimodal, mse, mean-collapse, by-hand
+  ============================================================================================
+
+  PATH . post 56/58 . part 3 of 5 in Chapter 19 -- Learning by Copying
+    <- prev:  [The Copying Machine by Pencil](the-copying-machine-by-pencil.txt)
+       next:  [Teaching the Wind: Flow Matching by Pencil](teaching-the-wind-by-pencil.txt) ->
+
+  ---
+
+  A copying machine learns a pushing game from a human's diary: given the five numbers
+  describing the table (hand position, block position, block twist), print the sixteen
+  numbers the human printed (the next eight target points, two numbers each). Its
+  wrongness meter is subtract-square-average, and training drives that meter from about
+  1.0 down to 0.128 within sixty dial-turns. It works.
+
+  Then it meets one particular kind of question, and the failure is not a bug, not a
+  shortage of dials, not too little training. It is arithmetic -- the meter's own
+  arithmetic -- and a pencil can locate the crash before the machine ever plays. This
+  page is that pencil work.
+
+  ---
+
+  THE QUESTION WITH TWO TRUTHS
+
+      +--------------------------------------------+
+      |                                            |
+      |        __________     ...........          |
+      |       |  goal    |   .   above   .         |
+      |       |  patch   |  .    path     .        |
+      |       |__________| .               .       |
+      |                    .      _T_       o      |
+      |                    .     block     hand    |
+      |                    .               .       |
+      |                     .    below    .        |
+      |                      ...  path  ..         |
+      |                        .........           |
+      +--------------------------------------------+
+
+  The hand stands to the right of the block; the goal patch waits on the left. To get
+  pushing, the hand must first swing AROUND the block -- and both ways around work.
+  In the diary, both ways EXIST: on this table, one recorded game swings above, another
+  recorded game swings below. Two lines of the diary carry (as near as makes no
+  difference) the SAME five question numbers with two different, individually perfect
+  answers.
+
+  So: same question, two truths. What does a machine graded by subtract-square-average
+  print when its diary says two things?
+
+  ---
+
+  STRIP IT TO ONE DIMENSION, WHERE THE WHOLE CRASH FITS ON A SLATE
+
+  Forget the table for a moment. One question; two recorded answers, +1 (call it the
+  above-answer) and -1 (the below-answer). The machine must print one number g, and
+  training grades g against BOTH recorded answers, adding the squared misses:
+
+      total(g) = (g - 1)^2 + (g + 1)^2
+
+  Try candidates, every stroke written:
+
+      print g = -1:  (-1-1)^2 + (-1+1)^2 = (-2)^2 + 0^2 = 4 + 0    = 4
+      print g =  0:  ( 0-1)^2 + ( 0+1)^2 = (-1)^2 + 1^2 = 1 + 1    = 2
+      print g = 0.5: (0.5-1)^2 + (0.5+1)^2 = 0.25 + 2.25           = 2.5
+      print g = +1:  ( 1-1)^2 + ( 1+1)^2 = 0 + 4                   = 4
+
+  Plot the four totals and the shape appears:
+
+      total
+        4 |  *                       *
+        3 |
+      2.5 |              *
+        2 |        *
+        --+--------------------------------
+           g = -1     0    0.5      +1
+
+  A valley -- and its bottom is NOT at either truth. Printing a truth (+1 or -1) costs
+  4; printing 0, a number NOBODY ever answered, costs 2. Seal it with algebra so no
+  candidate is left untried:
+
+      (g - 1)^2 + (g + 1)^2 = g^2 - 2g + 1 + g^2 + 2g + 1 = 2 g^2 + 2
+
+  The two g-terms cancel; what remains is smallest where g^2 is smallest: g = 0, the
+  AVERAGE of the two answers. And notice the bottom's height: 2, not 0. Even the best
+  possible print misses both truths by 1 each. A meter that cannot be driven to zero is
+  the tell that the question itself has no single right answer -- the machine is being
+  graded against a split truth.
+
+  YOUR TURN -- same two answers, print g = 0.2. Total? Slate first:
+
+      CHECK: (0.2-1)^2 + (0.2+1)^2 = 0.64 + 1.44 = 2.08
+      (and g = -0.2 gives 1.44 + 0.64 = 2.08 -- the valley is symmetric around 0)
+
+  YOUR TURN -- one question, THREE recorded answers: 2, 4, and 9. Which single print
+  has the smallest total of squared misses -- try 4 and 5. Slate first:
+
+      CHECK: at 4: (4-2)^2+(4-4)^2+(4-9)^2 = 4+0+25 = 29
+             at 5: (5-2)^2+(5-4)^2+(5-9)^2 = 9+1+16 = 26  -- smaller.
+             5 is the average (2+4+9)/3. The bottom is ALWAYS the average of the
+             recorded answers; more answers just move the average.
+
+  ---
+
+  NOW PUT THE AVERAGE BACK ON THE TABLE
+
+  Back to two dimensions with real-scale numbers. The block's centre sits at (230,
+  300). The above-game's recorded first move: target (230, 260) -- forty units above
+  the block, starting the high swing. The below-game's: target (230, 340) -- forty
+  units below, starting the low swing. The meter's favourite print is the average:
+
+      ( (230 + 230) / 2 ,  (260 + 340) / 2 )  =  ( 230, 300 )
+
+      above truth:   (230, 260)      .  <- swing high
+                                     |
+      meter's print: (230, 300)      X  <- the block's own centre
+                                     |
+      below truth:   (230, 340)      .  <- swing low
+
+  (230, 300) is not a compromise path. It is the coordinates OF THE BLOCK. The machine
+  drives the hand straight into the block, flat-on -- no swing, no push toward the
+  goal, a stall. Two individually perfect answers, averaged into the one move that
+  fails: the average of "go around this side" and "go around that side" is "walk into
+  it".
+
+  YOUR TURN -- two recorded first moves (200, 280) and (240, 280). The meter's
+  favourite print? Slate first:
+
+      CHECK: ((200+240)/2, (280+280)/2) = (220, 280) -- a lane neither human drove.
+
+  ---
+
+  AND NO AMOUNT OF TRAINING ESCAPES A VALLEY WHOSE BOTTOM IS THE CRASH
+
+  The reflex fixes all fail, and the parabola says why before trying them:
+
+      "train longer"  -- every dial-turn steps AGAINST the meter's pull, and the pull
+      points down-valley toward the bottom. The bottom is the average. Longer training
+      lands on the crash more precisely.
+
+      "add dials"     -- capacity moves a machine closer to whatever print the meter
+      scores best. That print is the average. A bigger machine averages better.
+
+      "the machine will just pick a side"  -- there is no force in subtract-square-
+      average that selects sides. Each meal's pull drags the print toward the mean of
+      the answers in the handful; meals with the above-answer pull up, meals with the
+      below-answer pull down, and the print settles where the pulls cancel: the middle.
+
+  The failure is not the machine. It is the QUESTION SHAPE: the meter's arithmetic
+  assumes each question has one right answer, and grades all prints against a single
+  target's distance. Feed it a question whose truth is a PILE of answers, and the
+  best-scoring print is the pile's average -- a point that can lie outside every
+  member of the pile.
+
+  So the fix cannot be a better print. The fix is to stop printing a single answer at
+  all, and learn something that can REACH every member of the pile -- from a random
+  starting point, walk to ONE truth, a different truth on a different day. Building
+  that walker is the next page.
+
+  ---
+
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
+
+  "It will learn both paths and the popular one will win." The meter has no shelf to
+  keep two answers on. Every candidate print is one point g, graded (g - 1)^2 +
+  (g + 1)^2 = 2g^2 + 2, and that expression has exactly one bottom -- at 0, between
+  the truths. Popularity only relocates the average: nine above-games and one
+  below-game put the bottom at (9 x 1 + 1 x (-1)) / 10 = 0.8 -- still a number no
+  game ever answered, just a less embarrassing one.
+
+  "Fine -- it should print the closer truth." Closer to which? The print starts
+  wherever the newborn dials put it, and from anywhere the meter's pull points toward
+  the bottom of the valley, not toward the nearest truth: standing at g = 0.9, a
+  breath from the +1 truth, the total is 2 x 0.81 + 2 = 3.62, while the middle scores
+  2.0 -- so training walks AWAY from the truth it nearly held. Squared grading pays
+  the machine to retreat.
+
+  "Then more dials, or more reads of the diary." Both sharpen the aim at the same
+  wrong bullseye. The bottom of the valley IS the least-total print; capacity and
+  practice get the machine THERE faster and hold it steadier. When the target is
+  mis-stated, competence makes the failure crisper -- the meter reads a comfortable
+  2.0 while the hand parks itself inside the block at (230, 300).
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same crash in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the candidate table and the on-table crash, hard-coded.
+  Eight squares, six adds, two averages: the entire failure.
+
+      # --- one question, two truths: +1 (above) and -1 (below) ---
+      total_at_minus1 = (-1 - 1)**2 + (-1 + 1)**2      # 4 + 0    = 4
+      total_at_0      = ( 0 - 1)**2 + ( 0 + 1)**2      # 1 + 1    = 2   <- the bottom
+      total_at_0p5    = (0.5 - 1)**2 + (0.5 + 1)**2    # 0.25+2.25= 2.5
+      total_at_plus1  = ( 1 - 1)**2 + ( 1 + 1)**2      # 0 + 4    = 4
+      # algebra behind the table: (g-1)^2 + (g+1)^2 = 2*g*g + 2, bottom at g = 0,
+      # bottom height 2 -- the meter cannot reach 0 on a split-truth question
+
+      # --- the same bottom on the table, in table units ---
+      above_move = (230.0, 260.0)                      # swing high, recorded
+      below_move = (230.0, 340.0)                      # swing low,  recorded
+      avg_move_x = (230.0 + 230.0) / 2                 # 230.0
+      avg_move_y = (260.0 + 340.0) / 2                 # 300.0
+      block_at   = (230.0, 300.0)
+      # the meter's favourite print (230.0, 300.0) == the block's own centre: a stall
+
+      print(total_at_0, (avg_move_x, avg_move_y))      # 2 (230.0, 300.0)
+
+  THE ANCHOR: 2g^2 + 2 is the whole post. One bottom, at the average, at height 2 --
+  a valley that punishes truths and rewards the point between them.
+
+  ---
+
+  ONE BREATH
+
+  The copying machine grades a print g against every recorded answer by
+  subtract-square-average, so on a question with two truths +1 and -1 its total is
+  (g-1)^2 + (g+1)^2 = 2g^2 + 2: printing a truth costs 4, printing the average 0 --
+  a number nobody answered -- costs 2, and the valley's bottom can never reach 0. On
+  the real table the two truths are "swing above" (230, 260) and "swing below"
+  (230, 340), and their average (230, 300) is the block's own centre: the best-scoring
+  print drives the hand into the obstacle. Longer training, more dials, more reads all
+  aim more precisely at that same bottom, because the bottom IS the least-squared-miss
+  print, and squared grading has no way to choose a side (from g = 0.9 it walks AWAY
+  from the nearby truth, back to the middle). The disease is the question shape: one
+  print graded against a pile of answers lands on the pile's average, which can sit
+  outside every member. The cure, next page, is to print no answer at all -- learn a
+  field of arrows that can WALK to one member of the pile, a different member from a
+  different random start.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other material after this page:
+  >>   a question with a pile of truths  = a multimodal action distribution
+  >>   one member of the pile            = a mode
+  >>   the crash into the average        = mode averaging / mean collapse (the known
+  >>                                        failure of MSE behavior cloning on
+  >>                                        multimodal demonstrations)
+  >>   single-truth questions            = unimodal (where MSE copying is fine)
+  >>   the valley bottom = the average   = the minimizer of squared error is the
+  >>                                        conditional mean
+  >>   bottom height 2, never 0          = irreducible loss (the variance of the
+  >>                                        answers around their mean)
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 19 -- Learning by Copying):
+    Part 1 -- [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt)
+    Part 2 -- [The Copying Machine by Pencil](the-copying-machine-by-pencil.txt)
+    Part 3 (this post) .
+    Part 4 -- [Teaching the Wind: Flow Matching by Pencil](teaching-the-wind-by-pencil.txt)
+    Part 5 -- [Riding the Wind: From Noise to an Answer](riding-the-wind-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

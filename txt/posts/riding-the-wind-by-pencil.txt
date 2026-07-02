@@ -1,0 +1,302 @@
+@title Riding the Wind: From Noise to an Answer :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 19 . LEARNING BY COPYING . PART 5 OF 5
+  Riding the Wind: From Noise to an Answer
+  Posted: 2026-07-03 . Author: Rahul Rai . Tags: imitation-learning, flow-matching, euler, sampling, by-hand
+  ============================================================================================
+
+  PATH . post 58/58 . part 5 of 5 in Chapter 19 -- Learning by Copying
+    <- prev:  [Teaching the Wind: Flow Matching by Pencil](teaching-the-wind-by-pencil.txt)
+       next:  (the chapter closes here)
+
+  ---
+
+  A machine has been taught the WIND: standing anywhere between pure noise and a
+  recorded truth, given the table situation (five numbers), its own position (a
+  candidate answer, here a two-number target point standing in for the real sixteen),
+  and a dial reading tau from 0 (all noise) to 1 (all truth), it prints the arrow
+  toward truth. Teaching used recorded answers to build those arrows. But at answering
+  time there IS no recorded answer -- a live game shows a table nobody played before
+  and asks for the machine's own move.
+
+  The move is made by walking: start from pure dust, read the arrow, take a small
+  step, read again. This page walks the whole walk by pencil, lands it, and closes the
+  chapter with the two-answers cure and the honest scoreboard.
+
+  ---
+
+  THE LADDER: N EQUAL RUNGS FROM DUST TO ANSWER
+
+      tau:   0.00 --------> 0.25 --------> 0.50 --------> 0.75 --------> 1.00
+              |    rung 0    |    rung 1    |    rung 2    |    rung 3    |
+            pure dust      step 1/4       step 1/4       step 1/4      the answer
+
+  Choose a rung count n (here n = 4, so every arithmetic line fits a slate; the real
+  machine walks n = 10). Each rung is the same two moves:
+
+      read the arrow:  wind = machine( question, current position, tau )
+      take the step:   current = current + (1/n) x wind ;   tau = tau + 1/n
+
+  The step is 1/n of the wind because the wind is calibrated for the WHOLE remaining
+  line -- the previous page's feet-check showed that walking (1 - tau) of the wind
+  from a mixture lands exactly on the truth. A walker taking n equal rungs covers that
+  same line in n honest pieces.
+
+  ---
+
+  THE FULL WALK, EVERY STROKE WRITTEN
+
+  A live question arrives (five re-ruled table numbers -- fixed all walk, so they are
+  written once and read every rung). Pull one speck of dust from the noise jar as the
+  starting position, and let the trained machine print the arrows (the four winds
+  below are its prints, hard-coded here so the pencil can follow):
+
+      start:   current = [0.10, 0.80]     tau = 0.00     step = 1/4 = 0.25
+
+      rung 0:  machine reads (question, [0.10, 0.80], 0.00) -> wind [0.40, -0.20]
+               current = [0.10 + 0.25 x 0.40 ,  0.80 + 0.25 x (-0.20)]
+                       = [0.10 + 0.10 , 0.80 - 0.05]  = [0.20, 0.75]     tau -> 0.25
+
+      rung 1:  machine reads (question, [0.20, 0.75], 0.25) -> wind [0.30, -0.10]
+               current = [0.20 + 0.075 , 0.75 - 0.025] = [0.275, 0.725]  tau -> 0.50
+
+      rung 2:  machine reads (question, [0.275, 0.725], 0.50) -> wind [0.20, -0.10]
+               current = [0.275 + 0.05 , 0.725 - 0.025] = [0.325, 0.700] tau -> 0.75
+
+      rung 3:  machine reads (question, [0.325, 0.700], 0.75) -> wind [0.15, -0.08]
+               current = [0.325 + 0.0375 , 0.700 - 0.02] = [0.3625, 0.680]
+               tau -> 1.00 -- the ladder ends exactly at 1.
+
+      landing: [0.3625, 0.680]
+
+  The landing is the machine's answer -- still in re-ruled units, because the machine
+  thinks in re-ruled units. De-rule it (multiply by the answer column's spread, add
+  back its middle; the target-x ruler is spread 101.6 middle 228.2, target-y spread
+  96.0 middle 294.0):
+
+      x: 0.3625 x 101.6 + 228.2 = 36.83 + 228.2 = 265.03
+      y: 0.680  x  96.0 + 294.0 = 65.28 + 294.0 = 359.28
+
+  Then clamp to the table (0..512 each way -- both already inside): the machine's move
+  is "slide the hand toward (265.0, 359.3)". For the real eight-move envelope the walk
+  is identical, just sixteen numbers wide instead of two -- and the live loop outside
+  is unchanged from the copier's: look once, walk one envelope, act eight ticks blind,
+  look again.
+
+  YOUR TURN -- one rung by hand: current = [0.5, 0.5], the machine prints wind
+  [-0.2, 0.4], rung count n = 4. Where is the walker next? Slate first:
+
+      CHECK: [0.5 + 0.25 x (-0.2) , 0.5 + 0.25 x 0.4] = [0.45, 0.60]
+
+  YOUR TURN -- n = 5 rungs. The step size, and the tau ladder? Slate first:
+
+      CHECK: step 1/5 = 0.2 ;  tau: 0 -> 0.2 -> 0.4 -> 0.6 -> 0.8 -> 1.0
+             (five rungs; the last STARTS at 0.8 and LANDS on 1.0)
+
+  ---
+
+  TWO SPECKS OF DUST, TWO DIFFERENT RIGHT ANSWERS
+
+  Now the payoff the whole chapter built toward. The two-truths question: the block's
+  centre sits at height 299 on the table; the diary swings above it (recorded first
+  move near height 256) in some games and below it (near height 342) in others. A
+  single-print machine was forced to print the average -- the block itself. Watch what
+  the walker does instead. Same question both times; the only change is which speck
+  of dust the jar hands over.
+
+  Speck one starts high side: current = [0.20, -1.00] (re-ruled; negative = above).
+
+      rung 0: wind [-0.20,  0.20] -> current = [0.15, -0.95]   tau -> 0.25
+      rung 1: wind [-0.20,  0.60] -> current = [0.10, -0.80]   tau -> 0.50
+      rung 2: wind [-0.20,  0.80] -> current = [0.05, -0.60]   tau -> 0.75
+      rung 3: wind [-0.20,  0.80] -> current = [0.00, -0.40]   tau -> 1.00
+
+      landing [0.00, -0.40] -> de-ruled y: -0.40 x 96.0 + 294.0 = 255.6
+      the ABOVE-swing answer, height 255.6.
+
+  Speck two starts low side: current = [-0.40, 1.30].
+
+      rung 0: wind [0.40, -0.20] -> current = [-0.30, 1.25]    tau -> 0.25
+      rung 1: wind [0.40, -0.80] -> current = [-0.20, 1.05]    tau -> 0.50
+      rung 2: wind [0.40, -1.00] -> current = [-0.10, 0.80]    tau -> 0.75
+      rung 3: wind [0.40, -1.20] -> current = [ 0.00, 0.50]    tau -> 1.00
+
+      landing [0.00, 0.50] -> de-ruled y: 0.50 x 96.0 + 294.0 = 342.0
+      the BELOW-swing answer, height 342.0.
+
+  Two details in those traces carry the previous page's honesty. First, the rung-0
+  winds are TIMID in the swing direction (0.20 and -0.20) while later rungs commit
+  (0.80, -1.20): at tau near 0 the honest arrow is still an average over both truths,
+  and only as the dial grows do the arrows pick a side -- the mean collapse now lives
+  harmlessly in the early rungs. Second, average the two LANDINGS and the old crash
+  reappears: (-0.40 + 0.50) / 2 = 0.05, de-ruled 0.05 x 96.0 + 294.0 = 298.8 -- the
+  block's lane. The walker never prints that average; it exists only if you insist on
+  merging two finished answers. Different dust, different truth, no crash.
+
+  ---
+
+  WHAT THE RIDE COSTS, AND HOW THE WHOLE THING IS GRADED
+
+  Nothing is free. The copier answered one envelope with ONE pass through its web; the
+  wind machine reads its web once per rung -- n = 10 passes per envelope on the real
+  settings. Over an average game (124 moments / 8 moves per envelope -> 16 envelope
+  calls), that is 16 passes for the copier against 16 x 10 = 160 for the rider. The
+  price of reaching every truth is ten thinks where one used to do.
+
+  YOUR TURN -- rung count n = 10, a game needing 16 envelope calls: how many web passes
+  for the copier, how many for the rider? Slate first:
+
+      CHECK: copier 16 x 1 = 16 ;  rider 16 x 10 = 160.
+
+  And the grading, same exam for both machines: freeze the dials, play 100 FRESH games
+  (fresh starting tables the diary never showed), and in each game record the best
+  moment of the world's 0..1 score -- the score that rises with how much of the goal
+  patch the block covers. The machine's grade is the average of those 100 bests. One
+  good game proves nothing (one run is an anecdote -- an average over 100 is a grade);
+  and playing uses frozen dials, no learning mid-exam.
+
+  The chapter's ledger, closed:
+
+      the diary        206 games, 25,650 moments, 24,208 window pairs
+      the copier       5 -> 256 -> 256 -> 256 -> 16, 137,232 dials,
+                       first meter ~1.0 predicted, 0.9885 measured
+      the crash        two truths average to (230, 300) -- the block itself
+      the wind machine 22 -> 256 -> 256 -> 256 -> 16, 141,584 dials,
+                       first meter ~2.0 predicted, 2.1136 measured
+      the ride         n = 10 rungs, step 1/10, tau 0 -> 1, ten passes per envelope
+      the exam         100 fresh games, average of per-game best coverage
+
+  ---
+
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
+
+  "More rungs would walk closer to THE answer." There is no THE answer -- that is the
+  point of the whole machine. The landing depends on the speck: dust at [0.20, -1.00]
+  rode to the above-swing (255.6), dust at [-0.40, 1.30] rode to the below-swing
+  (342.0), and both are right. More rungs buy a smoother, more faithful ride along
+  whichever line the speck selected; the JAR chooses the valley, the rungs only polish
+  the road there.
+
+  "Equal steps never actually reach 1 -- like the walker who halves forever." The
+  halving picture is the wrong picture: rungs are EQUAL, not shrinking. Four rungs of
+  0.25 make 0 -> 0.25 -> 0.50 -> 0.75 -> 1.00; the last rung STARTS at 0.75 and LANDS
+  on 1.00 exactly. The trace is the receipt -- tau arrived, no limit needed.
+
+  "At answering time there is no truth to mix with, so the machine's input is
+  broken." Study time needed truths to BUILD teaching arrows; answering time only
+  READS arrows. The machine's three inputs are all present at a live table: the
+  question (the world prints it), the current position (the walker carries it,
+  starting as dust), and tau (the ladder counts it). The recorded truth was
+  scaffolding; the trained wind stands without it.
+
+  "Flow must change the live game loop." The loop cannot tell which machine is
+  answering. Look at the situation, produce eight moves, act them blind, look again
+  -- identical for copier and rider. All that changed is the inside of "produce":
+  one web pass became ten rungs of web passes. Swap the machines and the world
+  notices nothing but the moves getting around the block.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same ride in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the four rungs unrolled one by one, the de-ruling, and the
+  two-speck demonstration. Per rung: 2 multiplies, 2 adds; the walk is 16 strokes and
+  a de-rule.
+
+      # --- the walk: n = 4 rungs, step 0.25; winds are the trained machine's prints ---
+      cx, cy = 0.10, 0.80                      # the dust speck (tau = 0.00)
+
+      wx, wy = 0.40, -0.20                     # rung 0's wind
+      cx, cy = cx + 0.25*wx, cy + 0.25*wy      # [0.20, 0.75]     tau -> 0.25
+
+      wx, wy = 0.30, -0.10                     # rung 1's wind
+      cx, cy = cx + 0.25*wx, cy + 0.25*wy      # [0.275, 0.725]   tau -> 0.50
+
+      wx, wy = 0.20, -0.10                     # rung 2's wind
+      cx, cy = cx + 0.25*wx, cy + 0.25*wy      # [0.325, 0.700]   tau -> 0.75
+
+      wx, wy = 0.15, -0.08                     # rung 3's wind
+      cx, cy = cx + 0.25*wx, cy + 0.25*wy      # [0.3625, 0.680]  tau -> 1.00
+
+      # --- de-rule the landing into table units, then clamp to the table ---
+      move_x = cx * 101.6 + 228.2              # 36.83 + 228.2 = 265.03
+      move_y = cy *  96.0 + 294.0              # 65.28 + 294.0 = 359.28
+      move_x = min(max(move_x, 0.0), 512.0)    # 265.03 (already inside)
+      move_y = min(max(move_y, 0.0), 512.0)    # 359.28
+
+      # --- two specks, same question: the two-truths cure ---
+      # speck one, [0.20, -1.00], winds per rung (timid early, committed late):
+      #   [-0.20, 0.20] [-0.20, 0.60] [-0.20, 0.80] [-0.20, 0.80]
+      s1y = -1.00 + 0.25*0.20 + 0.25*0.60 + 0.25*0.80 + 0.25*0.80   # -0.40
+      # speck two, [-0.40, 1.30], winds:
+      #   [0.40, -0.20] [0.40, -0.80] [0.40, -1.00] [0.40, -1.20]
+      s2y =  1.30 - 0.25*0.20 - 0.25*0.80 - 0.25*1.00 - 0.25*1.20   #  0.50
+      land1_y = s1y * 96.0 + 294.0             # 255.6  -- the above-swing answer
+      land2_y = s2y * 96.0 + 294.0             # 342.0  -- the below-swing answer
+      ghost_y = ((s1y + s2y) / 2) * 96.0 + 294.0   # 298.8 -- the block's lane;
+      # the walker never prints this: it exists only by merging finished answers
+
+      print(move_x, move_y, land1_y, land2_y)  # 265.03 359.28 255.6 342.0
+
+  THE ANCHOR: the whole rider is one repeated line -- current = current + (1/n) x
+  wind -- and every power it has over the single-print copier comes from WHERE that
+  line starts.
+
+  ---
+
+  ONE BREATH
+
+  Answering time has no recorded truth, so the answer is walked, not printed: pull a
+  dust speck from the noise jar, and for n = 4 equal rungs read the trained wind at
+  (question, current position, tau) and step current + (1/4) x wind while tau climbs
+  0 -> 0.25 -> 0.50 -> 0.75 -> 1.00. The traced walk [0.10, 0.80] -> [0.20, 0.75] ->
+  [0.275, 0.725] -> [0.325, 0.700] -> [0.3625, 0.680] lands, de-rules (x 101.6 +
+  228.2, x 96.0 + 294.0) to the table move (265.0, 359.3), and the live loop outside
+  is the copier's unchanged eight-envelope loop -- just ten web passes per envelope
+  instead of one (16 vs 160 over an average game). The two-truths crash is cured by
+  the start: a speck at [0.20, -1.00] rides to the above-swing answer (height 255.6),
+  a speck at [-0.40, 1.30] rides to the below-swing (342.0), early rungs timid (the
+  averaged arrow, harmless), late rungs committed -- and the old crash point 298.8
+  exists only if two finished answers are merged, which the rider never does. Grade
+  everything the same way: frozen dials, 100 fresh games, average of each game's best
+  0..1 coverage -- an average is a grade, one run is an anecdote.
+
+  ---
+
+  >> NOTE: STANDARD JARGON
+  >> If you read other material after this page:
+  >>   the ride / rung-by-rung walk      = Euler integration of the learned velocity
+  >>                                        field (an ODE solve from t = 0 to t = 1)
+  >>   the rung count n                  = the number of denoising / integration steps
+  >>   answering time                    = sampling / inference
+  >>   the dust speck                    = the initial noise sample (the seed's draw);
+  >>                                        same speck + same dials -> same landing
+  >>   ten passes per envelope           = n network evaluations per sampled chunk
+  >>   the frozen-dials exam             = evaluation rollouts; the 0..1 number is the
+  >>                                        goal-region coverage reward, best-per-episode,
+  >>                                        averaged over 100 seeded episodes
+  >>   different specks, different modes = the flow policy samples from a multimodal
+  >>                                        action distribution instead of averaging it
+
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 19 -- Learning by Copying):
+    Part 1 -- [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt)
+    Part 2 -- [The Copying Machine by Pencil](the-copying-machine-by-pencil.txt)
+    Part 3 -- [One Question, Two Right Answers: Where Copying Breaks](one-question-two-right-answers.txt)
+    Part 4 -- [Teaching the Wind: Flow Matching by Pencil](teaching-the-wind-by-pencil.txt)
+    Part 5 (this post) .
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================
