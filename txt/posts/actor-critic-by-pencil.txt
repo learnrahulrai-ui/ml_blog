@@ -16,45 +16,49 @@
 
   ---
 
-  Every machine in this book so far learned a WORTH and then acted greedy on it. The worth was
-  always a middleman: you wanted a policy -- what to DO -- but you learned a number and read the
-  policy off it by grabbing the biggest. This post drops the middleman and learns the policy
-  straight.
+  Every machine in this book so far learned a WORTH and then acted greedy on it. The
+  worth was always a middleman: you wanted a policy -- what to DO -- but you learned a
+  number and read the policy off it by grabbing the biggest. This post drops the
+  middleman and learns the policy straight.
 
-  A spot = one place in the world. A move = something you can do. A reward = a number the world
-  pays on a move. A policy = the rule that says which move to make. Three cracks show in
-  learn-a-worth-then-grab-the-biggest. Grabbing the biggest needs a max over moves -- fine for a
-  few buttons, a nightmare when the move is a real-numbered dial (a steering angle has infinitely
-  many settings to max over). The policy it gives is all-or-nothing: a hair's change in two close
-  worths flips the chosen move from one to the other, a jolt. And sometimes the best policy is
-  honestly MIXED -- "go left 70% of the time" -- which a grab-the-biggest rule can never say. So
-  learn the policy as its own thing, a set of knobs you can tune smoothly.
+  A spot = one place in the world. A move = something you can do. A reward = a number
+  the world pays on a move. A policy = the rule that says which move to make. Three
+  cracks show in learn-a-worth-then-grab-the-biggest. Grabbing the biggest needs a max
+  over moves -- fine for a few buttons, a nightmare when the move is a real-numbered
+  dial (a steering angle has infinitely many settings to max over). The policy it
+  gives is all-or-nothing: a hair's change in two close worths flips the chosen move
+  from one to the other, a jolt. And sometimes the best policy is honestly MIXED --
+  "go left 70% of the time" -- which a grab-the-biggest rule can never say. So learn
+  the policy as its own thing, a set of knobs you can tune smoothly.
 
   ---
 
   SO KEEP A PREFERENCE PER MOVE, AND SOFTMAX IT INTO CHANCES
 
-  Give every move at a spot a PREFERENCE -- a plain score, high means "lean toward this move."
-  Build it the linear way from Chapter 14: a preference is a sum of weights at the spot's active
-  tiles. (Reusing the one-dial tile coder from Chapter 14: position on [0,1], two shifted rulers,
-  so a spot lights two tiles -- here position 0.3 lights A0 and B1.) Three moves -- left, stay,
-  right -- each with its own row of weights:
+  Give every move at a spot a PREFERENCE -- a plain score, high means "lean toward
+  this move." Build it the linear tile way: lay two coarse shifted rulers over the
+  one-dial world (position on [0,1]), so a spot lights one tile per ruler; a
+  preference is the sum of that move's weights at the lit tiles. Here position 0.3
+  lights tiles A0 and B1. Three moves -- left, stay, right -- each with its own row
+  of weights:
 
       move \ tile :    A0     A1     B0     B1     B2
       left        :  -1.0    ...    0.0    0.0    0.0
       stay        :   0.0    ...    0.0    1.0    0.0
       right       :   1.0    ...    0.0    1.0    0.0
 
-  At position 0.3 (active tiles A0, B1) the three preferences are sums down those two columns:
+  At position 0.3 (lit tiles A0, B1) the three preferences are sums down those two
+  columns:
 
       h(left ) = -1.0 + 0.0 = -1.0
       h(stay ) =  0.0 + 1.0 =  1.0
       h(right) =  1.0 + 1.0 =  2.0
 
-  Preferences are not chances -- they can be negative, and they do not add to 1. Turn them into
-  chances with the softmax from Chapter 8: lift each by e, then divide by the total so they sum
-  to 1. Subtract the biggest preference first (here 2.0) so the e's never blow up -- it cancels
-  out and changes nothing:
+  Preferences are not chances -- they can be negative, and they do not add to 1. Turn
+  them into chances with a softmax: raise e (2.71828...) to each preference, then
+  divide each by the total, so all three are positive and sum to 1. Subtract the
+  biggest preference first (here 2.0) so the e's never blow up -- softmax reads only
+  the gaps between preferences, so the shift changes nothing:
 
       shifted:   h - 2.0  =  [ -3 , -1 ,  0 ]
       e^(-3) = 0.0498     e^(-1) = 0.3679     e^(0) = 1.0
@@ -64,36 +68,46 @@
       pi(stay ) = 0.3679 / 1.4177 = 0.2595
       pi(right) = 1.0    / 1.4177 = 0.7054      (check: 0.0351 + 0.2595 + 0.7054 = 1.0)
 
-  The biggest preference became the biggest chance, but the others kept a real slice. The policy
-  is now a smooth dial: shift a preference a hair and the chances slide a hair -- no jolt.
+  The biggest preference became the biggest chance, but the others kept a real slice.
+  The policy is now a smooth dial: shift a preference a hair and the chances slide a
+  hair -- no jolt.
+
+  YOUR TURN -- another spot, preferences h = [2, 0, 1]. Shift, lift by e, divide.
+  What are the three chances? Slate first, then check:
+
+      CHECK: shifted = [0, -2, -1];  e^0 = 1,  e^(-2) = 0.1353,  e^(-1) = 0.3679
+             total = 1 + 0.1353 + 0.3679 = 1.5032
+             pi = [ 1/1.5032 , 0.1353/1.5032 , 0.3679/1.5032 ]
+                = [ 0.665 , 0.090 , 0.245 ]        (sums to 1.000)
 
   ---
 
   WHICH YOU SAMPLE FROM, NOT ARGMAX
 
-  You do not grab the biggest chance. You ROLL. Lay the three chances end to end on a 0-to-1
-  line and drop a random number:
+  You do not grab the biggest chance. You ROLL. Lay the three chances end to end on a
+  0-to-1 line and drop a random number:
 
       |---left---|--------stay--------|------------------right------------------|
       0       0.0351              0.2946                                       1.0
 
       roll r = 0.63  ->  lands in right's slice [0.2946, 1.0)  ->  take RIGHT
 
-  Most rolls land in right (it owns 70% of the line), but stay and left still come up sometimes.
-  The wandering is built into the policy itself, not bolted on like the epsilon of the value
-  machines -- and it is exactly what the next nudge will tune.
+  Most rolls land in right (it owns 70% of the line), but stay and left still come up
+  sometimes. The wandering is built into the policy itself, not bolted on like the
+  epsilon of the value machines -- and it is exactly what the next nudge will tune.
 
   ---
 
   BUT TO NUDGE A PREFERENCE YOU NEED A YARDSTICK -- A CRITIC
 
-  You took "right" and the world paid a reward. Should "right" become MORE likely here? Only if
-  it did better than you had any right to expect. A raw reward cannot tell you that -- a +1 is
-  great in a bad spot, lousy in a great one. So keep a second learner, a CRITIC, that holds a
-  WORTH per spot -- a baseline of how good this spot already is. (The preference-keeper is the
-  ACTOR; the worth-keeper is the CRITIC. Actor proposes a move; critic grades how it went.)
+  You took "right" and the world paid a reward. Should "right" become MORE likely
+  here? Only if it did better than you had any right to expect. A raw reward cannot
+  tell you that -- a +1 is great in a bad spot, lousy in a great one. So keep a second
+  learner, a CRITIC, that holds a WORTH per spot -- a baseline of how good this spot
+  already is. (The preference-keeper is the ACTOR; the worth-keeper is the CRITIC.
+  Actor proposes a move; critic grades how it went.)
 
-  The critic's worth is the Chapter 14 linear sum again, its own row of weights at the active
+  The critic's worth is the same linear tile sum, its own row of weights at the lit
   tiles:
 
       tile  :   A0     A1     B0     B1     B2
@@ -106,14 +120,14 @@
 
   WHICH MEASURES "BETTER THAN EXPECTED": THE DIFFERENTIAL TD ERROR
 
-  The pendulum -- the standard toy here, a pole you swing up and balance -- never ends. There is
-  no goal to reach, no episode to finish; it just runs forever. With no finish line there is
-  nothing to discount toward, so you do not chase a discounted pile. You chase the average reward
-  PER STEP -- call your running guess of it R-bar -- and you ask of each move: did it beat that
-  average?
+  The pendulum -- the standard toy here, a pole you swing up and balance -- never
+  ends. There is no goal to reach, no episode to finish; it just runs forever. With no
+  finish line there is nothing to discount toward, so you do not chase a discounted
+  pile. You chase the average reward PER STEP -- call your running guess of it R-bar
+  -- and you ask of each move: did it beat that average?
 
-  That gap is the differential TD error. Take the reward, subtract the average you expected to
-  earn this step, and add the change in worth from leaving to landing:
+  That gap is the differential TD error. Take the reward, subtract the average you
+  expected to earn this step, and add the change in worth from leaving to landing:
 
       how wrong = reward - R-bar + V(landing) - V(left)
 
@@ -123,43 +137,50 @@
                 = 1 - 0.5 + 0.2   - 0.1
                 = 0.6
 
-  A positive 0.6: this step earned more than the running average and landed on a slightly better
-  spot than it left. Better than expected. That single number now drives BOTH learners.
+  A positive 0.6: this step earned more than the running average and landed on a
+  slightly better spot than it left. Better than expected. That single number now
+  drives BOTH learners.
 
   ---
 
   SO NUDGE BOTH: THE CRITIC TOWARD THE TRUTH, THE ACTOR TOWARD WHAT BEAT THE AVERAGE
 
-  Three nudges, all driven by the same how-wrong = 0.6. Sizes: 0.1 for each. Read old worths for
-  the how-wrong FIRST (above), THEN write -- a guess leaning on a guess, the same bootstrap as
-  every TD post.
+  Three nudges, all driven by the same how-wrong = 0.6. Sizes: 0.1 for each. Read old
+  worths for the how-wrong FIRST (above), THEN write -- a guess leaning on a guess,
+  the same read-then-write order as every one-sample nudge on this blog.
 
   The average-reward guess crawls toward what it keeps seeing:
 
       R-bar = 0.5 + 0.1 x 0.6 = 0.56
 
-  The critic crawls its worth for the spot you LEFT toward the how-wrong, on that spot's active
-  tiles (A0, B1), exactly the Chapter 14 value nudge:
+  The critic crawls its worth for the spot you LEFT toward the how-wrong, on that
+  spot's lit tiles (A0, B1) -- the linear value nudge:
 
       critic[A0] = 0.2  + 0.1 x 0.6 = 0.26
       critic[B1] = -0.1 + 0.1 x 0.6 = -0.04
 
-  The actor is the new part. Make the move you TOOK more likely when how-wrong is positive, and
-  the moves you did NOT take less likely -- each in proportion to how probable it already was.
-  The nudge to move a's preference weight, on each active tile, is
+  The actor is the new part. Make the move you TOOK more likely when how-wrong is
+  positive, and the moves you did NOT take less likely -- each in proportion to how
+  probable it already was. The nudge to move a's preference weight, on each lit tile,
+  is
 
       actor[a][tile] += size x how-wrong x ( took-it? - pi(a) )
 
-  where "took-it?" is 1 for the move actually taken and 0 for the rest. That (took-it? minus
-  pi(a)) is the whole trick: the taken move gets (1 - its chance) -- a shove UP, biggest when it
-  was UNlikely -- and every other move gets (0 - its chance), a shove DOWN sized by its own odds.
-  Worked on the active tiles A0 and B1, how-wrong 0.6, size 0.1, the chances from above:
+  where "took-it?" is 1 for the move actually taken and 0 for the rest. That
+  (took-it? minus pi(a)) is the whole trick: the taken move gets (1 - its chance) --
+  a shove UP, biggest when it was UNlikely -- and every other move gets (0 - its
+  chance), a shove DOWN sized by its own odds. Worked on the lit tiles A0 and B1,
+  how-wrong 0.6, size 0.1, the chances from above:
 
       right (taken):  0.1 x 0.6 x (1 - 0.7054) = 0.06 x  0.2946 =  0.0177   -> up
       stay         :  0.1 x 0.6 x (0 - 0.2595) = 0.06 x (-0.2595)= -0.0156   -> down
       left         :  0.1 x 0.6 x (0 - 0.0351) = 0.06 x (-0.0351)= -0.0021   -> down a hair
 
-  Add each to BOTH active tiles of that move's row:
+  (Add the three shoves: 0.0177 - 0.0156 - 0.0021 = 0. Exactly zero, always --
+  because (took-it? - pi) sums to 1 - 1 = 0 across the moves. The actor never
+  creates preference out of thin air; it reshuffles it toward what worked.)
+
+  Add each to BOTH lit tiles of that move's row:
 
       actor[right][A0]: 1.0 + 0.0177 = 1.0177      actor[right][B1]: 1.0 + 0.0177 = 1.0177
       actor[stay ][A0]: 0.0 - 0.0156 = -0.0156     actor[stay ][B1]: 1.0 - 0.0156 = 0.9844
@@ -171,62 +192,134 @@
       h(stay ) = -0.0156 + 0.9844 = 0.969  (was 1.0  -> down)
       h(left ) = -1.0021 + -0.0021 = -1.004 (was -1.0 -> barely moved)
 
-  Softmax those and "right" now owns a little more of the 0-to-1 line than its old 0.7054. One
-  good surprise made the move that caused it more likely -- and because the shove is sized by
-  (1 - pi), a move that was already near-certain barely moves, while an unlikely move that pays
-  off gets a big promotion. That is the actor learning a policy directly. Had how-wrong been
-  NEGATIVE (the step came in below average), every sign flips: the taken move would be shoved
-  DOWN and the rest nudged up.
+  Softmax those and "right" now owns a little more of the 0-to-1 line than its old
+  0.7054. One good surprise made the move that caused it more likely -- and because
+  the shove is sized by (1 - pi), a move that was already near-certain barely moves,
+  while an unlikely move that pays off gets a big promotion. That is the actor
+  learning a policy directly.
+
+  YOUR TURN -- the same spot, but a BAD step: how-wrong = -0.5 (the move came in
+  below the running average). Chances still [0.0351, 0.2595, 0.7054], right taken,
+  size 0.1. Compute the three shoves. Slate first, then check:
+
+      CHECK: right (taken):  0.1 x (-0.5) x (1 - 0.7054) = -0.05 x 0.2946 = -0.0147  -> DOWN
+             stay         :  0.1 x (-0.5) x (0 - 0.2595) = +0.0130                    -> up
+             left         :  0.1 x (-0.5) x (0 - 0.0351) = +0.0018                    -> up a hair
+             Every sign flipped: a below-average step demotes its cause and hands
+             the freed odds to the untried moves. (And the three still sum to 0.)
 
   ---
 
-  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Nothing above needed a computer. This last section is for the day you meet one.
+  When I first built this machine, four walls stopped me. Each wall, the number that
+  broke it, and the rule I carry now.
 
-  THE POLICY (preferences -> softmax), BY HAND at position 0.3 (active tiles A0, B1):
+  THE TRAP: "where did dilute go? I kept trying to discount." THE NUMBER THAT BROKE
+  IT: the pendulum never ends, and a discounted pile on an endless run blows up as
+  the discount nears 1 -- a steady reward of 1 per step is worth 1/(1-0.9) = 10, then
+  1/(1-0.99) = 100, then unbounded. The differential error stays small forever:
+  1 - 0.5 + 0.2 - 0.1 = 0.6. THE FIX: when the game never ends, grade each step
+  against the AVERAGE step (subtract R-bar) instead of fading a future that never
+  arrives.
 
-      import numpy as np
-      # actor[move] = row of weights; here only the two active tiles matter
-      h = np.array([-1.0, 1.0, 2.0])          # h(left), h(stay), h(right): sums over A0,B1
-      z = np.exp(h - h.max())                  # subtract max: e^[-3,-1,0] = [0.0498,0.3679,1.0]
-      pi = z / z.sum()                         # [0.0351, 0.2595, 0.7054]
-      print(pi)
+  THE TRAP: "the untaken moves did nothing -- why do their preferences move at all?"
+  THE NUMBER THAT BROKE IT: the three shoves were +0.0177, -0.0156, -0.0021 -- and
+  they sum to exactly 0, because (took-it? - pi) always does. Chances must keep
+  summing to 1, so pushing one move up IS pulling the others down; the formula just
+  does it in proportion to their odds. THE FIX: a policy is one pie. Nobody gets a
+  bigger slice unless someone gives some up.
 
-  SAMPLE a move from pi (roll once):
+  THE TRAP: "my winner was already at 0.7054 -- shouldn't winning make it grow just
+  as fast as ever?" THE NUMBER THAT BROKE IT: the taken move's shove carries
+  (1 - its chance): at chance 0.7054 the factor is 0.2946; at chance 0.99 it would be
+  0.01 -- thirty times smaller for the same good news. THE FIX: the promotion is
+  sized by how SURPRISED the policy was to be right. Near-certain moves have almost
+  nothing left to learn from their own success -- which is also what stops the policy
+  slamming into all-or-nothing.
 
-      r = 0.63                                 # a Uniform(0,1) draw
-      move = int(np.searchsorted(np.cumsum(pi), r))   # cumsum [0.0351,0.2946,1.0]; 0.63 -> 2 (right)
-
-  THE THREE NUDGES, BY HAND (reward 1, R_bar 0.5, V(left)=0.1, V(land)=0.2; all sizes 0.1):
-
-      how_wrong = 1 - 0.5 + 0.2 - 0.1          # 0.6
-      R_bar = 0.5 + 0.1 * how_wrong            # 0.56
-      # critic: nudge the LEFT spot's active tiles toward how_wrong
-      # critic[A0] += 0.1*0.6 -> 0.26 ; critic[B1] += 0.1*0.6 -> -0.04
-      took = np.array([0.0, 0.0, 1.0])         # right was taken
-      actor_step = 0.1 * how_wrong * (took - pi)   # [-0.0021, -0.0156, 0.0177]
-      # add actor_step[move] to each active tile of that move's row
-
-  THE ANCHOR has nothing to do here: the pendulum never ends, so there is no terminal move and no
-  reward-alone case -- the differential how-wrong (reward - R_bar + V(land) - V(left)) runs every
-  single step, forever.
+  THE TRAP: "R-bar is a third learner?! I set it once and left it." THE NUMBER THAT
+  BROKE IT: suppose the true average climbs to 1 while R-bar sits frozen at 0.5.
+  Every step now reads 1 - 0.5 + (about 0) = +0.5 "better than expected" -- forever
+  -- and every taken move keeps getting promoted, good or not; the yardstick itself
+  is lying by 0.5. THE FIX: R-bar crawls too (R-bar += size x how-wrong), so
+  "better than expected" keeps meaning something as expectations rise.
 
   ---
 
   ONE BREATH
 
-  Every earlier machine learned a worth and grabbed the biggest; this one learns the POLICY
-  itself, dodging the max (bad for real-valued moves), the all-or-nothing jolt, and the
-  can't-be-mixed limit. Keep a PREFERENCE per move (a sum of weights at the active tiles) and
-  softmax preferences into chances ([-1,1,2] -> [0.0351, 0.2595, 0.7054]); SAMPLE from those,
-  never argmax. To know whether a taken move deserves promoting, keep a CRITIC -- a worth per
-  spot -- as a baseline, and on the never-ending pendulum measure each step by the differential
-  how-wrong = reward - R-bar + V(landing) - V(left) (= 0.6 here). That one number drives three
-  crawls: R-bar toward the reward, the critic's worth toward how-wrong (Chapter 14's value
-  nudge), and each move's preference by size x how-wrong x (took-it? - pi) -- shoving the taken
-  move up by (1 - its chance) and the rest down by their odds, so a good surprise makes its cause
-  more likely. Actor proposes, critic grades, both learn from the same gap.
+  Every earlier machine learned a worth and grabbed the biggest; this one learns the
+  POLICY itself, dodging the max (bad for real-valued moves), the all-or-nothing
+  jolt, and the can't-be-mixed limit. Keep a PREFERENCE per move (a sum of weights at
+  the lit tiles) and softmax preferences into chances ([-1,1,2] -> [0.0351, 0.2595,
+  0.7054], shifting by the biggest first since softmax reads only gaps); SAMPLE from
+  those, never argmax. To know whether a taken move deserves promoting, keep a CRITIC
+  -- a worth per spot -- as a baseline, and on the never-ending pendulum measure each
+  step by the differential how-wrong = reward - R-bar + V(landing) - V(left) (= 0.6
+  here). That one number drives three crawls: R-bar toward the reward, the critic's
+  worth toward how-wrong (the linear value nudge), and each move's preference by
+  size x how-wrong x (took-it? - pi) -- shoving the taken move up by (1 - its chance)
+  and the rest down by their odds, the three shoves always summing to zero. A bad
+  step flips every sign. Actor proposes, critic grades, both learn from the same gap.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the step above, line by line, every number hard-coded.
+  Count one full step: 3 preference sums (2 picks + 1 add each), softmax (3
+  exponentials, 2 adds, 3 divides), the roll (2 compares), the how-wrong (2 picks +
+  1 add each for two worths, then 3 adds/subtracts), three shoves (3 multiplies
+  each), 8 weight-writes (R-bar, 2 critic tiles, 2 tiles x 3 moves... of which all 6
+  actor writes happen) -- about 40 strokes, 9 writes.
+
+      # ---- the three preferences at position 0.3 (lit tiles A0, B1)
+      h_left  = -1.0 + 0.0                     # -1.0
+      h_stay  =  0.0 + 1.0                     #  1.0
+      h_right =  1.0 + 1.0                     #  2.0
+
+      # ---- softmax (shift by the biggest, 2.0, first -- gaps only)
+      e_left  = 2.71828 ** (-1.0 - 2.0)        # 0.0498
+      e_stay  = 2.71828 ** ( 1.0 - 2.0)        # 0.3679
+      e_right = 2.71828 ** ( 2.0 - 2.0)        # 1.0
+      total   = e_left + e_stay + e_right      # 1.4177
+      pi_left, pi_stay, pi_right = e_left/total, e_stay/total, e_right/total
+      # 0.0351, 0.2595, 0.7054
+
+      # ---- the roll: cumulative line [0.0351, 0.2946, 1.0], draw r = 0.63
+      # 0.63 > 0.0351 (not left), 0.63 > 0.2946 (not stay) -> RIGHT taken
+
+      # ---- the differential how-wrong (reward 1, R_bar 0.5, V(left) 0.1, V(landing) 0.2)
+      how_wrong = 1 - 0.5 + 0.2 - 0.1          # 0.6
+
+      # ---- crawl 1: the average-reward guess
+      R_bar = 0.5 + 0.1 * how_wrong            # 0.56
+
+      # ---- crawl 2: the critic, on the LEFT spot's lit tiles
+      critic_A0 =  0.2 + 0.1 * how_wrong       #  0.26
+      critic_B1 = -0.1 + 0.1 * how_wrong       # -0.04
+
+      # ---- crawl 3: the actor, every move's shove on both lit tiles
+      shove_right = 0.1 * how_wrong * (1 - pi_right)   #  0.0177  (taken -> up)
+      shove_stay  = 0.1 * how_wrong * (0 - pi_stay)    # -0.0156  (down)
+      shove_left  = 0.1 * how_wrong * (0 - pi_left)    # -0.0021  (down a hair)
+      # shove_right + shove_stay + shove_left = 0.0 exactly
+      actor_right_A0 =  1.0 + shove_right      # 1.0177
+      actor_right_B1 =  1.0 + shove_right      # 1.0177
+      actor_stay_A0  =  0.0 + shove_stay       # -0.0156
+      actor_stay_B1  =  1.0 + shove_stay       # 0.9844
+      actor_left_A0  = -1.0 + shove_left       # -1.0021
+      actor_left_B1  =  0.0 + shove_left       # -0.0021
+      # re-read at 0.3: h_right = 2.035, h_stay = 0.969, h_left = -1.004
+
+  There is no anchor here: the pendulum never ends, so no terminal move and no
+  reward-alone case exists -- the differential how-wrong runs every single step,
+  forever.
 
   ---
 
@@ -234,6 +327,7 @@
   >> If you read other RL material after this page:
   >>   preference per move        = the action preference  h(s, a) = w_actor . x(s)
   >>   softmax preferences->chances = the softmax policy  pi(a|s) = e^h(a) / sum_b e^h(b)
+  >>   shift by the biggest first   = the max-subtraction trick (numerical stability)
   >>   sample, not argmax          = a stochastic policy (vs greedy)
   >>   the preference-keeper        = the ACTOR (the policy parameters)
   >>   the worth-keeper / baseline  = the CRITIC (a state-value estimate V(s))
@@ -242,6 +336,7 @@
   >>   critic nudge w += size x delta x x(s)     = semi-gradient TD value update
   >>   actor nudge w += size x delta x (1[a]-pi) = the softmax policy-gradient update
   >>   (1[a] - pi(a))               = the score / eligibility (gradient of log pi)
+  >>   the shoves sum to zero       = the score function has zero mean under pi
   >>   the pendulum                 = a continuing control task (swing up and balance)
   >>   actor + critic together      = actor-critic (policy gradient with a learned baseline)
 

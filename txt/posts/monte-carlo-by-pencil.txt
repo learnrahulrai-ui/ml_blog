@@ -72,6 +72,16 @@
       spot:      S       A       B
       return:   6.04    5.6      4         (rewards-that-followed, each faded 0.9 per step)
 
+  YOUR TURN -- total one fresh run backward. The courier runs:
+
+      S  --(+2)-->  A  --(+1)-->  B  --(+3)-->  END
+
+  With the same fade of 0.9 per step, what are the three returns? Slate first:
+
+      CHECK: return(B) = 3
+             return(A) = 1 + 0.9 x 3   = 1 + 2.7  = 3.7
+             return(S) = 2 + 0.9 x 3.7 = 2 + 3.33 = 5.33
+
   ---
 
   SO ONE FINISHED TRIP IS ONE HONEST SAMPLE OF EACH SPOT'S WORTH
@@ -136,9 +146,15 @@
 
   Same 5.77 as averaging the two totals by hand -- because a running average IS the average. The
   target of the nudge is the whole real return G; there is no guessed next-worth anywhere in it.
-  That is the one line that separates Monte Carlo from Chapter 13's TD: TD nudged toward
+  That is the one line that separates Monte Carlo from the one-step machine (TD): TD nudged toward
   reward + 0.9 x worth(next spot), a target holding a GUESS; Monte Carlo nudges toward the whole
   real total that actually followed, a target holding no guess.
+
+  YOUR TURN -- a third run ends, and it hands S a return of 7.0 (S's count so far is 2,
+  its average 5.77 from above). Bump the count and nudge. What is V(S) now? Slate first:
+
+      CHECK: count = 3 ;  V(S) = 5.77 + (1/3) x (7.0 - 5.77)
+                                = 5.77 + (1/3) x 1.23 = 5.77 + 0.41 = 6.18
 
   ---
 
@@ -160,10 +176,49 @@
 
   ---
 
-  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Nothing above needed a computer. This section is for the day you meet one. Each episode is stored
-  as the (spot, leaving-reward) pairs it produced, in order; the return is totalled backward.
+  When I first built this machine, four walls stopped me. Each wall, the number that
+  broke it, and the rule I carry now.
+
+  THE TRAP: "I graded S the moment I stepped off it." THE NUMBER THAT BROKE IT: at
+  that moment I held +1 of what turned out to be a 6.04 return -- more than four
+  fifths of S's grade had not happened yet. Monte Carlo has nothing to write until
+  the run ends. THE FIX: in this machine a spot is graded by what FOLLOWED it, and
+  "what followed" is a fact only the finish line can settle.
+
+  THE TRAP: "every spot in the run gets the episode's total." I gave A the whole
+  trip's takings. THE NUMBER THAT BROKE IT: A's return is 2 + 0.9 x 4 = 5.6 -- it
+  counts the +2 and the +4 that came AFTER A, and never the +1 paid before A
+  existed in the story. Grades start where the spot stands, not where the run
+  started. THE FIX: total BACKWARD from the end; the backward walk cannot even see
+  the rewards before a spot.
+
+  THE TRAP: "a run visited A twice, so I averaged both its returns as two samples."
+  THE NUMBER THAT BROKE IT: one run is ONE sample of a spot's worth -- the two
+  returns inside a single run share every reward after the second visit and are not
+  independent tries. The rule pinned above: take the return from the FIRST time you
+  stood there in that run, one number per run. THE FIX: samples are counted per
+  RUN, not per visit (first-visit Monte Carlo).
+
+  THE TRAP: "I pointed Monte Carlo at a task that never ends and waited." THE
+  NUMBER THAT BROKE IT: there is none -- and that is the point. No end, no total,
+  no return, ever; the machine is not slow there, it is undefined. THE FIX: Monte
+  Carlo is for episodic tasks only. A never-ending task needs a machine that leans
+  (TD) or an average-per-step yardstick -- waiting is not an option.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the two episodes above, line by line, every number
+  hard-coded; the return is totalled backward. Count one episode of three legs: 2
+  multiplies + 2 adds for the backward totals, then per first-visited spot 1
+  subtract, 1 multiply, 1 add for the nudge -- about 13 strokes, 3 writes.
 
       dilute = 0.9
       V     = {"S": 0.0, "A": 0.0, "B": 0.0}     # worths, start blank

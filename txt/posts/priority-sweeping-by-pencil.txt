@@ -117,6 +117,14 @@
       1        2        3        4
       0.729    0.81     0.9      1        (the goal's reward, faded one step per spot back)
 
+  YOUR TURN -- stretch the corridor one spot left. A spot 0 leads into spot 1 (its
+  right-move lands on 1, paying 0), and the sweep above just finished: V(1) = 0.729,
+  V(0) still 0. What priority does spot 0 get pushed with? Slate first, then check:
+
+      CHECK: new V(0) = 0 + 0.9 x V(1) = 0.9 x 0.729 = 0.6561
+             priority(0) = | 0.6561 - 0 | = 0.6561   -- well over the floor, so queued;
+             one more pop and the goal's reward is five spots from home.
+
   ---
 
   SO EVERY POP DID REAL WORK, WHICH IS THE WHOLE WIN OVER GRABBING AT RANDOM
@@ -139,13 +147,58 @@
   0.001, so all four were queued; deep in a long chain, where the faded jumps shrink below the floor,
   the sweep simply stops spending effort on changes too small to matter.
 
+  YOUR TURN -- one gatekeeping call. A predecessor's update works out to new V =
+  0.4213 against an old V of 0.4209; theta = 0.001. Does it enter the queue?
+
+      CHECK: priority = | 0.4213 - 0.4209 | = 0.0004 < 0.001  ->  no. The change is
+      real but too small to spend a pop on; the floor is what keeps a long chain from
+      queueing forever over dust.
+
   ---
 
-  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Nothing above needed a computer. This section is for the day you meet one. The model is the
-  deterministic corridor (each spot's right-move lands on the next, paying 0, and 4 pays +1 into the
-  GOAL); pred[s] is who leads into s; the queue is worked pop by pop, no loop.
+  When I first built this machine, four walls stopped me. Each wall, the number that
+  broke it, and the rule I carry now.
+
+  THE TRAP: "random rehearsal was already free -- why rank anything?" THE NUMBER
+  THAT BROKE IT: on the fresh corridor, only ONE of the four rehearsals teaches
+  anything (spot 4's; the other three copy 0.9 x 0 = 0 back onto a 0). A random grab
+  finds it one time in four; the queue finds it every time. THE FIX: free work is
+  still wasted work if the number it writes is the number already there.
+
+  THE TRAP: "I pushed the spot I had just fixed." It felt like the changed spot was
+  the busy one. THE NUMBER THAT BROKE IT: right after applying V(4) = 1, spot 4's
+  own priority is | 1 - 1 | = 0 -- it is DONE. The stale ones are its PREDECESSORS:
+  spot 3's priority is | 0.9 x 1 - 0 | = 0.9. THE FIX: a change ripples BACKWARD,
+  to the spots whose moves land on the one that changed -- never to itself.
+
+  THE TRAP: "priority is the worth -- rehearse the richest spot first." THE NUMBER
+  THAT BROKE IT: a spot worth 100 whose update reads 100.0001 has priority 0.0001 --
+  nothing to do -- while a spot worth 0 about to become 0.9 has priority 0.9. THE
+  FIX: the queue ranks SURPRISES (|new - old|), not riches. A rich, settled spot is
+  boring; a poor spot mid-jump is urgent.
+
+  THE TRAP: "my model could not answer 'who leads into 4?'" The forward model
+  (spot, move) -> (landing, reward) was all I kept, and the sweep died after one
+  pop: queue empty, worths [0, 0, 0, 1]. THE FIX: priority sweeping needs the model
+  READ BACKWARD too -- keep a reverse index (landing -> the spots that lead in),
+  filed at the same moment each forward fact is recorded.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the sweep above, pop by pop, every number hard-coded. The
+  model is the deterministic corridor (each spot's right-move lands on the next,
+  paying 0, and 4 pays +1 into the GOAL); pred[s] is who leads into s. Count one pop:
+  1 multiply + 1 add (the update), 1 write, then per predecessor 1 multiply + 1 add +
+  1 subtract + 1 compare (its priority against the floor) -- 8 strokes a pop, and
+  never a wasted one.
 
       dilute, theta = 0.9, 0.001
       V    = {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, "GOAL": 0.0}
