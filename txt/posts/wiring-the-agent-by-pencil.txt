@@ -16,26 +16,29 @@
 
   ---
 
-  This chapter built the pieces that TRAIN a Q-network: a net that reads a spot and hands back a
-  worth per move (Chapter 14); backprop, which walks one miss back to every dial (Part 1); Adam,
-  which spends each dial's nudge well (Part 2); and the replay bin plus the frozen twin, which grade
-  a whole batch of stored moves against a held-still copy of the net (Part 3). Four working parts --
-  and still no agent. An agent is not a pile of functions; it is a thing the world can CALL, moment
-  by moment, that answers with a move and quietly learns on the side. This post wires the parts into
-  that callable thing, then runs it on the lander.
+  This chapter built the pieces that TRAIN a Q-network: a net that reads a spot and
+  hands back a worth per move; backprop, which walks one miss back to every dial;
+  Adam, which spends each dial's nudge well; and the replay bin plus the frozen twin,
+  which grade a whole batch of stored moves against a held-still copy of the net.
+  Four working parts -- and still no agent. An agent is not a pile of functions; it
+  is a thing the world can CALL, moment by moment, that answers with a move and
+  quietly learns on the side. This post wires the parts into that callable thing,
+  then runs it on the lander.
 
-  A worth = the net's guess of total future reward for a move. A move = which engine to fire. A spot
-  (a state) = the lander's eight dials right now. The replay bin = a list of past moves, each stored
-  as five things (the spot left, the move taken, the reward, a terminal flag, the spot landed on).
-  All four carried in unchanged from earlier in the chapter.
+  A worth = the net's guess of total future reward for a move. A move = which engine
+  to fire (0 left, 1 main, 2 right, 3 coast). A spot (a state) = the lander's eight
+  dials right now. The replay bin = a list of past moves, each stored as a five-part
+  note: the spot left, the move taken, the reward, whether that move ENDED the run
+  (1 yes / 0 no), and the spot landed on.
 
   ---
 
   SO THE WORLD DOES NOT RUN THE AGENT -- IT CALLS IT, AT THREE KINDS OF MOMENT
 
-  You do not write a loop that drives the lander. The world (the simulator) runs the loop, and it
-  reaches into your agent at three kinds of moment: the FIRST moment of a run, every MIDDLE moment,
-  and the LAST moment. So the agent is three functions the world calls, not one:
+  You do not write a loop that drives the lander. The world (the simulator) runs the
+  loop, and it reaches into your agent at three kinds of moment: the FIRST moment of
+  a run, every MIDDLE moment, and the LAST moment. So the agent is three functions
+  the world calls, not one:
 
       episode timeline (one run of the lander):
 
@@ -46,17 +49,18 @@
       agent_start  agent_step    agent_step          agent_end
        (S0)         (R1, S1)      (R2, S2)            (R_last)
 
-  At the first moment the world has handed over a starting spot but no reward yet (nothing has
-  happened). At every middle moment it hands a reward and the new spot its last move produced. At the
-  last moment the run is over -- it hands the final reward and there is no new spot. Three moments,
-  three functions.
+  At the first moment the world has handed over a starting spot but no reward yet
+  (nothing has happened). At every middle moment it hands a reward and the new spot
+  its last move produced. At the last moment the run is over -- it hands the final
+  reward and there is no new spot. Three moments, three functions.
 
   ---
 
   WHICH MEANS THE FIRST CALL ONLY PICKS A MOVE AND REMEMBERS IT
 
-  The first call, agent_start, gets the starting spot S0 and nothing else. There is no reward to
-  learn from yet, so it does exactly two things: pick a move, and write down what it did.
+  The first call, agent_start, gets the starting spot S0 and nothing else. There is
+  no reward to learn from yet, so it does exactly two things: pick a move, and write
+  down what it did.
 
       agent_start(S0):
         pick a move A0 from S0        (softmax over the net's four worths -- below)
@@ -64,163 +68,235 @@
                    last_move  = A0
         hand A0 back to the world
 
-  Picking the move: read the net's four worths at S0, turn them into chances with softmax -- raise e
-  to each worth, divide each by the total, so the four are positive and add to 1, a bigger worth
-  earning a bigger slice -- then SAMPLE one engine from those chances (not always the biggest, so no
-  engine goes untried). Call the sampled engine A0.
+  Picking the move: read the net's four worths at S0, turn them into chances with
+  softmax -- raise e to each worth, divide each by the total, so the four are
+  positive and add to 1, a bigger worth earning a bigger slice -- then SAMPLE one
+  engine from those chances (not always the biggest, so no engine goes untried).
+  Call the sampled engine A0.
 
-  The two "remember" lines are the whole subtlety of this post, so look hard at what is stored:
+  The two "remember" lines are the whole subtlety of this post, so look hard at what
+  is stored:
 
       last_spot = S0    (the spot we were just handed)
       last_move = A0    (the move we are about to hand back for the world to execute)
 
-  last_move is not a move already carried out. It is the move the world is ABOUT to carry out next.
-  Why that matters is the next section.
+  last_move is not a move already carried out. It is the move the world is ABOUT to
+  carry out next. Why that matters is the next section.
 
   ---
 
   BECAUSE THE NEXT CALL MUST STORE last_move AS THE CAUSE OF THE REWARD IT RECEIVES
 
-  When the world calls agent_step, it hands back a reward R1 and a new spot S1. That reward and that
-  spot are the RESULT of the move the agent last handed over -- A0. So the transition to drop in the
-  bin is "from S0, move A0, got R1, landed S1." That is why last_move had to hold A0: it is the cause
-  of the reward now arriving. Draw the first two middle calls in order:
+  When the world calls agent_step, it hands back a reward R1 and a new spot S1. That
+  reward and that spot are the RESULT of the move the agent last handed over -- A0.
+  So the note to drop in the bin is "from S0, move A0, got R1, did not end, landed
+  S1." That is why last_move had to hold A0: it is the cause of the reward now
+  arriving. Draw the first two middle calls in order:
 
       agent_start:  pick A0                     remember last_spot=S0, last_move=A0
                     (world executes A0)
       agent_step 1: world gives R1, S1
-                    STORE (last_spot, last_move, R1, S1) = (S0, A0, R1, S1)   <- correct
+                    STORE (S0, A0, R1, 0, S1)                                <- correct
                     pick A1                     remember last_spot=S1, last_move=A1
                     (world executes A1)
       agent_step 2: world gives R2, S2
-                    STORE (last_spot, last_move, R2, S2) = (S1, A1, R2, S2)   <- correct
+                    STORE (S1, A1, R2, 0, S2)                                <- correct
 
-  Now see the bug that lurks if the "remember" lines are skipped. Suppose agent_step 1 stored its
-  transition but forgot to update last_move to A1. Then at agent_step 2, last_move is still A0, and
-  the stored transition would read:
+  Now see the bug that lurks if the "remember" lines are skipped. Suppose agent_step
+  1 stored its note but forgot to update last_move to A1. Then at agent_step 2,
+  last_move is still A0, and the stored note would read:
 
-      STORE (S1, A0, R2, S2)   <- WRONG: R2 came from A1, but A0 is blamed
+      STORE (S1, A0, R2, 0, S2)   <- WRONG: R2 came from A1, but A0 is blamed
 
-  A reward would be pinned on a move that did not cause it, and the net would learn a lie. The two
-  "remember" lines exist so every stored transition blames the RIGHT move. That is the entire reason
-  last_move is saved on every call: it must always hold the move whose reward the next call will
-  receive.
+  A reward would be pinned on a move that did not cause it, and the net would learn a
+  lie. The two "remember" lines exist so every stored note blames the RIGHT move.
+  That is the entire reason last_move is saved on every call: it must always hold the
+  move whose reward the next call will receive.
 
   ---
 
   SO A MIDDLE CALL DOES FOUR THINGS: STORE, LEARN, PICK, REMEMBER
 
-  With the timing settled, the middle call is straightforward. agent_step gets (reward R, new spot
-  S), and in order:
+  With the timing settled, the middle call is straightforward. agent_step gets
+  (reward R, new spot S), and in order:
 
       agent_step(R, S):
-        STORE   (last_spot, last_move, R, terminal=0, S)   -> drop in the replay bin
+        STORE   the note (last_spot, last_move, R, ended? 0, S)  -> drop in the bin
         LEARN   run the replay updates (below)
         PICK    a move A from S            (softmax over the net's worths at S, then sample)
         REMEMBER  last_spot = S ,  last_move = A
         hand A back to the world
 
-  The terminal flag stored is 0, because the run did NOT end on this move -- there is a real next
-  spot S to bootstrap from. LEARN is everything the chapter already built, restated in one breath:
-  grab a random batch of past transitions from the bin; for the batch, read each landing's worth
-  through the FROZEN twin and each left-spot's worth through the live net, subtract to get a
-  how-wrong per transition (Part 3); walk each how-wrong back to every dial (Part 1); and take one
-  Adam step on the batch's averaged nudges (Part 2). One real move in, several stored moves rehearsed
-  out.
+  The ended? stored is 0, because the run did NOT end on this move -- there is a real
+  next spot S to read a future from. LEARN is everything the chapter already built,
+  restated in one breath: photocopy the net into the frozen twin; grab a random batch
+  of notes from the bin; read each landing's worth through the TWIN and each
+  left-spot's worth through the live net; subtract to get a how-wrong per note; walk
+  each how-wrong back to every dial; take one Adam step on the batch's averaged
+  grades -- and repeat for the several replay passes of this burst. One real move in,
+  several stored moves rehearsed out.
 
   ---
 
-  BUT THE LAST CALL HAS NO NEXT SPOT, SO ITS TRANSITION IS MARKED TERMINAL
+  BUT THE LAST CALL HAS NO NEXT SPOT, SO ITS NOTE IS MARKED ENDED
 
-  When the run ends -- the lander touches down or crashes -- the world calls agent_end with only a
-  final reward R. There is no new spot: the game is over. So agent_end stores a transition whose
-  landing spot is a dead placeholder, MARKED with terminal = 1, and returns no move (there is nothing
-  left to do):
+  When the run ends -- the lander touches down or crashes -- the world calls
+  agent_end with only a final reward R. There is no new spot: the game is over. So
+  agent_end stores a note whose landing spot is a dead placeholder (a row of zeros),
+  MARKED with ended? = 1, and returns no move (there is nothing left to do):
 
       agent_end(R):
-        STORE   (last_spot, last_move, R, terminal=1, zero_spot)   -> drop in the bin
+        STORE   the note (last_spot, last_move, R, ended? 1, zero_spot)  -> drop in the bin
         LEARN   run the replay updates (same as agent_step)
         (return nothing -- the run is over)
 
-  That terminal = 1 is the flag Part 3 was built to read. When this transition is later replayed, its
-  target is reward + dilute x (worth of the landing) x (1 - terminal) = R + dilute x (worth) x 0 = R
-  -- the bare final reward, no faded future, because there IS no future past the end. A crash's target
-  is its penalty alone; a landing's target is its bonus alone. The two middle-vs-end calls, side by
-  side:
+  That ended? = 1 is the flag the batch machine was built to read. When this note is
+  later replayed, its target is reward + dilute x (worth of the landing) x
+  (1 - ended?) = R + dilute x (worth) x 0 = R -- the bare final reward, no faded
+  future, because there IS no future past the end. A crash's target is its penalty
+  alone; a landing's target is its bonus alone. The two calls, side by side:
 
       what              agent_step (mid-run)             agent_end (run over)
       ----              --------------------             --------------------
       world hands       reward R, new spot S             reward R only
-      terminal flag     0 (a real next spot follows)     1 (nothing follows)
+      ended? flag       0 (a real next spot follows)     1 (nothing follows)
       landing stored    S                                a dead placeholder spot
       returns           a move for the world to run      nothing (episode done)
+
+  YOUR TURN -- one whole tiny run, played out. The world makes four calls:
+
+      agent_start(S0)      -> the agent samples engine 2
+      agent_step(+5,  S1)  -> the agent samples engine 1
+      agent_step(-3,  S2)  -> the agent samples engine 3
+      agent_end(-100)         (the lander crashed)
+
+  Write every note the bin receives, in order -- five parts each. Then: which engine
+  gets blamed for the -100, and what will that note's target be when it is replayed
+  (dilute 0.9)? Slate first, then check:
+
+      CHECK: note 1 (at step 1):  ( S0 , 2 , +5   , 0 , S1 )
+             note 2 (at step 2):  ( S1 , 1 , -3   , 0 , S2 )
+             note 3 (at end)   :  ( S2 , 3 , -100 , 1 , zero-spot )
+             Three notes from four calls -- agent_start stores nothing (no reward has
+             happened yet). The -100 blames engine 3 -- the move picked at step 2,
+             the last move actually executed. Its replayed target: -100 + 0.9 x
+             (whatever the twin reads off the zero-spot) x (1 - 1) = -100 exactly.
 
   ---
 
   SO STRUNG TOGETHER, THE THREE CALLS ARE A LANDER THAT LEARNS TO FLY
 
-  The world runs its own loop and knocks on the three doors; the agent answers and learns on the
-  side. One whole run reads: agent_start picks the opening move; agent_step fires for every middle
-  moment -- store, learn, pick, remember -- until the lander lands or crashes; agent_end stores the
-  final terminal move and learns one last time. Then the world starts the next run and calls
-  agent_start again. Nothing else drives it.
+  The world runs its own loop and knocks on the three doors; the agent answers and
+  learns on the side. One whole run reads: agent_start picks the opening move;
+  agent_step fires for every middle moment -- store, learn, pick, remember -- until
+  the lander lands or crashes; agent_end stores the final ended note and learns one
+  last time. Then the world starts the next run and calls agent_start again. Nothing
+  else drives it.
 
-  Run that over a few hundred runs and the learning curve climbs: the early runs crash (the net's
-  worths are near-random, the softmax nearly a coin-toss), but every stored move feeds the replay
-  bin, every batch nudges the dials, and the worths sharpen until the softmax reliably fires the
-  engine that keeps the lander upright and slows its fall. The pile of functions from Parts 1 to 3,
-  wired through these three calls, is a complete deep-RL agent flying LunarLander.
+  Run that over a few hundred runs and the learning curve climbs: the early runs
+  crash (the net's worths are near-random, the softmax nearly a coin-toss), but
+  every stored move feeds the replay bin, every batch nudges the dials, and the
+  worths sharpen until the softmax reliably fires the engine that keeps the lander
+  upright and slows its fall. The pile of parts, wired through these three calls, is
+  a complete deep-RL agent flying LunarLander -- and the next post assembles every
+  dial of it, end to end, on one page.
 
   ---
 
-  THE CODE -- HARD-CODED, EVERY STEP SHOWN
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Nothing above needed a computer. This section is for the day you meet one. The learn step calls the
-  batch machine from Parts 1 to 3 (shown there); here the wiring is the point.
+  When I first wired this machine, four walls stopped me. Each wall, the number that
+  broke it, and the rule I carry now.
 
-      # --- the first moment ---
-      def agent_start(state):
-          action = pick_move(state)            # softmax over net's worths, then sample
-          self.last_spot = state               # remember the spot we were handed
-          self.last_move = action              # remember the move about to be executed
-          return action                        # hand it to the world
+  THE TRAP: "where is MY loop? I kept writing a main loop to drive the lander." THE
+  FACT THAT BROKE IT: the simulator already owns the loop -- it calls agent_start
+  once, agent_step a few hundred times, agent_end once, and there is no place for a
+  second driver. My job is three door-answers, not an engine room. THE FIX: the
+  world calls; the agent only ever ANSWERS. If you are writing a while-loop around
+  the lander, you are building a second world.
 
-      # --- every middle moment ---
-      def agent_step(reward, state):
-          # store the transition whose reward just arrived: terminal 0 (a real next spot)
-          self.buffer.append((self.last_spot, self.last_move, reward, 0, state))
-          replay_learn()                       # grab a batch -> how-wrong (Part 3) -> backprop -> Adam
-          action = pick_move(state)            # pick the next move from the new spot
-          self.last_spot = state               # remember for the NEXT call's transition
-          self.last_move = action
-          return action
+  THE TRAP: "agent_start should store a note too -- it did something!" THE NUMBER
+  THAT BROKE IT: a note has five parts, and at the first call I hold exactly one of
+  them (S0). No reward has been paid, nothing has ended, nothing has been landed on.
+  The drill above: four calls, three notes. THE FIX: a note records a CONSEQUENCE,
+  and the first call has none yet; its move gets its note at the NEXT call.
 
-      # --- the last moment ---
-      def agent_end(reward):
-          zero_spot = np.zeros_like(self.last_spot)   # dead placeholder: there is no next spot
-          # terminal 1: the target of this transition will be the bare reward
-          self.buffer.append((self.last_spot, self.last_move, reward, 1, zero_spot))
-          replay_learn()                       # one last learn; no move to return
+  THE TRAP: "the zero-spot placeholder will poison the learning -- the twin reads
+  worths off a fake spot!" THE NUMBER THAT BROKE IT: it does read them -- say it
+  reads [4, 4, 4, 4] off the zeros -- and then the target multiplies that whole
+  future by (1 - ended?) = 0, so the fat 4s vanish and the target is the bare
+  reward. The placeholder exists only so the note keeps five parts; its worths are
+  born condemned. THE FIX: do not fear a garbage value that a mask is about to
+  erase; fear a missing flag.
 
-  THE ANCHOR, unchanged since Chapter 13: a move that ended the run has terminal = 1, so its target
-  drops the faded-future piece and is the reward alone -- baked into the stored flag, read by the
-  batch's (1 - terminal) in Part 3.
+  THE TRAP: "I stored the note AFTER picking and remembering." Then the note read
+  (S, A_new, R, ...) -- the fresh pick blamed for the old reward, the same lie as
+  the forgotten remember-lines, one line later. THE FIX: the order inside a middle
+  call is fixed and means something: STORE first (the old pair earns its note while
+  it still IS the old pair), LEARN, then PICK, then REMEMBER the new pair. Two of
+  the four would happily swap; those two never can.
 
   ---
 
   ONE BREATH
 
-  Parts 1 to 3 built the machine that trains a Q-network -- backprop, Adam, replay, the frozen twin --
-  but a pile of functions is not an agent. The world runs the loop and CALLS the agent at three kinds
-  of moment: agent_start (first spot, no reward -- pick a move by softmax over the net's worths and
-  remember last_spot and last_move), agent_step (every middle moment -- store the 5-tuple
-  (last_spot, last_move, reward, terminal 0, new spot), run the replay learn from Parts 1 to 3, pick
-  the next move, remember it), and agent_end (run over -- store the same 5-tuple but terminal 1 with a
-  dead placeholder spot, learn once more, return nothing). last_move must always hold the move whose
-  reward the NEXT call receives, or a reward gets pinned on the wrong move (store (S1,A0,...) when A1
-  caused R2); the two "remember" lines guarantee the right blame. The terminal flag 1 makes the
-  ended move's target the bare reward via Part 3's (1 - terminal). Strung together over a few hundred
-  runs, the three calls are a lander that learns to fly.
+  The chapter's parts -- backprop, Adam, replay, the frozen twin -- become an agent
+  only when the world can CALL them. The world runs the loop and knocks at three
+  kinds of moment: agent_start (first spot, no reward -- pick a move by softmax over
+  the net's worths and remember last_spot, last_move), agent_step (every middle
+  moment -- STORE the five-part note (last_spot, last_move, reward, ended? 0, new
+  spot), LEARN by the replay burst, PICK the next move, REMEMBER the new pair), and
+  agent_end (run over -- store the note with ended? 1 and a dead placeholder spot,
+  learn once more, return nothing). last_move must always hold the move whose reward
+  the NEXT call receives, or a reward gets pinned on a move that did not cause it --
+  the two remember-lines and the store-first order both exist for that one law. The
+  ended? flag makes the final note's replayed target the bare reward via
+  (1 - ended?). Four calls, three notes, one law of blame -- strung over a few
+  hundred runs, that is a lander learning to fly.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- one whole tiny run, written flat, every value hard-coded
+  (two-dial toy spots so the numbers fit). Four calls arrive; three notes get filed;
+  the learn-burst runs inside every call after the first.
+
+      bin_notes = []
+
+      # ---- the world calls agent_start( S0 = [0.1, 1.4] )
+      last_spot = [0.1, 1.4]
+      last_move = 2                      # softmax over the worths at S0 sampled engine 2
+      # (nothing stored: a note needs five parts and only S0 exists yet)
+      # -> hand engine 2 back; the world executes it
+
+      # ---- the world calls agent_step( reward +5, S1 = [0.3, 1.1] )
+      bin_notes.append(([0.1, 1.4], 2, 5, 0, [0.3, 1.1]))   # note 1 blames engine 2
+      # LEARN: photocopy the net -> frozen twin; then the replay burst
+      #   (batch -> misses -> backprop -> one Adam step, several passes)
+      last_spot = [0.3, 1.1]
+      last_move = 1                      # sampled engine 1 for the world to run next
+      # -> hand engine 1 back
+
+      # ---- the world calls agent_step( reward -3, S2 = [0.2, 0.7] )
+      bin_notes.append(([0.3, 1.1], 1, -3, 0, [0.2, 0.7]))  # note 2 blames engine 1
+      # LEARN again (fresh photocopy, fresh burst)
+      last_spot = [0.2, 0.7]
+      last_move = 3                      # sampled engine 3
+      # -> hand engine 3 back
+
+      # ---- the world calls agent_end( reward -100 )        (engine 3 crashed it)
+      bin_notes.append(([0.2, 0.7], 3, -100, 1, [0.0, 0.0]))  # note 3: ended, dead spot
+      # LEARN one last time; nothing is returned -- the run is over
+      # when note 3 is ever drawn: target = -100 + 0.9 * (twin's read) * (1-1) = -100
+
+      # the run in numbers: 4 calls, 3 notes, 3 learn-bursts, 1 crash filed at -100
+      # (the real code wraps exactly these lines into three defs named agent_start,
+      #  agent_step, agent_end -- the world knows those three names and no others)
 
   ---
 
@@ -231,10 +307,11 @@
   >>   a spot (eight dials)             = a state s (the observation vector)
   >>   pick a move by softmax + sample  = the Boltzmann / softmax behaviour policy
   >>   last_spot / last_move            = the stored previous state and action
-  >>   the 5-tuple in the bin           = a transition (s, a, r, terminal, s') in the replay buffer
-  >>   the terminal flag                = the done / terminal bit
-  >>   terminal 1 -> target is reward   = no bootstrap at episode end (the (1 - terminal) mask)
-  >>   the replay learn                 = a minibatch update (Parts 1-3: TD error, backprop, Adam)
+  >>   the five-part note in the bin    = a transition (s, a, r, terminal, s') in the replay buffer
+  >>   the ended? flag                  = the done / terminal bit
+  >>   ended? 1 -> target is reward     = no bootstrap at episode end (the (1 - terminal) mask)
+  >>   the learn-burst                  = the replay updates per step (num_replay minibatches)
+  >>   store, learn, pick, remember     = the agent_step body, in its required order
   >>   the three calls over many runs   = a full deep-RL control agent (e.g. on LunarLander)
 
 ----------------------------------------------------------------------------------------------

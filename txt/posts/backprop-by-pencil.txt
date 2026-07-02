@@ -16,23 +16,26 @@
 
   ---
 
-  Chapter 14 closed on a sting. The network guessed an engine was worth 5.5; the target said
-  4.42; the miss was one number, -1.08. And that one number has to fix a whole pile of dials.
+  The previous chapter closed on a sting. A network guessed an engine was worth 5.5;
+  the grading target said 4.42; the miss was one number, -1.08. And that one number
+  has to fix a whole pile of dials.
 
-  On the tile-coding car the miss had a pointer: the feature lit exactly the tiles to nudge,
-  and you were done. A network has no such pointer. The miss is born at the output, but the
-  dials that caused it sit two sheets back, behind a bend. This post walks that one number
-  backward to every dial, by pencil -- which is the whole of what backpropagation is.
+  On a tile-coded car the miss had a pointer: the feature lit exactly the tiles to
+  nudge, and you were done. A network has no such pointer. The miss is born at the
+  output, but the dials that caused it sit two sheets back, behind a bend. This post
+  walks that one number backward to every dial, by pencil -- which is the whole of
+  what backpropagation is.
 
   ---
 
   THE MACHINE AND THE MISS, REBUILT FROM SCRATCH
 
-  Nothing here leans on memory. The toy network turns a 2-number state into 4 engine-worths,
-  through one middle row of 3 numbers, with a bend in between:
+  Nothing here leans on memory. The toy network turns a 2-number state into 4
+  engine-worths (engines numbered 0 to 3), through one middle row of 3 numbers, with
+  a bend in between:
 
       state s        sheet A        middle psi     bend     x       sheet C      worths Q
-      [s1 s2]  -->   (2 x 3)  -->  [p1 p2 p3] --> max(.,0) -->  -->  (3 x 4)  -->  [Q1..Q4]
+      [s1 s2]  -->   (2 x 3)  -->  [p1 p2 p3] --> max(.,0) -->  -->  (3 x 4)  -->  [Q0..Q3]
        1 x 2         + b1            1 x 3                      1x3   + b2          1 x 4
 
   With these dials and the state s = [1, 2]:
@@ -41,72 +44,83 @@
           [ 0.5  1  -1   ]                                  [  1   1  -1   0 ]
                                                             [ -1   2   1  -1 ]
 
-  the forward pass runs (each middle number = state dotted with a column of A, then the bend
-  flattens negatives, then each worth = the bent row dotted with a column of C):
+  the forward pass runs (each middle number = state dotted with a column of A, then
+  the bend flattens negatives, then each worth = the bent row dotted with a column
+  of C):
 
       psi = s A + b1 = [ 2.5, -0.5, -0.5 ]
       x   = max(psi, 0) = [ 2.5, 0, 0 ]            <- two middle numbers are DEAD (were negative)
       Q   = x C + b2 = [ 5.5, -1.5, 0.0, 2.0 ]
 
-  We fired engine 1 (worth Q1 = 5.5). The grading move (Chapter 14) returned a target of 4.42
-  for that engine, so the miss -- the same "how wrong" as every post -- is
+  We fired engine 0 (worth Q0 = 5.5). The grading move -- reward plus the diluted,
+  chance-weighted read of the next spot, built in the previous post -- returned a
+  target of 4.42 for that engine, so the miss, the same "how wrong" as every post, is
 
       how wrong = target - worth fired = 4.42 - 5.5 = -1.08
 
   written as a row that is zero except in the fired engine's slot:  [ -1.08, 0, 0, 0 ].
-  The guess was 1.08 too HIGH, so every dial that pushed Q1 up wants pulling down a little.
+  The guess was 1.08 too HIGH, so every dial that pushed Q0 up wants pulling down a
+  little.
 
   ---
 
   ONE NUMBER CANNOT INSTRUCT A SHEET -- SO ASK EACH DIAL WHAT IT DID
 
-  Sheet C alone is 12 dials; sheet A is 6; with the two bias rows that is 25 dials on this
-  toy (about 1,300 on the real lander). You cannot hand "-1.08" to 25 dials and call it an
-  instruction -- they did not all push equally. The fix is the fair-share rule that has run
-  this whole blog: nudge each dial in proportion to HOW MUCH IT MOVED THE THING WE GRADED.
+  Sheet C alone is 12 dials; sheet A is 6; with the two bias rows that is 25 dials on
+  this toy (about 1,300 on the real lander). You cannot hand "-1.08" to 25 dials and
+  call it an instruction -- they did not all push equally. The fix is the fair-share
+  rule that has run this whole blog, first met where a one-hot feature steered a
+  nudge onto one weight (nudge each weight by how-wrong times its feature). Here the
+  same rule, one word swapped: nudge each dial in proportion to HOW MUCH IT MOVED THE
+  THING WE GRADED.
 
-  So for every dial ask one question: if I raise this dial a hair, how much does Q1 (the
-  fired engine's worth) rise? Call that number the dial's PULL on Q1. Then nudge the dial by
+  So for every dial ask one question: if I raise this dial a hair, how much does Q0
+  (the fired engine's worth) rise? Call that number the dial's PULL on Q0. Then nudge
+  the dial by
 
-      dial = dial + size x (how wrong) x (its pull on Q1)
+      dial = dial + size x (how wrong) x (its pull on Q0)
 
-  A big puller takes a big share of the -1.08; a dial with zero pull is left alone. This is
-  exactly Part 1's rule (nudge by how-wrong times the feature) -- only now "the feature" is
-  replaced by "the pull," and the pull has to be CHASED back through two sheets and a bend.
+  A big puller takes a big share of the -1.08; a dial with zero pull is left alone.
+  The pull has to be CHASED back through two sheets and a bend -- that chase is the
+  rest of this post.
 
   ---
 
   SO WALK THE MISS BACKWARD, OUTPUT FIRST
 
-  Start where the miss is born: the worths Q. Only the fired engine matters -- Q1 -- so its
-  pull on ITSELF is 1, and the other three worths are bystanders, pull 0:
+  Start where the miss is born: the worths Q. Only the fired engine matters -- Q0 --
+  so its pull on ITSELF is 1, and the other three worths are bystanders, pull 0:
 
-      pull on the worths:  [ 1, 0, 0, 0 ]        (Q1 cares about Q1; Q2,Q3,Q4 are off the hook)
+      pull on the worths:  [ 1, 0, 0, 0 ]        (Q0 cares about Q0; Q1,Q2,Q3 are off the hook)
 
-  This single 1-in-a-row is the seed. Every pull below is this seed multiplied backward.
+  This single 1-in-a-row is the seed. Every pull below is this seed multiplied
+  backward.
 
   ---
 
   WHICH HANDS SHEET C ITS SHARE -- AND ONLY THE FIRED COLUMN MOVES
 
-  A worth is built as Q_k = (x dotted with column k of C) + b2_k. So the dial C[i,k] is
-  multiplied by x_i on its way into worth k. Raise C[i,k] by a hair and worth k rises by
-  x_i. Its pull is therefore x_i -- but ONLY on worth k, and we only care about worth 1
-  (k = 0, the fired engine). Every other column of C feeds a bystander worth, pull 0:
+  A worth is built as Q_k = (x dotted with column k of C) + b2_k. So the dial C[i,k]
+  is multiplied by x_i on its way into worth k. Raise C[i,k] by a hair and worth k
+  rises by x_i. Its pull is therefore x_i -- but ONLY on worth k, and we only care
+  about worth 0 (the fired engine's column). Every other column of C feeds a
+  bystander worth, pull 0:
 
       pull on C[i, fired col] = x_i      pull on every other column of C = 0
 
-  With x = [2.5, 0, 0], the pull-sheet for C is x dropped into the fired column, zeros else:
+  With x = [2.5, 0, 0], the pull-sheet for C is x dropped into the fired column,
+  zeros else:
 
-      pull on C :   col0   col1  col2  col3              (col0 = fired engine)
+      pull on C :   col0   col1  col2  col3              (col0 = fired engine 0)
             row0 [  2.5     0     0     0  ]              row i = hidden number x_i
             row1 [  0       0     0     0  ]
             row2 [  0       0     0     0  ]
 
-  Two things to see. First, the "one slot" from the miss has become "one column" -- only the
-  fired engine's column of C will ever move; the other three sleep. Second, rows 1 and 2 are
-  zero because x1 = x2 = 0: the dead middle numbers carried nothing in, so their dials get
-  no blame. The bias b2 adds straight onto the worths, so its pull is the seed itself:
+  Two things to see. First, the "one slot" from the miss has become "one column" --
+  only the fired engine's column of C will ever move; the other three sleep. Second,
+  rows 1 and 2 are zero because x2 = x3 = 0: the dead middle numbers carried nothing
+  in, so their dials get no blame. The bias b2 adds straight onto the worths, so its
+  pull is the seed itself:
 
       pull on b2 = [ 1, 0, 0, 0 ]
 
@@ -114,17 +128,18 @@
 
   WHICH MEANS THE BEND DECIDES WHAT GETS THROUGH
 
-  To reach sheet A we must pass back through the middle numbers x, and through the bend that
-  made them. First, how much does each middle number x_i pull on Q1? In Q1 = x dotted with
-  column 0 of C, the number x_i is multiplied by C[i,0], so its pull is C[i,0] -- column 0
-  of C, which is [2, 1, -1]:
+  To reach sheet A we must pass back through the middle numbers x, and through the
+  bend that made them. First, how much does each middle number x_i pull on Q0? In
+  Q0 = x dotted with column 0 of C, the number x_i is multiplied by C[i,0], so its
+  pull is C[i,0] -- column 0 of C, which is [2, 1, -1]:
 
       pull on x = column 0 of C = [ 2, 1, -1 ]
 
-  But x came from psi through the bend x = max(psi, 0). A middle number that was POSITIVE
-  passed straight through (a hair up in psi is a hair up in x, pull 1); one that was flattened
-  to zero is stuck flat (a hair up in psi, still zero out, pull 0). So the bend is a gate, open
-  where psi was positive, shut where it was not. With psi = [2.5, -0.5, -0.5]:
+  But x came from psi through the bend x = max(psi, 0). A middle number that was
+  POSITIVE passed straight through (a hair up in psi is a hair up in x, pull 1); one
+  that was flattened to zero is stuck flat (a hair up in psi, still zero out, pull
+  0). So the bend is a gate, open where psi was positive, shut where it was not.
+  With psi = [2.5, -0.5, -0.5]:
 
       bend gate = [ 1, 0, 0 ]        (open at p1; shut at the two that went negative)
 
@@ -134,17 +149,18 @@
                   = [ 2, 1, -1 ] x [ 1, 0, 0 ]
                   = [ 2, 0, 0 ]
 
-  The dead middle numbers slam the gate: whatever blame was heading for them ( the 1 and the
-  -1 ) hits the floor. Only the live number p1 carries blame onward.
+  The dead middle numbers slam the gate: whatever blame was heading for them (the 1
+  and the -1) hits the floor. Only the live number p1 carries blame onward.
 
   ---
 
   WHICH HANDS SHEET A ITS SHARE -- THROUGH THE ONE LIVE NUMBER
 
-  Last sheet. A middle number is built psi_j = (s dotted with column j of A) + b1_j, so the
-  dial A[i,j] is multiplied by s_i on its way into psi_j. Raise A[i,j] a hair and psi_j rises
-  by s_i; but psi_j only matters as much as psi_j pulls on Q1, which we just found. So the
-  pull is "input s_i times the blame on psi_j" -- every (input, blame) pair multiplied:
+  Last sheet. A middle number is built psi_j = (s dotted with column j of A) + b1_j,
+  so the dial A[i,j] is multiplied by s_i on its way into psi_j. Raise A[i,j] a hair
+  and psi_j rises by s_i; but psi_j only matters as much as psi_j pulls on Q0, which
+  we just found. So the pull is "input s_i times the blame on psi_j" -- every
+  (input, blame) pair multiplied:
 
       pull on A[i,j] = s_i   x   (pull on psi_j)
 
@@ -154,47 +170,71 @@
             row0 [ 1 x 2 = 2     0      0 ]      (row i = input dial s_i)
             row1 [ 2 x 2 = 4     0      0 ]
 
-  Only column 0 -- the live middle number's column -- carries anything; the dead two leave
-  four of sheet A's six dials untouched. And the bias b1 adds straight onto psi, so its pull
-  is the blame on psi itself:
+  Only column 0 -- the live middle number's column -- carries anything; the dead two
+  leave four of sheet A's six dials untouched. And the bias b1 adds straight onto
+  psi, so its pull is the blame on psi itself:
 
       pull on b1 = [ 2, 0, 0 ]
 
-  Notice the shape that keeps repeating: the pull-sheet for a stage is (the input that fed
-  that stage) times (the blame arriving at that stage), one product per dial -- "input times
-  signal." For sheet C it was x times the seed; for sheet A it was s times the blame on psi.
-  That single shape, applied stage by stage from the output back, IS backpropagation.
+  Notice the shape that keeps repeating: the pull-sheet for a stage is (the input
+  that fed that stage) times (the blame arriving at that stage), one product per dial
+  -- "input times signal." For sheet C it was x times the seed; for sheet A it was s
+  times the blame on psi. That single shape, applied stage by stage from the output
+  back, IS backpropagation.
+
+  YOUR TURN -- run the whole backward walk again, same state, same dials, but this
+  time the lander fired ENGINE 3 (worth Q3 = 2.0 on the forward pass above). The
+  seed becomes [0, 0, 0, 1]. Chase it: pull on C, pull on b2, pull on x (column 3 of
+  C is [1, 0, -1]), the gate (psi = [2.5, -0.5, -0.5] as before), pull on psi, pull
+  on A, pull on b1. Slate first, then check:
+
+      CHECK: pull on C = x dropped into column 3: C[0,3] gets 2.5, all else 0
+             pull on b2 = [ 0, 0, 0, 1 ]
+             pull on x  = column 3 of C = [ 1, 0, -1 ]
+             gate       = [ 1, 0, 0 ]  ->  pull on psi = [ 1, 0, 0 ]
+             pull on A  = s times that: row0 [1x1=1, 0, 0], row1 [2x1=2, 0, 0]
+             pull on b1 = [ 1, 0, 0 ]
+             Same doors, different column: the fired column of C changes, the gate
+             does not care which engine fired.
 
   ---
 
   BUT IS A PULL REALLY THE RIGHT NUMBER? WIGGLE ONE DIAL AND SEE
 
-  Those pulls were chased back through two sheets and a bend by algebra, and algebra can hide a
-  slipped sign. Before spending the miss on them, check one the blunt way -- move a single dial
-  a hair and watch the fired worth by brute force. A pull was DEFINED as "if I raise this dial a
-  hair, how much does Q1 rise," so that is exactly what to measure.
+  Those pulls were chased back through two sheets and a bend by algebra, and algebra
+  can hide a slipped sign. Before spending the miss on them, check one the blunt way
+  -- move a single dial a hair and watch the fired worth by brute force. A pull was
+  DEFINED as "if I raise this dial a hair, how much does Q0 rise," so that is exactly
+  what to measure.
 
-  Take A[1,0] -- row 1, column 0 of sheet A, currently 0.5 -- the dial the backward walk said
-  pulls hardest, with a pull of 4. Nudge it a whisker, 0.5 -> 0.501, leave every other dial put,
-  and run the forward pass again. Only the first middle number uses column 0 of A, so only it
-  changes:
+  Take A[1,0] -- row 1, column 0 of sheet A, currently 0.5 -- the dial the backward
+  walk said pulls hardest, with a pull of 4. Nudge it a whisker, 0.5 -> 0.501, leave
+  every other dial put, and run the forward pass again. Only the first middle number
+  uses column 0 of A, so only it changes:
 
       psi1 = (1)(1) + (2)(0.501) + 0.5 = 1 + 1.002 + 0.5 = 2.502   (still positive: gate open)
       x1   = 2.502
-      Q1   = (2.502)(2) + 0.5 = 5.004 + 0.5 = 5.504
+      Q0   = (2.502)(2) + 0.5 = 5.004 + 0.5 = 5.504
 
-  Q1 climbed from 5.5 to 5.504 -- a rise of 0.004 for a wiggle of 0.001. Rise per unit wiggle is
-  0.004 / 0.001 = 4, the very pull the algebra claimed. The backward walk was no trick: a pull IS
-  how far the worth moves when you lean on the dial. (The same test on C[0,0], pull 2.5: nudging
-  2.0 -> 2.001 lifts Q1 by 0.0025, and 0.0025 / 0.001 = 2.5 -- it checks too.) With one pull
-  confirmed by hand, trust the rest and spend the miss.
+  Q0 climbed from 5.5 to 5.504 -- a rise of 0.004 for a wiggle of 0.001. Rise per
+  unit wiggle is 0.004 / 0.001 = 4, the very pull the algebra claimed. The backward
+  walk was no trick: a pull IS how far the worth moves when you lean on the dial.
+
+  YOUR TURN -- check a second pull the same blunt way. The walk said C[0,0] (currently
+  2.0) has pull 2.5. Wiggle it to 2.001, rerun only what changes (x = [2.5, 0, 0]
+  stays put -- sheet A was not touched), and compute rise over wiggle. Slate first:
+
+      CHECK: Q0 = (2.5)(2.001) + 0.5 = 5.0025 + 0.5 = 5.5025
+             rise = 5.5025 - 5.5 = 0.0025 ;  0.0025 / 0.001 = 2.5. It checks.
+
+  With two pulls confirmed by hand, trust the rest and spend the miss.
 
   ---
 
   SO NUDGE EVERY DIAL BY ITS SHARE OF THE MISS
 
-  Now spend the miss. Pick a small step size 0.01 (small because many dials move at once, and
-  a big middle pull like 4 would overshoot). The nudge for each dial is
+  Now spend the miss. Pick a small step size 0.01 (small because many dials move at
+  once, and a big middle pull like 4 would overshoot). The nudge for each dial is
 
       dial = dial + size x (how wrong) x (its pull) = dial + 0.01 x (-1.08) x (pull)
                                                     = dial + (-0.0108) x (pull)
@@ -207,102 +247,165 @@
       C[0,0] : 2.0  + (-0.0108)(2.5) = 2.0  - 0.027  = 1.973
       b2[0]  : 0.5  + (-0.0108)(1)   = 0.5  - 0.0108 = 0.4892
 
-  Every other dial in A, C, b1, b2 had pull 0 and stands still. The biggest move went to
-  A[1,0] -- the dial carrying the largest input (s2 = 2) into the only live middle number --
-  exactly the fair share: the hardest pusher takes the biggest correction.
+  Every other dial in A, C, b1, b2 had pull 0 and stands still. The biggest move went
+  to A[1,0] -- the dial carrying the largest input (s2 = 2) into the only live middle
+  number -- exactly the fair share: the hardest pusher takes the biggest correction.
 
   Did it work? Run the forward pass again with the nudged dials:
 
       psi = [ 1x0.9784 + 2x0.4568 + 0.4784 ,  -0.5 ,  -0.5 ] = [ 2.3704, -0.5, -0.5 ]
       x   = max(psi, 0) = [ 2.3704, 0, 0 ]
-      Q1  = 2.3704 x 1.973 + 0.4892 = 4.6768 + 0.4892 = 5.166
+      Q0  = 2.3704 x 1.973 + 0.4892 = 4.6768 + 0.4892 = 5.166   (to three decimals)
 
-  The fired engine's worth fell from 5.5 toward the target 4.42 -- to 5.166, a step of about
-  0.33, not the whole way. One miss, one gentle nudge to two-dozen dials, the guess a little
-  less wrong. Do this on every step of every episode and the sheets slowly bend into worths
-  that need almost no correction. That is a network learning.
+  The fired engine's worth fell from 5.5 toward the target 4.42 -- to 5.166, a step
+  of about 0.33, not the whole way. One miss, one gentle nudge to two-dozen dials,
+  the guess a little less wrong. Do this on every step of every episode and the
+  sheets slowly bend into worths that need almost no correction. That is a network
+  learning.
 
   ---
 
   WHAT LEARNED AND WHAT SLEPT
 
-  Read back what just moved, because the zeros are the lesson. Of 25 dials, FIVE changed: the
-  fired engine's column of C (one live entry), that column's bias, the live middle number's
-  column of A (two entries), and its bias. Everything else slept -- the other three engine
-  columns (we did not fire them) and the two dead middle numbers (the bend shut their gate).
-  The miss flowed back along exactly the path it came forward, and nowhere else. Credit, and
-  blame, went only where they were earned.
+  Read back what just moved, because the zeros are the lesson. Of 25 dials, FIVE
+  changed: the fired engine's column of C (one live entry), that column's bias, the
+  live middle number's column of A (two entries), and its bias. Everything else
+  slept -- the other three engine columns (we did not fire them) and the two dead
+  middle numbers (the bend shut their gate). The miss flowed back along exactly the
+  path it came forward, and nowhere else. Credit, and blame, went only where they
+  were earned.
 
   ---
 
-  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Nothing above needed a computer. This last section is for the day you meet one. The forward
-  pass is two dot-and-add stages with a flatten; the backward pass is the same stages in
-  reverse, each grad an "input times signal" outer product, the bend gating the middle.
+  When I first walked a miss backward, four walls stopped me. Each wall, the number
+  that broke it, and the rule I carry now.
 
-      import numpy as np
+  THE TRAP: "partial derivatives... so this needs real calculus, which I don't
+  have." The WORD stopped me a full evening before the thing did. THE NUMBER THAT
+  BROKE IT: wiggle A[1,0] by 0.001 and Q0 rises by 0.004; the ratio 0.004 / 0.001 =
+  4 IS the partial derivative -- rise per unit wiggle, holding the other dials
+  still. Nothing more was ever meant by the words. THE FIX: whenever a symbol
+  frightens, ask what single division it stands for.
 
-      s  = np.array([1.0, 2.0])
-      A  = np.array([[1.0, -2.0, 0.5], [0.5, 1.0, -1.0]])                 # 2 x 3
-      b1 = np.array([0.5, -0.5, 1.0])
-      C  = np.array([[2.,-1.,0.,1.],[1.,1.,-1.,0.],[-1.,2.,1.,-1.]])      # 3 x 4
-      b2 = np.array([0.5, 1.0, 0.0, -0.5])
+  THE TRAP: "how can I compute pulls FIRST, when I don't yet know what was wrong?"
+  The order felt backwards -- surely blame needs a crime. THE NUMBER THAT BROKE IT:
+  A[1,0]'s pull is 4 no matter what the target says -- the pull is a fact about the
+  MACHINE (wiggle in, rise out), not about the miss. Only the SPENDING needs the
+  miss: nudge = 0.01 x (-1.08) x 4. THE FIX: pulls first (the machine's anatomy),
+  miss second (the day's verdict), product last (the correction).
 
-      # ---- forward (remember psi and x for the walk back) ----
-      psi = s @ A + b1                 # [ 2.5, -0.5, -0.5 ]
-      x   = np.maximum(psi, 0)         # [ 2.5,  0,    0   ]
-      Q   = x @ C + b2                 # [ 5.5, -1.5,  0,  2.0 ]
+  THE TRAP: "the pull-sheet duplicates my numbers -- why does x show up in a whole
+  column?" The outer product looked like a copying bug. THE NUMBER THAT BROKE IT: a
+  SHEET of dials needs a SHEET of pulls -- one per dial. Input times signal builds
+  it: with x = [2.5, 0, 0] and seed [1, 0, 0, 0], every (input, signal) pair gets
+  multiplied and only C[0,0]'s pair is non-zero: 2.5 x 1 = 2.5. No copying -- twelve
+  small multiplications, eleven of them zero. THE FIX: one dial, one pull, always;
+  a sheet's pulls just come out sheet-shaped.
 
-      fired, target = 0, 4.42          # fired engine 1 = index 0
-      how_wrong = target - Q[fired]    # 4.42 - 5.5 = -1.08
-
-      # ---- backward: the seed is a 1 in the fired engine's slot ----
-      seed = np.zeros(4); seed[fired] = 1.0          # [1, 0, 0, 0]
-
-      pull_C  = np.outer(x, seed)                    # input x  (x) signal seed  -> only col 0 = x
-      pull_b2 = seed                                 # [1, 0, 0, 0]
-
-      pull_x   = C @ seed                            # column 0 of C = [2, 1, -1]
-      gate     = (psi > 0).astype(float)             # [1, 0, 0]  -- the bend
-      pull_psi = pull_x * gate                       # [2, 0, 0]
-
-      pull_A  = np.outer(s, pull_psi)                # input s (x) signal pull_psi -> [[2,0,0],[4,0,0]]
-      pull_b1 = pull_psi                             # [2, 0, 0]
-
-      # ---- check one pull the blunt way: wiggle a dial, measure Q1's rise ----
-      A_wig = A.copy(); A_wig[1, 0] += 0.001         # nudge the hardest puller a hair
-      Q1_wig = (np.maximum(s @ A_wig + b1, 0) @ C + b2)[0]
-      print((Q1_wig - Q[fired]) / 0.001)             # 4.0 == pull_A[1,0]; the algebra was right
-
-      # ---- nudge every dial by size x how_wrong x its pull ----
-      size = 0.01
-      A  = A  + size * how_wrong * pull_A            # A[0,0]->0.9784, A[1,0]->0.4568
-      b1 = b1 + size * how_wrong * pull_b1           # b1[0]->0.4784
-      C  = C  + size * how_wrong * pull_C            # C[0,0]->1.973
-      b2 = b2 + size * how_wrong * pull_b2           # b2[0]->0.4892
-      print((s @ A + b1).clip(0) @ C + b2)           # Q1 = 5.166 -> moved toward 4.42
-
-  THE ANCHOR (the move landed the rocket -- no next state): the target is the reward alone,
-  so how_wrong = reward - Q[fired]; the backward walk is letter-for-letter the same.
+  THE TRAP: "every new symbol felt invented -- grads, W, 0, 1 -- I could not say how
+  many things I was even tuning." THE NUMBER THAT BROKE IT: count the dials FIRST:
+  sheet A has 2 x 3 = 6, its bias 3, sheet C has 3 x 4 = 12, its bias 4 -- 25 dials,
+  full stop. Every symbol in this post is one of those 25, or one of the fixed rows
+  (s, psi, x, Q) the forward pass makes. THE FIX: before learning any machine, count
+  its movable parts; then no symbol can be a stranger.
 
   ---
 
   ONE BREATH
 
-  A network's miss is one number born at the output, but the dials that caused it sit two
-  sheets back behind a bend, with no feature to point at them. So ask each dial its PULL on
-  the fired worth -- how much raising it raises that worth -- and nudge it by size x how-wrong
-  x pull, the fair-share rule from Part 1 with "feature" swapped for "pull." Chase the pull
-  backward: it starts as a single 1 in the fired engine's slot; sheet C's pull is x dropped
-  into that one column (only the fired column ever moves, dead middle rows zero); through the
-  bend, a gate open only where psi was positive kills the blame heading for dead numbers;
-  sheet A's pull is input s times the surviving blame. Every stage's grad is the same shape --
-  input times signal, one product per dial. Spend the miss with a small step (0.01): five of
-  the toy's 25 dials move, the biggest to the hardest pusher, and the fired worth slides 5.5
-  -> 5.166, toward its 4.42 target. The zeros are the lesson -- blame went only where it was
-  earned. Next: a smarter step than a flat 0.01 (momentum and Adam), and reusing old moves
+  A network's miss is one number born at the output, but the dials that caused it
+  sit two sheets back behind a bend, with no feature to point at them. So ask each
+  dial its PULL on the fired worth -- how much raising it raises that worth -- and
+  nudge it by size x how-wrong x pull, the fair-share rule with "feature" swapped
+  for "pull." Chase the pull backward: it starts as a single 1 in the fired engine's
+  slot (engine 0 here); sheet C's pull is x dropped into that one column (only the
+  fired column ever moves, dead middle rows zero); through the bend, a gate open
+  only where psi was positive kills the blame heading for dead numbers; sheet A's
+  pull is input s times the surviving blame. Every stage's grad is the same shape --
+  input times signal, one product per dial -- and any pull can be checked by brute
+  force: wiggle the dial 0.001, watch the worth, divide (A[1,0]: 0.004/0.001 = 4).
+  Spend the miss with a small step (0.01): five of the toy's 25 dials move, the
+  biggest to the hardest pusher, and the fired worth slides 5.5 -> 5.166, toward its
+  4.42 target. The zeros are the lesson -- blame went only where it was earned.
+  Next: a smarter step than a flat 0.01 (momentum and Adam), and reusing old moves
   (experience replay).
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the walk above, line by line, every number hard-coded.
+  Count the backward walk first: pull on C is 3 multiplies (one per live-or-dead row
+  into the fired column), pull on x is 3 picks, the gate 3 checks, pull on psi 3
+  multiplies, pull on A 6 multiplies, then 5 live nudges at 2 strokes each -- about
+  25 strokes to teach 25 dials from one miss.
+
+      s1, s2 = 1.0, 2.0
+
+      # ---- FORWARD (kept from the previous post; psi and x are remembered) ----
+      p1 = s1*1.0  + s2*0.5  + 0.5      #  2.5
+      p2 = s1*-2.0 + s2*1.0  - 0.5      # -0.5
+      p3 = s1*0.5  + s2*-1.0 + 1.0      # -0.5
+      x1, x2, x3 = max(p1,0), max(p2,0), max(p3,0)     # 2.5, 0, 0
+      Q0 = x1*2.0  + x2*1.0  + x3*-1.0 + 0.5           #  5.5   <- fired
+      Q1 = x1*-1.0 + x2*1.0  + x3*2.0  + 1.0           # -1.5
+      Q2 = x1*0.0  + x2*-1.0 + x3*1.0  + 0.0           #  0.0
+      Q3 = x1*1.0  + x2*0.0  + x3*-1.0 - 0.5           #  2.0
+
+      how_wrong = 4.42 - Q0                            # -1.08
+
+      # ---- BACKWARD: the seed is a 1 in the fired engine's slot ----
+      seed0, seed1, seed2, seed3 = 1.0, 0.0, 0.0, 0.0
+
+      # pull on C = input x times the seed, one product per dial (fired column only)
+      pull_C00 = x1 * seed0             # 2.5*1 = 2.5   (the one live dial of C)
+      pull_C10 = x2 * seed0             # 0*1   = 0     (dead middle -> no blame)
+      pull_C20 = x3 * seed0             # 0*1   = 0
+      # ...columns 1-3: nine more products, every one times seed 0 -> all 0
+      pull_b2 = [seed0, seed1, seed2, seed3]           # [1, 0, 0, 0]
+
+      # pull on x = the fired column of C, then the bend gates it
+      pull_x1, pull_x2, pull_x3 = 2.0, 1.0, -1.0       # column 0 of C
+      g1, g2, g3 = 1.0, 0.0, 0.0        # gate: psi = [2.5,-0.5,-0.5] -> open, shut, shut
+      pull_p1 = pull_x1 * g1            # 2*1  = 2
+      pull_p2 = pull_x2 * g2            # 1*0  = 0
+      pull_p3 = pull_x3 * g3            # -1*0 = 0
+
+      # pull on A = input s times the surviving blame, one product per dial
+      pull_A00 = s1 * pull_p1           # 1*2 = 2
+      pull_A10 = s2 * pull_p1           # 2*2 = 4      (the hardest puller)
+      pull_A01 = s1 * pull_p2           # 1*0 = 0
+      pull_A11 = s2 * pull_p2           # 2*0 = 0
+      pull_A02 = s1 * pull_p3           # 1*0 = 0
+      pull_A12 = s2 * pull_p3           # 2*0 = 0
+      pull_b1  = [pull_p1, pull_p2, pull_p3]           # [2, 0, 0]
+
+      # ---- THE WIGGLE CHECK: brute-force one pull before trusting the walk ----
+      p1_wig = s1*1.0 + s2*0.501 + 0.5                 # 2.502  (A[1,0] nudged 0.001)
+      Q0_wig = max(p1_wig,0)*2.0 + 0.5                 # 5.504
+      slope  = (Q0_wig - Q0) / 0.001                   # 0.004/0.001 = 4.0 == pull_A10
+
+      # ---- SPEND THE MISS: dial += size * how_wrong * pull  (size 0.01) ----
+      A00 = 1.0 + 0.01 * how_wrong * pull_A00          # 1.0 - 0.0216 = 0.9784
+      A10 = 0.5 + 0.01 * how_wrong * pull_A10          # 0.5 - 0.0432 = 0.4568
+      b10 = 0.5 + 0.01 * how_wrong * pull_p1           # 0.5 - 0.0216 = 0.4784
+      C00 = 2.0 + 0.01 * how_wrong * pull_C00          # 2.0 - 0.027  = 1.973
+      b20 = 0.5 + 0.01 * how_wrong * seed0             # 0.5 - 0.0108 = 0.4892
+      # the other 20 dials: pull 0, so size * how_wrong * 0 = 0 -- they stand still
+
+      # ---- FORWARD AGAIN, to see the step land ----
+      p1_new = s1*A00 + s2*A10 + b10                   # 0.9784 + 0.9136 + 0.4784 = 2.3704
+      Q0_new = max(p1_new,0)*C00 + b20                 # 2.3704*1.973 + 0.4892 = 5.166 (3 dp)
+      # 5.5 -> 5.166, toward the target 4.42: one miss taught 5 dials their share
+
+  THE ANCHOR (the move landed the rocket -- no next state): the target is the reward
+  alone, so how_wrong = reward - Q0; the backward walk is letter-for-letter the same.
 
   ---
 

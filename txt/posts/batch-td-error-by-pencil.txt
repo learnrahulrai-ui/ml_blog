@@ -16,29 +16,30 @@
 
   ---
 
-  Part 2 grabbed a random handful of past moves out of the bin -- a BATCH -- and said: for each
-  one, rebuild its target with the current net, then take one Adam step on the averaged miss. It
-  waved at two things to keep moving. First, it never showed the batch worked as a batch -- all
-  the misses computed in one sweep of arithmetic, not one move at a time. Second, "rebuild with
-  the current net" is not quite true. The net that GRADES the batch is a frozen copy, held still
-  on purpose, and holding it still is the whole point of this post.
+  The previous post grabbed a random handful of past moves out of a bin -- a BATCH --
+  and said: for each one, rebuild its target with the current net, then take one Adam
+  step on the averaged miss. It waved at two things to keep moving. First, it never
+  showed the batch worked as a batch -- all the misses computed in one sweep of
+  arithmetic, not one move at a time. Second, "rebuild with the current net" is not
+  quite true. The net that GRADES the batch is a frozen copy, held still on purpose,
+  and holding it still is the whole point of this post.
 
-  A quick redraw so nothing leans on memory. The bin is a list of past moves; each is a
-  four-piece record plus a flag: the spot you left s, the move you took a, the reward r, the spot
-  you landed on s', and done -- 1 if that move ended the game (a crash or a landing), else 0. To
-  learn, you scoop a batch out at random. Take a batch of two:
+  A quick redraw so nothing leans on memory. The bin is a list of past moves; each is
+  a five-part note: the spot you left s, the move you took a, the reward r, whether
+  that move ENDED the game (1 yes / 0 no -- a crash or a landing), and the spot you
+  landed on s'. To learn, you scoop a batch out at random. Take a batch of two:
 
-      the batch (two records pulled from the bin):
+      the batch (two notes pulled from the bin):
 
-        #   s (left)   a (took)      r      s' (landed)   done
-        --  --------   --------      --     -----------   ----
-        1     s1       1 = main      +2        s1'         0     (still flying)
-        2     s2       2 = right     -1        s2'         1     (crashed -- game over)
+        #   s (left)   a (took)      r     ended?   s' (landed)
+        --  --------   --------      --    ------   -----------
+        1     s1       1 = main      +2      0         s1'        (still flying)
+        2     s2       2 = right     -1      1         s2'        (crashed -- game over)
 
-  There are four engines to choose between -- 0 = left, 1 = main, 2 = right, 3 = nothing -- so a
-  worth-row has four numbers. Record 1 fired the MAIN engine and lived; record 2 fired the RIGHT
-  engine and crashed. The job: one how-wrong number per record. The rest is where each number
-  comes from.
+  There are four engines to choose between -- 0 = left, 1 = main, 2 = right, 3 =
+  coast -- so a worth-row has four numbers. Note 1 fired the MAIN engine and lived;
+  note 2 fired the RIGHT engine and crashed. The job: one how-wrong number per note.
+  The rest is where each number comes from.
 
   ---
 
@@ -48,74 +49,90 @@
 
       target = r + dilute x (worth of the landing s')          dilute = 0.9
 
-  But "worth of the landing" is worth-of-WHAT-move? You have not chosen the next move yet. So
-  do not guess one -- average over ALL four next-moves, each weighted by how likely the policy is
-  to pick it. That average-over-the-odds is the Expected-Sarsa worth of a spot, carried since
-  Chapter 13. Draw the frozen twin (call it current_q for now -- the "why frozen" is the last
-  section) reading both landing spots at once, one row out per landing:
+  But "worth of the landing" is worth-of-WHAT-move? You have not chosen the next move
+  yet. So do not guess one -- average over ALL four next-moves, each weighted by how
+  likely the habit is to pick it. That average-over-the-odds is the Expected-Sarsa
+  worth of a spot. Draw the frozen twin (call it current_q for now -- the "why
+  frozen" is the last section) reading both landing spots at once, one row out per
+  note:
 
       s1'  ->  +-----------+  ->  [ 0 , 2 , 0 , 0 ]     worth of each engine at landing 1
                | current_q |
       s2'  ->  +-----------+  ->  [ 4 , 4 , 4 , 4 ]     worth of each engine at landing 2
 
-      q_next  =  [ 0  2  0  0 ]      (one row per record, one column per engine: a 2 x 4 block)
+      q_next  =  [ 0  2  0  0 ]      (one row per note, one column per engine: a 2 x 4 block)
                  [ 4  4  4  4 ]
 
-  Now the odds. The policy here turns a row of worths into a row of chances with softmax: raise e
-  to each worth, then divide each by the row's total, so the four chances are all positive and
-  add to 1, and a bigger worth earns a bigger slice. Row 1, worths [0, 2, 0, 0]:
+  Now the odds. The habit here turns a row of worths into a row of chances with
+  softmax: raise e (the constant 2.71828...) to each worth, then divide each by the
+  row's total, so the four chances are all positive and add to 1, and a bigger worth
+  earns a bigger slice. Row 1, worths [0, 2, 0, 0]:
 
       e^0 = 1      e^2 = 7.39      e^0 = 1      e^0 = 1        total = 1 + 7.39 + 1 + 1 = 10.39
       chances = [ 1/10.39 , 7.39/10.39 , 1/10.39 , 1/10.39 ] ~ [ 0.096 , 0.711 , 0.096 , 0.096 ]
 
-  (Check: 0.096 + 0.711 + 0.096 + 0.096 = 0.999, a rounded 1.) Row 2, worths [4, 4, 4, 4]: every
-  e^4 is the same, so the four slices are equal -- [0.25, 0.25, 0.25, 0.25].
+  (Check: 0.096 + 0.711 + 0.096 + 0.096 = 0.999, a rounded 1.) Row 2, worths
+  [4, 4, 4, 4]: every e^4 is the same, so the four slices are equal --
+  [0.25, 0.25, 0.25, 0.25].
 
       chances  =  [ 0.096  0.711  0.096  0.096 ]      (softmax of each worth-row)
                   [ 0.25   0.25   0.25   0.25  ]
 
-  The spot's worth is then chances-dotted-into-worths, row by row -- each engine's worth times
-  its own chance, summed:
+  The spot's worth is then chances-dotted-into-worths, row by row -- each engine's
+  worth times its own chance, summed:
 
       row 1:  0.096x0 + 0.711x2 + 0.096x0 + 0.096x0  =  1.422 ~ 1.42
       row 2:  0.25x4 + 0.25x4 + 0.25x4 + 0.25x4      =  4.0
 
       v_next  =  [ 1.42 ,  4.0 ]        (one worth per landing spot)
 
+  YOUR TURN -- one more landing row. The twin reads worths [1, 1, 3, 1] at some
+  landing. Softmax it (e^1 = 2.72, e^3 = 20.09) and dot the chances back into the
+  worths. Slate first, then check:
+
+      CHECK: total = 2.72 + 2.72 + 20.09 + 2.72 = 28.25
+             chances ~ [ 0.096 , 0.096 , 0.711 , 0.096 ]  -- the SAME chances as the
+             [0,2,0,0] row above! [1,1,3,1] is that row plus 1 everywhere, and softmax
+             only reads the GAPS between worths, not their heights.
+             worth = 0.096x1 + 0.096x1 + 0.711x3 + 0.096x1 = 0.288 + 2.133 ~ 2.42
+             -- one higher than that row's 1.42, because every worth is one higher.
+
   ---
 
   BUT A CRASH HAS NO LANDING WORTH, SO ZERO THE ENDED ONES
 
-  That 4.0 is a trap. Record 2 CRASHED -- the game ended -- so there is no future to fade in. Its
-  s' is a dead placeholder, and the frozen twin does not know that; it happily reads a fat 4.0
-  off it. Kill those by hand with the done flag: multiply each worth by (1 - done), which is 1
-  for a move still in play and 0 for a move that ended:
+  That 4.0 is a trap. Note 2 CRASHED -- the game ended -- so there is no future to
+  fade in. Its s' is a dead placeholder, and the frozen twin does not know that; it
+  happily reads a fat 4.0 off it. Kill those by hand with the ended? flag: multiply
+  each worth by (1 - ended?), which is 1 for a move still in play and 0 for a move
+  that ended:
 
-      done      =  [ 0 ,  1 ]
-      1 - done  =  [ 1 ,  0 ]
+      ended?      =  [ 0 ,  1 ]
+      1 - ended?  =  [ 1 ,  0 ]
 
-      v_next x (1 - done)  =  [ 1.42 x 1 ,  4.0 x 0 ]  =  [ 1.42 ,  0 ]
+      v_next x (1 - ended?)  =  [ 1.42 x 1 ,  4.0 x 0 ]  =  [ 1.42 ,  0 ]
 
   See why it matters. The target is reward-now plus dilute times that landing worth:
 
       target = r + dilute x [ landing worth after the zeroing ]
 
-      record 1:  2  + 0.9 x 1.42  =  2 + 1.278  =  3.278 ~ 3.28
-      record 2: -1  + 0.9 x 0     = -1 + 0      = -1.0
+      note 1:  2  + 0.9 x 1.42  =  2 + 1.278  =  3.278 ~ 3.28
+      note 2: -1  + 0.9 x 0     = -1 + 0      = -1.0
 
       target  =  [ 3.28 , -1.0 ]
 
-  Had you skipped the (1 - done), record 2's target would be -1 + 0.9 x 4.0 = +2.6 -- a crash
-  scored as a REWARD, because the dead placeholder's worth leaked into it. The zeroing is what
-  keeps a game-ending move graded on its final reward alone.
+  Had you skipped the (1 - ended?), note 2's target would be -1 + 0.9 x 4.0 = +2.6 --
+  a crash scored as a REWARD, because the dead placeholder's worth leaked into it.
+  The zeroing is what keeps a game-ending move graded on its final reward alone.
 
   ---
 
   THE PREDICTION IS THE MOVE YOU REALLY MADE, SO PICK JUST THAT ONE
 
-  The target is what the move SHOULD have been worth. Now the guess: what did the net actually
-  think of the engine you fired? This time the LIVE net -- the one being trained, call it network
-  -- reads the two spots you LEFT, again one row out per record:
+  The target is what the move SHOULD have been worth. Now the guess: what did the net
+  actually think of the engine you fired? This time the LIVE net -- the one being
+  trained, call it network -- reads the two spots you LEFT, again one row out per
+  note:
 
       s1  ->  +---------+  ->  [ 1.0 , 2.5 , 0.5 , 1.5 ]     network's worths at spot 1
               | network |
@@ -124,44 +141,59 @@
       q_all  =  [ 1.0  2.5  0.5  1.5 ]        (2 x 4: a worth for every engine at every left-spot)
                 [ 0.0  1.0  0.5 -0.5 ]
 
-  Here is the asymmetry worth pausing on. On the target side you did NOT know the next move, so
-  you averaged all four columns. Here you DO know the move -- it is stored in the record -- so you
-  pick exactly ONE column and drop the other three. Record 1 fired engine 1 (main); record 2
-  fired engine 2 (right). Read down each record's own taken-column:
+  Here is the asymmetry worth pausing on. On the target side you did NOT know the
+  next move, so you averaged all four columns. Here you DO know the move -- it is
+  stored in the note -- so you pick exactly ONE column and drop the other three.
+  Note 1 fired engine 1 (main); note 2 fired engine 2 (right). Read down each note's
+  own taken-column:
 
-      record 1, took engine 1:  row [1.0, 2.5, 0.5, 1.5] -> pick column 1 -> 2.5
-      record 2, took engine 2:  row [0.0, 1.0, 0.5,-0.5] -> pick column 2 -> 0.5
+      note 1, took engine 1:  row [1.0, 2.5, 0.5, 1.5] -> pick column 1 -> 2.5
+      note 2, took engine 2:  row [0.0, 1.0, 0.5,-0.5] -> pick column 2 -> 0.5
 
-      q_took  =  [ 2.5 ,  0.5 ]        (the worth of the engine actually fired, one per record)
+      q_took  =  [ 2.5 ,  0.5 ]        (the worth of the engine actually fired, one per note)
 
   ---
 
   SUBTRACT, AND THE WHOLE BATCH'S MISS FALLS OUT AT ONCE
 
-  Target minus guess, straight across -- how wrong the live net was on each record you replayed:
+  Target minus guess, straight across -- how wrong the live net was on each note you
+  replayed:
 
       how-wrong  =  target  -  q_took
 
-        record 1:  3.28 - 2.5  =   0.78     (net lowballed the main engine -- pull it up)
-        record 2: -1.0  - 0.5  =  -1.5      (net overrated the right engine that crashed -- push down)
+        note 1:  3.28 - 2.5  =   0.78     (net lowballed the main engine -- pull it up)
+        note 2: -1.0  - 0.5  =  -1.5      (net overrated the right engine that crashed -- push down)
 
       how-wrong  =  [ 0.78 , -1.5 ]
 
-  That two-number row is the batch's miss, computed in one sweep rather than one record at a time.
-  Each number then rides Part 1's machine: walk it backward through the fired engine's slot to
-  every dial, summing pulls; and the two records' pulls are averaged into the single Adam step of
-  Part 2. A batch of misses, one step. The only piece still hand-waved is the word "frozen."
+  That two-number row is the batch's miss, computed in one sweep rather than one note
+  at a time. Each number then rides the backprop post's machine: walk it backward
+  through the fired engine's slot to every dial, summing pulls; the two notes' grades
+  are averaged into the single Adam step of the previous post. A batch of misses, one
+  step. The only piece still hand-waved is the word "frozen."
+
+  YOUR TURN -- a third note joins the batch: (s3, took engine 0, reward 0.5,
+  ended? 0, s3'). The frozen twin reads the landing s3' as [2, 2, 2, 2]; the live
+  net reads the left-spot s3 as [1.8, 0, 0, 0]. dilute 0.9. Compute the landing's
+  worth, the target, the guess, and the miss. Slate first, then check:
+
+      CHECK: equal worths -> equal chances [0.25 x 4] -> landing worth = 2.0
+             still flying -> x (1 - 0) keeps the 2.0
+             target = 0.5 + 0.9 x 2.0 = 2.3
+             guess  = pick column 0 of [1.8, 0, 0, 0] = 1.8
+             miss   = 2.3 - 1.8 = 0.5   (lowballed -- pull engine 0 up a little)
 
   ---
 
   WHY TWO NETS -- THE ONE THAT GRADES MUST HOLD STILL
 
-  Look back at what read what. The LANDINGS (for the target) went through current_q, the frozen
-  twin. The LEFT-SPOTS (for the guess) went through network, the live one. Two copies of the same
-  net, one held still. Here is the reason, and it hides inside a loop Part 2 mentioned once: after
-  a single real move, you do not learn just once -- you scoop a batch and take several replay
-  passes over fresh batches before stepping back into the world (say four). Each pass changes the
-  live net's dials. Draw the passes:
+  Look back at what read what. The LANDINGS (for the target) went through current_q,
+  the frozen twin. The LEFT-SPOTS (for the guess) went through network, the live one.
+  Two copies of the same net, one held still. Here is the reason, and it hides inside
+  a loop the previous post mentioned once: after a single real move, you do not learn
+  just once -- you scoop a batch and take several replay passes over fresh batches
+  before stepping back into the world (say four). Each pass changes the live net's
+  dials. Draw the passes:
 
       before the passes:   network = V1  ---- photocopy ---->  current_q = V1
       pass 1:  network V1 -> V2          current_q still V1
@@ -169,94 +201,152 @@
       pass 3:  network V3 -> V4          current_q still V1
       pass 4:  network V4 -> V5          current_q still V1
 
-  Now suppose you had ONE net doing both jobs. Pass 1 grades against V1 and nudges toward it. Pass
-  2 would grade against V2 -- a target that just moved because you moved it. Pass 3 grades against
-  V3. The thing you are chasing slides every pass, exactly as fast as you chase it:
+  Now suppose you had ONE net doing both jobs. Pass 1 grades against V1 and nudges
+  toward it. Pass 2 would grade against V2 -- a target that just moved because you
+  moved it. Pass 3 grades against V3. The thing you are chasing slides every pass,
+  exactly as fast as you chase it:
 
       one net:   guess V1 -> aim at target(V1),  then net becomes V2
                  guess V2 -> aim at target(V2),  then net becomes V3      <- the target keeps fleeing
                  guess V3 -> aim at target(V3),  ...
 
-  You cannot hit a mark that jumps each time you shoot. So the code photocopies the net BEFORE the
-  passes begin and freezes the copy as current_q. Every pass reads its target off that same V1
-  while only the live net moves. The mark holds still; the shots land. When the four passes end
-  and the next real move comes, a new photocopy is taken from wherever the live net now sits, and
-  the next burst of passes aims at THAT. The twin is refreshed between bursts, frozen within one.
+  You cannot hit a mark that jumps each time you shoot. So the code photocopies the
+  net BEFORE the passes begin and freezes the copy as current_q. Every pass reads its
+  target off that same V1 while only the live net moves. The mark holds still; the
+  shots land. When the four passes end and the next real move comes, a new photocopy
+  is taken from wherever the live net now sits, and the next burst of passes aims at
+  THAT. The twin is refreshed between bursts, frozen within one.
 
-  So the one line Part 2 rounded off -- "rebuild the target with the current net" -- reads exactly
-  now: rebuild the target with the FROZEN TWIN, the copy taken before this burst of passes. The
-  guess uses the live net; the target uses the twin; and because the twin does not budge while the
-  batch is swept, the miss you compute is a miss against a fixed mark, not a mirage.
+  So the one line the previous post rounded off -- "rebuild the target with the
+  current net" -- reads exactly now: rebuild the target with the FROZEN TWIN, the
+  copy taken before this burst of passes. The guess uses the live net; the target
+  uses the twin; and because the twin does not budge while the batch is swept, the
+  miss you compute is a miss against a fixed mark, not a mirage.
 
   ---
 
-  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Nothing above needed a computer. This section is for the day you meet one. The two nets are
-  black boxes here -- each get_worths just returns the rows drawn above (Chapter 14 built the
-  real forward pass psi = sA+b1, x = max(psi,0), Q = xC+b2 inside them).
+  When I first built this machine, four walls stopped me. Each wall, the number that
+  broke it, and the rule I carry now.
 
-      import numpy as np
+  THE TRAP: "one net can do both jobs -- why keep a copy?" My misses refused to
+  shrink across the replay passes, and I blamed the step size first. THE NUMBER THAT BROKE
+  IT: with one net, every pass moves the mark by the very step just taken -- guess V1
+  aims at target(V1) and becomes V2; V2 aims at target(V2); the gap you are closing
+  reopens as fast as you close it. Freeze the twin and all four passes aim at the
+  same V1 mark. THE FIX: the grader holds still inside a burst; it is refreshed only
+  between bursts.
 
-      dilute = 0.9                                   # the fade on the landing worth
-      rewards = np.array([ 2.0, -1.0])               # r for each record
-      done    = np.array([ 0.0,  1.0])               # 1 if that move ended the game
-      took    = np.array([ 1,    2  ])               # engine fired: main, right
+  THE TRAP: "softmax blew up on big worths." A worth-row like [500, 502, 500, 500]
+  asks for e^502 -- a number with 219 digits; the machine chokes. THE NUMBER THAT
+  BROKE IT: the drill above -- softmax reads only the GAPS. Subtract the row's
+  biggest worth first: [500, 502, 500, 500] - 502 = [-2, 0, -2, -2], and
+  e^-2 = 0.135, e^0 = 1, total 1.41, chances [0.096, 0.711, 0.096, 0.096] -- the
+  exact same chances as the row [0, 2, 0, 0]. Nothing changed but the arithmetic
+  stopped exploding. THE FIX: always shift a row so its biggest worth is 0 before
+  raising e to it. The chances cannot tell the difference; the machine can.
 
-      # --- target side: the FROZEN twin reads the LANDINGS ---
-      q_next = np.array([[0.0, 2.0, 0.0, 0.0],       # current_q.get_worths(next_states)
-                         [4.0, 4.0, 4.0, 4.0]])
+  THE TRAP: "I gathered the TAKEN column on the target side too." Symmetry felt
+  right: pick the stored move everywhere. THE NUMBER THAT BROKE IT: on note 1 that
+  reads q_next's column 1 -> worth 2, instead of the averaged 1.42 -- but the stored
+  move is the move you took at s, and nothing says the habit will repeat it at s'.
+  The future is unchosen, so it gets the AVERAGE; the past is on record, so it gets
+  the PICK. THE FIX: average where you do not know (the landing), pick where you do
+  (the move taken). The asymmetry is the design.
 
-      e = np.exp(q_next)                             # softmax each row into chances
-      chances = e / e.sum(axis=1, keepdims=True)     # row 1 ~ [.096 .711 .096 .096]; row 2 = [.25]*4
-      v_next = (chances * q_next).sum(axis=1)        # [1.42, 4.0]  (chances dotted into worths)
-      v_next = v_next * (1 - done)                   # [1.42, 0.0]  (zero the crashed record)
-      target = rewards + dilute * v_next             # [2+0.9*1.42, -1+0] = [3.28, -1.0]
-
-      # --- guess side: the LIVE net reads the LEFT-SPOTS ---
-      q_all = np.array([[1.0, 2.5, 0.5,  1.5],       # network.get_worths(states)
-                        [0.0, 1.0, 0.5, -0.5]])
-      rows = np.arange(2)                            # [0, 1] -- one index per record
-      q_took = q_all[rows, took]                     # pick each record's taken column -> [2.5, 0.5]
-
-      how_wrong = target - q_took                    # [3.28-2.5, -1.0-0.5] = [0.78, -1.5]
-      print(how_wrong)                               # [ 0.78 -1.5 ]
-
-  THE FROZEN TWIN, made once before the burst of replay passes and never touched inside it:
-
-      from copy import deepcopy
-      current_q = deepcopy(network)                  # photocopy V1, frozen for this whole burst
-
-      # pass 1: grab a batch, grade it, Adam-step the LIVE net -- current_q stays V1
-      batch = random.sample(buffer, 2)               # Part 2's bin, two records out
-      # target uses current_q (V1); guess uses network; how_wrong -> backprop (Part 1) ->
-      # Adam step (Part 2): network V1 -> V2, current_q untouched
-      # pass 2: another batch, graded against the SAME current_q (V1); network V2 -> V3
-      # pass 3: network V3 -> V4        (current_q still V1)
-      # pass 4: network V4 -> V5        (current_q still V1)
-
-      # next real move: current_q = deepcopy(network) again, now copying V5
-
-  THE ANCHOR, unchanged since Chapter 13: a record whose move ended the game has done = 1, so
-  (1 - done) = 0 zeroes its landing worth and its target is the bare reward -- here the crash's -1.
+  THE TRAP: "I wrote 'the twin is the net' instead of photocopying it." One line of
+  bookkeeping -- point a second name at the same sheets -- and my "frozen" twin
+  moved with every nudge, because both names were holding the same paper. THE NUMBER
+  THAT BROKE IT: after pass 1 the "twin" already read V2, and the fleeing-mark
+  disease came back wearing a twin costume. THE FIX: the twin is a PHOTOCOPY -- a
+  full copy of every dial made before the burst -- never a second label on the live
+  sheets. (In the code below, that is deepcopy, and it is the whole reason the word
+  appears.)
 
   ---
 
   ONE BREATH
 
-  Part 2 scooped a random batch from the bin and waved at how its miss is computed and at which
-  net computes it. Both, now. For a batch of records (s, a, r, s', done), the FROZEN twin reads
-  every landing s' at once into a worth-row per record; softmax turns each row into chances that
-  add to 1; chances-dotted-into-worths gives each landing's Expected-Sarsa worth; times (1 - done)
-  zeroes the ended ones (else a crash's dead placeholder leaks a fat worth into its target); and
-  target = r + dilute x that. The LIVE net reads every left-spot s into its own worth-rows, and --
-  since the move taken is stored -- picks just that one column as the guess. Subtract, straight
-  across, and the whole batch's how-wrong falls out in one sweep: [0.78, -1.5]. Each rides Part
-  1's backprop, averaged into Part 2's one Adam step. Two nets because the graders must hold still:
-  across the several replay passes taken after one real move, the live net moves every pass, so a
-  target read off IT would flee as fast as you chase it -- photocopy the net before the passes,
-  freeze the copy as the twin, grade every pass against it, refresh between bursts. Guess with the
-  live net; grade with the frozen twin.
+  The previous post scooped a random batch from the bin and waved at how its miss is
+  computed and at which net computes it. Both, now. For a batch of five-part notes
+  (s, a, r, ended?, s'), the FROZEN twin reads every landing s' at once into a
+  worth-row per note; softmax turns each row into chances that add to 1 (shift the
+  row so its biggest is 0 first -- chances read gaps, and e^502 chokes);
+  chances-dotted-into-worths gives each landing's Expected-Sarsa worth; times
+  (1 - ended?) zeroes the ended ones (else a crash's dead placeholder leaks a fat
+  worth into its target); and target = r + dilute x that. The LIVE net reads every
+  left-spot s into its own worth-rows, and -- since the move taken is stored -- picks
+  just that one column as the guess: average where you do not know, pick where you
+  do. Subtract, straight across, and the whole batch's how-wrong falls out in one
+  sweep: [0.78, -1.5]. Each rides the backprop machine, averaged into one Adam step.
+  Two nets because the grader must hold still: across the several replay passes taken
+  after one real move, the live net moves every pass, so a target read off IT would
+  flee as fast as you chase it -- photocopy the net before the passes (a real copy,
+  never a second name on the same sheets), grade every pass against the copy, refresh
+  between bursts. Guess with the live net; grade with the frozen twin.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the batch above, line by line, every number hard-coded.
+  The two nets are black boxes here: the rows they output are the rows drawn above
+  (the Q-network post built the real forward pass psi = sA+b1, x = max(psi,0),
+  Q = xC+b2 that lives inside each). Count one note's grading: 4 exponentials + 3
+  adds + 4 divides (softmax), 4 multiplies + 3 adds (the dot), 1 multiply (the mask),
+  1 multiply + 1 add (the target), 1 pick, 1 subtract -- 23 strokes; the batch of two
+  is 46, done in one sweep.
+
+      dilute = 0.9
+
+      # ---- TARGET SIDE: the FROZEN twin reads the LANDINGS ----
+      # note 1 landing worths [0,2,0,0]; note 2 landing worths [4,4,4,4]
+      # softmax note 1's row (shift by its biggest, 2, first):
+      e0 = 2.71828 ** (0 - 2)              # 0.135
+      e1 = 2.71828 ** (2 - 2)              # 1.0
+      e2 = 2.71828 ** (0 - 2)              # 0.135
+      e3 = 2.71828 ** (0 - 2)              # 0.135
+      total   = e0 + e1 + e2 + e3          # 1.406
+      c0, c1, c2, c3 = e0/total, e1/total, e2/total, e3/total   # 0.096 0.711 0.096 0.096
+      v_next1 = c0*0 + c1*2 + c2*0 + c3*0  # 1.42  (chances dotted into worths)
+      # note 2's row is all-equal -> chances 0.25 each -> worth:
+      v_next2 = 0.25*4 + 0.25*4 + 0.25*4 + 0.25*4                # 4.0
+
+      # ---- THE ENDED? MASK, then the targets ----
+      v_next1 = v_next1 * (1 - 0)          # still flying: keeps 1.42
+      v_next2 = v_next2 * (1 - 1)          # crashed: 0.0
+      target1 = 2  + dilute * v_next1      # 2 + 0.9*1.42 = 3.28
+      target2 = -1 + dilute * v_next2      # -1 + 0       = -1.0
+
+      # ---- GUESS SIDE: the LIVE net reads the LEFT-SPOTS ----
+      # network's rows: s1 -> [1.0, 2.5, 0.5, 1.5] ; s2 -> [0.0, 1.0, 0.5, -0.5]
+      q_took1 = 2.5                        # note 1 took engine 1 -> pick column 1
+      q_took2 = 0.5                        # note 2 took engine 2 -> pick column 2
+
+      # ---- SUBTRACT: the whole batch's miss in one sweep ----
+      how_wrong1 = target1 - q_took1       # 3.28 - 2.5 = 0.78
+      how_wrong2 = target2 - q_took2       # -1.0 - 0.5 = -1.5
+      # each rides backprop through its taken column; the two grades are AVERAGED
+      # into one Adam step
+
+      # ---- THE FROZEN TWIN: a real photocopy, made once per burst ----
+      # from copy import deepcopy
+      # current_q = deepcopy(network)      # copy V1's every dial -- NOT current_q = network,
+      #                                    # which is a second name on the same sheets
+      # pass 1: batch graded against current_q (V1); Adam steps network V1 -> V2
+      # pass 2: fresh batch, same V1 grader; network V2 -> V3
+      # pass 3: network V3 -> V4          (current_q still V1)
+      # pass 4: network V4 -> V5          (current_q still V1)
+      # next real move: current_q = deepcopy(network) again, now copying V5
+
+  The anchor, unchanged since the tables: a note whose move ended the game has
+  ended? = 1, so (1 - ended?) = 0 zeroes its landing worth and its target is the bare
+  reward -- here the crash's -1.
 
   ---
 
@@ -264,11 +354,13 @@
   >> If you read other RL material after this page:
   >>   the frozen twin / current_q      = the target network (the fixed Q_t used for targets)
   >>   the live net / network           = the online network (Q_{t+1}, the one being trained)
-  >>   photocopy before the passes       = freezing / syncing the target network
+  >>   photocopy before the passes       = freezing / syncing the target network (deepcopy)
+  >>   the five-part note                = a transition (s, a, r, terminal, s')
   >>   q_next (worths at the landings)   = action-values Q(s', .) from the target network
   >>   softmax of a worth-row            = the Boltzmann policy pi(.|s') over the actions
+  >>   shift by the row's biggest first  = the max-subtraction trick (numerical stability)
   >>   chances-dotted-into-worths        = the Expected-Sarsa state value sum_a' pi(a'|s') Q(s',a')
-  >>   times (1 - done)                  = the terminal mask (no bootstrap past episode end)
+  >>   times (1 - ended?)                = the terminal mask (no bootstrap past episode end)
   >>   target = r + dilute x v_next      = the Expected-Sarsa TD target; dilute = gamma
   >>   pick the taken column (q_took)    = gathering Q(s,a) for the action actually taken
   >>   how-wrong = target - q_took        = the TD error (delta), one per transition

@@ -16,80 +16,90 @@
 
   ---
 
-  Part 1 spread one miss across every dial. Each dial got a PULL -- how much it moved the
-  fired worth -- and a nudge of size x how-wrong x pull. The nudges were right. The way we
-  SPENT them was crude, in two separate ways, and this post fixes both.
+  Everything this page uses, from a blank sheet. A dial = one learned number in a
+  network. A worth = the network's guess of how much reward a move still brings.
+  How-wrong = target minus guess, one number per graded move (say -1.08: the guess
+  was 1.08 too high). A dial's pull = how much raising that dial raises the graded
+  worth. The previous post nudged every dial by
 
-  A dial = one learned number in the network. A pull = how much raising that dial raises the
-  worth we are grading (its share of the blame). How-wrong = target minus guess, the one miss.
-  In Part 1 we multiplied pull by a flat size of 0.01 -- the SAME tiny step for every dial,
-  on every move, forever. Two things are dumb about that. The step ignores each dial's own
-  history and scale; and we used each move's experience ONCE, in the order it happened, then
-  threw it away. Fix the step first, then the data.
+      dial = dial + size x (how wrong) x (its pull)
+
+  Call the signed product (how wrong) x (pull) the dial's GRADE for this move -- one
+  number per dial, already carrying its direction: a grade of +0.2 says "raise me a
+  little," -0.2 says "lower me." The nudges were right. The way we SPENT them was
+  crude, in two separate ways, and this post fixes both. The step: a flat size 0.01
+  for every dial, on every move, forever -- ignoring each dial's history and scale.
+  The data: each move's experience used ONCE, in the order it happened, then thrown
+  away. Fix the step first, then the data.
 
   ---
 
-  SO GIVE THE STEP A MEMORY: AVERAGE EACH DIAL'S RECENT PULLS
+  SO GIVE THE STEP A MEMORY: AVERAGE EACH DIAL'S RECENT GRADES
 
-  A flat step treats every nudge as a surprise. But a dial that gets pulled the SAME way move
-  after move is clearly being told something steady -- it should pick up speed, not inch. A
-  dial yanked one way then the other is getting mixed messages -- it should hold still. So keep,
-  per dial, a running average of its recent pulls. Call it m (for momentum):
+  A flat step treats every grade as a surprise. But a dial graded the SAME way move
+  after move is clearly being told something steady -- it should pick up speed, not
+  inch. A dial graded one way then the other is getting mixed messages -- it should
+  hold still. So keep, per dial, a running average of its recent grades. Call it m
+  (for momentum):
 
-      m = beta1 x m + (1 - beta1) x pull            (beta1 = 0.9: m is nine-tenths old, one-tenth new)
+      m = beta1 x m + (1 - beta1) x grade        (beta1 = 0.9: m is nine-tenths old, one-tenth new)
 
-  m is the dial's smoothed direction. A dial pulled +0.2, +0.2, +0.2 builds an m near +0.2 --
-  steady push. A dial pulled +0.2, -0.2, +0.2 builds an m near 0 -- the yanks cancel. Drawn:
+  m is the dial's smoothed direction. A dial graded +0.2, +0.2, +0.2 builds an m
+  near +0.2 -- steady push. A dial graded +0.2, -0.2, +0.2 builds an m near 0 -- the
+  yanks cancel. Drawn:
 
-      pulls in:   +0.2   +0.2   +0.2   ->  m climbs toward +0.2   (steady -> full speed)
-      pulls in:   +0.2   -0.2   +0.2   ->  m hovers near  0       (mixed -> crawl)
+      grades in:  +0.2   +0.2   +0.2   ->  m climbs toward +0.2   (steady -> full speed)
+      grades in:  +0.2   -0.2   +0.2   ->  m hovers near  0       (mixed -> crawl)
 
   ---
 
   WHICH STILL NEEDS SCALING, BECAUSE DIALS COME IN DIFFERENT SIZES
 
-  One dial's pulls might run around 0.2; another's around 50. A single step size cannot suit
-  both -- 0.01 x 50 lurches, 0.01 x 0.2 dawdles. So keep a SECOND running average per dial: the
-  average of its SQUARED pulls. Call it v:
+  One dial's grades might run around 0.2; another's around 50. A single step size
+  cannot suit both -- 0.01 x 50 lurches, 0.01 x 0.2 dawdles. So keep a SECOND
+  running average per dial: the average of its SQUARED grades. Call it v:
 
-      v = beta2 x v + (1 - beta2) x pull^2          (beta2 = 0.999: v is a slow, long memory)
+      v = beta2 x v + (1 - beta2) x grade^2      (beta2 = 0.999: v is a slow, long memory)
 
-  The square throws away the sign and keeps only the SIZE, so sqrt(v) is roughly how big this
-  dial's pulls typically are. Divide the step by sqrt(v) and every dial moves at the same
-  measured pace, whatever its raw scale:
+  The square throws away the sign and keeps only the SIZE, so sqrt(v) is roughly how
+  big this dial's grades typically are. Divide the step by sqrt(v) and every dial
+  moves at the same measured pace, whatever its raw scale:
 
       step for a dial  ~  m / sqrt(v)        (smoothed direction, divided by its typical size)
 
-  A big-pull dial and a small-pull dial both end up taking a step of about the same length --
-  the size is normalized away, only the direction and steadiness remain.
+  A big-grade dial and a small-grade dial both end up taking a step of about the
+  same length -- the size is normalized away, only the direction and steadiness
+  remain.
 
   ---
 
   AND BECAUSE BOTH START AT ZERO, UNDO THE EARLY LOWBALL
 
-  m and v both start at 0 (no history yet). On the first few moves that 0 drags the average
-  DOWN -- after one pull of 0.2, m = 0.1 x 0.2 = 0.02, far below the real 0.2. So divide each
-  by how much of the old zero is still in it, which is beta^t after t moves:
+  m and v both start at 0 (no history yet). On the first few moves that 0 drags the
+  average DOWN -- after one grade of 0.2, m = 0.1 x 0.2 = 0.02, far below the real
+  0.2. How much of the zero-start is still inside the average after t moves? Exactly
+  beta^t of it. So divide by what remains:
 
       m-hat = m / (1 - beta1^t)        v-hat = v / (1 - beta2^t)
 
-  This bias-correction blows the early estimates back up to true size. The full step, with a
-  base size alpha and a hair epsilon so you never divide by zero:
+  This bias-correction blows the early estimates back up to true size. The full
+  step, with a base size alpha and a hair epsilon so you never divide by zero:
 
-      dial = dial - alpha x  m-hat / ( sqrt(v-hat) + epsilon )
+      dial = dial + alpha x  m-hat / ( sqrt(v-hat) + epsilon )
 
-  That whole machine -- momentum m, scaler v, both bias-corrected -- is Adam. (The minus sign
-  is just descent: pull points uphill on the wrongness, so step the other way.)
+  That whole machine -- momentum m, scaler v, both bias-corrected -- is Adam. The
+  direction is already inside the grade (a negative grade makes m negative and the
+  step negative), so the update simply ADDS, exactly like the previous post's nudge.
 
   ---
 
   ADAM BY HAND -- TWO DIALS, THE STEADY ONE AND THE FLIP-FLOP
 
-  alpha = 0.1, beta1 = 0.9, beta2 = 0.999, epsilon a hair (ignore it). Both dials start with
-  m = 0, v = 0. Watch a STEADY dial (pull +0.2 every move) beside a FLIP-FLOP dial (+0.2 then
-  -0.2).
+  alpha = 0.1, beta1 = 0.9, beta2 = 0.999, epsilon a hair (ignore it). Both dials
+  start with m = 0, v = 0. Watch a STEADY dial (grade +0.2 every move) beside a
+  FLIP-FLOP dial (+0.2 then -0.2).
 
-  MOVE 1 -- both get pull +0.2, so both do the identical thing:
+  MOVE 1 -- both get grade +0.2, so both do the identical thing:
 
       m = 0.9 x 0 + 0.1 x 0.2   = 0.02
       v = 0.999 x 0 + 0.001 x (0.2)^2 = 0.001 x 0.04 = 0.00004
@@ -97,9 +107,9 @@
       v-hat = 0.00004 / (1 - 0.999) = 0.00004 / 0.001 = 0.04   ->  sqrt(v-hat) = 0.2
       step  = alpha x m-hat / sqrt(v-hat) = 0.1 x 0.2 / 0.2 = 0.1
 
-  The first step is the full alpha = 0.1, and notice WHY: m-hat / sqrt(v-hat) = 0.2 / 0.2 = 1,
-  the magnitude cancels and only the SIGN survives. Adam's first move is alpha-sized whatever
-  the pull's raw size -- big pulls and small pulls start out equal.
+  The first step is the full alpha = 0.1, and notice WHY: m-hat / sqrt(v-hat) =
+  0.2 / 0.2 = 1, the magnitude cancels and only the SIGN survives. Adam's first move
+  is alpha-sized whatever the grade's raw size -- more on that sting below.
 
   MOVE 2 -- here the two dials part. The STEADY dial gets +0.2 again:
 
@@ -112,139 +122,239 @@
   The FLIP-FLOP dial gets -0.2 on move 2 instead:
 
       m = 0.9 x 0.02 + 0.1 x (-0.2) = 0.018 - 0.02 = -0.002
-      m-hat = -0.002 / 0.19 = -0.0105
+      m-hat = -0.002 / 0.19 = -0.0105          (to four decimals)
       v = 0.00007996 (same -- squaring kills the sign)   ->  sqrt(v-hat) = 0.2
-      step  = 0.1 x (-0.0105) / 0.2 = -0.005              (a twentieth of the steady stride)
+      step  = 0.1 x (-0.0105) / 0.2 = -0.005   (a twentieth of the steady stride)
 
   Drawn, the two dials after move 2:
 
       STEADY    (+0.2, +0.2) :  step  0.1    (m held its direction -> full speed)
-      FLIP-FLOP (+0.2, -0.2) :  step  0.005  (m nearly cancelled -> near standstill)
+      FLIP-FLOP (+0.2, -0.2) :  step -0.005  (m nearly cancelled -> near standstill)
 
-  Same base alpha, same scaler; the only difference is whether the pulls AGREED. Consistent
-  pulls compound into speed; contradictory pulls cancel into caution. That is the whole gift
-  of Adam over the flat 0.01.
+  Same base alpha, same scaler; the only difference is whether the grades AGREED.
+  Consistent grades compound into speed; contradictory grades cancel into caution.
+  That is the whole gift of Adam over the flat 0.01.
+
+  YOUR TURN -- move 3 of the STEADY dial (a third grade of +0.2 arrives; m = 0.038
+  and v = 0.00007996 from move 2 above). Compute m, m-hat, and the step. Slate
+  first, then check:
+
+      CHECK: m = 0.9 x 0.038 + 0.1 x 0.2 = 0.0342 + 0.02 = 0.0542
+             m-hat = 0.0542 / (1 - 0.9^3) = 0.0542 / 0.271 = 0.2   -- exactly 0.2 again
+             v = 0.999 x 0.00007996 + 0.001 x 0.04 = 0.00011988   -> v-hat = 0.04, sqrt 0.2
+             step = 0.1 x 0.2 / 0.2 = 0.1
+             A perfectly steady dial strides the full alpha every single move -- the
+             bias correction keeps m-hat pinned at the true 0.2 while m itself is
+             still crawling up (0.02, 0.038, 0.0542, ...).
 
   ---
 
   BUT THE STEP IS ONLY HALF THE WASTE -- THE OTHER HALF IS THE DATA
 
-  Adam fixed HOW we spend a gradient. The second crude thing was the DATA: in Part 1 the net
-  learned from each move once, the instant it happened, in the order it happened. Two costs.
+  Adam fixed HOW we spend a grade. The second crude thing was the DATA: the net
+  learned from each move once, the instant it happened, in the order it happened.
+  Two costs.
 
-  First, a real run is a STREAK -- the lander drifts through a long stretch of near-identical
-  states, so the net sees the same kind of situation again and again and forgets the ones from
-  a minute ago (it overwrites its dials to fit the streak). Second, one move is one lesson,
-  then gone -- expensive footsteps, learned from once.
+  First, a real run is a STREAK -- the lander drifts through a long stretch of
+  near-identical states, so the net sees the same kind of situation again and again
+  and forgets the ones from a minute ago (it overwrites its dials to fit the
+  streak). Second, one move is one lesson, then gone -- expensive footsteps, learned
+  from once.
 
   ---
 
   WHICH IS WHY YOU KEEP A BIN OF PAST MOVES AND DRAW FROM IT AT RANDOM
 
-  Keep a bin -- a buffer -- of recent experiences. After every real move, drop its four-tuple
-  in: the spot you left, the move you took, the reward, the spot you landed on.
+  Keep a bin -- a buffer -- of recent experiences. After every real move, drop in
+  one five-part note: the spot you left, the move you made, the reward, whether the
+  game ENDED on that move (1 yes / 0 no), and the spot you landed on.
 
-      buffer:  [ (s, a, r, s') ,  (s, a, r, s') ,  ...  ]      newest pushed in, oldest dropped
+      one note :  ( spot s , move a , reward r , ended? , landing s' )
+      the bin  :  [ note, note, note, ... ]      newest pushed in, oldest dropped
 
-  Then, to LEARN, do not use the move you just made. Reach into the bin and pull out a RANDOM
-  handful -- a batch -- of old experiences, mixed from all over the run, and take one Adam step
-  on their averaged gradient:
+  (The ended? flag must ride in the note. A note is re-read long after the move
+  happened, and nothing else in it says whether a landing exists to peek at.)
 
-      real move  ->  drop (s,a,r,s') in the bin
+  Then, to LEARN, do not use the move you just made. Reach into the bin and pull out
+  a RANDOM handful -- a batch -- of old notes, mixed from all over the run, and take
+  one Adam step on their averaged grades:
+
+      real move  ->  drop the five-part note in the bin
       to learn   ->  grab a random batch from the bin  ->  forward, target, backprop, Adam step
 
-  Two wins at once. The random grab MIXES far-apart moves into one batch, so no single streak
-  dominates -- the correlation is broken. And every experience sits in the bin to be drawn many
-  times, so one costly footstep teaches over and over.
+  Two wins at once. The random grab MIXES far-apart moves into one batch, so no
+  single streak dominates -- the correlation is broken. And every note sits in the
+  bin to be drawn many times, so one costly footstep teaches over and over.
 
-  Each time an old (s, a, r, s') is drawn, its target y is rebuilt with the CURRENT net -- the
-  same Expected-Sarsa target from Chapter 14, y = reward + dilute x (chance-weighted next
-  worths from the net's read of s'). The transition is fixed, but the net has moved since, so
-  the target is fresh every draw. (This is Chapter 13's Dyna-Q rehearsal, with one change: the
-  replayed move is a REAL stored transition, not one a learned model dreamed up.)
+  Each time an old note is drawn, its target y is rebuilt with the CURRENT net --
+  reward + dilute x (chance-weighted worths the net NOW reads at s'), and the whole
+  future piece times (1 - ended?), so a note that ended the game keeps only its
+  reward. The note is fixed; the net has moved since; so the target is fresh every
+  draw. (This is the notebook-and-rehearsal trick from the Dyna post, with one
+  change: the replayed move is a REAL stored transition, not one a learned model
+  dreamed up.)
+
+  YOUR TURN -- one note, drawn twice. The note says (s, move 0, reward 1, ended? 0,
+  s'), dilute 0.9, chances at s' = [0.1, 0.6, 0.1, 0.2]. On the first draw the net
+  reads Q(s') = [3, 5, 1, 2]. By the second draw the net has learned a little and
+  reads Q(s') = [3, 4, 1, 2]. Compute both targets. Slate first, then check:
+
+      CHECK: draw 1: averaged = 0.1x3 + 0.6x5 + 0.1x1 + 0.2x2 = 3.8
+                     y = 1 + 0.9 x 3.8 = 4.42
+             draw 2: averaged = 0.1x3 + 0.6x4 + 0.1x1 + 0.2x2 = 0.3+2.4+0.1+0.4 = 3.2
+                     y = 1 + 0.9 x 3.2 = 3.88
+             Same note, two different targets -- the note never changes, the net's
+             read of the landing does. That is why the target is rebuilt per draw,
+             never stored.
 
   ---
 
   SO THE WHOLE TRAINING LOOP, ONE REAL MOVE AT A TIME
 
-  Everything from Chapter 14 and this chapter, in one beat-by-beat loop:
+  Everything so far, in one beat-by-beat loop:
 
-      (1) READ  the worths Q(s) from the net (forward pass: psi = sA+b1, x = max(psi,0), Q = xC+b2)
+      (1) READ  the worths Q(s) from the net (forward: psi = sA+b1, x = max(psi,0), Q = xC+b2)
       (2) PICK  a move -- mostly the biggest worth, epsilon of the time a wander
-      (3) ACT, and the world hands back (reward, next spot s')
-      (4) STORE (s, a, r, s') in the bin
+      (3) ACT, and the world hands back (reward, next spot s', ended?)
+      (4) STORE the five-part note (s, a, r, ended?, s') in the bin
       (5) GRAB  a random batch from the bin
-      (6) for each (s,a,r,s') in the batch: build target y, backprop the one-slot how-wrong,
-          add up each dial's pull
-      (7) STEP  every dial once with Adam, using the batch's averaged pulls
+      (6) for each note in the batch: rebuild target y (future piece times 1 - ended?),
+          backprop the one-slot how-wrong, add up each dial's grade
+      (7) STEP  every dial once with Adam, on the batch's averaged grades
       (8) SLIDE: s' becomes the new s; repeat
 
-  Beats 1, 2, 6 are Chapter 14 (forward, choose, target). Beat 6's backprop is Part 1. Beats 4
-  and 5 are the bin; beat 7 is Adam. That loop, run on the lander, is a complete deep-RL agent.
+  Beat 1 and 2 are the Q-network post; beat 6's backprop is the previous post; beats
+  4-5 are the bin; beat 7 is Adam. That loop, run on the lander, is a complete
+  deep-RL agent -- the remaining posts of this chapter batch it, wire it to the
+  world's three calls, and run it to a landing.
 
   ---
 
-  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Nothing above needed a computer. This last section is for the day you meet one.
+  When I first built this machine, four walls stopped me. Each wall, the number that
+  broke it, and the rule I carry now.
 
-  ONE ADAM STEP FOR ONE DIAL, BY HAND (move 1, pull 0.2, all the numbers above):
+  THE TRAP: "m and v are two averages of the same thing -- why keep both?" THE
+  NUMBER THAT BROKE IT: feed the flip-flop (+0.2, -0.2) into each. m goes 0.02 then
+  -0.002 -- it SEES the disagreement and stalls. v goes 0.00004 then 0.00007996 --
+  identical to the steady dial's v, because squaring erased every sign. v cannot see
+  disagreement; m cannot see scale. THE FIX: m answers "which way, and do the
+  grades agree?"; v answers "how big are they, usually?" Two questions, two
+  memories.
 
-      import numpy as np
-      alpha, beta1, beta2, eps = 0.1, 0.9, 0.999, 1e-8
-      m, v, t = 0.0, 0.0, 1                    # m, v start at zero; t = move count
-      pull = 0.2
+  THE TRAP: "my first grade was huge, so the first step should be huge." THE NUMBER
+  THAT BROKE IT: give one dial a first grade of 0.2 and another 50. The small one:
+  m-hat = 0.2, sqrt(v-hat) = 0.2, step = 0.1 x 1 = 0.1. The big one: m-hat = 50,
+  v-hat = 2500, sqrt = 50, step = 0.1 x 50/50 = 0.1. Identical. On move one,
+  m-hat / sqrt(v-hat) is ALWAYS +1 or -1 -- Adam is size-blind at birth and only
+  learns a dial's scale as history accumulates. THE FIX: alpha alone sets the first
+  stride; choose it as "the biggest step I am happy to take blind."
 
-      m = beta1 * m + (1 - beta1) * pull       # 0.1*0.2          = 0.02
-      v = beta2 * v + (1 - beta2) * pull**2    # 0.001*0.04       = 0.00004
-      m_hat = m / (1 - beta1**t)               # 0.02 / 0.1       = 0.2
-      v_hat = v / (1 - beta2**t)               # 0.00004 / 0.001  = 0.04
-      step  = alpha * m_hat / (np.sqrt(v_hat) + eps)   # 0.1 * 0.2 / 0.2 = 0.1
-      dial  = 1.0 - step                       # a dial of 1.0 steps down to 0.9
-      print(step)                              # 0.1
+  THE TRAP: "the bias correction looks like magic -- where does beta^t come from?"
+  THE NUMBER THAT BROKE IT: after one move, m = 0.9 x 0 + 0.1 x 0.2 = 0.02 -- the
+  average is 90% made of the fake zero start, and only 1 - 0.9^1 = 0.1 of it is real
+  signal. Divide by exactly that: 0.02 / 0.1 = 0.2, the true grade. After two moves
+  the real share is 1 - 0.9^2 = 0.19; check: 0.038 / 0.19 = 0.2 again. THE FIX: the
+  correction divides by the fraction of the average that is real. Nothing else.
 
-  THE REPLAY BIN (drop on every move, grab a random batch to learn):
-
-      from collections import deque
-      import random
-      buffer = deque(maxlen=100000)            # oldest fall out when full
-
-      buffer.append((s, a, r, s_next))         # beat 4: store the real move
-      batch = random.sample(buffer, 8)         # beat 5: 8 random past moves, mixed
-      # beat 6: for each (s,a,r,s_next) in batch -> forward, target, backprop (Part 1),
-      #         summing each dial's pull; beat 7: one Adam step on the averaged pulls.
-
-  THE ANCHOR, unchanged: a stored move that ended the episode has no next spot, so its target
-  is the reward alone -- exactly the terminal rule carried since Chapter 13.
+  THE TRAP: "I stored the target y in the note -- it saves recomputing." THE NUMBER
+  THAT BROKE IT: the drill above -- the same note honestly graded 4.42 on one draw
+  and 3.88 a while later, because the net's read of the landing had moved. A stored
+  4.42 would teach the old net's opinion forever, long after it stopped being held.
+  THE FIX: a note stores FACTS (s, a, r, ended?, s'). Opinions -- targets -- are
+  rebuilt from the current net at every draw.
 
   ---
 
   ONE BREATH
 
-  Part 1's nudge was right but spent crudely: a flat step for every dial, and each experience
-  used once in order. Adam fixes the step with two per-dial memories -- m, the average of recent
-  pulls (so a dial pulled the same way builds speed and one yanked both ways cancels), and v,
-  the average of squared pulls (so dividing by sqrt(v) makes big-pull and small-pull dials move
-  at the same pace) -- both bias-corrected by 1 - beta^t because they start at zero, giving
-  dial -= alpha x m-hat / sqrt(v-hat). Worked: a steady dial keeps the full 0.1 stride, a
-  flip-flop dial shrinks to 0.005. The replay BIN fixes the data: store every (s,a,r,s'), then
-  learn from a RANDOM batch drawn out of it -- breaking the streak that makes the net forget,
-  and squeezing many lessons from one footstep, each draw's target rebuilt with the current net
-  (Chapter 13's rehearsal, now on real stored moves). Forward, choose, store, grab, backprop,
-  Adam step, slide -- that loop on the lander is a whole deep-RL agent.
+  The backprop post's nudge was right but spent crudely: a flat step for every dial,
+  and each experience used once in order. Call how-wrong x pull a dial's GRADE (the
+  signed "raise me / lower me" for this move). Adam fixes the step with two per-dial
+  memories -- m, the average of recent grades (a dial graded the same way builds
+  speed; one yanked both ways cancels to a crawl), and v, the average of squared
+  grades (dividing by sqrt(v) makes big-grade and small-grade dials move at the same
+  pace) -- both bias-corrected by 1 - beta^t because they start at zero, giving
+  dial += alpha x m-hat / sqrt(v-hat); the first step is always exactly alpha-sized,
+  because m-hat/sqrt(v-hat) starts at plus-or-minus 1. Worked: a steady dial keeps
+  the full 0.1 stride every move; a flip-flop shrinks to a twentieth. The replay BIN
+  fixes the data: store a five-part note (s, a, r, ended?, s'), then learn from a
+  RANDOM batch drawn out of it -- breaking the streak that makes the net forget, and
+  squeezing many lessons from one footstep, each draw's target rebuilt with the
+  current net (4.42 one draw, 3.88 a later one -- facts stored, opinions rebuilt).
+  Read, pick, act, store, grab, backprop, Adam step, slide -- that loop on the
+  lander is a whole deep-RL agent.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the two dials and the bin above, line by line, every
+  number hard-coded. One Adam step for one dial costs 11 strokes: 2 multiplies + 1
+  add for m, 3 for v (one is the squaring), 2 divides for the hats, 1 square root,
+  1 divide, 1 multiply for the step, 1 add into the dial.
+
+      alpha, beta1, beta2 = 0.1, 0.9, 0.999
+
+      # ---- THE STEADY DIAL, move 1 (grade +0.2; m and v start at 0)
+      m = beta1 * 0.0 + (1 - beta1) * 0.2          # 0.1*0.2   = 0.02
+      v = beta2 * 0.0 + (1 - beta2) * 0.2**2       # 0.001*0.04 = 0.00004
+      m_hat = m / (1 - beta1**1)                   # 0.02/0.1     = 0.2
+      v_hat = v / (1 - beta2**1)                   # 0.00004/0.001 = 0.04
+      step  = alpha * m_hat / (v_hat ** 0.5)       # 0.1*0.2/0.2  = 0.1
+      dial  = 1.0 + step                           # 1.0 -> 1.1  (the grade said "raise me")
+
+      # ---- THE STEADY DIAL, move 2 (grade +0.2 again)
+      m = beta1 * 0.02 + (1 - beta1) * 0.2         # 0.018+0.02 = 0.038
+      v = beta2 * 0.00004 + (1 - beta2) * 0.04     # 0.00007996
+      m_hat = m / (1 - beta1**2)                   # 0.038/0.19    = 0.2
+      v_hat = v / (1 - beta2**2)                   # /0.001999     = 0.04
+      step  = alpha * m_hat / (v_hat ** 0.5)       # 0.1           (full stride held)
+
+      # ---- THE FLIP-FLOP DIAL, move 2 (its move 1 was identical; now grade -0.2)
+      m = beta1 * 0.02 + (1 - beta1) * -0.2        # 0.018-0.02 = -0.002
+      v = beta2 * 0.00004 + (1 - beta2) * 0.04     # 0.00007996  (square killed the sign)
+      m_hat = m / (1 - beta1**2)                   # -0.002/0.19 = -0.0105  (4 dp)
+      v_hat = v / (1 - beta2**2)                   # 0.04
+      step  = alpha * m_hat / (v_hat ** 0.5)       # 0.1*(-0.0105)/0.2 = -0.0053 (4 dp)
+
+      # ---- THE BIN: five-part notes; facts in, opinions never
+      bin_notes = [
+          ([1.0, 2.0], 0,  1.0, 0, [0.5, 1.8]),    # note 0: mid-flight move
+          ([0.5, 1.8], 3, -2.0, 0, [0.4, 1.5]),    # note 1
+          ([0.4, 1.5], 1,  0.5, 0, [0.4, 1.1]),    # note 2
+          ([0.4, 1.1], 1, 10.0, 1, [0.0, 0.0]),    # note 3: ENDED -- landing is a dummy
+      ]
+      # the lottery names three notes for this batch -- say it drew 2, 0, 3:
+      batch = [bin_notes[2], bin_notes[0], bin_notes[3]]
+      # per note: y = r + 0.9 * (chance-weighted worths at s') * (1 - ended?)
+      #   note 3's future piece: * (1 - 1) = 0 -> its target is the bare 10.0
+      # then backprop each one-slot miss (previous post) and ONE Adam step on the average
+
+  The bin holds facts only. Note 3's ended? flag is what zeroes its future piece --
+  nothing else in the note could say so.
 
   ---
 
   >> NOTE: STANDARD JARGON
   >> If you read other RL material after this page:
-  >>   a dial's pull               = the gradient of the worth wrt that dial (Part 1)
-  >>   m (average of pulls)         = the first moment / momentum  (Adam's m)
-  >>   v (average of squared pulls) = the second moment / per-parameter scale  (Adam's v)
+  >>   a dial's pull               = the gradient of the worth wrt that dial
+  >>   a dial's grade = how-wrong x pull = the ascent direction on the worth (what the code's
+  >>                                  td_update carries; textbooks feed the LOSS gradient,
+  >>                                  which is minus this, and subtract -- same arithmetic)
+  >>   m (average of grades)        = the first moment / momentum  (Adam's m)
+  >>   v (average of squared grades) = the second moment / per-parameter scale  (Adam's v)
   >>   beta1, beta2 (0.9, 0.999)    = the moment decay rates
   >>   divide by (1 - beta^t)       = bias correction (m, v start at zero)
-  >>   dial -= alpha x m-hat/sqrt(v-hat) = the Adam update; alpha = the base learning rate
-  >>   the bin / buffer             = the experience replay buffer
+  >>   dial += alpha x m-hat/sqrt(v-hat) = the Adam update; alpha = the base learning rate
+  >>   the bin / five-part note     = the experience replay buffer; (s, a, r, terminal, s')
   >>   a random batch               = a minibatch sampled to break correlation
+  >>   times (1 - ended?)           = the terminal mask on the bootstrap term
   >>   target rebuilt each draw      = recomputing the TD target with the current network
   >>   replay vs Dyna rehearsal      = replaying REAL transitions vs a learned model's simulated ones
   >>   the whole loop on the lander  = deep RL (a neural-net value agent, e.g. on LunarLander)
