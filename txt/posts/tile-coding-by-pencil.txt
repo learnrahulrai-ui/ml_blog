@@ -16,66 +16,70 @@
 
   ---
 
-  Part 1 grouped the spots and kept one weight per group. It bought speed -- fifty spots
-  learning together -- but it forced an ugly either/or, and this post is the way out.
-
-  A spot = one place in the world. A weight = one learned number. A worth = how good a
-  spot is. In Part 1 each spot pointed at its group with a one-hot (a row of switches, one
-  flipped on), and its worth was just that group's weight. Coarse groups learned fast but
-  blurry; squeeze the groups down toward one-spot-each and you are back to a slow table.
-  You could have sharing OR sharpness, never both.
+  Everything this page uses, from a blank sheet. A spot = one place in a world. A
+  worth = one number saying how good a spot is, counting the rewards you expect from
+  there on. A weight = one learned number. The previous post grouped the spots and
+  kept one weight per group: each spot pointed at its group with a one-hot feature (a
+  row of switches, exactly one flipped on) and its worth was that group's weight, so
+  fifty group-mates learned together. It bought speed and paid in blur: coarse groups
+  learn fast but cannot tell group-mates apart; squeeze the groups down toward
+  one-spot-each and you are back to a slow table. Sharing OR sharpness -- with plain
+  grouping, never both. This post is the way out.
 
   ---
 
   BUT THE STATE IS NOW TWO DIALS THAT NEVER LAND TWICE
 
-  Forget the tidy 500 numbered spots. Take the standard toy, a car in a valley, too weak
-  to climb straight out -- it must rock back and forth to build speed. Its whole state is
+  Forget tidy numbered spots. Take the standard toy, a car in a valley, too weak to
+  climb straight out -- it must rock back and forth to build speed. Its whole state is
   two real-number dials:
 
       position  (how far along the valley)   -- a real number, e.g. -0.45
       velocity  (how fast, which way)        -- a real number, e.g.  0.02
 
   These are not 500 tidy spots. They are two sliders that can sit at -0.4500001 or
-  -0.4500002 -- the car is almost never in the *exact* same place twice. A table wants one
-  cell per state, so first you would have to chop each slider into bins. Say a thousand
-  position bins and a thousand velocity bins:
+  -0.4500002 -- the car is almost never in the *exact* same place twice. A table wants
+  one cell per state, so first you would have to chop each slider into bins. Say a
+  thousand position bins and a thousand velocity bins:
 
       position bins x velocity bins  =  1000 x 1000  =  1,000,000 cells
 
-  A million weights for a crude two-dial toy -- and the chop is still coarse, and it STILL
-  shares nothing across a bin wall. Make it finer and the count explodes; a real screen of
-  pixels would need more cells than atoms. The table is dead here before it starts:
+  A million weights for a crude two-dial toy -- and the chop is still coarse, and it
+  STILL shares nothing across a bin wall. Make it finer and the count explodes; a real
+  screen of pixels would need more cells than atoms. The table is dead here before it
+  starts:
 
       position  --->  | one cell per (position, velocity) pair |  ---> a worth
       velocity  --->  |   ... a million-plus of them, and rising ...     |
 
-  We need a worth that is BUILT, not looked up -- and built so that close states share,
-  far states do not, and nobody pays for a million cells.
+  We need a worth that is BUILT, not looked up -- and built so that close states
+  share, far states do not, and nobody pays for a million cells.
 
   ---
 
   SO LAY THE SAME COARSE RULER DOWN TWICE, SHIFTED
 
-  Here is the whole trick, and it is small. Take ONE dial first -- position, on a stretch
-  from 0 to 1 -- and lay a COARSE ruler over it: two fat tiles, each half a unit wide.
+  Here is the whole trick, and it is small. Take ONE dial first -- position, on a
+  stretch from 0 to 1 -- and lay a COARSE ruler over it: two fat tiles, each half a
+  unit wide.
 
       ruler A:   [-----A0-----][-----A1-----]
                  0           0.5            1.0
 
-  A0 covers [0, 0.5), A1 covers [0.5, 1.0). Coarse -- only two tiles -- so it generalises
-  hard: every point in the left half is "A0", indistinguishable. On its own this ruler is
-  hopelessly blurry; it cannot tell 0.1 from 0.4.
+  A0 covers [0, 0.5), A1 covers [0.5, 1.0). Coarse -- only two tiles -- so it
+  generalises hard: every point in the left half is "A0", indistinguishable. On its
+  own this ruler is hopelessly blurry; it cannot tell 0.1 from 0.4.
 
-  Now lay a SECOND ruler of the same fat tiles, but slide it left by a quarter of a unit:
+  Now lay a SECOND ruler of the same fat tiles, but slide it left by a quarter of a
+  unit -- a second set of cuts, stacked one half-cut ahead of the first:
 
       ruler A:   [-----A0-----][-----A1-----]
                  0           0.5            1.0
       ruler B: [--B0--][-----B1-----][--B2--]
               -0.25  0.25          0.75    1.25
 
-  Ruler B's walls fall at 0.25 and 0.75 -- right in the MIDDLE of ruler A's tiles. Same
-  coarseness, just shifted. That offset is the entire idea.
+  Ruler B's walls fall at 0.25 and 0.75 -- right in the MIDDLE of ruler A's tiles.
+  Same coarseness, just shifted. That offset is the entire idea.
 
   ---
 
@@ -86,62 +90,72 @@
       0.3 on ruler A:  0.3 is in [0, 0.5)      ->  A0
       0.3 on ruler B:  0.3 is in [0.25, 0.75)  ->  B1
 
-  So position 0.3 is not one tile, it is the PAIR { A0, B1 } -- one tile per ruler. Write
-  that as a feature the same way Part 1 did, a long row of switches with the active ones
-  flipped on. Five tiles exist in all (A0, A1, B0, B1, B2), so the row is five wide:
+  So position 0.3 is not one tile, it is the PAIR { A0, B1 } -- one tile per ruler.
+  Write that as a feature the same switch-row way as before: five tiles exist in all
+  (A0, A1, B0, B1, B2), so the row is five wide, and now TWO switches are on:
 
       tiles:    A0  A1  B0  B1  B2
       0.3 ->  [  1   0   0   1   0 ]      two switches on, one per ruler
 
-  Part 1's feature had exactly ONE switch on. This one has TWO. That is the only change to
+  A one-hot has exactly one switch on; this row has two. That is the only change to
   the machinery -- and every good thing below falls out of it.
 
   ---
 
   WHICH MEANS TWO BLURRY RULERS READ SHARPER THAN EITHER ALONE
 
-  Ruler A alone splits the line into 2 regions. Ruler B alone splits it into 3. But what a
-  point actually carries is the PAIR of tiles, and the pairs change wherever EITHER wall
-  falls -- at 0.25, 0.5, and 0.75. Walk the line and list the pair:
+  Ruler A alone splits the line into 2 regions. Ruler B alone splits it into 3. But
+  what a point actually carries is the PAIR of tiles, and the pairs change wherever
+  EITHER wall falls -- at 0.25, 0.5, and 0.75. Walk the line and list the pair:
 
       [0,    0.25) ->  A0, B0
       [0.25, 0.5 ) ->  A0, B1
       [0.5,  0.75) ->  A1, B1
       [0.75, 1.0 ) ->  A1, B2
 
-  Four distinct readings -- a quarter-unit resolution -- out of two rulers whose tiles are
-  each half a unit wide. The blur of each ruler is real, but their WALLS land in different
-  places, so the overlap pins the point twice as finely as either coarse ruler could. Two
-  blurry rulers, read together, are sharp. Stack eight and the overlap gets eighth-of-a-
-  tile sharp -- from eight coarse grids, no fine grid anywhere.
+  Four distinct readings -- a quarter-unit resolution -- out of two rulers whose tiles
+  are each half a unit wide. The blur of each ruler is real, but their WALLS land in
+  different places, so the overlap pins the point twice as finely as either coarse
+  ruler could. Two blurry rulers, read together, are sharp. Stack eight and the
+  overlap gets eighth-of-a-tile sharp -- from eight coarse grids, no fine grid
+  anywhere.
+
+  YOUR TURN -- two points, read off both rulers (ruler A's walls at 0.5; ruler B's at
+  0.25 and 0.75). Which pair of tiles does 0.8 light? Which does 0.2 light? Write
+  both features (five slots: A0 A1 B0 B1 B2). Slate first, then check:
+
+      CHECK: 0.8 -> A: [0.5,1.0) = A1 ;  B: [0.75,1.25) = B2  -> { A1, B2 }
+             feature = [ 0, 1, 0, 0, 1 ]
+             0.2 -> A: [0,0.5)   = A0 ;  B: [-0.25,0.25) = B0 -> { A0, B0 }
+             feature = [ 1, 0, 1, 0, 0 ]
 
   ---
 
   AND IT SHARES EXACTLY THE RIGHT AMOUNT -- BY HOW MANY TILES OVERLAP
 
-  Now the other half of the prize, the thing the hard either/or could never give. Nudge the
-  car a little and watch how many of its two tiles stay put:
+  Now the other half of the prize, the thing plain grouping could never give. Nudge
+  the car a little and watch how many of its two tiles stay put:
 
       0.3  ->  { A0, B1 }
       0.4  ->  A: [0,0.5)->A0 ,  B: [0.25,0.75)->B1   =  { A0, B1 }   SAME two tiles
       0.6  ->  A: [0.5,1.0)->A1 ,  B: [0.25,0.75)->B1  =  { A1, B1 }   shares B1 only
       0.9  ->  A: [0.5,1.0)->A1 ,  B: [0.75,1.25)->B2  =  { A1, B2 }   shares NOTHING
 
-  Read that ladder. 0.3 and 0.4 are practically the same place, and they fire the SAME two
-  tiles -- so whatever one learns, the other gets in full. 0.6 is a step away and shares
-  ONE tile -- it gets half the lesson. 0.9 is far and shares NONE -- it is untouched. The
-  amount two states share is just the count of tiles they have in common, and that count
-  falls off smoothly with distance. Part 1 could only share ALL (same group) or NOTHING
-  (different group), a cliff. Tile coding makes a ramp. That is generalisation you can
-  dial, and it came free with the shift.
+  Read that ladder. 0.3 and 0.4 are practically the same place, and they fire the SAME
+  two tiles -- so whatever one learns, the other gets in full. 0.6 is a step away and
+  shares ONE tile -- it gets half the lesson. 0.9 is far and shares NONE -- it is
+  untouched. The amount two states share is just the count of tiles they have in
+  common, and that count falls off smoothly with distance. Plain grouping could only
+  share ALL (same group) or NOTHING (different group) -- a cliff. Tile coding makes a
+  ramp. That is generalisation you can dial, and it came free with the shift.
 
   ---
 
   SO THE WORTH IS THE SUM OF THE ACTIVE WEIGHTS
 
-  Give every tile its own weight, and build a spot's worth the Part 1 way -- dot the
-  feature with the weights -- except now two switches are on, so the dot ADDS two weights
-  instead of picking one:
+  Give every tile its own weight, and build a spot's worth by dotting the feature with
+  the weights (multiply slot by slot, add) -- except now two switches are on, so the
+  dot ADDS two weights instead of picking one:
 
       weights:  wA0   wA1   wB0   wB1   wB2
                 1.0  -0.5   0.0   0.5   0.0
@@ -151,32 +165,37 @@
                  = 1.0 + 0.5
                  = 1.5
 
-  Part 1: "the worth is that group's one weight." Here: "the worth is the sum of the active
-  tiles' weights." A k-hot instead of a one-hot, a sum instead of a pick. No table of
-  worths exists -- five weights GENERATE the worth of every point on the line, and points
-  that share tiles share weights.
+  With one switch on, "the worth is that group's one weight." With two: "the worth is
+  the sum of the active tiles' weights." A k-hot instead of a one-hot, a sum instead
+  of a pick. No table of worths exists -- five weights GENERATE the worth of every
+  point on the line, and points that share tiles share weights.
 
   ---
 
-  SO THE WEIGHTS LEARN BY THE SAME TD NUDGE, SPLIT ACROSS THE ACTIVE TILES
+  SO THE WEIGHTS LEARN BY THE SAME ONE-SAMPLE NUDGE, SPLIT ACROSS THE ACTIVE TILES
 
-  Chapter 13's nudge, carried unchanged through Part 1, still runs the show. You leave a
-  spot, grab a reward, land on the next, and crawl the left spot's worth toward a target:
+  The one-sample nudge (TD(0), rebuilt right here): you leave a spot, grab a reward,
+  land on the next spot, and crawl the LEFT spot's worth a fraction of the way toward
+  a target -- reward + dilute x worth(next), where dilute is the future-shrinker (0.9
+  here). Because a worth is now weights-dot-feature, the crawl lands on the weights,
+  steered by the feature:
 
       how wrong = reward + dilute x worth(next) - worth(left)
       weights   = weights + size x (how wrong) x feature(left)
 
   The feature(left) is the k-hot, so "x feature(left)" lands the nudge on exactly the
-  active tiles and zeroes the rest. One snag the one-hot never had: with TWO tiles both
-  adding into the worth, a full-strength step on EACH would move the worth by twice what
-  you asked -- an overshoot. So split the step across the tiles. With T tilings, use
+  active tiles and zeroes the rest. One snag the one-hot never had: with TWO tiles
+  both adding into the worth, a full-strength step on EACH would move the worth by
+  twice what you asked -- an overshoot. So split the step across the tiles. With T
+  rulers, use
 
       size = alpha / T          (here alpha = 0.2, T = 2 rulers, so size = 0.1)
 
   so the T active tiles together move the worth by the one step you meant.
 
-  Worked, every number. Leave position 0.3 (tiles A0, B1), grab reward 2, land on position
-  0.6 (tiles A1, B1). dilute 0.9, size 0.1.
+  Worked, every number. Leave position 0.3 (tiles A0, B1), grab reward 2, land on
+  position 0.6 (tiles A1, B1). dilute 0.9, size 0.1, weights as drawn above
+  [1.0, -0.5, 0.0, 0.5, 0.0]:
 
       worth(left  = 0.3) = wA0 + wB1 =  1.0 + 0.5 =  1.5
       worth(next  = 0.6) = wA1 + wB1 = -0.5 + 0.5 =  0.0
@@ -199,26 +218,40 @@
                ^^^^               ^^^^                (the other three stand still)
 
   And the worth of 0.3 climbed the right way: worth(0.3) = 1.05 + 0.55 = 1.60, up 0.10
-  from 1.5 -- two tiles, 0.05 each, the step you asked for. Now read the fallout on the
-  neighbours, for free:
+  from 1.5 -- two tiles, 0.05 each, the step you asked for. Now read the fallout on
+  the neighbours, for free:
 
       worth(0.4) -> A0,B1 -> 1.05 + 0.55 = 1.60   rose the full amount (shares both tiles)
       worth(0.6) -> A1,B1 -> -0.5 + 0.55 = 0.05   rose half (shares B1 only)
       worth(0.9) -> A1,B2 -> -0.5 + 0.0  = -0.5   untouched (shares nothing)
 
-  One step taught 0.3, and its lesson spread to the close-by 0.4 in full, to 0.6 in half,
-  and not at all to the far 0.9 -- weighted by shared tiles. That is the ramp, paid for in
-  one nudge. (At a terminal landing, the game ended, drop the dilute x worth(next) piece:
-  target = reward alone, exactly the Chapter 13 anchor.)
+  One step taught 0.3, and its lesson spread to the close-by 0.4 in full, to 0.6 in
+  half, and not at all to the far 0.9 -- weighted by shared tiles. That is the ramp,
+  paid for in one nudge. (If the move ENDS the game there is no next spot to read, so
+  the target loses its future piece: target = reward alone -- the anchor, the one
+  target with no guess inside it.)
+
+  YOUR TURN -- the next step of the same walk. The weights now read
+  [1.05, -0.5, 0.0, 0.55, 0.0]. You leave position 0.6 (tiles A1, B1), grab reward 0,
+  land on position 0.9 (tiles A1, B2). dilute 0.9, size 0.1. Which two weights move,
+  and to what? Slate first, then check:
+
+      CHECK: worth(left = 0.6)  = wA1 + wB1 = -0.5 + 0.55 =  0.05
+             worth(next = 0.9)  = wA1 + wB2 = -0.5 + 0.0  = -0.5
+             how wrong = 0 + 0.9 x (-0.5) - 0.05 = -0.45 - 0.05 = -0.5
+             each active tile of the LEFT point moves by 0.1 x (-0.5) = -0.05:
+             wA1 = -0.5 - 0.05 = -0.55 ,  wB1 = 0.55 - 0.05 = 0.50
+             (note wA1 sits in BOTH points here -- it still moves once, as a
+             left-point tile; the k-hot of the left point is what steers)
 
   ---
 
   THE REAL MOUNTAIN CAR -- TWO DIALS, SQUARE TILES, EIGHT RULERS
 
-  Stretch the one-line trick to the car's two dials and nothing new happens -- a tile is
-  just a little SQUARE now (a position band crossed with a velocity band) instead of a
-  segment, and a shifted ruler is a whole grid nudged diagonally. Picture eight CCTV
-  cameras over the same car, each grid pinned at a slightly different corner:
+  Stretch the one-line trick to the car's two dials and nothing new happens -- a tile
+  is just a little SQUARE now (a position band crossed with a velocity band) instead
+  of a segment, and a shifted ruler is a whole grid nudged diagonally. Picture eight
+  CCTV cameras over the same car, each grid pinned at a slightly different corner:
 
       camera 1   camera 2   camera 3        ... eight grids, each shifted a little ...
       +-+-+-+    +-+-+-+    +-+-+-+
@@ -226,80 +259,133 @@
       +-+-+-+    +-+-+-+    +-+-+-+           -> eight active tiles, e.g.
       | | | |    | | | |    | | | |             [ 19, 3, 44, 8, 27, 61, 12, 7 ]
 
-  Eight tilings -> eight switches on -> the feature is eight ones in a long row of zeros,
-  and a worth is the sum of those eight weights. When the car drifts a hair, only a camera
-  or two flips its square; the other six read the same -- smooth sharing, sharp overlap,
-  the same two prizes as the line.
+  Eight rulers -> eight switches on -> the feature is eight ones in a long row of
+  zeros, and a worth is the sum of those eight weights. When the car drifts a hair,
+  only a camera or two flips its square; the other six read the same -- smooth
+  sharing, sharp overlap, the same two prizes as the line.
 
-  One honest note kept for later. The real coder does not store a grid of named squares --
-  even two coarse dials chopped fine would blow past a billion squares. It HASHES each
-  tile's coordinates into a fixed bank of slots (an index hash table) and computes the
-  eight numbers by arithmetic every time, never a lookup. And the car has three real moves
-  -- push left, coast, push right -- so the worth becomes a worth-per-move; turning these
-  eight-tile features into a machine that CHOOSES is Part 3.
+  One honest note kept for later. The real coder does not store a grid of named
+  squares -- even two coarse dials chopped fine would blow past a billion squares. It
+  HASHES each tile's coordinates into a fixed bank of slots (an index hash table) and
+  computes the eight numbers by arithmetic every time, never a lookup. And the car has
+  three real moves -- push left, coast, push right -- so the worth becomes a
+  worth-per-move; turning these eight-tile features into a machine that CHOOSES is the
+  next post.
 
   ---
 
-  THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Nothing above needed a computer. This last section is for the day you meet one. The whole
-  one-line coder is "which tile on each shifted ruler," then "flip those switches on."
+  When I first built this machine on the real car, four walls stopped me. Each wall,
+  the number that broke it, and the rule I carry now.
 
-  THE TILE CODER for one dial (two fat tiles per ruler, ruler B shifted by 0.25):
+  THE TRAP: "the ruler reads the raw position, right?" I fed the coder a raw position
+  and it pointed at a tile that did not exist. THE NUMBER THAT BROKE IT: the car's
+  track runs from -1.2 to 0.6 (a stretch of 1.8). Position -0.3 with 4 tiles, fed
+  raw: -0.3 x 4 = -1.2, floor -2 -- tile "minus two". Scaled first: fraction =
+  (-0.3 - (-1.2)) / 1.8 = 0.9 / 1.8 = 0.5, then 0.5 x 4 = 2 -- tile 2, real. THE FIX:
+  always squeeze the dial into [0, 1] first -- subtract the LOW end, divide by the
+  STRETCH -- and only then talk to tiles.
 
-      import numpy as np
-      tile_width, n_tilings, offset = 0.5, 2, 0.25
+  THE TRAP: "the car starts at -1.2 and ends at 0.5... right?" I asked four times,
+  because three different numbers were wearing the same coat. THE NUMBERS THAT BROKE
+  IT: -1.2 is the LEFT WALL of the track (the far end of the back-swing); 0.6 is the
+  RIGHT WALL; 0.5 is the GOAL LINE painted just before it; and the car STARTS each
+  run near the valley floor, around -0.5. Wall, wall, finish line, starting stall --
+  four numbers, four different jobs. THE FIX: before coding any world, write its
+  numbers down with their JOBS next to them, not just their values.
 
-      def active_tiles(p):
-          # ruler A starts at 0; ruler B starts shifted left by 0.25
-          a = int((p - 0.0  ) // tile_width)          # 0.3 -> 0  (A0)
-          b = int((p + offset) // tile_width)          # 0.3 -> (0.55)//0.5 = 1  (B1)
-          return [a, 2 + b]      # global ids: ruler A uses 0,1 ; ruler B uses 2,3,4
-      # active_tiles(0.3) -> [0, 3]   == { A0, B1 }
+  THE TRAP: "surely I need one FINE ruler -- these fat tiles will never be precise."
+  I kept trying to chop finer. THE NUMBER THAT BROKE IT: two rulers of HALF-unit
+  tiles already read at QUARTER-unit resolution (the walk-the-line table above:
+  four distinct pair-readings), and eight rulers read at eighth-tile resolution --
+  while a single fine ruler with the same total tile count shares nothing between
+  neighbours. THE FIX: sharpness comes from the OVERLAP of coarse cuts stacked one
+  ahead of the other, not from fineness. Never build the fine ruler.
 
-  THE FEATURE (flip the active switches on) and THE WORTH (sum the active weights):
-
-      def feature(p):
-          a, b = active_tiles(p)      # 0.3 -> 0, 3  (A0, B1)
-          x = np.zeros(5)             # [A0, A1, B0, B1, B2]
-          x[a] = 1                    # flip ruler A's tile on
-          x[b] = 1                    # flip ruler B's tile on
-          return x
-
-      def worth(weights, p):
-          return np.dot(weights, feature(p))     # adds the active weights
-
-  ONE STEP BY HAND (leave 0.3, reward 2, land 0.6; alpha 0.2 over 2 tilings -> size 0.1):
-
-      weights = np.array([1.0, -0.5, 0.0, 0.5, 0.0])   # A0 A1 B0 B1 B2
-      size, dilute = 0.2 / n_tilings, 0.9              # size = 0.1
-
-      x_left   = feature(0.3)                           # [1,0,0,1,0]
-      how_wrong = 2 + dilute * worth(weights, 0.6) - worth(weights, 0.3)   # 0.5
-      weights  = weights + size * how_wrong * x_left    # wA0->1.05, wB1->0.55
-      print(weights)         # [1.05 -0.5  0.   0.55  0. ]
-
-  THE ANCHOR STEP (the move ended the game -- drop the next piece):
-
-      how_wrong = reward - worth(weights, p_left)       # target = reward alone
-      weights   = weights + size * how_wrong * feature(p_left)
+  THE TRAP: "two tiles are on, so nudge both by the full step." My worths kept
+  jumping past their targets. THE NUMBER THAT BROKE IT: asking for a step of
+  alpha x how-wrong = 0.2 x 0.5 = 0.1 but moving BOTH live tiles by 0.1 moved the
+  worth (their SUM) by 0.2 -- exactly double the ask. THE FIX: split the step:
+  size = alpha / rulers = 0.2 / 2 = 0.1 per tile, so the team of live tiles together
+  moves the worth by the one step you meant.
 
   ---
 
   ONE BREATH
 
-  A table dies on a two-dial continuous state -- a million cells and still sharing nothing
-  across a wall. So lay the same coarse ruler down several times, each SHIFTED a little: a
-  point lights one tile per ruler, so its feature is a k-hot (several switches on, not one),
-  and its worth is the SUM of the active weights. The shifted walls make the overlap read
-  finer than any single coarse ruler (two half-width rulers resolve to quarters; eight
-  resolve to eighths), and two states share exactly as many tiles as they have in common --
-  full for neighbours, none for the far-off, a smooth ramp instead of Part 1's cliff. The
-  weights learn by the unchanged TD nudge, weights += size x how-wrong x feature(left), the
-  k-hot steering the nudge onto just the active tiles; split the step size = alpha / tilings
-  so the several tiles together move the worth by one step (anchor drops the next piece). The
-  real car does this in 2-D with eight hashed grids and square tiles -- coarse everywhere,
-  sharp by overlap, cheap by sharing.
+  A table dies on a two-dial continuous state -- a million cells and still sharing
+  nothing across a wall. So lay the same coarse ruler down several times, each
+  SHIFTED a little: a point lights one tile per ruler, so its feature is a k-hot
+  (several switches on, not one), and its worth is the SUM of the active weights. The
+  shifted walls make the overlap read finer than any single coarse ruler (two
+  half-width rulers resolve to quarters; eight resolve to eighths), and two states
+  share exactly as many tiles as they have in common -- full for neighbours, none for
+  the far-off, a smooth ramp instead of grouping's cliff. The weights learn by the
+  one-sample nudge, weights += size x how-wrong x feature(left), the k-hot steering
+  the nudge onto just the active tiles; split the step size = alpha / rulers so the
+  team of live tiles moves the worth by one step (game over drops the future piece,
+  never the update). The real car does this in 2-D with eight hashed grids and square
+  tiles -- coarse everywhere, sharp by overlap, cheap by sharing.
+
+  ---
+
+  ==========================================================================================
+    THE SEAM. Pencil ends here. Below is the same machine in Python -- a museum exhibit
+    for the day you meet a computer. Nothing below teaches anything new; every number
+    below was already computed above by hand.
+  ==========================================================================================
+
+  No loops, no functions -- the traces above, line by line, every number hard-coded.
+  Count the cost of one step first: two worth-reads (2 picks + 1 add each), the TD
+  error (1 multiply, 1 add, 1 subtract), one shared multiply for the step, two tile
+  writes (1 add each) -- about 11 pencil strokes, 2 writes, whatever the world's size.
+
+      # ---- WHICH TILES LIGHT UP at position 0.3 (tile width 0.5; ruler B shifted 0.25)
+      a = int((0.3 - 0.0 ) // 0.5)        # 0.3  // 0.5 = 0  -> A0
+      b = int((0.3 + 0.25) // 0.5)        # 0.55 // 0.5 = 1  -> B1
+      # global slot ids: ruler A owns slots 0-1, ruler B owns slots 2-4
+      # so 0.3 lights slots [0, 2+1] = [0, 3]  == { A0, B1 }
+
+      x_left = [1, 0, 0, 1, 0]            # the k-hot for 0.3: A0 and B1 on
+
+      # ---- ONE STEP: leave 0.3, reward 2, land 0.6 (alpha 0.2 over 2 rulers -> size 0.1)
+      weights = [1.0, -0.5, 0.0, 0.5, 0.0]      # A0 A1 B0 B1 B2
+      size    = 0.2 / 2                          # 0.1
+      dilute  = 0.9
+
+      worth_left = (weights[0]*1 + weights[1]*0 + weights[2]*0
+                    + weights[3]*1 + weights[4]*0)    # 1.0 + 0.5      = 1.5
+      worth_next = weights[1] + weights[3]             # 0.6 lights A1,B1: -0.5+0.5 = 0.0
+      how_wrong  = 2 + dilute * worth_next - worth_left  # 2 + 0 - 1.5  = 0.5
+
+      step = size * how_wrong                  # 0.1 * 0.5 = 0.05 (one multiply, shared)
+      weights[0] = weights[0] + step * 1       # A0: 1.0 + 0.05 = 1.05   (live)
+      weights[1] = weights[1] + step * 0       # A1: -0.5 + 0   = -0.5   (dead slot)
+      weights[2] = weights[2] + step * 0       # B0:  0.0 + 0   =  0.0   (dead slot)
+      weights[3] = weights[3] + step * 1       # B1:  0.5 + 0.05 = 0.55  (live)
+      weights[4] = weights[4] + step * 0       # B2:  0.0 + 0   =  0.0   (dead slot)
+      # 2 live writes, 3 dead -- the k-hot's zeros hold everything else still
+
+      # ---- THE NEXT STEP: leave 0.6 (A1,B1), reward 0, land 0.9 (A1,B2)
+      worth_left = weights[1] + weights[3]      # -0.5 + 0.55 = 0.05
+      worth_next = weights[1] + weights[4]      # -0.5 + 0.0  = -0.5
+      how_wrong  = 0 + dilute * worth_next - worth_left   # -0.45 - 0.05 = -0.5
+      step = size * how_wrong                   # 0.1 * -0.5 = -0.05
+      weights[1] = weights[1] + step * 1        # A1: -0.5  - 0.05 = -0.55
+      weights[3] = weights[3] + step * 1        # B1:  0.55 - 0.05 = 0.50
+
+      # ---- THE ANCHOR STEP: leave 0.3 (A0,B1), the game ends, reward -4
+      worth_left = weights[0] + weights[3]      # 1.05 + 0.50 = 1.55
+      how_wrong  = -4 - worth_left              # target = reward alone: -5.55
+      step = size * how_wrong                   # 0.1 * -5.55 = -0.555
+      weights[0] = weights[0] + step * 1        # A0: 1.05 - 0.555 = 0.495
+      weights[3] = weights[3] + step * 1        # B1: 0.50 - 0.555 = -0.055
+
+  Weight-writes in this whole exhibit: 6 live (A0 twice, B1 three times, A1 once) and
+  every dead slot held still by a multiply-by-zero. Eight rulers
+  instead of two changes the counts to 8 picks per worth and 8 live writes per step --
+  still pocket change, whatever the world's size.
 
   ---
 
@@ -307,16 +393,19 @@
   >> If you read other RL material after this page:
   >>   coarse ruler / fat tiles    = a tiling  (one grid laid over the space)
   >>   several shifted rulers       = tile coding  (multiple offset tilings)
+  >>   cuts stacked one ahead       = the tiling offsets
   >>   the switches that light up   = the active tiles / the binary feature vector x(s)
   >>   k-hot (several switches on)   = a sparse binary feature (one 1 per tiling)
   >>   worth = sum of active weights = v-hat(s, w) = w . x(s)  (still a LINEAR value function)
   >>   share = count of common tiles = generalization (smooth, distance-weighted)
+  >>   squeeze into [0,1] first      = feature scaling / normalisation
   >>   size = alpha / tilings        = the step size, divided so the active tiles sum to one step
   >>   how wrong                     = the TD error  (delta)
-  >>   weights += size x delta x x(s) = the semi-gradient TD(0) update (same as Part 1, k-hot)
+  >>   weights += size x delta x x(s) = the semi-gradient TD(0) update (k-hot steered)
   >>   the hashed slot bank          = the index hash table (IHT) / hashing trick
-  >>   one tile per move             = a separate weight block per action (Part 3: control)
-  >>   the car in the valley         = Mountain Car (position in [-1.2, 0.6], velocity in [-0.07, 0.07])
+  >>   one tile per move             = a separate weight block per action (next post: control)
+  >>   the car in the valley         = Mountain Car (track [-1.2, 0.6], goal 0.5, start ~ -0.5,
+  >>                                    velocity in [-0.07, 0.07])
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 14 -- Function Approximation):
