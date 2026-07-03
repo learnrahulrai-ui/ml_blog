@@ -10,7 +10,7 @@
   Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, dyna-q, planning, model-based, by-hand
   ============================================================================================
 
-  PATH . post 39/40 . part 3 of 4 in Chapter 13 -- Sample-based Learning
+  PATH . post 39/58 . part 3 of 4 in Chapter 13 -- Sample-based Learning
     <- prev:  [Chapter 13, Part 2: Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt)
        next:  [Chapter 13, Part 4: Dyna-Q+ by Pencil](dyna-q-plus-by-pencil.txt) ->
 
@@ -143,8 +143,9 @@
 
   One rehearsal, one already-lit landing. The papers read:
 
-      model = { 2: { up -> (0, 3) } }             q[0] = [ 0.5 , 0 , 0 , 0 ]
-      size = 0.1, dilute = 1.0                    every other q cell = 0
+      model = { 2: { up -> (0, 3) } }
+      q[0] = [ 0.5 , 0 , 0 , 0 ]    <- a real move earlier paid 5: 0 + 0.1 x 5 = 0.5
+      size = 0.1, dilute = 1.0       every other q cell = 0
 
   Rehearse the one remembered move (2, up): what is the target, and what does q[2][up]
   (currently 0) become?
