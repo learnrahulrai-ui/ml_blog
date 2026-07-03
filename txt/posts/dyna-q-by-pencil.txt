@@ -280,6 +280,54 @@
   loses to 0 -- the bounce digs its own grave and the walk moves on. Bad loops punish
   themselves in the table; you do not have to break them by hand.
 
+  SEAM. Pencil ends here; below, the same numbers in Python.
+
+  No loops, no functions -- one recording, one rehearsal on a lit landing, the two-
+  step backward spread, the YOUR TURN extension, and the convergence trace.
+
+      size, dilute = 0.1, 1.0
+
+      # RECORDING: spot=7 move='right' landing=8 reward=-1, then a second line
+      model = {}
+      if 7 not in model: model[7] = {}            # page missing -> start blank page
+      model[7]['right'] = (8, -1)
+      if 7 not in model: model[7] = {}            # page exists -> guard skips blank start
+      model[7]['up']    = (7, -1)                 # wall: stayed at 7
+      # model = {7: {'right':(8,-1), 'up':(7,-1)}}
+
+      # REHEARSAL: model={2:{'up':(0,3)}}, q[0]=[0.5,0,0,0], size=0.1, dilute=1.0
+      model2 = {2: {'up': (0, 3)}}
+      q  = {0: [0.5,0,0,0], 2: [0,0,0,0]}
+      landing, reward = model2[2]['up']            # landing=0, reward=3
+      peek   = max(q[landing])                     # max([0.5,0,0,0]) = 0.5
+      target = reward + dilute * peek              # 3 + 1.0*0.5 = 3.5
+      q[2][0] = q[2][0] + size*(target - q[2][0]) # 0 + 0.1*(3.5-0) = 0.35
+      print(q[2][0])              # 0.35
+
+      # BACKWARD SPREAD: size=1, dilute=1; goal reached from spot 1 right
+      size2 = 1.0
+      q2 = {0:[0,0,0,0], 1:[0,0,0,0], 9:[0,0,0,0]}   # right = index 3
+      # rehearse (1, right): landing=-1 ended -> target = reward alone
+      q2[1][3] = q2[1][3] + size2*(1 - q2[1][3])      # 0 + 1*(1-0) = 1
+      # rehearse (0, right): landing=1 ordinary
+      peek2    = max(q2[1])                             # max([0,0,0,1]) = 1
+      target2  = 0 + dilute * peek2                     # 1
+      q2[0][3] = q2[0][3] + size2*(target2 - q2[0][3]) # 0 + 1*(1-0) = 1
+      print(q2[1][3], q2[0][3])  # 1.0  1.0
+
+      # YOUR TURN: spot 9 right lands on 0, reward 0
+      peek3    = max(q2[0])                             # max([0,0,0,1]) = 1
+      target3  = 0 + dilute * peek3                     # 1
+      q2[9][3] = 0 + size2*(target3 - 0)               # 1
+      print(q2[9][3])             # 1.0
+
+      # WHY REHEARSAL = REAL STEP: same target, same convergence
+      size3, qc = 0.5, 0.0
+      qc = qc + size3*(1.0 - qc)  # real step:    0 + 0.5*(1-0)     = 0.5
+      qc = qc + size3*(1.0 - qc)  # rehearsal 1:  0.5 + 0.5*(1-0.5) = 0.75
+      qc = qc + size3*(1.0 - qc)  # rehearsal 2:  0.75+0.5*(1-0.75) = 0.875
+      print(qc)                   # 0.875
+
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):
     [Part 1 -- TD(0) Built by Pencil](td-zero-by-pencil.txt) .

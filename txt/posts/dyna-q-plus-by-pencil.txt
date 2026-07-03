@@ -160,7 +160,7 @@
   bandit post on this blog meets the same square root under the name UCB; nothing from
   there is needed here.)
 
-  THE DAY THE WALL FALLS: WHAT EACH MACHINE ACTUALLY DOES
+  DAY THE WALL FALLS: WHAT EACH MACHINE ACTUALLY DOES
 
   Here is the experiment that shows the whole point, drawn. A grid world, start S,
   goal G, a wall (#) with one gap at its far LEFT. Each move pays 0 except reaching G,
@@ -205,7 +205,7 @@
   re-checking paths that are exactly as dead as remembered, and its curve sits a hair
   below Dyna-Q's. The bonus buys insurance, and insurance costs a premium.
 
-  THE BONUS LIVES IN IMAGINATION ONLY, AND THREE MORE BURNS THAT TAUGHT ME
+  BONUS LIVES IN IMAGINATION ONLY, AND THREE MORE BURNS THAT TAUGHT ME
 
   "A bonus is a bonus" -- so I added it to real moves too. The damage showed up as
   one number: a real move paying 1 with tau = 9 got taught as 1.003, and the crawl's
@@ -233,7 +233,7 @@
   one plus three back-to-here-reward-0 placeholders -- so curiosity has a line to
   grab.
 
-  THE WHOLE CHAPTER, ONE LINE EACH
+  CHAPTER MAP, ONE LINE EACH
 
   Four posts, one thread -- learn a worth from a sample, then squeeze more from
   memory:
@@ -246,6 +246,47 @@
 
   And the deeper split: a model-based machine (Dyna) learns faster per real footstep
   than a model-free one (Q-learning alone) -- but only as far as its notebook is true.
+
+  SEAM. Pencil ends here; below, the same numbers in Python.
+
+  No loops, no functions -- one clock update, the bonus at two staleness levels,
+  the YOUR TURN rehearsal, and the sqrt vs log vs tau table. Per rehearsal:
+  1 sqrt, 1 multiply (bonus), 1 add, 1 max, 1 add (target), 4 strokes.
+
+      import math
+      kappa, size, dilute = 0.001, 0.1, 1.0
+
+      # CLOCK UPDATE: tick all +1, reset walked move
+      tau   = {(7,'right'): 5, (7,'up'): 40, (3,'down'): 12}
+      for k in tau: tau[k] += 1                 # every clock up 1
+      tau[(7,'right')] = 0                      # walked -> reset to 0
+      # tau = {(7,'right'):0, (7,'up'):41, (3,'down'):13}
+
+      # YOUR TURN clock: start {(5,'left'):24, (5,'right'):3, (8,'up'):99}
+      tau2 = {(5,'left'):24, (5,'right'):3, (8,'up'):99}
+      for k in tau2: tau2[k] += 1
+      tau2[(5,'right')] = 0
+      print(tau2)   # {(5,'left'):25, (5,'right'):0, (8,'up'):100}
+
+      # BONUS at tau=9 and tau=100 (kappa=0.001)
+      bonus9   = kappa * math.sqrt(9)            # 0.001*3   = 0.003
+      bonus100 = kappa * math.sqrt(100)          # 0.001*10  = 0.01
+      print(bonus9, bonus100)   # 0.003  0.01
+
+      # YOUR TURN rehearsal: tau=100, reward=-1, landing best=2, old cell=0
+      target = (-1 + bonus100) + dilute * 2      # -0.99 + 2 = 1.01
+      cell   = 0 + size * (target - 0)           # 0.1 * 1.01 = 0.101
+      print(target, cell)       # 1.01  0.101
+
+      # SQRT vs LOG vs TAU table (kappa=0.001, natural log)
+      for tv in [1, 4, 25, 100, 2500]:
+          lv = math.log(tv) if tv > 1 else 0.0
+          print(tv, tv*kappa, math.sqrt(tv)*kappa, round(lv*kappa,4))
+      # 1     0.001  0.001  0.0
+      # 4     0.004  0.002  0.0014
+      # 25    0.025  0.005  0.0032
+      # 100   0.1    0.01   0.0046
+      # 2500  2.5    0.05   0.0078
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):

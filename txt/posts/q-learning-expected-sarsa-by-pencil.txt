@@ -81,7 +81,7 @@
   rolled FIRST, blind; only the greedy branch reads the row. "Biggest in the row" hands
   back the INDEX of the largest worth (ties broken by a fair pick among the tied).
 
-  THE NUDGE: FIX THE MOVE YOU JUST MADE
+  NUDGE: FIX THE MOVE YOU JUST MADE
 
   You stood at a spot (call it `prev`), picked a move (call it `move`), got paid a
   reward, and landed on a new spot (call it `landing`). Drawn:
@@ -105,7 +105,7 @@
   machine. The whole remaining question is the last piece -- the "future worth read at
   the landing" -- and it is the ONE place the two machines in the title split.
 
-  THE FORK: A DREAMED MAX, OR AN HONEST AVERAGE
+  FORK: A DREAMED MAX, OR AN HONEST AVERAGE
 
   The landing has a whole row of four move-worths. What single number stands for "the
   future from here"? Two answers, and that is the entire difference between the two
@@ -352,6 +352,55 @@
   switches the target from reward + dilute x future to reward alone. The ending is
   the world's news, not your deduction; your only job on hearing it is to drop the
   future piece.
+
+  SEAM. Pencil ends here; below, the same numbers in Python.
+
+  No loops, no functions -- Q-learning (3 moves) then Expected Sarsa (2 moves),
+  every number hard-coded. Per move: 1 max or weighted-sum, 1 add, 1 subtract,
+  1 multiply = 4 strokes.
+
+      size, dilute, eps = 0.1, 1.0, 0.1
+      q = [[0,0,0,0],[0,0,0,0],[0,0,0,0]]   # q[spot][move], 3 spots x 4 moves, start 0
+
+      # Q-LEARNING move 1: prev=0 move=1 reward=2 land=1
+      future  = max(q[1])                           # max([0,0,0,0]) = 0
+      target  = 2 + dilute * future                 # 2 + 1.0*0 = 2
+      q[0][1] = q[0][1] + size*(target - q[0][1])  # 0 + 0.1*(2-0) = 0.2
+
+      # move 2: prev=1 move=3 reward=0 land=0
+      future  = max(q[0])                           # max([0,0.2,0,0]) = 0.2
+      target  = 0 + dilute * future                 # 0 + 1.0*0.2 = 0.2
+      q[1][3] = q[1][3] + size*(target - q[1][3])  # 0 + 0.1*(0.2-0) = 0.02
+
+      # move 3 (YOUR TURN): prev=0 move=1 reward=2 land=1
+      future  = max(q[1])                           # max([0,0,0,0.02]) = 0.02
+      target  = 2 + dilute * future                 # 2 + 1.0*0.02 = 2.02
+      q[0][1] = q[0][1] + size*(target - q[0][1])  # 0.2 + 0.1*(2.02-0.2) = 0.382
+
+      print(q[0][1], q[1][3])    # 0.382  0.02
+
+      # EXPECTED SARSA: greedy weight 0.925, each other move 0.025
+      w_g, w_o = 1 - eps + eps/4, eps/4             # 0.925, 0.025
+      q2 = [[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+
+      # move 1: row all-zero, avg = 0 whatever the weights
+      q2[0][1] = 0 + size*(2 - 0)                   # 0.2  (same as Q-learning)
+
+      # move 2: land=0, row [0,0.2,0,0], greedy=move1
+      avg      = w_g*q2[0][1] + w_o*q2[0][0] + w_o*q2[0][2] + w_o*q2[0][3]
+      #        = 0.925*0.2 + 3*0.025*0 = 0.185
+      q2[1][3] = 0 + size*(0 + dilute*avg - 0)      # 0.1*0.185 = 0.0185
+
+      print(q2[0][1], q2[1][3])  # 0.2  0.0185
+
+      # YOUR TURN check: row [1,3,1,1] greedy=move1 (worth 3), reward=0, old cell=0
+      avg3  = w_g*3 + w_o*1 + w_o*1 + w_o*1         # 0.925*3 + 0.075 = 2.85
+      cell3 = 0 + size*(0 + dilute*avg3 - 0)         # 0.1*2.85 = 0.285
+      print(cell3)                # 0.285
+
+      # off-policy check: row [8,4,0,0]
+      print(max([8,4,0,0]))       # Q-learning peek = 8
+      print(w_g*8 + w_o*4)       # E-Sarsa peek    = 7.5
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):
