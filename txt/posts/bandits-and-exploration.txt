@@ -1,4 +1,4 @@
-@title Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines :: Rahul's ML Blog
+﻿@title Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -346,6 +346,6 @@
   <- prev:  [Chapter 12 intro: Five Cats, One New Power Each](the-agent-ladder.txt)
   -> next:  [Chapter 12, Part 2: Worth and Bellman from Zero](worth-and-bellman-from-zero.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  (c) 2026 Rahul Rai
   [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

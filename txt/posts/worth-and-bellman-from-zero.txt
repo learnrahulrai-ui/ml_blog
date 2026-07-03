@@ -1,4 +1,4 @@
-@title Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches :: Rahul's ML Blog
+﻿@title Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -443,6 +443,6 @@
   <- prev:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt)
   -> next:  [Chapter 12, Part 3: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  (c) 2026 Rahul Rai
   [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

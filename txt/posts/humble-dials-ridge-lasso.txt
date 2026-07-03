@@ -1,4 +1,4 @@
-@title The Leash: Ridge, Lasso, and Humbling the Dials :: Rahul's ML Blog
+﻿@title The Leash: Ridge, Lasso, and Humbling the Dials :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -493,6 +493,6 @@
   Previous chapter: [Chapter 3 -- Sorting Into Bins](sorting-into-bins.txt)
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  (c) 2026 Rahul Rai
   [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

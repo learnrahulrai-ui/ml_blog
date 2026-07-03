@@ -1,4 +1,4 @@
-@title From Eight Dials to a Soft Landing: The Whole Agent by Pencil :: Rahul's ML Blog
+﻿@title From Eight Dials to a Soft Landing: The Whole Agent by Pencil :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -429,6 +429,6 @@
 
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
+  (c) 2026 Rahul Rai
   [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
