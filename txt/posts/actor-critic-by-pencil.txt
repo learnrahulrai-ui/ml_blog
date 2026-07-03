@@ -226,6 +226,70 @@
   R-bar crawls too (R-bar += size x how-wrong), so "better than expected" keeps
   meaning something as expectations rise.
 
+SEAM. Pencil ends here; below, the same numbers in Python.
+
+  import math
+  size = 0.1
+
+  # preferences at 0.3 (lit tiles A0, B1)
+  wL_A0, wL_B1 = -1.0, 0.0
+  wS_A0, wS_B1 =  0.0, 1.0
+  wR_A0, wR_B1 =  1.0, 1.0
+  h_left  = wL_A0 + wL_B1   # -1.0+0.0 = -1.0
+  h_stay  = wS_A0 + wS_B1   #  0.0+1.0 =  1.0
+  h_right = wR_A0 + wR_B1   #  1.0+1.0 =  2.0
+  print(h_left, h_stay, h_right)   # -1.0  1.0  2.0
+
+  # softmax: shift by max h=2.0
+  eL = math.exp(h_left  - 2.0)   # e^-3 = 0.0498
+  eS = math.exp(h_stay  - 2.0)   # e^-1 = 0.3679
+  eR = math.exp(h_right - 2.0)   # e^0  = 1.0
+  tot = eL + eS + eR              # 1.4177
+  pi_left  = eL / tot             # 0.0351
+  pi_stay  = eS / tot             # 0.2595
+  pi_right = eR / tot             # 0.7054
+  print(round(eL,4), round(eS,4), round(tot,4))                        # 0.0498  0.3679  1.4177
+  print(round(pi_left,4), round(pi_stay,4), round(pi_right,4))         # 0.0351  0.2595  0.7054
+
+  # YOUR TURN CHECK: h=[2,0,1] -> same gaps as [-3,-1,0] minus 2 everywhere
+  e0t = math.exp(2-2); e1t = math.exp(0-2); e2t = math.exp(1-2)  # 1  0.1353  0.3679
+  tot2 = e0t+e1t+e2t                                               # 1.5032
+  print(round(e0t/tot2,3), round(e1t/tot2,3), round(e2t/tot2,3))  # 0.665  0.090  0.245
+
+  # critic worths; differential TD error
+  V_03 = 0.2 + (-0.1)                            #  0.1
+  V_06 = 0.3 + (-0.1)                            #  0.2
+  how_wrong = 1 - 0.5 + V_06 - V_03             #  0.6
+  print(round(V_03,4), round(V_06,4), round(how_wrong,4))  # 0.1  0.2  0.6
+
+  # nudge critic and R-bar
+  R_bar_new = 0.5 + size*how_wrong               # 0.56
+  critic_A0 = 0.2 + size*how_wrong               # 0.26
+  critic_B1 = -0.1 + size*how_wrong              # -0.04
+  print(R_bar_new, critic_A0, round(critic_B1,4))  # 0.56  0.26  -0.04
+
+  # actor shoves (took RIGHT, how_wrong=0.6)
+  shove_right = size*how_wrong*(1 - pi_right)    # 0.06*0.2946 =  0.0177
+  shove_stay  = size*how_wrong*(0 - pi_stay)     # 0.06*(-0.2595) = -0.0156
+  shove_left  = size*how_wrong*(0 - pi_left)     # 0.06*(-0.0351) = -0.0021
+  print(round(shove_right,4), round(shove_stay,4), round(shove_left,4))  # 0.0177  -0.0156  -0.0021
+  print(round(shove_right+shove_stay+shove_left,8))   # 0.0  (always)
+
+  # new weights and preferences
+  wR_A0 += shove_right; wR_B1 += shove_right     # 1.0177
+  wS_A0 += shove_stay;  wS_B1 += shove_stay      # -0.0156  0.9844
+  wL_A0 += shove_left;  wL_B1 += shove_left      # -1.0021  -0.0021
+  h_right_new = round(wR_A0 + wR_B1, 4)          # 2.0354 ~ 2.035
+  h_stay_new  = round(wS_A0 + wS_B1, 4)          # 0.9688 ~ 0.969
+  h_left_new  = round(wL_A0 + wL_B1, 4)          # -1.0042 ~ -1.004
+  print(h_right_new, h_stay_new, h_left_new)      # 2.0354  0.9688  -1.0042
+
+  # YOUR TURN: bad step how_wrong=-0.5, same chances
+  sb_right = size*(-0.5)*(1-pi_right)   # -0.0147
+  sb_stay  = size*(-0.5)*(0-pi_stay)    # +0.0130
+  sb_left  = size*(-0.5)*(0-pi_left)    # +0.0018
+  print(round(sb_right,4), round(sb_stay,4), round(sb_left,4))  # -0.0147  0.013  0.0018
+
 ----------------------------------------------------------------------------------------------
   CHAPTER 16 -- Policy Gradient:
     [Propose and Grade: Actor-Critic by Pencil] (this post) -- the chapter closes here .
