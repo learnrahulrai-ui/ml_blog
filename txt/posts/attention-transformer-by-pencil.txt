@@ -544,6 +544,6 @@
   sigmoid, and the result is the tick.
 
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

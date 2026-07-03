@@ -383,6 +383,6 @@
   Next chapter: [Chapter 2 -- Grading a Guesser (MSE, R^2, reading the dials)](grading-the-guess-mse-r2.txt)
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

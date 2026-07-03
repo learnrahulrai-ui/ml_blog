@@ -1,4 +1,4 @@
-@title Rahul's ML Blog
+﻿@title Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
@@ -909,5 +909,5 @@
   the method: ban the jargon . draw it first . solve by pencil . then write the code
   built with: pandas, scikit-learn, NumPy, and a pencil . pure HTML+CSS, no JavaScript
   follow along: [subscribe via RSS](feed.xml) . dark mode follows your system setting
-  (c) 2026 Rahul Rai . no cookies, no trackers . [source on GitHub](https://github.com/learnrahulrai-ui)
+ . no cookies, no trackers . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

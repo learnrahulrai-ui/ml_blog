@@ -521,6 +521,6 @@
   Previous chapter: [Chapter 4 -- Humble Dials](humble-dials-ridge-lasso.txt)
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

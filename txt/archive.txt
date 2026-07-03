@@ -162,6 +162,6 @@
   special:  [Transformers With Pencil -- A Whole Block Worked by Hand](posts/transformerforhn.txt)
 
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

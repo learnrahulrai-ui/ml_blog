@@ -453,6 +453,6 @@
   <- prev:  [Chapter 12, Part 2: Worth and Bellman from Zero](worth-and-bellman-from-zero.txt)
   -> next:  [Chapter 12, Part 4: Finding the Best Plan](finding-the-best-plan-policy-iteration.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

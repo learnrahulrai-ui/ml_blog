@@ -1,4 +1,4 @@
-@title 404 -- Page Not Found :: Rahul's ML Blog
+﻿@title 404 -- Page Not Found :: Rahul's ML Blog
 @desc That page is not here. Head back to the front page and follow the next-arrows.
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
@@ -31,5 +31,5 @@
 
 
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai . no cookies, no trackers . [source on GitHub](https://github.com/learnrahulrai-ui)
+ . no cookies, no trackers . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

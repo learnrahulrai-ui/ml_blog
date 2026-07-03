@@ -525,6 +525,6 @@
   target of an unconditional crush.
 
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

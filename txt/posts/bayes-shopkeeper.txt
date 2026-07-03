@@ -647,6 +647,6 @@
   the machine stayed silent on has already walked home into the wild.
 
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

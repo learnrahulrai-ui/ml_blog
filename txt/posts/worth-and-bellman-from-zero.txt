@@ -443,6 +443,6 @@
   <- prev:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt)
   -> next:  [Chapter 12, Part 3: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

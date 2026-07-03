@@ -493,6 +493,6 @@
   Previous chapter: [Chapter 3 -- Sorting Into Bins](sorting-into-bins.txt)
   <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================

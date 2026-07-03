@@ -357,6 +357,6 @@
   <- prev:  (this is the door to Chapter 12)
   -> next:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt)
 ----------------------------------------------------------------------------------------------
-  (c) 2026 Rahul Rai
+
   [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
 ==============================================================================================
