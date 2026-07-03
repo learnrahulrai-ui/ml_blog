@@ -10,7 +10,7 @@
   Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, function-approximation, state-aggregation, semi-gradient-td, by-hand
   ============================================================================================
 
-  PATH . post 41/41 . part 1 of 4 in Chapter 14 -- Function Approximation
+  PATH . post 41/58 . part 1 of 4 in Chapter 14 -- Function Approximation
     <- prev:  [Chapter 13 Reference: The Sample-based Map](sample-based-reference.txt)
        next:  [Sharp From Blurry: Tile Coding by Pencil](tile-coding-by-pencil.txt) ->
 
