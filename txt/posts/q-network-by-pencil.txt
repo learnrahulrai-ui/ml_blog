@@ -256,6 +256,55 @@
   the same 25 numbers. There is no table. The dials ARE the knowledge, and a worth
   is a computation, not an address.
 
+SEAM. Pencil ends here; below, the same numbers in Python.
+
+  dilute = 0.9
+
+  # forward pass s=[1,2]
+  # sheet A (2x3), nudge b1
+  p1 = 1*1    + 2*0.5 + 0.5     # 1+1+0.5      =  2.5
+  p2 = 1*(-2) + 2*1   + (-0.5)  # -2+2-0.5     = -0.5
+  p3 = 1*0.5  + 2*(-1)+ 1.0    # 0.5-2+1.0    = -0.5
+  print(p1, p2, p3)              # 2.5  -0.5  -0.5
+
+  # ReLU: flatten negatives to zero
+  x1 = p1 if p1 > 0 else 0      # 2.5  (kept)
+  x2 = p2 if p2 > 0 else 0      # 0    (killed)
+  x3 = p3 if p3 > 0 else 0      # 0    (killed)
+  print(x1, x2, x3)              # 2.5  0  0
+
+  # sheet C (3x4), nudge b2 -- only first row of C survives (x2=x3=0)
+  Q0 = x1*2   + x2*1  + x3*(-1) + 0.5    # 5 + 0 + 0 + 0.5   =  5.5
+  Q1 = x1*(-1)+ x2*1  + x3*2   + 1.0    # -2.5+0+0+1.0      = -1.5
+  Q2 = x1*0   + x2*(-1)+x3*1   + 0.0    # 0+0+0+0           =  0.0
+  Q3 = x1*1   + x2*0  + x3*(-1)+ (-0.5) # 2.5+0+0-0.5       =  2.0
+  print(Q0, Q1, Q2, Q3)                   # 5.5  -1.5  0.0  2.0
+
+  # YOUR TURN CHECK s=[2,0]
+  p1b = 2*1    + 0*0.5 + 0.5     # 2+0+0.5      =  2.5
+  p2b = 2*(-2) + 0*1   + (-0.5)  # -4+0-0.5     = -4.5
+  p3b = 2*0.5  + 0*(-1)+ 1.0    # 1+0+1.0      =  2.0
+  x1b = p1b if p1b > 0 else 0   # 2.5
+  x2b = p2b if p2b > 0 else 0   # 0    (killed)
+  x3b = p3b if p3b > 0 else 0   # 2.0
+  Q0b = x1b*2   + x2b*1  + x3b*(-1)+ 0.5   # 5+0-2+0.5    = 3.5
+  Q1b = x1b*(-1)+ x2b*1  + x3b*2   + 1.0   # -2.5+0+4+1.0 = 2.5
+  Q2b = x1b*0   + x2b*(-1)+x3b*1   + 0.0   # 0+0+2+0      = 2.0
+  Q3b = x1b*1   + x2b*0  + x3b*(-1)+(-0.5) # 2.5+0-2-0.5  = 0.0
+  print(Q0b, Q1b, Q2b, Q3b)      # 3.5  2.5  2.0  0.0  -> engine 0 wins
+
+  # Expected Sarsa target: fired engine 0, reward=1, Q(s')=[3,5,1,2], chances=[0.1,0.6,0.1,0.2]
+  avg_next  = 0.1*3 + 0.6*5 + 0.1*1 + 0.2*2    # 0.3+3.0+0.1+0.4 = 3.8
+  y         = 1 + dilute * avg_next               # 1+0.9*3.8       = 4.42
+  how_wrong = y - Q0                              # 4.42-5.5        = -1.08
+  print(avg_next, y, how_wrong)                   # 3.8  4.42  -1.08
+
+  # YOUR TURN: engine 3, reward=-2, Q(s')=[2,1,0,1], uniform chances
+  avg2 = 0.25*2 + 0.25*1 + 0.25*0 + 0.25*1   # 0.25*4 = 1.0
+  y2   = -2 + dilute * avg2                    # -2+0.9*1 = -1.1
+  hw2  = y2 - Q3                               # -1.1-2.0 = -3.1
+  print(avg2, y2, hw2)                         # 1.0  -1.1  -3.1
+
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 14 -- Function Approximation):
     Part 1 -- [State Aggregation by Pencil](state-aggregation-by-pencil.txt) .
