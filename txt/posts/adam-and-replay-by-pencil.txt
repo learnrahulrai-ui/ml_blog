@@ -242,6 +242,50 @@
   stores FACTS (s, a, r, ended?, s'). Opinions -- targets -- are rebuilt from the
   current net at every draw.
 
+SEAM. Pencil ends here; below, the same numbers in Python.
+
+  import math
+  alpha, beta1, beta2 = 0.1, 0.9, 0.999
+
+  # move 1: both dials get grade +0.2
+  m1 = 0.9*0   + 0.1*0.2         # 0.1*0.2    = 0.02
+  v1 = 0.999*0 + 0.001*0.2**2    # 0.001*0.04 = 0.00004
+  mh1 = m1 / (1 - 0.9**1)        # 0.02/0.1   = 0.2
+  vh1 = v1 / (1 - 0.999**1)      # 0.00004/0.001 = 0.04
+  step1 = alpha * mh1 / math.sqrt(vh1)   # 0.1*0.2/0.2 = 0.1
+  print(round(mh1,4), round(vh1,4), round(step1,4))   # 0.2  0.04  0.1
+
+  # move 2: STEADY dial gets +0.2 again
+  m2s = 0.9*m1 + 0.1*0.2         # 0.018+0.02 = 0.038
+  v2s = 0.999*v1 + 0.001*0.04    # ~0.00007996
+  mh2s = m2s / (1 - 0.9**2)      # 0.038/0.19 = 0.2
+  step2s = alpha * mh2s / math.sqrt(v2s/(1-0.999**2))  # 0.1*0.2/0.2 = 0.1
+  print(round(mh2s,4), round(step2s,4))                 # 0.2  0.1
+
+  # move 2: FLIP-FLOP dial gets -0.2
+  m2f = 0.9*m1 + 0.1*(-0.2)      # 0.018-0.02 = -0.002
+  mh2f = m2f / (1 - 0.9**2)      # -0.002/0.19 = -0.01053
+  step2f = alpha * mh2f / math.sqrt(v2s/(1-0.999**2))  # ~-0.005  (a twentieth of 0.1)
+  print(round(m2f,5), round(mh2f,5), round(step2f,4))  # -0.002  -0.01053  -0.0053
+
+  # move 3: STEADY dial (m2s=0.038, v2s carried forward)
+  m3s = 0.9*m2s + 0.1*0.2        # 0.0342+0.02 = 0.0542
+  v3s = 0.999*v2s + 0.001*0.04   # ~0.00011988
+  mh3s = m3s / (1 - 0.9**3)      # 0.0542/0.271 = 0.2
+  step3s = alpha * mh3s / math.sqrt(v3s/(1-0.999**3))  # 0.1*0.2/0.2 = 0.1
+  print(round(m3s,5), round(mh3s,4), round(step3s,4))  # 0.0542  0.2  0.1
+
+  # experience replay: note (s, move0, r=1, ended?=0, s'), dilute=0.9
+  # draw 1: Q(s')=[3,5,1,2], chances=[0.1,0.6,0.1,0.2]
+  avg1 = 0.1*3 + 0.6*5 + 0.1*1 + 0.2*2    # 0.3+3.0+0.1+0.4 = 3.8
+  y1   = 1 + 0.9*avg1                      # 1+3.42 = 4.42
+  print(avg1, y1)                           # 3.8  4.42
+
+  # draw 2: net moved; Q(s') now [3,4,1,2]
+  avg2 = 0.1*3 + 0.6*4 + 0.1*1 + 0.2*2    # 0.3+2.4+0.1+0.4 = 3.2
+  y2   = 1 + 0.9*avg2                      # 1+2.88 = 3.88
+  print(avg2, round(y2,4))                  # 3.2  3.88
+
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
     Part 1 -- [Backpropagation by Pencil](backprop-by-pencil.txt) .
