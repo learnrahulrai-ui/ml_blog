@@ -10,7 +10,7 @@
   Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, backpropagation, neural-network, by-hand
   ============================================================================================
 
-  PATH . post 45/45 . part 1 of 5 in Chapter 15 -- Training the Q-Network
+  PATH . post 45/58 . part 1 of 5 in Chapter 15 -- Training the Q-Network
     <- prev:  [Two Stages and a Bend: A Q-Network by Pencil](q-network-by-pencil.txt)
        next:  [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt) ->
 
@@ -24,7 +24,7 @@
   walks that one number backward to every dial, by pencil -- which is the whole of
   what backpropagation is.
 
-  THE MACHINE AND THE MISS, REBUILT FROM SCRATCH
+  MACHINE AND MISS, REBUILT FROM SCRATCH
 
   Nothing here leans on memory. The toy network turns a 2-number state into 4
   engine-worths (engines numbered 0 to 3), through one middle row of 3 numbers, with
@@ -274,7 +274,7 @@
   path it came forward, and nowhere else. Credit, and blame, went only where they
   were earned.
 
-  THE WORD "DERIVATIVE" SCARED ME LONGER THAN THE ARITHMETIC DID
+  DERIVATIVE MEANS RISE PER UNIT WIGGLE -- AND FOUR MORE BLOCKS THAT CLEARED
 
   "Partial derivatives... so this needs real calculus, which I don't have." The WORD
   stopped me a full evening before the thing did. Then one division dissolved it:
