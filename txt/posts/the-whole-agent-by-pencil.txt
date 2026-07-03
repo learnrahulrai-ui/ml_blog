@@ -10,7 +10,7 @@
   Posted: 2026-07-02 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, expected-sarsa, neural-network, adam, experience-replay, by-hand
   ============================================================================================
 
-  PATH . post 49/52 . part 5 of 5 in Chapter 15 -- Training the Q-Network
+  PATH . post 49/58 . part 5 of 5 in Chapter 15 -- Training the Q-Network
     <- prev:  [Chapter 15, Part 4: The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt)
        next:  [Chapter 16: Propose and Grade: Actor-Critic by Pencil](actor-critic-by-pencil.txt) ->
 

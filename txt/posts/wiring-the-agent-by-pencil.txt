@@ -10,7 +10,7 @@
   Posted: 2026-07-01 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, agent, experience-replay, terminal, by-hand
   ============================================================================================
 
-  PATH . post 48/51 . part 4 of 5 in Chapter 15 -- Training the Q-Network
+  PATH . post 48/58 . part 4 of 5 in Chapter 15 -- Training the Q-Network
     <- prev:  [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt)
        next:  [Chapter 15, Part 5: From Eight Dials to a Soft Landing: The Whole Agent by Pencil](the-whole-agent-by-pencil.txt) ->
 
