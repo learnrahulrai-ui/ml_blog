@@ -10,7 +10,7 @@
   Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, function-approximation, tile-coding, coarse-coding, by-hand
   ============================================================================================
 
-  PATH . post 42/42 . part 2 of 4 in Chapter 14 -- Function Approximation
+  PATH . post 42/58 . part 2 of 4 in Chapter 14 -- Function Approximation
     <- prev:  [Too Many Spots for a Table: State Aggregation by Pencil](state-aggregation-by-pencil.txt)
        next:  [Letting the Car Choose: Sarsa Control by Pencil](sarsa-control-by-pencil.txt) ->
 
@@ -228,7 +228,7 @@
              (note wA1 sits in BOTH points here -- it still moves once, as a
              left-point tile; the k-hot of the left point is what steers)
 
-  THE REAL MOUNTAIN CAR -- TWO DIALS, SQUARE TILES, EIGHT RULERS
+  REAL MOUNTAIN CAR -- TWO DIALS, SQUARE TILES, EIGHT RULERS
 
   Stretch the one-line trick to the car's two dials and nothing new happens -- a tile
   is just a little SQUARE now (a position band crossed with a velocity band) instead
