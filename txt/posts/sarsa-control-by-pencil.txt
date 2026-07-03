@@ -257,6 +257,59 @@
   makes the whole drive teach a single pair. Nudge first, THEN slide: the new tiles
   and the new push become the notes before the world is answered.
 
+SEAM. Pencil ends here; below, the same numbers in Python.
+
+  dilute, alpha, T = 0.9, 0.2, 2
+  size = alpha / T    # 0.2/2 = 0.1
+
+  # weights[move][tile]: move 0=left 1=coast 2=right; tile A0=0 A1=1 B0=2 B1=3 B2=4
+  w = [
+      [-2.0, -3.0, 0.0, -2.5, 0.0],   # left
+      [-1.0, -2.0, 0.0, -1.5, 0.0],   # coast
+      [-0.5, -1.0, 0.0, -0.8, 0.0],   # right
+  ]
+  # ruler A: A0=[0,0.5) -> idx 0,  A1=[0.5,1.0) -> idx 1
+  # ruler B: B0=[-0.25,0.25) -> idx 2,  B1=[0.25,0.75) -> idx 3,  B2=[0.75,1.25) -> idx 4
+  def tA(pos):
+      return 0 if pos < 0.5 else 1
+  def tB(pos):
+      return 2 if pos < 0.25 else (3 if pos < 0.75 else 4)
+  def worth(pos, move):
+      return w[move][tA(pos)] + w[move][tB(pos)]
+
+  # initial worths at 0.3 (tiles A0, B1)
+  print(worth(0.3, 0), worth(0.3, 1), worth(0.3, 2))   # -4.5  -2.5  -1.3
+
+  # worths at 0.9 (tiles A1, B2) -- YOUR TURN check
+  print(worth(0.9, 0), worth(0.9, 1), worth(0.9, 2))   # -3.0  -2.0  -1.0
+
+  # worths at 0.6 (tiles A1, B1) -- used in Sarsa target
+  print(worth(0.6, 0), worth(0.6, 1), worth(0.6, 2))   # -5.5  -3.5  -1.8
+
+  # Sarsa step 1: leave (0.3, right), reward=-1, land 0.6, next=right
+  w_left    = worth(0.3, 2)           # -0.5+(-0.8)      = -1.3
+  w_next    = worth(0.6, 2)           # -1.0+(-0.8)      = -1.8
+  target    = -1 + dilute * w_next    # -1 + 0.9*(-1.8)  = -2.62
+  how_wrong = target - w_left         # -2.62-(-1.3)      = -1.32
+  w[2][tA(0.3)] += size * how_wrong  # w[right][A0]: -0.5+0.1*(-1.32) = -0.632
+  w[2][tB(0.3)] += size * how_wrong  # w[right][B1]: -0.8+0.1*(-1.32) = -0.932
+  print(target, how_wrong)            # -2.62  -1.32
+  print(w[2][0], w[2][3])            # -0.632  -0.932
+
+  # fallout: neighbour 0.4 (A0+B1 both moved), 0.1 (A0 only)
+  print(worth(0.4, 2))   # -0.632+(-0.932) = -1.564
+  print(worth(0.1, 2))   # -0.632+0.0      = -0.632
+
+  # YOUR TURN step: leave (0.6, right), reward=-1, land 0.9, next=right
+  w_left2    = worth(0.6, 2)           # -1.0+(-0.932)    = -1.932  (B1 moved above)
+  w_next2    = worth(0.9, 2)           # -1.0+0.0         = -1.0
+  target2    = -1 + dilute * w_next2   # -1+0.9*(-1.0)    = -1.9
+  how_wrong2 = target2 - w_left2       # -1.9-(-1.932)    = +0.032
+  w[2][tA(0.6)] += size * how_wrong2  # w[right][A1]: -1.0+0.1*(0.032)  = -0.9968
+  w[2][tB(0.6)] += size * how_wrong2  # w[right][B1]: -0.932+0.1*(0.032) = -0.9288
+  print(target2, round(how_wrong2, 6))          # -1.9   0.032
+  print(round(w[2][1], 4), round(w[2][3], 4))  # -0.9968  -0.9288
+
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 14 -- Function Approximation):
     Part 1 -- [State Aggregation by Pencil](state-aggregation-by-pencil.txt) .
