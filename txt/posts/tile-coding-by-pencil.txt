@@ -286,6 +286,49 @@
   = 0.2 / 2 = 0.1 per tile, so the team of live tiles together moves the worth by
   the one step you meant.
 
+  SEAM. Pencil ends here; below, the same numbers in Python.
+
+  No loops, no functions -- tile reads for five positions, one TD step with fallout,
+  the YOUR TURN step, and the raw-to-scaled example. One epsilon note: (-0.3-(-1.2))
+  /1.8 gives 0.4999... in float; +1e-10 before the floor guards the tile index.
+
+      dilute, alpha, T = 0.9, 0.2, 2
+      size = alpha / T                          # 0.1 per tile
+      w = [1.0, -0.5, 0.0, 0.5, 0.0]          # [wA0, wA1, wB0, wB1, wB2]
+
+      # TILE READING: ruler A walls 0/0.5/1.0; ruler B walls -0.25/0.25/0.75
+      def tA(p): return 0 if p < 0.5 else 1
+      def tB(p): return 2 if p < 0.25 else (3 if p < 0.75 else 4)
+      def wval(p): return w[tA(p)] + w[tB(p)]
+
+      # YOUR TURN checks: 0.8 -> {A1,B2}  0.2 -> {A0,B0}
+      print(tA(0.8), tB(0.8))  # 1 4   feature [0,1,0,0,1]
+      print(tA(0.2), tB(0.2))  # 0 2   feature [1,0,1,0,0]
+
+      # WORTH: worth(0.3) = wA0 + wB1 = 1.0 + 0.5
+      print(wval(0.3))          # 1.5
+
+      # TD STEP: leave 0.3 (A0,B1), reward=2, land 0.6 (A1,B1)
+      how_wrong = 2 + dilute*wval(0.6) - wval(0.3)  # 2+0.9*0.0-1.5 = 0.5
+      w[tA(0.3)] += size * how_wrong                 # wA0: 1.0+0.05 = 1.05
+      w[tB(0.3)] += size * how_wrong                 # wB1: 0.5+0.05 = 0.55
+      print(how_wrong, w[0], w[3])  # 0.5  1.05  0.55
+
+      # FALLOUT: neighbours share in proportion to tiles in common
+      print(wval(0.4), wval(0.6), wval(0.9))  # 1.60  0.05  -0.5
+
+      # YOUR TURN: leave 0.6 (A1,B1), reward=0, land 0.9 (A1,B2)
+      how_wrong2 = 0 + dilute*wval(0.9) - wval(0.6)  # 0+0.9*(-0.5)-0.05 = -0.5
+      w[tA(0.6)] += size * how_wrong2                  # wA1: -0.5-0.05 = -0.55
+      w[tB(0.6)] += size * how_wrong2                  # wB1: 0.55-0.05 = 0.50
+      print(how_wrong2, w[1], w[3])   # -0.5  -0.55  0.50
+
+      # RAW SCALING: position -0.3, track [-1.2, 0.6], 4 tiles
+      low, stretch = -1.2, 1.8
+      fraction  = (-0.3 - low) / stretch              # 0.9/1.8 -> 0.4999... in float
+      tile_idx  = int(fraction * 4 + 1e-10)           # +eps guards floor: 2
+      print("scaled tile:", tile_idx)                 # 2
+
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 14 -- Function Approximation):
     Part 1 -- [State Aggregation by Pencil](state-aggregation-by-pencil.txt) .
