@@ -1,4 +1,4 @@
-﻿@title The Two-Memory Worker: How an LSTM Remembers Far-Back Words (RNNs by Hand, Part 2) :: Rahul's ML Blog
+@title The Two-Memory Worker: How an LSTM Remembers Far-Back Words (RNNs by Hand, Part 2) :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

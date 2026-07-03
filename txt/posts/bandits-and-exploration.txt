@@ -1,4 +1,4 @@
-﻿@title Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines :: Rahul's ML Blog
+@title Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

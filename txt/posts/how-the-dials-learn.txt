@@ -1,4 +1,4 @@
-﻿@title Rolling Downhill by Hand: How a Neural Network Learns (Backpropagation from Scratch) :: Rahul's ML Blog
+@title Rolling Downhill by Hand: How a Neural Network Learns (Backpropagation from Scratch) :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

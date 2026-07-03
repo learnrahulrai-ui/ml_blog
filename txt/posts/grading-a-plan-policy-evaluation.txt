@@ -1,4 +1,4 @@
-﻿@title Grading a Plan by Pencil: A Table of Lies That Heals Into the Truth :: Rahul's ML Blog
+@title Grading a Plan by Pencil: A Table of Lies That Heals Into the Truth :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

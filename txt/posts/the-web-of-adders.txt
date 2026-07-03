@@ -1,4 +1,4 @@
-﻿@title Stacked Rooms and One Walk by Hand: How a Neural Network Computes a Guess :: Rahul's ML Blog
+@title Stacked Rooms and One Walk by Hand: How a Neural Network Computes a Guess :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

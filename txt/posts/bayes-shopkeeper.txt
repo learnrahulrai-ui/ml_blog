@@ -1,4 +1,4 @@
-﻿@title Bayes by Head-Count: The Shopkeeper's Faulty Machine and the Sick Who Walked Away :: Rahul's ML Blog
+@title Bayes by Head-Count: The Shopkeeper's Faulty Machine and the Sick Who Walked Away :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

@@ -1,4 +1,4 @@
-﻿@title A Magic Paper Slid Over a Photo: How a Picture Network Sees (CNNs by Hand) :: Rahul's ML Blog
+@title A Magic Paper Slid Over a Photo: How a Picture Network Sees (CNNs by Hand) :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

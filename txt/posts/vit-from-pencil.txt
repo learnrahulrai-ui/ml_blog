@@ -1,4 +1,4 @@
-﻿@title Vision Transformer From Pencil: Strips, Seat-Stamps, and Masks by Hand :: Rahul's ML Blog
+@title Vision Transformer From Pencil: Strips, Seat-Stamps, and Masks by Hand :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

@@ -1,4 +1,4 @@
-﻿@title Leash and Cloud: L2 Punishment and the Two-Cloud Wall :: Rahul's ML Blog
+@title Leash and Cloud: L2 Punishment and the Two-Cloud Wall :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

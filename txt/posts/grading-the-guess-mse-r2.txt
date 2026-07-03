@@ -1,4 +1,4 @@
-﻿@title Two Rulers for One Guess: MSE and R^2 :: Rahul's ML Blog
+@title Two Rulers for One Guess: MSE and R^2 :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

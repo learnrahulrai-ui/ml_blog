@@ -1,4 +1,4 @@
-﻿@title One Question, Two Right Answers: Where Copying Breaks :: Rahul's ML Blog
+@title One Question, Two Right Answers: Where Copying Breaks :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

@@ -1,4 +1,4 @@
-﻿@title The Mark That Tells a Transformer Where It Is: Positional Encoding Built From Scratch :: Rahul's ML Blog
+@title The Mark That Tells a Transformer Where It Is: Positional Encoding Built From Scratch :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

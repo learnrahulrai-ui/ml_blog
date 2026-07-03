@@ -1,4 +1,4 @@
-﻿@title Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches :: Rahul's ML Blog
+@title Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

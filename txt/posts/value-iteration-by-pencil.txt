@@ -1,4 +1,4 @@
-﻿@title No Map in the Arguments: Value Iteration Built by Pencil :: Rahul's ML Blog
+@title No Map in the Arguments: Value Iteration Built by Pencil :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

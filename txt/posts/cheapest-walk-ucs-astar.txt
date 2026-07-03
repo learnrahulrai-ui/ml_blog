@@ -1,4 +1,4 @@
-﻿@title Cheapest Walk: UCS and A*, Built From Nothing, Every Pop Shown :: Rahul's ML Blog
+@title Cheapest Walk: UCS and A*, Built From Nothing, Every Pop Shown :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

@@ -1,4 +1,4 @@
-﻿@title The Vision Transformer: A Photo Cut Into Strips That Look at Each Other (Chapter 11, Part 1) :: Rahul's ML Blog
+@title The Vision Transformer: A Photo Cut Into Strips That Look at Each Other (Chapter 11, Part 1) :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

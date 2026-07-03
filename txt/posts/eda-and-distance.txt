@@ -1,4 +1,4 @@
-﻿@title Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem :: Rahul's ML Blog
+@title Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

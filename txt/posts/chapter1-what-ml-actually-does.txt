@@ -1,4 +1,4 @@
-﻿@title Guessing House Prices, End to End :: Rahul's ML Blog
+@title Guessing House Prices, End to End :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

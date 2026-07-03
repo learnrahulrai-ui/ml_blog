@@ -1,4 +1,4 @@
-﻿@title Transformer From Pencil: Attention From Scratch, One Number at a Time :: Rahul's ML Blog
+@title Transformer From Pencil: Attention From Scratch, One Number at a Time :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

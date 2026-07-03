@@ -1,4 +1,4 @@
-﻿@title The Diary and the Eight Envelopes: Learning by Copying :: Rahul's ML Blog
+@title The Diary and the Eight Envelopes: Learning by Copying :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

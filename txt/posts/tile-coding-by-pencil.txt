@@ -1,4 +1,4 @@
-﻿@title Sharp From Blurry: Tile Coding by Pencil :: Rahul's ML Blog
+@title Sharp From Blurry: Tile Coding by Pencil :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

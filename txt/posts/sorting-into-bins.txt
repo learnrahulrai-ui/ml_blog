@@ -1,4 +1,4 @@
-﻿@title Sorting Into Bins: The S-Curve, the Four-Box Table, and Why Accuracy Lies :: Rahul's ML Blog
+@title Sorting Into Bins: The S-Curve, the Four-Box Table, and Why Accuracy Lies :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

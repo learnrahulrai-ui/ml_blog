@@ -1,4 +1,4 @@
-﻿@title Grouping by Nearest Centre: K-Means From a Blank Sheet :: Rahul's ML Blog
+@title Grouping by Nearest Centre: K-Means From a Blank Sheet :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================

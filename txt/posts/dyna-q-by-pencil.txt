@@ -1,4 +1,4 @@
-﻿@title A Notebook and a Rehearsal: Dyna-Q by Pencil :: Rahul's ML Blog
+@title A Notebook and a Rehearsal: Dyna-Q by Pencil :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
