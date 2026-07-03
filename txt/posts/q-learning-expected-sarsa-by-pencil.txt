@@ -10,7 +10,7 @@
   Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, q-learning, expected-sarsa, control, by-hand
   ============================================================================================
 
-  PATH . post 38/40 . part 2 of 4 in Chapter 13 -- Sample-based Learning
+  PATH . post 38/58 . part 2 of 4 in Chapter 13 -- Sample-based Learning
     <- prev:  [Chapter 13, Part 1: TD(0) Built by Pencil](td-zero-by-pencil.txt)
        next:  [Chapter 13, Part 3: Dyna-Q by Pencil](dyna-q-by-pencil.txt) ->
 
@@ -125,8 +125,13 @@
 
   Q-LEARNING BY HAND -- THE MAX
 
-  size (the crawl fraction) = 0.1, dilute (the future-shrinker) = 1.0, and the table
-  starts all 0:
+  size (the crawl fraction) = 0.1, dilute (the future-shrinker) = 1.0.
+
+  World contract for this trace:
+      from spot 0, move 1  ->  reward +2, land at spot 1
+      from spot 1, move 3  ->  reward  0, land at spot 0
+
+  Table starts all 0:
 
               move0  move1  move2  move3
       spot0  [   0  ,   0  ,   0  ,   0   ]
@@ -135,7 +140,7 @@
 
   Stand at spot 0, pick move 1. So prev = 0, move = 1.
 
-  FIRST MOVE -- reward 2, land at spot 1. The landing's row is q[1] = [0,0,0,0], so its
+  FIRST MOVE -- reward 2 (from the contract above), land at spot 1. The landing's row is q[1] = [0,0,0,0], so its
   biggest is 0:
 
       target = reward + dilute x max(q[1])
