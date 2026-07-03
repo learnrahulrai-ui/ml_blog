@@ -245,6 +245,53 @@
   the burst -- never a second label on the live sheets. (In the code below, that is
   deepcopy, and it is the whole reason the word appears.)
 
+SEAM. Pencil ends here; below, the same numbers in Python.
+
+  import math
+  dilute = 0.9
+
+  # frozen twin reads landings
+  # note 1 landing s1': worths [0,2,0,0]
+  e0, e2 = math.exp(0), math.exp(2)       # 1.0  7.389
+  tot1   = e0 + e2 + e0 + e0             # 10.389
+  c10, c11 = e0/tot1, e2/tot1            # 0.096  0.711
+  v1 = c10*0 + c11*2 + c10*0 + c10*0    # 0.711*2 = 1.422
+  print(round(c10,3), round(c11,3), round(v1,3))  # 0.096  0.711  1.422
+
+  # note 2 landing s2': worths [4,4,4,4] -> equal chances
+  v2 = 0.25*4 + 0.25*4 + 0.25*4 + 0.25*4   # 4.0
+  print(v2)                                   # 4.0
+
+  # zero the crashed note (ended?=[0,1])
+  v1_safe = v1 * (1 - 0)   # 1.422*1 = 1.422
+  v2_safe = v2 * (1 - 1)   # 4.0*0   = 0.0
+  print(round(v1_safe,3), v2_safe)            # 1.422  0.0
+
+  # targets
+  t1 = 2  + dilute * v1_safe    # 2+0.9*1.422   = 3.28
+  t2 = -1 + dilute * v2_safe    # -1+0.9*0      = -1.0
+  print(round(t1,3), t2)                      # 3.28  -1.0
+
+  # live network: pick taken-engine column
+  # note 1 took engine 1 -> col 1 of [1.0,2.5,0.5,1.5] = 2.5
+  # note 2 took engine 2 -> col 2 of [0.0,1.0,0.5,-0.5] = 0.5
+  how_wrong1 = t1 - 2.5    # 3.28-2.5 = 0.78
+  how_wrong2 = t2 - 0.5    # -1.0-0.5 = -1.5
+  print(round(how_wrong1,3), how_wrong2)      # 0.78  -1.5
+
+  # YOUR TURN: note 3 (engine 0, reward=0.5, ended?=0, landing [2,2,2,2])
+  v3    = 0.25*2 + 0.25*2 + 0.25*2 + 0.25*2   # 2.0
+  t3    = 0.5 + dilute * v3                     # 0.5+0.9*2 = 2.3
+  miss3 = t3 - 1.8                              # 2.3-1.8 = 0.5
+  print(v3, t3, round(miss3,4))                 # 2.0  2.3  0.5
+
+  # softmax stability: [1,1,3,1] gives same chances as [0,2,0,0]
+  e1, e3 = math.exp(1), math.exp(3)            # 2.718  20.086
+  tot3   = e1 + e1 + e3 + e1                   # 28.24
+  cs, cf = e1/tot3, e3/tot3                    # 0.096  0.711
+  worth3 = cs*1 + cs*1 + cf*3 + cs*1           # 0.288+2.133 = 2.42
+  print(round(cs,3), round(cf,3), round(worth3,2))  # 0.096  0.711  2.42
+
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
     Part 1 -- [Backpropagation by Pencil](backprop-by-pencil.txt) .
