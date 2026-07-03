@@ -10,7 +10,7 @@
   Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, function-approximation, neural-network, expected-sarsa, deep-rl, by-hand
   ============================================================================================
 
-  PATH . post 44/44 . part 4 of 4 in Chapter 14 -- Function Approximation
+  PATH . post 44/58 . part 4 of 4 in Chapter 14 -- Function Approximation
     <- prev:  [Letting the Car Choose: Sarsa Control by Pencil](sarsa-control-by-pencil.txt)
        next:  [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt) ->
 
@@ -80,7 +80,7 @@
   worth more than one, and what lets the worth turn corners instead of drawing one
   flat wall.
 
-  THE FORWARD PASS, EVERY NUMBER
+  FORWARD PASS, EVERY NUMBER
 
   Take the state s = [1, 2]. Sheet A, nudge b1:
 
