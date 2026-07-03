@@ -10,7 +10,7 @@
   Posted: 2026-07-02 . Author: Rahul Rai . Tags: reinforcement-learning, episodic, continuing, model-based, prediction, control, by-hand
   ============================================================================================
 
-  PATH . post 53/53 . part 1 of 1 in Chapter 18 -- Choosing the Machine
+  PATH . post 53/58 . part 1 of 1 in Chapter 18 -- Choosing the Machine
     <- prev:  [Fix the Biggest Surprise First: Priority Sweeping by Pencil](priority-sweeping-by-pencil.txt)
        next:  [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt) ->
 
@@ -28,7 +28,7 @@
   each sorting, and -- because picking right is not the same as proving it worked --
   how a finished machine is honestly graded.
 
-  THE WORLD DECIDES -- SO INTERROGATE THE WORLD FIRST
+  WORLD DECIDES -- SO INTERROGATE IT FIRST
 
   A world, in this book's sense, is anything that repeats: you stand at a SPOT (the
   numbers describing where you are), make a MOVE, and the world pays a REWARD and
@@ -144,7 +144,7 @@
   its machine must carry one of those; if it must only judge, the per-move
   machinery is dead weight.
 
-  THE MAP, WHOLE
+  MAP IN FULL
 
   The four questions, laid flat -- find your world's row, and the shelf is on the
   right:

@@ -10,7 +10,7 @@
   Posted: 2026-07-01 . Author: Rahul Rai . Tags: reinforcement-learning, priority-sweeping, planning, model-based, dyna, by-hand
   ============================================================================================
 
-  PATH . post 52/52 . part 2 of 2 in Chapter 17 -- Two the Sample-Based Map Skipped
+  PATH . post 52/58 . part 2 of 2 in Chapter 17 -- Two the Sample-Based Map Skipped
     <- prev:  [Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt)
        next:  [Four Questions Before Any Arithmetic: Which Machine for Which World](which-machine-for-which-world.txt) ->
 
@@ -168,7 +168,7 @@
   a reverse index (landing -> the spots that lead in), filed at the same moment
   each forward fact is recorded.
 
-  THE SEAM. Pencil ends here; below, the same numbers in Python.
+  SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the sweep above, pop by pop, every number hard-coded. The
   model is the deterministic corridor (each spot's right-move lands on the next,
@@ -205,7 +205,7 @@
 
       print(V[1], V[2], V[3], V[4])               # 0.729 0.81 0.9 1.0
 
-  THE ANCHOR, unchanged since Chapter 13: the GOAL is a finished spot worth 0, so the move into it
+  ANCHOR, unchanged since Chapter 13: the GOAL is a finished spot worth 0, so the move into it
   fades nothing extra -- spot 4's worth is the bare +1, and every spot behind it is that +1 faded one
   more step.
 
