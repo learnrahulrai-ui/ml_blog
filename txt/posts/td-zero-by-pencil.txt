@@ -10,11 +10,9 @@
   Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, temporal-difference, td-zero, policy-evaluation, by-hand
   ============================================================================================
 
-  PATH . post 37/40 . part 1 of 4 in Chapter 13 -- Sample-based Learning
+  PATH . post 37/58 . part 1 of 4 in Chapter 13 -- Sample-based Learning
     <- prev:  [Chapter 12, Part 5: Value Iteration Built by Pencil](value-iteration-by-pencil.txt)
        next:  [Chapter 13, Part 2: Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt) ->
-
-  ---
 
   You already own both halves of this post. Chapter 12 built them.
 
@@ -46,8 +44,6 @@
   for every single update. That die is the one thing this chapter throws away: from
   here on the agent learns from what actually happens, not from the world's odds.
 
-  ---
-
   WHICH MEANS: WITHOUT THE DIE, YOU GET ONE SAMPLE, NOT AN AVERAGE
 
   No table of chances now. You just act, and the world hands back ONE thing:
@@ -76,9 +72,7 @@
   That single swap -- die-average becomes one-sample-plus-a-slow-crawl -- is TD(0).
   The rest of this post is what to nudge, toward what, and the two cases by hand.
 
-  ---
-
-  THE WORLD: A CLIFF TO WALK ALONG (THE PICTURE EVERYTHING LIVES IN)
+  WORLD: A CLIFF TO WALK ALONG (THE PICTURE EVERYTHING LIVES IN)
 
   The world here is a grid, 4 rows tall and 12 columns wide. Count the rows with x
   (x=0 top, x=3 bottom) and the columns with y (y=0 left, y=11 right). Each of the 48
@@ -107,8 +101,6 @@
   left wall, right along the top, down the right wall, well clear of the cliff. The job
   is to fill in the worth of every spot under that plan. This is exactly Chapter 12,
   Part 3 (grading a plan) -- but now graded from real walks, with no die.
-
-  ---
 
   SO: WHAT DO YOU NUDGE, AND TOWARD WHAT?
 
@@ -141,8 +133,6 @@
   Put the target inside and you have the entire TD(0) update. Two cases follow, because
   the target changes when the game ends.
 
-  ---
-
   THE FIRST CASE: THE MOVE DID NOT END THE GAME
 
   The numbers, all on the table before any arithmetic:
@@ -171,8 +161,6 @@
   size 0.1 eases one noisy sample in gently, so a single unlucky landing cannot wreck
   the guess. The other spot's guess (the 1) is not touched -- you only ever correct the
   spot you LEFT.
-
-  ---
 
   BUT THAT BREAKS AT THE GOAL: THE ANCHOR CASE
 
@@ -206,8 +194,6 @@
   -0.1, a hundred times larger. That is the whole difference between the two cases: a
   mid-game move uses reward + dilute x worth(next); the anchor uses reward alone.
 
-  ---
-
   WHICH RAISES THE OBVIOUS WORRY: ISN'T A GUESS-OFF-A-GUESS A SCAM?
 
   Leaning on your own guess of `next` feels like cheating -- you corrected a guess
@@ -229,8 +215,6 @@
 
   So a guess leaning on a guess, fed real rewards and crawled in slowly, climbs toward
   the truth. That is the whole reason TD(0) works without a die.
-
-  ---
 
   BUT DOES THE WOBBLE EVER STOP? IT DEPENDS ON THE SIZE
 
@@ -274,8 +258,6 @@
   squares must add to a finite number (so the noise fades). 1/n does both; a fixed 0.5
   does the first but not the second -- which is precisely why the fixed size wobbles for
   ever and the shrinking size converges.
-
-  ---
 
   THE CODE -- HARD-CODED, EVERY NUMBER SHOWN
 
@@ -351,41 +333,6 @@
 
       agent_step:  target = reward + discount * values[next]
       agent_end:   target = reward                            (anchor: stop here)
-
-  ---
-
-  ONE BREATH
-
-  A worth = one number per spot: how good that spot is to be in. In Chapter 12 you had
-  the die and AVERAGED the drone recipe (reward + dilute x worth-of-landing) over every
-  landing at once. Take the die away and you get ONE landing and ONE reward per move --
-  so you fold that single sample in with the bandit nudge (new = old + size x (target -
-  old)) and let many small crawls do the averaging the die used to do. You nudge the
-  worth of the spot you LEFT, toward target = reward + dilute x worth(landing) -- a
-  guess leaning on a guess, which heals because every sample carries a real reward and
-  the size eases the noise in slowly. At an anchor (the game ended) there is no landing,
-  so the target is the reward alone. And the "=" that stores the result back into the
-  table is the whole update -- forget it and the table stays a sheet of zeros.
-
-  ---
-
-  >> NOTE: STANDARD JARGON
-  >> If you read other RL material after this page:
-  >>   spot           = state  (standard: s)
-  >>   move / arrow    = action  (a)
-  >>   the "+" / reward = reward  (R or r)
-  >>   worth           = state value under a policy  (V, or v_pi)
-  >>   the plan        = policy  (pi)
-  >>   grade a plan    = policy evaluation / prediction
-  >>   dilute 0.99     = discount factor  (gamma)
-  >>   size 0.1        = step size / learning rate  (alpha)
-  >>   one sample, no die = model-free / sample-based learning
-  >>   guess leans on a guess = bootstrapping
-  >>   how wrong = target - old guess = the TD error  (delta)
-  >>   target = reward + gamma x V(next) = the TD target
-  >>   anchor (game ended) = terminal state  (target = reward alone)
-  >>   TD(0)           = one-step temporal-difference policy evaluation
-  >>   the world here  = Cliff Walking (Sutton & Barto)
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 13 -- Sample-based Learning):

@@ -39,7 +39,7 @@
   note 2 fired the RIGHT engine and crashed. The job: one how-wrong number per note.
   The rest is where each number comes from.
 
-  THE TARGET NEEDS THE LANDING'S WORTH, BUT WHICH MOVE COMES NEXT?
+  TARGET NEEDS THE LANDING'S WORTH, BUT WHICH MOVE COMES NEXT?
 
   A target is reward-now plus the faded worth of where you landed:
 
@@ -119,7 +119,7 @@
   a crash scored as a REWARD, because the dead placeholder's worth leaked into it.
   The zeroing is what keeps a game-ending move graded on its final reward alone.
 
-  THE PREDICTION IS THE MOVE YOU REALLY MADE, SO PICK JUST THAT ONE
+  PREDICTION IS THE MOVE YOU REALLY MADE, SO PICK JUST THAT ONE
 
   The target is what the move SHOULD have been worth. Now the guess: what did the net
   actually think of the engine you fired? This time the LIVE net -- the one being

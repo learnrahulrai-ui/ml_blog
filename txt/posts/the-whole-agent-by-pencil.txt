@@ -26,7 +26,7 @@
   needed, every number worked on the page. If you have never read a line of this chapter, you can
   still follow the whole machine from here.
 
-  THE EIGHT NUMBERS, AND THE FOUR THINGS TO DO ABOUT THEM
+  EIGHT NUMBERS, AND THE FOUR THINGS TO DO ABOUT THEM
 
   The rocket is a lander -- a little pod easing down onto a pad between two flags. At any instant
   the world hands the agent its state: EIGHT numbers, each a dial reading off the pod.
@@ -145,7 +145,7 @@
   it lands in. Engine 0 holds 966 thousandths of the line, so the roll almost surely lands on it --
   fire engine 0, and follow its grading the rest of the way.
 
-  THE WORLD ANSWERS -- SO WRITE IT IN A NOTEBOOK
+  WORLD ANSWERS -- SO WRITE IT IN A NOTEBOOK
 
   We fired an engine. The world takes its turn and hands back two things: a REWARD (one number --
   a little fuel-cost penalty each step, a big prize for landing in the flags, a big loss for
@@ -357,7 +357,7 @@
   still while the live network walks toward it. One frozen standard, many steps toward it, then --
   next move -- photocopy a fresh twin from the now-improved network and repeat.
 
-  THE THREE CALLS THAT ACTUALLY RUN IT
+  THREE CALLS THAT ACTUALLY RUN IT
 
   The world drives the agent through exactly three calls, and everything above slots into them.
 
