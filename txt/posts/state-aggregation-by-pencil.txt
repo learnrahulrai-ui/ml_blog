@@ -131,7 +131,7 @@
   game ended, there is no next spot to read) the target loses its future piece and
   becomes the reward alone -- the anchor, the one target with no guess inside it.
 
-  THE WHOLE THING BY HAND -- ONE STEP, EVERY NUMBER
+  WHOLE STEP BY HAND -- EVERY NUMBER
 
   weights = [-1.5, 0.5, 1.0, -0.5, 1.5, -0.5, 1.5, 0.0, -0.5, -1.0], size 0.1,
   dilute 0.9. You leave spot 50, grab reward 10, land on spot 120.
@@ -269,6 +269,49 @@
   Sharing buys speed and pays in blur. Inside a group the machine is blind. That
   blur is not a bug to fix here -- it is the price, and the NEXT post (tile coding)
   is the machine that buys the speed without going blind.
+
+  SEAM. Pencil ends here; below, the same numbers in Python.
+
+  No loops, no functions -- group assignments, worth lookups, two TD steps, the
+  semi-gradient breakdown, and the terminal anchor. Per step: 1 floor-divide,
+  1 subtract, 1 multiply, 1 add = 4 strokes.
+
+      size, dilute = 0.1, 0.9
+      w = [-1.5, 0.5, 1.0, -0.5, 1.5, -0.5, 1.5, 0.0, -0.5, -1.0]
+
+      # GROUP: (spot-1)//50 picks the group in a 500-spot, 10-group world
+      g50  = (50  - 1) // 50    # 49//50  = 0
+      g120 = (120 - 1) // 50    # 119//50 = 2
+      g337 = (337 - 1) // 50    # 336//50 = 6   (YOUR TURN check)
+      g500 = (500 - 1) // 50    # 499//50 = 9   (YOUR TURN check)
+      g480 = (480 - 1) // 50    # 479//50 = 9
+
+      # WORTH: one-hot dot = just pick the group's weight
+      worth_50  = w[g50]         # w[0] = -1.5
+      worth_120 = w[g120]        # w[2] =  1.0
+      worth_337 = w[g337]        # w[6] =  1.5
+      print(worth_50, worth_120, worth_337)   # -1.5  1.0  1.5
+
+      # STEP 1: leave spot 50 (w0=-1.5), reward=10, land spot 120 (w2=1.0)
+      how_wrong = 10 + dilute*worth_120 - worth_50  # 10+0.9*1.0-(-1.5) = 12.4
+      w[g50] = w[g50] + size * how_wrong * 1        # -1.5 + 0.1*12.4  = -0.26
+      print(how_wrong, w[g50])   # 12.4  -0.26
+
+      # YOUR TURN: leave spot 120 (w2=1.0), reward=-3, land spot 480 (w9=-1.0)
+      how_wrong2 = -3 + dilute*w[g480] - w[g120]   # -3+0.9*(-1.0)-1.0 = -4.9
+      w[g120] = w[g120] + size * how_wrong2 * 1    # 1.0 + 0.1*(-4.9)  = 0.51
+      print(how_wrong2, w[g120]) # -4.9  0.51
+
+      # SEMI-GRADIENT: step-1 numbers (how_wrong=12.4, left=g0, next=g2, dilute=0.9)
+      w0_piece = size * 12.4 * 1              #  0.1*12.4*1       = +1.24  (kept)
+      w2_piece = size * 12.4 * (-dilute * 1)  #  0.1*12.4*(-0.9)  = -1.116 (dropped)
+      print(w0_piece, round(w2_piece, 4))     # 1.24  -1.116
+
+      # TERMINAL: leave group-6 spot (w6=1.5), game ends, reward=-35
+      w6_old = 1.5
+      how_wrong_t = -35 - w6_old              # -35 - 1.5 = -36.5  (no future piece)
+      w6_new = w6_old + size * how_wrong_t    # 1.5 + 0.1*(-36.5)  = -2.15
+      print(how_wrong_t, w6_new)             # -36.5  -2.15
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 14 -- Function Approximation):
