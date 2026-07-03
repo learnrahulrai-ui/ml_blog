@@ -418,6 +418,57 @@
   twin, grade a batch, step -- turned often enough that the sheets bent into scores worth trusting.
   Every earlier part of this chapter was one gear; this is the whole clock, ticking.
 
+SEAM. Pencil ends here; below, the same numbers in Python.
+
+  import math
+
+  # forward pass s=[1,2]
+  p1 = 1*1   + 2*0.5 + 0.5     # 1+1+0.5    = 2.5
+  p2 = 1*(-2)+ 2*1   + (-0.5)  # -2+2-0.5   = -0.5
+  p3 = 1*0.5 + 2*(-1)+ 1.0    # 0.5-2+1.0  = -0.5
+  x1 = p1 if p1 > 0 else 0    # 2.5
+  x2 = p2 if p2 > 0 else 0    # 0    (killed)
+  x3 = p3 if p3 > 0 else 0    # 0    (killed)
+  Q0 = x1*2   + x2*1  + x3*(-1)+ 0.5    # 5.5
+  Q1 = x1*(-1)+ x2*1  + x3*2  + 1.0    # -1.5
+  Q2 = x1*0   + x2*(-1)+x3*1  + 0.0    # 0.0
+  Q3 = x1*1   + x2*0  + x3*(-1)+(-0.5) # 2.0
+  print(Q0, Q1, Q2, Q3)                  # 5.5  -1.5  0.0  2.0
+
+  # softmax: shift by max (Q0=5.5) to avoid overflow, temperature t=1
+  e0s = math.exp(0)          # e^0     = 1
+  e1s = math.exp(Q1-Q0)     # e^-7.0  = 0.0009
+  e2s = math.exp(Q2-Q0)     # e^-5.5  = 0.0041
+  e3s = math.exp(Q3-Q0)     # e^-3.5  = 0.0302
+  tot = e0s+e1s+e2s+e3s     # ~1.0352
+  print(round(e1s,4), round(e2s,4), round(e3s,4), round(tot,4))  # 0.0009  0.0041  0.0302  1.0352
+  c0 = round(e0s/tot,3)     # 0.966
+  c1 = round(e1s/tot,3)     # 0.001
+  c2 = round(e2s/tot,3)     # 0.004
+  c3 = round(e3s/tot,3)     # 0.029
+  print(c0, c1, c2, c3)     # 0.966  0.001  0.004  0.029
+
+  # Expected Sarsa target: fired engine 0, reward=1, twin reads [3,5,1,2]
+  # policy chances at s' = [0.1, 0.6, 0.1, 0.2]
+  avg_next  = 0.1*3 + 0.6*5 + 0.1*1 + 0.2*2   # 0.3+3.0+0.1+0.4 = 3.8
+  target    = 1 + 0.9 * avg_next                # 1+3.42 = 4.42
+  how_wrong = target - Q0                       # 4.42-5.5 = -1.08
+  print(avg_next, target, how_wrong)            # 3.8  4.42  -1.08
+
+  # grade of C[row0, col0]: pull = x1 = 2.5
+  grade = x1 * how_wrong     # 2.5*(-1.08) = -2.7
+  print(round(grade,4))      # -2.7
+
+  # Adam: first move, m=0 v=0 start
+  m  = 0.9*0   + 0.1*grade        # -0.27
+  v  = 0.999*0 + 0.001*grade**2   # 0.001*7.29 = 0.00729
+  mh = m / (1 - 0.9)              # -0.27/0.1  = -2.7
+  vh = v / (1 - 0.999)            # 0.00729/0.001 = 7.29
+  step = 0.001 * mh / math.sqrt(vh)   # 0.001*(-2.7)/2.7 = -0.001
+  print(m, round(v,5))            # -0.27  0.00729
+  print(round(mh,4), round(vh,4)) # -2.7   7.29
+  print(round(step,5))            # -0.001  (m-hat/sqrt(v-hat) = -1: size cancelled)
+
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
     Part 1 -- [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt) .
