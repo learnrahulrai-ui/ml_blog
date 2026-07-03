@@ -5,12 +5,12 @@
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  SPECIAL . FOR HACKER NEWS
+  CHAPTER 12 . REINFORCEMENT LEARNING . PART 4 OF 5
   Finding the Best Plan by Pencil: How Good Arrows Spread From the Runway
   Posted: 2026-06-19 . Author: Rahul Rai . Tags: reinforcement-learning, policy-iteration, policy-improvement, bellman, by-hand
   ============================================================================================
 
-  PATH . post 35/36 . part 4 of 5 in Chapter 12 -- Reinforcement Learning
+  PATH . post 35/58 . part 4 of 5 in Chapter 12 -- Reinforcement Learning
     <- prev:  [Chapter 12, Part 3: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt)
        next:  [Chapter 12, Part 5: No Map in the Arguments: Value Iteration](value-iteration-by-pencil.txt) ->
 
@@ -24,12 +24,10 @@
   a plan that got tired. This page shows both, by hand. No magic.
 
   TOY WORLD, REAL RECIPE. Grade a plan, peek every nudge, keep the best, repeat until the
-  arrows freeze -- exact. The WORLD is a toy: a small box of spots, simple painted
-  scores, and moves that always land where you aim (no slipping). Real problems let a move slip
-  -- push North, sometimes drift East -- and then a peek averages over where you MIGHT land,
-  weighted by the odds. Here a push lands for sure, so that average collapses to a single spot.
-  That collapse is the toy, named again loudly at the end. Trust the recipe; treat the rest as
-  a sketchpad.
+  arrows freeze -- exact. Real problems let a move slip -- push North, sometimes drift East --
+  and then a peek averages over where you MIGHT land, weighted by the odds. Here a push lands
+  for sure, so that average collapses to a single spot. That collapse is the toy, named again
+  loudly at the end. Trust the recipe; treat the rest as a sketchpad.
 
   You push a pawn to E4. Ten moves later you win. Was E4 a good move, or did you just
   get lucky after it? The instant you played it the reward was 0 -- so its own reward
@@ -49,7 +47,7 @@
   the move that led to it, even a move made ten turns earlier. That backward bleed
   is Bellman's idea.
 
-  The one move, named here so you are not surprised later:
+  Named here so you are not surprised later:
 
       To better a plan at a spot, do not solve anything. Just PEEK down each nudge -- "if I went
       THIS way, what would the spot I land on be worth?" -- and re-aim the arrow at the best
@@ -57,7 +55,7 @@
       spread outward from the runway one ring per pass, then stop. A plan that survives a full
       peek untouched is provably the best.
 
-  THE WORLD (REDRAWN HERE SO THE COMPANION POST IS NOT NEEDED)
+  WORLD AND TERMS (DEFINED HERE, COMPLETE)
 
   A drone hangs in the air over a patch of enemy ground. We want to find the best flight plan.
 
@@ -73,7 +71,7 @@
 
   Painted facts: +5, -2, -0.1, 0.9 -- handed to you, fixed.
 
-  THE WORLD, DRAWN (3x3 ground, 3 heights; top view and side view):
+  WORLD, DRAWN (3x3 ground, 3 heights; top view and side view):
 
       TOP VIEW (height 0 = ground):            SIDE VIEW (centre column, y=1):
 
@@ -81,10 +79,11 @@
       DIRT  RUNWY DIRT    <- runway centre       height 1:  [ air   ]
       DIRT  DIRT  DIRT                          height 0:  [RUNWAY ]  = +5  (ground, ends flight)
       x: 0    1    2
+
                                                   A nudge D takes the drone one height lower.
                                                   Six nudges: N S E W (sideways) + U D (vertical).
 
-  THE SIX NUDGES from spot (x, y, height):
+  SIX NUDGES from spot (x, y, height):
 
       N -> (x,   y+1, height)   S -> (x,   y-1, height)
       E -> (x+1, y,   height)   W -> (x-1, y,   height)
@@ -111,13 +110,12 @@
       again and again; the painted ground is a fixed anchor the truth climbs out from, one spot
       per pass; stop when a pass moves nothing.
 
-  One fact from that post we lean on hard below: grade the column straight above the runway and
-  you get +5 at the pad, then -0.1 + 0.9*5 = 4.4 one up, then -0.1 + 0.9*4.4 = 3.86 two up.
-  In this toy, worth is biggest right over the pad and shrinks with height above it. (That is a
-  property of this particular map -- one prize, one path, no competing rewards.) Hold that
-  picture for the worked example below.
+  One fact we lean on hard below: grade the column straight above the runway and you get +5 at
+  the pad, then -0.1 + 0.9*5 = 4.4 one up, then -0.1 + 0.9*4.4 = 3.86 two up. Worth is
+  biggest right over the pad and shrinks with height above it -- a property of this map, one
+  prize, one path, no competing rewards. Hold that picture for the worked example.
 
-  WHY WE NOW NEED ALL SIX NUDGES (THE GRADING POST ONLY EVER READ ONE)
+  GRADING ONLY READS ONE ARROW -- IMPROVING MUST SEE ALL SIX
 
   Grading read ONE arrow per spot -- whatever the plan said -- and followed it. To IMPROVE a
   plan we must compare the arrow it has against the arrows it could have. So for the first time
@@ -129,8 +127,8 @@
       W : (x-1, y, height)      go west
 
   The wall rule, worked once: at (0, 0, 1) a nudge W would set x = -1, off the box -- so the
-  drone stays at (0, 0, 1). A wall nudge is a move that lands you back on yourself. A ground
-  spot has no nudge at all (the flight is over); its only "move" is to stay put.
+  drone stays at (0, 0, 1). A wall nudge lands you back on yourself. A ground spot has no nudge
+  at all (the flight is over).
 
   IMPROVE MOVE -- PEEK THE SIX, KEEP THE WINNER
 
@@ -142,7 +140,7 @@
 
   Six nudges, six scores. Re-aim the arrow at the biggest. That is the entire improve move.
 
-  THE PEEK, DRAWN (standing at spot S, six directions, one score each):
+  PEEK AT ONE SPOT, DRAWN (standing at spot S, six directions, one score each):
 
                          U -> worth(above) * 0.9 - 0.1
                          ^
@@ -154,9 +152,7 @@
 
       best arrow here = the nudge with the largest score
 
-  The textbook writes one peek as Q(s, a) and the winner as argmax over a. Same thing. You write
-  the score rule ONCE; the "keep the biggest" runs it over the six and hands back the winner --
-  you do not write it six times.
+  (Textbooks write one peek's score as Q(s, a) and the winner as argmax over a. Same thing.)
 
   Note what does NOT change across the six: the fuel -0.1 is the same for every nudge (it is the
   cost of being in the air this move, not of the direction). Only 'worth(where it lands)' moves.
@@ -165,8 +161,8 @@
   WHOLE LOOP -- GRADE, PEEK, REPEAT, FREEZE
 
   No worths exist before a plan exists, and no smart plan exists before worths exist -- another
-  circle. Break it the same way grading broke its circle: start from a lie. Scribble ANY plan
-  (a nudge in the air, "stay put" on the ground). Garbage is fine; it gets fixed.
+  circle. Break it the same way grading broke its circle: start from a lie. Scribble ANY plan.
+  Garbage is fine; it gets fixed.
 
   LOOP, DRAWN:
 
@@ -184,26 +180,17 @@
         YES --->  go back to GRADE (plan changed; old worths are now wrong; rebuild them)
         NO  --->  STOP. the plan is frozen. the frozen plan is the best.
 
-  In code:
-
-      seed a dumb plan
-      GRADE it          -> fresh worths for every spot (start those worths at 0, settle them)
-      IMPROVE it        -> at each air spot, peek the six, re-aim the arrow at the best
-      did any arrow move?
-          yes -> GRADE the new plan, IMPROVE again
-          no  -> STOP. this plan is the best.
-
   Two layers of repeating live here, and mixing them up is the usual stumble. INSIDE the grade,
   many passes settle the worths for ONE plan. OUTSIDE, the grade-then-improve cycle swaps that
-  plan for a better one. The PLAN is the thread that carries across and keeps getting better;
-  the WORTH is scratch, rebuilt from 0 every time the plan changes.
+  plan for a better one. PLAN is the thread that carries across and keeps getting better;
+  WORTH is scratch paper, rebuilt from 0 every time the plan changes.
 
   WATCH THE GOOD ARROWS SPREAD -- WORKED BY HAND
 
-  Seed the dumb plan "always nudge Left" (every air arrow = W). The drone just slides into the
+  Seed the dumb plan "always nudge Left" (every air arrow = W). The drone slides into the
   west wall and never lands. Grade it: an air spot that keeps bumping a wall lands on itself
   forever, so its worth solves worth = -0.1 + 0.9*worth, i.e. 0.1*worth = -0.1, i.e. worth = -1.
-  (Same -1 the forever-bounce settled to in the companion post.) So after grading:
+  So after grading:
 
       WORTH:  every air spot = -1 ;  runway (1,1,0) = +5 ;  every dirt spot = -2
 
@@ -227,7 +214,11 @@
 
   The winner is E. The arrow at (0,1,1) flips toward (1,1,1). Another arrow moved -- keep going.
 
-  HOW THE ARROWS SPREAD (top view, height 1 layer, in this toy):
+  CHECK: spot (0,1,1) also has nudges N and S (not shown above). N lands (0,2,1), S lands
+  (0,0,1) -- both still worth -1 on this board (not yet improved). Score for N = score for S =
+  -0.1 + 0.9*(-1) = -1.0. E (3.86) beats all six. The skipped directions confirm the winner.
+
+  ARROWS SPREAD (top view, height 1 layer, in this toy):
 
       PASS 0 -- dumb seed "always Left" (W) everywhere:
         W  W  W
@@ -256,9 +247,9 @@
   spot touching THAT. In this environment -- one prize, uniform fuel, no slipping -- the good
   arrows happen to spread outward from the runway one ring per pass, each ring pointing the
   short way to the ring already fixed. This is a property of the map, not a law of policy
-  iteration: in a more complex MDP multiple distant states can flip at once, and improvements
+  iteration: in a more complex world multiple distant spots can flip at once, and improvements
   need not move in neat rings. When a whole pass re-aims nothing -- the frozen condition --
-  that is the universal signal. That frozen plan is the answer.
+  that is the universal signal.
 
   WHY A FROZEN PLAN IS THE BEST (DERIVED, NOT DECLARED)
 
@@ -285,43 +276,32 @@
           conditions is what optimality means, and the theorem proves the two are the same thing.
 
   So freezing is not exhaustion -- it is a fixed point. The plan answers its own question and
-  wins. That is the proof, and it is why the loop is guaranteed to land on the optimal plan
-  rather than wander.
+  wins.
 
-  Why the best plan looks the way it does IN THIS TOY -- head toward the pad-column, then drop:
-  in this environment, with one prize and uniform fuel cost, worth happens to be biggest right
-  over the runway and shrink with distance from it, so the winning peek at any spot is the
-  nudge that cuts the distance to the pad-column. (In a world with prizes scattered elsewhere or
-  stochastic slipping, the worth table and the best plan can look completely different.) Here the
-  math hands back exactly the plan a human would draw for this map.
+  CHECK: if M's arrow flipped BACK from 'down' to 'up' after freezing, the grade would give M
+  a worth of -1 (wall loop: -0.1 + 0.9*(-1) = -1). Peeking again with that worth:
+  score_down = -0.1 + 0.9*5 = 4.4, score_up = -0.1 + 0.9*(-1) = -1.0. Down wins immediately.
+  'Up' cannot survive its own peek. The only survivor is the plan where every arrow wins its
+  own peek -- the frozen one.
 
-  DECODER (JARGON -> PLAIN, MASTER SHEET)
+  (Textbook names, pinned once: a spot is a state, a plan is a policy, a nudge is an action,
+  the worth is the value function V. Grading a fixed plan is policy evaluation; peeking every
+  nudge to re-aim arrows is policy improvement; the whole grade-improve-repeat cycle is policy
+  iteration. The frozen plan that wins every peek under its own worth table is the optimal
+  policy, written pi*. Shrink 0.9 is the discount factor gamma. One nudge's score is the
+  action-value Q(s,a); the nudge that wins the peek is argmax_a Q(s,a).)
 
-      PEACOCK WORD                         WHAT IT ACTUALLY MEANS
-      --------------------------------------   -------------------------------------------------
-      state / s                                a spot -- a place the drone can be
-      action / a                               a nudge -- N S E W U D (or "stay put" on the ground)
-      policy / pi                              the plan -- one arrow per spot
-      value / V(s)                             a spot's worth under the current plan
-      reward / R(s)                            in this toy: painted points at the state reached
-                                               (+5 / -2 / -0.1). General RL attaches rewards to
-                                               transitions R(s,a,s') or R(s,a), not bare states.
-      discount / gamma                         the shrink (0.9) -- a future worth counts 0.9 per move
-      transition / result(s, a)                where a nudge lands you
-      deterministic transition                 a nudge lands for sure (no slipping) -- our toy
-      policy evaluation                        the GRADE: fill every worth for a fixed plan
-      one-step lookahead / Q(s, a)             one peek: -0.1 + 0.9 * worth(where nudge a lands)
-      policy improvement                       the IMPROVE: re-aim each arrow at its best peek
-      argmax over a                            "keep the nudge with the biggest score"
-      policy iteration                         grade, improve, repeat until the arrows freeze
-      optimal policy / pi*                     the frozen plan -- its own best reply, unbeatable
-      fixed point                              a plan that an improve leaves unchanged
+  In this toy -- one prize, uniform fuel cost -- worth is biggest right over the runway and
+  shrinks with distance, so the winning peek at any spot is the nudge that cuts distance to
+  the pad-column. In a world with prizes scattered elsewhere or stochastic slipping, the worth
+  table and the best plan can look completely different. Here the math hands back exactly the
+  plan a human would draw for this map.
 
-  PYTHON: THE IMPROVE, BY HAND, THEN THE WHOLE LOOP
+  PYTHON: SIX PEEKS BY HAND, THEN THREE PASSES UNROLLED
 
-  Three blocks. The first two are hard-coded -- the six peeks at a spot, then the spread -- so
-  you can check every score against the walk above. The third is the real loop; the one honest
-  place a loop is the lesson and not a hiding spot is flagged in plain words.
+  Three blocks. Cases 1 and 2 are fully explicit -- every score written out, winner visible.
+  Case 3 unrolls three grade-improve passes without any loop, so you can trace each line
+  against the walk above.
 
   # -----------------------------------------------------------------------
   # THE PAINTED FACTS (handed to us, fixed)
@@ -331,10 +311,9 @@
 
   # =======================================================================
   # CASE 1: ONE IMPROVE, BY HAND -- peek all six nudges at (1,1,1).
-  # The board is the dumb 'always-Left' plan, freshly graded: every air
-  # spot settled to -1 (slides into the wall, lands on itself: x=-0.1+0.9x).
-  # We do NOT loop the six here -- we write all six out, so the winner is
-  # visible, not hidden inside a max().
+  # Board: dumb 'always-Left' plan, freshly graded. Every air spot settled
+  # to -1 (slides into the wall, lands on itself: -0.1 + 0.9*x = x -> x = -1).
+  # All six scores written out; the winner is not hidden inside a max().
   # =======================================================================
   print("=== CASE 1: improve (1,1,1) -- peek the six by hand ===")
 
@@ -352,88 +331,101 @@
         f"E={score_E:.2f}  W={score_W:.2f}  U={score_U:.2f}")
   print(f"  winner = D ({score_D:.2f}).  arrow flips  W -> D.  (an arrow moved -> keep going)")
   # D=4.40  N=-1.00  S=-1.00  E=-1.00  W=-1.00  U=-1.00
-  # winner = D (4.40).  arrow flips  W -> D.  (an arrow moved -> keep going)
 
   # =======================================================================
-  # CASE 2: THE SPREAD -- regrade, then improve the NEXT ring out, (0,1,1).
-  # After (1,1,1) points D, a regrade gives worth(1,1,1) = -0.1 + 0.9*5 = 4.4.
-  # Now the spot west of it can finally find a good arrow: aim at 4.4.
+  # CASE 2: THE SPREAD -- regrade, then improve the next ring out, (0,1,1).
+  # After (1,1,1) points D, regrading gives worth(1,1,1) = -0.1 + 0.9*5 = 4.4.
+  # Now the spot west of it can find a good arrow: aim at 4.4.
   # =======================================================================
   print("\n=== CASE 2: the good arrow spreads one ring out, to (0,1,1) ===")
 
   worth_111 = FUEL + SHRINK * RUNWAY   # regraded: -0.1 + 0.9*5 = 4.4
   worth_010 = DIRT                     # (0,1,0) is dirt = -2
 
-  score_E2 = FUEL + SHRINK * worth_111   # -0.1 + 0.9*(4.4) =  3.86  <- toward the good ring
-  score_D2 = FUEL + SHRINK * worth_010   # -0.1 + 0.9*(-2)  = -1.9   (straight down = crash)
-  score_other2 = FUEL + SHRINK * (-1.0)  # -0.1 + 0.9*(-1)  = -1.0   (the still-bad air)
+  score_E2      = FUEL + SHRINK * worth_111   # -0.1 + 0.9*(4.4) =  3.86  <- toward the ring
+  score_D2      = FUEL + SHRINK * worth_010   # -0.1 + 0.9*(-2)  = -1.9   (straight down = crash)
+  score_other2  = FUEL + SHRINK * (-1.0)      # -0.1 + 0.9*(-1)  = -1.0   (still-bad air)
 
   print(f"  E={score_E2:.2f}  D={score_D2:.2f}  others={score_other2:.2f}")
   print(f"  winner = E ({score_E2:.2f}).  (0,1,1) now points at (1,1,1).  the good plan grew a ring.")
   # E=3.86  D=-1.90  others=-1.00
-  # winner = E (3.86).  (0,1,1) now points at (1,1,1).  the good plan grew a ring.
 
   # =======================================================================
-  # CASE 3: THE WHOLE LOOP -- grade, improve, repeat, freeze.
-  # A tiny self-contained world (the runway column: pad G, one up M, two up T,
-  # plus a dead air spot X off to the side) so the loop runs end to end and
-  # you can read the frozen plan. WHY a loop here and not hand-writing: the
-  # POINT of this block is the repetition itself -- 'grade, improve, again.'
-  # The body is the same peek you just did by hand; the loop only repeats it.
-  # That is the honest place an abstraction belongs: it is the lesson.
+  # CASE 3: THREE PASSES, FULLY UNROLLED -- no loop, no def, no hidden state.
+  # World: the runway column only. Three spots:
+  #   G = runway (ground, painted +5, game ends here)
+  #   M = one height up (air; nudge down lands G, nudge up lands T)
+  #   T = two heights up (air; nudge down lands M, nudge up hits ceiling -> stays T)
+  # Dumb seed plan: M->up, T->up.
   # =======================================================================
-  print("\n=== CASE 3: the whole loop on the runway column ===")
+  print("\n=== CASE 3: three grade-improve passes, fully unrolled ===")
 
-  # spots: 'G'=runway(ground,+5), 'M'=one up, 'T'=two up. Nudges per air spot:
-  # 'down' (toward the pad) and 'up' (away). 'down' from M lands G; from T lands M.
-  # 'up' from M lands T; from T lands itself (wall). The peek will prefer 'down'.
-  # the three-spot stack; each air spot can nudge UP or DOWN, the runway is the prize:
-  #
-  #     T  (two up)    up -> stays (ceiling wall)  ;  down -> M
-  #     M  (one up)    up -> T                     ;  down -> G
-  #     G  (runway)    +5, painted -- the only anchor
-  #
-  is_ground = {'G': True, 'M': False, 'T': False}
-  painted   = {'G': RUNWAY, 'M': None, 'T': None}
-  lands     = {                       # (spot, nudge) -> where it lands
-      ('M', 'down'): 'G', ('M', 'up'): 'T',
-      ('T', 'down'): 'M', ('T', 'up'): 'T',   # 'up' at the ceiling = wall = stay
-  }
-  nudges = {'M': ['down', 'up'], 'T': ['down', 'up']}
+  # -------- PASS 1 --------
+  # Grade plan {M->up, T->up}.
+  # T follows 'up' -> hits ceiling -> lands T again.
+  #   Steady state: worth_T = FUEL + SHRINK*worth_T
+  #   => (1-SHRINK)*worth_T = FUEL => worth_T = FUEL/(1-SHRINK) = -0.1/0.1 = -1.0
+  # M follows 'up' -> T (worth=-1):  worth_M = FUEL + SHRINK*(-1) = -1.0
+  worth_G = RUNWAY                         # 5.0  (painted, never changes)
+  worth_T = FUEL / (1.0 - SHRINK)         # -0.1 / 0.1 = -1.0  (wall loop)
+  worth_M = FUEL + SHRINK * worth_T       # -0.1 + 0.9*(-1) = -1.0
+  print(f"pass 1 grade: G={worth_G:.1f}  M={worth_M:.2f}  T={worth_T:.2f}")
 
-  def grade(plan):                          # the companion post's engine, compressed
-      worth = {s: 0.0 for s in ['G', 'M', 'T']}
-      for _ in range(1000):
-          delta = 0.0
-          for s in ['T', 'M', 'G']:
-              old = worth[s]
-              if is_ground[s]:
-                  worth[s] = painted[s]
-              else:
-                  worth[s] = FUEL + SHRINK * worth[lands[(s, plan[s])]]
-              delta = max(delta, abs(worth[s] - old))
-          if delta < 1e-8:
-              break
-      return worth
+  # Improve M: peek down (lands G=5) and up (lands T=-1), using graded worths.
+  score_M_dn = FUEL + SHRINK * worth_G    # -0.1 + 0.9*5    =  4.40  <- winner
+  score_M_up = FUEL + SHRINK * worth_T    # -0.1 + 0.9*(-1) = -1.00
+  plan_M = 'down'   # flips from 'up'; an arrow moved
+  print(f"pass 1 improve M: dn={score_M_dn:.2f}  up={score_M_up:.2f}  -> {plan_M}  (arrow moved)")
 
-  plan = {'G': None, 'M': 'up', 'T': 'up'}  # the dumb seed: air spots point away from the pad
-  for go in range(1, 100):
-      worth = grade(plan)                   # GRADE: fresh worths for this plan
-      new_plan = {}
-      for s in ['G', 'M', 'T']:
-          if is_ground[s]:
-              new_plan[s] = None
-          else:                             # IMPROVE: keep the nudge with the biggest peek
-              new_plan[s] = max(nudges[s],
-                                key=lambda a: FUEL + SHRINK * worth[lands[(s, a)]])
-      if new_plan == plan:                  # no arrow re-aimed -> frozen -> the best plan
-          print(f"froze after {go} goes.  best plan: M->{plan['M']}, T->{plan['T']}")
-          print(f"  worths: T={worth['T']:.2f}  M={worth['M']:.2f}  G={worth['G']:.1f}")
-          break
-      plan = new_plan
-  # froze after 3 goes.  best plan: M->down, T->down
-  #   (go 1 fixes M, the ring on the pad; go 2 fixes T, the next ring; go 3 confirms.)
-  #   worths: T=3.86  M=4.40  G=5.0
+  # Improve T: peek down (lands M=-1 same board) and up (wall=T=-1).
+  score_T_dn = FUEL + SHRINK * worth_M    # -0.1 + 0.9*(-1) = -1.00  (M still worth -1 this board)
+  score_T_up = FUEL + SHRINK * worth_T    # -0.1 + 0.9*(-1) = -1.00  (tie)
+  plan_T = 'up'   # tie -- no change
+  print(f"pass 1 improve T: dn={score_T_dn:.2f}  up={score_T_up:.2f}  -> {plan_T}  (tie, no change)")
+  print("pass 1: M moved -> keep going")
+
+  # -------- PASS 2 --------
+  # Grade plan {M->down, T->up}.
+  # M follows 'down' -> G: worth_M = FUEL + SHRINK*5 = 4.4
+  # T follows 'up'   -> ceiling -> T: same wall loop -> worth_T = -1 again
+  worth_T = FUEL / (1.0 - SHRINK)         # -1.0  (T->up still a wall loop)
+  worth_M = FUEL + SHRINK * RUNWAY        # -0.1 + 0.9*5 = 4.40
+  print(f"\npass 2 grade: G={worth_G:.1f}  M={worth_M:.2f}  T={worth_T:.2f}")
+
+  # Improve M (already down, confirm).
+  score_M_dn = FUEL + SHRINK * RUNWAY     # -0.1 + 0.9*5    =  4.40
+  score_M_up = FUEL + SHRINK * worth_T    # -0.1 + 0.9*(-1) = -1.00
+  plan_M = 'down'   # no change
+  print(f"pass 2 improve M: dn={score_M_dn:.2f}  up={score_M_up:.2f}  -> {plan_M}  (no change)")
+
+  # Improve T: down lands M (now worth 4.4); up is wall -> stays T (worth -1).
+  score_T_dn = FUEL + SHRINK * worth_M    # -0.1 + 0.9*4.4 =  3.86  <- winner
+  score_T_up = FUEL + SHRINK * worth_T    # -0.1 + 0.9*(-1) = -1.00
+  plan_T = 'down'   # flips from 'up'; an arrow moved
+  print(f"pass 2 improve T: dn={score_T_dn:.2f}  up={score_T_up:.2f}  -> {plan_T}  (arrow moved)")
+  print("pass 2: T moved -> keep going")
+
+  # -------- PASS 3 (confirm freeze) --------
+  # Grade plan {M->down, T->down}.
+  # M follows 'down' -> G: worth_M = 4.4
+  # T follows 'down' -> M (worth 4.4): worth_T = FUEL + SHRINK*4.4 = 3.86
+  worth_M = FUEL + SHRINK * RUNWAY        # 4.40
+  worth_T = FUEL + SHRINK * worth_M       # -0.1 + 0.9*4.4 = 3.86
+  print(f"\npass 3 grade: G={worth_G:.1f}  M={worth_M:.2f}  T={worth_T:.2f}")
+
+  # Improve M: down=G (score 4.40) vs up=T=3.86 (score 3.374).
+  score_M_dn = FUEL + SHRINK * RUNWAY     # 4.40
+  score_M_up = FUEL + SHRINK * worth_T    # -0.1 + 0.9*3.86 = 3.374
+  plan_M = 'down'   # 4.40 > 3.374, no change
+  print(f"pass 3 improve M: dn={score_M_dn:.2f}  up={score_M_up:.3f}  -> {plan_M}  (no change)")
+
+  # Improve T: down=M (score 3.86) vs up=T(wall, worth 3.86, score 3.374).
+  score_T_dn = FUEL + SHRINK * worth_M    # -0.1 + 0.9*4.4  = 3.86
+  score_T_up = FUEL + SHRINK * worth_T    # -0.1 + 0.9*3.86 = 3.374  (wall: nudge up lands T)
+  plan_T = 'down'   # 3.86 > 3.374, no change
+  print(f"pass 3 improve T: dn={score_T_dn:.2f}  up={score_T_up:.3f}  -> {plan_T}  (no change)")
+  print("pass 3: no arrows moved -> FROZEN.  best plan: M->down, T->down")
+  print(f"frozen worths:  T={worth_T:.2f}  M={worth_M:.2f}  G={worth_G:.1f}")
 
   Output of the three blocks:
 
@@ -445,34 +437,43 @@
         E=3.86  D=-1.90  others=-1.00
         winner = E (3.86).  (0,1,1) now points at (1,1,1).  the good plan grew a ring.
 
-      === CASE 3: the whole loop on the runway column ===
-        froze after 3 goes.  best plan: M->down, T->down
-          worths: T=3.86  M=4.40  G=5.0
+      === CASE 3: three grade-improve passes, fully unrolled ===
+      pass 1 grade: G=5.0  M=-1.00  T=-1.00
+      pass 1 improve M: dn=4.40  up=-1.00  -> down  (arrow moved)
+      pass 1 improve T: dn=-1.00  up=-1.00  -> up  (tie, no change)
+      pass 1: M moved -> keep going
 
-  > THE ONE HONEST FOOTNOTE (named again, loudly). Each peek here reads ONE landing spot:
-  > '-0.1 + 0.9 * worth(where the nudge lands)'. Real problems let a nudge slip -- push down,
-  > sometimes drift sideways -- so a peek must average over where you MIGHT land:
-  > '-0.1 + 0.9 * sum over landings of  P(landing) * worth(landing)'.
-  > Our nudges land for sure, so P = 1 for the one spot and 0 for the rest, and the average
-  > collapses to the single term you saw. That is the only thing the toy hides. Put the
-  > weighted average back and every peek, every spread, every freeze on this page holds.
+      pass 2 grade: G=5.0  M=4.40  T=-1.00
+      pass 2 improve M: dn=4.40  up=-1.00  -> down  (no change)
+      pass 2 improve T: dn=3.86  up=-1.00  -> down  (arrow moved)
+      pass 2: T moved -> keep going
 
-  ---
+      pass 3 grade: G=5.0  M=4.40  T=3.86
+      pass 3 improve M: dn=4.40  up=3.374  -> down  (no change)
+      pass 3 improve T: dn=3.86  up=3.374  -> down  (no change)
+      pass 3: no arrows moved -> FROZEN.  best plan: M->down, T->down
+      frozen worths:  T=3.86  M=4.40  G=5.0
 
-  Companion posts: [Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt) is the GRADE
-  half this post leans on -- read it for why a worth table of lies heals into the truth.
-  [The Agent Ladder](the-agent-ladder.txt) and [Cheapest Walk: UCS and A*](cheapest-walk-ucs-astar.txt)
-  build the neighbouring corners of the same toolbox.
+  ONE HONEST FOOTNOTE. Each peek here reads ONE landing spot: '-0.1 + 0.9 * worth(where the
+  nudge lands)'. Real problems let a nudge slip -- push down, sometimes drift sideways -- so
+  a peek must average over where you MIGHT land: '-0.1 + 0.9 * sum over landings of
+  P(landing) * worth(landing)'. Our nudges land for sure, so P = 1 for the one spot and 0
+  for the rest, and the average collapses to the single term you saw. That is the only thing
+  the toy hides. Put the weighted average back and every peek, every spread, every freeze on
+  this page holds.
 
-  ---
+----------------------------------------------------------------------------------------------
+  IN THIS CHAPTER (Chapter 12 -- Reinforcement Learning):
+    Part 1 -- [Five Cats, One New Power Each](the-agent-ladder.txt)
+    Part 2 -- [Greedy Shopkeeper, Faulty Machines](bandits-and-exploration.txt)
+    Part 3 -- [Worth and the Bellman Recipe from Zero](worth-and-bellman-from-zero.txt)
+    Part 3 -- [Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt)
+    Part 4 (this post) -- Finding the Best Plan by Pencil
+    Part 5 -- [No Map in the Arguments: Value Iteration](value-iteration-by-pencil.txt)
 
-  One Breath: with no plan handed to you, seed any plan, GRADE it (fill every spot's worth), then
-  IMPROVE each air spot by peeking every nudge -- '-0.1 + 0.9 * worth(where it lands)' -- and
-  re-aiming the arrow at the biggest peek; grade and improve again until a pass re-aims nothing;
-  that frozen plan is greedy with respect to its own value function, and the Policy Improvement
-  Theorem proves that any such plan is optimal -- not by definition, but because satisfying the
-  Bellman optimality conditions is what optimality means, and freezing is exactly how you reach it.
+  NEXT CHAPTER: [Chapter 13, Part 1: TD(0) Built by Pencil](td-zero-by-pencil.txt)
 
+  <- [Back to all posts](../index.txt)
 ----------------------------------------------------------------------------------------------
   (c) 2026 Rahul Rai . pure HTML+CSS, no JavaScript, no trackers .
   [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
