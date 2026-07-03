@@ -10,7 +10,7 @@
   Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, dyna-q-plus, exploration, changing-world, by-hand
   ============================================================================================
 
-  PATH . post 40/40 . part 4 of 4 in Chapter 13 -- Sample-based Learning
+  PATH . post 40/58 . part 4 of 4 in Chapter 13 -- Sample-based Learning
     <- prev:  [Chapter 13, Part 3: Dyna-Q by Pencil](dyna-q-by-pencil.txt)
        next:  [Chapter 13 Reference: The Sample-based Map](sample-based-reference.txt) ->
 
@@ -53,7 +53,7 @@
   So a move you took a moment ago has a tiny clock; a move you have not touched in
   ages has a big one. Drawn, one turn in which you really walk spot 7's "right":
 
-      BEFORE this turn:   tau[7][right] = 40    tau[7][up] = 40    tau[3][down] = 12
+      BEFORE this turn:   tau[7][right] = 5     tau[7][up] = 40    tau[3][down] = 12
       tick every clock +1, then reset the one you walked:
       AFTER:              tau[7][right] = 0     tau[7][up] = 41    tau[3][down] = 13
 
