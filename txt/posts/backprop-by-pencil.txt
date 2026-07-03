@@ -305,6 +305,76 @@
   Q) the forward pass makes. Before learning any machine, count its movable parts;
   then no symbol can be a stranger.
 
+SEAM. Pencil ends here; below, the same numbers in Python.
+
+  size = 0.01
+
+  # dials
+  s1, s2 = 1, 2
+  A00,A01,A02 =  1.0,-2.0, 0.5
+  A10,A11,A12 =  0.5, 1.0,-1.0
+  b10,b11,b12 =  0.5,-0.5, 1.0
+  C00,C10,C20 =  2.0, 1.0,-1.0  # column 0 (engine 0)
+  C03,C13,C23 =  1.0, 0.0,-1.0  # column 3 (engine 3)
+  b20,b23     =  0.5,          -0.5
+
+  # forward pass
+  p1 = s1*A00 + s2*A10 + b10   # 1+1+0.5    = 2.5
+  p2 = s1*A01 + s2*A11 + b11   # -2+2-0.5   = -0.5
+  p3 = s1*A02 + s2*A12 + b12   # 0.5-2+1.0  = -0.5
+  x1 = p1 if p1 > 0 else 0     # 2.5
+  x2 = p2 if p2 > 0 else 0     # 0    (killed)
+  x3 = p3 if p3 > 0 else 0     # 0    (killed)
+  Q0 = x1*C00 + x2*C10 + x3*C20 + b20  # 2.5*2+0+0+0.5 = 5.5
+  Q3 = x1*C03 + x2*C13 + x3*C23 + b23  # 2.5*1+0+0-0.5 = 2.0
+  print(p1, p2, p3)              # 2.5  -0.5  -0.5
+  print(x1, x2, x3)              # 2.5  0  0
+  print(Q0, Q3)                  # 5.5  2.0
+
+  # backward walk: fired engine 0, how_wrong = 4.42 - 5.5 = -1.08
+  how_wrong = 4.42 - 5.5         # -1.08
+
+  pull_x1   = C00                # 2    (column 0 of C)
+  gate1     = 1 if p1 > 0 else 0 # 1   (p1=2.5 positive, gate open)
+  gate2     = 1 if p2 > 0 else 0 # 0   (p2 negative, gate shut)
+  gate3     = 1 if p3 > 0 else 0 # 0   (p3 negative, gate shut)
+  pull_psi1 = pull_x1 * gate1    # 2*1 = 2
+  pull_psi2 = C10 * gate2        # 1*0 = 0
+  pull_psi3 = C20 * gate3        # -1*0 = 0
+  pull_A00  = s1 * pull_psi1     # 1*2 = 2
+  pull_A10  = s2 * pull_psi1     # 2*2 = 4
+  print(pull_psi1, pull_psi2, pull_psi3)  # 2  0  0
+  print(pull_A00, pull_A10)               # 2  4
+
+  # wiggle test A[1,0]: claimed pull = 4
+  p1_w  = s1*A00 + s2*0.501 + b10   # 1+1.002+0.5 = 2.502
+  Q0_w  = p1_w*C00 + b20             # 2.502*2+0.5 = 5.504
+  print(Q0_w, (Q0_w-Q0)/0.001)      # 5.504  4.0   -- pull confirmed
+
+  # wiggle test C[0,0]: claimed pull = 2.5
+  Q0_w2 = x1*2.001 + b20             # 2.5*2.001+0.5 = 5.5025
+  print(Q0_w2, (Q0_w2-Q0)/0.001)    # 5.5025  2.5   -- pull confirmed
+
+  # spend the miss
+  A00_new = A00 + size*how_wrong*pull_A00   # 1.0+0.01*(-1.08)*2   = 0.9784
+  A10_new = A10 + size*how_wrong*pull_A10   # 0.5+0.01*(-1.08)*4   = 0.4568
+  b10_new = b10 + size*how_wrong*pull_psi1  # 0.5+0.01*(-1.08)*2   = 0.4784
+  C00_new = C00 + size*how_wrong*x1         # 2.0+0.01*(-1.08)*2.5 = 1.973
+  b20_new = b20 + size*how_wrong*1          # 0.5+0.01*(-1.08)*1   = 0.4892
+  print(round(A00_new,4), round(A10_new,4), round(b10_new,4))  # 0.9784  0.4568  0.4784
+  print(round(C00_new,4), round(b20_new,4))                    # 1.973   0.4892
+
+  # post-nudge forward pass
+  p1_new = s1*A00_new + s2*A10_new + b10_new  # 0.9784+2*0.4568+0.4784 = 2.3704
+  Q0_new = p1_new*C00_new + b20_new            # 2.3704*1.973+0.4892    = 5.166
+  print(round(p1_new,4), round(Q0_new,3))      # 2.3704  5.166
+
+  # YOUR TURN: engine 3 backward walk (same gate, different column)
+  pull_psi1b = C03 * gate1    # 1*1 = 1
+  pull_A00b  = s1 * pull_psi1b  # 1*1 = 1
+  pull_A10b  = s2 * pull_psi1b  # 2*1 = 2
+  print(pull_psi1b, pull_A00b, pull_A10b)  # 1  1  2
+
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
     Part 1 (this post) .
