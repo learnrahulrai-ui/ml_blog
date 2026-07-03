@@ -135,27 +135,19 @@
 
   THE FIRST CASE: THE MOVE DID NOT END THE GAME
 
-  The numbers, all on the table before any arithmetic:
+  The worth table at this moment (many walks already done; most slots still near 0,
+  the slot for `next` has been nudged to 1 by earlier passes):
 
-      worth(last) = 0       (the guess starts as a lie -- every spot starts at 0)
-      reward      = -1      (an ordinary move costs you 1)
-      worth(next) = 1       (your current guess of where you landed)
-      size        = 0.1
-      dilute      = 0.99
+      spot:  ...  last  ...  next  ...
+      worth: ...   0    ...   1    ...
 
-  Drawn, before and after:
+      reward = -1 (ordinary move)    size = 0.1    dilute = 0.99
 
-      BEFORE:   worth(last) = 0
-      target  = reward + dilute x worth(next)
-              =  -1   + 0.99  x  1
-              =  -1   + 0.99
-              =  -0.01
+      target         = -1 + 0.99 x 1     =  -0.01
+      how wrong      = -0.01 - 0         =  -0.01
+      new worth(last) = 0 + 0.1 x (-0.01) = -0.001
 
-      how wrong = target - worth(last) = -0.01 - 0 = -0.01
-
-      new worth(last) = 0 + 0.1 x ( -0.01 ) = -0.001
-
-      AFTER:    worth(last) = -0.001     (worth(next) = 1 is untouched)
+      AFTER:  worth(last) = -0.001   [ worth(next) = 1 untouched ]
 
   So one walk nudged worth(last) a tiny step, from 0 down to -0.001. Tiny on purpose:
   size 0.1 eases one noisy sample in gently, so a single unlucky landing cannot wreck
@@ -177,21 +169,16 @@
       size        = 0.1
       (NO worth(next) -- the game ended, there is no landing)
 
-  Drawn, before and after:
+      target          = -1               (reward only -- no landing to add 0.99 of)
+      how wrong       = -1 - 0           = -1
+      new worth(last) = 0 + 0.1 x (-1)  = -0.1
 
-      BEFORE:   worth(last) = 0
-      target  = reward only = -1          (anchor: no landing to add 0.99 of)
+      AFTER:  worth(last) = -0.1
 
-      how wrong = target - worth(last) = -1 - 0 = -1
-
-      new worth(last) = 0 + 0.1 x ( -1 ) = -0.1
-
-      AFTER:    worth(last) = -0.1
-
-  Look at what the missing landing did. Mid-game the SAME -1 reward had 0.99 x worth(1)
-  = 0.99 added on top, which nearly cancelled it -- target -0.01, nudge to -0.001. At
-  the anchor there is no landing to add, so the bare -1 stands -- target -1, nudge to
-  -0.1, a hundred times larger. That is the whole difference between the two cases: a
+  Look at what the missing landing did. Mid-game the SAME -1 reward had 0.99 x 1
+  (the landing's current worth) = 0.99 added on top, nearly cancelling it --
+  target -0.01, nudge to -0.001. At the anchor there is no landing to add, so the
+  bare -1 stands -- target -1, nudge to -0.1, a hundred times larger. That is the whole difference between the two cases: a
   mid-game move uses reward + dilute x worth(next); the anchor uses reward alone.
 
   WHICH RAISES THE OBVIOUS WORRY: ISN'T A GUESS-OFF-A-GUESS A SCAM?
@@ -228,14 +215,16 @@
       target 12:  V = 9.5   + 0.5 x (12 - 9.5)   = 9.5 + 1.250 = 10.75
       target  8:  V = 10.75 + 0.5 x ( 8 - 10.75) = 10.75 - 1.375 = 9.375
 
-  Started on the truth, it walked AWAY. Drawn, it just bounces in a band around 10:
+  Started on the truth, it walked AWAY. In time order:
 
-      8         9       10       11        12
-      |---------|----*---|----*---|---------|
-                  9.375   10.75    11.0       ... and on, forever
+      target 12:  10     ->  11.0     (swing +1.00)
+      target  8:  11.0   ->   9.5     (swing -1.50)
+      target 12:   9.5   ->  10.75    (swing +1.25)
+      target  8:  10.75  ->   9.375   (swing -1.375)
+                                ... same size swing, forever
 
-  A fixed size keeps reacting to every noisy target at full half-strength, so a freak 8
-  or 12 always knocks it off by the same swing. It orbits the truth; it never lands.
+  Each swing is as large as the last -- freak 8 or freak 12 hits just as hard every
+  time. It orbits the truth; it never lands.
 
   So shrink the size as you go -- 1/1, then 1/2, then 1/3, then 1/4 (the running-average
   size from the bandit in Chapter 12). Same noisy targets 12, 8, 12, 8, now starting at
@@ -246,11 +235,13 @@
       size 1/3, target 12:  V = 10.0   + 0.333 x (12 - 10.0)   = 10.667
       size 1/4, target  8:  V = 10.667 + 0.250 x ( 8 - 10.667) = 10.0
 
-  Drawn, the swing SHRINKS each step -- it spirals inward and lands:
+  In time order, each swing is shorter than the last:
 
-      8         9       10       11        12
-      |---------|------> 10 <-----|---------|
-                steps getting smaller, closing on 10 (the true mean of 8 and 12)
+      target 12:   0     ->  12.0     (size 1/1, swing +12.000)
+      target  8:  12.0   ->  10.0     (size 1/2, swing  -2.000)
+      target 12:  10.0   ->  10.667   (size 1/3, swing  +0.667)
+      target  8:  10.667 ->  10.0     (size 1/4, swing  -0.167)
+                                ... swings keep halving, closing on 10
 
   Each later target moves the guess less, so the noise dies and the guess settles on the
   true 10 (the average of 8 and 12 is exactly 10). The rule behind it: the sizes must
@@ -270,26 +261,27 @@
                   0      0      0            0
               (48 slots, one per spot -- not a history, just the latest guess)
 
-  THE FIRST CASE BY HAND (the move did not end the game): peasant left spot 0, grabbed
-  reward -1, landed on spot 1, whose current guess is 1.
+  CASE 1 -- mid-game move (did not end): left spot 10, reward -1, landed spot 11.
+  Earlier passes have already nudged spot 11 to 1.0; spot 10 is still at 0.
 
       step_size, discount = 0.1, 0.99
-      last, reward, landed = 0, -1, 1
+      last, reward, landed = 10, -1, 11
       V = [0.0] * 48
-      V[landed] = 1.0                              # the landing's current guess is 1
+      V[11] = 1.0                                  # earlier passes nudged this to 1
 
-      target    = reward + discount * V[landed]    # -1 + 0.99*1   = -0.01
-      how_wrong = target - V[last]                 # -0.01 - 0     = -0.01
-      V[last]   = V[last] + step_size * how_wrong   # 0 + 0.1*-0.01 = -0.001
+      target    = reward + discount * V[landed]    # -1 + 0.99*1.0  = -0.01
+      how_wrong = target - V[last]                 # -0.01 - 0.0    = -0.01
+      V[last]   = V[last] + step_size * how_wrong  # 0.0 + 0.1*-0.01 = -0.001
       print(V[last])    # -0.001
 
-  THE ANCHOR CASE BY HAND (the move ended the game): peasant left spot 0, grabbed
-  reward -1, no landing -- so drop the discount piece.
+  CASE 2 -- anchor move (ended the game): left spot 46 (one step from G), reward -1.
+  No landing. V[46] = 0 (never updated yet).
 
+      last, reward = 46, -1
       V = [0.0] * 48
-      target    = -1                               # anchor: reward alone, no landing
-      how_wrong = target - V[last]                 # -1 - 0        = -1
-      V[last]   = V[last] + step_size * how_wrong   # 0 + 0.1*-1    = -0.1
+      target    = reward                           # anchor: reward alone, no landing
+      how_wrong = target - V[last]                 # -1 - 0.0      = -1.0
+      V[last]   = V[last] + step_size * how_wrong  # 0.0 + 0.1*-1  = -0.1
       print(V[last])    # -0.1
 
   Then the agent, the same two lines wrapped for any spot. The grader runs these:
