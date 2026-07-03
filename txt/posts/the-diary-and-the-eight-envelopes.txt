@@ -26,7 +26,7 @@
   can actually use, and that re-cutting has its own arithmetic. Get the food wrong and
   both machines starve.
 
-  THE GAME, BECAUSE THE NUMBERS MEAN NOTHING WITHOUT IT
+  GAME, BECAUSE THE NUMBERS MEAN NOTHING WITHOUT IT
 
       +--------------------------------------------+
       |                     (0,0) is this corner   |
@@ -81,7 +81,7 @@
   little up the page. One line of the diary is exactly this pair: five numbers of
   situation, two numbers of answer.
 
-  THE DIARY: 206 GAMES, 25,650 LINES
+  DIARY: 206 GAMES, 25,650 LINES
 
   The human played the game 206 times, start to finish, and every moment of every game
   was written down in one long ledger:
@@ -258,7 +258,7 @@
   eight-at-once shape is an invention for the machine's benefit, cut at study time, and
   the same recorded decision reappears in up to eight different windows because of it.
 
-  THE SEAM. Pencil ends here; below, the same numbers in Python.
+  SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the toy 12-moment game and the real diary's first seam,
   line by line, every count hard-coded. About 10 subtractions total, nothing more.

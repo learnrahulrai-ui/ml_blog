@@ -25,7 +25,7 @@
   arithmetic -- and a pencil can locate the crash before the machine ever plays. This
   page is that pencil work.
 
-  THE QUESTION WITH TWO TRUTHS
+  QUESTION WITH TWO TRUTHS
 
       +--------------------------------------------+
       |                                            |
@@ -176,7 +176,7 @@
   mis-stated, competence makes the failure crisper -- the meter reads a comfortable
   2.0 while the hand parks itself inside the block at (230, 300).
 
-  THE SEAM. Pencil ends here; below, the same numbers in Python.
+  SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the candidate table and the on-table crash, hard-coded.
   Eight squares, six adds, two averages: the entire failure.

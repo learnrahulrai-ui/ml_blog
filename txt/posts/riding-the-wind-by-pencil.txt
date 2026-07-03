@@ -25,7 +25,7 @@
   The move is made by walking: start from pure dust, read the arrow, take a small
   step, read again.
 
-  THE LADDER: N EQUAL RUNGS FROM DUST TO ANSWER
+  LADDER: N EQUAL RUNGS FROM DUST TO ANSWER
 
       tau:   0.00 --------> 0.25 --------> 0.50 --------> 0.75 --------> 1.00
               |    rung 0    |    rung 1    |    rung 2    |    rung 3    |
@@ -46,7 +46,7 @@
   -- exactly the truth, every time. A walker taking n equal rungs covers that same
   line in n honest pieces.
 
-  THE FULL WALK, EVERY STROKE WRITTEN
+  FULL WALK, EVERY STROKE WRITTEN
 
   A live question arrives (five re-ruled table numbers -- fixed all walk, so they are
   written once and read every rung). Pull one speck of dust from the noise jar as the
@@ -164,7 +164,7 @@
       the ride         n = 10 rungs, step 1/10, tau 0 -> 1, ten passes per envelope
       the exam         100 fresh games, average of per-game best coverage
 
-  THE JAR PICKS THE VALLEY, THE RUNGS ONLY POLISH THE ROAD
+  JAR PICKS THE VALLEY, RUNGS ONLY POLISH THE ROAD
 
   "More rungs would walk closer to THE answer." There is no THE answer -- that is the
   point of the whole machine. The landing depends on the speck: dust at [0.20, -1.00]
@@ -191,7 +191,7 @@
   one web pass became ten rungs of web passes. Swap the machines and the world
   notices nothing but the moves getting around the block.
 
-  THE SEAM. Pencil ends here; below, the same numbers in Python.
+  SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the four rungs unrolled one by one, the de-ruling, and the
   two-speck demonstration. Per rung: 2 multiplies, 2 adds; the walk is 16 strokes and

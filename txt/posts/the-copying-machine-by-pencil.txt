@@ -206,7 +206,7 @@
   a per-dial step-size picker; this page turns dials with a plain fixed step because
   the pull, not the tuner, is the idea.
 
-  THE FEEDING SCHEDULE, AT REAL SCALE
+  FEEDING SCHEDULE, AT REAL SCALE
 
   Nobody feeds the machine one pair at a time, and nobody feeds it the whole diary at
   once. The schedule between:
@@ -274,7 +274,7 @@
   was 0.9885. When a number is predictable before the experiment, the machine has
   stopped being magic -- that is the whole point of the pencil.
 
-  THE SEAM. Pencil ends here; below, the same numbers in Python.
+  SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- the re-ruling, the tiny twin's forward pass, the meter, one
   wiggle-priced dial-turn, and the real machine's schedule arithmetic. Count the twin's

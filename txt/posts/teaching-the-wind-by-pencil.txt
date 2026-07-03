@@ -232,7 +232,7 @@
   never comes). Cut the tau wire and the machine must average -0.5 with 5.0 -- one
   more mean collapse, this time in the wind itself.
 
-  THE SEAM. Pencil ends here; below, the same numbers in Python.
+  SEAM. Pencil ends here; below, the same numbers in Python.
 
   No loops, no functions -- one manufactured training pair, its grade, and a second
   dial roll on the same truth. Per pair: 4 multiplies + 2 adds for the mix, 2
