@@ -1,0 +1,332 @@
+@title Eight Blind Ticks, Then The Overshoot :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 20 . THE PUSH-T MACHINE . PART 3 OF 3
+  Eight Blind Ticks, Then The Overshoot
+  ============================================================================================
+
+
+  Part 1 built a 22-wire machine that reads a table situation (5 numbers) and prints
+  a direction, not an answer. Part 2 trained it: one wrong-wind reading, one backward
+  pass, 141,584 dials nudged a little each time. Neither part checked whether the
+  finished machine, run for real, does what the pencil work promised -- and whether
+  the plan it prints can be trusted all the way through once it starts acting on a
+  real table.
+
+  The loop for using that plan was fixed back in Chapter 19: look at the table once,
+  walk ten rungs of noise into one 16-number, 8-move plan, then act out all 8 moves
+  without looking again, then look once more. Blind for 8 ticks (a tick is one
+  moment of game time; the table updates once per tick), on purpose -- ten looks
+  per plan instead of eighty would have cost ten times as much for barely more
+  coverage. So the real question is what happens inside those 8 blind ticks the
+  moment the world stops matching what the plan assumed.
+
+  -------
+
+  THE RUN THAT ACTUALLY HAPPENED
+
+  Answering that starts with proof the walk itself works, in real numbers, not
+  estimates. The machine trained for 400 epochs over the diary (the recorded human
+  demonstrations from Chapter 19) and logged 75,599 total dial-nudges -- one shy of
+  the 75,600 that batch arithmetic alone would predict (189 batches per epoch, times
+  400). The gap is a single dropped partial batch at a fencepost the log does not
+  spell out; the measured number, not the estimate, is the one that matters from
+  here on.
+
+        LOSS, START TO FINISH
+
+        epoch 1:    loss = 0.59382   (wind is close to random)
+        epoch 400:  loss = 0.17142   (wind error cut by more than half)
+
+  The loss is a squared-error ruler: average of (predicted wind minus true wind)
+  squared, over a batch of 128 examples this time instead of 1. It fell by a factor
+  of about 3.5 over the run. That number says training worked; it says nothing yet
+  about what the machine does once it is turned loose in a live game.
+
+  -------
+
+  WHAT THE VIDEOS SHOW
+
+  A number falling is not proof of anything a person can watch, so the training
+  loop also freezes the dials every 10,000 dial-nudges and records 5 fresh games as
+  video -- 7 such freezes across the run, 35 videos total. Two of those freezes
+  tell the whole story.
+
+        FREEZE AT NUDGE 10,001 (early, loss still high)
+
+        The hand jerks. Its moves do not track any one line toward the block.
+        Across the recorded games at this freeze, the hand mostly fails to make
+        contact with the T-block at all.
+
+        FREEZE AT NUDGE 70,001 (late, loss near its floor)
+
+        The hand moves in one clean, fast line straight to the block, pushes it,
+        and the T slides toward the goal strip. Contact happens early and on
+        purpose, not by accident.
+
+  The gap between those two freezes is what 75,599 dial-nudges bought: a hand that
+  used to flail now commits to a single confident line.
+
+  -------
+
+  THE CRACK IN THE LATE VIDEO
+
+  But one clip from the nudge-70,001 freeze complicates the claim. The clip plays
+  past the 8-second mark. At 8 seconds in, the T-block reaches the goal strip
+  cleanly -- lines up, sits inside it, done. What plays right after that moment is
+  the crack: the hand keeps moving, keeps pushing, and the T slides back OUT of
+  the goal strip it had just reached.
+
+  This is not a training failure. The dials that just nailed the approach are the
+  same dials running the push that undoes it. The failure sits in the loop design
+  from Chapter 19, not in the network.
+
+  -------
+
+  WHY BLIND TICKS GUARANTEE THIS
+
+  So trace what the loop actually promises. At tick 0, the machine reads the table
+  once and walks ten rungs of noise into one 8-move plan -- 8 target positions for
+  the hand, ticks 1 through 8. Every one of those 8 targets was computed from the
+  SAME single reading, taken at tick 0. None of the later 7 targets has ever seen
+  what the table looks like at tick 3, tick 5, or tick 7.
+
+  If the block's true position at tick 6 matches what the tick-0 plan assumed it
+  would be, target 7 is still a good push. If it does not match -- because the
+  hand's push moved the block a little further than the walk assumed, which real
+  contact and momentum will always do by some amount -- target 7 is a push aimed
+  at a table that no longer exists. The plan cannot know it already succeeded,
+  because nothing after tick 0 was ever measured. It just keeps counting down 8
+  pre-decided moves.
+
+  -------
+
+  EIGHT BLIND TICKS, WORKED IN NUMBERS
+
+  Make that concrete with clean invented numbers standing for the block's height
+  on the table (the real state is 5 numbers; height alone carries the story). Goal
+  strip: centered at height 300, 8 units wide either way:
+
+        GOAL BAND
+        <---- 292 ================ 300 ================ 308 ---->
+                        "in the goal" means height falls inside here
+
+  Start: block height = 340, so 40 units of height need to close before the goal.
+  The tick-0 plan divides that evenly across 8 moves, 5 units of height each,
+  assuming each push moves the block exactly 5:
+
+        PLANNED HEIGHTS (assumes 5 units of real movement per push)
+        tick 1: 335   tick 2: 330   tick 3: 325   tick 4: 320
+        tick 5: 315   tick 6: 310   tick 7: 305   tick 8: 300
+
+  Real contact moves the block 6.5 units per push, not 5 -- the walk's estimate
+  was close, not exact, which training never forces it to be:
+
+        ACTUAL HEIGHTS (6.5 units of real movement per push, plan never re-measures)
+        tick 1: 333.5   tick 2: 327.0   tick 3: 320.5   tick 4: 314.0
+        tick 5: 307.5   tick 6: 301.0   tick 7: 294.5   tick 8: 288.0
+
+  Check those against the goal band [292, 308]: tick 5 (307.5) is already inside
+  it, and the block stays inside through tick 6 (301.0) and tick 7 (294.5) -- the
+  job is done three ticks early. Tick 8 still fires, because the plan was fixed at
+  tick 0 and nothing told it to stop. It lands at 288.0 -- 4 units below the goal
+  band's lower edge of 292 -- and the block is pushed clean back out. That is the
+  crack in the video: the 8th blind push, aimed at a table that no longer needed
+  it.
+
+  -------
+
+  RECEDING HORIZON CONTROL: LOOK AFTER EVERY TICK, NOT EVERY EIGHT
+
+  That gap forces one change: how many of the 8 planned moves get used before the
+  machine looks at the table again. Chapter 19's loop used N = 8 -- burn the whole
+  plan, then look. The fix uses N = 1: use only the first move, throw the other 7
+  away unused, read the table's real height again, walk a brand new 8-move plan
+  from THAT height, and repeat.
+
+        OLD LOOP (N = 8)                    NEW LOOP (N = 1)
+
+        read table once                     read table
+        walk 8-move plan                    walk 8-move plan
+        act move 1                          act move 1  <- only this one runs
+        act move 2                          (moves 2-8 thrown away, unused)
+        act move 3                          read table again (fresh, true height)
+        ...                                 walk a NEW 8-move plan from there
+        act move 8                          act move 1 of the new plan
+        read table again                    read table again
+                                             ...
+
+  Re-run the same worked numbers under the new loop. Real movement per push is
+  still 6.5 units for every 5 planned -- that ratio is a property of the table's
+  contact physics, not of the loop. Each tick now reads the TRUE height first,
+  computes the TRUE remaining gap, and plans a fresh 8-move split of that gap
+  before using only its first move:
+
+        tick 1: height 340.0,    gap 40.0,    planned push 5.0,    real push 6.5    -> 333.5
+        tick 2: height 333.5,    gap 33.5,    planned push 4.1875, real push 5.4438 -> 328.0562
+        tick 3: height 328.0562, gap 28.0562, planned push 3.507,  real push 4.5591 -> 323.4971
+        tick 4: height 323.4971, gap 23.4971, planned push 2.9371, real push 3.8183 -> 319.6788
+
+  Every tick's planned push shrinks, because every tick re-measures the true
+  remaining gap instead of trusting a plan computed when the gap was 40. The gap
+  after each tick is 0.8375 times the gap before it (real push is 1.3 times the
+  planned 1/8 share, and 1 - 1.3/8 = 0.8375) -- a fixed shrink factor strictly
+  between 0 and 1 for this contact ratio, so the gap only ever shrinks and never
+  changes sign. The height falls toward 300 and never ducks under it, so there is
+  no fixed final push left over to overshoot with.
+
+  -------
+
+  ONE BREATH
+
+  The trained machine works: loss fell from 0.59382 to 0.17142 over 75,599
+  nudges, and the videos show a hand that went from flailing to a single
+  confident push. The loop built in Chapter 19 to use that machine -- read once,
+  walk an 8-move plan, act all 8 blind, read again -- was cheap on purpose, and
+  cheap has a cost: none of moves 2 through 8 ever sees the table again before it
+  fires, so a plan that already finished the job by move 5 still fires move 8
+  anyway, overshooting a goal it had already reached. Receding Horizon Control
+  removes that cost by throwing away moves 2 through 8 unused every time and
+  re-planning from a freshly read table after every single move. The push shrinks
+  as the true remaining gap shrinks, because the gap is re-measured every tick
+  instead of assumed once at the start.
+
+
+  SEAM. Pencil ends here; below, the same numbers in Python.
+
+  -------
+
+```python
+# --------------------------------------------------------------------------
+# Blind 8-tick execution: plan computed once at tick 0, never re-measured
+# Goal band: height in [292, 308] (centered 300, +/-8)
+# --------------------------------------------------------------------------
+
+start_height     = 340.0
+planned_per_push = 5.0     # what the tick-0 walk assumed
+actual_per_push  = 6.5     # what real contact actually delivers
+
+# planned heights: every push assumed to move the block exactly 5.0
+planned_1 = start_height - planned_per_push*1   # 340 - 5  = 335.0
+planned_2 = start_height - planned_per_push*2   # 340 - 10 = 330.0
+planned_3 = start_height - planned_per_push*3   # 340 - 15 = 325.0
+planned_4 = start_height - planned_per_push*4   # 340 - 20 = 320.0
+planned_5 = start_height - planned_per_push*5   # 340 - 25 = 315.0
+planned_6 = start_height - planned_per_push*6   # 340 - 30 = 310.0
+planned_7 = start_height - planned_per_push*7   # 340 - 35 = 305.0
+planned_8 = start_height - planned_per_push*8   # 340 - 40 = 300.0
+print("planned:", planned_1, planned_2, planned_3, planned_4,
+                   planned_5, planned_6, planned_7, planned_8)
+
+# actual heights: real contact moves the block 6.5 per push, plan never re-measures
+actual_1 = start_height - actual_per_push*1     # 340 - 6.5  = 333.5
+actual_2 = start_height - actual_per_push*2     # 340 - 13.0 = 327.0
+actual_3 = start_height - actual_per_push*3     # 340 - 19.5 = 320.5
+actual_4 = start_height - actual_per_push*4     # 340 - 26.0 = 314.0
+actual_5 = start_height - actual_per_push*5     # 340 - 32.5 = 307.5
+actual_6 = start_height - actual_per_push*6     # 340 - 39.0 = 301.0
+actual_7 = start_height - actual_per_push*7     # 340 - 45.5 = 294.5
+actual_8 = start_height - actual_per_push*8     # 340 - 52.0 = 288.0
+print("actual :", actual_1, actual_2, actual_3, actual_4,
+                   actual_5, actual_6, actual_7, actual_8)
+
+goal_lo, goal_hi = 292.0, 308.0
+print("tick 5 in goal:", goal_lo <= actual_5 <= goal_hi, "height", actual_5)  # True 307.5
+print("tick 7 in goal:", goal_lo <= actual_7 <= goal_hi, "height", actual_7)  # True 294.5
+print("tick 8 in goal:", goal_lo <= actual_8 <= goal_hi, "height", actual_8)  # False 288.0
+# tick 8 lands 4.0 units below the goal band's low edge (292 - 288 = 4.0) --
+# the crack in the video is this exact unmeasured 8th push.
+
+# --------------------------------------------------------------------------
+# Receding Horizon Control: N=1, re-measure and re-plan after every push.
+# Every tick reads the TRUE height left by the tick before it -- no schedule
+# fixed at tick 0 survives past one move.
+# --------------------------------------------------------------------------
+
+ratio = actual_per_push / planned_per_push   # 6.5 / 5.0 = 1.3
+
+gap_1    = start_height - 300.0              # 40.0
+push_1   = (gap_1 / 8.0) * ratio             # 5.0 * 1.3 = 6.5
+height_1 = start_height - push_1             # 340.0 - 6.5 = 333.5
+
+gap_2    = height_1 - 300.0                  # 33.5
+push_2   = (gap_2 / 8.0) * ratio             # 4.1875 * 1.3 = 5.4438
+height_2 = height_1 - push_2                 # 333.5 - 5.4438 = 328.0562
+
+gap_3    = height_2 - 300.0                  # 28.0562
+push_3   = (gap_3 / 8.0) * ratio             # 3.507 * 1.3 = 4.5591
+height_3 = height_2 - push_3                 # 328.0562 - 4.5591 = 323.4971
+
+gap_4    = height_3 - 300.0                  # 23.4971
+push_4   = (gap_4 / 8.0) * ratio             # 2.9371 * 1.3 = 3.8183
+height_4 = height_3 - push_4                 # 323.4971 - 3.8183 = 319.6788
+
+gap_5    = height_4 - 300.0
+push_5   = (gap_5 / 8.0) * ratio
+height_5 = height_4 - push_5                 # 316.4810
+
+gap_6    = height_5 - 300.0
+push_6   = (gap_6 / 8.0) * ratio
+height_6 = height_5 - push_6                 # 313.8029
+
+gap_7    = height_6 - 300.0
+push_7   = (gap_7 / 8.0) * ratio
+height_7 = height_6 - push_7                 # 311.5599
+
+gap_8    = height_7 - 300.0
+push_8   = (gap_8 / 8.0) * ratio
+height_8 = height_7 - push_8                 # 309.6814
+
+gap_9    = height_8 - 300.0
+push_9   = (gap_9 / 8.0) * ratio
+height_9 = height_8 - push_9                 # 308.1082
+
+gap_10    = height_9 - 300.0
+push_10   = (gap_10 / 8.0) * ratio
+height_10 = height_9 - push_10               # 306.7906
+
+print("RHC heights, ticks 1-10:", round(height_1,4), round(height_2,4),
+      round(height_3,4), round(height_4,4), round(height_5,4), round(height_6,4),
+      round(height_7,4), round(height_8,4), round(height_9,4), round(height_10,4))
+print("tick 8  in goal:", goal_lo <= height_8  <= goal_hi)   # False, 309.6814 > 308
+print("tick 10 in goal:", goal_lo <= height_10 <= goal_hi)   # True,  306.7906
+```
+
+  Running this code prints:
+
+        planned: 335.0 330.0 325.0 320.0 315.0 310.0 305.0 300.0
+        actual : 333.5 327.0 320.5 314.0 307.5 301.0 294.5 288.0
+        tick 5 in goal: True height 307.5
+        tick 7 in goal: True height 294.5
+        tick 8 in goal: False height 288.0
+        RHC heights, ticks 1-10: 333.5 328.0562 323.4971 319.6788 316.481
+                                  313.8029 311.5599 309.6814 308.1082 306.7906
+        tick 8  in goal: False
+        tick 10 in goal: True
+
+  The blind trace is inside the goal band by tick 5, still inside at tick 7, and
+  outside again at tick 8 -- pushed 4 units past the band's lower edge by a move
+  that was never re-checked against the table. The RHC trace never fires a fixed
+  8th push at all: the height falls a shrinking amount every tick and only
+  crosses into the goal band at tick 10, two ticks later than blind's fixed
+  schedule -- slower by two ticks, but it never has to be undone, because nothing
+  was ever decided more than one tick in advance.
+
+  Chapter 20 closes here: a machine that turns noise into a plan (Part 1), learns
+  that plan from one wrong reading at a time (Part 2), and only earns its keep
+  once the loop using it looks as often as the table actually changes (Part 3).
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  tick                   = one moment of game time; the table's state updates once per tick
+  diary                  = the recorded human demonstration games from Chapter 19, used to train the machine
+  open-loop execution    = acting out a full multi-step plan without re-checking the true state mid-plan
+  Receding Horizon Control (RHC) = re-planning from the true state after every single action, using only the first action of each new plan
+  MPC                    = Model Predictive Control, the general name for the receding-horizon idea (plan ahead, act one step, replan)
+  evaluation freeze      = a pause in training where the dials hold still and the machine plays fresh games to be scored/recorded
+  goal band              = the range of positions counted as "the block is in the goal strip"

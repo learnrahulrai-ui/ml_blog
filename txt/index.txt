@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in nineteen chapters (fifty-eight posts),
+  This is not a pile of loose articles -- it is a short BOOK in twenty chapters (sixty-one posts),
   meant to be read top to bottom. Each post opens with a "post N" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 58:
+  >> NEW HERE? Start at post 1 of 61:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -933,6 +933,20 @@
     v=0.0000010796, bias-corrected step +0.0003 lifting W2[o0,h0] from 0.6 to 0.6003). Why
     zero_grad->backward->step order is mandatory. Why a dead ReLU is not permanent. Full training
     loop: 400 epochs x 189 batches = 75,600 total nudges, eval every 10,000. Assumes zero background.
+
+  [Part 3 -- Eight Blind Ticks, Then The Overshoot](posts/eight-blind-ticks-then-overshoot.txt)
+    post 61/61 . 2026-07-04 . part 3 of 3 . imitation-learning, push-t, evaluation, open-loop, mpc, receding-horizon-control, by-hand
+    The real run: 400 epochs, 75,599 logged dial-nudges (one shy of the 75,600 estimate -- a
+    dropped fencepost batch), loss 0.59382 -> 0.17142. 35 videos across 7 freezes: nudge 10,001
+    flails and misses the block, nudge 70,001 commits to one clean push -- but one clip past the
+    8-second mark reaches the goal strip cleanly, then a still-firing 8th blind push shoves the
+    block back out. Worked in clean numbers: a plan built once at tick 0 assumes 5 units of push
+    per tick; real contact delivers 6.5; the block sits inside a 292-308 goal band from tick 5
+    through tick 7, then tick 8 fires anyway and lands at 288, 4 units past the band's edge,
+    because the plan never re-measures. The fix, Receding Horizon Control: use only move 1 of
+    every 8-move plan, throw the rest away, re-plan from a freshly read table every tick -- gap
+    shrinks by a fixed 0.8375 factor per tick, never changes sign, never has a fixed final push
+    left to overshoot with. Closes Chapter 20. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------
