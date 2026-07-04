@@ -893,7 +893,7 @@
     First meter reading pencil-called at 1 + 1 = 2; measured 2.1136. Assumes zero background.
 
   [Part 5 -- Riding the Wind: From Noise to an Answer](posts/riding-the-wind-by-pencil.txt)
-    post 58/58 . 2026-07-03 . part 5 of 5 . imitation-learning, flow-matching, euler, sampling, by-hand
+    post 58/59 . 2026-07-03 . part 5 of 5 . imitation-learning, flow-matching, euler, sampling, by-hand
     Answering time has no truth, so the answer is walked: pull a dust speck from the jar and
     take n equal rungs, current = current + (1/n) x wind while tau climbs 0 -> 1. A full
     4-rung walk by pencil: [0.10, 0.80] -> [0.20, 0.75] -> [0.275, 0.725] -> [0.325, 0.700]
@@ -903,6 +903,25 @@
     merged, which the rider never does. Cost: ten web passes per envelope instead of one
     (16 vs 160 per game). Exam: frozen dials, 100 fresh games, average of per-game best
     coverage. Assumes zero background.
+
+
+
+
+  CHAPTER 20 . THE PUSH-T MACHINE . from five numbers to a working wind machine
+  ------------------------------------------------------------------------------
+
+  [Part 1 -- From Five to Twenty-Two: Why Flow Matching Needs a Clock](posts/from-five-to-twenty-two.txt)
+    post 59/59 . 2026-07-04 . part 1 of 3 . imitation-learning, push-t, flow-matching, architecture, action-chunking, by-hand
+    A square table, a T-block, a round hand, 25,650 recorded diary lines. The five-wire copying
+    machine (5 -> 256 -> 256 -> 256 -> 16) reads the situation and prints an 8-move plan directly.
+    It fails at the fork: when one situation has two equally valid paths (swing above or below),
+    the MSE ruler forces the machine to print their average -- a third path nobody ever chose,
+    proved by d/dc E[(c-Y)^2] = 0 -> c = (Y1+Y2)/2, worked with Y1=+0.3, Y2=-0.3 -> c=0.0.
+    The wind fix stops printing the answer and prints a direction instead, but that direction
+    depends on where the blend point currently sits (16 numbers) and how far along the walk we
+    are (tau, 1 number) as well as the table situation (5 numbers): 5+16+1=22. Drop tau and the
+    machine cannot tell early from late; drop the blend and it cannot tell which noise it started
+    from. All three blend/landing/MSE claims verified in hard-coded Python. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------
