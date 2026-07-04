@@ -429,21 +429,21 @@
   Update m and v:
         m_new = 0.9 * 0   + 0.1 * (-0.032860) = -0.003286
         v_new = 0.999 * 0 + 0.001 * (-0.032860)^2
-              = 0.001 * 0.001080 = 0.0000010796
+              = 0.001 * 0.0010798 = 0.0000010798
 
   Bias correction (t = 1):
         m_hat = -0.003286 / (1 - 0.9^1)  = -0.003286 / 0.1  = -0.03286
-        v_hat = 0.0000010796 / (1 - 0.999^1) = 0.0000010796 / 0.001 = 0.0010796
+        v_hat = 0.0000010798 / (1 - 0.999^1) = 0.0000010798 / 0.001 = 0.0010798
 
   Compute the step:
-        sqrt(v_hat) = sqrt(0.0010796) = 0.032857
-        m_hat / (sqrt(v_hat) + 1e-8) = -0.03286 / 0.032857 = -1.0001
+        sqrt(v_hat) = sqrt(0.0010798) = 0.032860
+        m_hat / (sqrt(v_hat) + 1e-8) = -0.03286 / 0.032860 = -1.0000
 
   The nudge:
-        nudge = lr * (-1.0001) = 0.0003 * (-1.0001) = -0.00030003
+        nudge = lr * (-1.0000) = 0.0003 * (-1.0000) = -0.00030000
 
   New value:
-        W2[o0,h0]_new = 0.6 - (-0.00030003) = 0.60030
+        W2[o0,h0]_new = 0.6 - (-0.00030000) = 0.60030
 
   A first Adam step on any dial almost always moves it by exactly lr,
   because m_hat / sqrt(v_hat) rounds to +1 or -1. That is the bias
@@ -649,21 +649,21 @@ m_prev = 0.0        # m starts at zero for every dial
 v_prev = 0.0        # v starts at zero for every dial
 
 m_new = beta1 * m_prev + (1 - beta1) * slope         # 0.9*0 + 0.1*(-0.032860) = -0.003286
-v_new = beta2 * v_prev + (1 - beta2) * slope**2      # 0.999*0 + 0.001*0.001080 = 0.0000010796
+v_new = beta2 * v_prev + (1 - beta2) * slope**2      # 0.999*0 + 0.001*0.0010798 = 0.0000010798
 print("m_new:", round(m_new, 7))                      # -0.003286
-print("v_new:", round(v_new, 10))                     # 0.0000010796
+print("v_new:", format(round(v_new, 10), '.10f'))     # 0.0000010798 (fixed decimal, not 1.0798e-06)
 
 m_hat = m_new / (1 - beta1**t)    # -0.003286 / (1 - 0.9) = -0.003286 / 0.1 = -0.03286
-v_hat = v_new / (1 - beta2**t)    # 0.0000010796 / (1 - 0.999) = 0.0000010796 / 0.001 = 0.0010796
+v_hat = v_new / (1 - beta2**t)    # 0.0000010798 / (1 - 0.999) = 0.0000010798 / 0.001 = 0.0010798
 print("m_hat:", round(m_hat, 6))   # -0.03286
-print("v_hat:", round(v_hat, 7))   # 0.0010796
+print("v_hat:", round(v_hat, 7))   # 0.0010798
 
 import math
-step_size = lr * m_hat / (math.sqrt(v_hat) + eps)    # 0.0003*(-0.03286)/(0.032857+0)
-           # = 0.0003 * (-1.00009) = -0.000300
-print("step_size:", round(step_size, 7))              # -0.000300
+step_size = lr * m_hat / (math.sqrt(v_hat) + eps)    # 0.0003*(-0.03286)/(0.032860+0)
+           # = 0.0003 * (-1.0000) = -0.000300
+print("step_size:", round(step_size, 7))              # -0.0003
 
-W2_o0_h0_new = W2_o0_h0 - step_size    # 0.6 - (-0.000300) = 0.60030
+W2_o0_h0_new = W2_o0_h0 - step_size    # 0.6 - (-0.0003) = 0.60030
 print("W2[o0,h0] before:", W2_o0_h0)   # 0.6
 print("W2[o0,h0] after :", round(W2_o0_h0_new, 5))   # 0.6003
 ```
@@ -681,9 +681,9 @@ print("W2[o0,h0] after :", round(W2_o0_h0_new, 5))   # 0.6003
         dL/dW1[h0,x0]: -0.0633
         dL/dW1[h1,x0]: -0.0023
         m_new: -0.003286
-        v_new: 0.0000010796
+        v_new: 0.0000010798
         m_hat: -0.03286
-        v_hat: 0.0010796
+        v_hat: 0.0010798
         step_size: -0.0003
         W2[o0,h0] before: 0.6
         W2[o0,h0] after : 0.6003
