@@ -1,0 +1,255 @@
+@title One Dot Away From An Infinite Loop :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 21 . SELF, NET, AND THE CALL THAT DOES NOT LOOP . PART 1 OF 2
+  One Dot Away From An Infinite Loop
+  ============================================================================================
+
+
+  Every policy in this book writes its forward method the same way: build a
+  stack of layers once, in __init__, and store it under the name self.net.
+  Then, every time a prediction is needed, forward does one thing with it:
+  self.net(state). That line is a function call written on an object that is
+  not, itself, a function -- self.net is a pile of weight numbers. And the
+  object making that call, self, is built the exact same way self.net is. So
+  the question this post answers: when forward calls self.net(state), why
+  does that not turn into forward calling forward calling forward, forever?
+
+  -------
+
+  TWO KINDS OF PARENTHESES
+
+  Answering that starts somewhere with no machine learning in it at all: a
+  plain class.
+
+        class Adder:
+            def __init__(self, n):
+                self.n = n
+            def __call__(self, x):
+                return x + self.n
+
+  Two separate lines use parentheses for two separate jobs:
+
+        add5 = Adder(5)      # BUILDS an object: allocate it, run __init__, hand it back
+        add5(10)             # RUNS that object: 10 + 5 = 15
+
+  Adder(5) and add5(10) both use (), but the first makes a new Adder sitting
+  in memory with n=5 inside it, and the second uses that already-built object
+  to compute something. Chained on one line, Adder(5)(10) does both: first
+  paren builds, second paren runs, and the answer is still 15.
+
+  -------
+
+  WHAT () MEANS WHEN THE THING IS NOT A PLAIN FUNCTION
+
+  add5(10) looks like a function call, but add5 is not a function -- it is a
+  data object, an Adder instance holding the number 5. So what does () even
+  mean here? Python's rule: x(y) means "look up the __call__ slot on x's
+  type, and run that, passing x and y to it." Concretely, add5(10) means
+  type(add5).__call__(add5, 10), which is Adder.__call__(add5, 10), which
+  runs return x + self.n with x=10 and self=add5, giving 15.
+
+  There is no separate category of "things allowed to use parentheses."
+  There is only: does this object's type have a __call__ slot filled in? A
+  plain def function's type fills that slot with "run my bytecode." Adder
+  fills it with the method shown above. nn.Module -- the base class every
+  layer and every policy in this book inherits from -- fills that slot with
+  a short routine that does one thing: call self.forward(x) and hand back
+  the result. That single fact is why self.net(state) and policy(state) are
+  legal at all: self.net and policy are not functions, but their type
+  defines __call__, so parentheses work on them the same way they worked on
+  add5.
+
+  -------
+
+  SELF.NET IS A DIFFERENT OBJECT, NOT A DIFFERENT NAME FOR SELF
+
+  Here is the fact that breaks the worry. self.net is built exactly once,
+  inside the policy's __init__, and stored under that name:
+
+        def __init__(self, ...):
+            self.net = nn.Sequential(*layers)     # built ONCE, right here
+
+  From that line on, self and self.net are two separate objects living at
+  two separate addresses. self is the policy -- it has its own forward
+  method, the one written by hand for this book (concatenate the inputs,
+  hand them to self.net, reshape the output). self.net is the layer stack --
+  it has its OWN forward, written by PyTorch, that is just a loop over
+  Linear and ReLU layers. Two objects, two different forward methods, two
+  different bodies of code.
+
+  -------
+
+  THE CALL TRACE, ONE DOT AT A TIME
+
+  So follow policy(state) all the way down, one hop per line:
+
+        policy(state)
+          = type(policy).__call__(policy, state)      -- nn.Module's routine
+            -> policy.forward(state)                    -- the policy's own code
+                 -> self.net(state)                      -- a DIFFERENT object now
+                      = type(self.net).__call__(self.net, state)
+                        -> self.net.forward(state)        -- PyTorch's layer-loop code
+                             -> layer 1 -> layer 2 -> layer 3 -> output tensor
+                             <- returns the tensor
+                 <- policy.forward uses that tensor, returns it
+          <- returns
+
+  Every arrow down is a hop to code written for a DIFFERENT object -- first
+  the policy's own forward, then, at self.net(state), a hop sideways to a
+  second object's forward. No arrow ever points back up into policy.forward.
+  The call ends because it runs out of different objects to hop to, not
+  because anyone stopped it.
+
+  -------
+
+  WHAT WOULD HAPPEN WITH THE MISSING DOT
+
+  The whole guarantee rests on that one dot. Compare the real line against
+  the one-character slip that removes it:
+
+        self.net(state)     # hop to a DIFFERENT object -- policy.forward -> net.forward -> done
+        self(state)         # hop to policy itself again -- policy.forward -> policy.forward -> ...
+
+  self(state) means type(policy).__call__(policy, state), which is exactly
+  the call that is already running. It would call policy.forward again,
+  which would call self(state) again, which would call policy.forward
+  again -- the same two lines, forever, until the machine's call stack
+  fills up and the program crashes. The .net is not decoration; it is the
+  entire reason the recursion terminates.
+
+  -------
+
+  WHY THE LAYERS ARE BUILT ONCE, NOT ON EVERY CALL
+
+  That answers why forward does not loop. A second question follows right
+  behind it: why does __init__ build self.net once, instead of building it
+  fresh on every call? One more line could look equivalent to self.net(state)
+  and is not: nn.Sequential(*layers)(state), built and run fresh on every
+  single call.
+  It would work -- it would return a number -- but every call would
+  construct a brand-new stack of layers with brand-new random weights,
+  run the input through them once, and throw them away. The training loop
+  edits the numbers inside self.net, in place, thousands of times. A
+  freshly-built stack has never been touched by any of those edits. Calling
+  self.net(state) reuses the one object that all that training landed on;
+  rebuilding it every call would reuse nothing, and the policy would never
+  get any smarter no matter how long it trained.
+
+  -------
+
+  ONE BREATH
+
+  self.net(state) is legal because self.net's type -- inherited from
+  nn.Module -- fills in a __call__ slot that runs self.forward, the same
+  mechanism that makes a plain callable object like Adder(5)(10) legal.
+  self.net is a different object from self, built once in __init__ and
+  never rebuilt, so calling it hops sideways to a different forward method
+  instead of back into the one already running. Drop the .net and the same
+  machinery calls the current object's own forward again, and again,
+  forever, until the stack overflows. One dot is the entire difference
+  between a network that runs and one that never returns.
+
+
+  SEAM. Pencil ends here; below, the same calls in Python.
+
+  -------
+
+```python
+# --------------------------------------------------------------------------
+# A plain-Python stand-in for nn.Module's __call__ / forward split.
+# No torch needed -- this is the object-model mechanics underneath it.
+# --------------------------------------------------------------------------
+
+class Module:
+    def __call__(self, x):
+        print("  __call__ runs on a", type(self).__name__, "object")
+        return self.forward(x)
+
+class Layers(Module):
+    def __init__(self, weight):
+        self.weight = weight        # one number standing in for a whole nn.Sequential
+
+    def forward(self, x):
+        result = x * self.weight
+        print("  Layers.forward runs: x * weight =", x, "*", self.weight, "=", result)
+        return result
+
+class Policy(Module):
+    def __init__(self, weight):
+        self.net = Layers(weight)   # built ONCE, stapled onto self.net
+
+    def forward(self, x):
+        print("  Policy.forward runs, hands x to self.net")
+        out = self.net(x)           # hop to a DIFFERENT object -- not self(x)
+        print("  Policy.forward got", out, "back from self.net, returns it")
+        return out
+
+policy = Policy(weight=3.0)
+print("calling policy(5.0):")
+result = policy(5.0)
+print("final result:", result)
+
+# --------------------------------------------------------------------------
+# The missing-dot version: self(x) instead of self.net(x).
+# Proven to never return, by actually letting it crash.
+# --------------------------------------------------------------------------
+
+import sys
+
+class SilentModule:              # same __call__->forward rule, no prints (the crash speaks for itself)
+    def __call__(self, x):
+        return self.forward(x)
+
+class BrokenPolicy(SilentModule):
+    def __init__(self, weight):
+        self.weight = weight
+
+    def forward(self, x):
+        out = self(x)      # self(x), NOT self.net(x) -- calls its OWN __call__ again
+        return out * self.weight
+
+broken = BrokenPolicy(weight=3.0)
+sys.setrecursionlimit(200)
+try:
+    broken(5.0)
+except RecursionError as e:
+    print("crashed:", type(e).__name__, "-- forward called itself until the stack ran out")
+```
+
+  Running this code prints:
+
+        calling policy(5.0):
+          __call__ runs on a Policy object
+          Policy.forward runs, hands x to self.net
+          __call__ runs on a Layers object
+          Layers.forward runs: x * weight = 5.0 * 3.0 = 15.0
+          Policy.forward got 15.0 back from self.net, returns it
+        final result: 15.0
+        crashed: RecursionError -- forward called itself until the stack ran out
+
+  The first trace shows exactly two __call__ hops -- one onto the Policy
+  object, one onto the Layers object -- before anything returns. The second
+  block is the same two lines with one dot removed, and it does not print a
+  result at all: it hits Python's own recursion limit and crashes, because
+  self(x) keeps hopping back onto the same object that is already mid-call.
+  Real policies in this book never write that line; every one of them
+  reaches for self.net.
+
+  Part 2 opens self.net back up once training starts: what those weight
+  numbers actually are, why editing them in place across a training run is
+  the entire mechanism of learning, and why the same self.net gets called
+  with a batch of 128 during training and exactly 1 during evaluation.
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  __call__               = the slot a Python type fills in to make its instances usable with (); x(y) runs type(x).__call__(x, y)
+  dispatch               = looking up which code actually runs for a given call, based on the object's type
+  nn.Module               = PyTorch's base class for layers and policies; supplies a __call__ that runs self.forward
+  forward                 = the method that does the actual computation for one Module; never called directly, only through ()
+  RecursionError           = Python's crash when a chain of calls never returns and the call stack fills up

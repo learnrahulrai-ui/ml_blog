@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in twenty chapters (sixty-one posts),
+  This is not a pile of loose articles -- it is a short BOOK in twenty-one chapters (sixty-two posts),
   meant to be read top to bottom. Each post opens with a "post N" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 61:
+  >> NEW HERE? Start at post 1 of 62:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -947,6 +947,24 @@
     every 8-move plan, throw the rest away, re-plan from a freshly read table every tick -- gap
     shrinks by a fixed 0.8375 factor per tick, never changes sign, never has a fixed final push
     left to overshoot with. Closes Chapter 20. Assumes zero background.
+
+
+
+
+  CHAPTER 21 . SELF, NET, AND THE CALL THAT DOES NOT LOOP . how one dot stops self.net(state) from recursing
+  ------------------------------------------------------------------------------------------------------------
+
+  [Part 1 -- One Dot Away From An Infinite Loop](posts/one-dot-from-infinite-loop.txt)
+    post 62/62 . 2026-07-04 . part 1 of 2 . pytorch, python-internals, object-model, nn-module, by-hand
+    forward calls self.net(state); self.net was itself built from nn.Sequential, and self is built the
+    same way -- so why does the call not become forward calling forward forever? Traced from a plain
+    Adder class with a hand-written __call__ (add5(10) = type(add5).__call__(add5, 10) = 15) up to
+    nn.Module, which fills that same slot with "run self.forward". self.net is a second object, built
+    once in __init__, never the same object as self -- so self.net(state) hops sideways to a different
+    forward, while the one-character slip self(state) hops back into the forward already running.
+    Proved both ways in code: the real line traces two clean __call__ hops (Policy then Layers) and
+    returns 15.0; the missing-dot version is let loose and actually crashes with RecursionError. Also:
+    why self.net is built once in __init__ and never rebuilt per call. Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------
