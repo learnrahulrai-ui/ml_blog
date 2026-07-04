@@ -160,6 +160,70 @@
 
   -------
 
+  WHAT A SLOPE IS, ON A HILL
+
+  Imagine the loss L as the height of a hill. Each dial is a position on
+  that hill. The slope for a dial W answers: if I slide W one unit to the
+  right, how much does the hill height change?
+
+        HILL PICTURE
+
+        loss L
+          |
+        4 |        *
+        3 |      *   *
+        2 |    *       *
+        1 |  *           *
+        0 |*               *
+          +--+--+--+--+--+---> dial value W
+           0  1  2  3  4  5
+
+  On the left the hill is falling rightward: slope is negative. On the
+  right the hill is rising rightward: slope is positive. At the bottom,
+  slope is zero. Training aims for the bottom.
+
+  Concrete numbers. Suppose L = (W - 2.5)^2. Then dL/dW = 2*(W - 2.5).
+        W = 4.5: slope = 2*(4.5 - 2.5) = +4.0  (hill rising -- W is too high, nudge left)
+        W = 0.5: slope = 2*(0.5 - 2.5) = -4.0  (hill falling -- W is too low, nudge right)
+        W = 2.5: slope = 2*(2.5 - 2.5) =  0.0  (bottom of valley -- no nudge needed)
+
+  Training nudges each dial OPPOSITE its slope: positive slope means W is
+  too large, so decrease it; negative slope means W is too small, so
+  increase it. Repeat until slope reaches zero.
+
+  The problem in the machine: L is many multiplications away from each
+  dial. W1[h0, x0] affects z1_0, which affects h0, which affects z2_0 and
+  z2_1, which affect e0 and e1, which affect L. You cannot measure dL/dW
+  in one step. The chain rule solves this.
+
+  -------
+
+  WHAT THE CHAIN RULE DOES
+
+  The chain rule says: if A affects B, and B affects L, then:
+        dL/dA = (dL/dB) * (dB/dA)
+
+  Each factor on the right is a SIMPLE one-step derivative. The hard job --
+  how does a change at A propagate all the way to L -- becomes a chain of
+  easy jobs (how does each step change the next?), multiplied together.
+
+  One concrete application. W2[o0, h0] appears in exactly one formula:
+        z2_0 = h0 * W2[o0,h0] + h1 * W2[o0,h1]     and     o0 = z2_0
+
+  Then L = ((o0 - true_0)^2 + (o1 - true_1)^2) / 2. The chain:
+
+        dL/dW2[o0,h0] = (dL/do0) * (do0/dW2[o0,h0])
+
+  Left factor: dL/do0 = (o0 - true_0) = e0.
+  Right factor: do0/dW2[o0,h0] = h0  (nudging the dial by 1 changes o0 by h0).
+  Product: dL/dW2[o0,h0] = e0 * h0. That is the slope of this one dial.
+
+  For deeper dials, the chain is longer: the slope must travel back through
+  W2, through ReLU, through W1. At each layer the chain rule multiplies by
+  one more simple factor. That full backward sweep is backpropagation.
+
+  -------
+
   THE SLOPE QUESTION
 
   Every dial has one slope number, also called a gradient. The slope for a
@@ -288,6 +352,31 @@
   Every dial now has a slope. All eight slopes were computed by multiplying
   in reverse through the network -- that chain of multiplications is what
   people call backpropagation.
+
+  -------
+
+  WHY PLAIN SLOPE-FOLLOWING BREAKS
+
+  Suppose training uses the simplest possible rule: nudge each dial by
+  lr * slope. Set lr = 0.0003. Now consider two dials with very different
+  slopes on one batch:
+
+        Dial A: slope = 10.0      (a large slope -- this dial strongly affects L)
+        Dial B: slope = 0.001     (a small slope -- this dial barely affects L)
+
+        Dial A nudge: 0.0003 * 10.0   = 0.0030
+        Dial B nudge: 0.0003 * 0.001  = 0.0000003
+
+  Dial A jumps by 0.003 per update. If its slope is 10.0, the loss changes
+  by roughly 0.003 * 10.0 = 0.030 per nudge -- large enough to shoot past
+  the valley bottom and oscillate. Dial B moves by 0.0000003 per update.
+  Even after 10,000 updates it has moved 0.003 -- nothing. There is no
+  single lr that trains both dials at a useful pace.
+
+  The fix: normalise each dial's step by how large its slopes have been
+  historically. A dial that has been receiving large slopes gets a smaller
+  step; one that has been receiving tiny slopes gets a larger step. Every
+  dial ends up moving roughly the same distance per update. Adam does this.
 
   -------
 
