@@ -7,12 +7,8 @@
 
   CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS . PART 3 OF 6
   Grouping by Nearest Centre: K-Means From a Blank Sheet
-  Posted: 2026-06-09 . Author: Rahul Rai . Tags: k-means, clustering, unsupervised
   ============================================================================================
 
-  PATH . post 18 of 31
-    <- prev:  [Chapter 6, Part 2: The Strongest Direction (PCA)](the-strongest-direction-pca.txt)
-       next:  [Chapter 6, Part 4: The Family Tree](the-family-tree-clustering.txt) ->
 
   Every row is a list of numbers.
   The straight-line gap between two rows is one number that says how far apart they sit.

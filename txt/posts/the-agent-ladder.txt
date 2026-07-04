@@ -7,12 +7,8 @@
 
   CHAPTER 12 . REINFORCEMENT LEARNING FROM ZERO
   Five Cats, One New Power Each: From Reflex to Learning
-  Posted: 2026-06-18 . Author: Rahul Rai . Tags: ai-agents, planning, utility, learning, by-hand
   ============================================================================================
 
-  PATH . Chapter 12 intro -- Reinforcement Learning
-    <- prev:  (start here; nothing before this is assumed)
-       next:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt) ->
 
   Open any AI textbook and it hands you a taxonomy: five agent names, five bullet-point
   features, a table to memorise. "Simple reflex uses condition-action rules. Model-based has

@@ -7,12 +7,8 @@
 
   CHAPTER 10 . MACHINES THAT READ WORDS . PART 3 OF 3
   The Look-Across Machine: Attention and the Transformer by Pencil
-  Posted: 2026-06-15 . Author: Rahul Rai . Tags: transformer, attention, nlp, sequence-models
   ============================================================================================
 
-  PATH . post 29 of 31
-    <- prev:  [Chapter 10, Part 2: The Two-Memory Worker](the-two-memory-worker.txt)
-       next:  [Chapter 11, Part 1: The Vision Transformer](the-vision-transformer.txt) ->
 
   Parts 1 and 2 built two walking machines. The plain RNN read 100 word-notes in order,
   rewriting one 32-number memory at each word. By word 90, word 1's signal had been tanh-crushed

@@ -7,12 +7,8 @@
 
   SPECIAL . FOR HACKER NEWS
   One Machine, Three Slips: Informed Search Jargon From Scratch
-  Posted: 2026-06-18 . Author: Rahul Rai . Tags: search, a-star, heuristics, ucs, greedy, by-hand
   ============================================================================================
 
-  PATH . post 1 of 3 in Chapter 13 -- Search and Optimization
-    <- prev:  (start of chapter)
-       next:  [Chapter 13, Part 2: Cheapest Walk -- UCS and A*](cheapest-walk-ucs-astar.txt) ->
 
   Every "A* explained" post gives you a box labelled f = g + h, names the three letters, and
   says "A* is optimal if the heuristic is admissible." Then it draws a pretty grid with coloured

@@ -7,12 +7,8 @@
 
   CHAPTER 13 . SAMPLE-BASED LEARNING . PART 2 OF 4
   Max or Honest Average: Q-Learning and Expected Sarsa by Pencil
-  Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, q-learning, expected-sarsa, control, by-hand
   ============================================================================================
 
-  PATH . post 38/58 . part 2 of 4 in Chapter 13 -- Sample-based Learning
-    <- prev:  [Chapter 13, Part 1: TD(0) Built by Pencil](td-zero-by-pencil.txt)
-       next:  [Chapter 13, Part 3: Dyna-Q by Pencil](dyna-q-by-pencil.txt) ->
 
   Here is the whole game, from a blank sheet. There is a tiny world of three places you
   can stand -- call each one a spot. At every spot you can walk one of four directions --

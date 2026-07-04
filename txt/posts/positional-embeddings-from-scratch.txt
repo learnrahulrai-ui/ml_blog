@@ -7,12 +7,8 @@
 
   SPECIAL . DEEP DIVE -- companion to Chapter 10
   The Mark That Tells a Transformer Where It Is: Positional Encoding Built From Scratch
-  Posted: 2026-06-22 . Author: Rahul Rai . Tags: transformer, positional-encoding, rope, attention, by-hand, deep-learning
   ============================================================================================
 
-  PATH . Companion to [The Look-Across Machine](the-look-across-machine.txt) and
-         [Attention and the Transformer by Pencil](attention-transformer-by-pencil.txt).
-         Those posts flagged positional encoding as "skipped." This is what was skipped.
 
   THE ORDER-BLIND MACHINE
      score("nolan" looking at "ended")  =  nolan.WANT · ended.HAVE

@@ -7,12 +7,8 @@
 
   CHAPTER 19 . LEARNING BY COPYING . PART 2 OF 5
   The Copying Machine by Pencil
-  Posted: 2026-07-03 . Author: Rahul Rai . Tags: imitation-learning, behavior-cloning, neural-network, mse, by-hand
   ============================================================================================
 
-  PATH . post 55/58 . part 2 of 5 in Chapter 19 -- Learning by Copying
-    <- prev:  [The Diary and the Eight Envelopes: Learning by Copying](the-diary-and-the-eight-envelopes.txt)
-       next:  [One Question, Two Right Answers: Where Copying Breaks](one-question-two-right-answers.txt) ->
 
   On the desk sit 24,208 question-answer pairs, cut from a diary of a human playing a
   block-pushing game 206 times. Each pair: a QUESTION of five numbers (hand x, hand y,

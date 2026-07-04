@@ -7,12 +7,8 @@
 
   CHAPTER 13 . SAMPLE-BASED LEARNING . PART 3 OF 4
   A Notebook and a Rehearsal: Dyna-Q by Pencil
-  Posted: 2026-06-24 . Author: Rahul Rai . Tags: reinforcement-learning, dyna-q, planning, model-based, by-hand
   ============================================================================================
 
-  PATH . post 39/58 . part 3 of 4 in Chapter 13 -- Sample-based Learning
-    <- prev:  [Chapter 13, Part 2: Q-Learning and Expected Sarsa](q-learning-expected-sarsa-by-pencil.txt)
-       next:  [Chapter 13, Part 4: Dyna-Q+ by Pencil](dyna-q-plus-by-pencil.txt) ->
 
   A spot = one place in a small
   world where you can stand. A move = a direction you pick there (four on offer: move0

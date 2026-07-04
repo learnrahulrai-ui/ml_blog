@@ -7,12 +7,8 @@
 
   CHAPTER 3 . SORTING INTO BINS . PART 3 OF 4
   Leash and Cloud: L2 Punishment and the Two-Cloud Wall
-  Posted: 2026-06-05 . Author: Rahul Rai . Tags: l2-regularization, lda, generative-models
   ============================================================================================
 
-  PATH . post 8 of 31
-    <- prev:  [Sorting 2: The Trade Curve](the-trade-curve.txt)
-       next:  [Sorting 4: Picking Settings, Skewed Piles](picking-settings-skewed-classes.txt) ->
 
   An over-confident machine is a dangerous thing.
   The machine we use here is the S-curve machine.

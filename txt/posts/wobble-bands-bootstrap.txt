@@ -7,12 +7,8 @@
 
   CHAPTER 4 . HUMBLE DIALS AND WOBBLE BANDS . PART 2 OF 3
   One Dial Is a Lie: Bootstrap, Wobble Bands, and the Free Exam
-  Posted: 2026-06-07 . Author: Rahul Rai . Tags: bootstrap, confidence-interval, out-of-bag
   ============================================================================================
 
-  PATH . post 11 of 31
-    <- prev:  [Chapter 4, Part 1: The Leash](humble-dials-ridge-lasso.txt)
-       next:  [Chapter 4, Part 3: The Dial by Hand](the-dial-by-hand.txt) ->
 
   First, the picture you need, built from scratch.
   A "dial" is a multiplier the machine attaches to one measurement.

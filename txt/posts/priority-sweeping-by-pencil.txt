@@ -7,12 +7,8 @@
 
   CHAPTER 17 . TWO THE SAMPLE-BASED MAP SKIPPED . PART 2 OF 2
   Fix the Biggest Surprise First: Priority Sweeping by Pencil
-  Posted: 2026-07-01 . Author: Rahul Rai . Tags: reinforcement-learning, priority-sweeping, planning, model-based, dyna, by-hand
   ============================================================================================
 
-  PATH . post 52/58 . part 2 of 2 in Chapter 17 -- Two the Sample-Based Map Skipped
-    <- prev:  [Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt)
-       next:  [Four Questions Before Any Arithmetic: Which Machine for Which World](which-machine-for-which-world.txt) ->
 
   Chapter 13 kept a second paper beside the worth-table -- a MODEL, a note of what each move once
   produced (which spot it landed on, what reward it paid) -- and REHEARSED off it: grab a remembered

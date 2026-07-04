@@ -7,12 +7,8 @@
 
   CHAPTER 3 . SORTING INTO BINS . PART 4 OF 4
   Picking Settings, Skewed Piles, and Averaging Many Classes
-  Posted: 2026-06-05 . Author: Rahul Rai . Tags: grid-search, precision-recall, class-imbalance
   ============================================================================================
 
-  PATH . post 9 of 31
-    <- prev:  [Sorting 3: Leash and Cloud](leash-and-cloud.txt)
-       next:  [Chapter 4, Part 1: The Leash (Ridge & Lasso)](humble-dials-ridge-lasso.txt) ->
 
   So far the world has been tidy.
   One sheet of breast lumps, one clean yes-or-no question, two groups of roughly equal size.

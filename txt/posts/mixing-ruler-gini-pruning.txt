@@ -7,12 +7,8 @@
 
   CHAPTER 5 . QUESTION CHARTS AND COMMITTEES . PART 2 OF 3
   The Mixing Ruler: Gini, Information Gain, and Pruning
-  Posted: 2026-06-07 . Author: Rahul Rai . Tags: gini, information-gain, pruning, classification
   ============================================================================================
 
-  PATH . post 14 of 31
-    <- prev:  [Chapter 5, Part 1: Question Charts by Hand](question-charts-by-hand.txt)
-       next:  [Chapter 5, Part 3: Committees](committees-bag-forest-boost.txt) ->
 
   A question chart is a stack of yes/no questions.
   A patient walks them top to bottom and lands in a final pile (a leaf), where the guess waits.

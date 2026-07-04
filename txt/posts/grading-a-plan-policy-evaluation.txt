@@ -7,12 +7,8 @@
 
   CHAPTER 12 . REINFORCEMENT LEARNING FROM ZERO
   Grading a Plan by Pencil: A Table of Lies That Heals Into the Truth
-  Posted: 2026-06-19 . Author: Rahul Rai . Tags: reinforcement-learning, policy-evaluation, bellman, dynamic-programming, by-hand
   ============================================================================================
 
-  PATH . Chapter 12, part 3 of 5 -- Reinforcement Learning
-    <- prev:  [Chapter 12, Part 2: Worth and Bellman from Zero](worth-and-bellman-from-zero.txt)
-       next:  [Chapter 12, Part 4: Finding the Best Plan](finding-the-best-plan-policy-iteration.txt) ->
 
   Every reinforcement-learning writeup hands you the Bellman equation -- V(s) = R(s) +
   g x V(next) -- names it after a dead mathematician, and says "now just iterate until it

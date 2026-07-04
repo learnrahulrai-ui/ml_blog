@@ -7,12 +7,8 @@
 
   CHAPTER 5 . QUESTION CHARTS AND COMMITTEES . PART 1 OF 3
   Question Charts: Building a Tree by Hand
-  Posted: 2026-06-07 . Author: Rahul Rai . Tags: decision-tree, regression, classification
   ============================================================================================
 
-  PATH . post 13 of 31
-    <- prev:  [Chapter 4, Part 3: The Dial by Hand](the-dial-by-hand.txt)
-       next:  [Chapter 5, Part 2: The Mixing Ruler](mixing-ruler-gini-pruning.txt) ->
 
   A straight-stick rule guesses by a weighted sum.
   It takes each column, multiplies it by a number (a dial), and adds.

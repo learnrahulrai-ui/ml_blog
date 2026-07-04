@@ -7,12 +7,8 @@
 
   CHAPTER 14 . FUNCTION APPROXIMATION . PART 3 OF 4
   Letting the Car Choose: Sarsa Control by Pencil
-  Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, function-approximation, sarsa, control, tile-coding, by-hand
   ============================================================================================
 
-  PATH . post 43/58 . part 3 of 4 in Chapter 14 -- Function Approximation
-    <- prev:  [Sharp From Blurry: Tile Coding by Pencil](tile-coding-by-pencil.txt)
-       next:  [Two Stages and a Bend: A Q-Network by Pencil](q-network-by-pencil.txt) ->
 
   The world is a car in a valley, too
   weak to climb straight out. A spot = where the car is (its position along the

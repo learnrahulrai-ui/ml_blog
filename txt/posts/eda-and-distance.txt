@@ -7,12 +7,8 @@
 
   CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS . PART 1 OF 6
   Looking at a Sheet With No Answers: Means, Distance, and the Ruler Problem
-  Posted: 2026-06-09 . Author: Rahul Rai . Tags: eda, distance, standardization, unsupervised
   ============================================================================================
 
-  PATH . post 16 of 31  (start of the unsupervised-learning chapter)
-    <- prev:  [Chapter 5, Part 3: Committees](committees-bag-forest-boost.txt)
-       next:  [Chapter 6, Part 2: The Strongest Direction](the-strongest-direction-pca.txt) ->
 
   Every post before this one had an answer column to check against.
   That answer column held a house price, a car's mileage, a sick-or-well flag, or a diabetes score.

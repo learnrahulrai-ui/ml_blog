@@ -7,12 +7,8 @@
 
   CHAPTER 1 . PREDICTING HOUSE PRICES . PART 2 OF 3
   Ask the Closest Rows: Gap Formula, Same-Ruler Rule, and How Slow It Gets
-  Posted: 2026-06-01 . Author: Rahul Rai . Tags: knn, distance, non-parametric, complexity
   ============================================================================================
 
-  PATH . post 2 of 31
-    <- prev:  [House Prices 1: Guessing Prices End to End](chapter1-what-ml-actually-does.txt)
-       next:  [House Prices 3: The Straight-Stick Rule](straight-stick-linear-regression.txt) ->
 
   Here is the oldest trick in the book, and one you already use every day.
   To guess something about a stranger, look at the people most like them.

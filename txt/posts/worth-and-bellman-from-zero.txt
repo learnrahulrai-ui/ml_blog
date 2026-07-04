@@ -7,12 +7,8 @@
 
   CHAPTER 12 . REINFORCEMENT LEARNING FROM ZERO
   Worth and Bellman from Zero: What a Spot Is Worth When the Future Branches
-  Posted: 2026-06-22 . Author: Rahul Rai . Tags: reinforcement-learning, bellman, mdp, value-function, discount, by-hand
   ============================================================================================
 
-  PATH . Chapter 12, part 2 of 5 -- Reinforcement Learning
-    <- prev:  [Chapter 12, Part 1: Bandits and Exploration](bandits-and-exploration.txt)
-       next:  [Chapter 12, Part 3: Grading a Plan by Pencil](grading-a-plan-policy-evaluation.txt) ->
 
   A shopkeeper who never leaves his counter has the easiest learning job there is: pull a
   lever, read a payout, fold it into an average. One place to stand, and each choice's worth

@@ -7,12 +7,8 @@
 
   CHAPTER 9 . MACHINES THAT LOOK AT PICTURES . PART 1
   A Magic Paper Slid Over a Photo: How a Picture Network Sees
-  Posted: 2026-06-12 . Author: Rahul Rai . Tags: cnn, convolution, pooling, computer-vision
   ============================================================================================
 
-  PATH . post 25 of 31
-    <- prev:  [Chapter 8: Five Machines Against Memorising](five-machines-against-memorising.txt)
-       next:  [Chapter 9, Part 2: The Deep Factory](the-deep-factory.txt) ->
 
   Every machine before this one read a flat row of numbers.
   A PIXEL is one tiny dot of a picture, and its value is how bright that dot is.

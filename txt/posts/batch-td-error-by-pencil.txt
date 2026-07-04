@@ -7,12 +7,8 @@
 
   CHAPTER 15 . TRAINING THE Q-NETWORK . PART 3 OF 5
   The Frozen Twin: A Batch of Misses at Once
-  Posted: 2026-07-01 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, expected-sarsa, target-network, td-error, by-hand
   ============================================================================================
 
-  PATH . post 47/58 . part 3 of 5 in Chapter 15 -- Training the Q-Network
-    <- prev:  [A Smarter Step: Adam and Replay by Pencil](adam-and-replay-by-pencil.txt)
-       next:  [The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt) ->
 
   The previous post grabbed a random handful of past moves out of a bin -- a BATCH --
   and said: for each one, rebuild its target with the current net, then take one Adam

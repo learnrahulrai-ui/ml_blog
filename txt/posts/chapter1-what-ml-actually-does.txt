@@ -6,12 +6,9 @@
 ----------------------------------------------------------------------------------------------
 
   CHAPTER 1 . PREDICTING HOUSE PRICES . PART 1 OF 3
-  Guessing House Prices, End to End (No Labels Until the End)
-  Posted: 2026-06-01 . Author: Rahul Rai . Tags: fundamentals, supervised-learning, knn
+  Guessing House Prices, End to End
   ============================================================================================
 
-  PATH . post 1 of 31  (you are at the start -- read top to bottom)
-       next:  [House Prices 2: Ask the Closest Rows](neighbor-machine-knn.txt) ->
 
   Welcome -- this is where the blog begins.
   It asks nothing of you but curiosity and a pencil.

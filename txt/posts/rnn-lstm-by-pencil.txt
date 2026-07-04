@@ -7,10 +7,8 @@
 
   SPECIAL . FOR HACKER NEWS
   The Walking Machine and the Vault: RNN and LSTM by Pencil
-  Posted: 2026-06-20 . Author: Rahul Rai . Tags: rnn, lstm, sequence-models, by-hand, deep-learning
   ============================================================================================
 
-  PATH . Chapter 10 companion -- Machines That Read Words (by-hand deep dive)
 
   Every deep-learning post introduces the LSTM with a diagram full of gates and arrows, names
   the four equations in a box, and says "now you understand recurrent networks." Two things

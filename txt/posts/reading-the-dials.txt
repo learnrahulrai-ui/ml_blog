@@ -7,12 +7,8 @@
 
   CHAPTER 2 . GRADING A GUESSER . PART 2 OF 2
   Reading the Dials: What the Coefficients Say
-  Posted: 2026-06-04 . Author: Rahul Rai . Tags: coefficients, interpretation, scaling
   ============================================================================================
 
-  PATH . post 5 of 31
-    <- prev:  [Grading 1: Two Rulers, MSE and R^2](grading-the-guess-mse-r2.txt)
-       next:  [Sorting 1: S-Curve and Four-Box Table](sorting-into-bins.txt) ->
 
   First, what is a dial?
   The guesser here is the straight-stick rule.

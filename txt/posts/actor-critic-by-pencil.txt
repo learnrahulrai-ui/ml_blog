@@ -7,12 +7,8 @@
 
   CHAPTER 16 . POLICY GRADIENT -- learning the policy itself, not a worth
   Propose and Grade: Actor-Critic by Pencil
-  Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, policy-gradient, actor-critic, softmax, average-reward, by-hand
   ============================================================================================
 
-  PATH . post 50/58 . Chapter 16 -- Policy Gradient
-    <- prev:  [Chapter 15, Part 5: From Eight Dials to a Soft Landing: The Whole Agent by Pencil](the-whole-agent-by-pencil.txt)
-       next:  [Chapter 17, Part 1: Wait for the Whole Trip: Monte Carlo by Pencil](monte-carlo-by-pencil.txt) ->
 
   Every machine in this book so far learned a WORTH and then acted greedy on it. The
   worth was always a middleman: you wanted a policy -- what to DO -- but you learned a

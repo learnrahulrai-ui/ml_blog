@@ -7,12 +7,8 @@
 
   CHAPTER 15 . TRAINING THE Q-NETWORK . PART 5 OF 5
   From Eight Dials to a Soft Landing: The Whole Agent by Pencil
-  Posted: 2026-07-02 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, expected-sarsa, neural-network, adam, experience-replay, by-hand
   ============================================================================================
 
-  PATH . post 49/58 . part 5 of 5 in Chapter 15 -- Training the Q-Network
-    <- prev:  [Chapter 15, Part 4: The World Calls Three Times: Wiring the Agent by Pencil](wiring-the-agent-by-pencil.txt)
-       next:  [Chapter 16: Propose and Grade: Actor-Critic by Pencil](actor-critic-by-pencil.txt) ->
 
   Every earlier part of this chapter forged ONE piece in isolation: the two-sheet network that
   scores the engines, the backward walk that spreads a miss to every dial, the smarter step that

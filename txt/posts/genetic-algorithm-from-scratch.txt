@@ -7,12 +7,8 @@
 
   SPECIAL . FOR HACKER NEWS
   Genetic Algorithm From Scratch: Optimising With No Gradient, Every Number Shown
-  Posted: 2026-06-18 . Author: Rahul Rai . Tags: genetic-algorithm, optimisation, evolution, by-hand
   ============================================================================================
 
-  PATH . post 3 of 3 in Chapter 13 -- Search and Optimization
-    <- prev:  [Chapter 13, Part 2: Cheapest Walk -- UCS and A*](cheapest-walk-ucs-astar.txt)
-       next:  (end of chapter)
 
   Every "genetic algorithm" post drowns in biology: chromosomes, alleles, survival of the
   fittest, a stock photo of DNA. Then it shows a code dump and calls the metaphor an

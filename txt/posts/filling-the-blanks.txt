@@ -7,12 +7,8 @@
 
   CHAPTER 6 . FINDING PATTERNS WITHOUT ANSWERS . PART 6 OF 6
   Filling the Blanks: Recommender Systems and Matrix Factorisation
-  Posted: 2026-06-09 . Author: Rahul Rai . Tags: recommender-systems, matrix-factorisation, collaborative-filtering
   ============================================================================================
 
-  PATH . post 21 of 31
-    <- prev:  [Chapter 6, Part 5: Both Tools on NCI60](nci60-revisited.txt)
-       next:  [Chapter 7, Part 1: How a Network Computes a Guess](the-web-of-adders.txt) ->
 
   The last post in the book.  Every chapter until now had a full sheet of numbers -- maybe
   no answer column, but at least every cell was filled in.  This post starts with a sheet

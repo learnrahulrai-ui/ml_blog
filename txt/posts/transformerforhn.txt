@@ -7,10 +7,8 @@
 
   SPECIAL . FOR HACKER NEWS
   Transformers With Pencil: A Whole Block Worked by Hand, One Line at a Time
-  Posted: 2026-06-15 . Author: Rahul Rai . Tags: transformer, attention, by-hand, from-scratch
   ============================================================================================
 
-  PATH . SPECIAL -- Transformers With Pencil  (standalone; no other page on this blog needed)
 
   Every "explain the transformer" post hides the same move: it draws boxes, names them
   Q, K, V, and waves at "attention is all you need." This page never waves. One transformer

@@ -7,12 +7,8 @@
 
   CHAPTER 19 . LEARNING BY COPYING . PART 5 OF 5
   Riding the Wind: From Noise to an Answer
-  Posted: 2026-07-03 . Author: Rahul Rai . Tags: imitation-learning, flow-matching, euler, sampling, by-hand
   ============================================================================================
 
-  PATH . post 58/60 . part 5 of 5 in Chapter 19 -- Learning by Copying
-    <- prev:  [Teaching the Wind: Flow Matching by Pencil](teaching-the-wind-by-pencil.txt)
-       next:  [From Five to Twenty-Two: Why Flow Matching Needs a Clock](from-five-to-twenty-two.txt) ->
 
   A machine has been taught the WIND: standing anywhere between pure noise and a
   recorded truth, given the table situation (five numbers), its own position (a

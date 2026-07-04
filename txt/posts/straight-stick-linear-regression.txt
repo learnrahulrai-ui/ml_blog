@@ -7,12 +7,8 @@
 
   CHAPTER 1 . PREDICTING HOUSE PRICES . PART 3 OF 3
   The Straight-Stick Rule: Setting the Dials, Checking the Leftovers, Getting Numbers Right
-  Posted: 2026-06-01 . Author: Rahul Rai . Tags: linear-regression, ols, least-squares
   ============================================================================================
 
-  PATH . post 3 of 31
-    <- prev:  [House Prices 2: Ask the Closest Rows](neighbor-machine-knn.txt)
-       next:  [Grading 1: Two Rulers, MSE and R^2](grading-the-guess-mse-r2.txt) ->
 
   The ask-closest rule never really learned anything -- it just kept the answer key handy.
   This rule is its opposite, and its better-behaved sibling. It actually studies the pile,

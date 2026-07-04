@@ -7,12 +7,8 @@
 
   CHAPTER 3 . SORTING INTO BINS . PART 1 OF 4
   Sorting Into Bins: The S-Curve, the Four-Box Table, and Why Accuracy Lies
-  Posted: 2026-06-05 . Author: Rahul Rai . Tags: logistic-regression, classification, evaluation
   ============================================================================================
 
-  PATH . post 6 of 31
-    <- prev:  [Grading 2: Reading the Dials](reading-the-dials.txt)
-       next:  [Sorting 2: The Trade Curve](the-trade-curve.txt) ->
 
   A machine that predicts a price answers with a sliding number.
   A house worth 2.8.

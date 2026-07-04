@@ -7,12 +7,8 @@
 
   CHAPTER 20 . THE PUSH-T MACHINE . PART 2 OF 3
   Wrong Wind Shows Every Dial Which Way to Turn
-  Posted: 2026-07-04 . Author: Rahul Rai . Tags: imitation-learning, push-t, backprop, forward-pass, adam, training-loop, by-hand
   ============================================================================================
 
-  PATH . post 60/60 . part 2 of 3 in Chapter 20 -- The Push-T Machine
-    <- prev:  [From Five to Twenty-Two: Why Flow Matching Needs a Clock](from-five-to-twenty-two.txt)
-       next:  (part 3 to follow)
 
   Part 1 built the case for a 22-wire wind machine: five situation numbers,
   sixteen blend numbers, one tau dial, all glued into one 22-number row,

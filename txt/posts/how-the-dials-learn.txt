@@ -7,12 +7,8 @@
 
   CHAPTER 7 . BUILDING A NEURAL NETWORK FROM SCRATCH . PART 2 OF 2
   Rolling Downhill by Hand: How a Neural Network Learns
-  Posted: 2026-06-11 . Author: Rahul Rai . Tags: backpropagation, gradient-descent, adam, dropout
   ============================================================================================
 
-  PATH . post 23 of 31
-    <- prev:  [Chapter 7, Part 1: How a Network Computes a Guess](the-web-of-adders.txt)
-       next:  [Chapter 8: Five Machines Against Memorising](five-machines-against-memorising.txt) ->
 
   Part 1 built a building full of clerks and walked one patient through it: thirty
   measurements in, a probability out. At the end the building guessed 0.622 (62.2% malignant)

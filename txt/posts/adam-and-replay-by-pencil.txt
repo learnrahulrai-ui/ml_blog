@@ -7,12 +7,8 @@
 
   CHAPTER 15 . TRAINING THE Q-NETWORK . PART 2 OF 5
   A Smarter Step: Adam and Replay by Pencil
-  Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, deep-rl, adam, momentum, experience-replay, by-hand
   ============================================================================================
 
-  PATH . post 46/58 . part 2 of 5 in Chapter 15 -- Training the Q-Network
-    <- prev:  [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt)
-       next:  [The Frozen Twin: A Batch of Misses at Once](batch-td-error-by-pencil.txt) ->
 
   A dial = one learned number in a
   network. A worth = the network's guess of how much reward a move still brings.

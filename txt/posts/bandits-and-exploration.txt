@@ -7,12 +7,8 @@
 
   CHAPTER 12 . REINFORCEMENT LEARNING FROM ZERO
   Bandits and Exploration: The Greedy Shopkeeper and His Faulty Machines
-  Posted: 2026-06-21 . Author: Rahul Rai . Tags: reinforcement-learning, bandits, exploration, epsilon-greedy, by-hand
   ============================================================================================
 
-  PATH . Chapter 12, part 1 of 5 -- Reinforcement Learning
-    <- prev:  [Chapter 12 intro: Five Cats, One New Power Each](the-agent-ladder.txt)
-       next:  [Chapter 12, Part 2: Worth and Bellman from Zero](worth-and-bellman-from-zero.txt) ->
 
   A greedy shopkeeper runs a medical-testing clinic at a busy railway station. He rents
   testing machines from a factory down the road -- dozens of them, some accurate, some not.

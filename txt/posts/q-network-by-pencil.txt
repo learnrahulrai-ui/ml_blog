@@ -7,12 +7,8 @@
 
   CHAPTER 14 . FUNCTION APPROXIMATION . PART 4 OF 4
   Two Stages and a Bend: A Q-Network by Pencil
-  Posted: 2026-06-30 . Author: Rahul Rai . Tags: reinforcement-learning, function-approximation, neural-network, expected-sarsa, deep-rl, by-hand
   ============================================================================================
 
-  PATH . post 44/58 . part 4 of 4 in Chapter 14 -- Function Approximation
-    <- prev:  [Letting the Car Choose: Sarsa Control by Pencil](sarsa-control-by-pencil.txt)
-       next:  [One Miss, a Thousand Nudges: Backpropagation by Pencil](backprop-by-pencil.txt) ->
 
   A worth = a number saying how much
   reward is still coming from a choice onward. A weight (a dial) = one learned number.

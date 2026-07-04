@@ -7,12 +7,8 @@
 
   CHAPTER 5 . QUESTION CHARTS AND COMMITTEES . PART 3 OF 3
   Committees: Bagging, Random Forest, and Boosting
-  Posted: 2026-06-07 . Author: Rahul Rai . Tags: bagging, random-forest, boosting, ensembles
   ============================================================================================
 
-  PATH . post 15 of 31  (end of the supervised-learning book)
-    <- prev:  [Chapter 5, Part 2: The Mixing Ruler](mixing-ruler-gini-pruning.txt)
-       next:  [Chapter 6, Part 1: Looking at a Sheet With No Answers](eda-and-distance.txt) ->
 
   Parts 1 and 2 built one question chart and tamed it with pruning.  One chart is jumpy
   -- it memorises quirks of whichever crowd it studied.  This post builds TWO HUNDRED

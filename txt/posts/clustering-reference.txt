@@ -7,10 +7,8 @@
 
   APPENDIX . DISTANCE AND CLUSTERING REFERENCE
   Rulers, Traps, and the Ethics of Sorting People Into Piles
-  Posted: 2026-06-09 . Author: Rahul Rai . Tags: clustering, distance, hamming, mahalanobis, ethics
   ============================================================================================
 
-  PATH . Chapter 6 reference card -- Finding Patterns Without Answers
 
   This is the appendix to Chapter 6 (Finding Patterns Without Answers). The chapter draws
   each idea by hand; this is a flip-to reference for the loose ends the chapter does not

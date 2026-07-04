@@ -7,12 +7,8 @@
 
   CHAPTER 10 . MACHINES THAT READ WORDS . PART 1 OF 3
   Words Into a Machine: The Notepad and the Walking Worker
-  Posted: 2026-06-13 . Author: Rahul Rai . Tags: rnn, embedding, nlp, sequence-models
   ============================================================================================
 
-  PATH . post 27 of 31
-    <- prev:  [Chapter 9, Part 2: The Deep Factory](the-deep-factory.txt)
-       next:  [Chapter 10, Part 2: The Two-Memory Worker](the-two-memory-worker.txt) ->
 
   A brand-new pile.
   A photo is already numbers: each pixel is a brightness from 0 to 1, ready to feed to a
