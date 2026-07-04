@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 17 chapters (52 posts), plus references and standalone specials,
+  ALL POSTS -- a book in 21 chapters (62 posts), plus references and standalone specials,
   every number worked by hand.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
@@ -137,6 +137,32 @@
   -----------------------------------------------------
   post 51   [Part 1 -- Wait for the Whole Trip: Monte Carlo by Pencil](posts/monte-carlo-by-pencil.txt)
   post 52   [Part 2 -- Fix the Biggest Surprise First: Priority Sweeping by Pencil](posts/priority-sweeping-by-pencil.txt)
+
+
+  CHAPTER 18 -- CHOOSING THE MACHINE (2026)
+  ------------------------------------------
+  post 53   [Four Questions Before Any Arithmetic: Which Machine for Which World](posts/which-machine-for-which-world.txt)
+
+
+  CHAPTER 19 -- LEARNING BY COPYING (2026)
+  -----------------------------------------
+  post 54   [Part 1 -- The Diary and the Eight Envelopes: Learning by Copying](posts/the-diary-and-the-eight-envelopes.txt)
+  post 55   [Part 2 -- The Copying Machine by Pencil](posts/the-copying-machine-by-pencil.txt)
+  post 56   [Part 3 -- One Question, Two Right Answers: Where Copying Breaks](posts/one-question-two-right-answers.txt)
+  post 57   [Part 4 -- Teaching the Wind: Flow Matching by Pencil](posts/teaching-the-wind-by-pencil.txt)
+  post 58   [Part 5 -- Riding the Wind: From Noise to an Answer](posts/riding-the-wind-by-pencil.txt)
+
+
+  CHAPTER 20 -- THE PUSH-T MACHINE (2026)
+  ----------------------------------------
+  post 59   [Part 1 -- From Five to Twenty-Two: Why Flow Matching Needs a Clock](posts/from-five-to-twenty-two.txt)
+  post 60   [Part 2 -- Wrong Wind Shows Every Dial Which Way to Turn](posts/dials-learn-the-wind.txt)
+  post 61   [Part 3 -- Eight Blind Ticks, Then The Overshoot](posts/eight-blind-ticks-then-overshoot.txt)
+
+
+  CHAPTER 21 -- SELF, NET, AND THE CALL THAT DOES NOT LOOP (2026)
+  -----------------------------------------------------------------
+  post 62   [Part 1 -- One Dot Away From An Infinite Loop](posts/one-dot-from-infinite-loop.txt)
 
 
   REFERENCES -- flip-to decoders, one per cluster of chapters
