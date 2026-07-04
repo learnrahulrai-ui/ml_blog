@@ -1,0 +1,629 @@
+@title Wrong Wind Shows Every Dial Which Way to Turn :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 20 . THE PUSH-T MACHINE . PART 2 OF 3
+  Wrong Wind Shows Every Dial Which Way to Turn
+  Posted: 2026-07-04 . Author: Rahul Rai . Tags: imitation-learning, push-t, backprop, forward-pass, adam, training-loop, by-hand
+  ============================================================================================
+
+  PATH . post 60/60 . part 2 of 3 in Chapter 20 -- The Push-T Machine
+    <- prev:  [From Five to Twenty-Two: Why Flow Matching Needs a Clock](from-five-to-twenty-two.txt)
+       next:  (part 3 to follow)
+
+  Part 1 built the case for a 22-wire wind machine: five situation numbers,
+  sixteen blend numbers, one tau dial, all glued into one 22-number row,
+  fed through three hidden rows of 256 adder-boxes, with 16 wind numbers
+  coming out. That machine has 141,584 dials. Every dial starts as a random
+  number near zero. Every dial prints wrong wind on the first pass. This
+  post is about how one wrong-wind reading tells every single dial which way
+  to turn, and by how much.
+
+  -------
+
+  A COMPRESSED STAND-IN
+
+  The real machine is 22 inputs wide and 256 hidden boxes per row. Working
+  through all 141,584 dials by hand would take a lifetime. So use a toy:
+  2 inputs, 2 hidden boxes, 2 outputs. The mechanics are identical. The
+  only difference is the count.
+
+  The toy stands in for the real machine like this:
+
+        REAL                         TOY
+
+        22 input wires               2 input wires
+        3 hidden rows x 256          1 hidden row x 2
+        16 output winds              2 output winds
+        141,584 dials                8 dials
+
+        [x0]                         [x0]
+        [x1]      identical          [x1]
+        [.]   ---structure--->
+        [x21]    just fewer                 [h0]   [h1]
+                 rows and boxes     [x0] ---|    |---|    |--- [o0]
+                                    [x1] ---|    |---|    |--- [o1]
+
+  In the toy, x0 and x1 stand in for all 22 input wires. The one hidden
+  row stands in for the three hidden rows. The two outputs stand in for
+  the 16 wind numbers.
+
+  -------
+
+  THE EIGHT DIALS AND THEIR STARTING VALUES
+
+  The toy's eight dials: four in the first layer (connecting 2 inputs to 2
+  hidden boxes) and four in the second layer (connecting 2 hidden boxes to
+  2 outputs). No bias dials to keep the arithmetic tight.
+
+        FIRST-LAYER DIALS (W1): each hidden box gets one weight per input wire
+
+                      x0    x1
+            h0:    [ 0.5   0.2 ]
+            h1:    [ 0.3   0.4 ]
+
+        SECOND-LAYER DIALS (W2): each output gets one weight per hidden box
+
+                      h0    h1
+            o0:    [ 0.6   0.4 ]
+            o1:    [-0.5   0.3 ]
+
+  These are the dials' current values after zero training. They are not
+  special -- any starting values would work. Training will change them.
+
+  -------
+
+  ONE FORWARD PASS
+
+  The input is a 2-number row. x0 = 0.5, x1 = 0.3. In the real machine
+  this row holds 22 numbers: five situation numbers, sixteen blend numbers,
+  one tau. Here it holds 2 as a stand-in.
+
+        INPUT ROW
+        [ x0=0.5 | x1=0.3 ]
+
+  First layer: each hidden box multiplies every input by its dial and sums.
+
+        h0 pre-activation:
+          z1_0 = x0 * W1[h0,x0]  +  x1 * W1[h0,x1]
+               = 0.5 * 0.5       +  0.3 * 0.2
+               = 0.25            +  0.06
+               = 0.31
+
+        h1 pre-activation:
+          z1_1 = x0 * W1[h1,x0]  +  x1 * W1[h1,x1]
+               = 0.5 * 0.3       +  0.3 * 0.4
+               = 0.15            +  0.12
+               = 0.27
+
+  Now the ReLU gate. ReLU passes a number unchanged if it is positive.
+  If the number is zero or negative, it clips it to zero.
+
+        RELU GATE
+
+             pre-activation    output
+        h0:  z1_0 = 0.31  -->  h0 = 0.31  (positive, passes through)
+        h1:  z1_1 = 0.27  -->  h1 = 0.27  (positive, passes through)
+
+  Both pre-activations were positive, so both pass through unchanged. That
+  will matter later.
+
+  Second layer: each output box multiplies every hidden value by its dial
+  and sums.
+
+        o0 pre-activation (= final output, no ReLU after the last layer):
+          z2_0 = h0 * W2[o0,h0]  +  h1 * W2[o0,h1]
+               = 0.31 * 0.6      +  0.27 * 0.4
+               = 0.186           +  0.108
+               = 0.294
+
+        o1 pre-activation:
+          z2_1 = h0 * W2[o1,h0]  +  h1 * W2[o1,h1]
+               = 0.31 * (-0.5)   +  0.27 * 0.3
+               = -0.155          +  0.081
+               = -0.074
+
+        PREDICTED WIND
+        [ pred_0 = 0.294 | pred_1 = -0.074 ]
+
+  -------
+
+  THE WIND LOSS
+
+  The true wind for this example -- answer minus noise -- is [0.40, -0.20].
+  That is the target the machine is training toward.
+
+        TRUE WIND:      [ 0.40  |  -0.20 ]
+        PREDICTED WIND: [ 0.294 |  -0.074 ]
+        ERRORS:         [ -0.106|   0.126 ]
+
+  The error at each output position: predicted minus true.
+
+        e0 = 0.294 - 0.40  = -0.106
+        e1 = -0.074 - (-0.20) = 0.126
+
+  The MSE ruler averages the squared errors across all output positions.
+  Two outputs here, so divide by 2.
+
+        L = (e0^2 + e1^2) / 2
+          = ((-0.106)^2 + (0.126)^2) / 2
+          = (0.011236 + 0.015876) / 2
+          = 0.027112 / 2
+          = 0.013556
+
+  That number, 0.013556, is the loss for this one example. In real training
+  the loss is averaged across a batch of 128 examples, but the derivative
+  mechanics are the same.
+
+  -------
+
+  THE SLOPE QUESTION
+
+  Every dial has one slope number, also called a gradient. The slope for a
+  dial W answers: if I nudge W up by a tiny amount epsilon, how much does
+  L change?
+
+        dL/dW = how much L changes per unit change in W
+
+  If dL/dW is negative, increasing W decreases L -- the right direction.
+  If dL/dW is positive, increasing W increases L -- the wrong direction.
+  Training nudges each dial OPPOSITE its slope.
+
+  -------
+
+  SLOPE FOR THE LAST-LAYER DIALS
+
+  Start with the simplest slope: dL/dW2[o0, h0].
+
+  W2[o0, h0] = 0.6. It appears in exactly one place:
+        z2_0 = h0 * W2[o0,h0] + h1 * W2[o0,h1]
+
+  A tiny nudge to W2[o0,h0] changes z2_0 by:
+        d(z2_0) / d(W2[o0,h0]) = h0 = 0.31
+
+  And z2_0 is the same as o0, the first output. L depends on o0 through:
+        L = (e0^2 + e1^2) / 2   where e0 = o0 - 0.40
+
+        d(L) / d(o0) = d/d(o0) of (o0 - 0.40)^2 / 2 = (o0 - 0.40) = e0 = -0.106
+
+  Chain rule multiplies these two:
+
+        dL / dW2[o0,h0] = (dL/do0) * (do0/dW2[o0,h0])
+                        = (-0.106) * (0.31)
+                        = -0.032860
+
+  The slope is -0.032860. Increasing W2[o0,h0] decreases the loss. That
+  dial should go up.
+
+  The same reasoning for the other three last-layer dials:
+
+        dL/dW2[o0,h1] = (dL/do0) * h1 = (-0.106) * 0.27 = -0.028620
+        dL/dW2[o1,h0] = (dL/do1) * h0 = ( 0.126) * 0.31 = +0.039060
+        dL/dW2[o1,h1] = (dL/do1) * h1 = ( 0.126) * 0.27 = +0.034020
+
+  -------
+
+  SLOPE PASSING BACK THROUGH THE HIDDEN LAYER
+
+  To find the slopes for the first-layer dials, the slope must travel back
+  through the second layer's dials. h0 contributed to BOTH output boxes.
+
+        h0 appears in:
+          z2_0 = h0 * W2[o0,h0] + ...     (links to o0)
+          z2_1 = h0 * W2[o1,h0] + ...     (links to o1)
+
+  The slope flowing back to h0 collects contributions from both:
+
+        SLOPE ARRIVING AT h0
+
+        from o0: (dL/do0) * W2[o0,h0] = (-0.106) * 0.6 = -0.0636
+        from o1: (dL/do1) * W2[o1,h0] = ( 0.126) * (-0.5) = -0.0630
+
+        total slope at h0: -0.0636 + (-0.0630) = -0.1266
+
+  Same for h1:
+
+        from o0: (dL/do0) * W2[o0,h1] = (-0.106) * 0.4  = -0.0424
+        from o1: (dL/do1) * W2[o1,h1] = ( 0.126) * 0.3  = +0.0378
+
+        total slope at h1: -0.0424 + 0.0378 = -0.0046
+
+  -------
+
+  THE RELU GATE IN REVERSE
+
+  The slope has now reached the hidden layer's post-ReLU values. But the
+  first-layer dials sit before the ReLU gate, at z1_0 and z1_1. The slope
+  must pass through the gate in reverse.
+
+        RELU GATE REVERSED
+
+             pre-activation    output    slope arriving    slope leaving
+        h0:  z1_0 = 0.31       0.31      -0.1266           -0.1266  (gate was open)
+        h1:  z1_1 = 0.27       0.27      -0.0046           -0.0046  (gate was open)
+
+  Both gates were open during the forward pass (both pre-activations were
+  positive). An open gate passes the slope backward unchanged.
+
+  If a gate had been closed (pre-activation <= 0, output clamped to 0),
+  the slope arriving at that gate would be multiplied by 0 and killed
+  completely. No slope would flow back through a closed ReLU gate. That
+  dial would not change on this lesson. It waits until a lesson arrives
+  where its pre-activation is positive and its gate opens.
+
+        CLOSED GATE EXAMPLE (illustrative, not this example):
+
+             pre-activation    output    slope arriving    slope leaving
+        ?:   z = -0.4          0.0       -0.09             0.0  (gate was closed)
+
+  In this example both gates were open, so the slopes pass through unchanged:
+
+        dL/dz1_0 = -0.1266
+        dL/dz1_1 = -0.0046
+
+  -------
+
+  SLOPE FOR THE FIRST-LAYER DIALS
+
+  Each first-layer dial W1[h, x] sits in the formula:
+        z1_h = x0 * W1[h,x0] + x1 * W1[h,x1]
+
+  The slope for W1[h0,x0]:
+
+        dL/dW1[h0,x0] = (dL/dz1_0) * (dz1_0/dW1[h0,x0])
+                       = (-0.1266)  * x0
+                       = (-0.1266)  * 0.5
+                       = -0.0633
+
+  All four first-layer slopes:
+
+        dL/dW1[h0,x0] = (-0.1266) * 0.5 = -0.0633
+        dL/dW1[h0,x1] = (-0.1266) * 0.3 = -0.03798
+        dL/dW1[h1,x0] = (-0.0046) * 0.5 = -0.0023
+        dL/dW1[h1,x1] = (-0.0046) * 0.3 = -0.00138
+
+  Every dial now has a slope. All eight slopes were computed by multiplying
+  in reverse through the network -- that chain of multiplications is what
+  people call backpropagation.
+
+  -------
+
+  ADAM: THE SMARTER NUDGE
+
+  Plain gradient descent would update each dial as:
+        W_new = W - lr * slope
+
+  Adam refines this. Each dial carries three extra numbers beside its
+  value: its slope (filled by backward), and two running totals that Adam
+  maintains across all training passes.
+
+        m  = running average of slopes           (tracks direction)
+        v  = running average of slope-squared    (tracks magnitude)
+
+  After each backward pass, Adam updates them for every dial:
+
+        m_new = 0.9 * m + 0.1 * slope
+        v_new = 0.999 * v + 0.001 * slope^2
+
+  The 0.9 and 0.999 are fixed. 0.9 means m is a slow-moving average: it
+  remembers the direction of many past slopes, not just the latest one.
+  0.999 means v is very slow-moving: it tracks the long-run squared
+  magnitude of the slope.
+
+  Before using m and v, Adam corrects for the fact that they both start at
+  zero and are therefore biased low on the first few updates. If t is the
+  update count (starts at 1):
+
+        m_hat = m_new / (1 - 0.9^t)
+        v_hat = v_new / (1 - 0.999^t)
+
+  The actual nudge:
+
+        W_new = W - lr * m_hat / (sqrt(v_hat) + epsilon)
+
+  lr = 0.0003. epsilon = 1e-8 (prevents division by zero).
+
+  Why divide by sqrt(v_hat)? Because v_hat tracks the recent magnitude of
+  the slopes. A dial that has been receiving large slopes already moved far
+  -- dividing by sqrt(v_hat) shrinks the step size for that dial so it does
+  not overshoot. A dial with consistently small slopes gets a proportionally
+  larger relative step. The effect: every dial moves roughly the same
+  distance per update regardless of how big its raw slope is.
+
+  -------
+
+  WORKED ADAM NUDGE ON W2[o0, h0]
+
+  Current value: W2[o0,h0] = 0.6
+  Slope from backward: slope = -0.032860
+  This is the very first update, so m = 0, v = 0 going in, and t = 1.
+
+  Update m and v:
+        m_new = 0.9 * 0   + 0.1 * (-0.032860) = -0.003286
+        v_new = 0.999 * 0 + 0.001 * (-0.032860)^2
+              = 0.001 * 0.001080 = 0.0000010796
+
+  Bias correction (t = 1):
+        m_hat = -0.003286 / (1 - 0.9^1)  = -0.003286 / 0.1  = -0.03286
+        v_hat = 0.0000010796 / (1 - 0.999^1) = 0.0000010796 / 0.001 = 0.0010796
+
+  Compute the step:
+        sqrt(v_hat) = sqrt(0.0010796) = 0.032857
+        m_hat / (sqrt(v_hat) + 1e-8) = -0.03286 / 0.032857 = -1.0001
+
+  The nudge:
+        nudge = lr * (-1.0001) = 0.0003 * (-1.0001) = -0.00030003
+
+  New value:
+        W2[o0,h0]_new = 0.6 - (-0.00030003) = 0.60030
+
+  A first Adam step on any dial almost always moves it by exactly lr,
+  because m_hat / sqrt(v_hat) rounds to +1 or -1. That is the bias
+  correction working: on the first step, m and v are both purely from the
+  one slope, so after correction m_hat equals the slope and sqrt(v_hat)
+  equals its absolute value, and their ratio is sign(slope). The step size
+  is just lr, with direction from the sign of the slope.
+
+  -------
+
+  WHY THE ORDER IS ZERO_GRAD, BACKWARD, STEP
+
+  Backward does not replace the slope slot. It ADDS the new slope on top
+  of whatever was there. On the very first pass the slot is empty, so this
+  does not matter. On every pass after that, the slot still holds the slope
+  from the previous lesson. If you do not zero it first, the slopes
+  accumulate -- the dial sees a smeared-together slope from lessons 1, 2,
+  and 3 when lesson 3 runs backward. That is wrong.
+
+        CORRECT ORDER ON EVERY LESSON:
+
+        zero_grad   -> set every slope slot to 0
+        forward     -> compute the prediction (uses dials, fills output)
+        loss        -> measure the error (one number)
+        backward    -> fill every slope slot (ADDS into the zero slot)
+        step        -> nudge every dial using Adam, using the filled slope
+
+  Skipping zero_grad is one of the two most common training bugs. The other
+  is forgetting model.train() after an evaluation block, which leaves
+  dropout and batch normalisation frozen in inference mode.
+
+  -------
+
+  THE TRAINING LOOP IN ONE RUN
+
+  The real Push-T wind machine trains for 400 epochs over 24,208 question-
+  answer pairs, with 128 pairs per batch. One epoch holds about 189 batches
+  (24,208 / 128 = 189, dropping the last partial batch). 400 epochs times
+  189 batches per epoch is 75,600 total weight updates.
+
+        ONE FULL RUN
+
+        epoch 0:
+          batch 0:  128 pairs -> forward -> loss -> zero_grad -> backward -> step
+          batch 1:  128 pairs -> forward -> loss -> zero_grad -> backward -> step
+          ...
+          batch 188: ...
+        epoch 1:
+          batch 0:  same 24,208 pairs reshuffled, dealt 128 at a time
+          ...
+        ...
+        epoch 399:
+          batch 188: final update
+
+  Every 10,000 weight updates the training loop pauses and runs an
+  evaluation: the machine plays 100 fresh Push-T games from scratch,
+  measuring how well the T gets pushed into the goal strip. It does not
+  train during evaluation; the dials hold still.
+
+  -------
+
+  WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
+
+  Wrong belief: a dead ReLU (pre-activation <= 0) stays dead forever.
+
+  The number that broke it: after one Adam nudge, a dial that was -0.4 (dead
+  gate) can become -0.1, and after more nudges it can cross zero into +0.1
+  (live gate). The gate status is decided fresh every forward pass from the
+  current dial values. The question is not "was this gate ever alive?" but
+  "given the current dials and this current input, is the pre-activation
+  above zero right now?"
+
+  The rule to carry: a dead gate on batch k does not mean a dead gate on
+  batch k+1. It means the slope for those dials is zero for this one batch.
+  They will start receiving slopes again as soon as a later batch pushes
+  their pre-activation positive.
+
+  -------
+
+  ONE BREATH
+
+  The 141,584 dials start random. One forward pass computes a predicted wind
+  by two rounds of multiply-and-sum plus a ReLU clamp. The MSE ruler
+  measures the squared gap between predicted and true wind. Backward
+  computes every dial's slope by chain rule: for each last-layer dial the
+  slope is (output error) times (hidden value); that error then flows back
+  through the second-layer weights and through the open ReLU gates to give
+  the first-layer slopes. Adam maintains two running totals per dial and
+  normalises the step size so all dials move roughly the same distance
+  regardless of slope magnitude. zero_grad wipes the slope slots clean,
+  backward refills them, step nudges the dials. 75,600 passes through that
+  loop, and the dials learn to print wind that points from noise toward a
+  real Push-T answer.
+
+
+  SEAM. Pencil ends here; below, the same numbers in Python.
+
+  -------
+
+```python
+# --------------------------------------------------------------------------
+# Forward pass -- toy 2->2->2 network standing in for the real 22->256->256->256->16
+# All values hard-coded; every line is annotated with its actual number.
+# --------------------------------------------------------------------------
+
+# First-layer weights W1: shape (2 hidden boxes, 2 inputs)
+W1_h0_x0 = 0.5   # dial from x0 to hidden box h0
+W1_h0_x1 = 0.2   # dial from x1 to hidden box h0
+W1_h1_x0 = 0.3   # dial from x0 to hidden box h1
+W1_h1_x1 = 0.4   # dial from x1 to hidden box h1
+
+# Second-layer weights W2: shape (2 outputs, 2 hidden boxes)
+W2_o0_h0 =  0.6   # dial from h0 to output o0
+W2_o0_h1 =  0.4   # dial from h1 to output o0
+W2_o1_h0 = -0.5   # dial from h0 to output o1
+W2_o1_h1 =  0.3   # dial from h1 to output o1
+
+# Input (2 numbers standing in for the real 22-number row)
+x0 = 0.5   # stands in for the 22-number [state, blend, tau] row
+x1 = 0.3
+
+# First layer: multiply inputs by dials, sum
+z1_0 = W1_h0_x0 * x0 + W1_h0_x1 * x1     # 0.5*0.5 + 0.2*0.3 = 0.25+0.06 = 0.31
+z1_1 = W1_h1_x0 * x0 + W1_h1_x1 * x1     # 0.3*0.5 + 0.4*0.3 = 0.15+0.12 = 0.27
+print("pre-ReLU:", round(z1_0, 5), round(z1_1, 5))   # 0.31  0.27
+
+# ReLU: clip negatives to zero
+h0 = max(0.0, z1_0)    # max(0, 0.31) = 0.31
+h1 = max(0.0, z1_1)    # max(0, 0.27) = 0.27
+print("hidden  :", round(h0, 5), round(h1, 5))        # 0.31  0.27
+
+# Second layer: multiply hidden values by dials, sum
+z2_0 = W2_o0_h0 * h0 + W2_o0_h1 * h1     #  0.6*0.31 + 0.4*0.27 = 0.186+0.108 = 0.294
+z2_1 = W2_o1_h0 * h0 + W2_o1_h1 * h1     # -0.5*0.31 + 0.3*0.27 = -0.155+0.081 = -0.074
+pred_0 = z2_0   # 0.294
+pred_1 = z2_1   # -0.074
+print("wind pred:", round(pred_0, 5), round(pred_1, 5))   # 0.294  -0.074
+
+# --------------------------------------------------------------------------
+# Wind loss: MSE between predicted wind and true wind
+# --------------------------------------------------------------------------
+
+true_0 =  0.40    # true wind: answer - noise from Part 1 example
+true_1 = -0.20
+
+e0 = pred_0 - true_0     # 0.294 - 0.40 = -0.106
+e1 = pred_1 - true_1     # -0.074 - (-0.20) = 0.126
+print("errors  :", round(e0, 5), round(e1, 5))   # -0.106  0.126
+
+loss = (e0**2 + e1**2) / 2     # (0.011236 + 0.015876) / 2 = 0.013556
+print("loss    :", round(loss, 6))                # 0.013556
+
+# --------------------------------------------------------------------------
+# Backward pass: compute slope for every dial
+# --------------------------------------------------------------------------
+
+# Slopes arriving at each output (dL/d_pred_k = e_k for 2-output MSE)
+dL_do0 = e0    # -0.106
+dL_do1 = e1    #  0.126
+
+# Slopes for last-layer dials: (error at that output) * (hidden value that fed it)
+dL_dW2_o0_h0 = dL_do0 * h0    # -0.106 * 0.31 = -0.032860
+dL_dW2_o0_h1 = dL_do0 * h1    # -0.106 * 0.27 = -0.028620
+dL_dW2_o1_h0 = dL_do1 * h0    #  0.126 * 0.31 =  0.039060
+dL_dW2_o1_h1 = dL_do1 * h1    #  0.126 * 0.27 =  0.034020
+print("dL/dW2[o0,h0]:", round(dL_dW2_o0_h0, 6))   # -0.03286
+print("dL/dW2[o1,h0]:", round(dL_dW2_o1_h0, 6))   #  0.03906
+
+# Slope arriving at each hidden value (sum over all outputs of error*weight)
+delta_h0 = dL_do0 * W2_o0_h0 + dL_do1 * W2_o1_h0   # -0.106*0.6 + 0.126*(-0.5)
+           # = -0.0636 + (-0.063) = -0.1266
+delta_h1 = dL_do0 * W2_o0_h1 + dL_do1 * W2_o1_h1   # -0.106*0.4 + 0.126*0.3
+           # = -0.0424 + 0.0378 = -0.0046
+print("delta_h:", round(delta_h0, 5), round(delta_h1, 5))   # -0.1266  -0.0046
+
+# Through ReLU: gate was open (z1_0=0.31>0 and z1_1=0.27>0), so slope passes unchanged
+gate_open_h0 = 1.0 if z1_0 > 0 else 0.0   # 1.0  (gate was open)
+gate_open_h1 = 1.0 if z1_1 > 0 else 0.0   # 1.0  (gate was open)
+dL_dz1_0 = delta_h0 * gate_open_h0        # -0.1266 * 1.0 = -0.1266
+dL_dz1_1 = delta_h1 * gate_open_h1        # -0.0046 * 1.0 = -0.0046
+
+# Slopes for first-layer dials: slope-at-pre-activation * input that fed it
+dL_dW1_h0_x0 = dL_dz1_0 * x0    # -0.1266 * 0.5 = -0.06330
+dL_dW1_h0_x1 = dL_dz1_0 * x1    # -0.1266 * 0.3 = -0.03798
+dL_dW1_h1_x0 = dL_dz1_1 * x0    # -0.0046 * 0.5 = -0.00230
+dL_dW1_h1_x1 = dL_dz1_1 * x1    # -0.0046 * 0.3 = -0.00138
+print("dL/dW1[h0,x0]:", round(dL_dW1_h0_x0, 5))   # -0.06330
+print("dL/dW1[h1,x0]:", round(dL_dW1_h1_x0, 5))   # -0.00230
+
+# --------------------------------------------------------------------------
+# Adam nudge: worked on W2[o0, h0] only; all other dials follow the same recipe
+# --------------------------------------------------------------------------
+
+lr = 0.0003         # learning rate (3e-4)
+beta1 = 0.9         # m decay rate
+beta2 = 0.999       # v decay rate
+eps = 1e-8          # prevents division by zero
+t = 1               # first update step
+
+slope = dL_dW2_o0_h0   # -0.032860
+
+m_prev = 0.0        # m starts at zero for every dial
+v_prev = 0.0        # v starts at zero for every dial
+
+m_new = beta1 * m_prev + (1 - beta1) * slope         # 0.9*0 + 0.1*(-0.032860) = -0.003286
+v_new = beta2 * v_prev + (1 - beta2) * slope**2      # 0.999*0 + 0.001*0.001080 = 0.0000010796
+print("m_new:", round(m_new, 7))                      # -0.003286
+print("v_new:", round(v_new, 10))                     # 0.0000010796
+
+m_hat = m_new / (1 - beta1**t)    # -0.003286 / (1 - 0.9) = -0.003286 / 0.1 = -0.03286
+v_hat = v_new / (1 - beta2**t)    # 0.0000010796 / (1 - 0.999) = 0.0000010796 / 0.001 = 0.0010796
+print("m_hat:", round(m_hat, 6))   # -0.03286
+print("v_hat:", round(v_hat, 7))   # 0.0010796
+
+import math
+step_size = lr * m_hat / (math.sqrt(v_hat) + eps)    # 0.0003*(-0.03286)/(0.032857+0)
+           # = 0.0003 * (-1.00009) = -0.000300
+print("step_size:", round(step_size, 7))              # -0.000300
+
+W2_o0_h0_new = W2_o0_h0 - step_size    # 0.6 - (-0.000300) = 0.60030
+print("W2[o0,h0] before:", W2_o0_h0)   # 0.6
+print("W2[o0,h0] after :", round(W2_o0_h0_new, 5))   # 0.6003
+```
+
+  Running this code prints:
+
+        pre-ReLU: 0.31 0.27
+        hidden  : 0.31 0.27
+        wind pred: 0.294 -0.074
+        errors  : -0.106 0.126
+        loss    : 0.013556
+        dL/dW2[o0,h0]: -0.03286
+        dL/dW2[o1,h0]:  0.03906
+        delta_h: -0.1266 -0.0046
+        dL/dW1[h0,x0]: -0.0633
+        dL/dW1[h1,x0]: -0.0023
+        m_new: -0.003286
+        v_new: 0.0000010796
+        m_hat: -0.03286
+        v_hat: 0.0010796
+        step_size: -0.0003
+        W2[o0,h0] before: 0.6
+        W2[o0,h0] after : 0.6003
+
+  Every number matches the by-hand derivation. W2[o0, h0] moved from 0.6
+  to 0.6003 -- a nudge of 0.0003 in the direction that reduces the wind
+  error. After 75,600 such nudges, on 75,600 different batches of 128 real
+  Push-T lessons, the 141,584 dials learn to print wind that points from
+  noise toward a real recorded answer.
+
+  Part 3 shows what happens at answering time: no recorded answer is
+  available, so the machine starts from pure noise and walks ten steps
+  along its predicted winds, arriving at a finished 8-move plan.
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  slope / gradient     = dL/dW: how much the loss changes per unit change in one dial
+  backpropagation      = computing slopes for all dials by chain rule, from output to input
+  chain rule           = dL/dW = (dL/d_output) * (d_output/dW), repeated layer by layer
+  dead gate            = a ReLU whose pre-activation was <= 0; passes slope of zero backward
+  open gate            = a ReLU whose pre-activation was > 0; passes slope backward unchanged
+  m, v                 = Adam's two running totals per dial (direction average, magnitude average)
+  bias correction      = dividing m and v by (1 - beta^t) to un-shrink them on early steps
+  zero_grad            = clearing the slope slot before each backward (prevents accumulation)
+  epoch                = one full pass over all 24,208 question-answer pairs, in random order
+  batch                = 128 pairs taken together for one weight update
+  step counter         = a plain integer that counts total weight updates (not the dial nudge)

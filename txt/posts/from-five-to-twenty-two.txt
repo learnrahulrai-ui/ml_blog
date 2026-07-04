@@ -10,9 +10,9 @@
   Posted: 2026-07-04 . Author: Rahul Rai . Tags: imitation-learning, push-t, flow-matching, architecture, action-chunking, by-hand
   ============================================================================================
 
-  PATH . post 59/59 . part 1 of 3 in Chapter 20 -- The Push-T Machine
+  PATH . post 59/60 . part 1 of 3 in Chapter 20 -- The Push-T Machine
     <- prev:  [Riding the Wind: From Noise to an Answer](riding-the-wind-by-pencil.txt)
-       next:  (part 2 to follow)
+       next:  [Wrong Wind Shows Every Dial Which Way to Turn](dials-learn-the-wind.txt) ->
 
   A square table. On it, a T-shaped block and a round sliding hand. The
   hand must push the T into the goal strip on the right. A human already
