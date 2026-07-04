@@ -14,20 +14,22 @@
     <- prev:  [Riding the Wind: From Noise to an Answer](riding-the-wind-by-pencil.txt)
        next:  [Wrong Wind Shows Every Dial Which Way to Turn](dials-learn-the-wind.txt) ->
 
-  A square table. On it, a T-shaped block and a round sliding hand. The
-  hand must push the T into the goal strip on the right. A human already
-  knows how. Two hundred and six recorded games -- 25,650 lines of notes --
-  show every move the human ever made. The question: can a machine read
-  those notes and copy the moves well enough to push the T home in a fresh
-  game it has never seen?
+  Here is the problem. A robot arm must push a T-shaped block into a goal
+  strip on a table. A human already solved this task two hundred and six
+  times. Every move the human ever made was recorded. Can a machine read
+  those recordings and learn to copy the human well enough to push the
+  block home in a game it has never seen?
 
-  The answer is almost. This post is about why "almost" falls short at one
-  specific moment, what the fix demands, and why the fix forces the machine
-  to take 22 wires in instead of 5.
+  The answer is: almost. The "almost" fails in one specific place, in a way
+  that is mathematically guaranteed. This post shows what that place is, why
+  no amount of extra training can fix it, and what the exact fix demands.
+  The fix forces the machine's input to grow from 5 wires to 22. This post
+  works out why.
 
   -------
 
-        TABLE
+        THE TABLE
+
         +--------------------------+
         |      ___                 |
         |     |   |                |
@@ -38,333 +40,410 @@
         |====== GOAL STRIP ========|
         +--------------------------+
 
-  The hand slides anywhere on the table. The goal strip runs along the
-  bottom edge. Reward arrives when the T touches the strip.
+  The hand slides anywhere on the table. Push the T into the goal strip
+  at the bottom. A round hand (the robot's end-effector) is the only thing
+  that can touch the block. The human controlled where the hand moved each
+  tick. Those control decisions are what the machine will copy.
 
-  At every tick of the game, the table hands the machine five numbers:
-
-        WHAT THE MACHINE SEES EACH TICK
+  At every tick, the table gives the machine five numbers:
 
         [ T_x | T_y | hand_x | hand_y | hand_speed ]
           0     1     2        3        4
 
-  T_x is the block's left-right position. T_y is its up-down position.
-  hand_x and hand_y are the hand's position. hand_speed is how fast the
-  hand is moving. Five numbers. That is the full picture.
+  T_x and T_y: where the block is. hand_x and hand_y: where the hand is.
+  hand_speed: how fast the hand is moving. Those five numbers describe
+  everything visible at this moment.
 
-  The machine must send back two numbers: where it wants the hand to move
-  next, as a target point (target_x, target_y). The game engine slides the
-  hand toward that point at a fixed speed.
+  The machine must send back two numbers: a target point (target_x,
+  target_y) telling the game engine where to slide the hand next.
 
-        WHAT THE MACHINE SENDS BACK
+        WHAT THE MACHINE SENDS BACK EACH TICK
 
         [ target_x | target_y ]
 
-  Two numbers per tick. That is the full action.
+  Two numbers in, two numbers out per tick. That is the task.
+
+  -------
+
+  PLAN EIGHT TICKS AT ONCE
 
   Replanning every single tick means the machine must decide 20 times per
-  second. A machine that thinks one tick ahead is brittle -- the slightest
-  delay leaves it blind. The fix: plan eight ticks in advance. The machine
-  prints eight moves at once. The game executes them one by one, and only
-  after all eight are spent does the machine plan the next eight.
+  second. Any delay between observation and decision leaves the hand blind.
+  The solution: let the machine plan eight ticks at once. The machine sends
+  back eight move targets instead of one. The game uses them one at a time,
+  and after eight ticks it asks the machine for the next eight.
 
-        ONE PLAN: EIGHT MOVES STACKED
+        ONE PLAN: EIGHT MOVES
 
         move 0: [ target_x_0, target_y_0 ]
         move 1: [ target_x_1, target_y_1 ]
-        move 2: [ target_x_2, target_y_2 ]
-        move 3: [ target_x_3, target_y_3 ]
-        move 4: [ target_x_4, target_y_4 ]
-        move 5: [ target_x_5, target_y_5 ]
-        move 6: [ target_x_6, target_y_6 ]
+        ...
         move 7: [ target_x_7, target_y_7 ]
 
-  Eight moves times two numbers each is 16 numbers. That is the machine's
-  output: one block of 16 numbers per plan. The five input numbers come in,
-  sixteen output numbers come out.
+  That is 8 x 2 = 16 numbers per plan. The machine reads five numbers and
+  must print sixteen. The recordings are re-cut to match: every recorded
+  tick t becomes one question (five situation numbers at tick t) paired
+  with one answer (the eight recorded moves starting at tick t). The last
+  seven ticks of each game cannot start a plan -- no eight moves remain --
+  so they are dropped. The 206 games holding 25,650 recorded ticks yield
+  24,208 valid question-answer pairs after this cut.
 
-  The diary is cut to match. Each line in the diary is one tick. A plan
-  built at tick t uses the next eight moves: ticks t, t+1, t+2, ..., t+7.
-  The last seven ticks of each game cannot start a plan (there are not
-  eight moves left), so those lines are never used as question starts. The
-  diary of 25,650 lines, across 206 games, yields 24,208 valid
-  question-answer pairs after removing the tail of each game.
+  -------
+
+  WHAT ONE ADDER-BOX DOES
+
+  Before building the machine, understand the one piece it is made from.
+  The piece is called an adder-box (or neuron or unit). It works like this:
+
+        ONE ADDER-BOX: THREE WIRES IN, ONE NUMBER OUT
+
+               wire_0 = 0.5
+               wire_1 = 0.3         each wire has one dial
+               wire_2 = 0.7
+
+               dial_0 = 1.2    dial_1 = -0.5    dial_2 = 0.8
+
+        output = wire_0 * dial_0 + wire_1 * dial_1 + wire_2 * dial_2
+               = 0.5   * 1.2    + 0.3   * (-0.5)  + 0.7   * 0.8
+               = 0.6           + (-0.15)           + 0.56
+               = 1.01
+
+  That is the entire computation. Multiply each incoming wire value by that
+  wire's dial, sum everything, get one number out. Nothing more.
+
+  A dial is just a number stored inside the box. Training will change these
+  dials. They start as small random numbers near zero. After training they
+  hold numbers that make the box useful.
+
+  The box has one dial per incoming wire. Three wires in means three dials.
+  Twenty-two wires in would mean twenty-two dials per box.
+
+  -------
+
+  A LAYER IS A ROW OF BOXES
+
+  A layer is many adder-boxes sitting side by side, ALL reading the SAME
+  incoming wires, each producing its own output number.
+
+        ONE LAYER: 2 BOXES, 3 WIRES IN
+
+        wire_0 = 0.5 ---+---> box_0: dials [1.2, -0.5, 0.8] -> output 1.01
+        wire_1 = 0.3 ---+---> box_1: dials [0.3,  0.9, 0.2] -> output 0.38
+        wire_2 = 0.7 ---+
+
+  Box_0 applies its own set of dials to the three wires: 0.5*1.2 + 0.3*(-0.5) +
+  0.7*0.8 = 0.6 - 0.15 + 0.56 = 1.01.
+
+  Box_1 applies a DIFFERENT set of dials to the same three wires:
+  0.5*0.3 + 0.3*0.9 + 0.7*0.2 = 0.15 + 0.27 + 0.14 = 0.56.
+
+  Wait -- let me recheck box_1: 0.5*0.3 + 0.3*0.9 + 0.7*0.2 = 0.15 + 0.27 + 0.14 = 0.56.
+
+  Every box in a layer reads the same wires but uses its own dial set. Two
+  boxes, two outputs. 256 boxes, 256 outputs.
+
+  Stacking layers: the outputs of one layer become the input wires of the
+  next. The first layer reads the five original situation numbers and
+  produces 256 numbers. The second layer reads those 256 and produces 256
+  more. The last layer reads the final 256 and produces 16: the plan.
+
+  -------
+
+  WHY THE RELU GATE IS NOT OPTIONAL
+
+  Stack two layers without anything between them. Layer 1 computes:
+        hidden = input * W1
+
+  Layer 2 computes:
+        output = hidden * W2 = (input * W1) * W2 = input * (W1 * W2)
+
+  W1 * W2 is just another single matrix. Two stacked layers collapse into
+  one layer with dials W1*W2. Add a third layer: still collapses. No matter
+  how many layers you stack without anything between them, the whole thing
+  is equivalent to one layer. Depth buys nothing.
+
+  The gate that prevents this collapse is the ReLU: applied between layers,
+  it clips every negative number to zero.
+
+        RELU: A GATE FOR EACH NUMBER
+
+        input number -> if > 0: pass it through unchanged
+                        if <= 0: output zero
+
+        0.31  -->  0.31    (positive, passes through)
+        0.27  -->  0.27    (positive, passes through)
+       -0.40  -->  0.00    (negative, clipped to zero)
+
+  Why does this break the collapse? Because (input * W1) after ReLU is
+  no longer a linear function of input. Some of the hidden values were
+  clipped to zero. Which ones were clipped depends on the input itself.
+  That makes the overall function non-linear, and two non-linear layers
+  cannot be collapsed into one.
+
+  With ReLU between layers, depth buys expressive power. Without it,
+  depth buys nothing. That is why ReLU appears between every pair of layers
+  in the machine.
 
   -------
 
   THE FIVE-WIRE COPYING MACHINE
 
-  Build a web of multipliers and adders. Wire in the five situation numbers.
-  Wire out the sixteen plan numbers. Put three hidden rows of 256 adder-
-  boxes between them. Each adder-box takes every wire from the row above,
-  multiplies each by a dial setting, sums them all, and passes the sum
-  through a ReLU -- a gate that passes positive values unchanged and clips
-  negative values to zero. The full shape:
+  Now the architecture makes sense. Five wires in, three hidden layers of
+  256 boxes each, sixteen wires out:
 
-        INPUT         HIDDEN ROWS          OUTPUT
-          5        256   256   256            16
+        5  ->  [256 boxes + ReLU]  ->  [256 boxes + ReLU]
+           ->  [256 boxes + ReLU]  ->  [16 boxes]  ->  16 outputs
 
-        [s0]        [h0]                  [out_0 ]
-        [s1]  -->   [h1]  --> ...  -->    [out_1 ]
-        [s2]        [.]                   [.     ]
-        [s3]        [255]                 [out_15]
-        [s4]
+  Count the dials:
+    - Layer 1: 5 wires feeding 256 boxes = 5 * 256 = 1,280 dials, plus 256 biases = 1,536
+    - Layer 2: 256 wires feeding 256 boxes = 256 * 256 = 65,536 plus 256 biases = 65,792
+    - Layer 3: same = 65,792
+    - Layer 4: 256 wires feeding 16 boxes = 256 * 16 = 4,096 plus 16 biases = 4,112
+    - Total: 1,536 + 65,792 + 65,792 + 4,112 = 137,232 dials
 
-  Count the dials: the first layer connects 5 inputs to 256 hidden boxes
-  (5 x 256 = 1,280 weights, plus 256 biases = 1,536 dials). The second
-  layer connects 256 to 256 (65,536 + 256 = 65,792). The third, same
-  (65,792). The last layer connects 256 to 16 (256 x 16 = 4,096 + 16 = 4,112).
-  Total: 1,536 + 65,792 + 65,792 + 4,112 = 137,232 dials. Every one of them
-  starts as a random number, and every one of them is turned a tiny amount
-  each training pass.
-
-  Call this the copying machine. Its only job: read five situation numbers,
-  print sixteen plan numbers.
+  All 137,232 dials start as random numbers near zero. Every one of them is
+  turned a tiny amount on each training pass.
 
   -------
 
-  HOW THE RULER GRADES IT
+  HOW WRONG IS THE GUESS
 
-  Every lesson from the diary gives the machine a five-number question (the
-  situation at tick t) and a sixteen-number correct answer (the eight recorded
-  moves starting at tick t). The machine prints its own sixteen-number guess.
-  The ruler measures how wrong the guess is:
+  Every question-answer pair from the diary provides one lesson. The machine
+  reads the five situation numbers, runs them through all 137,232 dials, and
+  prints sixteen plan numbers. The true sixteen numbers (the human's actual
+  moves) are also known. The ruler measures how wrong the machine is:
+
+        THE MSE RULER
 
         L = (1/16) * sum over k from 0 to 15 of (guess_k - truth_k)^2
 
-  Each of the 16 output positions contributes one squared gap. Average all
-  16. That is the Mean Squared Error, or MSE. If the guess exactly matches
-  the truth, every gap is zero and L = 0. If the guess is far off, L is
-  large. Training turns the 137,232 dials in the direction that makes L
-  smaller. Do this 75,600 times across 400 full passes through the diary,
-  and the machine learns to copy the human's moves.
+  Subtract the guess from the truth at each of the 16 positions. Square
+  each gap. Average all 16 squared gaps. That is L, the Mean Squared Error.
 
-  It works. For many situations the human always moved the same way, and the
-  machine copies that well. Then a specific situation appears where the
-  copying machine is not just imperfect -- it is perfectly wrong.
+  Why square? Two reasons. First, squaring makes positive and negative gaps
+  both count as positive (a guess of 0.5 is just as wrong as a guess of -0.5
+  when the truth is zero). Second, squaring penalises large gaps much more
+  than small ones: a gap of 2 costs 4; a gap of 1 costs 1; a gap of 0.1
+  costs only 0.01. The machine learns to avoid large gaps.
+
+  If every guess exactly matches the truth, every gap is zero and L = 0.
+  If every guess is 1.0 away from the truth, L = 1.0. Training pushes L
+  toward zero by turning the dials.
 
   -------
 
   THE FORK
 
-  Imagine the T sitting in the centre of the table and the hand to its left.
-  The human can push the T into the goal strip by swinging the hand ABOVE
-  the T first, or BELOW it first. Both paths work. The human chose above on
-  some days and below on others. Both choices are recorded in the diary. At
-  this one situation (T and hand in those exact positions), the diary holds
-  two equally valid sixteen-number answers.
+  Suppose the T sits near the centre and the hand is to its left. To push
+  the T into the goal strip, the human can swing the hand ABOVE the T first,
+  or BELOW it first. Both paths work. The human chose above on some days,
+  below on others. The diary holds both.
 
-        THE FORK
+        THE FORK: ONE SITUATION, TWO VALID ANSWERS
 
-                   [ go above ]
+                   [ above path: plan_A ]
                   /
         state s --
                   \
-                   [ go below ]
+                   [ below path: plan_B ]
 
-  Both answers are in the diary. Neither is wrong. The machine is asked to
-  print one sixteen-number answer for state s. What does it print?
-
-  The math forces the answer. Pick any one output position -- call it the
-  y-component of the first move. Going above might set it to +0.3 (move up).
-  Going below might set it to -0.3 (move down). Call these Y1 = +0.3 and
-  Y2 = -0.3. The machine must print a single number c for this position.
-
-  The ruler grades c against both answers equally:
-
-        L(c) = (1/2) * (c - Y1)^2 + (1/2) * (c - Y2)^2
-
-  Find the c that makes L smallest: take the derivative with respect to c,
-  set it to zero, solve.
-
-        dL/dc = (c - Y1) + (c - Y2)
-              = 2c - Y1 - Y2
-
-  Setting 2c - Y1 - Y2 = 0 gives c = (Y1 + Y2) / 2.
-
-  With Y1 = +0.3 and Y2 = -0.3:
-
-        c = (+0.3 + (-0.3)) / 2 = 0 / 2 = 0.0
-
-  The answer that minimises the MSE ruler is the average of the two truths.
-  The average of "move up" and "move down" is "move straight." The hand
-  drives straight into the side of the T. The block does not move. The
-  machine did not learn to fail -- the ruler forced it to fail. Any single
-  number the machine prints will lose to the average, every time, because
-  the average is provably the MSE minimiser when two equal answers exist.
-
-  This is not a training problem. More dials, more passes, longer training:
-  all aim the machine at the same answer, the average, because that is the
-  lowest point the ruler can reach given the question shape. The disease is
-  in the question: "given this one state, what is the one right answer?" --
-  when the right answer is not unique, the question cannot be answered well.
+  Both plan_A and plan_B are in the diary. Neither is wrong. When training,
+  the machine sees state s with the above-plan answer, and sees state s again
+  with the below-plan answer. It must learn one sixteen-number output for
+  state s. What does it learn?
 
   -------
 
-  THE WIND FIX
+  THE MATH THAT FORCES THE MACHINE TO PRINT GARBAGE
 
-  The fix is to stop printing the answer. Print a direction instead.
+  Pick one output position -- say the y-component of the first move. The
+  above path has it as Y_A = +0.3 (move up first). The below path has it as
+  Y_B = -0.3 (move down first). Each appears equally often in the diary.
+  Call the machine's printed number c. The training ruler grades c against
+  both answers:
 
-  Imagine the real answer -- the above-swing plan -- as a point in a 16-
-  dimensional space. Imagine a blob of pure random noise as another point.
-  Draw a straight line from the noise to the answer. The direction that
-  line points is the wind.
+        L(c) = (1/2) * (c - Y_A)^2  +  (1/2) * (c - Y_B)^2
 
-        NOISE TO ANSWER
+  To find the c that makes L smallest, differentiate with respect to c and
+  set the result to zero:
 
-        noise      blend      answer
-          *   ---- M ------>   *
-          |                    |
-        tau=0               tau=1
+        dL/dc = (c - Y_A) + (c - Y_B) = 2c - Y_A - Y_B
 
-  tau is a dial. At tau = 0, you are standing at the noise point. At tau =
-  1, you are standing at the answer. At tau = 0.4, you are standing at a
-  blend M that is 40% of the way from noise to answer:
+        set equal to zero:
+          2c - Y_A - Y_B = 0
+          c = (Y_A + Y_B) / 2
 
-        M = (1 - tau) * noise + tau * answer
-          = 0.6 * noise + 0.4 * answer
+  With Y_A = +0.3 and Y_B = -0.3:
 
-  The wind at every point along the line is the same: it always points from
-  noise toward answer. Its exact value:
+        c = (0.3 + (-0.3)) / 2 = 0 / 2 = 0.0
 
-        wind = answer - noise
+  The c that minimises the MSE ruler is the average. The machine has no
+  choice: the average is the provably correct answer to the question the
+  ruler is asking. The average of "move up 0.3" and "move down 0.3" is
+  "move straight: 0.0." The hand slides straight into the side of the block.
+  The block does not move.
 
-  That wind is constant because the line is straight. Training shows the
-  machine many (state, noise, answer, tau) combinations. The machine learns
-  to print the wind from each blend point M. At serving time, no answer is
-  available -- the machine starts from pure noise and walks along the wind
-  it predicts, step by step, until tau reaches 1.
-
-  Why does this cure the fork? Because two different noise draws produce two
-  different starting points. Each starting point rides its own wind toward
-  its own answer. The above-noise rides to above-answer. The below-noise
-  rides to below-answer. The two paths never average. The fork disappears
-  because the machine never prints a single answer -- it prints a direction
-  from wherever it currently stands, and two different starting points stand
-  in two different places.
+  This is not a training bug. More epochs, more dials, a bigger machine:
+  all find the same minimum, because the RULER forces it. The failure is in
+  the question shape: "given one state, print one answer" cannot be answered
+  honestly when one state has two correct answers.
 
   -------
 
-  WHY THE WIND MACHINE CANNOT GET AWAY WITH FIVE WIRES
+  STOP PRINTING ANSWERS. PRINT WIND INSTEAD.
 
-  The wind machine reads five situation numbers. That seems like the only
-  input it needs: the table situation tells it which answer to aim for. But
-  there is a problem.
+  If the machine printed the average of two good answers and got a bad one,
+  the fix is: stop asking it to print the answer. Ask it instead to print
+  a direction -- the wind that blows from wherever it currently stands
+  toward the correct answer.
 
-  Consider two blend points that have the same coordinates in the 16-
-  dimensional blend space. One is at tau = 0.1 (nearly all noise, just
-  started walking) and the other is at tau = 0.9 (nearly all answer, almost
-  done). The correct wind at tau = 0.1 is a large arrow -- there is a long
-  way to go, and the blend is mostly noise, and the machine must point hard
-  toward the answer. The correct wind at tau = 0.9 is a small arrow in
-  exactly the same direction -- the blend is mostly answer already, and a
-  small nudge finishes the job.
+        NOISE, BLEND, ANSWER: A STRAIGHT LINE
 
-  If the machine sees only the five situation numbers and the 16-dimensional
-  blend point, it cannot tell which of those two blend points it is at.
-  Same state, same blend position -- but the right wind is big or small
-  depending on whether tau is 0.1 or 0.9.
+        noise (tau=0.0)    blend M    answer (tau=1.0)
+             *    -------> M  -------->     *
+             |                              |
+         pure random              the human's recorded
+         16 numbers               16 moves
 
-        SAME BLEND POINT M, TWO DIFFERENT TAUS
+  Start from pure random noise. Draw a straight line to the recorded answer.
+  Every point along that line is a blend. tau is how far along: tau=0 is
+  all noise, tau=1 is the answer, tau=0.4 is 40% of the way.
 
-           tau=0.1:          M           answer
-           *----|-----------[M]----------->*
-                ^ big wind needed here
+  The blend formula: call the noise N (16 random numbers) and the answer A
+  (16 recorded moves). The blend at tau=0.4 is:
 
-           tau=0.9:          answer M
-           *---------------------------------|---[M]->*
-                                                ^ small wind
+        M = (1 - 0.4) * N + 0.4 * A = 0.6 * N + 0.4 * A
 
-  Without tau, the machine is asked: "given this state and this blend
-  point, what is the wind?" -- but the correct answer changes depending on
-  how far along the walk the blend point is. The machine cannot distinguish
-  the two situations. It averages them and gets both wrong.
+  Concrete: N = [0.10, 0.80], A = [0.50, 0.60], tau = 0.4 (showing 2 of
+  the 16 numbers):
 
-  With tau, the machine sees the full picture. Each call to the machine
-  includes: the five situation numbers, the current 16-dimensional blend
-  point M (laid flat as 16 separate numbers), and the tau dial (1 number).
-  That is 5 + 16 + 1 = 22 wires in.
+        M_0 = 0.6 * 0.10 + 0.4 * 0.50 = 0.06 + 0.20 = 0.26
+        M_1 = 0.6 * 0.80 + 0.4 * 0.60 = 0.48 + 0.24 = 0.72
+
+  The true wind -- the direction from noise to answer -- is:
+
+        wind = A - N = [0.50 - 0.10, 0.60 - 0.80] = [0.40, -0.20]
+
+  The wind is constant along the line (the line is straight, so its slope
+  does not change). If you start at blend M and walk the remaining
+  (1 - tau) = 0.6 of the way along the wind, you land exactly on A:
+
+        M_0 + (1 - tau) * wind_0 = 0.26 + 0.6 * 0.40 = 0.26 + 0.24 = 0.50  = A_0
+        M_1 + (1 - tau) * wind_1 = 0.72 + 0.6 * (-0.20) = 0.72 - 0.12 = 0.60 = A_1
+
+  This cures the fork because two different noise draws start at two
+  different blend points. One noise placed you on the above-path line; the
+  other on the below-path line. Each line has its own wind pointing to its
+  own answer. No averaging occurs because the machine is asked "from THIS
+  blend point, which way?" -- and two blend points are in two different
+  places.
+
+  -------
+
+  WHY FIVE WIRES IS NOT ENOUGH FOR THE WIND MACHINE
+
+  The wind machine's job: read the situation and print the wind. The
+  situation is five numbers. Can the machine manage with only those five?
+
+  No. Consider two blend points that happen to land at the same position in
+  16-dimensional space. One is at tau = 0.1 (just 10% of the way from noise
+  to answer -- mostly noise, large remaining distance). The other is at
+  tau = 0.9 (90% of the way -- mostly answer, small remaining distance).
+
+        SAME BLEND POSITION, DIFFERENT STAGE
+
+           tau=0.1:                                    answer
+           *--------[M?]------------------------------->*
+           ^ big wind still needed
+
+           tau=0.9:                                    answer
+           *-------------------------------------------[M?]->*
+                                                        ^ small finishing nudge
+
+  At tau=0.1, the machine is far from the answer. The wind should be large
+  to carry it there. At tau=0.9, the machine is nearly done. The wind
+  should be small so it does not overshoot.
+
+  If the machine sees only the five situation numbers and the 16-number
+  blend position, it cannot tell which case it is in. Both blend points
+  happen to be at the same coordinates but at different stages. The machine
+  averages the big and small winds and gets both wrong.
+
+  With tau, the machine sees the complete picture. The three inputs it needs:
+
+        1. The five situation numbers          (what is happening on the table)
+        2. The 16-number blend point M         (where are you in the 16D space right now)
+        3. The tau dial                        (how far along the walk are you)
+
+        Total: 5 + 16 + 1 = 22 wires in.
 
         THE 22-WIRE INPUT ROW
 
-        [ s0, s1, s2, s3, s4 | M0, M1, ..., M15 | tau ]
-           ----five-----       -----sixteen------   one
-                5          +          16           + 1  = 22
-
-  The output remains sixteen numbers -- one wind value per output dimension.
+        [s0  s1  s2  s3  s4 | M0  M1  M2 ... M15 | tau]
+           ---- five ----    ----- sixteen ------    one
+                5          +          16           + 1   = 22
 
   -------
 
   THE 22-WIRE MACHINE
 
-  Same shape as the five-wire machine, but the first layer now connects 22
-  wires to 256 hidden boxes instead of 5:
+  Same structure as the five-wire machine, but the first layer now connects
+  22 wires to 256 boxes instead of 5:
 
-        INPUT         HIDDEN ROWS          OUTPUT
-         22         256   256   256           16
+        22  ->  [256 boxes + ReLU]  ->  [256 boxes + ReLU]
+            ->  [256 boxes + ReLU]  ->  [16 boxes]  ->  16 outputs (winds)
 
-        [s0  ]       [h0 ]                 [wind_0 ]
-        [s1  ]  -->  [h1 ]  --> ...  -->   [wind_1 ]
-        [.   ]       [.  ]                 [.      ]
-        [M0  ]       [255]                 [wind_15]
-        [.   ]
-        [M15 ]
-        [tau ]
+  Dial count:
+    - Layer 1: 22 * 256 = 5,632 plus 256 biases = 5,888
+    - Layers 2 and 3: unchanged at 65,792 each
+    - Layer 4: unchanged at 4,112
+    - Total: 5,888 + 65,792 + 65,792 + 4,112 = 141,584 dials
 
-  The dials: first layer 22 x 256 + 256 = 5,632 + 256 = 5,888. Second and
-  third layers unchanged at 65,792 each. Last layer unchanged at 4,112.
-  Total: 5,888 + 65,792 + 65,792 + 4,112 = 141,584 dials.
-
-  One training lesson for this machine: pull one recorded 16-number answer
-  from the diary, draw a 16-number blob of pure noise (each number from a
-  bell curve centred at 0), draw a tau uniformly between 0 and 1, blend
-  them as M = (1-tau)*noise + tau*answer, feed [state, M_flat, tau] into
-  the machine, compare the machine's output to (answer - noise), grade with
-  the same MSE ruler, turn all 141,584 dials.
-
-  This is the wind machine. It never prints an answer directly. It prints
-  the wind at the current blend. At serving time, start from pure noise and
-  follow the predicted winds for ten or twenty steps. Arrive at the answer.
+  Every training lesson: pick a recorded 16-number answer from the diary,
+  draw 16 random noise numbers, draw a random tau, blend them into M, feed
+  [situation, M_flat, tau] into the machine as 22 input numbers, compare
+  the machine's 16 output numbers to the true wind (answer minus noise) with
+  the MSE ruler, turn all 141,584 dials. Part 2 shows how each dial is
+  turned and by how much.
 
   -------
 
   WHERE I ACTUALLY GOT STUCK (SO YOU DON'T HAVE TO)
 
-  Wrong belief: the wind only depends on the state and the tau. The blend
-  M is redundant because you can reconstruct it from noise and tau.
+  Wrong belief: tau alone is enough. If the machine knows how far along the
+  walk it is, it can figure out the blend position from the noise and the
+  answer.
 
-  The number that broke it: at tau = 0.0, the blend M equals the noise.
-  But which noise? Each training example drew a different noise. At serving
-  time there is no recorded noise -- you draw a fresh one. The machine
-  cannot reconstruct M from state and tau alone because M also depends on
-  which noise speck was drawn. Two examples with the same state and the
-  same tau have different M values because they started from different noise
-  specks. So M must enter the machine explicitly. That is the 16 blend
-  wires. tau alone does not carry the information about where the current
-  blend sits in 16-dimensional space.
+  The number that broke it: at any tau, two different noise draws produce
+  two different blend points at the same tau. The machine has no access to
+  which noise was drawn -- the noise is drawn fresh at serving time without
+  a recorded match. So the blend position M cannot be reconstructed from
+  tau alone. M must be handed to the machine explicitly as 16 separate
+  numbers. The input is 22, not 6.
 
-  The rule to carry: the machine always needs all three -- state (the
-  question), M (where you are right now in the walk), tau (how far along
-  you are). Drop any one of them and the machine goes blind.
+  The rule to carry: the machine needs all three inputs. State: what the
+  table looks like. M: where the current blend sits in 16D space. tau: how
+  far along the walk. Drop any one of them and the machine goes blind.
 
   -------
 
   ONE BREATH
 
-  A table, a T-block, a hand, five numbers in, sixteen moves out. The five-
-  wire copying machine learns from 24,208 recorded question-answer pairs and
-  prints the 16-number plan directly. It fails at the fork: whenever one
-  state has two valid answers, the MSE ruler forces the machine to print
-  their average, which is a third path nobody ever chose. The fix stops
-  printing the answer and prints the wind instead: a direction from wherever
-  the current blend sits toward the answer. The wind machine needs three
-  inputs at every call -- the five situation numbers, the current sixteen-
-  number blend point, and the tau dial saying how far along the walk we are.
-  Drop tau and the machine cannot tell early from late. Drop the blend and
-  it cannot tell which noise it started from. Five wires in cannot carry
-  all three. So the input grows from 5 to 22, the hidden count stays at
-  three rows of 256, the output stays at 16, and the machine trains on
-  predicted wind, not predicted answer.
+  A Push-T table, a T-block, a round hand, five situation numbers at each
+  tick, 24,208 recorded question-answer pairs. One adder-box multiplies
+  each incoming wire by a dial and sums: one number out. A layer is 256
+  such boxes reading the same wires, each with its own dial set. ReLU
+  between layers clips negative pre-activations to zero -- without it,
+  stacked layers collapse to one. The five-wire copying machine (five in,
+  three layers of 256, sixteen out, 137,232 dials) learns to print plans
+  directly but fails at the fork: when one state has two valid answers,
+  differentiating the MSE ruler and setting to zero gives c = (Y_A+Y_B)/2,
+  the average, which is the third path nobody ever chose. The wind machine
+  prints a direction from the current blend toward the answer instead of
+  the answer itself, curing the fork because two noise draws start two
+  separate walks. But the direction depends on WHERE the blend sits (16
+  numbers) and HOW FAR along the walk it is (tau = 1 number) as well as
+  the table situation (5 numbers): 5 + 16 + 1 = 22 wires in, 141,584 dials.
 
 
   SEAM. Pencil ends here; below, the same numbers in Python.
@@ -373,133 +452,116 @@
 
 ```python
 # --------------------------------------------------------------------------
-# Blend formula: M = (1 - tau) * noise + tau * answer
-# Using 2-number actions for clarity; real is 16 (8 moves x 2 numbers).
-# Every printed value is confirmed by running the arithmetic below.
+# PART 1: One adder-box (the fundamental unit)
+# 3 wires in, 3 dials, 1 number out.
 # --------------------------------------------------------------------------
 
-# Noise draw (2 numbers from a bell curve; shown as fixed values here)
-noise_x = 0.10                                           # first noise number
-noise_y = 0.80                                           # second noise number
+wire_0 = 0.5 ;  dial_0 = 1.2    # first wire and its dial
+wire_1 = 0.3 ;  dial_1 = -0.5   # second wire and its dial
+wire_2 = 0.7 ;  dial_2 = 0.8    # third wire and its dial
 
-# Recorded answer from the diary
-answer_x = 0.50                                          # first answer number
-answer_y = 0.60                                          # second answer number
-
-# tau: how far along the blend are we?
-tau = 0.4                                                # 40% of the way to the answer
-
-# Blend: M = (1 - tau) * noise + tau * answer
-M_x = (1 - tau) * noise_x + tau * answer_x              # 0.6*0.10 + 0.4*0.50 = 0.26
-M_y = (1 - tau) * noise_y + tau * answer_y              # 0.6*0.80 + 0.4*0.60 = 0.72
-print("blend:", round(M_x, 4), round(M_y, 4))           # 0.26  0.72
+box_output = wire_0*dial_0 + wire_1*dial_1 + wire_2*dial_2   # multiply each, sum
+           # = 0.5*1.2 + 0.3*(-0.5) + 0.7*0.8 = 0.6 - 0.15 + 0.56
+print("one box output:", round(box_output, 4))   # 1.01
 
 # --------------------------------------------------------------------------
-# Target wind: w = answer - noise
+# PART 2: Blend formula M = (1 - tau)*noise + tau*answer
+# Using 2 numbers; the real machine blends 16-number chunks.
 # --------------------------------------------------------------------------
 
-w_x = answer_x - noise_x                                # 0.50 - 0.10 = 0.40
-w_y = answer_y - noise_y                                # 0.60 - 0.80 = -0.20
-print("wind:", round(w_x, 4), round(w_y, 4))            # 0.40  -0.20
+noise_0  = 0.10 ;  noise_1  = 0.80    # two noise numbers drawn from a bell curve
+answer_0 = 0.50 ;  answer_1 = 0.60    # two numbers from one recorded human move
+tau      = 0.4                         # 40% of the way from noise to answer
+
+M_0 = (1 - tau) * noise_0 + tau * answer_0   # 0.6*0.10 + 0.4*0.50 = 0.06+0.20 = 0.26
+M_1 = (1 - tau) * noise_1 + tau * answer_1   # 0.6*0.80 + 0.4*0.60 = 0.48+0.24 = 0.72
+print("blend M:", round(M_0, 4), round(M_1, 4))   # 0.26  0.72
 
 # --------------------------------------------------------------------------
-# Verify: starting from M, walking the remaining (1 - tau) of the wind,
-# lands back exactly on the answer.
+# PART 3: True wind = answer - noise
 # --------------------------------------------------------------------------
 
-remaining = 1 - tau                                      # 1 - 0.4 = 0.6
-land_x = M_x + remaining * w_x                          # 0.26 + 0.6*0.40 = 0.26+0.24 = 0.50
-land_y = M_y + remaining * w_y                          # 0.72 + 0.6*(-0.20) = 0.72-0.12 = 0.60
-print("landing:", round(land_x, 4), round(land_y, 4))   # 0.50  0.60  -- matches answer
+wind_0 = answer_0 - noise_0   # 0.50 - 0.10 = 0.40
+wind_1 = answer_1 - noise_1   # 0.60 - 0.80 = -0.20
+print("wind:", round(wind_0, 4), round(wind_1, 4))   # 0.40  -0.20
 
 # --------------------------------------------------------------------------
-# MSE averaging failure: two equal valid answers, MSE picks the mean.
+# PART 4: Walk the remaining (1-tau) of the wind from M; must land on answer.
 # --------------------------------------------------------------------------
 
-# The two valid y-components: go above (+0.3) or go below (-0.3)
-Y1 = 0.3                                                 # above-path y-move
-Y2 = -0.3                                               # below-path y-move
-
-# MSE minimiser: c* = (Y1 + Y2) / 2
-c_star = (Y1 + Y2) / 2                                  # (0.3 + (-0.3)) / 2 = 0.0
-print("MSE best single answer:", c_star)                 # 0.0  -- straight into the block
-
-# Confirm c_star beats any other single value at the MSE ruler
-loss_at_mean  = 0.5 * (c_star - Y1)**2 + 0.5 * (c_star - Y2)**2  # 0.5*0.09 + 0.5*0.09
-loss_at_Y1    = 0.5 * (Y1     - Y1)**2 + 0.5 * (Y1     - Y2)**2  # 0 + 0.5*0.36
-loss_at_half  = 0.5 * (0.15   - Y1)**2 + 0.5 * (0.15   - Y2)**2  # 0.5*0.0225 + 0.5*0.2025
-print("loss at mean:", round(loss_at_mean,  4))          # 0.09  -- the minimum
-print("loss at Y1  :", round(loss_at_Y1,    4))          # 0.18  -- worse than mean
-print("loss at 0.15:", round(loss_at_half,  4))          # 0.1125 -- also worse than mean
+remaining = 1 - tau                                  # 1 - 0.4 = 0.6
+land_0 = M_0 + remaining * wind_0   # 0.26 + 0.6*0.40 = 0.26+0.24 = 0.50
+land_1 = M_1 + remaining * wind_1   # 0.72 + 0.6*(-0.20) = 0.72-0.12 = 0.60
+print("landing:", round(land_0, 4), round(land_1, 4))   # 0.50  0.60  == answer
 
 # --------------------------------------------------------------------------
-# The 22-wire input row: cat([state_5, blend_flat_16, tau_1]) = 22 numbers.
+# PART 5: MSE averaging failure -- the math that forces the machine to print
+# the mean of two conflicting answers.
 # --------------------------------------------------------------------------
 
-# Five situation numbers (illustrative values)
-s0 = 0.32                                                # T block x-position (normalised)
-s1 = 0.55                                                # T block y-position (normalised)
-s2 = 0.18                                                # hand x-position (normalised)
-s3 = 0.73                                                # hand y-position (normalised)
-s4 = 0.02                                                # hand speed (normalised)
+Y_A =  0.3    # y-component of the "above" plan: move up 0.3
+Y_B = -0.3    # y-component of the "below" plan: move down 0.3
 
-# Sixteen blend numbers: for a real 8-move plan, each move has 2 blend numbers.
-# These are 8 copies of the (M_x, M_y) pair worked above, standing in for
-# 8 different blend pairs that would come from 8 different noise/answer pairs.
-M0  = 0.26 ; M1  = 0.72   # step 0 of the blend (computed above)
-M2  = 0.31 ; M3  = 0.65   # step 1 (illustrative)
-M4  = 0.28 ; M5  = 0.70   # step 2
-M6  = 0.25 ; M7  = 0.67   # step 3
-M8  = 0.22 ; M9  = 0.64   # step 4
-M10 = 0.19 ; M11 = 0.61   # step 5
-M12 = 0.16 ; M13 = 0.58   # step 6
-M14 = 0.13 ; M15 = 0.55   # step 7
+# The MSE-minimising single answer c = (Y_A + Y_B) / 2
+c_star = (Y_A + Y_B) / 2                        # (0.3 + (-0.3)) / 2 = 0.0
+print("MSE best single answer:", c_star)          # 0.0 -- straight, into the block
 
-# tau is the same one scalar for the whole blend (0.4 from above)
-tau_val = 0.4                                            # one number: how far along
+# Confirm c_star loses less than any other choice
+loss_c_star = 0.5*(c_star - Y_A)**2 + 0.5*(c_star - Y_B)**2  # 0.5*0.09+0.5*0.09
+loss_at_Y_A = 0.5*(Y_A    - Y_A)**2 + 0.5*(Y_A    - Y_B)**2  # 0 + 0.5*0.36
+loss_at_mid = 0.5*(0.15   - Y_A)**2 + 0.5*(0.15   - Y_B)**2  # 0.5*0.0225+0.5*0.2025
+print("loss at mean (0.0)   :", round(loss_c_star, 4))   # 0.09  -- minimum
+print("loss at Y_A  (0.3)   :", round(loss_at_Y_A, 4))   # 0.18  -- worse
+print("loss at 0.15 (halfway):", round(loss_at_mid,  4))  # 0.1125 -- also worse
 
-# The 22-input row: glue state, blend, tau side by side
-row = [s0, s1, s2, s3, s4,
-       M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12, M13, M14, M15,
-       tau_val]
-print("input width:", len(row))                          # 22
-print("state slice :", row[:5])                          # [0.32, 0.55, 0.18, 0.73, 0.02]
-print("blend slice :", row[5:7], "...", row[19:21])      # [0.26, 0.72] ... [0.13, 0.55]
-print("tau         :", row[21])                          # 0.4
+# --------------------------------------------------------------------------
+# PART 6: The 22-wire input row -- count the wires.
+# --------------------------------------------------------------------------
+
+s0=0.32; s1=0.55; s2=0.18; s3=0.73; s4=0.02   # five situation numbers (normalised)
+
+# 16 blend numbers (real is 8 moves x 2 coordinates, here listed flat)
+M = [0.26, 0.72, 0.31, 0.65, 0.28, 0.70, 0.25, 0.67,
+     0.22, 0.64, 0.19, 0.61, 0.16, 0.58, 0.13, 0.55]   # 16 numbers (8 blend pairs)
+
+tau_val = 0.4   # one number: how far along the walk
+
+row = [s0, s1, s2, s3, s4] + M + [tau_val]   # glue side by side
+print("input row width:", len(row))            # 22 = 5 + 16 + 1
+print("first 5 (state) :", row[:5])            # [0.32, 0.55, 0.18, 0.73, 0.02]
+print("last 1  (tau)   :", row[-1])             # 0.4
 ```
 
   Running this code prints:
 
-        blend: 0.26 0.72
+        one box output: 1.01
+        blend M: 0.26 0.72
         wind: 0.4 -0.2
         landing: 0.5 0.6
         MSE best single answer: 0.0
-        loss at mean: 0.09
-        loss at Y1  : 0.18
-        loss at 0.15: 0.1125
-        input width: 22
-        state slice : [0.32, 0.55, 0.18, 0.73, 0.02]
-        blend slice : [0.26, 0.72] ... [0.13, 0.55]
-        tau         : 0.4
+        loss at mean (0.0)   : 0.09
+        loss at Y_A  (0.3)   : 0.18
+        loss at 0.15 (halfway): 0.1125
+        input row width: 22
+        first 5 (state) : [0.32, 0.55, 0.18, 0.73, 0.02]
+        last 1  (tau)   : 0.4
 
-  The blend lands back on the answer (0.5, 0.6). The MSE ruler confirms
-  that the average (0.0) is a lower-loss answer than Y1 (+0.3) or any
-  halfway point -- which is why the five-wire machine always drifts to the
-  mean. The 22-input row holds exactly 5 + 16 + 1 = 22 numbers: situation,
-  blend, clock.
-
-  Part 2 builds the dials: every multiplied-and-summed step of the forward
-  pass, the backward pass that fills each dial's slope, and the Adam nudge
-  that turns the dials toward smaller wind error.
+  The one adder-box outputs 1.01. The blend sits at [0.26, 0.72]. Walking
+  the remaining 60% of the wind from there lands exactly back on [0.50,
+  0.60] -- the original answer. The MSE minimiser is 0.0 (the average),
+  which loses less than any other single answer, including one of the true
+  answers (0.18 vs 0.09). The input row is exactly 22 numbers wide.
 
   -------
 
   >> NOTE: STANDARD JARGON
-  action chunk    = the block of 8 consecutive moves the machine plans at once
-  MSE             = Mean Squared Error: average of squared gaps between guess and truth
-  blend / M       = the point on the straight line from noise to answer at fraction tau
-  wind / velocity = answer minus noise; the constant direction from noise to answer
-  tau             = the progress dial; 0 is pure noise, 1 is pure answer
-  22-wire input   = the concatenation [state(5), blend_flat(16), tau(1)]
-  ReLU            = the gate max(x, 0); passes positives, clips negatives to zero
-  dial / weight   = a single number inside one adder-box that training adjusts
+  adder-box / neuron    = one unit: multiply each input by a dial, sum, output one number
+  dial / weight         = one multiplier stored in a box; training changes these numbers
+  layer                 = a row of adder-boxes all reading the same input wires
+  ReLU                  = max(x, 0): clips negative pre-activations to zero
+  MSE                   = Mean Squared Error: average of squared gaps between guess and truth
+  action chunk          = the 8-move plan the machine prints (8 * 2 = 16 numbers)
+  blend / M             = (1-tau)*noise + tau*answer: a point on the line from noise to answer
+  wind / velocity       = answer - noise: the constant direction from noise toward answer
+  tau                   = progress dial: 0 is pure noise, 1 is pure answer
+  22-wire input         = cat([state(5), blend_flat(16), tau(1)]) = one row fed to the machine
