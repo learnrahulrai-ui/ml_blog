@@ -42,7 +42,9 @@
     gap between two rows                  Euclidean distance (L2); city-block = L1/Manhattan
     straight-stick rule                   linear regression / ordinary least squares (OLS)
     dials                                 weights / coefficients (beta)
-    fixed nudge                           intercept / bias term (beta0)
+    fixed nudge / free add                intercept / bias term (beta0; b1, b2 in a neural net)
+    the pull on a dial                    that dial's gradient entry; the tweak = one SGD update
+    the flip                              transpose (.T), as in dW2 = a1.T @ dL_dguess
     put columns on the same ruler         feature scaling / standardisation / normalisation
     bowl-shaped mistake                   convex loss surface
     flat-point equations                  normal equations (X^T X beta = X^T y)

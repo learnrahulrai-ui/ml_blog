@@ -346,6 +346,16 @@
   tilt is pinned through zero at the average patient, and no amount of tilting
   un-pins it.
 
+  "But the nudge is added with a bare 1 in front -- no dial scales it, so surely
+  it is the weakest part in the room?" Backwards. Read the 1 next to the nudge
+  the way you read the 2 next to m: it is the multiplier on that part's push.
+  The dial's push arrives as 2 x (whatever m is) -- on the average patient m is
+  0, so the push is 2 x 0 = 0, the dial fully asleep. The nudge's push arrives
+  as 1 x itself, every patient, every time. Zero is what "does nothing" looks
+  like; a 1 is a push at full strength that no measurement can switch off. The
+  nudge is not the spare part -- it is the only part whose wire the data cannot
+  cut.
+
   WHAT ONE ROOM ALONE CAN NEVER FIT
 
   Which leaves a sharper question: if one room already has tilt and slide, why

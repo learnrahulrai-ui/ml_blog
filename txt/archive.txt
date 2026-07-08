@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 21 chapters (62 posts), plus references and standalone specials,
+  ALL POSTS -- a book in 22 chapters (65 posts), plus references and standalone specials,
   every number worked by hand.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
@@ -163,6 +163,13 @@
   CHAPTER 21 -- SELF, NET, AND THE CALL THAT DOES NOT LOOP (2026)
   -----------------------------------------------------------------
   post 62   [Part 1 -- One Dot Away From An Infinite Loop](posts/one-dot-from-infinite-loop.txt)
+
+
+  CHAPTER 22 -- THE FATE OF EVERY NUMBER (2026)
+  ----------------------------------------------
+  post 63   [Part 1 -- The 90 Comes Back As 89.94](posts/the-90-comes-back-as-89-94.txt)
+  post 64   [Part 2 -- The 52 Forces The Flip](posts/the-52-forces-the-flip.txt)
+  post 65   [Part 3 -- Born, Works, Dies -- Then All Twelve Dials Turn](posts/born-works-dies.txt)
 
 
   REFERENCES -- flip-to decoders, one per cluster of chapters

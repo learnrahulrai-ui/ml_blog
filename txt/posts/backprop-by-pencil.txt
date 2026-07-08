@@ -270,7 +270,7 @@
   path it came forward, and nowhere else. Credit, and blame, went only where they
   were earned.
 
-  DERIVATIVE MEANS RISE PER UNIT WIGGLE -- AND FOUR MORE BLOCKS THAT CLEARED
+  DERIVATIVE MEANS RISE PER UNIT WIGGLE -- AND FIVE MORE BLOCKS THAT CLEARED
 
   "Partial derivatives... so this needs real calculus, which I don't have." The WORD
   stopped me a full evening before the thing did. Then one division dissolved it:
@@ -305,6 +305,17 @@
   about the miss. Only the SPENDING needs the miss: nudge = 0.01 x (-1.08) x 4.
   Pulls first (the machine's anatomy), miss second (the day's verdict), product last
   (the correction).
+
+  "The bias slides Q0 one-for-one -- rise per unit wiggle exactly 1 -- so I wrote
+  down 1 and called that dial finished." Half a chain, wearing the full chain's
+  name. The 1 answers one question only: how much Q0 moves per wiggle of b20 -- a
+  fact about the machine's wiring. The number the correction spends answers a
+  different question: how much the day's wrongness moves per wiggle of b20 -- and
+  Q0's own move still has to be priced by the miss riding in from the output:
+  1 x (-1.08), not a bare 1. Every mislabel that evening was this same collapse,
+  a LOCAL rise dressed up as the whole road. A slope's name must say both of its
+  ends -- "Q0 per b20" and "wrongness per Q0" are different animals, and only
+  their product is "wrongness per b20."
 
   "The pull-sheet duplicates my numbers -- why does x show up in a whole column?"
   The outer product looked like a copying bug until I counted what it builds: a

@@ -1,0 +1,276 @@
+@title The 52 Forces The Flip :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 22 . THE FATE OF EVERY NUMBER . PART 2 OF 3
+  The 52 Forces The Flip
+  ============================================================================================
+
+
+  The same machine as part 1, rebuilt from zero because nothing may be
+  assumed remembered. Twelve dials the machine may turn; eight numbers it
+  may not: four inputs, four targets.
+
+        inputs        2   1          targets      100    55
+                      1   3                       117    33
+
+        first room dials      3  -2        free adds   2   -8
+                              1   5
+
+        second room dials     2   1        free adds  90   40
+                              3  -1
+
+  The forward run, every multiplication written out:
+
+        first room:            the bend:          second room:
+        2*3 + 1*1 + 2   =  9   max(9,0)  = 9      9*2 + 0*3    + 90 = 108
+        2*(-2)+ 1*5 - 8 = -7   max(-7,0) = 0      9*1 + 0*(-1) + 40 =  49
+        1*3 + 3*1 + 2   =  8   max(8,0)  = 8      8*2 + 5*3    + 90 = 121
+        1*(-2)+ 3*5 - 8 =  5   max(5,0)  = 5      8*1 + 5*(-1) + 40 =  43
+
+        misses and loss:
+        108-100 = 8    49-55 = -6    121-117 = 4    43-33 = 10
+        (64 + 36 + 16 + 100) / 4 = 54
+
+  Part 1 followed the free adds, 90 and 40 -- numbers handed to the + and
+  passed through at rate 1. This part follows the multiplied dials, and
+  their roads are heavier: every road now carries a multiplier, and at the
+  end a number built by hand, a 52, will force a flip in the code that no
+  spoken rule can pick on its own.
+
+  -------
+
+  THE FATE OF THE 2
+
+  The 2 is the dial in the second room that multiplied the bent 9 and the
+  bent 8. Its two appearances, and only these two:
+
+        9*2 = 18     then  18 + 90 = 108
+        8*2 = 16     then  31 + 90 = 121     (31 = 16 + 5*3)
+
+  Scan the other two guesses for it: 49 = 9*1 + 0*(-1) + 40 -- no 2 inside.
+  43 = 8*1 + 5*(-1) + 40 -- no 2 inside. The 2 lives in 108 and 121 and
+  nowhere else, always wearing a multiplier: once as "times 9", once as
+  "times 8".
+
+  Forward proof that it matters -- put 3 in its slot and rerun. The first
+  room and the bend never touch this slot, so 9, 0, 8, 5 are unchanged.
+  The two guesses that hold the dial move hard:
+
+        9*3 = 27    27 + 0*3 + 90 = 117      117 - 100 = 17     17*17 = 289
+        8*3 = 24    24 + 5*3 + 90 = 129      129 - 117 = 12     12*12 = 144
+
+        (289 + 36 + 144 + 100) / 4 = 569 / 4 = 142.25
+
+  One unit into this slot took the loss from 54 to 142.25 -- against 60.5
+  for the same unit into the 90's slot in part 1. The difference is the
+  multipliers: the 90 stepped into its guesses at rate 1; the 2 steps in at
+  rate 9 and rate 8.
+
+  Backward, from 54 to the slot. Slope of the loss at 108, from scratch:
+  the loss is (64+36+16+100)/4 and only the first square holds 108, so
+
+        (108 + h - 100)^2 = (8+h)^2 = 64 + 16h + h^2   ->  slope 16/4 = 4
+
+  Slope at 121: (4+h)^2 = 16 + 8h + h^2  ->  slope 8/4 = 2. Now the rates.
+  108 = 9*dial + 0*3 + 90: wiggle the dial by h and 108 moves by 9h -- the
+  rate is the 9 the dial was multiplied by. 121 = 8*dial + 5*3 + 90: rate 8.
+  Two roads, multiply along, add where they meet:
+
+        through 108:   4 * 9  =  36
+        through 121:   2 * 8  =  16
+                                 36 + 16 = 52
+
+  (And the whole-unit test above agrees: 142.25 - 54 = 88.25 = the slope 52
+  plus the squares' own bend at h = 1, which is (9*9 + 8*8)/4 = 36.25. A
+  dial with loud rates bends the road fast; the slope is honest only near
+  where it was read.)
+
+  The tweak:
+
+        2 - 0.01 * 52 = 2 - 0.52 = 1.48
+
+  -------
+
+  THE FLIP THAT 52 FORCES
+
+  So far every pull was built by hand, one number at a time. The code does
+  not do that -- it holds the numbers as sheets and grinds whole sheets at
+  once. The bent numbers sit on one sheet, the four slopes on another:
+
+        bent:   9   0        slopes:   4  -3
+                8   5                   2   5
+
+  The machine's grinding move, @, always does the same thing: take the left
+  sheet's first line, pair it against the right sheet's first stack,
+  multiply the pairs, add. Hand it the sheets as they are -- bent @ slopes
+  -- and the first number it builds is:
+
+        9*4 + 0*2 = 36
+
+  36. Not 52. Look at what it paired: the 9 with the 4, then the 0 with the
+  2. The 9 and the 0 are the two numbers that came out of the bend TOGETHER
+  -- both born from the first input line. They are bend-mates. But the 52
+  needs the 9 paired with the 4 and the 8 paired with the 2, because the 9
+  and the 8 are the two numbers THE DIAL MULTIPLIED -- its two jobs, one
+  per input line. The pull on a dial gathers over the dial's own jobs, not
+  over whatever happened to exit the bend side by side.
+
+  The fix is one flip. Written bent.T, the sheet regroups so that 9 and 8
+  now travel together, and the same grinding move pairs them with 4 and 2:
+
+        bent.T:   9   8        9*4 + 8*2 = 36 + 16 = 52
+                  0   5
+
+  That is the whole mystery of the flip. The spoken chain rule -- "slope of
+  the loss at the guess, times rate of the guess at the dial" -- reads the
+  same in either order, and words happily commute. Sheets do not. Two
+  arrangements were possible; one reproduces the 52 that was proved by hand,
+  wiggle by wiggle; the other builds 36, the answer to a question nobody
+  asked. The hand number picks the arrangement. Nothing else can.
+
+  The same one line builds all four second-room pulls at once. The bottom
+  pair comes out as 0*4 + 5*2 = 10 and 0*(-3) + 5*5 = 25 -- and there is the
+  dead cell from the bend doing damage in daylight: the dial 3 multiplied
+  the bent 0 on the first input line, so that whole road contributes 0*4 =
+  nothing, and its pull is built by the second line alone.
+
+  -------
+
+  THE FATE OF THE -2, ONE ROAD DEAD
+
+  Same machine, from the top: inputs 2,1 and 1,3; first room dials 3,-2,1,5
+  with free adds 2,-8; the raw numbers 9, -7, 8, 5; bent to 9, 0, 8, 5;
+  second room dials 2,1,3,-1 with free adds 90,40; guesses 108, 49, 121,
+  43; misses 8, -6, 4, 10; loss 54.
+
+  The -2 is a first-room dial. Its two jobs:
+
+        2*(-2) = -4   inside   2*(-2) + 1*5 - 8 = -7
+        1*(-2) = -2   inside   1*(-2) + 3*5 - 8 =  5
+
+  It multiplied the input 2 on its way into the -7, and the input 1 on its
+  way into the 5. Two roads. Follow them separately.
+
+  Road one, through the -7: the bend turns -7 into 0, and every descendant
+  of that 0 is nothing -- 0*3 = 0 inside 108, 0*(-1) = 0 inside 49. Wiggle
+  the dial by a tiny h: the -7 moves by 2h, to -7 + 2h -- still negative,
+  so the bend still outputs exactly 0, so nothing downstream moves at all.
+  This road's rate is 0. Dead. Not because the dial is small, but because
+  its passenger got bent flat.
+
+  Road two, through the 5: the 5 is positive, the bend passes it and its
+  wiggles one for one. The 5 then works twice in the second room:
+
+        5*3    = 15    inside 121
+        5*(-1) = -5    inside 43
+
+  So a wiggle h of the -2 moves the 5 by 1h (its multiplier was the input
+  1), and the 5's wiggle moves 121 by 3h and 43 by -1h. Slopes at those
+  guesses, from scratch: at 121, (4+h)^2 = 16+8h+h^2 gives 2; at 43,
+  (10+h)^2 = 100+20h+h^2 gives 5. The pull arriving at the 5:
+
+        through 121:   2 * 3    =  6
+        through 43:    5 * (-1) = -5
+                                   6 + (-5) = 1
+
+  and the pull on the -2 through road two: 1 (at the 5) * 1 (the input it
+  was multiplied by) = 1. Total over both roads:
+
+        0 + 1 = 1
+        -2 - 0.01 * 1 = -2.01
+
+  A dial with two jobs, one silenced by the bend, learns only from the
+  surviving one.
+
+  -------
+
+  THE FATE OF THE -8, SAME TWO ROADS, NO MULTIPLIERS
+
+  From the top once more: the raw numbers are 2*3+1*1+2 = 9, 2*(-2)+1*5-8 =
+  -7, 1*3+3*1+2 = 8, 1*(-2)+3*5-8 = 5; bent to 9, 0, 8, 5; guesses 108, 49,
+  121, 43; loss 54. The -8 is the first room's second free add. The + hands
+  one copy into the -7 and one copy into the 5 -- rate 1 both times, no
+  multiplier, exactly like the 90 in part 1.
+
+  Road one, through the -7: dead at the bend, rate 0, contributes nothing
+  and hears nothing.
+
+  Road two, through the 5: the pull arriving at the 5 is, rebuilt: slope 2
+  at 121 times the 5's multiplier 3, plus slope 5 at 43 times its
+  multiplier -1, so 6 - 5 = 1. The + passes it at rate 1.
+
+        pull on the -8:  0 + 1*1 = 1
+        -8 - 0.01 * 1 = -8.01
+
+  Notice what the dead road means for this dial: of its two copies, only
+  one ever reports back. If the machine saw thirty-two input lines instead
+  of two, this free add would send out thirty-two copies and collect only
+  from the lines whose raw number came out positive. A free add whose every
+  line goes negative collects nothing at all -- a dial the loss can no
+  longer reach.
+
+  -------
+
+  All of it as code -- the hand numbers first, then the sheets grinding the
+  same numbers in four lines:
+
+```python
+import numpy as np
+X  = np.array([[2., 1.], [1., 3.]])                    # inputs, may not be touched
+W1 = np.array([[3., -2.], [1., 5.]])                   # first room dials
+b1 = np.array([2., -8.])                               # first room free adds
+W2 = np.array([[2., 1.], [3., -1.]])                   # second room dials
+b2 = np.array([90., 40.])                              # second room free adds
+Y  = np.array([[100., 55.], [117., 33.]])              # targets, may not be touched
+
+raw   = X @ W1 + b1                                    # [[9, -7], [8, 5]]
+bent  = np.maximum(raw, 0)                             # [[9, 0], [8, 5]]
+guess = bent @ W2 + b2                                 # [[108, 49], [121, 43]]
+slope = 2 * (guess - Y) / 4                            # [[4, -3], [2, 5]]
+
+print("no flip :", (bent @ slope)[0, 0])               # pairs bend-mates 9,0 -> 36
+pull_room2 = bent.T @ slope                            # pairs the dial's jobs 9,8
+print("flipped :", pull_room2[0, 0])                   # 9*4 + 8*2 = 52
+
+pull_at_raw = (slope @ W2.T) * (raw > 0)               # [[5, 0], [9, 1]] -- the -7's road reads 0
+pull_room1  = X.T @ pull_at_raw                        # [[19, 1], [32, 3]]
+pull_adds1  = pull_at_raw.sum(axis=0)                  # [14, 1]
+
+print("pull on the -2:", pull_room1[0, 1])             # 2*0 + 1*1 = 1
+print("pull on the -8:", pull_adds1[1])                # 0 + 1 = 1
+print("the 2 becomes :", 2 - 0.01 * pull_room2[0, 0])
+print("the -2 becomes:", -2 - 0.01 * pull_room1[0, 1])
+print("the -8 becomes:", -8 - 0.01 * pull_adds1[1])
+```
+
+  Running this code prints:
+
+        no flip : 36.0
+        flipped : 52.0
+        pull on the -2: 1.0
+        pull on the -8: 1.0
+        the 2 becomes : 1.48
+        the -2 becomes: -2.01
+        the -8 becomes: -8.01
+
+  Five dials have now made the round trip: 90, 40, the 2, the -2, the -8.
+  Every trip was the same walk -- find the numbers the dial got fused into,
+  read the loss's slope there, carry it back multiplying the rates along
+  the road, add where roads meet, subtract a hundredth of it from the slot.
+  Part 3 follows the numbers nobody tweaks -- an input that fans out
+  everywhere and is never touched, a raw number that dies at the bend in
+  both directions, a pull that exists only as freight -- and then turns all
+  twelve dials at once and reruns the machine to see whether 54 actually
+  falls.
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  the multiplied dials    = the weights; the second room's four dials form the weight matrix W2
+  the flip                = the transpose, written .T; the pull sheet for a weight matrix is dW2 = a1.T @ dL_dguess
+  a road's rate           = the local derivative; multiplied dial -> rate = its input; free add -> rate = 1; bend -> rate = 1 if the raw number is positive, else 0
+  the dead road           = a dying ReLU: a raw number stuck negative blocks its dial's report on that line

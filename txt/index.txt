@@ -967,6 +967,44 @@
     why self.net is built once in __init__ and never rebuilt per call. Assumes zero background.
 
 
+
+
+  CHAPTER 22 . THE FATE OF EVERY NUMBER . one plain number traced into the loss and back to its slot
+  ------------------------------------------------------------------------------------------------------------
+
+  [Part 1 -- The 90 Comes Back As 89.94](posts/the-90-comes-back-as-89-94.txt)
+    post 63/65 . 2026-07-08 . part 1 of 3 . backpropagation, bias, gradient, sgd, broadcasting, by-hand
+    Textbooks show the fate of variables; this follows one plain number. A twelve-dial machine
+    guesses 108, 49, 121, 43 against targets 100, 55, 117, 33 -- loss 54. The free add 90 is
+    copied twice by the +, fused into 108 (18+90) and 121 (31+90), and can never be un-added --
+    yet the slot still holds 90, and a wiggle passes the + at rate 1. Slope 4 through one guess,
+    slope 2 through the other, one slot, so 4+2 = 6, and 90 - 0.01*6 = 89.94. Then the 40, whose
+    two roads FIGHT (-3 wants it bigger, +5 wants it smaller; verdict +2, so 39.98). Proof by
+    rerun: put 91 in the slot and the loss climbs 54 -> 60.5. Assumes zero background.
+
+  [Part 2 -- The 52 Forces The Flip](posts/the-52-forces-the-flip.txt)
+    post 64/65 . 2026-07-08 . part 2 of 3 . backpropagation, weights, transpose, relu, dying-relu, by-hand
+    The multiplied dials. The 2 in the second room rides in at rate 9 and rate 8 (one unit in
+    its slot moves the loss 54 -> 142.25), and its pull is 4*9 + 2*8 = 52. Hand the code the
+    sheets as they sit and it grinds 9*4 + 0*2 = 36 -- it paired the bend-mates, the two numbers
+    that exited the bend together, instead of the dial's own two jobs. The flip (.T) regroups 9
+    with 8 and reproduces 52: the hand-built number picks the arrangement, the spoken chain rule
+    cannot. Then the -2 and the -8, whose shared road through the -7 is dead at the bend (rate
+    0) -- dials that learn only from their surviving line. Assumes zero background.
+
+  [Part 3 -- Born, Works, Dies -- Then All Twelve Dials Turn](posts/born-works-dies.txt)
+    post 65/65 . 2026-07-08 . part 3 of 3 . backpropagation, sgd, dead-relu, gradient-check, cache, by-hand
+    Fates of the numbers nobody tweaks: the reading 3 (shapes two squares of the loss, and no
+    slot ever reaches back -- the machine may not edit the world), the -7 (hands 0*3 and 0*(-1)
+    forward, and the loudest pull in the run, 15, dies at its bend: 15*0 = 0; after the turn it
+    drifts to -7.06, deader than before), and the freight pull 5 (born 4*2 + (-3)*1, delivers
+    10, 5, and 5 to three dials, then is never referenced again). Then all twelve dials turn at
+    once and the machine reruns: loss 54 -> 30.1145, three guesses closer, one worse -- a
+    committee verdict. The slopes promise a fall of 52.3 at step 0.01 but deliver 23.9; at step
+    0.0001 they promise 0.523 and deliver 0.5197 -- slopes tell the truth only near where they
+    were read. Assumes zero background.
+
+
 ----------------------------------------------------------------------------------------------
   the method: ban the jargon . draw it first . solve by pencil . then write the code
   built with: pandas, scikit-learn, NumPy, and a pencil . pure HTML+CSS, no JavaScript

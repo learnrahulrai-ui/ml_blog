@@ -1,0 +1,261 @@
+@title Born, Works, Dies -- Then All Twelve Dials Turn :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 22 . THE FATE OF EVERY NUMBER . PART 3 OF 3
+  Born, Works, Dies -- Then All Twelve Dials Turn
+  ============================================================================================
+
+
+  The same machine, rebuilt from zero. Twelve dials the machine may turn;
+  eight numbers it may not: four inputs, four targets.
+
+        inputs        2   1          targets      100    55
+                      1   3                       117    33
+
+        first room dials      3  -2        free adds   2   -8
+                              1   5
+
+        second room dials     2   1        free adds  90   40
+                              3  -1
+
+        the run:
+        2*3 + 1*1 + 2   =  9    max(9,0)  = 9     9*2 + 0*3    + 90 = 108
+        2*(-2)+ 1*5 - 8 = -7    max(-7,0) = 0     9*1 + 0*(-1) + 40 =  49
+        1*3 + 3*1 + 2   =  8    max(8,0)  = 8     8*2 + 5*3    + 90 = 121
+        1*(-2)+ 3*5 - 8 =  5    max(5,0)  = 5     8*1 + 5*(-1) + 40 =  43
+
+        108-100 = 8    49-55 = -6    121-117 = 4    43-33 = 10
+        (64 + 36 + 16 + 100) / 4 = 54
+
+  Parts 1 and 2 walked five dials through the full round trip: 90 became
+  89.94, 40 became 39.98, the 2 became 1.48, the -2 became -2.01, the -8
+  became -8.01. But most numbers in that run are not dials at all, and
+  their fates are stranger: one is never touched, one is dead in both
+  directions, and one is born, works three jobs, and is thrown away.
+
+  -------
+
+  THE READING 3, TOUCHED BY NOTHING
+
+  The 3 is the second reading on the second input line. Its jobs, forward:
+
+        3*1 = 3     inside  1*3 + 3*1 + 2 = 8
+        3*5 = 15    inside  1*(-2) + 3*5 - 8 = 5
+
+  It helped build both raw numbers of its line. Both survive the bend (8
+  and 5 are positive), and both work twice in the second room -- the 8 as
+  8*2 = 16 inside 121 and 8*1 = 8 inside 43, the 5 as 5*3 = 15 inside 121
+  and 5*(-1) = -5 inside 43. So the reading 3 reaches the loss through the
+  squares 16 and 100 -- a wider fan than any single dial, since a dial owns
+  one multiplication per line and a reading feeds a whole line.
+
+  Backward: nothing. No slot anywhere holds the 3 for overwriting, because
+  the 3 came from the world. The machine's whole job is to bend ITSELF
+  toward the readings; a machine allowed to edit its readings would fix the
+  misses by falsifying the patient instead of fitting him. So the 3's fate
+  is one-directional by design: it shapes everything, and nothing reaches
+  back for it.
+
+  -------
+
+  THE -7, DEAD IN BOTH DIRECTIONS
+
+  Born in the first room: 2*(-2) + 1*5 - 8 = -7. The bend reads it:
+  max(-7, 0) = 0. Now watch its descendants -- the 0 works twice in the
+  second room:
+
+        0*3    = 0    inside 108
+        0*(-1) = 0    inside 49
+
+  Nothing and nothing. The -7 contributed exactly zero to every guess.
+  Dead forward.
+
+  Backward, the loss actually has a lot to say to this cell. Rebuild the
+  message: the slope of the loss at 108 is 2*(108-100)/4 = 4, at 49 it is
+  2*(49-55)/4 = -3. The bent number under those two guesses carried the
+  multipliers 3 and -1, so the pull arriving at the bend's output is
+
+        4*3 + (-3)*(-1) = 12 + 3 = 15
+
+  -- the loudest pull anywhere in this machine's backward run (the other
+  three are 5, 9, and 1). And then it reaches the bend. The bend's rate at
+  -7: wiggle by a tiny h, max(-7 + h, 0) = 0, unmoved. Rate 0.
+
+        15 * 0 = 0
+
+  The loudest voice in the run, silenced at the fold. Dead backward too:
+  the -7 contributed nothing, and it cannot be corrected -- today.
+
+  One more honest turn of the knife. The -7's parents do get tweaked today
+  through the OTHER line (the -2 becomes -2.01, the 5 becomes 4.97, the -8
+  becomes -8.01), so tomorrow this cell is
+
+        2*(-2.01) + 1*4.97 - 8.01 = -4.02 + 4.97 - 8.01 = -7.06
+
+  Deader than yesterday. Nothing pulls it back toward zero because nothing
+  downstream hears it. A cell like this can drift dead forever -- the same
+  trap part 2 flagged for a free add whose every line goes negative.
+
+  -------
+
+  THE 5 THAT IS ONLY FREIGHT
+
+  Not the dial 5 -- a pull named 5, and it exists for three lines of
+  arithmetic. Born: the bent 9 worked twice in the second room (9*2 inside
+  108, 9*1 inside 49), so the pull arriving at it gathers two roads:
+
+        4*2 + (-3)*1 = 8 - 3 = 5
+
+  The bend's rate at the raw 9 is 1 (positive, passes), so the 5 stands at
+  the first room's door. And there it is NOT a tweak -- the 9 it belongs to
+  is a made number with no slot; nobody writes 9 - 0.01*5. The 5 works as
+  freight instead. The raw 9 was built as 2*3 + 1*1 + 2, so the dials 3, 1
+  and the free add 2 all pass through it, and the 5 is the loss's message
+  to all of them, multiplied by what multiplied them:
+
+        into the dial 3's pull:      2 * 5 = 10     (the reading 2 rode with it)
+        into the dial 1's pull:      1 * 5 =  5     (the reading 1 rode with it)
+        into the free add 2's pull:  1 * 5 =  5     (free adds ride at rate 1)
+
+  Three deliveries, and the 5 is never referenced again. Born from two
+  slopes, works three jobs, dies. Every in-between pull in the backward run
+  lives exactly like this: it is freight between the loss and the dials,
+  not a resident. The dials keep their pulls (they get tweaked); the loss
+  keeps its place at the top of every question ("how does the 54 move
+  when..."); everything between is born, works, and dies inside four lines
+  of arithmetic.
+
+  -------
+
+  ALL TWELVE AT ONCE
+
+  Every dial's pull, gathered the same way the five worked examples were --
+  find where the dial's copies sit, slope times rate along the road, add
+  where roads meet:
+
+        first room dials:  19    1        first room adds:  14    1
+                           32    3
+
+        second room dials: 52   13        second room adds:  6    2
+                           10   25
+
+  Twelve tweaks, a hundredth of the pull, written out:
+
+        3 - 0.19 =  2.81       2 - 0.14 =  1.86       2 - 0.52 = 1.48
+       -2 - 0.01 = -2.01      -8 - 0.01 = -8.01       1 - 0.13 = 0.87
+        1 - 0.32 =  0.68                              3 - 0.10 = 2.90
+        5 - 0.03 =  4.97                             -1 - 0.25 = -1.25
+
+        90 - 0.06 = 89.94     40 - 0.02 = 39.98
+
+  And the only test that matters: run the whole machine again on the same
+  inputs with the twelve new dials. The rerun's guesses, against where they
+  stood and where they should be:
+
+        108   ->  102.0168    target 100    closer
+         49   ->   47.0792    target  55    WORSE -- it walked away
+        121   ->  114.0518    target 117    closer
+         43   ->   39.7052    target  33    closer
+
+  The second guess lost ground: it sat 6 under its target and the turn
+  pushed it further under, because the dials it shares -- part 1 watched
+  the 40 get pulled down by 43's louder vote, -3 against 5 -- serve the
+  other guesses too. Three wins, one loss, and the averaged loss still
+  fell,
+
+        54  ->  30.1145
+
+  because the twelve pulls are a committee verdict over all four squares
+  at once, not a guarantee to any single guess.
+
+  One more honesty check, because the fall is smaller than the slopes
+  promised. Twelve slopes promise, for a step of s, a fall of s times the
+  sum of the squared pulls: 19*19 + 1 + 32*32 + 9 + 14*14 + 1 + 52*52 +
+  13*13 + 10*10 + 25*25 + 36 + 4 = 5230. At s = 0.01 that promises a fall
+  of 52.3 -- but the measured fall is 23.9. The pulls here are loud, and a
+  slope is read standing still: walk 0.01 of a pull like 52 and the
+  squares' own bend eats half the promise. Shrink the step to s = 0.0001
+  and the promise is 0.523 while the measured fall is 0.5197 -- now they
+  agree to three figures. Slopes tell the truth near where they were read,
+  and only there.
+
+```python
+import numpy as np
+X  = np.array([[2., 1.], [1., 3.]])                    # readings, never touched
+W1 = np.array([[3., -2.], [1., 5.]])                   # first room dials
+b1 = np.array([2., -8.])                               # first room free adds
+W2 = np.array([[2., 1.], [3., -1.]])                   # second room dials
+b2 = np.array([90., 40.])                              # second room free adds
+Y  = np.array([[100., 55.], [117., 33.]])              # targets, never touched
+
+raw   = X @ W1 + b1                                    # [[9, -7], [8, 5]]
+bent  = np.maximum(raw, 0)                             # [[9, 0], [8, 5]]
+guess = bent @ W2 + b2                                 # [[108, 49], [121, 43]]
+print("loss:", np.mean((guess - Y)**2))                # 54.0
+
+slope       = 2 * (guess - Y) / 4                      # [[4, -3], [2, 5]]  born
+pull_room2  = bent.T @ slope                           # [[52, 13], [10, 25]]
+pull_adds2  = slope.sum(axis=0)                        # [6, 2]
+pull_bent   = slope @ W2.T                             # [[5, 15], [9, 1]]  slope dies here
+pull_raw    = pull_bent * (raw > 0)                    # [[5, 0], [9, 1]]   the 15 dies here
+pull_room1  = X.T @ pull_raw                           # [[19, 1], [32, 3]]
+pull_adds1  = pull_raw.sum(axis=0)                     # [14, 1]            pull_raw dies here
+
+W1n = W1 - 0.01 * pull_room1                           # all twelve tweaks...
+b1n = b1 - 0.01 * pull_adds1
+W2n = W2 - 0.01 * pull_room2
+b2n = b2 - 0.01 * pull_adds2
+print("first room dials now:", np.round(W1n, 2).tolist())
+print("first room adds now :", np.round(b1n, 2).tolist())
+print("second room dials now:", np.round(W2n, 2).tolist())
+print("second room adds now :", np.round(b2n, 2).tolist())
+
+raw2   = X @ W1n + b1n                                 # ...and the rerun
+print("the -7 is now:", round(raw2[0, 1], 2))          # -7.06, drifting deader
+guess2 = np.maximum(raw2, 0) @ W2n + b2n
+print("loss after the turn:", round(np.mean((guess2 - Y)**2), 4))
+
+pulls = np.concatenate([pull_room1.ravel(), pull_adds1,
+                        pull_room2.ravel(), pull_adds2])
+print("sum of squared pulls:", (pulls**2).sum())
+s = 0.0001                                             # the tiny honest step
+g3 = np.maximum(X @ (W1 - s*pull_room1) + (b1 - s*pull_adds1), 0) \
+       @ (W2 - s*pull_room2) + (b2 - s*pull_adds2)
+print("tiny step promised:", -s * (pulls**2).sum(),
+      "measured:", round(np.mean((g3 - Y)**2) - 54, 4))
+```
+
+  Running this code prints:
+
+        loss: 54.0
+        first room dials now: [[2.81, -2.01], [0.68, 4.97]]
+        first room adds now : [1.86, -8.01]
+        second room dials now: [[1.48, 0.87], [2.9, -1.25]]
+        second room adds now : [89.94, 39.98]
+        the -7 is now: -7.06
+        loss after the turn: 30.1145
+        sum of squared pulls: 5230.0
+        tiny step promised: -0.523 measured: -0.5197
+
+  That closes the fates. This machine holds twelve dials; a machine taking
+  eight readings into sixteen raw numbers and out to four guesses holds
+  8*16 + 16 + 16*4 + 4 = 212, and the machines in the news hold billions --
+  and every single one of those billions has exactly the fate traced here:
+  copied or multiplied into a handful of made numbers, fused, carried into
+  one loss, reached back for by slopes times rates, added where its roads
+  meet, and overwritten by a hundredth of the verdict. Wider sheets, more
+  rooms, same four lines of arithmetic per number. Nothing else was ever
+  happening.
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  the made numbers        = activations; saving them for the backward walk is "the cache", and (X, raw, bent, guess) is exactly what real code stores
+  freight pulls           = intermediate gradients (dL/da1, dL/dz1); computed, used to build the dial pulls, then discarded
+  dead in both directions = a dead ReLU unit: zero output forward, zero gradient backward
+  the committee verdict   = one SGD step over a mini-batch; some guesses worsen, the average improves
+  the tiny-step check     = gradient verification by finite differences: promised s*sum(pull^2) fall vs measured rerun
