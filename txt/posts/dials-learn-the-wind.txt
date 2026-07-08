@@ -249,6 +249,20 @@
 
         d(L) / d(o0) = d/d(o0) of (o0 - 0.40)^2 / 2 = (o0 - 0.40) = e0 = -0.106
 
+  Earn that line by raw expansion once, because a sign inside it eats careless
+  pencils. Expand the square with (a - b)^2 = a^2 - 2ab + b^2 -- the middle term
+  is MINUS. (Check the pattern itself with a=3, b=1: (3-1)^2 = 4, and
+  9 - 6 + 1 = 4; the sloppy 9 + 6 + 1 = 16 is wrong.) So:
+
+        (o0 - 0.40)^2 = o0^2 - 0.80*o0 + 0.16
+
+  Slope of each piece as o0 moves, with 0.40 a frozen constant: o0^2 gives 2*o0;
+  -0.80*o0 gives -0.80; the lone 0.16 gives 0. Total: 2*o0 - 0.80 = 2(o0 - 0.40).
+  The loss carries a /2 outside, which halves it back to (o0 - 0.40)
+  = 0.294 - 0.40 = -0.106. Same answer, earned the long way -- and the -0.80
+  came from the MINUS in the expansion; flip that sign and every slope in the
+  backward pass follows it into the ditch.
+
   Chain rule multiplies these two:
 
         dL / dW2[o0,h0] = (dL/do0) * (do0/dW2[o0,h0])
@@ -290,6 +304,13 @@
         from o1: (dL/do1) * W2[o1,h1] = ( 0.126) * 0.3  = +0.0378
 
         total slope at h1: -0.0424 + 0.0378 = -0.0046
+
+  Stop and name the two motions just used, because together they are the whole
+  method. ALONG one path, slopes MULTIPLIED: an output's error times the dial it
+  crossed. ACROSS the two paths arriving at the same hidden box, the products
+  ADDED: h0 feeds both outputs, so it collects two contributions and sums them.
+  Multiply along a path; add across paths that meet. A hidden box feeding
+  sixteen outputs would collect sixteen products the same way.
 
   -------
 
@@ -348,6 +369,15 @@
   Every dial now has a slope. All eight slopes were computed by multiplying
   in reverse through the network -- that chain of multiplications is what
   people call backpropagation.
+
+  And count what came out: eight dials in, eight slopes out -- exactly one per
+  dial, never more, never fewer, because each slope answers one dial's private
+  question ("if I alone turn, how much does L move?") with every other dial
+  frozen. Arrange the answers in the same grid as their dials -- the four
+  first-layer slopes in a 2-by-2 like W1, the four last-layer slopes like W2 --
+  and the slope grid wears the dial grid's exact shape. That same-shape fact is
+  what makes the update one clean move: lay the slope grid over the dial grid
+  and nudge slot by slot.
 
   -------
 
@@ -452,6 +482,26 @@
   equals its absolute value, and their ratio is sign(slope). The step size
   is just lr, with direction from the sign of the slope.
 
+  Close the loop: did that 0.0003 actually buy anything? Re-run the forward
+  pass with the one nudged dial -- W2[o0,h0] = 0.6003, the other seven dials
+  untouched, same input, same hidden values 0.31 and 0.27. Only the first
+  output moves:
+
+        z2_0 = 0.31 * 0.6003 + 0.27 * 0.4 = 0.186093 + 0.108 = 0.294093
+        e0   = 0.294093 - 0.40 = -0.105907          (was -0.106)
+        L    = ((-0.105907)^2 + (0.126)^2) / 2
+             = (0.011216 + 0.015876) / 2 = 0.013546  (was 0.013556)
+
+  The loss fell by about 0.0000099. Tiny -- one dial of eight, one lr-sized
+  step -- but hold it against what the slope PROMISED before the re-run: the
+  slope of the loss along this dial was -0.032860 per unit, the dial rose by
+  0.0003, so the promised change was -0.032860 * 0.0003 = -0.0000099. Promise
+  first, measurement second, and they agree to the last shown digit. That
+  agreement is the entire meaning of a slope -- and re-running the forward
+  pass after a nudge is the cheapest lie detector a backward pass will ever
+  face: if the promised drop and the measured drop disagree, some slope in
+  the chain is wrong, and no amount of further training will out-run it.
+
   -------
 
   WHY THE ORDER IS ZERO_GRAD, BACKWARD, STEP
@@ -520,6 +570,25 @@
   batch k+1. It means the slope for those dials is zero for this one batch.
   They will start receiving slopes again as soon as a later batch pushes
   their pre-activation positive.
+
+  One honest edge on that comfort, so the rule is not oversold. The revival
+  above worked because some batch could still open the gate. Now build the
+  trap where no batch can. The real machine's boxes each carry a bias dial --
+  one extra number added to the box's sum (the toy above omitted them to keep
+  the arithmetic tight; the real 141,584 count includes them). The inputs are
+  re-ruled, so the weighted sum entering any box stays within a few units of
+  zero. Let one box's bias get knocked to -100 -- one oversized update on one
+  wild batch is enough. From then on, every example the table can produce
+  gives that box a pre-activation near (a few units) - 100: negative, always.
+  Gate closed on every batch. Slope through the closed gate: exactly 0, on
+  every batch -- for every dial feeding the box AND for the bias itself. The
+  box now outputs zero forever and LEARNS zero forever, because the only tool
+  training owns for moving a dial is the slope, and the closed gate is
+  precisely the thing that zeroes it. Easy to fall in, and no gradient road
+  leads back out. So keep both halves of the truth: a gate closed on THIS
+  batch is routine and self-healing; a gate closed on EVERY POSSIBLE batch is
+  a dead box, and that death really is permanent -- short of outside surgery,
+  meaning re-rolling those dials by hand and starting that box over.
 
   -------
 
@@ -666,6 +735,24 @@ print("step_size:", round(step_size, 7))              # -0.0003
 W2_o0_h0_new = W2_o0_h0 - step_size    # 0.6 - (-0.0003) = 0.60030
 print("W2[o0,h0] before:", W2_o0_h0)   # 0.6
 print("W2[o0,h0] after :", round(W2_o0_h0_new, 5))   # 0.6003
+
+# --------------------------------------------------------------------------
+# Earning dL/do0 by raw expansion, then the lie-detector re-run after the nudge
+# --------------------------------------------------------------------------
+
+slope_expanded = (2*0.294 - 0.80) / 2     # (0.588 - 0.80)/2 = -0.212/2 = -0.106
+print("dL/do0 by expansion:", round(slope_expanded, 6))   # -0.106  (matches e0)
+
+z2_0_new = 0.6003*0.31 + 0.4*0.27         # 0.186093 + 0.108 = 0.294093
+e0_new   = z2_0_new - 0.40                 # -0.105907  (was -0.106)
+L_new    = (e0_new**2 + 0.126**2) / 2     # (0.011216 + 0.015876)/2 = 0.013546
+print("z2_0 after nudge:", round(z2_0_new, 6))    # 0.294093
+print("loss after nudge :", round(L_new, 6))       # 0.013546  (was 0.013556)
+
+change_measured = L_new - 0.013556         # what the re-run measured
+change_promised = -0.032860 * 0.0003       # what the slope promised beforehand
+print("measured change:", round(change_measured, 8))   # -9.85e-06
+print("promised change:", round(change_promised, 8))   # -9.86e-06
 ```
 
   Running this code prints:
@@ -687,6 +774,11 @@ print("W2[o0,h0] after :", round(W2_o0_h0_new, 5))   # 0.6003
         step_size: -0.0003
         W2[o0,h0] before: 0.6
         W2[o0,h0] after : 0.6003
+        dL/do0 by expansion: -0.106
+        z2_0 after nudge: 0.294093
+        loss after nudge : 0.013546
+        measured change: -9.85e-06
+        promised change: -9.86e-06
 
   Every number matches the by-hand derivation. W2[o0, h0] moved from 0.6
   to 0.6003 -- a nudge of 0.0003 in the direction that reduces the wind

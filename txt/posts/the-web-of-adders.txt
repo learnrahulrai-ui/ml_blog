@@ -291,6 +291,21 @@
                               |  |           |
                              c1 c2  ...     c16   (16 raw scores out)
 
+  The grid's shape is not a styling choice -- both numbers are forced. A clerk's
+  sum pairs measurements with dials -- (m1 x dial_1) + (m2 x dial_2) + ... -- and a
+  pairing only works when both lists have the same length. A patient carries 30
+  measurements, so every clerk needs exactly 30 dials: 30 rows, forced by the
+  sheet. We chose 16 clerks: 16 columns, chosen by us. Hand this room a patient
+  with 29 measurements and dial 30 sits partnerless; hand it 31 and one
+  measurement goes unread. The inner numbers must shake hands.
+
+     The study pile is 341 patients by 30 columns, and it flows into this room
+     of 16 clerks. What shape comes out the far side?
+
+     check your slate: 341-by-30 meets 30-by-16; the two 30s shake hands and
+     are used up in the pairing; out comes 341-by-16 -- one row per patient,
+     one column per clerk's raw score.
+
   How much work? For one patient, Room 1 does:
     30 multiplications x 16 clerks      = 480 multiplications
     30 additions per clerk x 16 clerks  = 480 additions (29 to sum + 1 nudge)
@@ -298,6 +313,69 @@
 
   For all 341 study patients in one pass: 341 x 960 = 327,360 operations. A room of tireless
   clerks handles this before lunch. A single pencil would take months.
+
+  WHY EVERY CLERK CARRIES A NUDGE
+
+  The dials earn their keep visibly -- they weigh the measurements. The nudge looks
+  like a spare part. Delete it and watch what breaks.
+
+  The columns were humbled: every column now averages 0 across the study pile. So
+  the perfectly AVERAGE patient -- average radius, average texture, average
+  everything -- is the all-zeros row [0, 0, ..., 0]. Feed that patient to a clerk
+  with no nudge:
+
+      raw score = (0 x dial_1) + (0 x dial_2) + ... + (0 x dial_30) = 0
+
+  Zero -- for EVERY possible setting of all thirty dials. Turn them anywhere you
+  like; the average patient scores 0. And the zero survives the whole building:
+  the zero-out rule maps 0 to 0, the next room's nudge-less clerks multiply zeros
+  and write 0, the final raw score is 0, and the S-curve (built later in this
+  post) turns a raw 0 into exactly 0.50. A building with no nudges is condemned
+  to answer "coin flip" on the average patient forever, no matter how long it
+  studies. But 212 of the 569 patients are malignant -- about 37% -- so the
+  honest lean on a typical patient is NOT 50/50, and a no-nudge building is
+  locked out of ever saying so.
+
+  Put the nudge back: raw score = 0 + nudge = nudge. Now the clerk can score the
+  average patient anything it needs to -- the nudge IS its opinion about the
+  average case, and the dials are its opinions about departures from average.
+  Geometrically the two are separate powers. Take one clerk, one measurement,
+  raw = 2 x m. It scores m = 0 as 0 and m = 1 as 2. Add a nudge of 3: the scores
+  become 3 and 5 -- each step in m still adds the same 2 (the tilt is untouched),
+  but the whole line slid up by 3. Dials tilt; the nudge slides. A rule with only
+  tilt is pinned through zero at the average patient, and no amount of tilting
+  un-pins it.
+
+  WHAT ONE ROOM ALONE CAN NEVER FIT
+
+  Which leaves a sharper question: if one room already has tilt and slide, why
+  stack a second room at all? Because one multiply-and-nudge rule draws a
+  STRAIGHT line -- equal jumps in a measurement always buy equal jumps in the
+  score -- and the truth is allowed to bend.
+
+  Watch the straight rule run out of fingers. One measurement m, one clerk:
+  raw score = m x dial + nudge. Three patients, and the score each SHOULD get
+  (made-up numbers, kept small):
+
+      m = 1  ->  should score 10
+      m = 2  ->  should score  3
+      m = 3  ->  should score 12
+
+  Force the rule through the first two patients:
+
+      dial x 1 + nudge = 10
+      dial x 2 + nudge =  3
+
+  Subtract the first equation from the second: dial = 3 - 10 = -7. Put that back
+  into the first: nudge = 10 - (-7) = 17. Both numbers are now spent. The third
+  patient's score is forced with nothing left to turn:
+
+      -7 x 3 + 17 = -21 + 17 = -4        the target was 12 -- missed by 16
+
+  Two targets used up the entire clerk; a third target off the line is already
+  one too many. Three points that refuse to sit on one straight line beat every
+  single multiply-and-nudge rule there is -- and real sheets bend far worse than
+  three points. So we stack rooms.
 
   WHY PLAIN STACKING FALLS APART
 
@@ -661,8 +739,38 @@
     loss = -math.log(p)   # 0.475
     print(round(loss, 3)) # 0.475
 
-  Three rooms, five multiplications, one S-curve, one loss -- all visible.  The toolbox block
-  below uses the same steps on the full Wisconsin sheet:
+  Three rooms, five multiplications, one S-curve, one loss -- all visible.
+
+  Three more claims from the pencil half, each settled by a few lines of the same
+  arithmetic -- the straight rule running out of fingers, the no-nudge building
+  stuck on the fence, and the grid handshake:
+
+    ONE STRAIGHT RULE VS THREE TARGETS (m=1 -> 10, m=2 -> 3, m=3 -> 12)
+    dial  = 3 - 10                 # subtract the two fitted equations: dial = -7
+    nudge = 10 - dial*1            # 10 - (-7) = 17 ; both numbers now spent
+    third = dial*3 + nudge         # -21 + 17 = -4  ; the target was 12
+    print(dial, nudge, third)      # -7  17  -4
+    print("miss:", 12 - third)     # miss: 16  -- and nothing left to turn
+
+    THE NO-NUDGE BUILDING ON THE AVERAGE PATIENT (HUMBLED -> ALL ZEROS)
+    m1, m2 = 0.0, 0.0              # average radius, average texture: the all-zeros row
+    c1 = m1*2.0 + m2*1.0           # 0.0  (clerk 1's dials, nudge deleted)
+    c2 = m1*(-1.0) + m2*0.5        # 0.0  (clerk 2's dials, nudge deleted)
+    r1 = max(0, c1)                # 0    the zero-out rule keeps 0 at 0
+    r2 = max(0, c2)                # 0
+    z  = r1*3.0 + r2*(-2.0)        # 0.0  (final clerk, nudge deleted)
+    p  = 1 / (1 + math.exp(-z))    # 1/(1+1) = 0.5
+    print(p)                        # 0.5  -- locked on the fence; NO dial setting moves it
+
+    THE HANDSHAKE: ONE PATIENT ROW (1x2) THROUGH A 2x3 DIAL GRID -> 1x3
+    out1 = 0.5*2.0    + (-1.2)*1.0   # -0.2   two measurements paired with two dials
+    out2 = 0.5*(-1.0) + (-1.2)*0.5   # -1.1   inner 2 met inner 2; three clerks out
+    out3 = 0.5*0.5    + (-1.2)*0.5   # 0.25 - 0.6 = -0.35
+    print(round(out1,2), out2, round(out3,2))   # -0.2  -1.1  -0.35
+    # a 1x2 row against a 3x2 grid has no such pairing: each clerk's third dial
+    # would sit partnerless -- the arithmetic refuses before it starts.
+
+  The toolbox block below uses the same steps on the full Wisconsin sheet:
 
   Here is the forward half in Python: load, split, scale, build, and the by-hand forward
   pass in code so you can check the 0.622 we computed above.

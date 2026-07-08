@@ -133,6 +133,17 @@
                            x (slope of p w.r.t. z2)
                            x (slope of z2 w.r.t. w2)
 
+  Why MULTIPLY the links, and not add them? Because each link's slope acts on the
+  change ARRIVING from the previous link -- not on the original wiggle. Watch two
+  gears with plain numbers. First gear: u = 3 x d, so turning d by +1 turns u by
+  +3. Second gear: y = 5 x u, so each unit of u turns y by +5. Now turn d by +1:
+  u moves by +3, and the second gear moves y by 5 FOR EACH of those 3 arriving
+  units -- 5 x 3 = +15. Check it without gears: y = 5 x (3 x d) = 15 x d, slope 15
+  exactly. Adding would claim 3 + 5 = 8, which pretends both gears acted on the
+  original +1 -- but the second gear never saw the original wiggle; it only saw
+  the +3 the first gear handed it. Slopes through a chain multiply because each
+  stage scales what the stage before delivered.
+
   Let me compute each link. Two require calculus derivatives -- facts above the floor of this
   chapter (the floor is: add, subtract, multiply, divide, squares, roots). I flag each as an
   IOU and give a wiggle-check so you can verify the claim without the calculus.
@@ -213,6 +224,14 @@
   subtract step x slope. When the slope is negative, subtracting a negative ADDS -- the dial
   goes up. When the slope is positive, the dial goes down. The minus sign does the steering
   automatically. This single rule -- dial = dial - step x slope -- is gradient descent.
+
+  One reading error to disarm before it can form. The slope's sign says which way
+  the ground TIPS under this dial -- does the loss rise or fall as the dial grows.
+  It says nothing about the SHAPE of the valley. Whether the ground curves like a
+  bowl or a dome is a different measurement -- the slope OF the slope, taken by
+  wiggling twice -- and nothing in this walk ever needs it. At w2 = 1.5 the slope
+  is -0.158: the ground tips down as w2 grows, so walk that way. That is the whole
+  message; direction, not shape.
 
   --- Does the slope tell the truth? Check it by brute force ---
 
@@ -329,6 +348,34 @@
   A bigger output error pushes a bigger slope back to w1 -- so w1 takes a bigger step. The
   network corrects fastest exactly where it was most wrong.
 
+  WHY THE GATE'S SLOPE OF 1 MATTERS TEN ROOMS DEEP
+
+  Look again at what the error is multiplied by at each squasher it crosses on the
+  way back. The zero-out gate, when open, multiplies the error by exactly 1 -- the
+  error walks through untouched. The S-curve multiplies by p x (1 - p), and that
+  factor has a hard ceiling: p x (1 - p) is largest when p = 0.5, where it equals
+  0.5 x 0.5 = 0.25, and it only falls from there -- at p = 0.9 it is 0.9 x 0.1 =
+  0.09; at p = 0.99, about 0.01. Never more than a quarter.
+
+  Now build DEEP. Suppose ten stacked rooms each ended in an S-curve instead of a
+  zero-out gate. An error born at the exit must cross ten such squashers to reach
+  Room 1's dials, and each crossing multiplies it by at most 0.25:
+
+      0.25 x 0.25 x ... x 0.25   (ten times)  =  0.25^10  ≈  0.00000095
+
+  Under one millionth of the error survives the trip -- and that is the BEST case,
+  every squasher sitting at its steepest point. Room 1's dials receive a whisper
+  of a whisper: slopes near zero, steps near zero, learning near zero. The same
+  ten rooms with open zero-out gates multiply the error by 1 x 1 x ... x 1 = 1.
+  It arrives at full strength no matter the depth.
+
+  That is the second, deeper reason for the placement rule this post has been
+  using all along: the S-curve appears exactly ONCE, at the exit -- where a
+  probability is genuinely needed -- and every squasher BETWEEN rooms is the
+  zero-out gate, whose open slope of 1 lets the error travel any distance
+  unshrunk. The gate's price is the shut side (a dead clerk passes nothing, 0);
+  the S-curve's price is paid on EVERY crossing, everywhere.
+
   HOW BIG A STEP? (LEARNING RATE)
 
   We used a step size of 0.1 above. That number is the learning rate, and it is its own small
@@ -339,10 +386,38 @@
     Step too small: the dial creeps. It will get there eventually, but you may run out of
       patience (and compute budget) first.
 
+  Those two failures can be DERIVED, not just feared, on a hill small enough to
+  solve outright. Take one dial d with wrongness L = d x d -- a bowl whose bottom
+  sits at d = 0. Its slope: nudge d by a hair h and the wrongness moves by
+  (d + h)^2 - d^2 = 2dh + h^2, which per unit of hair settles at 2d as the hair
+  shrinks. So the update rule dial = dial - step x slope becomes:
+
+      new d = d - step x 2d = d x (1 - 2 x step)
+
+  Every step MULTIPLIES the dial by the same fixed factor (1 - 2 x step). The
+  whole future of the training run is that one factor:
+
+      step = 0.1:  factor 0.8    d: 1 -> 0.8 -> 0.64 -> 0.512     eases to the bottom
+      step = 0.9:  factor -0.8   d: 1 -> -0.8 -> 0.64 -> -0.512   CROSSES the valley
+                                 every step, but shrinks -- wasteful, still landing
+      step = 1.0:  factor -1     d: 1 -> -1 -> 1 -> -1            hops between the same
+                                 two spots forever; wrongness frozen at 1, never settles
+      step = 1.1:  factor -1.2   d: 1 -> -1.2 -> 1.44 -> -1.728   each overshoot lands
+                                 HIGHER up the far wall; wrongness 1, 1.44, 2.07, 2.99...
+
+  The dividing line falls straight out: the dial shrinks toward the bottom only
+  while the factor's size is below 1 -- here, only while the step is below 1.
+  Cross that line and every step amplifies instead of settling. And the line is
+  the BOWL'S property, not a universal constant: a steeper bowl (L = 3 x d x d,
+  slope 6d, factor 1 - 6 x step) forbids any step past 1/3. Every loss has its
+  own threshold, no one step size is safe everywhere -- which is why the step is
+  the hardest number in the building to pick by hand.
+
   I once set a fixed step that was slightly too large and spent two hours wondering why my
   building was WORSE after training than before. The dials were bouncing around the valley
-  floor, never settling in it. Halving the step fixed it instantly. The lesson stuck: when
-  training diverges, suspect the step size first.
+  floor, never settling in it -- the factor above, sitting near -1: each step teleporting the
+  dial to the mirror spot across the valley instead of down into it. Halving the step fixed
+  it instantly. The lesson stuck: when training diverges, suspect the step size first.
 
   A MANAGER WHO SIZES THE STEPS (ADAM)
 
@@ -525,6 +600,36 @@
     new_w2 = w2 - 0.1*slope_w2   # 1.5 + 0.0158 = 1.5158
     new_w1 = w1 - 0.1*slope_w1   # 1.0 + 0.0148 = 1.0148
     print(round(new_w2,4), round(new_w1,4))
+
+  And the three claims that framed the walk -- gears multiply, squashers pass or
+  shrink, the step factor decides settle-or-explode -- each settled in a few lines:
+
+    GEARS: u = 3x, y = 5u -- WIGGLE x BY 1 AND WATCH y
+    y_at_10 = 5 * (3 * 10)          # 150
+    y_at_11 = 5 * (3 * 11)          # 165
+    print((y_at_11 - y_at_10) / 1)  # 15.0 = 3 x 5 -- the two link slopes MULTIPLIED
+
+    TEN S-CURVES VS TEN OPEN GATES (WHAT SURVIVES THE BACKWARD TRIP)
+    print(0.5 * 0.5)                # 0.25    the S-curve's steepest possible slope (p = 0.5)
+    print(round(0.9 * 0.1, 2))      # 0.09    and it only falls from there (p = 0.9)
+    print(0.25 ** 10)               # 9.5367431640625e-07  ten S-curve rooms: a millionth survives
+    print(1 ** 10)                  # 1       ten open zero-out gates: full strength
+
+    THE STEP FACTOR ON L = d*d (SLOPE 2d): NEW d = d x (1 - 2*step)
+    d1 = 1.0 * (1 - 2*0.1)          # 0.8     step 0.1: eases toward the bottom
+    d2 = d1  * (1 - 2*0.1)          # 0.64
+    d3 = d2  * (1 - 2*0.1)          # 0.512
+    print(d1, round(d2,4), round(d3,4))   # 0.8  0.64  0.512
+
+    e1 = 1.0 * (1 - 2*1.0)          # -1.0    step 1.0: the frozen hop --
+    e2 = e1  * (1 - 2*1.0)          # 1.0     same two spots forever, loss never falls
+    print(e1, e2)                    # -1.0  1.0
+
+    f1 = 1.0 * (1 - 2*1.1)          # -1.2    step 1.1: every shot lands higher up
+    f2 = f1  * (1 - 2*1.1)          # 1.44    the far wall
+    f3 = f2  * (1 - 2*1.1)          # -1.728
+    print(round(f1,4), round(f2,4), round(f3,4))          # -1.2  1.44  -1.728
+    print(round(f1*f1,4), round(f2*f2,4), round(f3*f3,4)) # 1.44  2.0736  2.986  <- wrongness CLIMBING
 
   No loop: four dials, every slope visible. The real building has 641 dials over 341 patients
   for 50 passes -- you cannot write 641 lines, so there the toolbox loops the IDENTICAL step

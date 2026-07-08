@@ -279,6 +279,26 @@
   more was ever meant by the words. Whenever a symbol frightens, ask what single
   division it stands for.
 
+  "The gate is 1 or 0 -- so which is it AT the fold, when a middle number lands
+  exactly on zero?" I waved this off as pedantry until I aimed the wiggle ruler at
+  it and got two answers. Put psi = 0 exactly, so the bend outputs max(0, 0) = 0.
+  Wiggle UP by a hair: max(0, 0.001) = 0.001 -- the output moved a full hair,
+  rise per unit wiggle = 0.001 / 0.001 = 1. Wiggle DOWN by a hair:
+  max(0, -0.001) = 0 -- the output moved nothing, rise per unit wiggle = 0. The
+  two probes disagree: 1 from the right, 0 from the left. So at the fold there
+  IS no single honest rise-per-unit-wiggle -- the bend's graph has a sharp corner
+  there, and a corner owns no one slope. The machine still needs SOME number to
+  multiply by, so the gate rule quietly legislates one: "open only if psi is
+  strictly positive" scores the fold as 0 (the code's p1 > 0 below does exactly
+  this). Scoring the fold as 1 instead trains just as well. The choice never
+  matters in practice, because a middle number computed from real-world decimals
+  lands EXACTLY on 0.000000 about never -- this post's own psi row came out
+  [2.5, -0.5, -0.5], nowhere near the fold. Rule to carry: the fold is the one
+  point where the slope question has no answer; pick a side, write it down, and
+  move on -- but KNOW it has no answer, and know your side was a choice. "Smooth
+  everywhere except one corner" is the bend's exact shape, and saying it
+  precisely costs nothing.
+
   "How can I compute pulls FIRST, when I don't yet know what was wrong?" The order
   felt backwards -- surely blame needs a crime. But A[1,0]'s pull is 4 no matter what
   the target says: the pull is a fact about the MACHINE (wiggle in, rise out), not
@@ -370,6 +390,13 @@ SEAM. Pencil ends here; below, the same numbers in Python.
   pull_A00b  = s1 * pull_psi1b  # 1*1 = 1
   pull_A10b  = s2 * pull_psi1b  # 2*1 = 2
   print(pull_psi1b, pull_A00b, pull_A10b)  # 1  1  2
+
+  # THE FOLD: aim the wiggle ruler at psi = 0 exactly, from both sides
+  up   = (max(0, 0.0 + 0.001) - max(0, 0.0)) / 0.001    # (0.001 - 0)/0.001 = 1.0
+  down = (max(0, 0.0 - 0.001) - max(0, 0.0)) / -0.001   # (0 - 0)/-0.001    = 0.0
+  print(up, down + 0.0)          # 1.0  0.0  -- two probes, two answers: no one slope exists
+  gate_at_fold = 1 if 0.0 > 0 else 0
+  print(gate_at_fold)             # 0  -- this code's own legislated choice: strictly-positive opens
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):

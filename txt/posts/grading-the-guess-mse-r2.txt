@@ -113,6 +113,84 @@
      Same ordering of which fit is better -- the square root only ever rises as its input
      rises, so it never swaps the order.
 
+  Every piece of that recipe -- the square, the mean, the stop-at-one-number -- has to
+  earn its place. So make each one earn it, starting with the square.
+
+  WHY SQUARE AT ALL -- RAW MISSES VOTE EACH OTHER OUT
+
+  Try to grade WITHOUT the square. The three cars from the top of the page:
+
+    car 1:  guess 20 mpg, real 18  ->  miss = 20 - 18 = +2   (too high by 2)
+    car 2:  guess 16 mpg, real 15  ->  miss = 16 - 15 = +1   (too high by 1)
+    car 3:  guess 12 mpg, real 14  ->  miss = 12 - 14 = -2   (too low by 2)
+
+  Add the raw misses: (+2) + (+1) + (-2) = +1.
+  The report reads "one mpg wrong, in total" -- about a machine that missed every
+  single car. The high misses and the low misses CANCELLED. Push it to the edge: a
+  guesser that shouts 100 too high on half the fleet and 100 too low on the other
+  half sums to zero -- a perfect grade for a useless machine. Raw misses carry
+  signs, and signed misses vote each other out.
+
+  So kill the sign before adding. Square each miss:
+
+    (+2)^2 + (+1)^2 + (-2)^2 = 4 + 1 + 4 = 9
+
+  Nine units of misery. Nothing cancelled; every car's miss is in the bill.
+
+     A guesser misses +3 on one car and -3 on another. Its raw-sum grade, and
+     its squared grade?
+
+     check your slate:  raw (+3) + (-3) = 0, a perfect score for two misses --
+     the lie.  squared: 9 + 9 = 18.  The square keeps both crimes on the books.
+
+  WHICH MEANS ANY SIGN-KILLER WOULD DO -- SO WHY THE SQUARE AND NOT THE BARE SIZE?
+
+  Dropping the minus outright also kills the sign: the bare sizes |+2|, |+1|, |-2|
+  add to 2 + 1 + 2 = 5, positive, no cancelling. Two honest candidates, so the
+  square must beat the bare size somewhere else. It does: in how the penalty
+  PUSHES as one miss shrinks.
+
+  Take one miss, call it m, and nudge it by a hair h. The squared penalty moves by
+
+    (m + h)^2 - m^2 = m^2 + 2mh + h^2 - m^2 = 2mh + h^2
+
+  Per unit of hair that is 2m + h, and as the hair shrinks toward nothing the push
+  settles at exactly 2m. Check it at m = 4: penalty 4^2 = 16; shrink the miss to
+  3.9 and the penalty is 15.21; the 0.1 of shrink paid back 0.79, a push of 7.9
+  per unit -- and 2m = 2 x 4 = 8, matching (the small gap is the +h just derived).
+
+  Read what push = 2m means:
+
+    miss m = 4     ->  push 8    a big miss gets shoved HARD
+    miss m = 0.1   ->  push 0.2  a small miss gets a gentle touch
+    miss m = 0     ->  push 0    AT the right answer, the grading goes quiet
+
+  The bare size |m| pushes differently: 1 per unit when m is above zero, 1 per
+  unit (the other way) when m is below -- the same shove for a hair as for a
+  mile -- and at m = 0 the push jumps straight from -1 to +1 with no quiet point
+  in between. The square's push scales with the crime and settles to zero exactly
+  at the answer. That is why the straight-stick rule shrinks SQUARED leftovers
+  when it sets its dials, and why the ruler that grades it squares too.
+
+  THE SQUARES ARE IN -- NOW WHY DIVIDE BY THE COUNT?
+
+  Skip the divide and the ruler grades the paperwork, not the machine. Imagine a
+  guesser that misses EVERY car by exactly 1 mpg -- same skill on every row. On a
+  5-car sheet: five squared misses of 1, total 5. On a 400-car sheet: total 400.
+  Same machine, same skill, and the no-divide ruler calls the second job eighty
+  times worse. The sum grows with the SHEET. Divide by the count and both sheets
+  read exactly 1.0 -- "one squared mpg of miss per car" -- a per-car grade that
+  follows the guesser, not the size of the pile it was handed.
+
+  AND WHY CRUSH IT ALL TO ONE NUMBER?
+
+  Because a grade exists to be COMPARED. Turn a dial, re-grade, keep the turn if
+  the grade fell -- that loop is how the dials get set, and it needs a number that
+  can FALL. Keep the whole column of squared misses instead and the comparison
+  dies: after a dial turn, car 3's square drops while car 7's rises -- better or
+  worse? A column can only shuffle; one number can fall. The mean is the crush
+  that turns a sheet of misses into a verdict a dial can act on.
+
   Count the clerk-strokes for MSE on a whole sheet of 400 cars (made-up count).
   Per car: 1 subtraction to get the miss, plus 1 squaring = 2 strokes.
   So 400 cars x 2 = 800 strokes.
@@ -461,6 +539,36 @@
     leftover     = ((y1-g1)**2 + (y2-g2)**2 + (y3-g3)**2 + (y4-g4)**2 + (y5-g5)**2)        # 2
     r2 = (total_wobble - leftover) / total_wobble
     print("R^2:", round(r2, 2))        # 0.94  = (34 - 2) / 34 = 32/34
+
+  And the why-checks from the pencil half -- the cancellation lie, the two
+  sign-killers, the square's push, and sum-versus-mean -- each settled by a line
+  of the same arithmetic:
+
+    WHY SQUARE: RAW MISSES VOTE EACH OTHER OUT (the three cars from the top)
+    raw_sum = (+2) + (+1) + (-2)              # 2 + 1 - 2 = 1  <- "one mpg wrong" about three misses
+    print("raw sum:", raw_sum)                 # 1   (the lie)
+
+    sq_sum = (+2)**2 + (+1)**2 + (-2)**2      # 4 + 1 + 4 = 9  every miss on the bill
+    print("squared sum:", sq_sum)              # 9
+
+    bare_sum = abs(+2) + abs(+1) + abs(-2)    # 2 + 1 + 2 = 5  the other sign-killer
+    print("bare-size sum:", bare_sum)          # 5
+
+    THE SQUARE'S PUSH AT m = 4: SHRINK THE MISS BY 0.1, MEASURE THE PAYBACK
+    push = (4.0**2 - 3.9**2) / 0.1            # (16 - 15.21) / 0.1 = 7.9  ~ 2m = 8
+    print("push at m=4:", round(push, 4))      # 7.9
+
+    THE +3 / -3 DRILL
+    print("raw:", (+3) + (-3))                 # 0   a perfect grade for two misses
+    print("squared:", 3**2 + (-3)**2)          # 18  both crimes on the books
+
+    SUM GRADES THE SHEET, MEAN GRADES THE MACHINE (every car missed by exactly 1)
+    sum_5    = 1 + 1 + 1 + 1 + 1              # 5    five squared misses of 1
+    sum_400  = 400 * 1                         # 400  four hundred of them, one product
+    mean_5   = sum_5 / 5                       # 1.0
+    mean_400 = sum_400 / 400                   # 1.0  same machine, same grade
+    print("sums:", sum_5, sum_400)             # 5  400   <- the sum grew 80x for no new skill
+    print("means:", mean_5, mean_400)          # 1.0  1.0  <- the mean held still
 
   No loop: five cars, five lines, every miss visible. On a real sheet of hundreds of cars
   you would not hand-type each row -- there the toolbox does the same two rulers in two

@@ -156,7 +156,8 @@
   at a time. Each number then rides the backprop post's machine: walk it backward
   through the fired engine's slot to every dial, summing pulls; the two notes' grades
   are averaged into the single Adam step of the previous post. A batch of misses, one
-  step. The only piece still hand-waved is the word "frozen."
+  step. Two pieces are still hand-waved: how one dial obeys two notes at once, and
+  the word "frozen."
 
   A third note joins the batch: (s3, took engine 0, reward 0.5,
   ended? 0, s3'). The frozen twin reads the landing s3' as [2, 2, 2, 2]; the live
@@ -168,6 +169,44 @@
              target = 0.5 + 0.9 x 2.0 = 2.3
              guess  = pick column 0 of [1.8, 0, 0, 0] = 1.8
              miss   = 2.3 - 1.8 = 0.5   (lowballed -- pull engine 0 up a little)
+
+  ONE DIAL, TWO NOTES PULLING OPPOSITE WAYS -- SO WHY DO THEIR VOTES ADD?
+
+  Now pay the first hand-wave. Every dial in the net served BOTH notes' forward
+  passes -- the same sheets read s1 and s2. So when the misses ride backward, one
+  dial receives TWO verdicts, and nothing says they agree. Take one dial d,
+  currently 1.0, and say the backward walks (run once per note) return:
+
+      note 1:  d's pull on note 1's guess = 2       note 1's miss = +0.78
+      note 2:  d's pull on note 2's guess = 3       note 2's miss = -1.5
+
+  Note 1 was lowballed and wants its guess UP: its vote on d is
+  (+0.78)(2) = +1.56. Note 2 overrated an engine that crashed and wants its
+  guess DOWN: its vote is (-1.5)(3) = -4.5. One dial cannot move two directions
+  at once. What it does instead is forced by a one-line theorem, derived on the
+  spot. The batch's wrongness is the SUM of the notes' wrongnesses (averaging is
+  the same sum, divided by the note count). Wiggle d by a hair h: note 1's
+  wrongness moves by (its slope) x h, note 2's moves by (its slope) x h, so the
+  sum moves by (slope1 + slope2) x h. The slope of a sum is the sum of the
+  slopes -- nothing deeper. So votes on a shared dial ADD:
+
+      combined vote = (+1.56) + (-4.5) = -2.94       averaged over 2 notes: -1.47
+      nudge         = size x (-1.47)                 (size 0.01: d moves by -0.0147)
+
+  The louder note wins -- not by silencing the other, but by outvoting it. The
+  dial falls: note 2's fat error shrinks a lot, note 1's small hope is set back
+  a little, and the batch's TOTAL wrongness falls by the most this one dial can
+  manage. The rule in five words: multiply along, add across. Multiply pulls
+  along one note's chain; add the votes across the notes that share the dial.
+
+  The neatest special case is a nudge. A nudge's pull on its own note's raw
+  score is exactly 1 -- raise the nudge a hair and the score rises a hair,
+  nothing dilutes it. So a shared nudge's combined vote is each note's arriving
+  blame times 1, added: here, if both notes' blame reached the same nudge,
+  (+0.78) + (-1.5) = -0.72. One number was handed out to every note on the way
+  forward; every note's verdict is added up on the way back. Handed out forward,
+  summed backward -- the pairing is exact, and it is why a batch of 32 notes
+  hands each of its shared nudges a 32-term sum.
 
   WHY TWO NETS -- THE ONE THAT GRADES MUST HOLD STILL
 
@@ -287,6 +326,15 @@ SEAM. Pencil ends here; below, the same numbers in Python.
   cs, cf = e1/tot3, e3/tot3                    # 0.096  0.711
   worth3 = cs*1 + cs*1 + cf*3 + cs*1           # 0.288+2.133 = 2.42
   print(round(cs,3), round(cf,3), round(worth3,2))  # 0.096  0.711  2.42
+
+  # ONE SHARED DIAL, TWO VOTES: multiply along a note's chain, ADD across notes
+  vote1 = 0.78 * 2               # note 1: miss +0.78 x pull 2 = +1.56  (wants d up)
+  vote2 = -1.5 * 3               # note 2: miss -1.5  x pull 3 = -4.5   (wants d down)
+  combined = vote1 + vote2       # 1.56 - 4.5 = -2.94   the slope of a sum is the sum of slopes
+  avg      = combined / 2        # -1.47                averaged over the 2 notes
+  print(vote1, vote2, combined, avg)   # 1.56  -4.5  -2.94  -1.47
+  print(0.01 * avg)              # -0.0147  the ONE nudge d actually takes -- the louder note outvoted
+  print(0.78 + (-1.5))           # -0.72    a shared NUDGE's combined vote: each miss x pull 1, summed
 
 ----------------------------------------------------------------------------------------------
   IN THIS CHAPTER (Chapter 15 -- Training the Q-Network):
