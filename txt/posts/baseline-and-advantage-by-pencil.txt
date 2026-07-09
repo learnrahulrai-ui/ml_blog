@@ -1,0 +1,158 @@
+@title Subtract a Yardstick, Lose No Truth :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 23 . POLICY GRADIENTS . PART 3 OF 4
+  Subtract a Yardstick, Lose No Truth
+  ============================================================================================
+
+
+  A move gets a score -- the rewards it went on to collect -- and that score turns the
+  dials behind the coin: push the move's odds up in proportion to its score. The trouble
+  is the score's size lies about the move. A move that scores +14 may not be a good move
+  at all; it may just have happened in a rich part of the world where every move scores
+  around +13. Another move that scores +2 in a poor corner, where everything scores about
+  +1, was the better decision. Raw score confuses "this was a good move" with "this was a
+  good place to be." You want only the first. So measure each move against how good its
+  situation already was, and keep the difference.
+
+  THE YARDSTICK: HOW GOOD THE SITUATION IS BEFORE YOU EVEN MOVE
+
+  Give every situation a single worth number, V -- "sitting here, before I pick anything,
+  about this well is how it tends to go." Then the honest signal for a move is not its
+  raw score but its score minus that worth:
+
+      advantage = ( score of the move ) - ( V of the situation )
+
+  a picture of the subtraction:
+
+      score of Left  14.009  ---.
+                                 |--  minus V(s) = 13  -->  advantage
+      V of situation 13.000  ---'
+
+  A positive advantage means the move did BETTER than the situation's going rate -- worth
+  making more likely. A negative advantage means it did worse -- worth making less likely.
+  The word "better than expected" is now a real number.
+
+  THE ADVANTAGE, WORKED
+
+  One situation, two moves. Their runs earned scores 14.009 (Left) and 12.0 (Right). The
+  situation's worth is V = 13. Then
+
+      advantage of Left  = 14.009 - 13 =  1.009      (beat the going rate -- nudge up)
+      advantage of Right = 12.0   - 13 = -1.0        (fell short -- nudge down)
+
+  The two raw scores were both big and positive -- 14 and 12 -- and would have shoved both
+  moves' odds up, a muddy signal. Against the yardstick they split cleanly into a small
+  plus and a small minus: Left beat the situation, Right lost to it. Same situation, and
+  now the coin is told exactly which of the two to favor.
+
+  BUT DOES SUBTRACTING A NUMBER BEND THE HONEST DIRECTION?
+
+  The direction was proved before: push each move's dial by its log-change times its
+  signal, and on average that climbs the true expected score. Swap the signal from raw
+  score to score-minus-V and you must check that the subtracted V did not quietly tilt
+  that average push. It did not, and here is the whole reason on one line.
+
+  The extra push the yardstick adds is V times a sum, over the moves, of each move's
+  chance multiplied by its dial-rate. For the dial hL behind a two-move coin, the rate of
+  the taken move Left is ( 1 - pi(Left) ), and the rate of the other move Right is
+  ( -pi(Left) ). So the sum is
+
+      pi(Left) * ( 1 - pi(Left) )  +  pi(Right) * ( -pi(Left) )
+
+  With a 50/50 coin, pi(Left) = pi(Right) = 0.5:
+
+      0.5 * (1 - 0.5)  +  0.5 * (-0.5)  =  0.25  -  0.25  =  0
+
+  Zero. And it is zero for ANY coin, not just 50/50: factor pi(Left) out of both terms
+  and what is left is pi(Left) + pi(Right) - 1 = 1 - 1 = 0, because the odds add to one.
+  The yardstick's contribution to the average push is V times zero -- nothing. It cannot
+  move the direction one degree. All it does is shrink the numbers you multiply by, from
+  a wild +14 to a calm +1.009, so the pushes stop lurching run to run. You buy a steadier
+  hand and pay nothing in truth.
+
+  WHERE THE YARDSTICK COMES FROM: A SECOND LEARNER, THE CRITIC
+
+  V is not known; it must be learned. Keep a second small machine -- the critic -- whose
+  only job is to read a situation and guess its worth V. Teach it the plainest way there
+  is, the same squared-miss that taught the very first guessing machine in this book: it
+  guesses V, the run reveals an actual score, and you nudge V a little toward that score
+  to shrink the square of the gap. With the situation's worth guessed at V = 13 and a
+  small size 0.1:
+
+      saw Left's run score 14.009:  V = 13 + 0.1 * (14.009 - 13) = 13 + 0.1009 = 13.1009
+      saw Right's run score 12.0 :  V = 13 + 0.1 * (12.0   - 13) = 13 - 0.1    = 12.9
+
+  The worth crawls toward the middle of what the situation actually pays -- here it hovers
+  around 13, the average of 14.009 and 12. Two learners now run side by side: the coin
+  (the ACTOR) that picks moves, and the worth-guesser (the CRITIC) that grades how good
+  the situation was, handing the actor a calm advantage instead of a wild score.
+
+  One thing about the yardstick is still shaky. The critic is itself a guess, wrong early
+  on, and the advantage score-minus-V leans partly on that wrong guess and partly on the
+  full run's score, which is honest but noisy. Part 4 builds a dial that slides between
+  trusting the critic's calm one-step guess and trusting the noisy full run -- the last
+  piece, and the one companies ask about by name.
+
+  -------
+
+  The advantage, the zero-tilt check, and one critic nudge, run as code:
+
+```python
+# one situation, two moves; their runs earned these scores (returns from part 1)
+scoreL, scoreR = 14.009, 12.0
+
+# the critic's current worth for this situation
+V = 13.0
+
+# advantage = score - yardstick: how much better than expected each move did
+advL = scoreL - V     #  1.009  (Left beat the going rate)
+advR = scoreR - V     # -1.0    (Right fell short)
+print("advantages:", round(advL, 3), round(advR, 3))
+
+# the yardstick cannot tilt the average push: on dial hL, rate is (1-pL) for Left, -pL for Right
+pL, pR = 0.5, 0.5
+tilt = pL * (1 - pL) + pR * (-pL)     # 0.25 - 0.25 = 0
+print("baseline tilt:", round(tilt, 6))
+print("tilt times V:", round(V * tilt, 6))
+
+# the critic learns V by shrinking the squared miss toward an observed score (plain regression)
+lr = 0.1
+V_after_L = V + lr * (scoreL - V)     # 13 + 0.1009 = 13.1009
+V_after_R = V + lr * (scoreR - V)     # 13 - 0.1    = 12.9
+print("critic V after seeing Left, Right:", round(V_after_L, 4), round(V_after_R, 4))
+```
+
+  Running this code prints:
+
+        advantages: 1.009 -1.0
+        baseline tilt: 0.0
+        tilt times V: 0.0
+        critic V after seeing Left, Right: 13.1009 12.9
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  the yardstick V           = the baseline, the value function V(s); worth of a situation
+  the advantage             = A(s,a) = Q(s,a) - V(s), score minus baseline
+  the zero-tilt proof       = why a baseline is unbiased: E[ grad log pi ] = 0 over the moves
+  the critic                = the value network, trained by mean-squared error toward the returns
+  the actor                 = the policy (the coin) from part 2, trained by -log pi * advantage
+  shrink the squared miss   = the critic's loss, mean((V - score)^2), plain regression
+
+----------------------------------------------------------------------------------------------
+  CHAPTER 23 -- Policy Gradients:
+    [Part 1 -- No Answer Key, Only a Score](return-and-reward-to-go-by-pencil.txt)
+    [Part 2 -- Why the Log Times the Score Turns the Dial](reinforce-log-prob-by-pencil.txt)
+    [Part 3 -- Subtract a Yardstick, Lose No Truth] (this post)
+    Next: [Part 4 -- Trust the Critic a Little: GAE](gae-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

@@ -1,0 +1,168 @@
+@title Trust the Critic a Little: GAE by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 23 . POLICY GRADIENTS . PART 4 OF 4
+  Trust the Critic a Little: GAE by Pencil
+  ============================================================================================
+
+
+  The signal that turns the dials is the advantage: how much better than expected a move
+  did. There are two ways to measure it, and each is broken in an opposite way. The full
+  run's leftover -- add up every reward from this move to the end of the run, shrinking
+  each by the discount -- is honest, because it is what actually happened; but it is
+  noisy, because a whole run's worth of luck rides on it. The one-step measure -- look
+  only at this single tick and lean on a worth-guesser for everything after -- is calm,
+  because only one tick's luck is in it; but it is biased, because the worth-guesser is
+  itself wrong, especially early. GAE is the dial that slides between the two.
+
+  Setup, all defined here: a run of three ticks, ending (done) at tick 2. The rewards paid
+  were r0 = 1, r1 = 1, r2 = 1. A worth-guesser (the critic) reads each situation and gives
+  its worth -- how well things tend to go from there: V0 = 0.8, V1 = 0.9, V2 = 0.5. The
+  discount gamma = 0.9 says a reward one tick later counts as 0.9 of its size.
+
+  THE ONE-STEP SURPRISE: WHAT HAPPENED MINUS WHAT WAS EXPECTED
+
+  For one tick, compare what actually came -- the reward now, plus the discounted worth of
+  where you landed -- against the worth the critic gave the situation you left:
+
+      surprise = reward + gamma * (worth of the situation you landed on) - (worth of the one you left)
+
+  a picture for tick 1 (left situation 1, landed on situation 2):
+
+      what happened :  r1  +  gamma * V2      =  1 + 0.9*0.5   = 1.45
+      what expected :  V1                     =  0.9
+      surprise d1   :  1.45 - 0.9             =  0.55
+
+  Do all three. The last tick needs care and gets it in a moment; here are the middle and
+  first:
+
+      d1 = r1 + gamma*V2 - V1 = 1 + 0.9*0.5 - 0.9 = 1 + 0.45 - 0.9 = 0.55
+      d0 = r0 + gamma*V1 - V0 = 1 + 0.9*0.9 - 0.8 = 1 + 0.81 - 0.8 = 1.01
+
+  A positive surprise means the tick beat what the critic expected of that spot.
+
+  THE LAST TICK HITS A WALL: THERE IS NO NEXT SITUATION
+
+  Tick 2 is where the run ends. There is no situation after it -- the game is over. So the
+  "worth of where you landed" term has nothing to point at, and you must NOT let it reach
+  into whatever comes next, because whatever comes next is a fresh, unrelated run. Zero
+  that term out:
+
+      d2 = r2 + gamma * (nothing) - V2 = 1 + 0 - 0.5 = 0.5
+
+  This is the one edge case that quietly wrecks a policy-gradient build if missed: let the
+  end of one run bootstrap off the start of the next and you have wired two strangers
+  together. Done means the chain stops -- the reach past the end is zero.
+
+  BLEND THE SURPRISES BACKWARD, WITH A DIAL
+
+  A single tick's surprise is calm but shortsighted. The full run's leftover is farsighted
+  but wild. GAE folds the surprises together, backward from the end, each older one shrunk
+  by gamma and by a new dial lambda (here 0.95):
+
+      advantage_t = surprise_t + (gamma * lambda) * advantage_(t+1)
+
+  with the reach-past-the-end already zeroed by done. Let gl = gamma * lambda = 0.9 * 0.95
+  = 0.855, and fold:
+
+      A2 = d2                    = 0.5                              (last tick; nothing beyond it)
+      A1 = d1 + gl * A2          = 0.55 + 0.855*0.5    = 0.9775
+      A0 = d0 + gl * A1          = 1.01 + 0.855*0.9775 = 1.8458
+
+  Backward again -- each advantage needs the one after it before it can be built, the same
+  end-first fold that built the run's leftover in the first place.
+
+  THE DIAL'S TWO ENDS: CALM AT ZERO, HONEST AT ONE
+
+  Turn lambda to 0 and every term after the first surprise dies: the advantage is just
+  this tick's surprise, A0 = d0 = 1.01 -- fully trusting the critic's one-step guess, calm
+  but carrying the critic's bias. Turn lambda to 1 and gl becomes plain gamma, so the fold
+  sums ALL the future surprises, discounted:
+
+      A0 at lambda=1 = d0 + gamma*d1 + gamma^2*d2 = 1.01 + 0.495 + 0.405 = 1.91
+
+  which is exactly the full run's leftover measured against the starting worth -- the
+  honest, noisy end, the critic's intermediate guesses cancelling out. Between 0 and 1 the
+  dial buys some of the calm without all of the bias: at 0.95, A0 = 1.8458, most of the
+  way toward the honest 1.91 but pulled a little toward the critic's steadier read.
+
+  TWO DIALS, NOT ONE: GAMMA VERSUS LAMBDA
+
+  They are easy to confuse and do different jobs. Gamma lives inside the reward itself: it
+  says how much a reward far in the future is worth counting at all -- how farsighted the
+  machine is about the world. Lambda lives only in this blend: it says how much to trust
+  the critic's one-step guess versus the whole run when building the advantage -- a pure
+  calm-versus-honest knob, nothing to do with how much a future reward matters. Set gamma
+  by how long the consequences of a move really last; set lambda by how much you trust the
+  critic you have.
+
+  That is the whole machine. A coin picks a move (the actor). Its run earns a score. A
+  worth-guesser (the critic) says how good the spot was, learned by shrinking a squared
+  miss. Subtract that worth to get a clean advantage, blend the one-step surprises with
+  lambda to steady it, and feed it as the signal into -log(chance) * advantage, whose one
+  downhill step -- proved earlier -- turns the coin toward the moves that beat expectation.
+  No answer key anywhere: the machine improved a rule purely from the scores its own moves
+  brought back.
+
+  -------
+
+  The surprises, the terminal wall, and the backward blend, run as code:
+
+```python
+gamma = 0.9
+lam = 0.95
+r0, r1, r2 = 1.0, 1.0, 1.0        # rewards; the run ends (done) at tick 2
+V0, V1, V2 = 0.8, 0.9, 0.5        # the critic's worth for each situation
+
+# one-step surprise = reward + gamma*worth(landed) - worth(left)
+# the last tick is done: there is no next situation, so the gamma*worth term is zeroed
+d2 = r2 + 0.0      - V2           # 1 + 0    - 0.5 = 0.5   (done: no reach past the end)
+d1 = r1 + gamma*V2 - V1           # 1 + 0.45 - 0.9 = 0.55
+d0 = r0 + gamma*V1 - V0           # 1 + 0.81 - 0.8 = 1.01
+print("deltas:", round(d0, 3), round(d1, 3), round(d2, 3))
+
+# GAE: fold the surprises backward, each shrunk by gamma*lambda
+gl = gamma * lam                  # 0.855
+A2 = d2                           # 0.5    (last tick; nothing beyond it in this run)
+A1 = d1 + gl * A2                 # 0.55 + 0.855*0.5    = 0.9775
+A0 = d0 + gl * A1                 # 1.01 + 0.855*0.9775 = 1.8458
+print("GAE lambda=0.95:", round(A0, 4), round(A1, 4), round(A2, 4))
+
+# the dial's two ends: lambda=0 keeps only the one-step surprise; lambda=1 sums the whole run
+A0_l0 = d0                                    # 1.01  (trust the critic's one step)
+A0_l1 = d0 + gamma*d1 + gamma**2*d2           # 1.01 + 0.495 + 0.405 = 1.91  (trust the run)
+print("lambda=0 vs lambda=1 at tick 0:", round(A0_l0, 3), round(A0_l1, 3))
+```
+
+  Running this code prints:
+
+        deltas: 1.01 0.55 0.5
+        GAE lambda=0.95: 1.8458 0.9775 0.5
+        lambda=0 vs lambda=1 at tick 0: 1.01 1.91
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  the one-step surprise d   = the TD error delta_t = r_t + gamma*V(s_{t+1}) - V(s_t)
+  the backward blend        = GAE, generalized advantage estimation, A_t = d_t + gamma*lambda*A_(t+1)
+  lambda                    = the GAE parameter, the bias-variance dial (0 = one-step, 1 = full rollout)
+  zero the reach past done  = the terminal edge case: terminals[t]=1 kills the bootstrap term
+  gamma                     = the discount, how much a far-future reward counts (a separate dial)
+  the actor / the critic    = the policy (coin) and the value network (worth-guesser)
+
+----------------------------------------------------------------------------------------------
+  CHAPTER 23 -- Policy Gradients:
+    [Part 1 -- No Answer Key, Only a Score](return-and-reward-to-go-by-pencil.txt)
+    [Part 2 -- Why the Log Times the Score Turns the Dial](reinforce-log-prob-by-pencil.txt)
+    [Part 3 -- Subtract a Yardstick, Lose No Truth](baseline-and-advantage-by-pencil.txt)
+    [Part 4 -- Trust the Critic a Little: GAE by Pencil] (this post) -- the chapter closes here .
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

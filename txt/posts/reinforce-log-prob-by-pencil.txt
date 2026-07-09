@@ -1,0 +1,207 @@
+@title Why the Log Times the Score Turns the Dial :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 23 . POLICY GRADIENTS . PART 2 OF 4
+  Why the Log Times the Score Turns the Dial
+  ============================================================================================
+
+
+  A move in this world is not chosen by hand. A set of dials turns a situation into a
+  weighted coin -- odds over the moves -- and the machine ROLLS that coin and does
+  whatever comes up. After the move, the world hands back a score for it: one number
+  saying how much that move was worth (the rewards it went on to collect). The score is
+  in hand. The lever is the dials behind the coin. The question of this whole chapter,
+  now made sharp: what single number can you roll downhill so that a good-scoring move
+  ends up with MORE of the coin next time?
+
+  THE COIN, AND THE ONE DIAL PAIR BEHIND IT
+
+  Two moves, Left and Right. The dials produce a preference for each -- a plain score,
+  higher means "lean this way." Call them hL and hR. Turn the two preferences into a
+  coin with the exponential-and-divide (the softmax): lift each with e, then divide by
+  the total so the two odds are positive and add to 1.
+
+      preferences        coin (odds that add to 1)
+        hL  ---.         pi(Left)  = e^hL / (e^hL + e^hR)
+               |--e, / --
+        hR  ---'         pi(Right) = e^hR / (e^hL + e^hR)
+
+  Start the dials equal, hL = hR = 0. Then e^0 = 1 on both sides, the total is 2, and
+
+      pi(Left) = 1 / 2 = 0.5        pi(Right) = 1 / 2 = 0.5
+
+  a fair 50/50 coin. Now the machine rolled it, got Left, and the world paid that move
+  a score of 14.009 -- a solid positive number, meaning going Left here led somewhere
+  good. Left should become more likely. How, by turning hL and hR?
+
+  THE LOSS TO ROLL DOWNHILL, STATED THEN JUSTIFIED
+
+  Here is the number to minimize, for the one move taken:
+
+      loss = - log( pi of the move taken ) * ( score of that move )
+
+  Worked on the coin above -- Left taken, chance 0.5, score 14.009. The natural log
+  (base e) of 0.5 is -0.6931. So
+
+      loss = -( -0.6931 ) * 14.009 = 0.6931 * 14.009 = 9.71
+
+  Dials roll downhill: every dial turns the way that makes this loss smaller. The claim
+  is that turning them downhill on THIS number pushes pi(Left) up. Why it is this exact
+  shape -- a log, times the score, with a minus -- is the rest of the post.
+
+  WHY A LOG AT ALL: THE ONE SWAP THAT MAKES SAMPLING WORK
+
+  What you actually want to climb is the EXPECTED score -- the average score the coin
+  earns, weighing each move by how often the coin plays it:
+
+      expected score = pi(Left)*score(Left) + pi(Right)*score(Right)
+
+  Climbing this means turning the dials the way that raises it. Its change as you nudge
+  a dial is the sum of (change in each pi) times that move's score. That looks like it
+  needs every move's score at once. The log removes that need, through one swap.
+
+  Take any chance, call it p, and its log, log p. Nudge a dial a hair; both move. The
+  change in the log is the change in the chance divided by the chance itself:
+
+      change in (log p) = ( change in p ) / p
+
+  Flip it around and you get the swap:
+
+      change in p = p * change in (log p)
+
+  A chance's own change equals the chance times the log's change. Drop that into the
+  expected-score change:
+
+      change in expected score
+        = sum over moves of ( change in p ) * score
+        = sum over moves of  p * ( change in log p ) * score
+        = the average, over moves the coin actually plays, of ( change in log p ) * score
+
+  The last line is an AVERAGE over moves drawn from the coin. You do not need every
+  move -- you draw one the honest way (roll the coin, take what comes), read the change
+  in its log-chance, multiply by its score, and that single sample already points the
+  same way as the true climb. Minimizing loss = -log(p)*score does exactly one such
+  uphill step on the expected score. That is why the log is there: it is the shape that
+  turns "climb an average you cannot fully compute" into "do a move and read one term."
+
+  NOW TURN THE DIALS, BY PENCIL, AND WATCH THE COIN MOVE
+
+  For the softmax coin, the change in log-chance per dial is clean. Nudging hL up by a
+  hair changes log pi(Left) at the rate ( 1 - pi(Left) ); it changes the OTHER move's
+  dial hR at the rate ( -pi(Right) ). With pi(Left) = pi(Right) = 0.5:
+
+      rate on hL for taking Left =  1 - 0.5 =  0.5
+      rate on hR for taking Left =  -0.5    = -0.5
+
+  Climb the expected score: push each dial by a small size (0.01) times the score
+  (14.009) times its rate:
+
+      hL = 0 + 0.01 * 14.009 * ( 0.5) =  0.07
+      hR = 0 + 0.01 * 14.009 * (-0.5) = -0.07
+
+  Re-read the coin with the new dials. e^0.07 = 1.0726, e^-0.07 = 0.9324, total 2.0049:
+
+      pi(Left) = 1.0726 / 2.0049 = 0.535
+
+  The coin went from 0.500 to 0.535 on Left. A positive score turned the taken move UP,
+  by an amount sized to the score. Had the score been negative -- the move led somewhere
+  bad -- every push would flip sign and Left would drop below 0.5. That is the entire
+  mechanism: log-change of the taken move, times its score, is the turn of the dials.
+
+  WHY THE WORLD'S OWN DICE NEVER ENTER
+
+  A whole run's chance is two things multiplied: the world's part (which situation it
+  hands you next, its own dice) and your part (which move your coin played). Take the
+  log and the product becomes a sum: log(world's part) + log(your part). Now nudge a
+  dial. The world's part does not contain your dials at all -- the world does not care
+  how your coin is set -- so its change is zero. Only log(your part) = log pi(a|s)
+  moves. The world's dice differentiate away and vanish. This is why lived runs are
+  enough: you never need a map of how the world responds, only the log-chance of your
+  own moves.
+
+  WHY THE MINUS, AND WHY NOT THE RAW CHANCE
+
+  The minus is bookkeeping: dials are built to roll a loss DOWNHILL, but you want to
+  climb the score, so you minimize the negative of it -- down on -(score-shaped number)
+  is up on the score. And you multiply the LOG of the chance, not the chance itself,
+  for the swap above (change in p = p times change in log p is what let one sampled move
+  stand in for the full average) and for two smaller mercies: log turns a long run's
+  many multiplied move-chances into an addable sum, and it keeps a run of tiny
+  probabilities from multiplying down to a number too small to hold.
+
+  One crack remains. That score of 14.009 swings wildly from run to run -- a move can
+  look worth +14 in a rough neighborhood and +2 in a fine one, purely by where it
+  happened to be. A push sized by such a jumpy number is a jumpy push. Part 3 subtracts
+  a yardstick from the score so the dial feels only how much BETTER than expected a move
+  did -- without bending the honest direction proven here one degree.
+
+  -------
+
+  The coin, the loss, and one turn of the dials, run as code:
+
+```python
+import math
+lr = 0.01
+score = 14.009            # this move's score: the rewards it went on to collect
+
+# the dials give two preferences; equal preferences make a 50/50 coin
+hL, hR = 0.0, 0.0
+piL = math.exp(hL) / (math.exp(hL) + math.exp(hR))   # 0.5
+piR = math.exp(hR) / (math.exp(hL) + math.exp(hR))   # 0.5
+print("chance of Left:", round(piL, 3))              # 0.5
+
+# it took Left; the loss uses the log-chance of the move actually taken
+logpiL = math.log(piL)                                # -0.6931
+print("log chance of Left:", round(logpiL, 4))        # -0.6931
+loss_term = -logpiL * score                           # 0.6931 * 14.009 = 9.71
+print("loss term:", round(loss_term, 2))              # 9.71
+
+# rate of change of log-chance of Left per dial (softmax): 1-piL on the taken one, -pi on the rest
+rate_hL = 1 - piL                                     #  0.5
+rate_hR = -piR                                        # -0.5
+
+# climb the expected score: push each dial by lr * score * its rate
+hL_new = hL + lr * score * rate_hL                     #  0.07
+hR_new = hR + lr * score * rate_hR                     # -0.07
+print("new dials:", round(hL_new, 4), round(hR_new, 4))   # 0.07 -0.07
+
+# re-read the coin: Left, which scored well, is now more likely than 0.5
+piL_new = math.exp(hL_new) / (math.exp(hL_new) + math.exp(hR_new))
+print("chance of Left now:", round(piL_new, 3))        # 0.535
+```
+
+  Running this code prints:
+
+        chance of Left: 0.5
+        log chance of Left: -0.6931
+        loss term: 9.71
+        new dials: 0.07 -0.07
+        chance of Left now: 0.535
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  the loss -log(pi)*score  = the policy-gradient (REINFORCE) loss, -log pi(a|s) * Q(s,a)
+  the score of a move      = the return Q(s,a) from part 1 (the rewards the move collected)
+  the coin / the odds      = the policy pi(.|s), a probability distribution over moves
+  the preferences hL, hR   = the policy network's raw outputs (logits) before softmax
+  change in p = p*change in log p  = the likelihood-ratio (score-function) trick; grad p = p * grad log p
+  the world's dice vanish  = why transition probabilities drop out of the policy gradient
+  the expected score       = J(theta), the objective policy gradient climbs
+  push down on -score      = gradient ascent on the return, done as descent on its negative
+
+----------------------------------------------------------------------------------------------
+  CHAPTER 23 -- Policy Gradients:
+    [Part 1 -- No Answer Key, Only a Score](return-and-reward-to-go-by-pencil.txt)
+    [Part 2 -- Why the Log Times the Score Turns the Dial] (this post)
+    Next: [Part 3 -- Subtract a Yardstick, Lose No Truth](baseline-and-advantage-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

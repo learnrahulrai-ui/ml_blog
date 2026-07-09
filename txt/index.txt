@@ -9,13 +9,13 @@
   jargon, drawn first as a picture, solved by pencil, then written in code -- with the
   textbook labels stuck on only at the very end. No hype, no frameworks, no JavaScript.
 
-  This is not a pile of loose articles -- it is a short BOOK in twenty-one chapters (sixty-two posts),
+  This is not a pile of loose articles -- it is a short BOOK in twenty-three chapters (sixty-nine posts),
   meant to be read top to bottom. Each post opens with a "post N" path header and a
   next-arrow, so you can read the whole thing front to back without ever hunting for what
   comes next. Each chapter draws its ideas by hand first; the runnable Python is gathered
   at the end of every post, and assumes almost no Python. Appendices tie it together.
 
-  >> NEW HERE? Start at post 1 of 62:
+  >> NEW HERE? Start at post 1 of 69:
      [Guessing House Prices, End to End](posts/chapter1-what-ml-actually-does.txt)
      No prior knowledge required. Just follow the pencil, and follow the next-arrows.
 
@@ -298,6 +298,20 @@
     range vs 298° at inference). Base-frequency scaling fix computed (0.000104 → 0.0000021, ~49x
     slower, 6° vs 298° for gap 50,000). Production recipe: geometry fix + continued training +
     long-range data. Python unrolled for d_model=4, 512-dim loop, all scores verified.
+
+  [SPECIAL. The Window That Drops Its Best Old Match -- Sliding Window Attention by Pencil](posts/sliding-window-attention-by-pencil.txt)
+    special . 2026-07-09 . standalone . transformer, attention, sliding-window, causal-mask, by-hand
+    The companion to the attention post that works the masking it skipped. Full attention costs
+    the square of the row length (100,000 tokens -> 5 billion matches), so cap each token to its
+    last W. Worked on token 5 of six, W=3: its scores against tokens 0..5 come out 9,8,7,2,4,6 --
+    the loudest match, 9, is the OLDEST token. Full attention hands token 0 a 64.1% share; the
+    window strikes tokens 0,1,2 and that same best match drops to 0.0%, thrown away only for
+    being old. The kept-set is two number-line tests (j <= i not-ahead AND j >= i-W+1 not-stale),
+    a band of 3 that slides -- token 5 keeps {3,4,5}. Why strike the SCORE to minus infinity, not
+    the share (e^-inf = 0 keeps the survivors summing to one; zeroing after leaves the blend
+    short). Then the payoff: stacked window-3 layers rebuild the reach two tokens per layer, so
+    five layers see ten back, not three -- local per layer, not local overall -- and the seam
+    where that relay still breaks. Python unrolled, all shares verified.
 
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
     special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand . (also: Chapter 12 intro)
@@ -1003,6 +1017,40 @@
     committee verdict. The slopes promise a fall of 52.3 at step 0.01 but deliver 23.9; at step
     0.0001 they promise 0.523 and deliver 0.5197 -- slopes tell the truth only near where they
     were read. Assumes zero background.
+
+
+  CHAPTER 23 . POLICY GRADIENTS . improving a rule from its own scores, with no answer key anywhere
+  ------------------------------------------------------------------------------------------------------------
+
+  [Part 1 -- No Answer Key, Only a Score](posts/return-and-reward-to-go-by-pencil.txt)
+    post 66/69 . 2026-07-09 . part 1 of 4 . reinforcement-learning, policy-gradient, return, reward-to-go, discount, by-hand
+    The jump from copying an answer key to learning from a bare score. A four-tick run pays
+    rewards 1,2,3,4 with discount 0.9. The blunt whole-run pile stamps 8.146 on every move; the
+    fair reward-to-go charges each move only its own future -- 8.146, 7.94, 6.6, 4 -- folded
+    backward because each score leans on the one after it. Assumes zero background.
+
+  [Part 2 -- Why the Log Times the Score Turns the Dial](posts/reinforce-log-prob-by-pencil.txt)
+    post 67/69 . 2026-07-09 . part 2 of 4 . reinforcement-learning, policy-gradient, reinforce, log-prob, likelihood-ratio, by-hand
+    Why one downhill step on -log(chance)*score turns the coin toward good moves. A 50/50 coin
+    takes Left and scores 14.009; the swap "change in p = p times change in log p" turns climbing
+    the expected score into an average over sampled moves, so the world's own dice differentiate
+    away and vanish. The dials move to 0.07 and -0.07, and Left's chance climbs 0.500 -> 0.535.
+    Assumes zero background.
+
+  [Part 3 -- Subtract a Yardstick, Lose No Truth](posts/baseline-and-advantage-by-pencil.txt)
+    post 68/69 . 2026-07-09 . part 3 of 4 . reinforcement-learning, policy-gradient, baseline, advantage, critic, by-hand
+    Raw score confuses a good move with a good place. Subtract a yardstick V(s): the advantage
+    score-minus-V splits 14.009 and 12.0 into a clean +1.009 and -1.0. Proof the yardstick cannot
+    tilt the average push -- the sum of each move's chance times its dial-rate is 1 - 1 = 0,
+    always. The critic learns V by shrinking a squared miss. Assumes zero background.
+
+  [Part 4 -- Trust the Critic a Little: GAE by Pencil](posts/gae-by-pencil.txt)
+    post 69/69 . 2026-07-09 . part 4 of 4 . reinforcement-learning, policy-gradient, gae, td-error, bias-variance, by-hand
+    Two broken advantages -- the full run honest but noisy, the one-step calm but biased -- blended
+    by a dial. The surprise d = reward + gamma*V(next) - V(here); at the last tick "done" zeroes the
+    reach past the end. GAE folds the surprises backward by gamma*lambda: lambda 0 gives 1.01 (trust
+    the critic), lambda 1 gives 1.91 (trust the run), 0.95 gives 1.8458. Closes Chapter 23.
+    Assumes zero background.
 
 
 ----------------------------------------------------------------------------------------------

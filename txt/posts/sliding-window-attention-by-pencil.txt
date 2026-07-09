@@ -1,0 +1,296 @@
+@title The Window That Drops Its Best Old Match -- Sliding Window Attention by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL -- SLIDING WINDOW ATTENTION BY PENCIL
+  The Window That Drops Its Best Old Match
+  ============================================================================================
+
+
+  Six tokens sit in a row -- six words, say, or six moments in a signal. Each
+  token carries two short rows of numbers, built earlier and here just handed
+  to us: a WANT (what this token is looking for) and a HAVE (what this token
+  offers to the others). One token reads another by dotting its own WANT
+  against the other's HAVE -- multiply the paired numbers, add them -- and the
+  single number that falls out is a match score, large when the WANT and the
+  HAVE line up. A token then rebuilds itself as a blend of the earlier tokens,
+  each weighted by its match score once the scores are turned into shares that
+  add to one. Full attention lets a token match every token at or before it.
+  This post forbids that: it caps how far back a token may look, then follows
+  one token by pencil to see exactly what the cap destroys -- and what,
+  stacked, it hands back.
+
+  -------
+
+  THE COUNT CLIMBS WITH THE SQUARE, WHICH FORCES A CAP
+
+  Count the matches full attention asks for. Token 0 matches 1 token (itself),
+  token 1 matches 2, token 2 matches 3, and so on. Six tokens:
+
+      1 + 2 + 3 + 4 + 5 + 6 = 21 matches
+
+  Push the row to 100,000 tokens and the same triangle is about 5,000,000,000
+  matches. Double the length and the work roughly quadruples -- it grows with
+  the SQUARE of the row length, because each of the T tokens reaches back over
+  about T others. A long document exhausts the machine before it finishes a
+  chapter.
+
+  So cap it. Pick a window size W and forbid any token from matching more than
+  W tokens: itself and the W-1 before it, nothing older. Fix W = 3 for the
+  whole post -- a token may look at itself and the two immediately behind it.
+  Now each token does at most 3 matches instead of climbing with the row, and
+  the total grows in step with the length, not its square. The document fits.
+  The question is what that cap costs, and the cost is not small.
+
+  -------
+
+  TOKEN 5 SCORES SIX TOKENS, THEN THE CAP ERASES THREE
+
+  Follow the last token, token 5. Its WANT and the six HAVE rows are these
+  given numbers:
+
+      WANT of token 5   :  [2, 1]
+
+      HAVE of token 0   :  [4, 1]        HAVE of token 3   :  [0, 2]
+      HAVE of token 1   :  [3, 2]        HAVE of token 4   :  [1, 2]
+      HAVE of token 2   :  [2, 3]        HAVE of token 5   :  [2, 2]
+
+  Token 5 matches each token: dot its WANT [2, 1] against that token's HAVE.
+
+      vs token 0 :  2*4 + 1*1  =  9
+      vs token 1 :  2*3 + 1*2  =  8
+      vs token 2 :  2*2 + 1*3  =  7
+      vs token 3 :  2*0 + 1*2  =  2
+      vs token 4 :  2*1 + 1*2  =  4
+      vs token 5 :  2*2 + 1*2  =  6
+
+  Read those six scores. The loudest by far is token 0, at 9 -- and token 0 is
+  the OLDEST token in the row. The three highest matches (9, 8, 7) all sit at
+  the far back; the three nearest tokens (2, 4, 6) are quieter.
+
+  Turn the scores into shares the standard way -- blow each up by e, divide by
+  the total, so the six shares add to one:
+
+      e^9 = 8103.08   e^8 = 2980.96   e^7 = 1096.63
+      e^2 =    7.389  e^4 =   54.598  e^6 =  403.429
+      total = 12645.7
+
+      share on token 0 = 8103.08 / 12645.7 = 0.641
+      share on token 5 =  403.429 / 12645.7 = 0.032
+
+  Under full attention token 5 becomes 64% token 0. The oldest, loudest match
+  dominates the blend, which is the whole point of full attention: it can reach
+  straight back across the entire row.
+
+  Now drop the cap on. W = 3 means token 5 may keep only token 3, token 4, and
+  token 5 -- itself and the two behind it. Tokens 0, 1, and 2 are struck out,
+  and token 0, the single strongest match in the row, goes with them. Redo the
+  shares over only the survivors:
+
+      survivors : token 3 (e^2 = 7.389), token 4 (e^4 = 54.598), token 5 (e^6 = 403.429)
+      total = 465.416
+
+      share on token 0 = 0            (struck out -- outside the window)
+      share on token 3 = 7.389  / 465.416 = 0.016
+      share on token 4 = 54.598 / 465.416 = 0.117
+      share on token 5 = 403.429 / 465.416 = 0.867
+
+  There it is, worked in numbers: the match that took 64% of token 5's
+  attention now takes 0%. Token 0 was not wrong -- its score was the highest on
+  the page. It was thrown away for one reason only, that it was too old. That
+  is what the cap costs. A token loses its best evidence the instant that
+  evidence drifts more than W-1 steps into the past. Full attention would have
+  leaned almost entirely on token 0; the window leaves token 5 leaning on
+  itself.
+
+  -------
+
+  THE STRIKE-OUT IS TWO NUMBER-LINE TESTS, NOT A DRAWING
+
+  Which tokens survive is not drawn by eye -- it falls out of two comparisons a
+  clerk can run for any pair. For a reader token at position i deciding whether
+  to keep a token at position j, keep it only when BOTH hold:
+
+      j <= i            not ahead:   token i has not reached what comes after it
+      j >= i - W + 1    not stale:   nothing older than W-1 steps back
+
+  Run both tests for every reader across all six positions, W = 3, and the
+  kept-sets come out as a staircase:
+
+      token 0  keeps  {0}                 (i-W+1 = -2, floored at 0)
+      token 1  keeps  {0, 1}
+      token 2  keeps  {0, 1, 2}
+      token 3  keeps  {1, 2, 3}
+      token 4  keeps  {2, 3, 4}
+      token 5  keeps  {3, 4, 5}
+
+  The first three tokens keep everything behind them -- the cap has not bitten
+  yet, because fewer than W tokens exist behind them to drop. From token 3 on,
+  the set is a band of exactly W = 3 that slides forward: as the newest token
+  joins on the right, the oldest falls off the left. Token 3 lets go of token
+  0; token 4 lets go of token 1; token 5 lets go of tokens 0, 1, and 2 at once.
+  The window is not a fixed patch -- it walks.
+
+  -------
+
+  WHY STRIKE TO MINUS-INFINITY AND NOT JUST ZERO THE SHARE
+
+  A struck token must end with 0 share, so a first instinct is to compute all
+  six shares and then set the unwanted three to zero. That breaks the blend.
+  The six full-attention shares add to one; zero out three of them after the
+  fact and the four that remain add to less than one, so token 5's rebuilt row
+  quietly shrinks toward nothing for no reason anyone asked for.
+
+  The fix is to strike earlier -- on the SCORE, before the blow-up. Set the
+  struck scores to minus infinity, then run the same blow-up:
+
+      e raised to minus infinity = 0
+
+  so a struck token contributes exactly 0 to the total and takes exactly 0
+  share, while the survivors divide by a total built only from survivors and so
+  still split a full one between them. The scores token 5 actually blows up are
+
+      [ -inf, -inf, -inf, 2, 4, 6 ]
+
+  giving e-values [0, 0, 0, 7.389, 54.598, 403.429], total 465.416, and shares
+  [0, 0, 0, 0.016, 0.117, 0.867] that add to one across the survivors. Striking
+  the score kills the token cleanly; striking the share afterward would leave a
+  hole in the blend.
+
+  -------
+
+  THE SURVIVORS' GIVES, BLENDED, ARE THE NEW TOKEN
+
+  A token's third given row is its GIVE -- what it actually hands over when it
+  is kept. Token 5's rebuilt row is its survivors' GIVE rows, each scaled by
+  the share just computed. The three survivors give:
+
+      GIVE of token 3 : [2, 0]      share 0.016
+      GIVE of token 4 : [0, 2]      share 0.117
+      GIVE of token 5 : [2, 2]      share 0.867
+
+      out first number  = 0.016*2 + 0.117*0 + 0.867*2 = 1.765
+      out second number = 0.016*0 + 0.117*2 + 0.867*2 = 1.968
+
+  Token 5 comes out as [1.765, 1.968] -- almost exactly its own GIVE of
+  [2, 2], because the window handed 87% of the blend to token 5 itself. That is
+  the shape a capped token takes: mostly its own recent neighbourhood, with the
+  far past gone. Which raises the obvious worry -- if every token is now local,
+  how does a windowed machine ever see far?
+
+  -------
+
+  THE REACH COMES BACK ONE LAYER AT A TIME
+
+  Stack the same window twice. In one window-3 layer, token 5 touches only
+  tokens 3, 4, 5. But token 3, after that same layer, is itself a blend of
+  tokens 1, 2, 3 -- its own window. So when a SECOND window-3 layer has token 5
+  read token 3 again, token 3 now carries tokens 1, 2, 3 folded inside it.
+  Through token 3, token 5 has indirectly reached tokens 1 and 2 -- tokens the
+  window forbade it to touch directly.
+
+  Count the reach as the layers stack, W = 3 so each layer adds W-1 = 2 new
+  tokens of depth:
+
+      after 1 layer :  token 5 reaches back to token 3      (2 back)
+      after 2 layers:  token 5 reaches back to token 1      (4 back)
+      after 3 layers:  token 5 reaches back to token -1     (all 6, floored at 0)
+
+  A window of 3, five layers deep, reaches 2*5 = 10 tokens back -- not 3. The
+  cap is local at each single layer, yet the stack is not local at all: reach
+  grows by a fixed 2 per layer, so any distance is covered by going deep
+  enough. That is the bargain sliding window attention strikes. Each layer pays
+  the cheap bill -- work that grows with the row length, not its square -- and
+  the depth quietly buys back the long reach the cap seemed to throw away.
+
+  What it does NOT buy back is a straight, single-hop path to the far past: the
+  information from token 0 now has to survive being blended and reblended
+  through every layer between, and a detail that matters only to token 5 and
+  nobody in between can be washed out on the way. A capped machine hunting one
+  far-off token across a long gap can lose it. That is the seam where sliding
+  window attention actually breaks -- the reach exists on paper, but only as a
+  relay, never as a direct line.
+
+  -------
+
+  Below, token 5's whole trip in Python -- the six scores, the full-attention
+  shares, the windowed shares with the strike to minus infinity, and the
+  blended output. No loops: every score, every blow-up, every share written on
+  its own line so the arithmetic stays visible.
+
+```python
+import math
+
+# six tokens in a row; each carries a WANT row and a HAVE row (given, 2 numbers each)
+want5 = [2, 1]                       # token 5's WANT
+h0, h1, h2 = [4, 1], [3, 2], [2, 3]  # HAVE rows of the three OLD tokens 0,1,2
+h3, h4, h5 = [0, 2], [1, 2], [2, 2]  # HAVE rows of the three RECENT tokens 3,4,5
+
+# token 5 scores each token: match = WANT . HAVE (pair-multiply, add)
+s0 = 2*4 + 1*1        # 9   token 5 vs token 0  -- the LOUDEST, and the OLDEST
+s1 = 2*3 + 1*2        # 8
+s2 = 2*2 + 1*3        # 7
+s3 = 2*0 + 1*2        # 2
+s4 = 2*1 + 1*2        # 4
+s5 = 2*2 + 1*2        # 6   token 5 vs itself
+print("scores:", s0, s1, s2, s3, s4, s5)
+
+# full attention: keep all six -- blow each up by e, divide by the total -> shares add to 1
+e0 = math.exp(s0)     # e^9 = 8103.08
+e1 = math.exp(s1)     # e^8 = 2980.96
+e2 = math.exp(s2)     # e^7 = 1096.63
+e3 = math.exp(s3)     # e^2 = 7.389
+e4 = math.exp(s4)     # e^4 = 54.598
+e5 = math.exp(s5)     # e^6 = 403.429
+full_total = e0 + e1 + e2 + e3 + e4 + e5
+print("full  share on token 0:", round(e0 / full_total, 3))   # 0.641  -- the far past dominates
+print("full  share on token 5:", round(e5 / full_total, 3))   # 0.032
+
+# window W=3: token 5 keeps only 3,4,5 -- strike 0,1,2 to -inf BEFORE the blow-up
+w0 = math.exp(float("-inf"))   # e^-inf = 0.0   <- token 0 struck out
+w1 = math.exp(float("-inf"))   # 0.0
+w2 = math.exp(float("-inf"))   # 0.0
+w3, w4, w5 = e3, e4, e5        # survivors keep their e-values
+win_total = w0 + w1 + w2 + w3 + w4 + w5
+print("window share on token 0:", round(w0 / win_total, 3))   # 0.0    -- was 0.641
+print("window share on token 3:", round(w3 / win_total, 3))   # 0.016
+print("window share on token 4:", round(w4 / win_total, 3))   # 0.117
+print("window share on token 5:", round(w5 / win_total, 3))   # 0.867
+
+# token 5's new row = its survivors' GIVE rows, blended by those shares
+g3, g4, g5 = [2, 0], [0, 2], [2, 2]     # GIVE rows of tokens 3,4,5
+f3, f4, f5 = w3/win_total, w4/win_total, w5/win_total
+out0 = f3*g3[0] + f4*g4[0] + f5*g5[0]
+out1 = f3*g3[1] + f4*g4[1] + f5*g5[1]
+print("token 5 out:", round(out0, 3), round(out1, 3))         # 1.765 1.968
+```
+
+  Running this code prints:
+
+        scores: 9 8 7 2 4 6
+        full  share on token 0: 0.641
+        full  share on token 5: 0.032
+        window share on token 0: 0.0
+        window share on token 3: 0.016
+        window share on token 4: 0.117
+        window share on token 5: 0.867
+        token 5 out: 1.765 1.968
+
+  The two share-lines for token 0 are the whole story in two numbers: 0.641
+  with the full reach, 0.0 once the window caps it. Everything else -- the
+  sliding band, the strike to minus infinity, the reach rebuilt two tokens per
+  layer -- is machinery around that one drop.
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  WANT / HAVE / GIVE     = query / key / value (Q, K, V); the match WANT.HAVE is the dot product Q_i . K_j
+  match score            = the attention score; real code also divides it by the square root of the row width to keep big rows from blowing up (a fixed shrink, applied to every score, that does not change which positions the window keeps)
+  blow up by e, divide by total  = softmax
+  cap / window           = sliding window attention; W = window size
+  not-ahead test         = causal masking (a token never reads the future)
+  strike to minus infinity  = the mask; setting a score to -inf so e^(-inf) = 0 gives it exactly 0 share
+  reach grows with depth = the receptive field of stacked local layers; L layers of window W reach about L*(W-1) tokens back

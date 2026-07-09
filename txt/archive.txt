@@ -5,7 +5,7 @@
   [home](index.txt) | [about](about.txt) | [archive](archive.txt) | [glossary](glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  ALL POSTS -- a book in 22 chapters (65 posts), plus references and standalone specials,
+  ALL POSTS -- a book in 23 chapters (69 posts), plus references and standalone specials,
   every number worked by hand.
   First time here? [Start from the beginning.](posts/chapter1-what-ml-actually-does.txt)
 
@@ -172,6 +172,14 @@
   post 65   [Part 3 -- Born, Works, Dies -- Then All Twelve Dials Turn](posts/born-works-dies.txt)
 
 
+  CHAPTER 23 -- POLICY GRADIENTS (2026)
+  --------------------------------------
+  post 66   [Part 1 -- No Answer Key, Only a Score](posts/return-and-reward-to-go-by-pencil.txt)
+  post 67   [Part 2 -- Why the Log Times the Score Turns the Dial](posts/reinforce-log-prob-by-pencil.txt)
+  post 68   [Part 3 -- Subtract a Yardstick, Lose No Truth](posts/baseline-and-advantage-by-pencil.txt)
+  post 69   [Part 4 -- Trust the Critic a Little: GAE by Pencil](posts/gae-by-pencil.txt)
+
+
   REFERENCES -- flip-to decoders, one per cluster of chapters
   -----------------------------------------------------------
   ref:      [A. Classification Reference -- Loss, Leash, Grid, and All the Terms](posts/classification-lab.txt)   (companion to Chapter 3)
@@ -191,6 +199,7 @@
   special:  [The Walking Machine and the Vault -- RNN and LSTM by Pencil](posts/rnn-lstm-by-pencil.txt)
   special:  [Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
   special:  [The Mark That Tells a Transformer Where It Is -- Positional Encoding From Scratch](posts/positional-embeddings-from-scratch.txt)
+  special:  [The Window That Drops Its Best Old Match -- Sliding Window Attention by Pencil](posts/sliding-window-attention-by-pencil.txt)
   special:  [The Agent Ladder -- Five Cats, One New Power Each](posts/the-agent-ladder.txt)
   special:  [Transformers With Pencil -- A Whole Block Worked by Hand](posts/transformerforhn.txt)
 

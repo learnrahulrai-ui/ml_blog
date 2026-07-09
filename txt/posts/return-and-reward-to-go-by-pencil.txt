@@ -1,0 +1,170 @@
+@title No Answer Key, Only a Score :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  CHAPTER 23 . POLICY GRADIENTS . PART 1 OF 4
+  No Answer Key, Only a Score
+  ============================================================================================
+
+
+  Every machine built before this one had a right answer sitting next to each input.
+  You showed it a house and the true price was written on the back of the card; you
+  showed it a picture and the true label was stapled to it. The machine guessed, the
+  gap between guess and true answer was the wrongness, and every dial turned to shrink
+  that gap. The answer key did all the teaching.
+
+  Now the answer key is gone. The machine stands in a world, makes a move, and the
+  only thing it ever gets back is a single number that says "that was worth this much"
+  -- and nothing else. No "here is what you should have done." Just a score, paid after
+  the fact. The whole job of this chapter is to turn that bare score into a turn of the
+  dials, with no answer key anywhere. This first part builds the score itself.
+
+  WHAT ONE RUN LOOKS LIKE, DRAWN BEFORE ANYTHING ELSE
+
+  A run is a strip of ticks. At each tick the world shows a situation, the rule picks a
+  move, and the world pays one reward and slides to the next situation:
+
+      tick        0         1         2         3
+      situation  s0   ->   s1   ->   s2   ->   s3   ->  done
+      move       a0        a1        a2        a3
+      reward     r0        r1        r2        r3
+
+  A situation is just where you are. A move is one of the things you can do. A reward
+  is the one number the world hands back the instant you move -- "how good that move
+  was, right now, nothing beyond this tick." The chain s0, a0, r0, s1, a1, r1, ... up
+  to the tick where the world says done is one run.
+
+  Take a run of four ticks whose four rewards came out as
+
+      r0 = 1     r1 = 2     r2 = 3     r3 = 4
+
+  BUT A PER-TICK REWARD CANNOT SCORE A MOVE BY ITSELF
+
+  You want to know whether move a0 was a good move, so that you can make it more likely
+  next time. Its reward r0 = 1 is not the answer: a0 also set up the situation that let
+  r1, r2, r3 be collected. A move is worth the rewards it leads to, not just the one it
+  is paid on the spot. So a move's score must gather the rewards that come AFTER it, not
+  only the one under it.
+
+  Gathering them raises one question first: is a reward three ticks from now worth as
+  much as a reward right now? Treat it as worth a little less. Fix one fraction, call it
+  gamma, and let a reward that lands k ticks later count as gamma multiplied by itself
+  k times of its face value. Here gamma = 0.9, so
+
+      a reward now      counts as   1        of its size
+      a reward 1 later  counts as   0.9      of its size
+      a reward 2 later  counts as   0.81     of its size
+      a reward 3 later  counts as   0.729    of its size
+
+  THE BLUNT SCORE: PILE UP THE WHOLE RUN, ONE NUMBER
+
+  The simplest score adds every reward in the run, each shrunk by gamma for how far
+  off it lands, counting from the start:
+
+      pile = r0 + gamma*r1 + gamma^2*r2 + gamma^3*r3
+           = 1 + 0.9*2 + 0.81*3 + 0.729*4
+           = 1 + 1.8  + 2.43   + 2.916
+           = 8.146
+
+  This blunt version hands that same 8.146 to every move in the run -- one pile, stamped
+  on all four:
+
+      move       a0       a1       a2       a3
+      score     8.146    8.146    8.146    8.146
+
+  It is the same for all four because the sum always starts at tick 0, no matter which
+  move you are scoring. Simple, and it works -- but it is unfair: it credits move a2 for
+  r0 and r1, rewards that were already paid and pocketed BEFORE a2 was ever made. A move
+  cannot have caused a reward that happened before it. So the blunt pile blames every
+  move for the past as well as the future.
+
+  SO GIVE EACH MOVE ONLY WHAT CAME AFTER IT
+
+  Cut the past out. Score each move with only the rewards from its own tick onward:
+
+      score of a3 = r3
+      score of a2 = r2 + gamma*r3
+      score of a1 = r1 + gamma*r2 + gamma^2*r3
+      score of a0 = r0 + gamma*r1 + gamma^2*r2 + gamma^3*r3
+
+  Each row is the row below it, pushed one tick and shrunk by gamma, plus its own
+  reward. That means the cheapest way to fill them is to start at the LAST move and walk
+  backward, each score leaning on the one already found:
+
+      start at the end   :  G3 = r3            = 4
+      one tick back      :  G2 = r2 + 0.9*G3   = 3 + 0.9*4    = 3 + 3.6   = 6.6
+      one tick back      :  G1 = r1 + 0.9*G2   = 2 + 0.9*6.6  = 2 + 5.94  = 7.94
+      one tick back      :  G0 = r0 + 0.9*G1   = 1 + 0.9*7.94 = 1 + 7.146 = 8.146
+
+  which gives, per move,
+
+      move       a0       a1       a2       a3
+      score     8.146    7.94     6.6      4
+
+  Backward, because each score needs the one after it before it can be built. The
+  scores now shrink as you go later in the run -- a3 is near the end, so little future
+  is left to collect, while a0 still has the whole run ahead of it. And a0 lands on
+  8.146, the very same number the blunt pile gave: the first move does see the entire
+  run, so there the two agree exactly. Every move after it gets a smaller, fairer score
+  -- charged for its own future only, never for a past it could not touch.
+
+  Either way, each move now carries a single number -- its score. A big score should
+  make that move more likely the next time its situation comes up; a small score, less
+  likely. But the move was not chosen by hand -- it fell out of a weighted coin, a set
+  of odds the dials produced. Turning "this move scored 7.94" into an actual nudge on
+  those odds is the one move-that-breaks-everything, and it is the whole of part 2.
+
+  -------
+
+  Both scores, run as code -- the blunt pile and the fair reward-to-go, same arithmetic:
+
+```python
+gamma = 0.9
+r0, r1, r2, r3 = 1, 2, 3, 4
+
+# the blunt pile: the whole run, each reward shrunk by gamma per tick, from the start
+S = r0 + gamma*r1 + gamma**2*r2 + gamma**3*r3   # 1 + 1.8 + 2.43 + 2.916 = 8.146
+print("whole-run pile:", round(S, 3))
+
+# the blunt version stamps that same pile on all four moves
+print("array A:", round(S, 3), round(S, 3), round(S, 3), round(S, 3))
+
+# fair score: each move keeps only rewards from its own tick on,
+# folded backward because each score leans on the one after it
+G3 = r3                 # 4
+G2 = r2 + gamma*G3      # 3 + 3.6   = 6.6
+G1 = r1 + gamma*G2      # 2 + 5.94  = 7.94
+G0 = r0 + gamma*G1      # 1 + 7.146 = 8.146
+print("array B:", round(G0, 3), round(G1, 3), round(G2, 3), round(G3, 3))
+```
+
+  Running this code prints:
+
+        whole-run pile: 8.146
+        array A: 8.146 8.146 8.146 8.146
+        array B: 8.146 7.94 6.6 4
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  the score of a move     = the return, written Q(s,a) or G_t; the number a move is worth
+  the blunt whole-run pile = the discounted return (vanilla policy gradient uses this)
+  the fair per-move score  = the reward-to-go: rewards from tick t onward only
+  gamma                    = the discount factor, how much a later reward counts now (0.9 here)
+  a run                    = a trajectory or episode: s0,a0,r0,s1,a1,r1,... up to done
+  a situation / a move     = a state s and an action a
+  done                     = a terminal state; the run ends, terminals[t] = 1
+
+----------------------------------------------------------------------------------------------
+  CHAPTER 23 -- Policy Gradients:
+    [Part 1 -- No Answer Key, Only a Score] (this post)
+    Next: [Part 2 -- Why the Log Times the Score Turns the Dial](reinforce-log-prob-by-pencil.txt)
+
+  <- [Back to all posts](../index.txt)
+----------------------------------------------------------------------------------------------
+
+  [home](../index.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

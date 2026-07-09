@@ -15,14 +15,14 @@
 
       Three ways back onto the path:
 
-        ->  [Start at post 1 of 65](posts/chapter1-what-ml-actually-does.txt)
+        ->  [Start at post 1 of 69](posts/chapter1-what-ml-actually-does.txt)
             Guessing House Prices, End to End. No prior knowledge needed.
 
         ->  [The full archive](archive.txt)
-            Every one of the 65 posts, in order, in one list.
+            Every one of the 69 posts, in order, in one list.
 
         ->  [The front page](index.txt)
-            Twenty-two chapters, top to bottom.
+            Twenty-three chapters, top to bottom.
 
 
   >> If you reached this from a link on the blog itself, that is a real bug --
