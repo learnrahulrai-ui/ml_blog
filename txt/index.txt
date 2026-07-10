@@ -313,6 +313,36 @@
     five layers see ten back, not three -- local per layer, not local overall -- and the seam
     where that relay still breaks. Python unrolled, all shares verified.
 
+  [SPECIAL. The Two Flips That Are Not the Same Flip -- Attention's Shapes by Pencil](posts/the-two-flips-by-pencil.txt)
+    special . 2026-07-10 . standalone . transformer, attention, tensor-shapes, multi-head, by-hand
+    The plumbing companion: attention's arithmetic is easy, but WHERE the numbers sit and how they
+    are re-grouped is where days vanish. One book, three tokens, two lenses, followed from a wide
+    row to a finished row. The projection coefficients live in one shared table, not stapled to the
+    outputs; cutting the wide row into WANT/HAVE/GIVE is scissors, no math; view only draws dividers
+    (width 4 -> 2 lenses of 2), moving nothing. Then the trap: ONE word, "transpose," is two
+    different flips. The re-shelve (transpose(1,2)) swaps the token and lens SHELVES so each lens
+    owns all its tokens; the inside flip (transpose(-2,-1)) stands one lens's grid on its edge,
+    (T,D)->(D,T), so HAVE rows become columns -- the only reason Q @ K-transpose lines up, since the
+    dot eats left-rows against right-columns. A dimension is a counter; a grid appears only when you
+    pin all but two (that is batched matmul). Token COUNT (T) is not token WIDTH (D); after the match
+    the width axis is gone and the share-split runs across tokens. Merge is the re-shelve run
+    backward plus a glue. Full multi-head sliding-window forward, every shape printed, all verified.
+
+  [SPECIAL. Sliding Window Self-Attention, Built From One Pencil And One Page](posts/sliding-window-attention-from-one-pencil.txt)
+    special . 2026-07-10 . standalone . transformer, attention, sliding-window, from-scratch, by-hand
+    Starts from a blank page and a single row of numbers, builds a whole layer with nothing borrowed:
+    nine forced lines, every WHY worked by hand, clear as water down to a last decimal. One shared
+    C-by-3C table makes Q/K/V, and its 3C outputs are outputs not coefficients (why three roles: tie
+    Q=K and every token stares at itself); slices make heads; a query-row dotted with a stood-up
+    key-column makes the T-by-T score grid; root-D tames its spread -- derived in full from
+    expectation and variance (E[X^2]-(E[X])^2, independence E[XY]=E[X]E[Y], one product term variance
+    sigma^4, sum of D adds to D*sigma^4, spread sigma^2*root-D, cancel by root-D); tril + triu carve
+    the causal-plus-window band; a minus-infinity strike beats zero (e^0=1 still counts, worked in
+    numbers); softmax on the last axis splits shares across keys; shares blend value rows;
+    transpose+contiguous+view glue heads back to width C. Plus O(n^2)->O(n*W) by clerk-count and reach
+    ~= L*(W-1) through stacked layers. Every number machine-checked; written with the word "the"
+    banned throughout.
+
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
     special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand . (also: Chapter 12 intro)
     Written for Hacker News, self-contained: why five agent types are a LADDER (each rung =

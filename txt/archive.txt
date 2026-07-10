@@ -200,6 +200,8 @@
   special:  [Attention and the Transformer by Pencil -- Every Word Looks at Every Word](posts/attention-transformer-by-pencil.txt)
   special:  [The Mark That Tells a Transformer Where It Is -- Positional Encoding From Scratch](posts/positional-embeddings-from-scratch.txt)
   special:  [The Window That Drops Its Best Old Match -- Sliding Window Attention by Pencil](posts/sliding-window-attention-by-pencil.txt)
+  special:  [The Two Flips That Are Not the Same Flip -- Attention's Shapes by Pencil](posts/the-two-flips-by-pencil.txt)
+  special:  [Sliding Window Self-Attention, Built From One Pencil And One Page](posts/sliding-window-attention-from-one-pencil.txt)
   special:  [The Agent Ladder -- Five Cats, One New Power Each](posts/the-agent-ladder.txt)
   special:  [Transformers With Pencil -- A Whole Block Worked by Hand](posts/transformerforhn.txt)
 

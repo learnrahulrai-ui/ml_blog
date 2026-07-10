@@ -1,0 +1,370 @@
+@title The Two Flips That Are Not the Same Flip -- Attention's Shapes by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL -- ATTENTION'S SHAPES BY PENCIL
+  The Two Flips That Are Not the Same Flip
+  ============================================================================================
+
+
+  The arithmetic of attention is small and already familiar: a token reads
+  another by dotting two short rows, the dots become shares that add to one,
+  and a token rebuilds itself as a blend of others weighted by those shares.
+  Multiply, add, divide -- nothing a clerk has not done a hundred times. That
+  is not where the days are lost. The days are lost in the plumbing: WHERE the
+  numbers sit, how they get cut and re-grouped before the dot can even run, and
+  one move -- a "flip" -- that shows up twice, spelled the same both times, yet
+  does two entirely different things. Mistake the one for the other and every
+  shape stops making sense.
+
+  So this post touches almost no new arithmetic. It follows a tiny pile of
+  numbers -- one book, three tokens -- from a single wide row to a finished
+  row, and names every re-grouping out loud: what cuts, what only draws a
+  divider, what re-shelves, and which of the two flips is happening. Three
+  tokens, two lenses, numbers small enough to check on a slate.
+
+  -------
+
+  THE COEFFICIENTS LIVE IN ONE MACHINE, NOT ON THE PAPER
+
+  Before any attention, each token's row is grown wider by pouring it through a
+  table of coefficients. The first trap is believing those coefficients ride
+  along with the numbers that come out. They do not.
+
+  Take one token whose row is two numbers, [5, 3]. The table is a grid: as many
+  rows tall as the input is wide (2), as many columns as outputs wanted. Say
+  the first column is [2, 1]. The first output is that column dotted with the
+  token:
+
+      output 0  =  5*2 + 3*1  =  13
+
+  The next output reads the NEXT column, the same token. And here is the part
+  worth burning in: the token that comes out the far side is just a list of
+  outputs -- 13, then the rest -- plain numbers. The coefficients 2 and 1 never
+  left the table. They are not stapled to the 13. Push the next token through,
+  and the next, and every token of every book -- all of them pour through the
+  SAME table. One table on the desk, reused; the paper that comes out holds
+  outputs only.
+
+  Grow a width-C token into a width-3C row this way, in one pour, and that wide
+  row already holds three things stacked side by side: a WANT (what the token
+  seeks), a HAVE (what it offers), a GIVE (what it hands over). From here on the
+  wide row is given; take it as already poured.
+
+  -------
+
+  CUTTING THE WIDE ROW IS SCISSORS, NOT ARITHMETIC
+
+  The wide row is 3C numbers in a line. Splitting it into WANT, HAVE, GIVE is
+  one act only: scissors. Cut the first C off for WANT, the middle C for HAVE,
+  the last C for GIVE. No number is multiplied, none is changed, none is even
+  moved -- the same numbers, three labels. The multiply that made them already
+  happened back in the table. A cut that produces three shorter rows from one
+  long row costs zero clerk-steps.
+
+  For the three tokens, take the WANT, HAVE, and GIVE rows already cut, each C =
+  4 numbers wide:
+
+      token 0   WANT [1,0,2,1]   HAVE [1,0,1,0]   GIVE [2,0,1,3]
+      token 1   WANT [0,1,1,0]   HAVE [0,2,0,1]   GIVE [1,1,0,0]
+      token 2   WANT [1,1,0,2]   HAVE [1,1,1,1]   GIVE [0,2,2,1]
+
+  -------
+
+  DIVIDERS SPLIT A ROW INTO LENSES WITHOUT MOVING A NUMBER
+
+  A lens is one way of looking at a token -- not a different token, the same
+  numbers read through a narrower slot. Two lenses over a width-4 row means each
+  lens gets 2 numbers: lens 0 the first pair, lens 1 the second pair. The act is
+  drawing a divider down the middle of the row. Token 0's WANT:
+
+      [1, 0, 2, 1]   ->   lens 0 : [1, 0]   |   lens 1 : [2, 1]
+
+  Nothing multiplied, nothing moved -- a pencil line between the second and
+  third number. The row was width 4; now the machine reads it as 2 lenses of 2.
+  Written as a shape, the pile of WANT rows goes
+
+      (tokens, width) = (3, 4)   ->   (tokens, lenses, numbers) = (3, 2, 2)
+
+  where the 4 was only re-labelled as 2 x 2. The count of tokens did not
+  change; the width was split. This is the move code writes as view: it inserts
+  dividers, it computes nothing.
+
+  -------
+
+  RESHELVING GIVES EACH LENS ALL ITS TOKENS
+
+  After the dividers, the pile is stacked token first: token 0 holds its two
+  lenses, token 1 holds its two lenses, and so on. But a lens wants to work
+  alone, across ALL tokens at once -- lens 0 needs token 0's, token 1's, and
+  token 2's first pair, gathered. Right now lens 0's numbers are scattered, one
+  pair buried in each token.
+
+  So swap which label comes first. Turn
+
+      book -> token -> lens -> numbers        into        book -> lens -> token -> numbers
+
+  and now lens 0 owns a clean block: all three tokens' first pairs, in order.
+  Not one number was copied or changed -- only the order of the shelves. Lens
+  0's WANT is now a tidy grid, one token per row:
+
+      lens 0 WANT          number 0   number 1
+          token 0    :        1          0
+          token 1    :        0          1
+          token 2    :        1          1
+
+  As a shape, this re-shelving is
+
+      (tokens, lenses, numbers) = (3, 2, 2)   ->   (lenses, tokens, numbers) = (2, 3, 2)
+
+  It reads like a flip, and code even spells it "transpose." Hold that word. It
+  is about to appear a second time, on the same lens, meaning something else.
+
+  -------
+
+  THE SECOND FLIP IS NOT THE FIRST FLIP
+
+  Name the four slots a number sits in, in order: book, token, lens, numbers.
+  The re-shelving just done traded slots 2 and 3 -- token and lens -- deciding
+  which shelf you open first. It shuffled containers. It never touched the
+  little grid inside a lens.
+
+  The flip about to come trades the LAST two slots -- token and numbers -- and
+  it happens INSIDE one lens, on that lens's own grid. Book and lens sit
+  perfectly still; only the grid turns on its side. Watch it on lens 0's HAVE,
+  whose three token-rows are [1,0], [0,2], [1,1]:
+
+      before (token rows, number cols)          after the inside flip (number rows, token cols)
+              n0  n1                                       t0  t1  t2
+      t0  |   1   0                                 n0  |   1   0   1
+      t1  |   0   2                                 n1  |   0   2   1
+      t2  |   1   1
+
+  Same six numbers. Before, each token is a ROW. After, each token is a COLUMN.
+  Nothing rotated in your hand -- the reading slots stayed put; the paper turned
+  under them. As a shape the grid went (tokens, numbers) = (3, 2) to (numbers,
+  tokens) = (2, 3).
+
+  So two flips, one word:
+
+      re-shelve   : trades the token and lens SHELVES; picks which container opens first; no grid turns
+      inside flip : trades the last two slots; turns ONE lens's grid on its side; shelves untouched
+
+  Read them as the same operation and the shapes dissolve into noise. They are
+  not the same operation. One re-orders boxes; the other stands a grid on its
+  edge. The next line needs the second one, and only because of how school
+  multiplication eats its inputs.
+
+  -------
+
+  WHY THE HAVE ROWS MUST STAND UP AS COLUMNS
+
+  A match is one WANT dotted with one HAVE: pair the numbers, multiply, add. The
+  whole table of matches -- every token's WANT against every token's HAVE -- is
+  exactly what row-by-column multiplication produces, but that multiplication
+  has one fixed appetite: it dots a ROW of the left grid against a COLUMN of the
+  right grid. Left rows, right columns.
+
+  The WANT grid already stores each token as a row -- good, those are the rows
+  it will use. The HAVE grid also stores each token as a row -- wrong side. To
+  feed a HAVE as a column, stand it up: the inside flip, turning lens 0's HAVE
+  from (tokens, numbers) into (numbers, tokens) so that each token is now a
+  column. Then WANT (3 rows x 2) meets HAVE-stood-up (2 x 3 columns), the shared
+  width 2 is the pair the dot sums over, and out falls a 3 x 3 table -- one dot
+  per cell:
+
+      lens 0 scores          key t0   key t1   key t2
+          query t0    :        1        0        1
+          query t1    :        0        2        1
+          query t2    :        1        2        2
+
+  Cell (query t2, key t1) is WANT of token 2, [1,1], dotted with HAVE of token
+  1, [0,2]: 1*0 + 1*2 = 2. Skip the stand-up and the two grids are both 3-wide
+  by 2 -- the widths do not even meet, and the multiply is illegal. The flip is
+  not decoration; it is what makes the dot line up at all. (Real code then
+  shrinks every score by the square root of the lens width, 2 here, a fixed
+  divide that changes no cell's rank; the printout below shows the shrunk
+  numbers.)
+
+  -------
+
+  A DIMENSION IS A COUNTER; A GRID APPEARS WHEN YOU PIN ALL BUT TWO
+
+  Nothing above said what a "dimension" is, and the word trips people who read
+  it as "a matrix." A dimension is only a counting direction. The pile has four:
+  book counts books, token counts tokens, lens counts lenses, numbers counts
+  numbers. None of them is a grid.
+
+  A grid appears the moment you PIN every counter but two. Pin book = 0 and lens
+  = 0, and what is left free is token against numbers -- that is one grid, the 3
+  x 2 above. Pin book = 0 and lens = 1, another grid. The match runs on those
+  free-two grids, and the machine simply repeats the identical row-by-column
+  multiply once for every (book, lens) pin. That is all "multiply the last two
+  dimensions" means: freeze the front counters, multiply the grid they leave
+  behind, move the pin. Lens 1 does its own three flips on its own numbers,
+  never touching lens 0.
+
+  -------
+
+  COUNT OF TOKENS IS NOT WIDTH OF A TOKEN
+
+  The scores grid is tokens by tokens -- 3 by 3 -- and the number-axis is gone.
+  It vanished on purpose: it was the shared width the dot summed over, spent in
+  the summing. This is the seam where a wrong word costs an hour. The count of
+  tokens and the width of a token are two different counters: tokens is how many
+  rows sit in the book, numbers is how many marks lie across one row. Before the
+  match, a lens held tokens-by-numbers. After, tokens-by-tokens. Only the token
+  counter survived, now on both sides.
+
+  That is why the share-split runs across a ROW of the scores. One row is one
+  query token looking out at every token it might read; blow each score up by e,
+  divide by that row's total, and the row becomes shares that add to one -- this
+  token's whole attention, parcelled out. The split goes along the token-that-
+  is-being-looked-at, never along a width that no longer exists.
+
+  -------
+
+  THE KEEP-TABLE STRIKES BEFORE THE SPLIT, THEN GIVE IS BLENDED
+
+  A token may not read every token. Two plain tests decide each cell (query i,
+  key j): keep it only when j <= i (not ahead -- no reading the future) and j >=
+  i - W + 1 (not stale -- nothing older than the window W = 2). Run both across
+  the 3 tokens and the keep-table is
+
+      keep          key t0   key t1   key t2
+      query t0  :     1        0        0
+      query t1  :     1        1        0
+      query t2  :     0        1        1
+
+  A struck cell must end with zero share, and the clean way is to strike the
+  SCORE before the blow-up, setting it to minus infinity so that e raised to
+  minus infinity is 0 -- the struck token contributes nothing to the row total
+  and takes nothing, while the survivors still split a full one between them.
+  Query token 1 keeps t0 and t1; its two scores blow up and share out as 0.196
+  and 0.804; the struck t2 takes 0.
+
+  Then the shares finally touch GIVE, the row held in reserve the whole time and
+  never yet multiplied. Token 1's new lens-0 row is its survivors' GIVE, each
+  scaled by its share: 0.196 * GIVE(t0) + 0.804 * GIVE(t1). One ordinary blend,
+  and the lens's output grid is tokens-by-numbers again -- back to the width it
+  started with, its numbers now a weighted mix of the tokens it was allowed to
+  read.
+
+  -------
+
+  GLUING THE LENSES BACK IS THE RE-SHELVE RUN BACKWARD
+
+  Each lens now holds a finished tokens-by-numbers grid, and they sit stacked
+  lens first: lens 0's whole grid, then lens 1's. The wanted answer is one row
+  per token, each token's two lenses laid side by side into a single width-4
+  row. So re-shelve the other way -- swap lens and token back, turning
+
+      book -> lens -> token -> numbers        into        book -> token -> lens -> numbers
+
+  so every token again owns its two lenses. Then pull the divider out: token 0's
+  lens-0 pair and lens-1 pair, written end to end, are one width-4 row again.
+  (Code first calls "contiguous" here, which only tidies the numbers back into a
+  solid block of memory so the divider can be redrawn cleanly -- it changes no
+  value.) The pile leaves exactly as wide as it entered, tokens-by-4, one
+  finished row per token -- every number now carrying a little of the tokens it
+  was allowed to see.
+
+  -------
+
+  Below, the whole trip in one run: the dividers, the re-shelve, the inside
+  flip, the match, the keep-table strike, the share-split, the blend, and the
+  glue back. Every shape is printed at its seam, and the grids are small enough
+  that no number hides -- the arrays print in full.
+
+```python
+import numpy as np
+np.set_printoptions(precision=3, suppress=True)
+
+# THREE tokens in one book. Each token's wide row is already built and handed to us,
+# then cut into WANT (what it seeks), HAVE (what it offers), GIVE (what it hands over).
+# Each row is C = 4 numbers. Nothing here is a weight; these are outputs.
+WANT = np.array([[1,0,2,1], [0,1,1,0], [1,1,0,2]])   # (T=3, C=4)
+HAVE = np.array([[1,0,1,0], [0,2,0,1], [1,1,1,1]])
+GIVE = np.array([[2,0,1,3], [1,1,0,0], [0,2,2,1]])
+T, C, H, D, Wn = 3, 4, 2, 2, 2                        # 2 lenses, 2 numbers each; window 2
+
+# DIVIDERS, no move: cut each token's C=4 row into H=2 lenses of D=2.
+wv = WANT.reshape(T, H, D); kv = HAVE.reshape(T, H, D); vv = GIVE.reshape(T, H, D)
+print("token0 WANT, C=4:", WANT[0].tolist(), "-> two lenses:", wv[0].tolist())
+print("shape after dividers (T,H,D):", wv.shape)
+
+# RESHELVE, no copy: swap the token-axis and the lens-axis so each lens owns all 3 tokens.
+wt = wv.transpose(1,0,2); kt = kv.transpose(1,0,2); vt = vv.transpose(1,0,2)
+print("shape after reshelve (H,T,D):", wt.shape)
+print("lens0 WANT, its 3 token-rows:", wt[0].tolist())
+
+# lens 0. THE INSIDE FLIP is a different flip: stand lens0's HAVE rows up as columns.
+K0T = kt[0].T                                         # (T,D)=(3,2) -> (D,T)=(2,3)
+print("lens0 HAVE rows:", kt[0].tolist(), "-> stood up as columns, shape:", K0T.shape)
+scores0 = (wt[0] @ K0T) / np.sqrt(D)                  # row.column dot -> (T,T)
+print("lens0 scores (T,T), each cell one dot:\n", scores0)
+
+# mask keeps cell (i,j) only when j<=i (not ahead) AND j>=i-Wn+1 (not stale). 1=keep.
+mask = np.array([[1,0,0], [1,1,0], [0,1,1]])
+e = np.exp(np.where(mask==1, scores0, -np.inf))       # struck cells -> e^-inf = 0
+att0 = e / e.sum(axis=1, keepdims=True)               # each row splits one share
+out0 = att0 @ vt[0]                                   # blend lens0 GIVE rows
+print("lens0 weights:\n", att0)
+print("lens0 out (T,D):\n", out0)
+
+# lens 1 runs the very same three flips, on its own numbers.
+e1 = np.exp(np.where(mask==1, (wt[1] @ kt[1].T)/np.sqrt(D), -np.inf))
+out1 = (e1 / e1.sum(axis=1, keepdims=True)) @ vt[1]
+
+# MERGE: (H,T,D) -> reshelve back to (T,H,D) -> glue the two lenses into one C=4 row.
+merged = np.stack([out0, out1]).transpose(1,0,2).reshape(T, C)
+print("final out (T,C):\n", merged)
+```
+
+  Running this code prints:
+
+        token0 WANT, C=4: [1, 0, 2, 1] -> two lenses: [[1, 0], [2, 1]]
+        shape after dividers (T,H,D): (3, 2, 2)
+        shape after reshelve (H,T,D): (2, 3, 2)
+        lens0 WANT, its 3 token-rows: [[1, 0], [0, 1], [1, 1]]
+        lens0 HAVE rows: [[1, 0], [0, 2], [1, 1]] -> stood up as columns, shape: (2, 3)
+        lens0 scores (T,T), each cell one dot:
+         [[0.707 0.    0.707]
+         [0.    1.414 0.707]
+         [0.707 1.414 1.414]]
+        lens0 weights:
+         [[1.    0.    0.   ]
+         [0.196 0.804 0.   ]
+         [0.    0.5   0.5  ]]
+        lens0 out (T,D):
+         [[2.    0.   ]
+         [1.196 0.804]
+         [0.5   1.5  ]]
+        final out (T,C):
+         [[2.    0.    1.    3.   ]
+         [1.196 0.804 0.67  2.009]
+         [0.5   1.5   1.    0.5  ]]
+
+  Two flips carried the whole trip. The re-shelve, swapping which shelf opens
+  first, gathered each lens's tokens into a clean grid; the inside flip, standing
+  one grid on its edge, turned HAVE rows into columns so the dot could line up.
+  Spelled the same, they never did the same job -- and telling them apart is the
+  difference between shapes that follow and shapes that fight.
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  wide row / the machine  = the qkv projection; one shared weight matrix (C x 3C) applied to every token of every batch element; its output row is split into Q, K, V
+  WANT / HAVE / GIVE      = query / key / value (Q, K, V); a match WANT.HAVE is the dot product Q_i . K_j
+  lens                    = one attention head; head_dim (D) is the numbers per lens, and C = H * D across all lenses
+  dividers / view         = reshape that splits width C into (heads, head_dim); moves no data
+  re-shelve / first flip  = transpose(1, 2): swaps the token axis and the head axis, (B,T,H,D) <-> (B,H,T,D); reorders axes, copies nothing
+  inside flip / second flip = transpose(-2, -1): swaps the last two axes of each head's grid, (T,D) <-> (D,T); the ordinary matrix transpose before Q @ K-transpose
+  scores                  = Q @ K-transpose, then divided by the square root of the head width; each cell is one row-by-column dot
+  pin all but two         = batched matmul: the leading axes (batch, head) are looped over, the trailing two are the matrix
+  keep-table / strike to minus infinity = the causal + sliding-window mask; a struck score set to -inf gives e^(-inf) = 0, hence 0 share
+  blow up by e, divide by total = softmax, taken across the key axis (the last one)
+  glue the lenses back    = transpose(1, 2) again, then contiguous().view(B, T, C) to merge heads

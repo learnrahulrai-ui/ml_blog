@@ -1,0 +1,380 @@
+@title Sliding Window Self-Attention, Built From One Pencil And One Page :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL -- SLIDING WINDOW SELF-ATTENTION, FROM ONE PENCIL AND ONE PAGE
+  Nine Lines Forced In Order, Every Why Worked By Hand
+  ============================================================================================
+
+
+  One pencil. One page. Nothing else on a desk -- no computer, no calculator, only marks a
+  hand can make and a clerk can add. From that, pages below build a full sliding-window
+  self-attention layer, one line at a time, each line forced by what came before, every
+  number worked by hand and then checked against a short program at end. No prior page is
+  assumed; each word is fixed where it first appears. Start from a single mark, stop only at
+  a finished layer.
+
+  A first mark: write one row of C numbers. That row is a token -- one position in a
+  sequence, one word, say, turned into C numbers on a page. Write more tokens under it, one
+  row each: T tokens make a block, T rows tall and C numbers wide. Stack B such blocks -- B
+  independent sequences -- and that whole pile is x, shape (B, T, C). Work of a layer:
+  replace each token's row with a new row of C numbers, where each new row blends other
+  tokens' content, and how much of another token enters is decided by content of both.
+  Everything below builds that decision on paper, then spends it.
+
+  -------
+
+  WORDS FIXED ONCE, USED EVERYWHERE BELOW
+
+    token        one position, a row of C numbers.
+    B, T, C      sequence count, tokens per sequence, numbers per token.
+    dot product  of two rows u, w: u.w = u1*w1 + u2*w2 + ... , one number, large when
+                 both rows carry big values in matching slots.
+    Q, K, V      query, key, value: three rows per token, produced next.
+    head         one D-wide slice of a token's row; H heads, C = H*D.
+    softmax      of a row: replace each entry z by e^z (e = 2.718..., always positive),
+                 then divide each by their sum; outputs are positive and add to 1.
+
+  -------
+
+  ONE SHARED WEIGHT TABLE TURNS EACH TOKEN INTO THREE ROLES
+
+  A token arrives as C numbers. One weight matrix W, shape C by 3C, multiplies each token's
+  row: row-out = row-in times W, a row of 3C numbers. Those 3C numbers are outputs, not
+  coefficients -- a multiply already spent W's numbers to make them, and W stays behind on
+  its table for a next token. Same W multiplies every token of every sequence -- one table
+  on a desk, reused, never copied onto any output. Cut that 3C-wide row into three equal
+  C-wide pieces, named Q, K, V:
+
+      Q  what this token seeks
+      K  what this token offers for matching
+      V  content this token hands over if chosen
+
+  Three separate C-blocks from one shared multiply. Cutting spends no arithmetic -- first C
+  numbers become Q, middle C become K, last C become V. Why three roles and not one row
+  reused: a match compares Q of one token against K of another. Tie Q equal to K and a
+  token's match with itself becomes a row multiplied by itself -- largest value possible --
+  so every token stares at itself and output collapses to a copy. Distinct roles need
+  distinct rows, so width grows to 3C and splits three ways.
+
+  Shapes: x is (B, T, C). After one multiply, (B, T, 3C). After cutting, Q, K, V each
+  (B, T, C).
+
+  -------
+
+  MATCHING RUNS PER HEAD, SO EACH ROW SPLITS INTO H SLICES FIRST
+
+  Attention runs H times in parallel on narrower slices, so each token learns H separate
+  matches instead of one. Split a token's width-C row into H pieces of width D, where
+  C = H*D. This split moves no number -- same values, regrouped. Shape (B, T, C) becomes
+  (B, T, H, D).
+
+  Next, gather every token's slice-h together, one block per head. Swap axis 1 (tokens)
+  with axis 2 (heads): (B, T, H, D) becomes (B, H, T, D). No number is copied -- only axis
+  order changes. Now each head owns a clean (T, D) block: T tokens, D numbers each, ready to
+  match alone.
+
+  -------
+
+  A SCORE IS ONE QUERY ROW DOTTED WITH ONE KEY ROW, SO KEYS STAND ON END
+
+  Inside one head, Q is (T, D) and K is (T, D). A match between query token i and key token j
+  is their dot product: q_i . k_j = q_i[1]*k_j[1] + ... + q_i[D]*k_j[D], one number, large
+  when both point alike. A full table of matches -- every query against every key -- is a T
+  by T grid, score[i][j] = q_i . k_j.
+
+  School multiplication builds each grid cell from one row of a left matrix times one column
+  of a right matrix: row against column. Q already stores queries as rows -- correct. K
+  stores keys as rows too -- wrong side for a column. Stand each key on end: flip K from
+  (T, D) to (D, T), so every key becomes a column. Then Q times K-flipped is (T, D) times
+  (D, T) = (T, T): one dot per cell.
+
+  Worked, head 0, four tokens, D = 2. Query row 0 = [1, 0]; key rows = [1,0], [1,1], [0,1],
+  [1,0]. Dots: [1,0].[1,0]=1, [1,0].[1,1]=1, [1,0].[0,1]=0, [1,0].[1,0]=1. Raw scores row 0
+  = [1, 1, 0, 1]. Divide by root-D (reason next): 1 / 1.414 = 0.707, giving
+  [0.707, 0.707, 0, 0.707].
+
+  Shapes: Q is (B, H, T, D), K-flipped is (B, H, D, T), scores is (B, H, T, T). D vanishes --
+  summed inside each dot. H stays -- one T by T grid per head.
+
+  -------
+
+  A WIDE VECTOR MAKES LOUD SCORES, SO DIVIDE EVERY SCORE BY ROOT-D
+
+  A score sums D products. Ask how large a score runs as D grows, treating query and key
+  entries as random. Three definitions, built here, settle it.
+
+  A random value X takes value x with probability p(x), and all p(x) add to 1. Expectation
+  E[X] = sum over x of x*p(x) -- a probability-weighted average, written in square brackets,
+  and unrelated to e in softmax. Variance Var(X) = E[(X - E[X])^2] -- average squared
+  distance from that average, a measure of spread; standard deviation, or spread, = square
+  root of variance.
+
+  Two results drop straight out. First, Var(X) = E[X^2] - (E[X])^2: expand
+  E[(X-m)^2] = E[X^2] - 2m*E[X] + m^2 with m = E[X], and last two terms collapse to -m^2.
+  Second, for independent X and Y -- where a pair's probability p(x,y) = p(x)*p(y) --
+  expectation of a product factors: E[XY] = sum over pairs of x*y*p(x)*p(y) =
+  (sum x*p(x)) * (sum y*p(y)) = E[X]*E[Y], and likewise E[X^2 Y^2] = E[X^2]*E[Y^2].
+
+  Model each entry as mean 0, variance sigma^2, independent. Concrete: five equally likely
+  values -2, -1, 0, 1, 2. Mean = 0. E[X^2] = (4+1+0+1+4)/5 = 2, so sigma^2 = 2 (mean 0 makes
+  Var = E[X^2]).
+
+  One product term t = q[d]*k[d]: E[t] = E[q]*E[k] = 0, and Var(t) = E[t^2] - 0 =
+  E[q^2]*E[k^2] = sigma^2 * sigma^2 = sigma^4. With sigma^2 = 2, that variance is 4.
+
+  A score is a sum of D such terms, independent, each mean 0. Variances of independent terms
+  add: Var(score) = D * sigma^4. For D = 3: 3*4 = 12, spread = root 12 = 3.464. Loud, and
+  louder as D grows, since spread = sigma^2 * root-D.
+
+  Divide every score by root-D: Var(score / root-D) = Var(score) / D = sigma^4, a constant
+  free of D. Spread returns to sigma^2 = 2 for any width. A single divide, applied to every
+  cell, changes no ranking -- only loudness.
+
+  Why loudness matters: a score row next feeds softmax, e^z over a sum of e-values. Large
+  gaps between scores push one share toward 1 and rest toward 0; slope of softmax at a share
+  s equals s*(1 - s), which vanishes as s nears 1, so a pinned share stops teaching its
+  weights during learning. Holding spread near sigma^2 keeps shares soft and slopes alive.
+  Hence root-D, present in code as a divide by root of head width.
+
+  -------
+
+  A WRITER CANNOT READ ITS FUTURE, AND A WINDOW FORBIDS ITS FAR PAST
+
+  Not every token may inform every other. Two rules cut a score grid down. Causal rule:
+  token i may read token j only when j <= i -- no reading a position that comes later.
+  Window rule, size W: token i may read token j only when j >= i - W + 1 -- nothing older
+  than W-1 positions back. Both must hold:
+
+      keep(i, j)  =  (j <= i)  AND  (j >= i - W + 1)
+
+  which leaves a diagonal band of width W.
+
+  Build this band as a grid of 1 (keep) and 0 (block), size T by T. Start all 1. Keep a
+  lower triangle -- torch.tril -- zeroing wherever j > i: kills future. Then keep an upper
+  triangle from a shifted diagonal -- torch.triu with diagonal = -(W-1) -- zeroing wherever
+  j < i - W + 1: kills far past. A negative diagonal argument names a diagonal that many
+  steps below a main diagonal, so -(W-1) permits exactly W-1 steps back.
+
+  Worked, T = 4, W = 2, so diagonal = -1. After tril then triu:
+
+      token 0 keeps {0}
+      token 1 keeps {0, 1}
+      token 2 keeps {1, 2}      (token 0 dropped -- too old)
+      token 3 keeps {2, 3}
+
+  As a grid, rows 1 0 0 0 / 1 1 0 0 / 0 1 1 0 / 0 0 1 1. Row index = query token; column
+  index = key token; a 1 at (i, j) permits query i to read key j.
+
+  -------
+
+  STRIKE BLOCKED SCORES TO MINUS INFINITY, SINCE ZERO WOULD STILL COUNT
+
+  Blocked cells must end with 0 share. Overwrite each blocked score with minus infinity
+  before softmax. Softmax raises e to each score; e raised to minus infinity is 0 (since
+  e^(-x) = 1 / e^x, and e^x grows without bound as x grows). A struck cell then contributes
+  0 to a row sum and takes 0 share, while survivors still split a full 1.
+
+  Zero would fail. A score of 0 is neutral, not blocked: e^0 = 1, so a cell blocked with
+  zero keeps weight 1 and still counts. Numbers, a row keeping only column 0 at score 2:
+
+      minus infinity: e^2, 0, 0 = 7.389, 0, 0   -> / 7.389 -> 1.0, 0, 0      (blocked 0, right)
+      zero          : e^2, 1, 1 = 7.389, 1, 1   -> / 9.389 -> 0.787, 0.107, 0.107  (blocked 10.7%, wrong)
+
+  Only minus infinity gives an exact 0 share.
+
+  In code, a keep-grid marks keep as True. Softmax-fill overwrites where a passed grid is
+  True, so hand it a flip: fill where NOT-keep. That flip is written ~mask. Result: kept
+  cells hold real scores, blocked cells hold minus infinity.
+
+  -------
+
+  SPLIT EACH QUERY ROW INTO SHARES THAT SUM TO ONE, ACROSS KEYS
+
+  A masked score grid is (B, H, T, T): second-to-last axis indexes query tokens (rows), last
+  axis indexes key tokens (columns). Each query token spreads a total attention of 1 across
+  keys it may read. So each row turns into shares summing to 1: replace each score z by e^z,
+  then divide each by that row's sum. Blocked cells at minus infinity give e = 0, so drop
+  out.
+
+  Softmax runs along last axis -- across columns, one row at a time -- because shares must
+  total 1 per query, and keys sit on last axis. In code: dim = -1.
+
+  Worked, a row keeping columns 0 and 1 at scores [0, 0.707]: e^0 = 1, e^0.707 = 2.028,
+  sum = 3.028, shares = [0.330, 0.670, 0, 0]. Positive, adding to 1.
+
+  -------
+
+  SHARES BLEND VALUE ROWS INTO ONE NEW ROW PER QUERY
+
+  Shares now weight values. Inside one head, shares form a (T, T) grid, V is (T, D). New row
+  for query i = sum over keys j of share[i][j] * v_j -- a weighted average of value rows,
+  weights being that query's shares.
+
+  Same result by school multiplication: shares times V is (T, T) times (T, D) = (T, D).
+  Output cell [i][d] = share row i dotted with V column d.
+
+  Worked, head 0, query row 1 shares [0.330, 0.670, 0, 0], value rows v0=[2,0], v1=[1,1],
+  v2=[0,2], v3=[3,1]:
+
+      0.330*[2,0] + 0.670*[1,1] = [0.66 + 0.67, 0 + 0.67] = [1.33, 0.67].
+
+  Query 1 becomes a blend of v0 and v1 only -- value rows query 1 was permitted to read; v2
+  and v3 weigh 0.
+
+  Shapes: shares (B, H, T, T), V (B, H, T, D), output (B, H, T, D). Key axis summed away; D
+  returns, now a mix.
+
+  -------
+
+  HEADS RAN ALONE, SO GLUE THEM BACK INTO ONE WIDTH-C ROW
+
+  Output sits as (B, H, T, D) -- grouped by head. A caller wants one width-C row per token,
+  (B, T, C). Swap axis 1 (heads) with axis 2 (tokens), giving (B, T, H, D) -- grouped by
+  token, each token holding its H heads side by side. Then merge last two axes H and D into
+  one C, since C = H*D: (B, T, H, D) becomes (B, T, C). Each token's H heads of D join into
+  one row of C.
+
+  A swap of axes moves no number; it only relabels stride, leaving memory out of plain row
+  order. A merge that reads memory as one flat row demands plain row order, so a copy into
+  that order comes first (written contiguous(), then view), or one call reshape does that
+  copy when needed.
+
+  Return that (B, T, C). Same shape as input x -- yet each row now carries a blend of tokens
+  a token was permitted to read. Shape made a round trip; content did not.
+
+  -------
+
+  COST CLIMBS WITH TOKEN COUNT SQUARED, WHICH IS WHY A WINDOW EXISTS
+
+  Count clerk-work. A score grid is T by T -- one dot per cell, each dot D long -- so T*T*D
+  multiply-adds per head, per sequence. Double token count and work quadruples: cost climbs
+  with square of T. Memory also holds a T by T grid. A document of 100,000 tokens asks for
+  ten billion cells -- a clerk retires first.
+
+  A window caps each row at W kept cells instead of T, so work falls to T*W*D -- straight in
+  token count, not squared. That cap is why a window exists: full attention cannot afford
+  long inputs.
+
+  -------
+
+  STACKED WINDOWS REACH FAR THOUGH EACH LAYER STAYS NEAR
+
+  A single window-W layer lets token i read only positions i-W+1 to i. Yet stack layers and
+  reach grows. After one layer, token i holds a blend of positions i-(W-1) to i. After a
+  second layer, token i reads those same near neighbours, but each of them already folded in
+  its own window, so token i now depends on i-2(W-1) to i. Each layer adds W-1 of new depth:
+
+      reach after L layers  ~=  L * (W - 1)
+
+  For W = 3, five layers reach 10 tokens back, not 3. Local at a single layer, far once
+  stacked.
+
+  A catch remains, and it matters: this reach is a relay, not a direct wire. A far fact must
+  survive being blended and reblended through every layer between. A lone sharp detail -- an
+  account number no middle token needs -- can wash out across hops. So a windowed model can
+  still miss a needle in a long haystack, even though reach on paper covers it.
+
+  -------
+
+  All nine moves run once below on four tokens, two heads, window two -- every stage
+  printed, plus a short check that a score's spread grows with root-D. No loops: reshape,
+  one matrix multiply per stage, and plain arithmetic.
+
+```python
+import numpy as np, math
+np.set_printoptions(precision=3, suppress=True)
+
+# four tokens, each a width-4 row already split into query Q, key K, value V (given).
+Q = np.array([[1,0, 0,1], [0,1, 1,0], [1,1, 0,0], [0,0, 1,1]])   # (T=4, C=4)
+K = np.array([[1,0, 1,0], [1,1, 0,1], [0,1, 1,1], [1,0, 0,1]])
+V = np.array([[2,0, 1,3], [1,1, 0,0], [0,2, 2,1], [3,1, 1,0]])
+T, C, H, D, Wn = 4, 4, 2, 2, 2                # 2 heads of 2 numbers; window 2
+
+# split width 4 into 2 heads of 2, group each head's four token-rows
+Qh = Q.reshape(T, H, D).transpose(1, 0, 2)   # (H, T, D)
+Kh = K.reshape(T, H, D).transpose(1, 0, 2)
+Vh = V.reshape(T, H, D).transpose(1, 0, 2)
+
+# mask keeps cell (i,j) when j<=i AND j>=i-Wn+1 ; 1 keep, 0 block
+mask = np.array([[1,0,0,0], [1,1,0,0], [0,1,1,0], [0,0,1,1]])
+print("mask:\n", mask)
+
+# head 0, full trace
+s0 = Qh[0] @ Kh[0].T / math.sqrt(D)           # (T,T) scaled scores
+print("head0 scaled scores:\n", s0)
+e0 = np.exp(np.where(mask == 1, s0, -np.inf))  # strike blocked to -inf, then exp
+a0 = e0 / e0.sum(axis=1, keepdims=True)        # softmax across each row (keys)
+print("head0 weights:\n", a0)
+o0 = a0 @ Vh[0]                                # blend value rows
+print("head0 out:\n", o0)
+
+# head 1, same three moves
+e1 = np.exp(np.where(mask == 1, Qh[1] @ Kh[1].T / math.sqrt(D), -np.inf))
+o1 = (e1 / e1.sum(axis=1, keepdims=True)) @ Vh[1]
+
+# merge two heads back into one width-4 row per token
+out = np.stack([o0, o1]).transpose(1, 0, 2).reshape(T, C)
+print("final out (T,C):\n", out)
+
+# why divide scores by sqrt(D): variance of a dot grows with D
+ex2 = ((-2)**2 + (-1)**2 + 0**2 + 1**2 + 2**2) / 5    # E[X^2] on -2..2 = sigma^2
+brick = ex2 * ex2                                      # one product term variance = sigma^4
+d3 = 3 * brick                                         # sum of 3 products, variances add
+print("sigma^2:", ex2, " one-brick var:", brick, " sum-of-3 var:", d3,
+      " spread:", round(math.sqrt(d3), 3), " after /sqrt3:", round(math.sqrt(d3)/math.sqrt(3), 3))
+```
+
+  Running this code prints:
+
+        mask:
+         [[1 0 0 0]
+         [1 1 0 0]
+         [0 1 1 0]
+         [0 0 1 1]]
+        head0 scaled scores:
+         [[0.707 0.707 0.    0.707]
+         [0.    0.707 0.707 0.   ]
+         [0.707 1.414 0.707 0.707]
+         [0.    0.    0.    0.   ]]
+        head0 weights:
+         [[1.   0.   0.   0.  ]
+         [0.33 0.67 0.   0.  ]
+         [0.   0.67 0.33 0.  ]
+         [0.   0.   0.5  0.5 ]]
+        head0 out:
+         [[2.   0.  ]
+         [1.33 0.67]
+         [0.67 1.33]
+         [1.5  1.5 ]]
+        final out (T,C):
+         [[2.    0.    1.    3.   ]
+         [1.33  0.67  0.67  2.009]
+         [0.67  1.33  1.    0.5  ]
+         [1.5   1.5   1.67  0.67 ]]
+        sigma^2: 2.0  one-brick var: 4.0  sum-of-3 var: 12.0  spread: 3.464  after /sqrt3: 2.0
+
+  That final grid is a full layer worked from a blank page: nine lines, each forced by a
+  line before it. One shared multiply makes three roles; slices make heads; a dotted pair
+  makes a score; root-D tames its spread; two triangles carve a band; minus infinity blanks
+  blocked cells; softmax splits shares; shares blend values; a regroup glues heads. Every
+  why sits inside one of those lines -- why three roles, why root-D, why minus infinity over
+  zero, why softmax on last axis, why cost squares, how depth beats a window -- each worked
+  from one pencil and one page, clear as water down to a last decimal.
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+  query / key / value (Q, K, V)  = three linear projections of one input; a match Q_i . K_j is a dot product
+  head                           = one D-wide slice; H heads, C = H*D; multi-head attention runs H matches at once
+  divide by root-D               = scaled dot-product attention; scale holds score variance near 1 as head width grows
+  tril + triu band               = causal plus sliding-window mask; keep i-W+1 <= j <= i
+  minus infinity strike          = masked fill before softmax; e^(-inf) = 0 gives an exact 0 share
+  softmax on last axis (dim=-1)  = normalise across keys, one distribution per query token
+  shares times V                 = attention output; a convex blend of value rows
+  transpose, contiguous, view    = merge heads back to width C
+  cost T*T*D                     = O(n^2) attention; a window cuts it to O(n*W)
+  reach ~= L*(W-1)               = receptive field of L stacked window-W layers
