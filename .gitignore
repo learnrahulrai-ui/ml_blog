@@ -232,4 +232,14 @@ __marimo__/
 *audit*
 *Audit*
 markdownaudti
+# widened 2026-07-10: proprietary rule/report docs live under reports/ and their names
+# carry no "audit" (CHARTER_1950.md, RULES.md, ...), so *audit* missed them and they
+# leaked onto public PRs. Block the whole directory.
+reports/
+# CLAUDE.md holds the private teaching/audit rules -- untracked so it stays off the public repo
+CLAUDE.md
 
+demis_review.md
+cheap_agent.md
+ml_blog.code-workspace
+ops.py
