@@ -343,6 +343,18 @@
     ~= L*(W-1) through stacked layers. Every number machine-checked; written with the word "the"
     banned throughout.
 
+  [SPECIAL. What a Machine Does the Instant You Type "h" -- One Letter, the Whole Machine](posts/what-happens-when-you-type-h.txt)
+    special . 2026-07-12 . standalone . transformer, gpt, nanogpt, forward-pass, by-hand
+    Follows a single letter "h" through the whole forward pass of a GPT: the dictionary lookup to
+    token 71, a meaning-row and a slot-row added into one running strip, then twelve rooms that each
+    do even-out (LayerNorm) -> want/label/payload (Q/K/V) -> match -> share (softmax) -> answer, plus a
+    widen-bend-press (MLP), and a last table that scores every possible next letter. The clean case one
+    letter exposes: with nothing else typed, the look-around has exactly one label to match -- its own
+    -- so the share is always 1 and the answer is the payload unchanged. Attention does nothing; the
+    fixed tables do the work. Every number worked by hand, a hardcoded numpy block verified, then
+    confirmed on real GPT-2 (123M numbers) where "h" -> ".". A jargon map ties every plain term to its
+    textbook name.
+
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
     special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand . (also: Chapter 12 intro)
     Written for Hacker News, self-contained: why five agent types are a LADDER (each rung =

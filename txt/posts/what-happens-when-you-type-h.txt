@@ -1,0 +1,279 @@
+@title What a Machine Does the Instant You Type "h" :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL -- ONE LETTER, THE WHOLE MACHINE
+  What a Machine Does the Instant You Type "h"
+  ============================================================================================
+
+
+  You press one key -- "h" -- and before your finger lifts, a machine has scored every
+  letter and word it knows for what should come next, and bet on one. This follows that
+  single letter through every move the machine makes, a drawing before each step and every
+  number worked in front of you, checked at the end by code and then by the real trained
+  machine itself.
+
+  One letter is the clean case. With nothing else typed yet, the famous "looking around"
+  step has nothing to look at, and does nothing at all. What actually rewrites the letter is
+  a stack of fixed tables, twelve rooms deep. That is easiest to watch with just "h".
+
+  -------
+
+  A MACHINE MULTIPLIES NUMBERS, NOT LETTERS, SO "h" BECOMES A NUMBER
+
+        "h"                 a fixed dictionary, made once and never changed
+         |                  .----------------------.
+         |   look up  --->  |   ...   "g" -> 70     |
+         v                  |         "h" -> 71     |  <- the row for "h"
+        71                  |         "i" -> 72 ... |
+     one integer            '----------------------'
+
+  Nothing about the shape of the letter survives. The dictionary is fixed. "h" is entry 71,
+  and 71 -- a single whole number -- is the entire input from here on.
+
+  -------
+
+  71 IS AN ADDRESS, NOT A MEANING, WHICH FORCES A SECOND LOOKUP
+
+      a tall table: one row per letter or word, every row the same width (four here)
+          row 70 : [  .     .     .     .   ]
+          row 71 : [ 0.5  -1.0   2.0   0.3  ]   <- copied out; this row IS "h"
+          row 72 : [  .     .     .     .   ]
+
+      meaning of "h"  =  [ 0.5  -1.0  2.0  0.3 ]
+
+  71 says which entry, not what it means. So it indexes a tall table with one row per known
+  letter or word, and copies out row 71. Every row is the same width -- four numbers here,
+  four whether the entry is "h" or "cathedral". That copied row is "h" as the machine carries
+  it: a fixed-width strip of numbers.
+
+  -------
+
+  A STRIP WITH NO SENSE OF PLACE IS BLIND, SO A PLACE-STRIP IS ADDED
+
+        meaning strip   [ 0.5  -1.0   2.0   0.3 ]     (which letter)
+      + slot-0 strip    [ ..    ..    ..    ..  ]     (that it sits in slot 0)
+      ---------------------------------------------
+        running strip   [ 0.5  -1.0   2.0   0.3 ]     one strip, added slot by slot
+
+  The strip so far says which letter, never where it sits. So a second table, indexed by
+  slot instead of by letter, hands back a slot-0 strip, and the two are added slot for slot
+  into one running strip. From here only that running strip moves. Its width -- four -- never
+  changes again; every room ahead rewrites the four numbers, never their count. Its numbers
+  are written here as [ 0.5  -1.0  2.0  0.3 ] so every step below can be followed to the last
+  digit.
+
+  -------
+
+  THE RUNNING STRIP IS OFF-CENTER AND WIDE, SO IT IS FIRST EVENED OUT
+
+      before   [ 0.5    -1.0    2.0     0.3  ]     average 0.45, spread wide
+        subtract the average (0.45), divide by the spread (1.064)
+      after    [ 0.047  -1.363  1.457  -0.141 ]   average 0, spread 1
+
+  Before a room touches the strip, the strip is evened out: its average pulled to zero, its
+  spread pulled to one, so no single loud number drowns the rest. The four evened numbers are
+  what the room reads. The running strip itself is left as it was, waiting to have a result
+  added back onto it.
+
+  -------
+
+  ONE EVENED STRIP BECOMES THREE STRIPS: A WANT, A LABEL, A PAYLOAD
+
+      evened strip  [ 0.047  -1.363  1.457  -0.141 ]
+          |  three fixed tables
+          +--> want row     q = [  0.31   -0.291  -0.188   0.583 ]   "what am I after"
+          +--> label row    k = [ -0.268   0.047   0.564   0.094 ]   "what I offer"
+          +--> payload row  v = [ -0.141   0.31   -0.291  -0.611 ]   "what I hand over if picked"
+
+  From the evened strip the room builds three fresh strips, each by its own fixed table: a
+  want strip (what this position is after), a label strip (what it offers to others), and a
+  payload strip (what it hands over when picked). One strip in, three strips out.
+
+  -------
+
+  A WANT MEANS NOTHING ALONE, SO IT IS MATCHED AGAINST A LABEL
+
+      want   [  0.31   -0.291  -0.188   0.583 ]
+      label  [ -0.268   0.047   0.564   0.094 ]
+        multiply slot by slot, add, then divide by 2 (the square root of the width 4):
+        (0.31*-0.268) + (-0.291*0.047) + (-0.188*0.564) + (0.583*0.094) = -0.148
+        -0.148 / 2 = -0.074
+      match score = -0.074
+
+  A want is matched against a label by multiplying the two strips slot for slot and adding --
+  one blended number -- then dividing by two, the square root of the strip's width, so the
+  number does not grow just because the strip is wide. That single number, -0.074, is how
+  strongly this want matches that label.
+
+  -------
+
+  A RAW SCORE CANNOT WEIGH ANYTHING, SO IT IS TURNED INTO A SHARE
+
+      one score  -0.074
+        turn it into a share of the whole:  e^(-0.074) / e^(-0.074)  =  1
+      share = 1
+
+  A match score is turned into a share -- a fraction of a whole, where all the shares add to
+  one. With a single letter typed, exactly one label is present (the letter's own), so there
+  is exactly one score, and one score turned into a share of itself is the whole share: 1.
+
+  -------
+
+  A SHARE OF 1 TIMES THE PAYLOAD IS THE PAYLOAD, SO THE LOOK-AROUND ADDS NOTHING
+
+      share 1  x  payload [ -0.141  0.31  -0.291  -0.611 ]
+      =  answer           [ -0.141  0.31  -0.291  -0.611 ]     the payload, digit for digit
+
+  The share scales the payload strip, and that scaled payload is the look-around's answer,
+  added back onto the running strip. A share of one leaves the payload exactly as it was. So
+  for one letter the look-around hands back the letter's own payload, unchanged -- it looked,
+  found only itself, and moved nothing.
+
+  -------
+
+  THE STRIP STILL NEEDS A PRIVATE RETHINK, SO IT IS WIDENED, BENT, AND PRESSED
+
+      evened strip (4 wide) --widen--> 16 wide --bend each number--> 16 wide --press--> 4 wide
+                                                                            added back onto the running strip
+
+  The room does a second rewrite that reads no other position at all. The evened strip is
+  widened to four times its size, each widened number is bent so the negative ones squash
+  toward zero, and the wide strip is pressed back to four numbers and added onto the running
+  strip. Two rewrites, and the room is finished.
+
+  -------
+
+  ONE ROOM CHANGES LITTLE, SO A REAL MACHINE STACKS TWELVE OF THEM
+
+      running strip -> room 1 -> room 2 -> ... -> room 12 -> even out once more
+
+  Twelve rooms in a row, each with its own fixed tables, the strip out of one feeding the
+  next. Each room is the same pair of rewrites: a look-around added back, then a widen-bend-
+  press added back. After the twelfth, the strip is evened one final time.
+
+  -------
+
+  THE STRIP IS NOT A LETTER, SO A LAST TABLE SCORES EVERY POSSIBLE NEXT LETTER
+
+      final strip (4 wide) --last table--> one score for EVERY entry in the dictionary
+          score("a")  score("b")  ...  score(".")  ...      (tens of thousands of them)
+          the biggest score wins  ->  that entry is the guess
+
+  The four numbers are not yet a letter. A last table turns them into one score for every
+  entry the dictionary holds -- one score per possible next letter or word. The entry with
+  the biggest score is the machine's single guess for what follows.
+
+  -------
+
+  SEAM -- WITH ONLY ONE LETTER, THE LOOK-AROUND NEVER LOOKS
+
+  In every one of the twelve rooms the same thing happens to a lone letter: its want has
+  exactly one label to match -- its own -- so its share is 1, and its answer is its own
+  payload, added back unchanged. The looking-around does no looking. Every real change to the
+  strip comes from the fixed tables and the widen-bend-press, room after room. A letter alone
+  can only stare at itself, so the whole "attention" idea rests, and the plain tables do the
+  work.
+
+  -------
+
+  THE PROOF, EVERY NUMBER SPELLED OUT
+
+  One evened strip, three tables written by hand, the self-match, the share, the answer:
+
+```python
+import numpy as np
+# "h" has already become a row of four numbers (its meaning plus its slot):
+x0, x1, x2, x3 = 0.5, -1.0, 2.0, 0.3
+
+# even out: subtract the average, divide by the spread
+mu  = (x0 + x1 + x2 + x3) / 4.0                                    # 0.45
+var = ((x0-mu)**2 + (x1-mu)**2 + (x2-mu)**2 + (x3-mu)**2) / 4.0    # 1.133
+s   = var**0.5                                                     # 1.064
+a0, a1, a2, a3 = (x0-mu)/s, (x1-mu)/s, (x2-mu)/s, (x3-mu)/s        # 0.047 -1.363 1.457 -0.141
+
+# three rows from that one row, by three fixed tables
+q0 = a0*0.1 + a1*0.0  + a2*0.2 + a3*(-0.1)
+q1 = a0*0.0 + a1*0.3  + a2*0.1 + a3*0.2
+q2 = a0*(-0.2)+a1*0.1 + a2*0.0 + a3*0.3
+q3 = a0*0.2 + a1*(-0.1)+a2*0.3 + a3*0.0
+k0 = a0*0.3 + a1*0.1  + a2*(-0.1)+a3*0.0
+k1 = a0*0.0 + a1*0.2  + a2*0.2 + a3*(-0.2)
+k2 = a0*0.1 + a1*(-0.1)+a2*0.3 + a3*0.1
+k3 = a0*(-0.2)+a1*0.0 + a2*0.1 + a3*0.3
+v0 = a0*0.2 + a1*0.1  + a2*0.0 + a3*0.1
+v1 = a0*0.1 + a1*0.0  + a2*0.2 + a3*(-0.1)
+v2 = a0*0.0 + a1*0.3  + a2*0.1 + a3*0.2
+v3 = a0*(-0.1)+a1*0.2 + a2*(-0.2)+a3*0.3
+
+# the match: want dotted with its own label, divided by 2 (the root of the width 4)
+dot   = q0*k0 + q1*k1 + q2*k2 + q3*k3                              # -0.148
+score = dot / (4.0**0.5)                                          # -0.074
+
+# turning one score into a share always gives 1
+share = np.exp(score) / np.exp(score)
+
+# the answer: that share times the payload row
+o0, o1, o2, o3 = share*v0, share*v1, share*v2, share*v3
+
+print("evened row  =", [round(a0,3), round(a1,3), round(a2,3), round(a3,3)])
+print("want    q   =", [round(q0,3), round(q1,3), round(q2,3), round(q3,3)])
+print("label   k   =", [round(k0,3), round(k1,3), round(k2,3), round(k3,3)])
+print("payload v   =", [round(v0,3), round(v1,3), round(v2,3), round(v3,3)])
+print("match score =", round(float(score),3))
+print("share       =", round(float(share),3))
+print("answer      =", [round(float(o0),3), round(float(o1),3), round(float(o2),3), round(float(o3),3)])
+print("answer equals payload v ?", (o0,o1,o2,o3) == (v0,v1,v2,v3))
+```
+
+  Running this code prints:
+
+```
+evened row  = [0.047, -1.363, 1.457, -0.141]
+want    q   = [0.31, -0.291, -0.188, 0.583]
+label   k   = [-0.268, 0.047, 0.564, 0.094]
+payload v   = [-0.141, 0.31, -0.291, -0.611]
+match score = -0.074
+share       = 1.0
+answer      = [-0.141, 0.31, -0.291, -0.611]
+answer equals payload v ? True
+```
+
+  The answer is the payload, digit for digit. The look-around moved nothing.
+
+  -------
+
+  THE REAL MACHINE, ONE LETTER, ITS ONE GUESS
+
+  Run this same walk on a real trained machine of a hundred and twenty-three million
+  numbers, fed the single letter "h": across all twelve rooms and every look-around, the
+  share comes out 1, exactly as the hand proof says. And its top guess for what follows a
+  lone "h"?
+
+      "h"  ->  "."
+
+  A period. Given one letter and nothing else, the machine bets the sentence is already over.
+
+  -------
+
+  >> NOTE: STANDARD JARGON
+
+  Every plain term above has a textbook name. Here they are, side by side, so the words match
+  what you will read elsewhere.
+
+      strip / row                a vector
+      meaning table (row 71)     the token embedding table (wte); "h" is token id 71
+      slot-strip                 the position embedding (wpe)
+      running strip              the residual stream
+      even out                   LayerNorm (average 0, spread 1)
+      want / label / payload     query (Q) / key (K) / value (V)
+      match score                attention score:  q . k / sqrt(head width)
+      turn into a share          softmax
+      look-around                self-attention
+      widen, bend, press         the MLP: expand to 4x, GELU, project back
+      room                       a transformer block (attention added back, then MLP added back)
+      last table over every entry   the output head (lm_head) over the vocabulary
+      biggest score wins         argmax

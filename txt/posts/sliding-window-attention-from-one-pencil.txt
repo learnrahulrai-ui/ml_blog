@@ -6,7 +6,7 @@
 ----------------------------------------------------------------------------------------------
 
   SPECIAL -- SLIDING WINDOW SELF-ATTENTION, FROM ONE PENCIL AND ONE PAGE
-  Nine Lines Forced In Order, Every Why Worked By Hand
+  Nine Moves Forced In Order, Every Why Worked By Hand
   ============================================================================================
 
 
@@ -56,8 +56,9 @@
   Three separate C-blocks from one shared multiply. Cutting spends no arithmetic -- first C
   numbers become Q, middle C become K, last C become V. Why three roles and not one row
   reused: a match compares Q of one token against K of another. Tie Q equal to K and a
-  token's match with itself becomes a row multiplied by itself -- largest value possible --
-  so every token stares at itself and output collapses to a copy. Distinct roles need
+  token's match with itself becomes a row multiplied by itself -- a sum of squares, never
+  negative -- so a self-match tends to dominate its row, every token leans hard on itself,
+  and output collapses toward a copy. Distinct roles need
   distinct rows, so width grows to 3C and splits three ways.
 
   Shapes: x is (B, T, C). After one multiply, (B, T, 3C). After cutting, Q, K, V each
@@ -119,7 +120,9 @@
   expectation of a product factors: E[XY] = sum over pairs of x*y*p(x)*p(y) =
   (sum x*p(x)) * (sum y*p(y)) = E[X]*E[Y], and likewise E[X^2 Y^2] = E[X^2]*E[Y^2].
 
-  Model each entry as mean 0, variance sigma^2, independent. Concrete: five equally likely
+  Model each entry as mean 0, variance sigma^2, independent -- an idealisation, since Q and K
+  trace to one token through two multiplies, yet close enough in practice that a root-D divide
+  holds spread steady. Concrete: five equally likely
   values -2, -1, 0, 1, 2. Mean = 0. E[X^2] = (4+1+0+1+4)/5 = 2, so sigma^2 = 2 (mean 0 makes
   Var = E[X^2]).
 
@@ -131,8 +134,9 @@
   louder as D grows, since spread = sigma^2 * root-D.
 
   Divide every score by root-D: Var(score / root-D) = Var(score) / D = sigma^4, a constant
-  free of D. Spread returns to sigma^2 = 2 for any width. A single divide, applied to every
-  cell, changes no ranking -- only loudness.
+  free of D. Spread -- square root of that -- settles at sigma^2, a value of 2 here, and no
+  longer climbs as width D grows. A single divide, applied to every cell, changes no ranking
+  -- only loudness.
 
   Why loudness matters: a score row next feeds softmax, e^z over a sum of e-values. Large
   gaps between scores push one share toward 1 and rest toward 0; slope of softmax at a share
@@ -186,9 +190,10 @@
 
   Only minus infinity gives an exact 0 share.
 
-  In code, a keep-grid marks keep as True. Softmax-fill overwrites where a passed grid is
-  True, so hand it a flip: fill where NOT-keep. That flip is written ~mask. Result: kept
-  cells hold real scores, blocked cells hold minus infinity.
+  In code, a keep-grid marks keep as 1 (or True). Two mirror moves land identical: keep a
+  score where a grid says keep else write minus infinity -- numpy's where(keep, score, -inf),
+  used below; or overwrite where NOT-keep -- torch's masked_fill(~keep, -inf), a flip written
+  ~mask. Either way, kept cells hold real scores, blocked cells hold minus infinity.
 
   -------
 
@@ -202,6 +207,12 @@
 
   Softmax runs along last axis -- across columns, one row at a time -- because shares must
   total 1 per query, and keys sit on last axis. In code: dim = -1.
+
+  One guard a real machine needs: e^z overflows once z runs large. Subtract each row's peak
+  score from every entry in that row before raising e -- a shift that divides top and bottom
+  of a share by one same factor, so every share stays exact while no exponent blows up.
+  Blocked cells hold minus infinity still, and minus infinity minus a finite peak stays minus
+  infinity, so a struck cell keeps its 0 share. Tiny scores below need no such guard.
 
   Worked, a row keeping columns 0 and 1 at scores [0, 0.707]: e^0 = 1, e^0.707 = 2.028,
   sum = 3.028, shares = [0.330, 0.670, 0, 0]. Positive, adding to 1.
@@ -246,6 +257,14 @@
   Return that (B, T, C). Same shape as input x -- yet each row now carries a blend of tokens
   a token was permitted to read. Shape made a round trip; content did not.
 
+  One remix still waits in a standard layer. Merged heads sit side by side, each in its own
+  D-wide band, never yet mixed across a band -- head 0's numbers never met head 1's. So a
+  last weight matrix W_o, shape C by C, multiplies that merged row (row-out = merged-row times
+  W_o), letting every head feed every output number. This closing multiply is a twin of an
+  opening C-by-3C table: a plain row-by-column pass, no new rule inside. A demo below stops at
+  a merge and omits W_o, one more plain multiply that adds no fresh mechanic; naming it keeps
+  a full layer honest.
+
   -------
 
   COST CLIMBS WITH TOKEN COUNT SQUARED, WHICH IS WHY A WINDOW EXISTS
@@ -257,7 +276,9 @@
 
   A window caps each row at W kept cells instead of T, so work falls to T*W*D -- straight in
   token count, not squared. That cap is why a window exists: full attention cannot afford
-  long inputs.
+  long inputs. A demo below still forms a whole T by T grid then strikes cells outside a band
+  -- plain on paper, though a production kernel skips blocked cells outright and never pays
+  for them, which is where a window's saving truly lands.
 
   -------
 
@@ -357,13 +378,13 @@ print("sigma^2:", ex2, " one-brick var:", brick, " sum-of-3 var:", d3,
          [1.5   1.5   1.67  0.67 ]]
         sigma^2: 2.0  one-brick var: 4.0  sum-of-3 var: 12.0  spread: 3.464  after /sqrt3: 2.0
 
-  That final grid is a full layer worked from a blank page: nine lines, each forced by a
-  line before it. One shared multiply makes three roles; slices make heads; a dotted pair
-  makes a score; root-D tames its spread; two triangles carve a band; minus infinity blanks
-  blocked cells; softmax splits shares; shares blend values; a regroup glues heads. Every
-  why sits inside one of those lines -- why three roles, why root-D, why minus infinity over
-  zero, why softmax on last axis, why cost squares, how depth beats a window -- each worked
-  from one pencil and one page, clear as water down to a last decimal.
+  That final grid walks a full layer from a blank page, bar one closing W_o remix: nine moves,
+  each forced by a move before it. One shared multiply makes three roles; slices make heads; a
+  dotted pair makes a score; root-D tames its spread; two triangles carve a band; minus
+  infinity blanks blocked cells; softmax splits shares; shares blend values; a regroup glues
+  heads. Every why sits inside one of those moves -- why three roles, why root-D, why minus
+  infinity over zero, why softmax on last axis, why cost squares, how depth beats a window --
+  each worked from one pencil and one page, clear as water down to a last decimal.
 
   -------
 
