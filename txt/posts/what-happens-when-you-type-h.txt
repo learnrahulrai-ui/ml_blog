@@ -1,279 +1,313 @@
-@title What a Machine Does the Instant You Type "h" :: Rahul's ML Blog
+@title What a Machine Does When You Press "h" -- Every Matrix, Forced Into Being :: Rahul's ML Blog
 ==============================================================================================
   RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
 ==============================================================================================
   [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
 ----------------------------------------------------------------------------------------------
 
-  SPECIAL -- ONE LETTER, THE WHOLE MACHINE
-  What a Machine Does the Instant You Type "h"
+  SPECIAL -- ONE KEYPRESS, EVERY MATRIX FORCED INTO BEING
+  What a Machine Does When You Press "h"
   ============================================================================================
 
 
-  You press one key -- "h" -- and before your finger lifts, a machine has scored every
-  letter and word it knows for what should come next, and bet on one. This follows that
-  single letter through every move the machine makes, a drawing before each step and every
-  number worked in front of you, checked at the end by code and then by the real trained
-  machine itself.
+  Press "h". A machine ranks every mark it knows for what follows, and bets one. Below, each
+  operation is forced by a mechanical wall a round earlier hits -- no operation arrives before a
+  wall demands it. Every matrix shown was drawn fresh from a running program, so no number
+  repeats across sections; a person can redo any product with a pencil. Widths are six here, ten
+  marks, twelve rooms. A shipped machine runs six-hundred-plus wide over near fifty-thousand
+  marks, and walks an identical path.
 
-  One letter is the clean case. With nothing else typed yet, the famous "looking around"
-  step has nothing to look at, and does nothing at all. What actually rewrites the letter is
-  a stack of fixed tables, twelve rooms deep. That is easiest to watch with just "h".
 
-  -------
+  --------
+  A KEY-MARK IS A SHAPE, NOT A NUMBER, SO PAIR EACH MARK WITH AN INTEGER ONCE
 
-  A MACHINE MULTIPLIES NUMBERS, NOT LETTERS, SO "h" BECOMES A NUMBER
+      'a' -> 0    'b' -> 1    'c' -> 2    'd' -> 3
+      'e' -> 4    'f' -> 5    'g' -> 6    'h' -> 7
 
-        "h"                 a fixed dictionary, made once and never changed
-         |                  .----------------------.
-         |   look up  --->  |   ...   "g" -> 70     |
-         v                  |         "h" -> 71     |  <- the row for "h"
-        71                  |         "i" -> 72 ... |
-     one integer            '----------------------'
+  Wall: multiplication acts on numbers, and a mark drawn on a key is a shape, so "h" times
+  anything is undefined. A pairing of marks to integers, fixed once, breaks that wall: "h"
+  becomes integer 7. (A shipped machine pins "h" at 71 inside a near-fifty-thousand pairing; 7 is
+  a fact about a chosen pairing, not about "h".) From now, 7 is all a keypress leaves behind.
 
-  Nothing about the shape of the letter survives. The dictionary is fixed. "h" is entry 71,
-  and 71 -- a single whole number -- is the entire input from here on.
 
-  -------
+  --------
+  AN INTEGER NAMES A SHELF BUT CARRIES NO TRAITS, SO PARK A ROW OF NUMBERS PER MARK
 
-  71 IS AN ADDRESS, NOT A MEANING, WHICH FORCES A SECOND LOOKUP
+      table E : ten marks down, six traits across
+      [ -0.76   0.50  -0.11   0.40   0.86   0.07 ]   mark 0
+      [  0.00  -0.77  -0.42  -0.00   0.32   0.55 ]   mark 1
+      [ -0.21  -0.78  -0.38   0.74  -0.52  -0.09 ]   mark 2
+      [  0.78  -0.86   0.18   0.81  -0.49   0.09 ]   mark 3
+      [  0.74  -0.66   0.04   0.45   0.30  -0.06 ]   mark 4
+      [ -0.53  -0.02  -0.23  -0.04  -0.24   0.61 ]   mark 5
+      [  0.48  -0.33   0.13  -0.40  -0.08  -0.26 ]   mark 6
+      [  0.28  -0.23  -0.07   0.39  -0.16   0.73 ]   mark 7  <- "h"
+      [ -0.58   0.43  -0.14  -0.13   0.24   0.04 ]   mark 8
+      [ -0.15  -0.90  -0.73   0.38   0.04   0.35 ]   mark 9
 
-      a tall table: one row per letter or word, every row the same width (four here)
-          row 70 : [  .     .     .     .   ]
-          row 71 : [ 0.5  -1.0   2.0   0.3  ]   <- copied out; this row IS "h"
-          row 72 : [  .     .     .     .   ]
+      read row 7:  e = [ 0.28  -0.23  -0.07  0.39  -0.16  0.73 ]
 
-      meaning of "h"  =  [ 0.5  -1.0  2.0  0.3 ]
+  Wall: 7 is a shelf label, and a label has no size, sign, or trait to grind into a guess. Park a
+  fresh row of six numbers under every mark; reading row 7 hands back six numbers a machine can
+  multiply. A row per mark, a shelf per integer: a lookup table. Row 7 speaks for "h" now.
 
-  71 says which entry, not what it means. So it indexes a tall table with one row per known
-  letter or word, and copies out row 71. Every row is the same width -- four numbers here,
-  four whether the entry is "h" or "cathedral". That copied row is "h" as the machine carries
-  it: a fixed-width strip of numbers.
 
-  -------
+  --------
+  TWO IDENTICAL MARKS AT DIFFERENT SLOTS READ ONE ROW, YET ORDER FLIPS MEANING, SO ADD A SLOT-ROW
 
-  A STRIP WITH NO SENSE OF PLACE IS BLIND, SO A PLACE-STRIP IS ADDED
+      table P : eight slots down, six numbers across
+      [  0.82   0.33  -0.80  -0.34   0.17  -0.48 ]   slot 0
+      [  0.84   0.80   0.63  -0.05   0.61  -0.66 ]   slot 1
+      [ -0.34  -0.07   0.44  -0.03  -0.65  -0.28 ]   slot 2
+      [ -0.32  -0.36  -0.60  -0.15  -0.09   0.49 ]   slot 3
+      [  0.53   0.04  -0.07   0.50   0.70   0.31 ]   slot 4
+      [  0.54   0.79  -0.83   0.68  -0.40  -0.04 ]   slot 5
+      [  0.53   0.39  -0.64   0.29  -0.78  -0.26 ]   slot 6
+      [  0.56  -0.13   0.18   0.41   0.58   0.47 ]   slot 7
 
-        meaning strip   [ 0.5  -1.0   2.0   0.3 ]     (which letter)
-      + slot-0 strip    [ ..    ..    ..    ..  ]     (that it sits in slot 0)
-      ---------------------------------------------
-        running strip   [ 0.5  -1.0   2.0   0.3 ]     one strip, added slot by slot
+      e        = [ 0.28  -0.23  -0.07   0.39  -0.16   0.73 ]   ("h", any slot)
+      + slot 0 = [ 0.82   0.33  -0.80  -0.34   0.17  -0.48 ]   (sits first)
+      -------------------------------------------------------
+      x        = [ 1.10   0.10  -0.87   0.05   0.01   0.25 ]
 
-  The strip so far says which letter, never where it sits. So a second table, indexed by
-  slot instead of by letter, hands back a slot-0 strip, and the two are added slot for slot
-  into one running strip. From here only that running strip moves. Its width -- four -- never
-  changes again; every room ahead rewrites the four numbers, never their count. Its numbers
-  are written here as [ 0.5  -1.0  2.0  0.3 ] so every step below can be followed to the last
-  digit.
+  Wall: "h" first and "h" fifth read one identical row, yet a guesser must part them -- order
+  bends meaning. A second table holds a fresh row per slot; adding slot 0's row onto e stamps
+  position into six numbers. Call a running six-number row x. Length six never budges downstream;
+  values do.
 
-  -------
 
-  THE RUNNING STRIP IS OFF-CENTER AND WIDE, SO IT IS FIRST EVENED OUT
+  --------
+  ONE LOUD COORDINATE DROWNS A PRODUCT, SO CENTER TO ZERO AND DIVIDE BY SPREAD
 
-      before   [ 0.5    -1.0    2.0     0.3  ]     average 0.45, spread wide
-        subtract the average (0.45), divide by the spread (1.064)
-      after    [ 0.047  -1.363  1.457  -0.141 ]   average 0, spread 1
+      u    = [ -0.89  -0.14  -0.07  -0.80   0.07   0.19 ]
+      mean = ( -0.89 -0.14 -0.07 -0.80 +0.07 +0.19 ) / 6 = -0.27
+      spread = root of average squared gap from mean = 0.42
+      norm_i = ( u_i - (-0.27) ) / 0.42
+      norm = [ -1.47   0.32   0.49  -1.26   0.82   1.11 ]
+      check: mean(norm) = 0.00,  spread(norm) = 1.00
 
-  Before a room touches the strip, the strip is evened out: its average pulled to zero, its
-  spread pulled to one, so no single loud number drowns the rest. The four evened numbers are
-  what the room reads. The running strip itself is left as it was, waiting to have a result
-  added back onto it.
+  Wall: a product row-times-matrix sums six terms, and one coordinate at 8.0 beside others near
+  0.1 hijacks every sum -- sign of a result turns hostage to a single loud entry. Center a copy to
+  mean 0, divide by spread, so no coordinate towers over rest. A tiny guard sits under a root
+  against a divide by zero. This flattened copy feeds forward; x waits untouched, to catch a
+  result added on. Name: layer normalization.
 
-  -------
 
-  ONE EVENED STRIP BECOMES THREE STRIPS: A WANT, A LABEL, A PAYLOAD
+  --------
+  ONE POSITION MUST PLAY THREE ROLES AT ONCE, SO ONE WIDE MATRIX CASTS ONE ROW INTO THREE
 
-      evened strip  [ 0.047  -1.363  1.457  -0.141 ]
-          |  three fixed tables
-          +--> want row     q = [  0.31   -0.291  -0.188   0.583 ]   "what am I after"
-          +--> label row    k = [ -0.268   0.047   0.564   0.094 ]   "what I offer"
-          +--> payload row  v = [ -0.141   0.31   -0.291  -0.611 ]   "what I hand over if picked"
+      matrix Wc : six rows, eighteen columns (drawn fresh) -- left six -> q, mid six -> k, right six -> v
+      [  0.59  0.80 -0.67 -0.49  0.29 -0.66 | -0.50  0.13 -0.59  0.51  0.64 -0.84 |  0.06  0.53  0.86 -0.41 -0.60  0.68 ]
+      [  0.74 -0.54 -0.11  0.39  0.62 -0.60 |  0.30  0.55  0.09 -0.60 -0.84 -0.39 |  0.55 -0.82 -0.89 -0.25 -0.79 -0.63 ]
+      [ -0.86  0.04  0.35 -0.13 -0.66 -0.30 |  0.16  0.79  0.89 -0.47 -0.88  0.60 |  0.77 -0.07  0.49  0.66  0.20  0.67 ]
+      [ -0.86 -0.41 -0.40 -0.68  0.74 -0.85 |  0.31 -0.77 -0.25 -0.15 -0.57  0.04 |  0.06 -0.33  0.43 -0.61 -0.55 -0.26 ]
+      [ -0.22 -0.53  0.75  0.59 -0.71 -0.23 | -0.48 -0.09 -0.40  0.00  0.76 -0.21 |  0.27  0.17  0.45 -0.79  0.44  0.80 ]
+      [  0.19 -0.38  0.31  0.38  0.28 -0.64 |  0.85  0.82 -0.14  0.17 -0.83  0.88 |  0.57  0.25  0.47 -0.56 -0.35 -0.46 ]
 
-  From the evened strip the room builds three fresh strips, each by its own fixed table: a
-  want strip (what this position is after), a label strip (what it offers to others), and a
-  payload strip (what it hands over when picked). One strip in, three strips out.
+      feed a normalized row  a = [ 0.17  -0.73  0.71  -0.07  -0.10  -0.71 ]
+      q = a Wc[left]  = [ -1.10   0.91  -0.05  -0.74  -1.05   0.65 ]
+      k = a Wc[mid]   = [ -0.77  -0.34   0.62   0.08   0.65  -0.04 ]
+      v = a Wc[right] = [ -0.28   0.47   0.74   1.10   0.86   1.32 ]
 
-  -------
+      one entry by hand:  q[0] = a . Wc[:,0]
+        = 0.17(0.59) + (-0.73)(0.74) + 0.71(-0.86) + (-0.07)(-0.86) + (-0.10)(-0.22) + (-0.71)(0.19)
+        = -1.10
 
-  A WANT MEANS NOTHING ALONE, SO IT IS MATCHED AGAINST A LABEL
+  Wall: a position must hunt for helpers, advertise to others, and hand out a payout -- three jobs
+  at one instant -- yet it holds one row of six. One wide matrix of eighteen columns, split three
+  ways, casts one row into three fresh rows: a want-row q, an offer-row k, a payout-row v. One
+  product yields all three.
 
-      want   [  0.31   -0.291  -0.188   0.583 ]
-      label  [ -0.268   0.047   0.564   0.094 ]
-        multiply slot by slot, add, then divide by 2 (the square root of the width 4):
-        (0.31*-0.268) + (-0.291*0.047) + (-0.188*0.564) + (0.583*0.094) = -0.148
-        -0.148 / 2 = -0.074
-      match score = -0.074
 
-  A want is matched against a label by multiplying the two strips slot for slot and adding --
-  one blended number -- then dividing by two, the square root of the strip's width, so the
-  number does not grow just because the strip is wide. That single number, -0.074, is how
-  strongly this want matches that label.
+  --------
+  TWO ROWS MUST COLLAPSE INTO ONE AGREEMENT NUMBER, SO MULTIPLY PAIRWISE AND SUM, THEN CANCEL LENGTH
 
-  -------
+      want-row  q = [ 0.33   0.57   0.23  -0.46   0.51  -0.64 ]
+      offer-row k = [ 0.59   0.15  -0.38   0.02   0.23  -0.43 ]
 
-  A RAW SCORE CANNOT WEIGH ANYTHING, SO IT IS TURNED INTO A SHARE
+      pairwise product and sum:
+        0.33(0.59)+0.57(0.15)+0.23(-0.38)+(-0.46)(0.02)+0.51(0.23)+(-0.64)(-0.43)
+        = 0.19 +0.09 -0.09 -0.01 +0.12 +0.28  =  0.58
 
-      one score  -0.074
-        turn it into a share of the whole:  e^(-0.074) / e^(-0.074)  =  1
-      share = 1
+      cancel length:  0.58 / root(6) = 0.58 / 2.45 = 0.24  = agreement number
 
-  A match score is turned into a share -- a fraction of a whole, where all the shares add to
-  one. With a single letter typed, exactly one label is present (the letter's own), so there
-  is exactly one score, and one score turned into a share of itself is the whole share: 1.
+  Wall: a want-row and an offer-row must yield one number rating fit, yet each holds six. Multiply
+  coordinate against coordinate and sum: agreement climbs when signs align, falls when they
+  clash -- a dot product. A longer row inflates that sum by length alone, so divide by root of
+  width; a fit rating must not ride on width. Name: scaled dot-product score.
 
-  -------
 
-  A SHARE OF 1 TIMES THE PAYLOAD IS THE PAYLOAD, SO THE LOOK-AROUND ADDS NOTHING
+  --------
+  AGREEMENT NUMBERS RUN ANY SIGN, YET A BLEND NEEDS POSITIVE WEIGHTS TOTALLING ONE, SO EXPONENTIATE THEN DIVIDE BY SUM
 
-      share 1  x  payload [ -0.141  0.31  -0.291  -0.611 ]
-      =  answer           [ -0.141  0.31  -0.291  -0.611 ]     the payload, digit for digit
+      four fresh agreement numbers:
+      scores = [  0.62  -0.14   0.71   0.60 ]
+      exp    = [  1.86   0.87   2.03   1.82 ]      (exp kills sign, keeps order)
+      sum(exp) = 1.86 + 0.87 + 2.03 + 1.82 = 6.58
+      weights = exp / 6.58 = [ 0.28   0.13   0.31   0.28 ]      sum = 1.00
 
-  The share scales the payload strip, and that scaled payload is the look-around's answer,
-  added back onto the running strip. A share of one leaves the payload exactly as it was. So
-  for one letter the look-around hands back the letter's own payload, unchanged -- it looked,
-  found only itself, and moved nothing.
+      pressing one mark, only one agreement number exists:
+      weight = exp(s) / exp(s) = 1.0        (a quantity over itself)
 
-  -------
+  Wall: agreement numbers run negative and unbounded, yet a blend needs weights that stay positive
+  and total 1 -- raw numbers fail both. Raise e to each (positive always, order kept), divide by a
+  running sum (totals 1). Name: softmax. Feeding one mark, one offer-row exists, so a lone weight
+  equals a quantity over itself, 1 -- always, at every room. No blending choice arrives at length
+  one; a lone mark pulls in only a payout it built.
 
-  THE STRIP STILL NEEDS A PRIVATE RETHINK, SO IT IS WIDENED, BENT, AND PRESSED
 
-      evened strip (4 wide) --widen--> 16 wide --bend each number--> 16 wide --press--> 4 wide
-                                                                            added back onto the running strip
+  --------
+  A WEIGHT OF ONE KEEPS A PAYOUT-ROW WHOLE, YET A SQUARE MATRIX MUST RESHAPE IT BACK INTO A SIX-WIDE STREAM
 
-  The room does a second rewrite that reads no other position at all. The evened strip is
-  widened to four times its size, each widened number is bent so the negative ones squash
-  toward zero, and the wide strip is pressed back to four numbers and added onto the running
-  strip. Two rewrites, and the room is finished.
+      matrix Wo : six rows, six columns (drawn fresh)
+      [ -0.72   0.26  -0.34   0.46   0.08  -0.08 ]
+      [  0.71  -0.80   0.10  -0.31  -0.84   0.46 ]
+      [  0.11   0.71   0.18  -0.29   0.87  -0.69 ]
+      [ -0.81   0.42  -0.23  -0.25   0.68  -0.31 ]
+      [  0.70   0.26  -0.31  -0.79  -0.46   0.84 ]
+      [ -0.17  -0.61  -0.36   0.72  -0.60   0.50 ]
 
-  -------
+      blend (weight 1 times payout-row)  v = [ -0.66   0.83   0.05  -0.82   0.78  -0.26 ]
+      y = v Wo = [ 2.32  -0.78   0.36  -1.17  -1.47   1.18 ]
 
-  ONE ROOM CHANGES LITTLE, SO A REAL MACHINE STACKS TWELVE OF THEM
+  Wall: a weight of 1 leaves a blend equal to a lone mark's payout-row -- no cross-mark mixing, for
+  no other mark exists. Yet a round does not halt. That blend runs through a square matrix Wo,
+  turning [ -0.66 0.83 0.05 -0.82 0.78 -0.26 ] into [ 2.32 -0.78 0.36 -1.17 -1.47 1.18 ]. So a lone
+  mark, with nobody to blend, is reshaped anyway -- by Wo now, an add next, a private reshape soon.
+  No blending at length one, far from idle. Name: output projection.
 
-      running strip -> room 1 -> room 2 -> ... -> room 12 -> even out once more
 
-  Twelve rooms in a row, each with its own fixed tables, the strip out of one feeding the
-  next. Each room is the same pair of rewrites: a look-around added back, then a widen-bend-
-  press added back. After the twelfth, the strip is evened one final time.
+  --------
+  TWELVE ROUNDS OF REWRITING COULD ERASE OR EXPLODE A ROW, SO ADD ONTO A STREAM, NEVER REPLACE
 
-  -------
+      x   = [  0.42   0.04  -0.73  -0.71  -0.63  -0.61 ]
+      y   = [ -0.81  -0.82   0.81  -0.74   0.02  -0.69 ]
+      -------------------------------------------------
+      x+y = [ -0.39  -0.78   0.08  -1.45  -0.61  -1.30 ]
 
-  THE STRIP IS NOT A LETTER, SO A LAST TABLE SCORES EVERY POSSIBLE NEXT LETTER
+  Wall: twelve rounds that overwrite a row could rub out what mark 7 carried, or let numbers
+  balloon past control. Add a round's output onto a running row rather than replace it; a clear
+  road stays open for early numbers to survive twelve rounds, and each round nudges instead of
+  erasing. Name: residual stream.
 
-      final strip (4 wide) --last table--> one score for EVERY entry in the dictionary
-          score("a")  score("b")  ...  score(".")  ...      (tens of thousands of them)
-          the biggest score wins  ->  that entry is the guess
 
-  The four numbers are not yet a letter. A last table turns them into one score for every
-  entry the dictionary holds -- one score per possible next letter or word. The entry with
-  the biggest score is the machine's single guess for what follows.
+  --------
+  BLENDING ACROSS POSITIONS NEVER LETS A LONE ROW REVISE ITSELF, SO WIDEN, BEND EACH, NARROW BACK
 
-  -------
+      matrix Wf : six rows, twenty-four columns (drawn fresh)
+      [ -0.51  0.47  0.79 -0.05 -0.89  0.90 -0.81 -0.20  0.07  0.71  0.58  0.20 -0.18  0.60  0.66  0.67  0.39 -0.72 -0.36 -0.03  0.01  0.60 -0.47  0.30 ]
+      [ -0.23  0.50 -0.55 -0.04 -0.71 -0.52  0.78 -0.33  0.71  0.04 -0.83  0.53 -0.81  0.59 -0.88  0.31 -0.60 -0.28  0.81 -0.02  0.28  0.43 -0.70  0.61 ]
+      [  0.75 -0.62  0.08 -0.39  0.43 -0.85  0.02  0.53  0.42 -0.71  0.60 -0.47  0.55 -0.01 -0.61  0.42  0.55  0.36  0.84 -0.44 -0.48 -0.63  0.07 -0.18 ]
+      [ -0.26 -0.07 -0.41 -0.89 -0.05 -0.40 -0.09  0.77 -0.58  0.25  0.26 -0.39 -0.05  0.85 -0.28  0.38  0.61 -0.25  0.88  0.23  0.00  0.39 -0.14  0.38 ]
+      [ -0.41  0.77  0.08 -0.47 -0.11  0.71  0.55 -0.03 -0.27 -0.22  0.87 -0.70  0.70  0.64 -0.50 -0.27  0.13  0.54  0.81  0.89 -0.39 -0.55 -0.02  0.10 ]
+      [  0.28 -0.71  0.26  0.76  0.75  0.80  0.76  0.83 -0.81  0.75 -0.41 -0.32 -0.07  0.82  0.19 -0.27 -0.23  0.73  0.58 -0.65 -0.45 -0.23 -0.51  0.11 ]
 
-  SEAM -- WITH ONLY ONE LETTER, THE LOOK-AROUND NEVER LOOKS
+      b    = [ -0.46   0.67   0.36   0.64  -0.09   0.03 ]   (a fresh normalized row)
+      wide = b Wf  (twenty-four numbers):
+      [ 0.23 -0.24 -0.96 -0.65  0.09 -1.36  0.82  0.58  0.22 -0.35 -0.53 -0.10 -0.36  0.63 -1.24  0.31 -0.01  0.09  1.52 -0.11  0.03  0.08 -0.33  0.44 ]
 
-  In every one of the twelve rooms the same thing happens to a lone letter: its want has
-  exactly one label to match -- its own -- so its share is 1, and its answer is its own
-  payload, added back unchanged. The looking-around does no looking. Every real change to the
-  strip comes from the fixed tables and the widen-bend-press, room after room. A letter alone
-  can only stare at itself, so the whole "attention" idea rests, and the plain tables do the
-  work.
+      bend each (large positives pass near whole, negatives fold toward 0, every number moves):
+      [ 0.14 -0.10 -0.16 -0.17  0.05 -0.12  0.65  0.42  0.13 -0.13 -0.16 -0.05 -0.13  0.46 -0.13  0.19 -0.01  0.05  1.42 -0.05  0.02  0.04 -0.12  0.30 ]
 
-  -------
+      matrix Pm : twenty-four rows, six columns (drawn fresh) -- first four rows shown, all twenty-four multiply
+      [ -0.50   0.13   0.78   0.63  -0.72  -0.53 ]
+      [ -0.16   0.26  -0.20  -0.45  -0.28  -0.53 ]
+      [  0.65   0.36  -0.16   0.36   0.04   0.05 ]
+      [ -0.24  -0.02   0.87   0.51   0.59  -0.68 ]
+        ... twenty more rows ...
+      m = bend Pm = [ -1.52  -1.63  -0.32   0.07   0.74   0.09 ]
 
-  THE PROOF, EVERY NUMBER SPELLED OUT
+  Wall: blending only mixes across positions, and at length one there are no others, so a lone row
+  can never reconsider itself by itself. Two matrices back to back fold into one matrix, buying
+  nothing. Widen six into twenty-four for elbow room, bend each number so two matrices cannot fold
+  into one, narrow twenty-four back to six to re-enter a stream. Bend name: GELU. Block name:
+  feed-forward.
 
-  One evened strip, three tables written by hand, the self-match, the share, the answer:
+
+  --------
+  ONE ROUND BARELY MOVES A GUESS, SO STACK TWELVE ROOMS, EACH FRESH, AND WATCH A STREAM DRIFT
+
+      in  [ -0.76   0.50  -0.11   0.40   0.86   0.07 ]
+      r 1 [ -1.88  -0.50   0.76   3.87   7.41  -0.71 ]
+      r 2 [ -3.22   0.80   3.39   5.43   5.51   1.15 ]
+      r 3 [ -1.91   3.26   4.87   6.55   0.46  -3.93 ]
+      r 4 [ -4.83  -1.72   4.59   6.89  -0.92  -4.90 ]
+      r 5 [  0.46  -4.82   4.54   9.51  -2.06  -3.50 ]
+      r 6 [ -0.89  -6.77   5.21   7.60  -1.31  -7.34 ]
+      r 7 [ -0.00  -5.60   6.25   6.63   1.34  -8.23 ]
+      r 8 [  8.99 -11.20   5.13   4.60  -0.45  -7.75 ]
+      r 9 [ 12.17 -13.13  -0.28   3.06  -2.03  -6.18 ]
+      r10 [ 12.99 -16.70  -0.64   2.16  -1.90  -7.22 ]
+      r11 [ 10.67 -14.05  -1.59   1.58  -2.81 -11.44 ]
+      r12 [ 12.14 -13.84   0.01   7.92  -5.35 -10.18 ]
+
+  Wall: one round nudges a six-number row a little, far short of a confident guess. Stack twelve
+  rooms, each holding fresh matrices, each a flatten-blend-project-add then flatten-widen-bend-
+  narrow-add. A first coordinate climbs -0.76 -> 12.14, a second falls 0.50 -> -13.84. All that
+  drift came from output projections and private reshapes; at length one no room ever blended
+  across positions. Heavy work, zero blending -- a point missed often. (These twelve rows, and
+  every number below, print from a program shown at close of page.)
+
+
+  --------
+  A SIX-WIDE ROW IS NOT A RANKING OVER MARKS, SO A MATRIX SCORES EVERY MARK, THEN BIGGEST WINS
+
+      flatten a last time:  norm(x) = [ 1.47  -1.32   0.17   1.02  -0.41  -0.93 ]
+
+      matrix Wlm : six rows, ten columns (drawn fresh) -- one column scores one mark
+      [  0.36   0.56  -0.13  -0.38  -0.66   0.77  -0.33   0.31  -0.03   0.62 ]
+      [ -0.31   0.62   0.74   0.61  -0.31  -0.36  -0.13   0.51   0.27  -0.44 ]
+      [ -0.06  -0.47   0.56   0.66  -0.28   0.82   0.02  -0.19  -0.83  -0.30 ]
+      [  0.64   0.39   0.77  -0.84   0.52   0.06   0.80   0.46   0.03   0.28 ]
+      [  0.83  -0.74  -0.53  -0.16  -0.35   0.10   0.18   0.32  -0.88   0.66 ]
+      [ -0.56  -0.74   0.56  -0.50  -0.41  -0.33  -0.49   0.33  -0.58   0.67 ]
+
+      scores = norm(x) Wlm:
+        mark:   0      1      2      3      4      5      6      7      8      9
+             [ 1.76   1.31  -0.59  -1.58   0.44   2.07   0.88  -0.22   0.39   0.84 ]
+                                                        ^ 2.07 biggest, at mark 5
+
+      biggest wins -> next mark = 5
+
+  Wall: six numbers are not a ranking over ten marks. A matrix of six rows and ten columns, one
+  column per mark, turns six numbers into one score per mark. Biggest-wins picks mark 0 here -- a
+  greedy rule. Often a guesser instead softmaxes scores into weights and draws by lot, so a lower
+  mark can surface; wording drifts run to run for that reason. Name of a score matrix: language-
+  model head. And a shipped machine of a hundred-twenty-three-million numbers, fed a lone "h",
+  scores a full stop highest -- betting a sentence is already closed. A fact about one trained
+  machine, not a law.
+
+
+  --------
+  PROOF -- RUN IT, GET THESE NUMBERS
+
+  Every matrix above printed from a running program with fresh draws; a reader reproduces any room
+  by feeding a six-number row through a flatten, a wide matrix cut three ways, a dot over root-six,
+  a softmax (weight 1 at length one), an output matrix, an add, a flatten, a widen, a bend, a
+  narrow, an add. A twelve-room run:
 
 ```python
-import numpy as np
-# "h" has already become a row of four numbers (its meaning plus its slot):
-x0, x1, x2, x3 = 0.5, -1.0, 2.0, 0.3
+import numpy as np, math
+np.random.seed(7)
+R = lambda *s: np.round(np.random.uniform(-0.9, 0.9, s), 2)
+gelu = lambda v: np.array([0.5*z*(1+math.erf(z/math.sqrt(2))) for z in np.ravel(v)])
+flat = lambda v: (v - v.mean()) / math.sqrt(((v - v.mean())**2).mean() + 1e-5)
+D, H = 6, 24
 
-# even out: subtract the average, divide by the spread
-mu  = (x0 + x1 + x2 + x3) / 4.0                                    # 0.45
-var = ((x0-mu)**2 + (x1-mu)**2 + (x2-mu)**2 + (x3-mu)**2) / 4.0    # 1.133
-s   = var**0.5                                                     # 1.064
-a0, a1, a2, a3 = (x0-mu)/s, (x1-mu)/s, (x2-mu)/s, (x3-mu)/s        # 0.047 -1.363 1.457 -0.141
-
-# three rows from that one row, by three fixed tables
-q0 = a0*0.1 + a1*0.0  + a2*0.2 + a3*(-0.1)
-q1 = a0*0.0 + a1*0.3  + a2*0.1 + a3*0.2
-q2 = a0*(-0.2)+a1*0.1 + a2*0.0 + a3*0.3
-q3 = a0*0.2 + a1*(-0.1)+a2*0.3 + a3*0.0
-k0 = a0*0.3 + a1*0.1  + a2*(-0.1)+a3*0.0
-k1 = a0*0.0 + a1*0.2  + a2*0.2 + a3*(-0.2)
-k2 = a0*0.1 + a1*(-0.1)+a2*0.3 + a3*0.1
-k3 = a0*(-0.2)+a1*0.0 + a2*0.1 + a3*0.3
-v0 = a0*0.2 + a1*0.1  + a2*0.0 + a3*0.1
-v1 = a0*0.1 + a1*0.0  + a2*0.2 + a3*(-0.1)
-v2 = a0*0.0 + a1*0.3  + a2*0.1 + a3*0.2
-v3 = a0*(-0.1)+a1*0.2 + a2*(-0.2)+a3*0.3
-
-# the match: want dotted with its own label, divided by 2 (the root of the width 4)
-dot   = q0*k0 + q1*k1 + q2*k2 + q3*k3                              # -0.148
-score = dot / (4.0**0.5)                                          # -0.074
-
-# turning one score into a share always gives 1
-share = np.exp(score) / np.exp(score)
-
-# the answer: that share times the payload row
-o0, o1, o2, o3 = share*v0, share*v1, share*v2, share*v3
-
-print("evened row  =", [round(a0,3), round(a1,3), round(a2,3), round(a3,3)])
-print("want    q   =", [round(q0,3), round(q1,3), round(q2,3), round(q3,3)])
-print("label   k   =", [round(k0,3), round(k1,3), round(k2,3), round(k3,3)])
-print("payload v   =", [round(v0,3), round(v1,3), round(v2,3), round(v3,3)])
-print("match score =", round(float(score),3))
-print("share       =", round(float(share),3))
-print("answer      =", [round(float(o0),3), round(float(o1),3), round(float(o2),3), round(float(o3),3)])
-print("answer equals payload v ?", (o0,o1,o2,o3) == (v0,v1,v2,v3))
+x = R(D)
+print("in ", [round(float(z),2) for z in x])
+for i in range(12):
+    Wc, Wo, Wf, Pm = R(D,3*D), R(D,D), R(D,H), R(H,D)   # fresh room
+    a = flat(x); q,k,v = (a@Wc)[:D], (a@Wc)[D:2*D], (a@Wc)[2*D:]
+    w = math.exp(float(q@k)/math.sqrt(D)) / math.exp(float(q@k)/math.sqrt(D))  # =1 at length one
+    x = x + (w*v) @ Wo                                  # blend, project, add
+    x = x + gelu(flat(x)@Wf) @ Pm                       # widen, bend, narrow, add
+    print(f"r{i+1:>2}", [round(float(z),2) for z in x])
+Wlm = R(D,10)
+print("scores    ", [round(float(z),2) for z in flat(x)@Wlm])
+print("next mark =", int(np.argmax(flat(x)@Wlm)))
 ```
 
-  Running this code prints:
-
-```
-evened row  = [0.047, -1.363, 1.457, -0.141]
-want    q   = [0.31, -0.291, -0.188, 0.583]
-label   k   = [-0.268, 0.047, 0.564, 0.094]
-payload v   = [-0.141, 0.31, -0.291, -0.611]
-match score = -0.074
-share       = 1.0
-answer      = [-0.141, 0.31, -0.291, -0.611]
-answer equals payload v ? True
-```
-
-  The answer is the payload, digit for digit. The look-around moved nothing.
-
-  -------
-
-  THE REAL MACHINE, ONE LETTER, ITS ONE GUESS
-
-  Run this same walk on a real trained machine of a hundred and twenty-three million
-  numbers, fed the single letter "h": across all twelve rooms and every look-around, the
-  share comes out 1, exactly as the hand proof says. And its top guess for what follows a
-  lone "h"?
-
-      "h"  ->  "."
-
-  A period. Given one letter and nothing else, the machine bets the sentence is already over.
-
-  -------
-
-  >> NOTE: STANDARD JARGON
-
-  Every plain term above has a textbook name. Here they are, side by side, so the words match
-  what you will read elsewhere.
-
-      strip / row                a vector
-      meaning table (row 71)     the token embedding table (wte); "h" is token id 71
-      slot-strip                 the position embedding (wpe)
-      running strip              the residual stream
-      even out                   LayerNorm (average 0, spread 1)
-      want / label / payload     query (Q) / key (K) / value (V)
-      match score                attention score:  q . k / sqrt(head width)
-      turn into a share          softmax
-      look-around                self-attention
-      widen, bend, press         the MLP: expand to 4x, GELU, project back
-      room                       a transformer block (attention added back, then MLP added back)
-      last table over every entry   the output head (lm_head) over the vocabulary
-      biggest score wins         argmax
+  Running a program prints a stream drifting room by room, then a mark. Swap these small random
+  matrices for a hundred-twenty-three-million learned ones over a near-fifty-thousand pairing, and
+  an identical path lands a lone "h" on a full stop.

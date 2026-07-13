@@ -343,17 +343,39 @@
     ~= L*(W-1) through stacked layers. Every number machine-checked; written with the word "the"
     banned throughout.
 
-  [SPECIAL. What a Machine Does the Instant You Type "h" -- One Letter, the Whole Machine](posts/what-happens-when-you-type-h.txt)
+  [SPECIAL. What a Machine Does When You Press "h" -- Every Matrix, Forced Into Being](posts/what-happens-when-you-type-h.txt)
     special . 2026-07-12 . standalone . transformer, gpt, nanogpt, forward-pass, by-hand
-    Follows a single letter "h" through the whole forward pass of a GPT: the dictionary lookup to
-    token 71, a meaning-row and a slot-row added into one running strip, then twelve rooms that each
-    do even-out (LayerNorm) -> want/label/payload (Q/K/V) -> match -> share (softmax) -> answer, plus a
-    widen-bend-press (MLP), and a last table that scores every possible next letter. The clean case one
-    letter exposes: with nothing else typed, the look-around has exactly one label to match -- its own
-    -- so the share is always 1 and the answer is the payload unchanged. Attention does nothing; the
-    fixed tables do the work. Every number worked by hand, a hardcoded numpy block verified, then
-    confirmed on real GPT-2 (123M numbers) where "h" -> ".". A jargon map ties every plain term to its
-    textbook name.
+    Presses one letter "h" and walks a GPT forward pass where each operation is forced by a mechanical
+    wall a round earlier hits -- pair a mark to an integer, park a row of numbers per mark, add a slot-
+    row, flatten (LayerNorm), cast one row into want/label/payload by a wide matrix, dot over root-width
+    (score), exponentiate to positive weights totalling one (softmax), an output matrix, a residual add,
+    a widen-bend-narrow (GELU feed-forward), twelve rooms, a score matrix over every mark, biggest wins.
+    At length one a lone mark's weight is a quantity over itself, 1 -- no blending -- yet output matrices
+    and private reshapes drift a strip past 12 and below -13. Every matrix drawn fresh from a running
+    program so no number repeats, full large matrices, a hardcoded numpy block reproduces a twelve-room
+    drift and a guess. Word "the" banned throughout.
+
+  [SPECIAL. What Happens When You Press "h" in a GPT -- A Plain Walkthrough](posts/pressing-h-in-a-gpt-explained.txt)
+    special . 2026-07-13 . standalone . transformer, gpt, nanogpt, forward-pass, explainer
+    The casual, shareable version: one letter "h" through a whole GPT, front to back, in plain English
+    with all the math and a runnable proof. Tokenize to id 71, embed, add position, then twelve blocks
+    of LayerNorm -> Q/K/V from one matrix -> scaled dot-product score -> softmax (a flat 1 for a single
+    token) -> value -> output projection -> residual add, plus a widen/GELU/shrink MLP. The single-token
+    punchline worked out: attention returns the value untouched, yet the running vector still drifts from
+    under 1.0 to past 12 -- so the projections and MLPs do all the lifting. Ends on real GPT-2 (123M),
+    where a lone "h" predicts a full stop. Two short numpy/torch blocks reproduce the toy drift and the
+    real result.
+
+  [SPECIAL. A Note a Machine Keeps So It Stops Redoing Old Work -- KV Cache by Pencil](posts/kv-cache-by-pencil.txt)
+    special . 2026-07-12 . standalone . transformer, kv-cache, autoregressive, inference, by-hand
+    A machine writing one word per turn rebuilds a label-row (word-row through a fixed matrix) for every
+    word every turn, since it keeps no memory between turns -- yet a label-row draws on one word alone,
+    so word1's row prints identical at turn 1, 2, 3. Builds pile as 1+2+3=6 where three rows exist;
+    writing each row once on a note collapses six to three, and 125,250 to 500 across five hundred
+    words. That note is a KV cache. A payload-row (a second matrix) joins it; a want-row (a third) is
+    cast fresh for a newest word and dropped; a note is per-room. Every matrix drawn fresh from a running
+    program, full six-by-six matrices, a hardcoded numpy block reproduces every number. Words "the" and
+    "same" banned throughout.
 
   [SPECIAL. The Agent Ladder -- Five Cats, One New Power Each, From Reflex to Learning](posts/the-agent-ladder.txt)
     special . 2026-06-18 . standalone . ai-agents, planning, utility, learning, by-hand . (also: Chapter 12 intro)

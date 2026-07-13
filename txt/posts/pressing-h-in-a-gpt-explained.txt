@@ -1,0 +1,293 @@
+@title What Happens When You Press "h" in a GPT -- A Plain Walkthrough :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL -- ONE KEYSTROKE, END TO END
+  What Happens When You Press "h" in a GPT
+  ============================================================================================
+
+
+  You press one key, "h", and a language model ranks every token it knows for what should come
+  next and bets on one. I wanted to trace that whole trip, front to back, with real numbers and
+  a bit of proof you can run yourself. No hand-waving, no "and then magic happens." Just a single
+  letter walking through a GPT, one honest arrow at a time.
+
+  I will keep two versions side by side. A toy model, six numbers wide, twelve blocks deep, small
+  enough to check on paper. And real GPT-2 (123 million numbers), so you can see that a toy and a
+  giant run exactly the same path. Let's go.
+
+
+  --------
+  FIRST, "h" IS NOT A NUMBER, SO IT GETS A NUMBER
+
+  Arithmetic works on numbers, and a letter drawn on a key is a shape. So before a model can do
+  anything, it swaps your keystroke for an integer using a fixed lookup that was agreed on once.
+
+  In GPT-2's lookup, "h" maps to token id 71. In my toy, I use a smaller lookup where "h" lands
+  on 7. That integer is all a keypress leaves behind. Worth saying early: tokens are not always
+  single letters -- common chunks like " the" or "ing" get one id each -- but a lone "h" happens
+  to be one token, which keeps this clean.
+
+
+  --------
+  A BARE INTEGER CARRIES NO MEANING, SO IT LOOKS UP A ROW OF NUMBERS
+
+  An id like 71 is just a shelf label. It has no size, no direction, nothing to multiply. So the
+  model keeps a big table with one row of numbers per token, and reads off the row for 71. That
+  row is a vector -- a short list of numbers standing in for what a token means.
+
+  In the toy, six numbers per token. In GPT-2, 768 per token. Reading row 7 in the toy gives:
+
+      e = [ 0.28  -0.23  -0.07  0.39  -0.16  0.73 ]
+
+  That vector is the model's starting picture of "h". This table is called the token embedding.
+
+
+  --------
+  A MODEL ALSO NEEDS TO KNOW WHERE A TOKEN SITS, SO WE ADD A POSITION VECTOR
+
+  Here is a snag: "h" typed first and "h" typed fifth read the very same embedding row, yet order
+  changes meaning. So the model keeps a second table, one row per slot, and adds the row for
+  "position 0" onto our token vector:
+
+      token vector    e   = [ 0.28   -0.23   -0.07   0.39   -0.16   0.73 ]
+      position 0 row      = [ 0.82    0.33   -0.80  -0.34    0.17  -0.48 ]
+      -----------------------------------------------------------------------
+      running vector  x   = [ 1.10    0.10   -0.87   0.05    0.01   0.25 ]
+
+  Now x knows both what the token is and where it sits. Call x the running vector. Its width never
+  changes from here on -- six in the toy, 768 in GPT-2 -- only its numbers change. This is the
+  positional embedding.
+
+
+  --------
+  THE ONE IDEA THAT HOLDS THE WHOLE THING TOGETHER: A RESIDUAL STREAM
+
+  A GPT is a stack of blocks, twelve in the toy and in GPT-2 small. Each block does not overwrite
+  x. It computes a small change and ADDS it back:
+
+      x  <-  x + (whatever this block figured out)
+
+  That "add, do not replace" habit is the residual stream, and it matters. It keeps an open path
+  for early information to survive all twelve blocks, and it lets each block nudge the picture
+  rather than stomp on it. Almost every arrow below ends in "add this onto x."
+
+
+  --------
+  EACH BLOCK STARTS BY TIDYING THE NUMBERS: LAYERNORM
+
+  Before a block multiplies x by anything, it tidies x. Why bother? A matrix multiply sums many
+  terms, and if one coordinate is huge (say 40) next to others near 0.1, that one loud coordinate
+  hijacks every sum and the result becomes hostage to it. So the model centers a copy of x to
+  average 0 and rescales it to spread 1:
+
+      take x, subtract its mean, divide by its spread (with a tiny value added under the root so
+      we never divide by zero)
+
+  Now no single coordinate towers over the rest, and the multiply that follows is well behaved.
+  This is LayerNorm. A block does this twice -- once before attention, once before the MLP -- and
+  there is one more LayerNorm right at the very end. The tidy copy feeds forward; the untidy x
+  waits to receive the result.
+
+
+  --------
+  ATTENTION, PART ONE: ONE MATRIX TURNS x INTO THREE ROLES (Q, K, V)
+
+  A token has to play three parts at once. It has to look for helpers (what am I searching for?),
+  advertise to others (what do I offer?), and hand over content if picked (what do I pass along?).
+  One tidy vector cannot be all three, so the model multiplies it by one wide matrix and slices
+  the output into three vectors:
+
+      query  Q  -- what this token is looking for
+      key    K  -- what this token offers to others
+      value  V  -- what this token hands over if leaned on
+
+  In GPT-2, that one matrix takes 768 numbers to 2304, sliced into three 768-wide vectors. And
+  those three are split further into heads (12 in GPT-2), so several little attention operations
+  run in parallel and get glued back together. Same arithmetic, just chunked.
+
+
+  --------
+  ATTENTION, PART TWO: A SCORE IS A DOT PRODUCT, SCALED
+
+  To decide how much token A should listen to token B, the model compares A's query with B's key.
+  The comparison is a dot product: multiply the two vectors coordinate by coordinate and sum.
+  Bigger sum means better alignment.
+
+  There is a catch: a dot product grows just because the vectors are long, not only because they
+  agree. So the model divides by the square root of the width (sqrt(768) in GPT-2, sqrt(6) in the
+  toy). That keeps scores from ballooning with size. This is the scaled dot-product score, and it
+  is the whole of "attention" in one line:
+
+      score(A, B) = ( Q_A dot K_B ) / sqrt(width)
+
+
+  --------
+  ATTENTION, PART THREE: SOFTMAX, AND A SURPRISE WHEN THERE IS ONLY ONE TOKEN
+
+  Scores can be any sign and any size, but to blend values we want weights that are positive and
+  add up to 1. So we exponentiate each score (e to the power of it, always positive, order
+  preserved) and divide by their total. That is softmax:
+
+      weight = exp(score) / sum of exp(score over all tokens)
+
+  Here is the surprise, and it is the heart of the "single letter" case. When you have typed only
+  "h", there is exactly one token. So there is exactly one score, and softmax over one number is:
+
+      exp(s) / exp(s) = 1
+
+  The weight is 1, every time, in every block, at every head. So attention returns 1 x V -- the
+  token's own value, unchanged. With a single token, attention has nobody to look at and nothing
+  to route. It is, in that specific picture, doing nothing interesting.
+
+  Which raises a fair question: if attention does nothing here, what moves the numbers at all?
+
+
+  --------
+  THE ANSWER: EVEN WITH WEIGHT 1, THE PROJECTIONS AND MLP DO REAL WORK
+
+  Two things keep going even when attention is idle.
+
+  First, the value that attention hands back is immediately multiplied by an output matrix (the
+  output projection) before it is added onto x. So V goes in and a reshaped, mixed version comes
+  out. That already changes the running vector.
+
+  Second, and bigger, comes the MLP.
+
+
+  --------
+  THE MLP: WIDEN, BEND, SHRINK -- AND WHY THE BEND IS NON-NEGOTIABLE
+
+  After attention, each block runs a small feed-forward network on the (tidied) running vector:
+
+      widen:   multiply by a matrix that blows the width up 4x (768 -> 3072 in GPT-2, 6 -> 24 in
+               the toy)
+      bend:    push every number through a smooth curve called GELU (big positives pass nearly
+               unchanged, negatives get folded toward zero, everything moves a little)
+      shrink:  multiply by a matrix that brings the width back down (3072 -> 768)
+
+  Why the bend? Because two matrix multiplies with nothing between them collapse into a single
+  matrix multiply -- you gain no new power. The GELU in the middle is what stops that collapse and
+  lets the network compute something a single matrix never could. Then the result is added onto x.
+  This block does the bulk of the reshaping for a single token.
+
+
+  --------
+  ONE BLOCK BARELY MOVES x, SO WE STACK TWELVE, AND WATCH IT DRIFT
+
+  Now put it together and run all twelve blocks on the toy. Attention returns the value untouched
+  (weight 1), the output projection mixes it, the MLP widens-bends-shrinks it, everything is added
+  back onto x. Here is the running vector as it leaves each block, from a real run of the toy:
+
+      in   [ -0.76   0.50  -0.11   0.40   0.86   0.07 ]
+      1    [ -1.88  -0.50   0.76   3.87   7.41  -0.71 ]
+      2    [ -3.22   0.80   3.39   5.43   5.51   1.15 ]
+      3    [ -1.91   3.26   4.87   6.55   0.46  -3.93 ]
+      4    [ -4.83  -1.72   4.59   6.89  -0.92  -4.90 ]
+      5    [  0.46  -4.82   4.54   9.51  -2.06  -3.50 ]
+      6    [ -0.89  -6.77   5.21   7.60  -1.31  -7.34 ]
+      7    [ -0.00  -5.60   6.25   6.63   1.34  -8.23 ]
+      8    [  8.99 -11.20   5.13   4.60  -0.45  -7.75 ]
+      9    [ 12.17 -13.13  -0.28   3.06  -2.03  -6.18 ]
+      10   [ 12.99 -16.70  -0.64   2.16  -1.90  -7.22 ]
+      11   [ 10.67 -14.05  -1.59   1.58  -2.81 -11.44 ]
+      12   [ 12.14 -13.84   0.01   7.92  -5.35 -10.18 ]
+
+  Look at that. A vector that started with every number under 1.0 in size ends up with numbers
+  past 12 and below -13. It drifted enormously. And remember: at a single token, attention never
+  once blended across positions, because there were no other positions. Every bit of that drift
+  came from output projections and MLPs. That is the real lesson of pressing one key -- the
+  "look-around" part is asleep, and the per-token machinery does all the lifting.
+
+
+  --------
+  FINALLY, TURN x INTO A BET OVER TOKENS
+
+  After the twelfth block, one last LayerNorm tidies x, and then a final matrix scores every token
+  in the vocabulary. In the toy, that matrix is 6 wide by 10 tall (ten possible tokens), so six
+  numbers become ten scores, one per token:
+
+      scores = [ 1.76  1.31  -0.59  -1.58  0.44  2.07  0.88  -0.22  0.39  0.84 ]
+
+  The biggest score is 2.07, at token 5. Pick the biggest and that is the model's guess. This
+  final matrix is the language-model head, and the scores are called logits.
+
+  Two ways to pick the winner. Greedy, which always takes the biggest logit (token 5 here). Or
+  sampling, where the logits are softmaxed into probabilities and one is drawn by weighted lottery,
+  so a slightly lower token can still win. Sampling is why the same prompt can give different
+  wording on different runs.
+
+
+  --------
+  WHAT DOES THE REAL MODEL SAY?
+
+  Run this exact path on actual GPT-2 small (123 million learned numbers), feed it a lone "h", and
+  the token it scores highest is "." -- a full stop. Given one letter and nothing else, the model's
+  single best bet is that a sentence is already over. I love that. It is not a bug and not a deep
+  truth about the letter h; it is just what that particular trained model learned about text that
+  starts with a bare "h" and no context. A different model would bet differently.
+
+
+  --------
+  RUN IT YOURSELF
+
+  Here is the toy, unrolled, so you can reproduce the twelve-block drift and the final guess. It
+  needs only numpy. Every block draws its own small random matrices, tidies, runs attention (whose
+  weight is 1 at a single token), projects, then does the widen-bend-shrink MLP, adding each result
+  back onto the running vector:
+
+```python
+import numpy as np, math
+np.random.seed(7)
+R    = lambda *s: np.round(np.random.uniform(-0.9, 0.9, s), 2)
+gelu = lambda v: np.array([0.5*z*(1+math.erf(z/math.sqrt(2))) for z in np.ravel(v)])
+norm = lambda v: (v - v.mean()) / math.sqrt(((v - v.mean())**2).mean() + 1e-5)
+D, H = 6, 24
+
+x = R(D)
+print("in ", [round(float(z), 2) for z in x])
+for i in range(12):
+    Wc, Wo, Wf, Wp = R(D, 3*D), R(D, D), R(D, H), R(H, D)   # fresh block
+    a = norm(x)
+    q, k, v = (a @ Wc)[:D], (a @ Wc)[D:2*D], (a @ Wc)[2*D:]  # one matrix -> Q, K, V
+    w = math.exp(float(q @ k) / math.sqrt(D)) / math.exp(float(q @ k) / math.sqrt(D))  # =1 for one token
+    x = x + (w * v) @ Wo                                     # attention value, projected, added
+    x = x + gelu(norm(x) @ Wf) @ Wp                          # MLP: widen, bend, shrink, added
+    print(f"blk {i+1:>2}", [round(float(z), 2) for z in x])
+Wlm = R(D, 10)
+logits = norm(x) @ Wlm
+print("logits    ", [round(float(z), 2) for z in logits])
+print("next token =", int(np.argmax(logits)))
+```
+
+  And if you want to watch the giant do it, load real GPT-2 and feed one token:
+
+```python
+import torch, tiktoken
+from transformers import GPT2LMHeadModel
+tok   = tiktoken.get_encoding("gpt2")
+model = GPT2LMHeadModel.from_pretrained("gpt2").eval()
+ids   = torch.tensor([tok.encode("h")])          # "h" -> [71]
+with torch.no_grad():
+    logits = model(ids).logits[0, -1]            # scores over all 50257 tokens
+nxt = int(logits.argmax())
+print("h ->", repr(tok.decode([nxt])))           # -> '.'
+```
+
+
+  --------
+  THE WHOLE TRIP IN ONE BREATH
+
+  Press "h". It becomes token 71. Token 71 reads a row of numbers. A position row is added on. Then
+  twelve blocks, each one: tidy (LayerNorm), split into query/key/value with one matrix, score by
+  scaled dot product, softmax into weights (which is a flat 1 when there is only one token), pull
+  the value, project it, add it back; then tidy again, widen 4x, bend with GELU, shrink, add back.
+  One last tidy, one last matrix, and you have a score for every token. Take the biggest (or sample)
+  and that is the next token. On real GPT-2, a lone "h" comes out as a full stop.
+
+  No magic. Just a lookup, a lot of matrix multiplies, one nonlinearity that earns its keep, and a
+  running vector that everything politely adds onto. Once you have watched a single letter make the
+  trip, every prompt you type after is the same machine, only wider and with more company.
