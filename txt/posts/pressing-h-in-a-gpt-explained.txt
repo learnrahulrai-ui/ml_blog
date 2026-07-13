@@ -59,17 +59,20 @@
       running vector  x   = [ 1.10    0.10   -0.87   0.05    0.01   0.25 ]
 
   Now x knows both what the token is and where it sits. Call x the running vector. Its width never
-  changes from here on -- six in the toy, 768 in GPT-2 -- only its numbers change. This is the
-  positional embedding.
+  changes from here on -- six in the toy, 768 in GPT-2 -- only its numbers change. (Blocks will
+  build wider scratch copies internally, as the MLP section shows, but what they add back onto x
+  always matches this width.) This is the positional embedding.
 
 
   --------
   THE ONE IDEA THAT HOLDS THE WHOLE THING TOGETHER: A RESIDUAL STREAM
 
   A GPT is a stack of blocks, twelve in the toy and in GPT-2 small. Each block does not overwrite
-  x. It computes a small change and ADDS it back:
+  x. It computes a small change and ADDS it back -- twice per block, in fact, once with what
+  attention found and once with what the MLP computed:
 
-      x  <-  x + (whatever this block figured out)
+      x  <-  x + (what attention figured out)
+      x  <-  x + (what the MLP figured out)
 
   That "add, do not replace" habit is the residual stream, and it matters. It keeps an open path
   for early information to survive all twelve blocks, and it lets each block nudge the picture
@@ -98,16 +101,40 @@
 
   A token has to play three parts at once. It has to look for helpers (what am I searching for?),
   advertise to others (what do I offer?), and hand over content if picked (what do I pass along?).
-  One tidy vector cannot be all three, so the model multiplies it by one wide matrix and slices
-  the output into three vectors:
+  One vector cannot play all three parts as-is, so the model learns three different views of the
+  same vector: it multiplies x by one wide matrix and slices the output into three:
 
       query  Q  -- what this token is looking for
       key    K  -- what this token offers to others
       value  V  -- what this token hands over if leaned on
 
   In GPT-2, that one matrix takes 768 numbers to 2304, sliced into three 768-wide vectors. And
-  those three are split further into heads (12 in GPT-2), so several little attention operations
-  run in parallel and get glued back together. Same arithmetic, just chunked.
+  those three are split further into heads (12 in GPT-2, each working a 64-wide slice, since
+  768 / 12 = 64), so twelve little attention operations run in parallel and get glued back
+  together. "Split into heads" deserves more than a sentence, so here is the whole shape
+  pipeline, nothing left to imagination:
+
+      x, tidied                          768 numbers
+          |
+          v   multiply by the wide matrix (768 x 2304)
+      one long row                       2304 numbers
+          |
+          v   slice in three
+      Q = 768      K = 768      V = 768
+          |
+          v   cut each into 12 pieces of 64
+      Q -> [64|64|64|64|64|64|64|64|64|64|64|64]
+      K -> [64|64|64|64|64|64|64|64|64|64|64|64]
+      V -> [64|64|64|64|64|64|64|64|64|64|64|64]
+          |
+          v   head i works ONLY with piece i of Q, K, and V
+      head 1 -> 64 numbers    head 2 -> 64 numbers    ...    head 12 -> 64 numbers
+          |
+          v   glue the twelve answers side by side
+      768 numbers  ->  output projection (768 x 768)  ->  added onto x
+
+  Same arithmetic inside each head, just chunked -- and the next section shows the chunking with
+  actual numbers, because it changes the scaling. Hold onto that 64.
 
 
   --------
@@ -115,14 +142,37 @@
 
   To decide how much token A should listen to token B, the model compares A's query with B's key.
   The comparison is a dot product: multiply the two vectors coordinate by coordinate and sum.
-  Bigger sum means better alignment.
+  Bigger sum means better alignment -- once training has shaped these vectors, that is; at random
+  initialization the scores are just noise.
+
+  And here, with actual numbers, is what "chunked into heads" does to a dot product. Take a
+  6-wide query and key and cut both into two heads of 3:
+
+      Q = [ 0.60  -0.20   0.50 | 0.30  -0.40   0.10 ]
+      K = [ 0.20   0.70  -0.10 | 0.40   0.50  -0.30 ]
+
+      coordinate-by-coordinate products (all six, either way):
+            0.12  -0.14  -0.05 | 0.12  -0.20  -0.03
+
+      one full-width head sums all six:
+            0.12 - 0.14 - 0.05 + 0.12 - 0.20 - 0.03 = -0.18
+      two heads refuse to sum across the bar:
+            head 1 score = 0.12 - 0.14 - 0.05 = -0.07
+            head 2 score = 0.12 - 0.20 - 0.03 = -0.11
+
+  The six multiplications are identical either way; heads just stop summing at the seam and keep
+  separate scores. Each head then turns its own scores into weights and blends its own slice of
+  V, so with many tokens the two halves can attend to completely different places. That is the
+  whole trick of multi-head attention: the same arithmetic, grouped differently.
 
   There is a catch: a dot product grows just because the vectors are long, not only because they
-  agree. So the model divides by the square root of the width (sqrt(768) in GPT-2, sqrt(6) in the
-  toy). That keeps scores from ballooning with size. This is the scaled dot-product score, and it
-  is the whole of "attention" in one line:
+  agree. So the model divides by the square root of the width the score actually spans. In the
+  single-head toy that is sqrt(6). In the two-head split just shown, each score spans three
+  numbers, so each head would divide by sqrt(3). In GPT-2 it is NOT sqrt(768) -- each head
+  compares 64-wide slices, so the divisor is sqrt(64) = 8. That keeps scores from ballooning with size. This is
+  the scaled dot-product score, and it is the whole of "attention" in one line:
 
-      score(A, B) = ( Q_A dot K_B ) / sqrt(width)
+      score(A, B) = ( Q_A dot K_B ) / sqrt(width one head sees)
 
 
   --------
@@ -141,9 +191,16 @@
 
   The weight is 1, every time, in every block, at every head. So attention returns 1 x V -- the
   token's own value, unchanged. With a single token, attention has nobody to look at and nothing
-  to route. It is, in that specific picture, doing nothing interesting.
+  to route. The routing -- the celebrated part of attention -- is idle in this specific picture.
 
-  Which raises a fair question: if attention does nothing here, what moves the numbers at all?
+  One more rule deserves a name here, even though it stays invisible: attention is causal. A
+  token may only look at itself and tokens before it, never ahead. The model enforces this by
+  setting every blocked score to minus infinity before softmax, so those weights come out
+  exactly 0. With one token there is nothing to block -- the mask is just [0] -- which is why it
+  never touched our arithmetic. It is also the reason a KV cache works: no later token can reach
+  back and change an earlier one.
+
+  Which raises a fair question: if the routing does nothing here, what moves the numbers at all?
 
 
   --------
@@ -152,8 +209,9 @@
   Two things keep going even when attention is idle.
 
   First, the value that attention hands back is immediately multiplied by an output matrix (the
-  output projection) before it is added onto x. So V goes in and a reshaped, mixed version comes
-  out. That already changes the running vector.
+  output projection) before it is added onto x. So V goes in and a mixed, recombined version
+  comes out -- a real matrix multiply that blends coordinates, not a mere reshape. That already
+  changes the running vector.
 
   Second, and bigger, comes the MLP.
 
@@ -166,7 +224,8 @@
       widen:   multiply by a matrix that blows the width up 4x (768 -> 3072 in GPT-2, 6 -> 24 in
                the toy)
       bend:    push every number through a smooth curve called GELU (big positives pass nearly
-               unchanged, negatives get folded toward zero, everything moves a little)
+               unchanged, negatives get squashed most of the way to zero yet stay slightly
+               negative -- GELU(-1) is about -0.16 -- and everything moves a little)
       shrink:  multiply by a matrix that brings the width back down (3072 -> 768)
 
   Why the bend? Because two matrix multiplies with nothing between them collapse into a single
@@ -250,9 +309,10 @@ D, H = 6, 24
 x = R(D)
 print("in ", [round(float(z), 2) for z in x])
 for i in range(12):
-    Wc, Wo, Wf, Wp = R(D, 3*D), R(D, D), R(D, H), R(H, D)   # fresh block
+    Wc, Wo, Wf, Wp = R(D, 3*D), R(D, D), R(D, H), R(H, D)   # random stand-ins; a real GPT loads trained weights
     a = norm(x)
-    q, k, v = (a @ Wc)[:D], (a @ Wc)[D:2*D], (a @ Wc)[2*D:]  # one matrix -> Q, K, V
+    qkv = a @ Wc                                             # one multiply -> 18 numbers
+    q, k, v = qkv[:D], qkv[D:2*D], qkv[2*D:]                 # sliced into Q, K, V
     w = math.exp(float(q @ k) / math.sqrt(D)) / math.exp(float(q @ k) / math.sqrt(D))  # =1 for one token
     x = x + (w * v) @ Wo                                     # attention value, projected, added
     x = x + gelu(norm(x) @ Wf) @ Wp                          # MLP: widen, bend, shrink, added
