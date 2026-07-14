@@ -351,3 +351,14 @@ print("h ->", repr(tok.decode([nxt])))           # -> '.'
   No magic. Just a lookup, a lot of matrix multiplies, one nonlinearity that earns its keep, and a
   running vector that everything politely adds onto. Once you have watched a single letter make the
   trip, every prompt you type after is the same machine, only wider and with more company.
+
+
+  --------
+  WHERE THIS WALK SITS IN A LADDER
+
+  This post walks a full twelve-block GPT. If you would rather see the same machine built from
+  a wall up, start smaller: [A Writing Machine of One Room](one-room-gpt-by-pencil.txt) writes
+  a whole line with one block, every matrix by pencil. And the wall this walk ends on -- every
+  new token makes the model redo all the old key/value work from scratch -- is paid off in
+  [A Note a Machine Keeps So It Stops Redoing Old Work](kv-cache-by-pencil.txt). The full
+  reading ladder is [Build a GPT, Forced](build-a-gpt-ladder.txt).

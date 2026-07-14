@@ -1,0 +1,787 @@
+@title When You Press "h" -- The Final Pencil Pass Through a GPT :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL -- ONE KEYPRESS, ONE FORWARD PASS, NO GAPS
+  When You Press "h" -- The Final Pencil Pass Through a GPT
+  ============================================================================================
+
+
+  If a CHECK line appears, cover the next line and calculate it. If your number differs, do not
+  borrow the printed number. Find the sign or pairing clash, then try again. The page is static,
+  so the answer has to sit below the question; your job is to delay reading it until your pencil
+  has paid the price.
+
+  The full route, drawn before any name earns a label:
+
+      key "h"
+         |
+         v
+      fixed text splitter
+         |
+         v
+      integer 7 in the toy, integer 71 in GPT-2
+         |
+         v
+      row from token table + row from position table
+         |
+         v
+      running row x, six numbers wide in the toy
+         |
+         v
+      one block: flatten, make three roles, score, split shares, blend, project, add,
+                 flatten again, widen, bend, narrow, add
+         |
+         v
+      same block law repeated with new dials
+         |
+         v
+      final score table over every possible next token
+         |
+         v
+      one next token chosen
+
+  The toy below is six numbers wide, two heads, ten possible marks. GPT-2 small is 768 numbers
+  wide, twelve heads, 50,257 possible tokens. The path is the same. Only the page count changes.
+
+
+  --------
+  A KEY DRAWN ON PLASTIC CANNOT BE MULTIPLIED, SO FIX A TEXT SPLITTER
+
+      text splitter table, toy:
+
+          mark    integer
+          ----    -------
+          "a"        0
+          "b"        1
+          "c"        2
+          "d"        3
+          "e"        4
+          "f"        5
+          "g"        6
+          "h"        7
+          "."        8
+          " "        9
+
+      keypress:
+
+          "h"  ->  7
+
+  Wall: multiplication is defined on numbers. The mark "h" is a shape, not a number. A fixed
+  splitter replaces the mark by an integer. That integer is not meaning. It is only a shelf
+  address.
+
+  In GPT-2's splitter, a lone "h" is token id 71. In this toy, a lone "h" is mark 7. From here
+  on, the toy carries 7, not the drawn letter.
+
+  CHECK: In the toy table, what integer does "." become?
+
+  CHECK ANSWER: 8. If you said anything else, you read a different row.
+
+
+  --------
+  AN INTEGER IS ONLY A SHELF ADDRESS, SO READ A ROW OF NUMBERS
+
+      token table E: ten rows, six columns
+
+          mark 0   [ -0.76   0.50  -0.11   0.40   0.86   0.07 ]
+          mark 1   [  0.00  -0.77  -0.42  -0.00   0.32   0.55 ]
+          mark 2   [ -0.21  -0.78  -0.38   0.74  -0.52  -0.09 ]
+          mark 3   [  0.78  -0.86   0.18   0.81  -0.49   0.09 ]
+          mark 4   [  0.74  -0.66   0.04   0.45   0.30  -0.06 ]
+          mark 5   [ -0.53  -0.02  -0.23  -0.04  -0.24   0.61 ]
+          mark 6   [  0.48  -0.33   0.13  -0.40  -0.08  -0.26 ]
+          mark 7   [  0.28  -0.23  -0.07   0.39  -0.16   0.73 ]  <- "h"
+          mark 8   [ -0.58   0.43  -0.14  -0.13   0.24   0.04 ]
+          mark 9   [ -0.15  -0.90  -0.73   0.38   0.04   0.35 ]
+
+      read shelf 7:
+
+          e = [ 0.28  -0.23  -0.07   0.39  -0.16   0.73 ]
+
+  Wall: the integer 7 has no direction, no size, no traits. A row of six numbers can be multiplied.
+  So each possible mark owns one row. Reading row 7 gives the first six-number row for "h".
+
+  Standard name, now earned: token embedding.
+
+
+  --------
+  ONE MARK IN TWO DIFFERENT SLOTS MUST DIFFER, SO ADD A SLOT ROW
+
+      position table P: first two rows shown
+
+          slot 0   [  0.82   0.33  -0.80  -0.34   0.17  -0.48 ]
+          slot 1   [  0.84   0.80   0.63  -0.05   0.61  -0.66 ]
+          ...
+
+      "h" sits first, so use slot 0:
+
+          token row e     [ 0.28  -0.23  -0.07   0.39  -0.16   0.73 ]
+          slot row p0     [ 0.82   0.33  -0.80  -0.34   0.17  -0.48 ]
+                          ------------------------------------------------
+          running row x   [ 1.10   0.10  -0.87   0.05   0.01   0.25 ]
+
+  Wall: the token row for "h" is identical wherever "h" appears. But slot 0 and slot 5 are not
+  the same event. Add a slot row before any block reads the numbers. After the addition, the row
+  carries mark and place together.
+
+  Standard name, now earned: positional embedding.
+
+  CHECK: The third coordinate is -0.07 + (-0.80). What is it?
+
+  CHECK ANSWER: -0.87. If you got +0.73, the sign of -0.80 was lost.
+
+
+  --------
+  ONE LOUD COORDINATE CAN HIJACK A PRODUCT, SO FLATTEN A COPY
+
+      x = [ 1.10   0.10  -0.87   0.05   0.01   0.25 ]
+
+      mean(x) = (1.10 + 0.10 - 0.87 + 0.05 + 0.01 + 0.25) / 6
+              = 0.64 / 6
+              = 0.1067
+
+      spread(x) = root( average squared distance from 0.1067 )
+                = 0.5736
+
+      flatten each coordinate:
+
+          a_i = (x_i - 0.1067) / 0.5736
+
+      a = [ 1.73  -0.01  -1.70  -0.10  -0.17   0.25 ]
+
+          mean(a)   = 0.00
+          spread(a) = 1.00
+
+  Wall: a row-times-table product adds coordinate products. If one coordinate is huge only because
+  earlier arithmetic made it huge, it can dominate every later sum. So the block reads a flattened
+  copy: subtract that row's mean, divide by that row's spread. The running row x is not replaced;
+  x waits for an addition later.
+
+  Standard name, now earned: layer normalization.
+
+  CHECK: The first flattened coordinate is (1.10 - 0.1067) / 0.5736. Estimate it.
+
+  CHECK ANSWER: 1.73. If your number is near 0.58, you divided backward.
+
+
+  --------
+  ONE ROW MUST DO THREE JOBS, SO CAST IT INTO THREE ROWS
+
+      a [six numbers]
+         |
+         v
+      three learned tables, each six by six
+         |
+         +--> q = what this position seeks
+         +--> k = what this position offers
+         +--> v = what this position will hand over if used
+
+      On disk these three tables are often packed side by side:
+
+          a [1 x 6]  times  Wc [6 x 18]
+                            | q 6 | k 6 | v 6 |
+                              \____\____\_____
+                                   scissors only
+
+      For this toy row, the products are:
+
+          q = [  0.92  -0.39  -0.08   0.58  -0.79  -0.21 ]
+          k = [ -0.49   0.45   0.94  -1.09   0.04   0.25 ]
+          v = [  0.90  -0.65   0.85  -0.37   0.98  -0.66 ]
+
+      One entry by pencil, q[0]:
+
+          q[0] =
+             1.73( 0.2)
+          + -0.01( 0.0)
+          + -1.70(-0.4)
+          + -0.10( 0.1)
+          + -0.17( 0.3)
+          +  0.25(-0.2)
+          = 0.92
+
+  Wall: one position has to seek, offer, and hand over. One row cannot be tuned separately for
+  three jobs if it stays one row. Three learned tables make three different views of the same
+  flattened row.
+
+  Standard names, now earned:
+
+      q = query
+      k = key
+      v = value
+
+  CHECK: Why is q[0] positive even though q[0]'s column has two negative coefficients?
+
+  CHECK ANSWER: because -1.70 times -0.4 gives +0.68, the largest term in that sum. If your
+  answer was "because q is positive by definition", that clashes with q values being ordinary
+  sums that may have either sign.
+
+
+  --------
+  A HEAD IS A DRAWN DIVIDER, NOT A NEW TOKEN
+
+      q = [ 0.92  -0.39  -0.08 |  0.58  -0.79  -0.21 ]
+      k = [-0.49   0.45   0.94 | -1.09   0.04   0.25 ]
+      v = [ 0.90  -0.65   0.85 | -0.37   0.98  -0.66 ]
+              head 0, width 3  |      head 1, width 3
+
+  Wall: one attention operation may need several kinds of match. Split the width into heads. Each
+  head runs the same math on its own slice. The slices are not extra tokens. They are dividers
+  across one row.
+
+  In GPT-2 small:
+
+      full width     = 768
+      heads          = 12
+      width per head = 768 / 12 = 64
+
+  Therefore GPT-2 divides a score by root(64), not root(768). The dot product in one head sees
+  only that head's 64 numbers.
+
+
+  --------
+  TWO ROWS MUST BECOME ONE MATCH NUMBER, SO DOT THEN DIVIDE BY ROOT-WIDTH
+
+      head 0:
+
+          q0 = [ 0.92  -0.39  -0.08 ]
+          k0 = [-0.49   0.45   0.94 ]
+
+          dot = 0.92(-0.49) + (-0.39)(0.45) + (-0.08)(0.94)
+              = -0.45       + -0.18        + -0.08
+              = -0.71
+
+          scaled score = -0.71 / root(3)
+                       = -0.71 / 1.732
+                       = -0.40
+
+      head 1:
+
+          score = -0.41
+
+  Wall: a match must be one number, but a head holds three coordinate pairs. Pair them, multiply,
+  add. That is a dot product. A wider head adds more terms, so raw dots grow partly from width
+  alone. Divide by root(width) to cancel that scale growth.
+
+  Standard name, now earned: scaled dot-product score.
+
+  CHECK: In head 0, which term makes the dot most negative?
+
+  CHECK ANSWER: 0.92(-0.49) = -0.45. It is the largest negative term by magnitude.
+
+
+  --------
+  A SCORE CAN BE NEGATIVE, BUT A BLEND NEEDS POSITIVE SHARES
+
+      With many prior tokens, a row of scores might be:
+
+          scores = [ -0.40   0.20   0.10 ]
+
+      Force positive, keep order:
+
+          exp(-0.40) = 0.67
+          exp( 0.20) = 1.22
+          exp( 0.10) = 1.11
+
+      Divide by the total:
+
+          total = 0.67 + 1.22 + 1.11 = 3.00
+
+          shares = [ 0.22   0.41   0.37 ]
+
+      They sum to one. They can weight rows.
+
+  Wall: raw scores are not weights. They can be negative, and they do not add to one. Raise e to
+  each score: positive always, order preserved. Divide each by the row total: shares add to one.
+
+  Standard name, now earned: softmax.
+
+  Now the actual keypress page has only one token. One token means each head has one score:
+
+      head 0 share = exp(-0.40) / exp(-0.40) = 1.00
+      head 1 share = exp(-0.41) / exp(-0.41) = 1.00
+
+  A quantity divided by itself is one. With one token, there is no choice among tokens. The value
+  row survives the share-split unchanged.
+
+  CHECK: If a head has exactly one score s, what is exp(s) / exp(s)?
+
+  CHECK ANSWER: 1. If you wrote exp(0), you silently replaced s by 0; no such replacement
+  happened.
+
+
+  --------
+  A SHARE OF ONE STILL PASSES THROUGH AN OUTPUT TABLE
+
+      blend from attention:
+
+          head 0 returns [ 0.90  -0.65   0.85 ]
+          head 1 returns [-0.37   0.98  -0.66 ]
+
+      glue heads back:
+
+          blend = [ 0.90  -0.65   0.85  -0.37   0.98  -0.66 ]
+
+      output table Wo sends six numbers to six numbers:
+
+          y = blend Wo
+            = [ 0.31  -0.16   0.12  -0.07   0.09   0.39 ]
+
+      add to the running row:
+
+          old x   [ 1.10   0.10  -0.87   0.05   0.01   0.25 ]
+          y       [ 0.31  -0.16   0.12  -0.07   0.09   0.39 ]
+                  ------------------------------------------------
+          x       [ 1.41  -0.06  -0.75  -0.02   0.10   0.64 ]
+
+  Wall: each head worked in its own slice. Glue the slices, then let a learned output table mix
+  all six coordinates back together. Even when one token gives share 1, this table still changes
+  the row. The add keeps the old row alive while letting the block write a correction.
+
+  Standard names, now earned:
+
+      output table = output projection
+      add-to-old-x = residual connection
+
+
+  --------
+  TWO TABLES IN A ROW COLLAPSE, SO BEND BETWEEN THEM
+
+      If there is no bend:
+
+          b Wf Wp = b (Wf Wp)
+
+      That is one table wearing two names.
+
+      So the block does this instead:
+
+          b  ->  Wf  ->  wide row  ->  bend each coordinate  ->  Wp  ->  six numbers
+
+      Flatten x after the attention add:
+
+          b = [ 1.78  -0.41  -1.45  -0.36  -0.18   0.63 ]
+
+      Widen in the toy, six to twelve:
+
+          wide =
+          [  0.14  -0.49   0.98  -0.25  -0.96  -0.25
+             0.54  -0.93   0.63   0.86  -0.80  -0.31 ]
+
+      Bend each coordinate with GELU:
+
+          bend =
+          [  0.08  -0.15   0.82  -0.10  -0.16  -0.10
+             0.38  -0.16   0.47   0.70  -0.17  -0.12 ]
+
+      Narrow twelve back to six:
+
+          m = [ 0.43   0.29  -0.69   0.15   0.30  -0.01 ]
+
+      Add to the running row:
+
+          before MLP add   [ 1.41  -0.06  -0.75  -0.02   0.10   0.64 ]
+          m                [ 0.43   0.29  -0.69   0.15   0.30  -0.01 ]
+                           ------------------------------------------------
+          after block      [ 1.83   0.24  -1.44   0.12   0.39   0.62 ]
+
+      (rows print rounded to two decimals while the machine adds at full precision, so a
+      pencil add of two printed rows can land 0.01 away: 1.41 + 0.43 reads 1.84, but the
+      full-precision sum is 1.8349, which prints 1.83)
+
+  Wall: attention mixes positions. With one token, there is no cross-position choice. The private
+  per-token part must still be able to reshape the row. A widen table gives more temporary
+  coordinates, a bend prevents table collapse, a narrow table returns to the stream width.
+
+  Standard names, now earned:
+
+      GELU = the bend
+      MLP  = the widen-bend-narrow part
+
+  Real GPT-2 small uses 768 -> 3072 -> 768 here. The toy uses 6 -> 12 -> 6 so the row fits on a
+  page. The law is unchanged: widen, bend, narrow, add.
+
+  CHECK: Why would b Wf Wp collapse without the bend?
+
+  CHECK ANSWER: matrix multiplication is associative: first multiply Wf and Wp into one table,
+  then b times that table. If your answer says "because the model is too small", that does not
+  touch the algebra.
+
+
+  --------
+  ONE BLOCK IS A LAW; A GPT STACKS THE LAW WITH NEW DIALS
+
+      one block:
+
+          x
+          |
+          +-- flatten -> q,k,v -> score/share/blend -> output table --+
+          |                                                           |
+          +----------------------------- add back --------------------+
+          |
+          +-- flatten -> widen -> bend -> narrow ---------------------+
+          |                                                           |
+          +----------------------------- add back --------------------+
+          |
+          v
+          new x
+
+      stack:
+
+          x0 -> block 1 -> x1 -> block 2 -> x2 -> ... -> block 12 -> x12
+
+  Wall: one block writes one correction. A language model needs many corrections. Stack blocks.
+  Each block has its own learned dials. No new operation appears after block 1; only new numbers
+  in the tables.
+
+  GPT-2 small counts:
+
+      blocks              12
+      stream width         768
+      heads                 12
+      head width             64
+      qkv table          768 x 2304
+      output table       768 x 768
+      MLP widen table     768 x 3072
+      MLP narrow table   3072 x 768
+
+  The toy block above is one page wide. GPT-2's block is the same page copied with 768-wide rows.
+
+
+  --------
+  A ROW IS NOT A NEXT-TOKEN DECISION, SO SCORE EVERY TOKEN
+
+      after one toy block:
+
+          x = [ 1.83   0.24  -1.44   0.12   0.39   0.62 ]
+
+      flatten one last time:
+
+          c = [ 1.60  -0.06  -1.81  -0.18   0.10   0.34 ]
+
+      final score table: six rows, ten columns
+
+          c Wlm =
+
+          mark:    0      1      2      3      4      5      6      7      8      9
+                [ -0.36   0.73  -0.24   0.59   0.33  -0.51   0.18   0.07  -0.47  -0.40 ]
+                           ^
+                           biggest score, mark 1
+
+  Wall: six numbers are not yet a next token. A final table has one column per possible next
+  token. Dot the final row with each column. The result is a score list over the vocabulary.
+
+  Standard names, now earned:
+
+      final score table = language-model head
+      scores            = logits
+
+  Greedy rule: choose the largest logit. The toy chooses mark 1.
+
+  Sampling rule: softmax the logits into chances, then draw a ticket:
+
+      chances =
+      [ 0.064  0.190  0.072  0.166  0.127  0.055  0.110  0.099  0.057  0.061 ]
+
+      cumulative =
+      [ 0.064  0.254  0.326  0.492  0.619  0.674  0.783  0.882  0.939  1.000 ]
+
+      ticket 0.40 lands between 0.326 and 0.492, so sampling would pick mark 3.
+
+  Greedy and sampling are two different readout rules over the same logits. The forward pass did
+  not change.
+
+
+  --------
+  REAL GPT-2 SHAPES, PUT BESIDE THE TOY SHAPES
+
+      thing                         toy page              GPT-2 small
+      ---------------------------   ------------------    -------------------------
+      possible tokens               10                    50,257
+      token id for "h"              7                     71
+      stream width                  6                     768
+      blocks                        1 shown               12
+      heads                         2                     12
+      width per head                3                     64
+      qkv output width              18                    2304
+      MLP hidden width              12                    3072
+      final score count             10                    50,257
+
+  A trained GPT-2 small, fed only the one token "h", scores a full stop highest in one run of
+  its learned dials. That is not a law about the letter. It is a fact about that trained model's
+  score table after the block stack has rewritten the row.
+
+
+  --------
+  PROOF -- RUN THE SAME TOY WITH HARD-CODED NUMBERS
+
+  The code below has no random draw and no model download. The dials are the printed dials. The
+  helper functions only save typing; the data path is the page above.
+
+```python
+import math
+
+def gelu(z):
+    return 0.5 * z * (1.0 + math.erf(z / math.sqrt(2.0)))
+
+def norm6(x):
+    mean = sum(x) / 6.0
+    spread = math.sqrt(sum((z - mean) ** 2 for z in x) / 6.0 + 1e-5)
+    return [(z - mean) / spread for z in x], mean, spread
+
+def dot6(a, b):
+    return (
+        a[0]*b[0] + a[1]*b[1] + a[2]*b[2] +
+        a[3]*b[3] + a[4]*b[4] + a[5]*b[5]
+    )
+
+def dot3(a, b):
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
+
+def dot12(a, b):
+    return (
+        a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3] +
+        a[4]*b[4] + a[5]*b[5] + a[6]*b[6] + a[7]*b[7] +
+        a[8]*b[8] + a[9]*b[9] + a[10]*b[10] + a[11]*b[11]
+    )
+
+def col6(M, j):
+    return [M[0][j], M[1][j], M[2][j], M[3][j], M[4][j], M[5][j]]
+
+def col12(M, j):
+    return [
+        M[0][j], M[1][j], M[2][j], M[3][j], M[4][j], M[5][j],
+        M[6][j], M[7][j], M[8][j], M[9][j], M[10][j], M[11][j],
+    ]
+
+def mv6x6(row, M):
+    return [
+        dot6(row, col6(M, 0)), dot6(row, col6(M, 1)), dot6(row, col6(M, 2)),
+        dot6(row, col6(M, 3)), dot6(row, col6(M, 4)), dot6(row, col6(M, 5)),
+    ]
+
+def mv6x10(row, M):
+    return [
+        dot6(row, col6(M, 0)), dot6(row, col6(M, 1)), dot6(row, col6(M, 2)),
+        dot6(row, col6(M, 3)), dot6(row, col6(M, 4)), dot6(row, col6(M, 5)),
+        dot6(row, col6(M, 6)), dot6(row, col6(M, 7)), dot6(row, col6(M, 8)),
+        dot6(row, col6(M, 9)),
+    ]
+
+def mv6x12(row, M):
+    return [
+        dot6(row, col6(M, 0)),  dot6(row, col6(M, 1)),
+        dot6(row, col6(M, 2)),  dot6(row, col6(M, 3)),
+        dot6(row, col6(M, 4)),  dot6(row, col6(M, 5)),
+        dot6(row, col6(M, 6)),  dot6(row, col6(M, 7)),
+        dot6(row, col6(M, 8)),  dot6(row, col6(M, 9)),
+        dot6(row, col6(M, 10)), dot6(row, col6(M, 11)),
+    ]
+
+def mv12x6(row, M):
+    return [
+        dot12(row, col12(M, 0)), dot12(row, col12(M, 1)),
+        dot12(row, col12(M, 2)), dot12(row, col12(M, 3)),
+        dot12(row, col12(M, 4)), dot12(row, col12(M, 5)),
+    ]
+
+def round_list(xs, n=2):
+    return [round(z, n) for z in xs]
+
+token_h = [0.28, -0.23, -0.07,  0.39, -0.16,  0.73]
+pos_0   = [0.82,  0.33, -0.80, -0.34,  0.17, -0.48]
+x = [token_h[i] + pos_0[i] for i in range(6)]
+print("x after token + position:", round_list(x))
+
+a, mean, spread = norm6(x)
+print("first norm mean/spread:", round(mean, 4), round(spread, 4))
+print("a:", round_list(a))
+
+Wq = [
+    [ 0.2,-0.1, 0.0, 0.4,-0.2, 0.1],
+    [ 0.0, 0.3,-0.5, 0.1, 0.2,-0.1],
+    [-0.4, 0.2, 0.1, 0.0, 0.3, 0.2],
+    [ 0.1,-0.3, 0.2, 0.2, 0.0,-0.4],
+    [ 0.3, 0.0,-0.2, 0.1,-0.1, 0.5],
+    [-0.2, 0.4, 0.3,-0.3, 0.2, 0.0],
+]
+
+Wk = [
+    [-0.1, 0.4, 0.2,-0.2, 0.1, 0.0],
+    [ 0.3,-0.2, 0.1, 0.0,-0.4, 0.2],
+    [ 0.2, 0.1,-0.3, 0.5, 0.0,-0.1],
+    [-0.4, 0.0, 0.2, 0.1, 0.3,-0.2],
+    [ 0.1, 0.3, 0.0,-0.4, 0.2, 0.1],
+    [ 0.0,-0.1, 0.4, 0.2,-0.3, 0.3],
+]
+
+Wv = [
+    [ 0.5,-0.2, 0.1, 0.0, 0.3,-0.1],
+    [-0.1, 0.4, 0.2,-0.3, 0.1, 0.2],
+    [ 0.0, 0.1,-0.4, 0.2,-0.2, 0.3],
+    [ 0.3, 0.0, 0.5,-0.1, 0.2,-0.4],
+    [-0.2, 0.3, 0.0, 0.4,-0.1, 0.1],
+    [ 0.1,-0.3, 0.2, 0.1, 0.5, 0.0],
+]
+
+q = mv6x6(a, Wq)
+k = mv6x6(a, Wk)
+v = mv6x6(a, Wv)
+print("q:", round_list(q))
+print("k:", round_list(k))
+print("v:", round_list(v))
+
+score0 = dot3(q[:3], k[:3]) / math.sqrt(3.0)
+score1 = dot3(q[3:], k[3:]) / math.sqrt(3.0)
+print("head scores:", round(score0, 2), round(score1, 2))
+print("one-token shares:", 1.0, 1.0)
+
+Wo = [
+    [ 0.2, 0.1,-0.3, 0.4, 0.0,-0.2],
+    [-0.1, 0.3, 0.2, 0.0,-0.4, 0.1],
+    [ 0.5,-0.2, 0.1,-0.3, 0.2, 0.0],
+    [ 0.0, 0.4,-0.1, 0.2, 0.3,-0.2],
+    [-0.3, 0.0, 0.4, 0.1,-0.1, 0.5],
+    [ 0.1,-0.4, 0.0, 0.3, 0.2,-0.1],
+]
+
+y = mv6x6(v, Wo)
+x = [x[i] + y[i] for i in range(6)]
+print("attention projection:", round_list(y))
+print("after attention add:", round_list(x))
+
+b, mean, spread = norm6(x)
+print("second norm:", round_list(b))
+
+Wf = [
+    [ 0.2,-0.1, 0.3, 0.0,-0.4, 0.1, 0.2,-0.3, 0.4, 0.1,-0.2, 0.0],
+    [-0.3, 0.2, 0.0, 0.4, 0.1,-0.2, 0.3, 0.0,-0.1, 0.2, 0.4,-0.3],
+    [ 0.1, 0.3,-0.2, 0.2, 0.0, 0.4,-0.3, 0.1, 0.2,-0.4, 0.0, 0.3],
+    [ 0.0,-0.4, 0.2, 0.1, 0.3, 0.0, 0.4,-0.2,-0.3, 0.1, 0.2,-0.1],
+    [ 0.4, 0.0, 0.1,-0.3, 0.2, 0.3,-0.1, 0.4, 0.0,-0.2, 0.1, 0.2],
+    [-0.2, 0.1, 0.4, 0.3,-0.1, 0.2, 0.0,-0.4, 0.1, 0.3,-0.3, 0.0],
+]
+
+Wp = [
+    [ 0.3,-0.2, 0.1, 0.0, 0.4,-0.1],
+    [-0.1, 0.2, 0.3,-0.4, 0.0, 0.1],
+    [ 0.0, 0.4,-0.2, 0.1,-0.3, 0.2],
+    [ 0.2, 0.0, 0.4,-0.1, 0.1,-0.3],
+    [-0.4, 0.1, 0.0, 0.3,-0.2, 0.2],
+    [ 0.1,-0.3, 0.2, 0.4, 0.0,-0.1],
+    [ 0.3, 0.0,-0.4, 0.2, 0.1, 0.0],
+    [-0.2, 0.3, 0.1, 0.0,-0.1, 0.4],
+    [ 0.4,-0.1, 0.0,-0.2, 0.3, 0.1],
+    [ 0.0, 0.2,-0.3, 0.1, 0.4,-0.2],
+    [ 0.1, 0.0, 0.2,-0.3,-0.1, 0.3],
+    [-0.3, 0.4, 0.1, 0.2, 0.0,-0.4],
+]
+
+wide = mv6x12(b, Wf)
+bend = [gelu(z) for z in wide]
+m = mv12x6(bend, Wp)
+x = [x[i] + m[i] for i in range(6)]
+print("wide:", round_list(wide))
+print("bend:", round_list(bend))
+print("MLP projection:", round_list(m))
+print("after block:", round_list(x))
+
+c, mean, spread = norm6(x)
+print("c:", round_list(c))
+Wlm = [
+    [ 0.1, 0.3,-0.2, 0.0, 0.4, 0.1,-0.1, 0.2, 0.0,-0.3],
+    [-0.2, 0.0, 0.4, 0.1,-0.3, 0.2, 0.3,-0.1, 0.1, 0.0],
+    [ 0.3,-0.1, 0.0,-0.4, 0.2, 0.4,-0.2, 0.1, 0.3, 0.0],
+    [ 0.0, 0.2, 0.1, 0.3,-0.1,-0.2, 0.4, 0.0,-0.3, 0.2],
+    [ 0.4,-0.3, 0.2, 0.0, 0.1,-0.1, 0.0, 0.3, 0.2,-0.2],
+    [-0.1, 0.4, 0.3,-0.2, 0.0, 0.1, 0.2,-0.3, 0.0, 0.4],
+]
+
+logits = mv6x10(c, Wlm)
+print("logits:", round_list(logits))
+print("greedy next mark:", max(range(10), key=lambda i: logits[i]))
+
+shift = max(logits)
+e = [math.exp(z - shift) for z in logits]
+probs = [z / sum(e) for z in e]
+print("chances:", [round(z, 3) for z in probs])
+cum = [round(sum(probs[:i+1]), 3) for i in range(10)]
+print("cumulative:", cum)
+print("ticket 0.40 picks mark:", min(i for i in range(10) if cum[i] >= 0.40))
+```
+
+  Running it prints:
+
+```
+x after token + position: [1.1, 0.1, -0.87, 0.05, 0.01, 0.25]
+first norm mean/spread: 0.1067 0.5736
+a: [1.73, -0.01, -1.7, -0.1, -0.17, 0.25]
+q: [0.92, -0.39, -0.08, 0.58, -0.79, -0.21]
+k: [-0.49, 0.45, 0.94, -1.09, 0.04, 0.25]
+v: [0.9, -0.65, 0.85, -0.37, 0.98, -0.66]
+head scores: -0.4 -0.41
+one-token shares: 1.0 1.0
+attention projection: [0.31, -0.16, 0.12, -0.07, 0.09, 0.39]
+after attention add: [1.41, -0.06, -0.75, -0.02, 0.1, 0.64]
+second norm: [1.78, -0.41, -1.45, -0.36, -0.18, 0.63]
+wide: [0.14, -0.49, 0.98, -0.25, -0.96, -0.25, 0.54, -0.93, 0.63, 0.86, -0.8, -0.31]
+bend: [0.08, -0.15, 0.82, -0.1, -0.16, -0.1, 0.38, -0.16, 0.47, 0.7, -0.17, -0.12]
+MLP projection: [0.43, 0.29, -0.69, 0.15, 0.3, -0.01]
+after block: [1.83, 0.24, -1.44, 0.12, 0.39, 0.62]
+c: [1.6, -0.06, -1.81, -0.18, 0.1, 0.34]
+logits: [-0.36, 0.73, -0.24, 0.59, 0.33, -0.51, 0.18, 0.07, -0.47, -0.4]
+greedy next mark: 1
+chances: [0.064, 0.19, 0.072, 0.166, 0.127, 0.055, 0.11, 0.099, 0.057, 0.061]
+cumulative: [0.064, 0.254, 0.326, 0.492, 0.619, 0.674, 0.783, 0.882, 0.939, 1.0]
+ticket 0.40 picks mark: 3
+```
+
+  Every drawn row above reprints from this run, digit for digit.
+
+
+  --------
+  DECODER SHEET
+
+      plain phrase                       standard label
+      --------------------------------   -----------------------------------------
+      text splitter                      tokenizer
+      mark integer                       token id
+      token table row                    token embedding
+      slot row                           positional embedding
+      running row                        residual stream
+      flatten a copy                     layer normalization
+      seek row q                         query
+      offer row k                        key
+      hand-over row v                    value
+      split width into lanes             multi-head attention
+      dot then divide by root width      scaled dot-product score
+      exponentiate then divide by sum    softmax
+      output table after heads           output projection
+      widen-bend-narrow                  MLP / feed-forward network
+      final score table                  language-model head
+      final scores                       logits
+      biggest-logit choice               greedy decoding
+      ticket from chances                sampling
+
+
+  --------
+  ONE KEYPRESS, RETOLD END TO END
+
+  Press "h". A fixed splitter writes token id 71 in GPT-2, 7 in this toy. That id reads a token
+  row. Slot 0 reads a position row. Add them to get a running row. A block flattens a copy, makes
+  q/k/v, splits each into heads, dots q with k inside each head, divides by root(head width),
+  softmaxes scores into shares, blends v rows by those shares, runs an output table, adds back to
+  the running row, flattens again, widens, bends with GELU, narrows, adds back again. GPT repeats
+  that block law with fresh dials. A final table scores every possible next token. Greedy takes
+  the largest score; sampling turns scores into chances and draws a ticket.
+
+  Everything is add, subtract, multiply, divide, root, exp, and one fixed bend. The rest is table
+  size.
+
+----------------------------------------------------------------------------------------------
+
+  [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)
+==============================================================================================

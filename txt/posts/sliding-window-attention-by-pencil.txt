@@ -294,3 +294,15 @@ print("token 5 out:", round(out0, 3), round(out1, 3))         # 1.765 1.968
   not-ahead test         = causal masking (a token never reads the future)
   strike to minus infinity  = the mask; setting a score to -inf so e^(-inf) = 0 gives it exactly 0 share
   reach grows with depth = the receptive field of stacked local layers; L layers of window W reach about L*(W-1) tokens back
+
+  -------
+
+  WHERE THIS WINDOW SITS IN A LADDER
+
+  The wall that forced this page comes from the KV-cache rung: even with a note that stops all
+  re-derivation, a full score grid still grows with the square of the line
+  ([A Note a Machine Keeps So It Stops Redoing Old Work](kv-cache-by-pencil.txt)). The window
+  caps that growth. Next rung: build the whole masked multi-head layer from a blank page, every
+  WHY derived by hand --
+  [Sliding Window Self-Attention, Built From One Pencil And One Page](sliding-window-attention-from-one-pencil.txt).
+  The full reading ladder is [Build a GPT, Forced](build-a-gpt-ladder.txt).

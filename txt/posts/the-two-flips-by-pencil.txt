@@ -368,3 +368,15 @@ print("final out (T,C):\n", merged)
   keep-table / strike to minus infinity = the causal + sliding-window mask; a struck score set to -inf gives e^(-inf) = 0, hence 0 share
   blow up by e, divide by total = softmax, taken across the key axis (the last one)
   glue the lenses back    = transpose(1, 2) again, then contiguous().view(B, T, C) to merge heads
+
+  -------
+
+  WHERE THESE FLIPS SIT IN A LADDER
+
+  This page exists because the sliding-window build before it
+  ([Sliding Window Self-Attention, Built From One Pencil And One Page](sliding-window-attention-from-one-pencil.txt))
+  proved the arithmetic easy while the shapes ate days. One wall remains after the plumbing:
+  attention looks everywhere at once, so nothing in it says WHERE a token sits -- order is
+  built from scratch in
+  [Positional Encoding From Scratch](positional-embeddings-from-scratch.txt).
+  The full reading ladder is [Build a GPT, Forced](build-a-gpt-ladder.txt).

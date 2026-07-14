@@ -1,0 +1,513 @@
+@title A Writing Machine of One Room -- Smallest GPT That Works, by Pencil :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL -- SMALLEST MACHINE THAT WRITES
+  A Writing Machine of One Room, Built by Pencil
+  ============================================================================================
+
+
+  A machine that writes takes a line of marks, bets on a next mark, appends its bet, and goes
+  again. Below sits a smallest such machine that genuinely works: ONE room of machinery, six
+  numbers per mark, ten marks known. It runs three full turns in front of you and writes a
+  four-mark line, 7 8 1 2. Every matrix comes from a running program (a proof at bottom
+  reproduces every number); every operation is forced by a wall. This page also opens a
+  ladder: pages after it exist because this machine, working exactly as shown, turns out
+  shallow and wasteful in ways worth their own pages.
+
+
+  --------
+  WRITING MEANS PICKING A NEXT MARK OFF A FIXED MENU, SO A MACHINE KNOWS TEN MARKS
+
+      menu of marks this machine knows:
+
+        0    1    2    3    4    5    6    7    8    9
+                                       ^
+                                       a keystroke "h" lands on mark 7 (a pairing agreed once)
+
+  Wall: written text is a line of marks, and writing one more means choosing from marks a
+  machine knows -- nothing outside a menu can ever be written. This toy knows ten marks,
+  numbered 0 to 9; a shipped machine knows about fifty thousand. A keystroke becomes an
+  integer by one fixed pairing, and "h" here lands on 7.
+
+
+  --------
+  AN INTEGER MULTIPLIES INTO NOTHING, SO A TABLE HANDS EVERY MARK SIX NUMBERS
+
+      mark table E : ten rows, six numbers each (drawn fresh from a run)
+
+        mark 0   [  0.71  -0.30   0.58  -0.82  -0.71   0.17 ]
+        mark 1   [  0.05  -0.15  -0.30   0.22  -0.11   0.42 ]
+        mark 2   [  0.03   0.14   0.26   0.88   0.58  -0.16 ]
+        mark 3   [  0.68   0.58  -0.80   0.39   0.54   0.43 ]
+        mark 4   [  0.38   0.07  -0.68   0.82  -0.17  -0.51 ]
+        mark 5   [  0.39   0.89  -0.44   0.31   0.18   0.39 ]
+        mark 6   [  0.79  -0.27  -0.44  -0.18   0.44   0.40 ]
+        mark 7   [ -0.17   0.88  -0.09  -0.23   0.38  -0.75 ]   <-- "h" reads this row
+        mark 8   [ -0.18   0.49   0.48  -0.39  -0.56  -0.05 ]
+        mark 9   [ -0.30   0.42  -0.56  -0.30   0.62   0.21 ]
+
+  Wall: 7 is a shelf label -- no size, no direction, nothing to multiply. So a fixed table
+  parks one row of six numbers per mark, and arithmetic starts by reading row 7 off a shelf.
+
+
+  --------
+  MARK 7 FIRST IN A LINE AND MARK 7 THIRD READ ONE IDENTICAL ROW, SO A SLOT-ROW IS ADDED ON
+
+      slot rows S : one row per position in a line
+
+        slot 0   [  0.69   0.86   0.61  -0.57   0.21  -0.04 ]
+        slot 1   [ -0.17   0.44   0.59   0.33  -0.65   0.37 ]
+        slot 2   [ -0.79  -0.55   0.76  -0.17  -0.63   0.33 ]
+
+      row(mark 7)    [ -0.17   0.88  -0.09  -0.23   0.38  -0.75 ]
+    + slot 0         [  0.69   0.86   0.61  -0.57   0.21  -0.04 ]
+      ------------------------------------------------------------
+      strip x        [  0.52   1.74   0.52  -0.80   0.59  -0.79 ]
+
+      first entry by hand: -0.17 + 0.69 = 0.52
+
+  Wall: what follows a mark depends on WHERE it sits, yet a table row ignores position -- mark
+  7 opening a line and mark 7 third in a line read one identical row. A second table holds one
+  row per slot; adding a slot-row onto a mark-row stamps WHERE onto WHAT. Call a result a
+  strip: six numbers that will carry mark 7's fate through a room.
+
+
+  --------
+  ONE LOUD COORDINATE HIJACKS EVERY SUM, SO CENTER A COPY TO ZERO AND DIVIDE BY SPREAD
+
+      strip x   [  0.52   1.74   0.52  -0.80   0.59  -0.79 ]
+
+      mean   = (0.52 + 1.74 + 0.52 - 0.80 + 0.59 - 0.79) / 6 = 1.78 / 6 = 0.30
+      spread = 0.88   (root of average squared distance from mean; a tiny value sits under
+                       a root so nothing ever divides by zero)
+
+      a = (x - 0.30) / 0.88 = [  0.25   1.64   0.25  -1.25   0.33  -1.23 ]
+
+      one entry by hand: (0.52 - 0.30) / 0.88 = 0.22 / 0.88 = 0.25
+
+  Wall: every matrix product ahead sums six terms, and one huge coordinate (say 40 next to
+  0.1s) would hold every such sum hostage. So a COPY of a strip is centered to mean zero and
+  divided by spread before touching any matrix. Flattened copy a feeds machinery; x itself
+  waits untouched, ready to receive adds.
+
+
+  --------
+  A STRIP MUST HUNT, OFFER, AND HAND OVER AT ONCE, SO THREE MATRICES CAST THREE ROWS
+
+      want-matrix Wq : six rows, six columns
+
+        [ -0.61   0.27  -0.45  -0.83   0.83  -0.78 ]
+        [  0.02  -0.29   0.29   0.62   0.19   0.16 ]
+        [ -0.69   0.38  -0.53  -0.02  -0.83  -0.33 ]
+        [  0.65   0.11   0.08  -0.24   0.59  -0.40 ]
+        [ -0.67   0.11  -0.42   0.50  -0.58   0.51 ]
+        [  0.19  -0.82   0.11   0.30   0.79   0.51 ]
+
+      label-matrix Wk : six rows, six columns
+
+        [  0.45  -0.01  -0.82   0.57  -0.88   0.09 ]
+        [  0.12  -0.70  -0.79   0.13  -0.03  -0.36 ]
+        [ -0.83   0.24  -0.68  -0.88  -0.40  -0.36 ]
+        [ -0.58  -0.78   0.50  -0.18  -0.46   0.04 ]
+        [ -0.44   0.63  -0.03   0.22   0.85  -0.26 ]
+        [ -0.50   0.86   0.16   0.87   0.84   0.37 ]
+
+      payload-matrix Wv : six rows, six columns
+
+        [ -0.87   0.20  -0.45  -0.67  -0.24  -0.54 ]
+        [  0.48   0.78  -0.85  -0.44  -0.42  -0.64 ]
+        [  0.81  -0.45  -0.26  -0.81  -0.47   0.69 ]
+        [  0.84   0.28  -0.37  -0.79   0.66  -0.62 ]
+        [ -0.41   0.09  -0.45   0.62   0.00  -0.03 ]
+        [  0.73   0.75  -0.47  -0.87   0.31  -0.41 ]
+
+      want-row    q = a Wq = [ -1.56   0.60  -0.15   0.90  -1.59   0.02 ]
+      label-row   k = a Wk = [  1.29  -0.97  -2.51  -0.64  -0.55  -1.25 ]
+      payload-row v = a Wv = [ -1.31  -0.03  -0.68   1.17  -2.07   0.26 ]
+
+      one entry by hand:  q[1] = a . Wq[:,1]
+        = 0.25(0.27) + 1.64(-0.29) + 0.25(0.38) + (-1.25)(0.11) + 0.33(0.11) + (-1.23)(-0.82)
+        = 0.07 - 0.48 + 0.10 - 0.14 + 0.04 + 1.01
+        = 0.60
+
+  Wall: reading across a line needs three parts from every mark -- what it hunts (a want-row),
+  what it offers to hunters (a label-row), what it hands over once leaned on (a payload-row).
+  One flat row cannot play three parts raw, so three fixed matrices cast three views, all from
+  one identical flattened strip. Three roles, one source.
+
+
+  --------
+  A LINE OF ONE MARK MATCHES ONLY ITSELF, AND A SHARE OF EXACTLY 1 FALLS OUT
+
+      score = q . k / root(6)
+
+      q . k = (-1.56)(1.29) + 0.60(-0.97) + (-0.15)(-2.51) + 0.90(-0.64) + (-1.59)(-0.55) + 0.02(-1.25)
+            = -2.01 - 0.58 + 0.38 - 0.58 + 0.87 - 0.03
+            = -1.95
+
+      score = -1.95 / 2.45 = -0.80
+        (a dot over six numbers inflates with width alone, so divide by root of width)
+
+      exponentiate and share out over ALL scores a line holds -- here exactly one:
+
+        share = e^(-0.80) / e^(-0.80) = 1
+
+      blend of payload-rows = 1 x v = v   (a payload passes through whole)
+
+  Wall: a want-row grades fit against every label-row on a line, but this line holds one mark.
+  One score, and exponent-share over one number is 1 no matter what a score says. So at length
+  one, attention routes nothing -- a proven fact, not a shrug. Machinery ahead still works on
+  this strip; machinery here waits for a longer line.
+
+
+  --------
+  A PAYLOAD SPEAKS PAYLOAD COORDINATES, SO A MIXING MATRIX RECASTS IT -- AND A ROOM ADDS, NEVER REPLACES
+
+      mixing matrix Wo : six rows, six columns
+
+        [ -0.87  -0.73  -0.15  -0.68  -0.53   0.44 ]
+        [ -0.08  -0.70  -0.51   0.77  -0.89   0.26 ]
+        [  0.26   0.32   0.14   0.51   0.58   0.26 ]
+        [ -0.58   0.41  -0.39   0.61   0.13  -0.75 ]
+        [  0.74  -0.07   0.80  -0.83  -0.71   0.46 ]
+        [ -0.82  -0.09   0.57  -0.15  -0.56   0.62 ]
+
+      mix = v Wo = [ -1.46   1.36  -1.85   2.92   1.81  -2.43 ]
+
+      one entry by hand:  mix[0] = v . Wo[:,0]
+        = (-1.31)(-0.87) + (-0.03)(-0.08) + (-0.68)(0.26) + 1.17(-0.58) + (-2.07)(0.74) + 0.26(-0.82)
+        = 1.14 + 0.00 - 0.18 - 0.68 - 1.53 - 0.21
+        = -1.46
+
+      x2 = x + mix:
+          [  0.52   1.74   0.52  -0.80   0.59  -0.79 ]
+        + [ -1.46   1.36  -1.85   2.92   1.81  -2.43 ]
+        = [ -0.94   3.10  -1.33   2.12   2.40  -3.22 ]     first entry: 0.52 - 1.46 = -0.94
+
+  Wall: a blended payload sits in payload coordinates, not strip coordinates, so one more
+  fixed matrix recasts it before it may touch x. And a room never overwrites a strip -- it
+  ADDS. An add keeps an open path for an original strip to survive whatever a room computes,
+  and lets a room nudge a picture rather than stomp on it.
+
+
+  --------
+  TWO STRAIGHT MULTIPLIES COLLAPSE INTO ONE, SO WIDEN, BEND, SHRINK
+
+      flatten a copy again:  a2 = flatten(x2) = [ -0.56   1.19  -0.73   0.76   0.88  -1.55 ]
+
+      widen-matrix Wf : six rows, twelve columns
+
+      [ -0.71  -0.38  -0.51  -0.06  -0.32   0.74   0.51   0.37  -0.65   0.20   0.63   0.76 ]
+      [  0.29  -0.43  -0.40   0.24   0.40  -0.35   0.32   0.01   0.59   0.33   0.74  -0.68 ]
+      [  0.61   0.81   0.13  -0.89  -0.84  -0.16  -0.08  -0.04   0.33   0.46   0.58  -0.28 ]
+      [  0.21  -0.19   0.41   0.11   0.17  -0.20   0.24   0.66   0.27  -0.67  -0.74   0.32 ]
+      [ -0.26  -0.33   0.70   0.66   0.55  -0.26   0.25   0.18  -0.48   0.16   0.89  -0.81 ]
+      [ -0.47  -0.30   0.54  -0.10  -0.79  -0.33   0.59   0.43  -0.40   0.41  -0.32  -0.63 ]
+
+      hid = a2 Wf
+          = [  0.95  -0.86  -0.19   1.79   3.10  -0.58  -0.35  -0.17   1.22  -1.06   0.82  -0.52 ]
+
+      bend every number (a smooth curve): big positives pass nearly whole, negatives shrink
+      most of a way to zero yet stay negative:
+
+        0.95 -> 0.79        -0.86 -> -0.17        3.10 -> 3.10
+
+      bent
+          = [  0.79  -0.17  -0.08   1.72   3.10  -0.16  -0.13  -0.07   1.09  -0.15   0.65  -0.16 ]
+
+      shrink-matrix Wp : twelve rows, six columns
+
+        [  0.87  -0.43   0.20   0.75   0.26  -0.13 ]
+        [ -0.19  -0.81  -0.75  -0.09   0.76  -0.48 ]
+        [  0.66   0.55  -0.59  -0.34  -0.13   0.65 ]
+        [  0.24   0.58  -0.01   0.15  -0.08  -0.44 ]
+        [  0.21   0.14   0.66   0.76   0.13   0.35 ]
+        [ -0.19   0.32   0.90   0.79  -0.65   0.79 ]
+        [ -0.83  -0.85  -0.58  -0.35   0.87   0.80 ]
+        [  0.48   0.22   0.84   0.13  -0.52  -0.66 ]
+        [  0.47   0.05   0.57   0.53   0.31   0.50 ]
+        [  0.34  -0.13   0.59   0.75   0.50  -0.75 ]
+        [  0.81  -0.04   0.69  -0.75   0.79  -0.33 ]
+        [ -0.14   0.33  -0.74  -0.53   0.15  -0.21 ]
+
+      mout = bent Wp = [  2.84   1.22   3.32   3.21   1.14   0.55 ]
+
+      x3 = x2 + mout:
+          [ -0.94   3.10  -1.33   2.12   2.40  -3.22 ]
+        + [  2.84   1.22   3.32   3.21   1.14   0.55 ]
+        = [  1.91   4.32   1.99   5.33   3.53  -2.68 ]
+
+      (rows print rounded to two decimals while sums run at full precision, so a last
+      digit can sit 0.01 off a printed-row add: -0.94 + 2.84 reads 1.90, a true sum
+      lands 1.91)
+
+  Wall: chain two matrices with nothing between and they collapse into one 6x6 in disguise --
+  zero new power gained. A bend between them blocks that collapse and lets a room compute what
+  no single matrix can. So: widen six to twelve, bend every number, shrink back to six, add
+  onto x. This toy widens two-fold; a shipped machine widens four-fold (768 to 3072).
+
+
+  --------
+  A STRIP HOLDS SIX NUMBERS BUT A BET NEEDS TEN, SO A LAST MATRIX SCORES EVERY MARK
+
+      flatten once more:  a3 = flatten(x3) = [ -0.19   0.75  -0.16   1.14   0.44  -1.97 ]
+
+      score-matrix Wh : six rows, ten columns (one column per mark on a menu)
+
+        [ -0.71  -0.88   0.71   0.30  -0.32   0.69   0.84  -0.75  -0.43   0.05 ]
+        [  0.76  -0.48   0.78   0.72  -0.29  -0.49  -0.57  -0.80   0.82  -0.64 ]
+        [  0.82  -0.29  -0.79   0.57   0.55  -0.07   0.49   0.45  -0.09  -0.39 ]
+        [ -0.64   0.74  -0.76   0.41  -0.76   0.31  -0.79  -0.70  -0.04  -0.75 ]
+        [ -0.84   0.25   0.71  -0.03   0.61   0.38   0.78   0.85   0.16   0.80 ]
+        [  0.37  -0.06   0.75   0.14  -0.47  -0.20  -0.14  -0.60  -0.86  -0.81 ]
+
+      scores over ten marks = a3 Wh:
+
+        mark:      0      1      2      3      4      5      6      7      8      9
+              [ -1.25   0.93  -1.46   0.57   0.09   0.43  -0.94   0.24   2.43   0.67 ]
+
+      biggest = 2.43, at mark 8  ->  machine writes mark 8        line so far: 7 8
+
+  Wall: a strip is six numbers; a bet needs one score per mark on a menu of ten. One last
+  matrix, six by ten, turns a flattened strip into ten scores. Biggest wins on this page. (A
+  shipped machine often runs a weighted lottery over exponent-shares of these scores instead,
+  which is why one prompt can end two different ways on two runs.) A turn is over: mark 8 is
+  appended, and a machine starts again from a longer line.
+
+
+  --------
+  A LINE OF TWO GIVES A WANT-ROW A REAL CHOICE, SO SHARES FINALLY SPLIT
+
+  Nothing in a machine moved between turns -- Wq, Wk, Wv, Wo, Wf, Wp, Wh and both tables are
+  frozen while it writes; only a line grew. Mark 8 sits in slot 1:
+
+      row(mark 8)    [ -0.18   0.49   0.48  -0.39  -0.56  -0.05 ]
+    + slot 1         [ -0.17   0.44   0.59   0.33  -0.65   0.37 ]
+      ------------------------------------------------------------
+      x_new          [ -0.35   0.93   1.07  -0.06  -1.21   0.32 ]
+
+      a_new = flatten(x_new) = [ -0.60   1.05   1.23  -0.23  -1.71   0.26 ]
+      want-row q_new = a_new Wq = [  0.59  -0.43   0.65   0.40  -0.26  -0.42 ]
+
+      mark 7's label-row and payload-row, rebuilt from a blank start this turn:
+
+        k(mark 7) = [  1.29  -0.97  -2.51  -0.64  -0.55  -1.25 ]   <- no digit differs from turn 1
+        v(mark 7) = [ -1.31  -0.03  -0.68   1.17  -2.07   0.26 ]   <- no digit differs from turn 1
+
+      mark 8's fresh rows:
+
+        k(new) = a_new Wk = [ -0.41  -1.11  -1.19  -1.39  -1.12  -0.34 ]
+        v(new) = a_new Wv = [  2.72   0.12  -0.21  -2.16  -0.94   0.59 ]
+
+      two scores, each over root(6) = 2.45:
+
+        q_new . k(mark 7) / 2.45 = -0.02        q_new . k(new) / 2.45 = -0.28
+
+      exponentiate:  e^(-0.02) = 0.98    e^(-0.28) = 0.76    total = 1.74
+      share out:     0.98 / 1.74 = 0.56          0.76 / 1.74 = 0.44
+
+      blend = 0.56 v(mark 7) + 0.44 v(new) = [  0.45   0.04  -0.48  -0.29  -1.58   0.40 ]
+
+      one entry by hand:  0.56(1.17) + 0.44(-2.16) = 0.66 - 0.95 = -0.29
+
+      mixing matrix, add; widen-bend-shrink, add (matrices unchanged, arithmetic identical in
+      shape to turn 1):
+
+        x2_new = [ -2.20   0.38  -0.01   0.50  -0.90   0.14 ]
+        x3_new = [  0.91  -0.18   0.77   2.72   0.25   1.37 ]
+
+      flatten, score over ten marks:
+
+        [ -1.48   1.91  -2.52  -0.19  -1.85   0.79  -1.62  -1.29  -1.55  -1.51 ]
+
+      biggest = 1.91, at mark 1  ->  line so far: 7 8 1
+
+  Wall: two marks on a line, so a want-row finally has a choice, and shares split for real --
+  0.56 toward mark 7, 0.44 toward mark 8. Only a newest mark asks: mark 7's follower is
+  already written, so no want-row is cast for it. A newest mark reads itself and every earlier
+  mark, never a later one -- while writing, later marks do not exist yet. And note what
+  rebuilding cost: mark 7's label-row and payload-row came out digit-for-digit unchanged,
+  because mark 7's strip and Wk, Wv never moved. Two builds bought nothing.
+
+
+  --------
+  A NEWEST MARK LEANS HARDEST ON AN OLDEST ONE, SO REACH ACROSS A LINE IS REAL
+
+      mark 1 sits in slot 2:
+
+        x_new = row(mark 1) + slot 2 = [ -0.74  -0.70   0.46   0.05  -0.74   0.75 ]
+        want-row q_new = [  1.02  -0.90   0.23   0.11   0.12   0.41 ]
+
+      three scores, each over root(6):
+
+        against k(mark 7):  0.39      against k(mark 8): -0.05      against k(mark 1): -1.02
+
+      exponentiate and share out:  0.53      0.34      0.13
+
+      an oldest mark, 7, takes over half a blend -- 0.53 -- while a newest mark keeps 0.13
+
+      blend  = [  0.62  -0.00  -0.36  -0.37  -1.31   0.47 ]
+      x3_new = [ -0.42  -0.76  -1.57  -0.15  -0.61   2.02 ]   (after both adds)
+
+      flatten, score over ten marks:
+
+        [ -0.24   0.57   1.71  -0.73  -1.71  -0.30  -1.07  -1.63  -2.03  -1.24 ]
+
+      biggest = 1.71, at mark 2  ->  line written: 7 8 1 2
+
+  Wall: nothing walked from mark 7 to mark 1 through go-betweens. A want-row dotted an oldest
+  label-row DIRECTLY, and an oldest mark won over half a blend across a whole line at one flat
+  cost. That direct reach is what all this machinery buys -- a walking machine (an RNN) pays
+  for distance with fading rewrites; this one does not.
+
+
+  --------
+  THREE TURNS WORKED, SO HERE IS WHAT THIS MACHINE PROVES -- AND WHERE IT CRACKS
+
+  One room writes. Menu, table row, slot-row, flatten, three cast rows, score over root-width,
+  exponentiate-share, blend, mixing matrix, add, widen-bend-shrink, add, ten scores, biggest
+  wins, append, go again. 7 became 7 8 became 7 8 1 became 7 8 1 2, every digit in view.
+
+  Three cracks, and each one is a page:
+
+  - One room barely bends a strip. Stack twelve rooms and a strip drifts from under 1.0 past
+    12 -- worked matrix by matrix in
+    [What a Machine Does When You Press "h"](what-happens-when-you-type-h.txt).
+
+  - Turn 2 rebuilt mark 7's label-row and payload-row and no digit differed; turn 3 rebuilt
+    both again. Builds pile up 1+2+3 = 6 where three rows exist -- 125,250 where 500 exist on
+    a five-hundred-mark line. A note that kills that waste is
+    [A Note a Machine Keeps So It Stops Redoing Old Work](kv-cache-by-pencil.txt).
+
+  - Three marks made three match scores. A line of 100,000 marks makes five billion. Capping
+    each mark's reach is [Sliding Window Attention by Pencil](sliding-window-attention-by-pencil.txt).
+
+  A whole ladder, in reading order, sits at [Build a GPT, Forced](build-a-gpt-ladder.txt).
+
+
+  --------
+  PROOF -- RUN IT, GET THESE NUMBERS
+
+  Three turns, one room, every row above:
+
+```python
+import numpy as np, math
+np.random.seed(6)
+R    = lambda *s: np.round(np.random.uniform(-0.9, 0.9, s), 2)
+p    = lambda v: [round(float(z), 2) for z in np.ravel(v)]
+flat = lambda v: (v - v.mean()) / math.sqrt(((v - v.mean())**2).mean() + 1e-5)
+gelu = lambda v: np.array([0.5*z*(1+math.erf(z/math.sqrt(2))) for z in np.ravel(v)])
+D, V, H = 6, 10, 12
+
+E  = R(V, D)                                   # mark table, ten rows of six
+S  = R(3, D)                                   # slot rows
+Wq, Wk, Wv, Wo = R(D, D), R(D, D), R(D, D), R(D, D)
+Wf, Wp = R(D, H), R(H, D)
+Wh = R(D, V)                                   # score matrix over ten marks
+
+# ---- turn 1, line = [7] ----
+x  = E[7] + S[0]
+a  = flat(x)
+q, k, v = a @ Wq, a @ Wk, a @ Wv
+print("turn 1 x      :", p(x))
+print("turn 1 q      :", p(q))
+print("turn 1 k      :", p(k))
+print("turn 1 v      :", p(v))
+print("turn 1 score  :", round(float(q @ k) / math.sqrt(D), 2), "  share = 1")
+x2 = x + v @ Wo                                # share 1: blend is v alone
+x3 = x2 + gelu(flat(x2) @ Wf) @ Wp
+lg = flat(x3) @ Wh
+print("turn 1 scores :", p(lg))
+print("turn 1 emits  :", int(np.argmax(lg)))
+
+# ---- turn 2, line = [7, 8] ----
+xn = E[8] + S[1]
+an = flat(xn)
+qn = an @ Wq
+k7, v7 = flat(E[7] + S[0]) @ Wk, flat(E[7] + S[0]) @ Wv
+kn, vn = an @ Wk, an @ Wv
+print("mark 7 label-row rebuilt, no digit differs:", p(k7) == p(k))
+s1 = float(qn @ k7) / math.sqrt(D)             # -0.02
+s2 = float(qn @ kn) / math.sqrt(D)             # -0.28
+e1, e2 = math.exp(s1), math.exp(s2)            #  0.98   0.76
+w1, w2 = e1/(e1+e2), e2/(e1+e2)
+print("turn 2 shares :", round(w1, 2), round(w2, 2))
+bl  = w1*v7 + w2*vn
+x2n = xn + bl @ Wo
+x3n = x2n + gelu(flat(x2n) @ Wf) @ Wp
+lgn = flat(x3n) @ Wh
+print("turn 2 scores :", p(lgn))
+print("turn 2 emits  :", int(np.argmax(lgn)))
+
+# ---- turn 3, line = [7, 8, 1] ----
+x1 = E[1] + S[2]
+a1 = flat(x1)
+q1 = a1 @ Wq
+k8, v8 = flat(E[8] + S[1]) @ Wk, flat(E[8] + S[1]) @ Wv
+k1, v1 = a1 @ Wk, a1 @ Wv
+t1 = float(q1 @ k7) / math.sqrt(D)             #  0.39
+t2 = float(q1 @ k8) / math.sqrt(D)             # -0.05
+t3 = float(q1 @ k1) / math.sqrt(D)             # -1.02
+g1, g2, g3 = math.exp(t1), math.exp(t2), math.exp(t3)
+tot = g1 + g2 + g3
+print("turn 3 shares :", round(g1/tot, 2), round(g2/tot, 2), round(g3/tot, 2))
+bl3 = (g1/tot)*v7 + (g2/tot)*v8 + (g3/tot)*v1
+x23 = x1 + bl3 @ Wo
+x33 = x23 + gelu(flat(x23) @ Wf) @ Wp
+lg3 = flat(x33) @ Wh
+print("turn 3 scores :", p(lg3))
+print("turn 3 emits  :", int(np.argmax(lg3)))
+print("line written  : 7 8 1 2")
+```
+
+  Running a program prints:
+
+```
+turn 1 x      : [0.52, 1.74, 0.52, -0.8, 0.59, -0.79]
+turn 1 q      : [-1.56, 0.6, -0.15, 0.9, -1.59, 0.02]
+turn 1 k      : [1.29, -0.97, -2.51, -0.64, -0.55, -1.25]
+turn 1 v      : [-1.31, -0.03, -0.68, 1.17, -2.07, 0.26]
+turn 1 score  : -0.8   share = 1
+turn 1 scores : [-1.25, 0.93, -1.46, 0.57, 0.09, 0.43, -0.94, 0.24, 2.43, 0.67]
+turn 1 emits  : 8
+mark 7 label-row rebuilt, no digit differs: True
+turn 2 shares : 0.56 0.44
+turn 2 scores : [-1.48, 1.91, -2.52, -0.19, -1.85, 0.79, -1.62, -1.29, -1.55, -1.51]
+turn 2 emits  : 1
+turn 3 shares : 0.53 0.34 0.13
+turn 3 scores : [-0.24, 0.57, 1.71, -0.73, -1.71, -0.3, -1.07, -1.63, -2.03, -1.24]
+turn 3 emits  : 2
+line written  : 7 8 1 2
+```
+
+  Every drawn row above reprints, digit for digit. One caution: these matrices are random
+  stand-ins so a pencil can follow -- a shipped machine loads matrices shaped by training,
+  and only training makes mark 8 a SENSIBLE follower for mark 7. Wiring is what this page
+  teaches; wisdom comes from elsewhere.
+
+
+  --------
+  >> NOTE: STANDARD JARGON
+
+  Plain term above            textbook name
+      mark                        token
+      menu of marks               vocabulary
+      mark table row              token embedding
+      slot-row                    positional embedding
+      strip                       residual stream (hidden state)
+      flatten                     LayerNorm
+      want-row                    query (Q)
+      label-row                   key (K)
+      payload-row                 value (V)
+      score over root-width       scaled dot-product attention
+      exponentiate, share to 1    softmax
+      mixing matrix               output projection (W_O)
+      widen-bend-shrink           MLP / feed-forward, bend = GELU
+      ten scores over a menu      logits, cast by an LM head
+      biggest wins / lottery      greedy decoding / sampling
+      a room                      a transformer block (layer)
+      one-room writing machine    a one-layer GPT (nanoGPT with n_layer = 1)

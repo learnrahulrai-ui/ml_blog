@@ -341,3 +341,15 @@ room2 word1 label-row : [0.01, 0.02, -1.09, -0.37, -1.28, 1.06]
   keeps a slice of a note, so a match divides by root(64) = 8 -- never by root of full width.
   Second: after blending, each room also runs a widen-bend-shrink stage (textbook: MLP) on a
   newest word alone; it reads no old word, so a note holds nothing for it.
+
+
+  --------
+  A LADDER RUNG -- WHAT FORCED THIS PAGE, AND WHAT IT FORCES NEXT
+
+  Rungs below: a smallest writing machine of one room
+  ([A Writing Machine of One Room](one-room-gpt-by-pencil.txt)), then twelve rooms stacked
+  ([What a Machine Does When You Press "h"](what-happens-when-you-type-h.txt)) -- and both
+  rebuild every old row every turn, a waste this page's note kills. A wall remains: a note
+  grows with a line, and a full score grid grows with a square of length -- capping each
+  word's reach is [Sliding Window Attention by Pencil](sliding-window-attention-by-pencil.txt).
+  A whole ladder, rung by rung, sits at [Build a GPT, Forced](build-a-gpt-ladder.txt).

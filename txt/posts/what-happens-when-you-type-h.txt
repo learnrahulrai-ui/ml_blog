@@ -311,3 +311,15 @@ print("next mark =", int(np.argmax(flat(x)@Wlm)))
   Running a program prints a stream drifting room by room, then a mark. Swap these small random
   matrices for a hundred-twenty-three-million learned ones over a near-fifty-thousand pairing, and
   an identical path lands a lone "h" on a full stop.
+
+
+  --------
+  A LADDER RUNG -- WHAT FORCED THIS PAGE, AND WHAT IT FORCES NEXT
+
+  A rung below built a smallest machine that writes at all -- one room, three turns, a line
+  7 8 1 2 worked by pencil: [A Writing Machine of One Room](one-room-gpt-by-pencil.txt). One
+  room barely bent a strip, so this page stacked twelve and watched drift. A wall remains:
+  every turn rebuilds every old row from a blank start, and a rebuilt row matches digit for
+  digit -- a note that kills that waste is
+  [A Note a Machine Keeps So It Stops Redoing Old Work](kv-cache-by-pencil.txt). A whole
+  ladder, rung by rung, sits at [Build a GPT, Forced](build-a-gpt-ladder.txt).

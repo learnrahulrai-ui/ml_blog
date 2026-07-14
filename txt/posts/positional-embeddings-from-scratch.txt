@@ -653,6 +653,15 @@
   millions when you understand that relative distance is a geometric property, not a learned
   one, and that the bottleneck is data quality, not token count.
 
+  ---
+
+  TOP OF A LADDER
+
+  This page ends a reading ladder that starts with a one-room machine that writes
+  ([A Writing Machine of One Room](one-room-gpt-by-pencil.txt)) and climbs through depth,
+  the KV note, the sliding window, and the two flips. Order was the last hole; RoPE fills it.
+  The full ladder, with every wall named, is [Build a GPT, Forced](build-a-gpt-ladder.txt).
+
 ----------------------------------------------------------------------------------------------
 
   [home](../index.txt) . [archive](../archive.txt) . [source on GitHub](https://github.com/learnrahulrai-ui)

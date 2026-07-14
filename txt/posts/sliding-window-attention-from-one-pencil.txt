@@ -399,3 +399,14 @@ print("sigma^2:", ex2, " one-brick var:", brick, " sum-of-3 var:", d3,
   transpose, contiguous, view    = merge heads back to width C
   cost T*T*D                     = O(n^2) attention; a window cuts it to O(n*W)
   reach ~= L*(W-1)               = receptive field of L stacked window-W layers
+
+  -------
+
+  A LADDER RUNG -- WHAT FORCED THIS PAGE, AND WHAT IT FORCES NEXT
+
+  A rung below capped a token's reach and proved why a strike beats a zero:
+  [Sliding Window Attention by Pencil](sliding-window-attention-by-pencil.txt). This page
+  rebuilt a whole such layer from a blank sheet, every WHY worked. A wall remains, and it is
+  not arithmetic: days vanish in WHERE numbers sit -- two flips that are not one flip, worked
+  at [Attention's Shapes by Pencil](the-two-flips-by-pencil.txt). A whole ladder, rung by
+  rung, sits at [Build a GPT, Forced](build-a-gpt-ladder.txt).

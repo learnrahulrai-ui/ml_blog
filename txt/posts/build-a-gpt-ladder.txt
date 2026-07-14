@@ -1,0 +1,108 @@
+@title Build a GPT, Forced -- A Reading Ladder :: Rahul's ML Blog
+==============================================================================================
+  RAHUL'S ML BLOG -- notes on machine learning, worked out by hand                    est. 2026
+==============================================================================================
+  [home](../index.txt) | [about](../about.txt) | [archive](../archive.txt) | [glossary](../glossary.txt) | [contact](mailto:learn.rahul.rai@gmail.com)
+----------------------------------------------------------------------------------------------
+
+  SPECIAL -- A READING LADDER
+  Build a GPT, Forced: Each Page Pays a Prior Page's Bill
+  ============================================================================================
+
+
+  Several pages on this blog circle one machine -- a GPT -- and each stands alone. Read in
+  this order they become one forced build: every rung exists because a machine on a rung
+  below hit a wall, worked out in numbers, not waved at. Start with a writer that works;
+  climb until even word order is solved.
+
+      rung 1   a machine that writes at all        (one room)
+      rung 2   depth, because one room is shallow  (twelve rooms)
+      rung 3   a note, because redoing is waste    (KV cache)
+      rung 4   a window, because lines outgrow grids
+      rung 5   shapes, because plumbing eats days
+      rung 6   order, because look-everywhere forgets where
+
+
+  --------
+  RUNG 1 -- A MACHINE THAT WRITES AT ALL
+
+  [A Writing Machine of One Room, Built by Pencil](one-room-gpt-by-pencil.txt)
+
+  Smallest working writer: one room, six numbers per mark, ten marks known. Three turns run
+  by pencil, every matrix drawn, and a line gets written: 7 -> 7 8 -> 7 8 1 -> 7 8 1 2.
+  Wall it ends on: one room barely bends a strip.
+
+
+  --------
+  RUNG 2 -- DEPTH, BECAUSE ONE ROOM IS SHALLOW
+
+  [What a Machine Does When You Press "h" -- Every Matrix, Forced Into Being](what-happens-when-you-type-h.txt)
+
+  Twelve rooms stacked. A strip that starts with every number under 1.0 drifts past 12 and
+  below -13, with output matrices and widen-bend-shrink stages doing all lifting at length
+  one. A casual twin in plain English, ending on real GPT-2 where a lone "h" predicts a full
+  stop: [What Happens When You Press "h" in a GPT](pressing-h-in-a-gpt-explained.txt).
+  Wall: every turn rebuilds every old row from a blank start.
+
+
+  --------
+  RUNG 3 -- A NOTE, BECAUSE REDOING OLD WORK IS WASTE
+
+  [A Note a Machine Keeps So It Stops Redoing Old Work -- KV Cache by Pencil](kv-cache-by-pencil.txt)
+
+  A label-row and a payload-row -- two rows cast from each written mark by fixed matrices,
+  one for matching and one for handing over -- never move once a mark is written, yet a no-memory machine
+  rebuilds them every turn: builds pile up 1+2+3 = 6 where three rows exist, 125,250 where
+  500 exist. Writing each row once on a note collapses a squared pile to a straight line.
+  Wall: a note still grows with a line, and a full score grid grows with its square.
+
+
+  --------
+  RUNG 4 -- A WINDOW, BECAUSE A LINE OUTGROWS A GRID
+
+  [Sliding Window Attention by Pencil -- A Window That Drops Its Best Old Match](sliding-window-attention-by-pencil.txt)
+
+  Full attention on 100,000 marks costs five billion matches, so cap each mark's reach to a
+  last W marks: a best old match holding a 64.1% share drops to 0.0% only for being old --
+  and stacked rooms rebuild reach anyway, about two marks per room. Then build a whole
+  masked multi-head layer from a blank page, every WHY derived by hand, root-D included:
+  [Sliding Window Self-Attention, Built From One Pencil](sliding-window-attention-from-one-pencil.txt).
+  Wall: arithmetic was never hard -- days vanish in WHERE numbers sit.
+
+
+  --------
+  RUNG 5 -- SHAPES, BECAUSE PLUMBING EATS DAYS
+
+  [Attention's Shapes by Pencil -- Two Flips That Are Not One Flip](the-two-flips-by-pencil.txt)
+
+  One word, "transpose", names two different moves: a re-shelve hands each lens (one
+  attention head) all of its tokens; an inside flip stands one grid on edge, (T,D) -> (D,T), a sole reason a want-grid
+  against a stood-up label-grid lines up at all. Chunking, viewing, merging -- followed from
+  a wide row to a finished row, every shape printed.
+  Wall: with no walking and no order, nothing says WHERE a mark sits.
+
+
+  --------
+  RUNG 6 -- ORDER, BECAUSE LOOK-EVERYWHERE FORGETS WHERE
+
+  [Positional Encoding Built From Scratch -- A Mark That Tells a Transformer Where It Is](positional-embeddings-from-scratch.txt)
+
+  Two naive position marks fail by arithmetic. Sinusoidal encoding built from scratch, every
+  number computed; then RoPE, rotation derived by hand, with a full proof that absolute
+  positions cancel out of a score and only a gap between marks remains. A ladder tops out
+  here: a machine that writes, deep, thrifty, windowed, plumbed, and ordered.
+
+
+  --------
+  FOUNDATIONS SHELF -- ATTENTION ALONE, BEFORE ANY WHOLE MACHINE
+
+  Rungs above assume attention itself feels familiar. If not, one of these first:
+
+  - [Attention by Pencil -- Every Word Looks at Every Word](attention-transformer-by-pencil.txt)
+    one word ("nolan") followed through every move, real numbers throughout.
+  - [Transformers With Pencil -- A Whole Block Worked by Hand](transformerforhn.txt)
+    one full block on two words, in and out, nothing waved at.
+  - [Transformer From Pencil -- a KATA](transformer-from-pencil.txt)
+    a drill version, made to be redone on a blank sheet until a hand knows it.
+
+  Read a rung, run its proof, climb.

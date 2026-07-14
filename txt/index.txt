@@ -343,6 +343,31 @@
     ~= L*(W-1) through stacked layers. Every number machine-checked; written with the word "the"
     banned throughout.
 
+  [SPECIAL. Build a GPT, Forced -- A Reading Ladder](posts/build-a-gpt-ladder.txt)
+    special . 2026-07-14 . standalone . transformer, gpt, reading-order, ladder
+    A hub that orders the GPT specials into one forced build: each page exists because a
+    machine on a page below hit a wall, worked out in numbers. Rung 1: a one-room writer that
+    works. Rung 2: depth, because one room barely bends a strip. Rung 3: a note (KV cache),
+    because rebuilding old rows piles up 1+2+3=6 where three rows exist. Rung 4: a window,
+    because 100,000 marks cost five billion matches. Rung 5: shapes, because days vanish in
+    WHERE numbers sit, not in arithmetic. Rung 6: order, because look-everywhere forgets
+    where. Ends with a foundations shelf -- three attention-alone posts for a reader starting
+    cold.
+
+  [SPECIAL. A Writing Machine of One Room -- Smallest GPT That Works, by Pencil](posts/one-room-gpt-by-pencil.txt)
+    special . 2026-07-14 . standalone . transformer, gpt, forward-pass, generation, by-hand
+    Rung 1 of the ladder: the smallest machine that genuinely writes. One room of machinery,
+    six numbers per mark, ten marks known, run for three full turns until a four-mark line
+    exists: 7 -> 7 8 -> 7 8 1 -> 7 8 1 2. Every move forced by a wall: an integer multiplies
+    into nothing, so a table hands every mark six numbers; mark 7 first and mark 7 third read
+    one identical row, so a slot-row is added on; one loud coordinate hijacks every sum, so
+    center a copy and divide by spread; a strip must hunt, offer, and hand over at once, so
+    three matrices cast want/label/payload rows; a line of one mark matches only itself, so a
+    share of exactly 1 falls out; widen-bend-shrink, then a last matrix scores all ten marks.
+    Turn two splits shares for real; turn three shows a newest mark leaning hardest on an
+    oldest one. Ends where it cracks -- one room is shallow -- and a hardcoded numpy proof
+    reproduces every number.
+
   [SPECIAL. What a Machine Does When You Press "h" -- Every Matrix, Forced Into Being](posts/what-happens-when-you-type-h.txt)
     special . 2026-07-12 . standalone . transformer, gpt, nanogpt, forward-pass, by-hand
     Presses one letter "h" and walks a GPT forward pass where each operation is forced by a mechanical
@@ -365,6 +390,17 @@
     under 1.0 to past 12 -- so the projections and MLPs do all the lifting. Ends on real GPT-2 (123M),
     where a lone "h" predicts a full stop. Two short numpy/torch blocks reproduce the toy drift and the
     real result.
+
+  [SPECIAL. Press "h" -- Final GPT Pencil Pass](posts/press-h-final-gpt-by-pencil.txt)
+    special . 2026-07-13 . standalone . transformer, gpt, forward-pass, by-hand
+    The final standalone pencil version: one keypress through token id, token row, position row,
+    LayerNorm, q/k/v, head split, scaled dot-product score, one-token softmax share, value blend,
+    output projection, residual add, MLP widen-bend-narrow, final logits, greedy choice, and
+    sampling.
+    Every new name is earned after the arithmetic that forces it; every key row is drawn before use;
+    the toy is six-wide with two heads and ten marks, while GPT-2's 768-wide, 12-head, 50,257-token
+    shapes sit beside it. Ends with hard-coded plain Python: no random draw, no model download, no
+    skipped table.
 
   [SPECIAL. A Note a Machine Keeps So It Stops Redoing Old Work -- KV Cache by Pencil](posts/kv-cache-by-pencil.txt)
     special . 2026-07-12 . standalone . transformer, kv-cache, autoregressive, inference, by-hand
